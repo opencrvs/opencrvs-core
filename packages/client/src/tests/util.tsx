@@ -9,6 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  Scope,
+  SCOPES,
+  DEFAULT_ROLES_DEFINITION
+} from '@opencrvs/commons/client'
+import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getReviewForm } from '@client/forms/register/review-selectors'
+import { offlineDataReady, setOfflineData } from '@client/offline/actions'
+import { AppStore, createStore, IStoreState } from '@client/store'
+import { ThemeProvider } from 'styled-components'
+import { getSchema } from '@client/tests/graphql-schema-mock'
+import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
+import { getTheme } from '@opencrvs/components/lib/theme'
+import { join } from 'path'
+import {
   ApolloClient,
   ApolloLink,
   ApolloProvider,
@@ -18,16 +34,7 @@ import {
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
 import { App, routesConfig } from '@client/App'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getReviewForm } from '@client/forms/register/review-selectors'
-import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { setUserDetails } from '@client/profile/profileActions'
-import { AppStore, createStore, IStoreState } from '@client/store'
-import { getSchema } from '@client/tests/graphql-schema-mock'
-import { EventType, Status, SystemRoleType } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
-import { getTheme } from '@opencrvs/components/lib/theme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import {
   configure,
@@ -40,38 +47,89 @@ import { readFileSync } from 'fs'
 import { graphql, print } from 'graphql'
 import { createLocation, createMemoryHistory } from 'history'
 import * as jwt from 'jsonwebtoken'
-import { join } from 'path'
 import { stringify } from 'query-string'
 import * as React from 'react'
 import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
-import { ThemeProvider } from 'styled-components'
 import { waitForElement } from './wait-for-element'
 
 import { SUBMISSION_STATUS } from '@client/declarations'
+import { vi } from 'vitest'
+import { getUserRolesQuery } from '@client/forms/user/query/queries'
+import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
+import { draftToGqlTransformer } from '@client/transformer'
 import { Section, SubmissionAction } from '@client/forms'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
-import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
-import { getSystemRolesQuery } from '@client/forms/user/query/queries'
-import { draftToGqlTransformer } from '@client/transformer'
 import * as builtInValidators from '@client/utils/validate'
+import * as actions from '@client/profile/profileActions'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
-import { vi } from 'vitest'
 import { mockOfflineData } from './mock-offline-data'
 
-export const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-export const registrationClerkScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ2YWxpZGF0ZSIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU3ODMwNzgzOSwiZXhwIjoxNTc4OTEyNjM5LCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciIsIm9wZW5jcnZzOnNlYXJjaC11c2VyIiwib3BlbmNydnM6bWV0cmljcy11c2VyIiwib3BlbmNydnM6cmVzb3VyY2VzLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNWRmYmE5NDYxMTEyNTliZDBjMzhhY2JhIn0.CFUy-L414-8MLf6pjA8EapK6qN1yYN6Y0ywcg1GtWhRxSWnT0Kw9d2OOK_IVFBAqTXLROQcwHYnXC2r6Ka53MB14HUZ39H7HrOTFURCYknYGIeGmyFpBjoXUj4yc95_f1FCpW6fQReBMnSIzUwlUGcxK-ttitSLfQebPFaVosM6kQpKd-n5g6cg6eS9hsYzxVme9kKkrxy5HRkxjNe8VfXEheKGqpRHxLGP7bo1bIhw8BWto9kT2kxm0NLkWzbqhxKyVrk8cEdcFiIAbUt6Fzjcx_uVPvLnJPNQAkZEO3AdqbZDFuvmBQWCf2Z6l9c8fYuWRD4SA5tBCcIKzUcalEg'
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 export const inValidImageB64String =
   'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-export const natlSysAdminToken =
-  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsIm5hdGxzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNjQ5NjU3MTM4LCJleHAiOjE2NTAyNjE5MzgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjIyZjgxYjQyY2Q1MzdiZjkxZGFhMTBiIn0.MojnxjSVja4VkS5ufVtpJHmiqQqngW3Zb6rHv4MqKwqSgHptjta1A-1xdpkfadxr0pVIYTh-rhKP93LPCTfThkA01oW8qgkUr0t_02cgJ5KLe1B3R5QFJ9i1IzLye9yOeakfpbtnk67cwJ2r4KTJMxj5BWucdPGK8ifZRBdDrt9HsTtcDOutgLmEp2VnxLvc2eAEmoBBp6mRZ8lOYIRei5UHfaROCk0vdwjLchiqQWH9GE8hxU3RIA1jpzshd3_TC4G0rvuIXnBGf9VQaH-gkNW7a44xLVHhdENxAsGTdyeSHRC83wbeoUZkuOFQpF8Iz-8SbLEQfmipdzeBAsBgWg'
+
+export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
+  SCOPES.CONFIG_UPDATE_ALL,
+  SCOPES.USER_CREATE,
+  SCOPES.USER_READ,
+  SCOPES.USER_UPDATE,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+] satisfies Scope[]
+
+export const REGISTRAR_DEFAULT_SCOPES = [
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE_DEATH,
+  SCOPES.RECORD_DECLARE_MARRIAGE,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_REVIEW_DUPLICATES,
+  SCOPES.RECORD_DECLARATION_ARCHIVE,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_REGISTRATION_CORRECT,
+  SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+  SCOPES.RECORD_EXPORT_RECORDS,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+  SCOPES.RECORD_CREATE_COMMENTS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_MARRIAGE
+] satisfies Scope[]
+
+export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE_DEATH,
+  SCOPES.RECORD_DECLARE_MARRIAGE,
+  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_DECLARATION_ARCHIVE,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+  SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+  SCOPES.RECORD_EXPORT_RECORDS,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+  SCOPES.RECORD_CREATE_COMMENTS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_MARRIAGE
+] satisfies Scope[]
 
 export const ACTION_STATUS_MAP = {
   [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -92,16 +150,6 @@ export const ACTION_STATUS_MAP = {
   [SubmissionAction.REJECT_CORRECTION]:
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
 } as const
-
-export const validateScopeToken = jwt.sign(
-  { scope: ['validate'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
 
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
@@ -303,15 +351,12 @@ export const userDetails: UserDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  systemRole: SystemRoleType.FieldAgent,
   role: {
-    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-    labels: [
-      {
-        lang: 'en',
-        label: 'ENTREPENEUR'
-      }
-    ]
+    label: {
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      id: 'userRole.fieldAgent'
+    }
   },
   mobile: '01677701431',
   primaryOffice: {
@@ -321,7 +366,7 @@ export const userDetails: UserDetails = {
     status: 'active'
   },
   localRegistrar: {
-    role: 'LOCAL_REGISTRAR' as SystemRoleType,
+    role: 'LOCAL_REGISTRAR',
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'
@@ -373,7 +418,13 @@ export const mockUserResponse = {
           }
         ]
       },
-      systemRole: 'LOCAL_REGISTRAR',
+      role: {
+        label: {
+          id: 'userRoles.localRegistar',
+          defaultMessage: 'Local Registrar',
+          description: 'Label for local registrar'
+        }
+      },
       practitionerId: '9202fa3c-7eb7-4898-bea5-5895f7f99534'
     }
   }
@@ -389,7 +440,13 @@ export const mockLocalSysAdminUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      systemRole: 'LOCAL_SYSTEM_ADMIN',
+      role: {
+        label: {
+          id: 'userRoles.localSystemAdmin',
+          defaultMessage: 'Local System Admin',
+          description: 'Label for local system admin'
+        }
+      },
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -423,7 +480,11 @@ export const mockRegistrarUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      systemRole: 'LOCAL_REGISTRAR',
+      label: {
+        defaultMessage: 'Local Registrar',
+        description: 'Name for user role Local Registrar',
+        id: 'userRole.localRegistrar'
+      },
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -1050,8 +1111,8 @@ export async function goToSection(component: ReactWrapper, nth: number) {
     await flushPromises()
     await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
-
-    await component.update()
+    await flushPromises()
+    component.update()
   }
 }
 
@@ -1084,7 +1145,7 @@ export async function getRegisterFormFromStore(
   store: Store<IStoreState, AnyAction>,
   event: EventType
 ) {
-  await store.dispatch(setOfflineData(userDetails))
+  store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getRegisterForm(state)[event]
 }
@@ -1093,7 +1154,7 @@ export async function getReviewFormFromStore(
   store: Store<IStoreState, AnyAction>,
   event: EventType
 ) {
-  await store.dispatch(setOfflineData(userDetails))
+  store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getReviewForm(state)![event]
 }
@@ -1119,15 +1180,12 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          systemRole: SystemRoleType.FieldAgent,
           role: {
-            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'CHA'
-              }
-            ]
+            label: {
+              id: 'userRoles.CHA',
+              defaultMessage: 'CHA',
+              description: 'CHA'
+            }
           },
           status: Status.Active,
           name: [
@@ -1151,7 +1209,7 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: SystemRoleType.LocalRegistrar,
+            role: 'LOCAL_REGISTRAR',
             signature: undefined
           }
         }
@@ -1196,365 +1254,138 @@ export function createRouterProps<
 
 export const mockRoles = {
   data: {
-    getSystemRoles: [
-      {
-        id: '63c7ebee48dc29888b5b020d',
-        value: 'FIELD_AGENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c279',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Health Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Professionnel de Santé',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Police Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Agent de Police',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27b',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Social Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Travailleur Social',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27c',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local Leader',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Leader Local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b020e',
-        value: 'REGISTRATION_AGENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27d',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Registration Agent',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: "Agent d'enregistrement",
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b020f',
-        value: 'LOCAL_REGISTRAR',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27e',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local Registrar',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Registraire local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0210',
-        value: 'LOCAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27f',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local System Admin',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Administrateur système local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0211',
-        value: 'NATIONAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c280',
-            labels: [
-              {
-                lang: 'en',
-                label: 'National System Admin',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Administrateur système national',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0212',
-        value: 'PERFORMANCE_MANAGEMENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c281',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Performance Manager',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Gestion des performances',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0213',
-        value: 'NATIONAL_REGISTRAR',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c282',
-            labels: [
-              {
-                lang: 'en',
-                label: 'National Registrar',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Registraire national',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      }
-    ]
+    getUserRoles: DEFAULT_ROLES_DEFINITION
   }
 }
 
 export const mockFetchRoleGraphqlOperation = {
   request: {
-    query: getSystemRolesQuery,
+    query: getUserRolesQuery,
     variables: {}
   },
   result: {
     data: {
-      getSystemRoles: [
+      getUserRoles: [
         {
-          value: 'FIELD_AGENT',
-          roles: [
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Healthcare Worker'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Professionnel de Santé'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Police Officer'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Agent de Police'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Social Worker'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Travailleur Social'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Local Leader'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Leader Local'
-                }
-              ]
-            }
-          ],
-          active: true
+          id: 'HOSPITAL',
+          label: {
+            defaultMessage: 'Field Agent in a Hospital',
+            description: 'Name for user role Field Agent',
+            id: 'userRole.hospitalFieldAgent'
+          },
+          scopes: [SCOPES.RECORD_DECLARE_BIRTH]
         },
         {
-          value: 'REGISTRATION_AGENT',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Registration Agent'
-            },
-            {
-              lang: 'fr',
-              label: "Agent d'enregistrement"
-            }
-          ],
-          active: true
+          id: 'FIELD_AGENT',
+          label: {
+            defaultMessage: 'Field Agent',
+            description: 'Name for user role Field Agent',
+            id: 'userRole.fieldAgent'
+          },
+          scopes: [SCOPES.RECORD_DECLARE_DEATH]
         },
         {
-          value: 'LOCAL_REGISTRAR',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Local Registrar'
-            },
-            {
-              lang: 'fr',
-              label: 'Registraire local'
-            }
-          ],
-          active: true
+          id: 'POLICE_OFFICER',
+          label: {
+            defaultMessage: 'Police Officer',
+            description: 'Name for user role Police Officer',
+            id: 'userRole.policeOfficer'
+          },
+          scopes: [SCOPES.RECORD_DECLARE_DEATH]
         },
         {
-          value: 'LOCAL_SYSTEM_ADMIN',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Local System_admin'
-            },
-            {
-              lang: 'fr',
-              label: 'Administrateur système local'
-            }
-          ],
-          active: true
+          id: 'SOCIAL_WORKER',
+          label: {
+            defaultMessage: 'Social Worker',
+            description: 'Name for user role Social Worker',
+            id: 'userRole.socialWorker'
+          },
+          scopes: [SCOPES.SEARCH_MARRIAGE]
         },
         {
-          value: 'NATIONAL_SYSTEM_ADMIN',
-          roles: [
-            {
-              lang: 'en',
-              label: 'National System_admin'
-            },
-            {
-              lang: 'fr',
-              label: 'Administrateur système national'
-            }
-          ],
-          active: true
+          id: 'HEALTHCARE_WORKER',
+          label: {
+            defaultMessage: 'Healthcare Worker',
+            description: 'Name for user role Healthcare Worker',
+            id: 'userRole.healthcareWorker'
+          },
+          scopes: [SCOPES.SEARCH_BIRTH]
         },
         {
-          value: 'PERFORMANCE_MANAGEMENT',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Performance Management'
-            },
-            {
-              lang: 'fr',
-              label: 'Gestion des performances'
-            }
-          ],
-          active: true
+          id: 'LOCAL_LEADER',
+          label: {
+            defaultMessage: 'Local Leader',
+            description: 'Name for user role Local Leader',
+            id: 'userRole.localLeader'
+          },
+          scopes: [SCOPES.SEARCH_MARRIAGE]
         },
         {
-          value: 'NATIONAL_REGISTRAR',
-          roles: [
-            {
-              lang: 'en',
-              label: 'National Registrar'
-            },
-            {
-              lang: 'fr',
-              label: 'Registraire national'
-            }
-          ],
-          active: true
+          id: 'REGISTRATION_AGENT',
+          label: {
+            defaultMessage: 'Registration Agent',
+            description: 'Name for user role Registration Agent',
+            id: 'userRole.registrationAgent'
+          },
+          scopes: [
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+          ]
+        },
+        {
+          id: 'LOCAL_REGISTRAR',
+          label: {
+            defaultMessage: 'Local Registrar',
+            description: 'Name for user role Local Registrar',
+            id: 'userRole.localRegistrar'
+          },
+          scopes: [
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+          ]
+        },
+        {
+          id: 'LOCAL_SYSTEM_ADMIN',
+          label: {
+            defaultMessage: 'Local System Admin',
+            description: 'Name for user role Local System Admin',
+            id: 'userRole.localSystemAdmin'
+          },
+          scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        },
+        {
+          id: 'NATIONAL_SYSTEM_ADMIN',
+          label: {
+            defaultMessage: 'National System Admin',
+            description: 'Name for user role National System Admin',
+            id: 'userRole.nationalSystemAdmin'
+          },
+          scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        },
+        {
+          id: 'PERFORMANCE_MANAGER',
+          label: {
+            defaultMessage: 'Performance Manager',
+            description: 'Name for user role Performance Manager',
+            id: 'userRole.performanceManager'
+          },
+          scopes: [SCOPES.PERFORMANCE_READ]
+        },
+        {
+          id: 'NATIONAL_REGISTRAR',
+          label: {
+            defaultMessage: 'National Registrar',
+            description: 'Name for user role National Registrar',
+            id: 'userRole.nationalRegistrar'
+          },
+          scopes: [
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.ORGANISATION_READ_LOCATIONS
+          ]
         }
       ]
     }
@@ -1571,7 +1402,6 @@ export const mockCompleteFormData = {
   phoneNumber: '01662132132',
   email: 'jeff.hossain@gmail.com',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  systemRole: 'FIELD_AGENT',
   role: 'HOSPITAL',
   userDetails: '',
   username: ''
@@ -1795,19 +1625,6 @@ export const mockUserGraphqlOperation = {
                       validator: []
                     },
                     {
-                      name: 'systemRole',
-                      type: 'SELECT_WITH_OPTIONS',
-                      label: {
-                        defaultMessage: 'Role',
-                        description: 'Role label',
-                        id: 'constants.role'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [],
-                      options: []
-                    },
-                    {
                       name: 'role',
                       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
                       label: {
@@ -1819,10 +1636,7 @@ export const mockUserGraphqlOperation = {
                       required: true,
                       initialValue: '',
                       validator: [],
-                      dynamicOptions: {
-                        dependency: 'systemRole',
-                        options: {}
-                      }
+                      dynamicOptions: {}
                     },
                     {
                       name: 'device',
@@ -1849,7 +1663,7 @@ export const mockUserGraphqlOperation = {
                     {
                       action: 'hide',
                       expression:
-                        'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
+                        "!values.scopes?.includes('profile.electronic-signature')"
                     }
                   ],
                   fields: [
@@ -1918,8 +1732,8 @@ export const mockDataWithRegistarRoleSelected = {
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  systemRole: 'LOCAL_REGISTRAR',
-  role: 'SECRETARY',
+  role: 'LOCAL_REGISTRAR',
+  scopes: [SCOPES.PROFILE_ELECTRONIC_SIGNATURE],
   userDetails: '',
   username: '',
   signature: {
@@ -1932,3 +1746,45 @@ export {
   mockOfflineData,
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
+
+export function fetchUserMock(officeId: string): FetchUserQuery {
+  return {
+    getUser: {
+      id: '123',
+      userMgntUserID: '123',
+      primaryOffice: {
+        id: officeId
+      },
+      name: [
+        {
+          use: 'en',
+          firstNames: 'Mohammad',
+          familyName: 'Ashraful'
+        }
+      ],
+      status: Status.Active,
+      practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
+      creationDate: '1701241360173',
+      role: {
+        label: {
+          id: 'userRoles.localSystemAdmin',
+          defaultMessage: 'Local System Admin',
+          description: 'Label for local system admin'
+        }
+      }
+    }
+  }
+}
+
+export function setScopes(scope: Scope[], store: AppStore) {
+  const token = jwt.sign({ scope: scope }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  })
+  window.history.replaceState({}, '', '?token=' + token)
+
+  return store.dispatch({
+    type: actions.CHECK_AUTH
+  })
+}

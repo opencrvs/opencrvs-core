@@ -14,11 +14,12 @@ import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['natlsysadmin', 'sysadmin', 'demo'] },
+  { scope: [SCOPES.USER_UPDATE, SCOPES.CONFIG_UPDATE_ALL] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -39,9 +40,7 @@ const mockUser = {
   username: 'jw.doe',
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
-  scope: ['register'],
   deviceId: 'D444',
   password: 'test',
   signature: {
@@ -155,7 +154,7 @@ const mockPractitionerRole = {
   id: '703112e2-2bbf-42c4-a397-b7bfeb35a625'
 }
 
-describe('updateUser handler', () => {
+describe('updateUser handler with config.update:all scope to update primary office id', () => {
   let server: any
 
   beforeEach(async () => {
@@ -194,7 +193,6 @@ describe('updateUser handler', () => {
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        systemRole: 'REGISTRATION_AGENT',
         role: '',
         primaryOfficeId: '322',
         deviceId: 'D444'
@@ -237,7 +235,6 @@ describe('updateUser handler', () => {
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123111111',
-        systemRole: 'FIELD_AGENT',
         role: 'POLICE_OFFICER',
         primaryOfficeId: '323',
         deviceId: 'D444'
@@ -351,7 +348,6 @@ describe('updateUser handler', () => {
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        systemRole: 'FIELD_AGENT',
         role: 'SOCIAL_WORKER',
         primaryOfficeId: '322',
         deviceId: 'D444'
@@ -361,5 +357,96 @@ describe('updateUser handler', () => {
       }
     })
     expect(res.statusCode).toBe(400)
+  })
+})
+
+describe('updateUser handler without config.update:all scope', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  const tokenWithoutConfigScope = jwt.sign(
+    { scope: [SCOPES.USER_UPDATE] },
+    readFileSync('./test/cert.key'),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:user-mgnt-user'
+    }
+  )
+
+  it('returns 500 if user without config scope tries to update user info ', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
+    fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/updateUser',
+      payload: {
+        id: '12345',
+        name: [
+          {
+            use: 'en',
+            given: ['Euan', 'Millar'],
+            family: 'Doe'
+          }
+        ],
+        email: 'j.doe@gmail.com',
+        mobile: '+880123445568',
+        role: 'SOCIAL_WORKER',
+        primaryOfficeId: '123456',
+        deviceId: 'D444'
+      },
+      headers: {
+        Authorization: `Bearer ${tokenWithoutConfigScope}`
+      }
+    })
+    expect(res.statusCode).toBe(500)
+  })
+
+  it('update fhir resources and update user except ', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
+    fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
+    fetch.mockResponses(
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+    )
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
+      if (query.getQuery()._id === '12345') {
+        return mockUser
+      }
+      return null
+    }
+
+    mockingoose(User).toReturn(finderMock, 'findOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/updateUser',
+      payload: {
+        id: '12345',
+        name: [
+          {
+            use: 'en',
+            given: ['Euan', 'Millar'],
+            family: 'Doe'
+          }
+        ],
+        email: 'j.doe@gmail.com',
+        mobile: '+880123445568',
+        role: 'SOCIAL_WORKER',
+        primaryOfficeId: '321',
+        deviceId: 'D444'
+      },
+      headers: {
+        Authorization: `Bearer ${tokenWithoutConfigScope}`
+      }
+    })
+    expect(res.statusCode).toBe(201)
   })
 })

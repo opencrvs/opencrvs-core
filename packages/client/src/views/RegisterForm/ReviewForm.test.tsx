@@ -16,6 +16,7 @@ import {
   storeDeclaration
 } from '@opencrvs/client/src/declarations'
 import { IForm, IFormSectionData } from '@opencrvs/client/src/forms'
+import { SCOPES } from '@opencrvs/commons/client'
 import { EventType, RegStatus } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
@@ -29,12 +30,13 @@ import {
   getReviewFormFromStore,
   createTestStore,
   mockDeathDeclarationData,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES,
   flushPromises
 } from '@client/tests/util'
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
-
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { birthDraftData } from '@client/tests/mock-drafts'
 import { vi, Mock } from 'vitest'
 import { formatUrl } from '@client/navigation'
@@ -256,7 +258,7 @@ const mockFetchUserDetails = vi.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
 describe('ReviewForm tests', () => {
-  const scope = ['register']
+  const scope = [SCOPES.RECORD_REGISTER]
 
   let form: IForm
   let store: AppStore
@@ -265,9 +267,10 @@ describe('ReviewForm tests', () => {
     const testStore = await createTestStore()
     store = testStore.store
 
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
+
     form = await getReviewFormFromStore(store, EventType.Birth)
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth())
   })
 
   it('Shared contact phone number should be set properly', async () => {

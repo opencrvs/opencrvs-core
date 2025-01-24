@@ -7,10 +7,10 @@
       "@data-seeder/*": ["./*"]
     },
     "target": "es6",
-    "module": "commonjs",
+    "module": "node16",
     "outDir": "build/dist",
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "rootDir": ".",
     "lib": ["esnext.asynciterable", "es6", "es2019", "DOM.Iterable"],
     "forceConsistentCasingInFileNames": true,
