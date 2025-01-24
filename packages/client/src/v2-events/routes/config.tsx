@@ -21,6 +21,7 @@ import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventO
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch'
 import { ROUTES } from './routes'
 
 /**
@@ -108,6 +109,10 @@ export const routesConfig = {
           element: <Register.Review />
         }
       ]
+    },
+    {
+      path: ROUTES.V2.ADVANCED_SEARCH.path,
+      element: <AdvancedSearch />
     }
   ]
 }

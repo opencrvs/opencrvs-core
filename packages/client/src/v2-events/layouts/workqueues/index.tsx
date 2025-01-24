@@ -13,22 +13,35 @@ import React from 'react'
 
 import { noop } from 'lodash'
 import { useNavigate } from 'react-router-dom'
+import { useIntl } from 'react-intl'
 import {
   AppBar,
   Button,
   Frame,
   Icon,
+  INavigationType,
   SearchTool,
   Stack
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
+import { messages } from '@client/i18n/messages/views/header'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
 export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
+  const intl = useIntl()
+  const advancedSearchNavigationList: INavigationType[] = [
+    {
+      label: intl.formatMessage(messages.advancedSearch),
+      id: 'advanced-search',
+      onClick: () => {
+        navigate(ROUTES.V2.ADVANCED_SEARCH.path)
+      }
+    }
+  ]
 
   return (
     <Frame
@@ -47,6 +60,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
 
               <SearchTool
                 language="en"
+                navigationList={advancedSearchNavigationList}
                 searchHandler={noop}
                 searchTypeList={[
                   {
