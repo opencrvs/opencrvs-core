@@ -125,6 +125,14 @@ export const routesConfig = {
         {
           path: ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.REVIEW.path,
           element: <CollectCertificate.Review />
+        },
+        {
+          path: ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.VERIFY.path,
+          element: <CollectCertificate.VerifyIdPage />
+        },
+        {
+          path: ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.PAYMENT.path,
+          element: <CollectCertificate.PaymentPage />
         }
       ]
     }

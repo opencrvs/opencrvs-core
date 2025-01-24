@@ -75,7 +75,9 @@ export const ROUTES = {
                   from: string()
                 },
                 hash: hashValues()
-              })
+              }),
+              VERIFY: route('pages/verify'),
+              PAYMENT: route('pages/payment')
             }
           )
         }

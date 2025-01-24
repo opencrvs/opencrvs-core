@@ -73,7 +73,22 @@ const DeleteConfig = ActionConfigBase.merge(
 
 const CollectCertificateActionConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.COLLECT_CERTIFICATE)
+    type: z.literal(ActionType.COLLECT_CERTIFICATE),
+    verifyId: z
+      .array(
+        z.object({
+          whenRequesterIs: z.string(),
+          andRequesterValueIs: z.string(),
+          verifyTheseFields: z.array(z.string())
+        })
+      )
+      .optional(),
+    payment: z
+      .object({
+        registrationTarget: z.number(),
+        lateRegistrationTarget: z.number()
+      })
+      .optional()
   })
 )
 

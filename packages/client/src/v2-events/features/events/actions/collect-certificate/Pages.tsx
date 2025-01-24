@@ -16,7 +16,6 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { v4 as uuid } from 'uuid'
 import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -25,8 +24,6 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
-import { defaultCertificateCollectorFormConfig } from './defaultCertificateCollectorFormConfig'
-import { FormPage } from '@opencrvs/commons'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -54,21 +51,24 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  let formPages = configuration.actions
+  const formPages = configuration.actions
     .find((action) => action.type === ActionType.COLLECT_CERTIFICATE)
     ?.forms.find((form) => form.active)?.pages
+
+  const verifyId = configuration.actions.find(
+    (action) => action.type === ActionType.COLLECT_CERTIFICATE
+  )?.verifyId
+
+  const payment = configuration.actions.find(
+    (action) => action.type === ActionType.COLLECT_CERTIFICATE
+  )?.payment
 
   if (!formPages) {
     throw new Error('Form configuration not found for type: ' + event.type)
   }
 
-  const collectFormPage = merge(
-    defaultCertificateCollectorFormConfig,
-    formPages.length ? formPages[0] : {}
-  )
-  const currentPageId = formPages.find(
-    (p) => p.id === collectFormPage[0].id
-  )?.id
+  const currentPageId =
+    formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
 
   if (!currentPageId) {
     throw new Error('Form does not have any pages')
@@ -106,11 +106,25 @@ export function Pages() {
             })
           )
         }
-        onSubmit={() =>
-          navigate(
-            ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.REVIEW.buildPath({ eventId })
-          )
-        }
+        onSubmit={() => {
+          if (verifyId && verifyId.length > 0) {
+            navigate(
+              ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.VERIFY.buildPath({ eventId })
+            )
+          } else if (payment) {
+            if (verifyId && verifyId.length > 0) {
+              navigate(
+                ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.VERIFY.buildPath({
+                  eventId
+                })
+              )
+            }
+          } else {
+            navigate(
+              ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.REVIEW.buildPath({ eventId })
+            )
+          }
+        }}
       />
     </FormLayout>
   )

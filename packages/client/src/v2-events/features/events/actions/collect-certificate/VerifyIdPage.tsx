@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Review } from './Review'
-import { Pages } from './Pages'
-import { VerifyIdPage } from './VerifyIdPage'
-import { PaymentPage } from './PaymentPage'
+import React from 'react'
 
-export { Review, Pages, VerifyIdPage, PaymentPage }
+export function VerifyIdPage() {
+  return <h1>Verify Id</h1>
+}
