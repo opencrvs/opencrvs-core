@@ -51,7 +51,7 @@ jobs:
 
       - name: Build
         if: steps.check-version.outputs.version-exists == 'false'
-        run: yarn build
+        run: yarn build:all
         working-directory: packages/toolkit
 
       - name: Authenticate to npm

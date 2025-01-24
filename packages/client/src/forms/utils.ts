@@ -523,16 +523,6 @@ export function isDefaultCountry(countryCode: string): boolean {
   return countryCode === window.config.COUNTRY.toUpperCase()
 }
 
-export function getListOfLocations(
-  resource: IOfflineData,
-  resourceType: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
-  >
-) {
-  return resource[resourceType]
-}
-
 interface IVars {
   [key: string]: any
 }

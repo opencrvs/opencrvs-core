@@ -24,10 +24,8 @@ const mockUser: Partial<IUser & { _id: string }> = {
   username: 'j.doe1',
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   status: 'pending',
   primaryOfficeId: '321',
-  scope: ['register'],
   device: 'D444',
   passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
   salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'
@@ -62,18 +60,6 @@ test("verifyPassHandler should throw with 401 when password hash doesn't match",
   })
 
   expect(res.result.statusCode).toBe(401)
-})
-
-test('verifyPassHandler should return 200 and the user scope when the user exists and the password hash matches', async () => {
-  mockingoose(User).toReturn(mockUser, 'findOne')
-
-  const res = await server.server.inject({
-    method: 'POST',
-    url: '/verifyPassword',
-    payload: { username: 'j.doe1', password: 'test' }
-  })
-
-  expect([...res.result.scope]).toMatchObject(['register'])
 })
 
 test('verifyPassHandler should throw when User.findOne throws', async () => {

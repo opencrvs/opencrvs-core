@@ -160,3 +160,7 @@ export function getPractitionerRef(practitioner: Practitioner) {
     practitioner.id as UUID /* @todo move to practitioner */
   }` as const
 }
+
+export function getPractitionerRoleByPractitionerId(practitionerId: UUID) {
+  return getFromFhir(`/PractitionerRole?practitioner=${practitionerId}`)
+}

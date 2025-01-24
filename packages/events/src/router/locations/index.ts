@@ -20,7 +20,7 @@ import { z } from 'zod'
 
 export const locationRouter = router({
   set: publicProcedure
-    .use(middleware.isNationalSystemAdminUser)
+    .use(middleware.isDataSeedingUser)
     .input(z.array(Location).min(1))
     .mutation(async (options) => {
       await setLocations(options.input)

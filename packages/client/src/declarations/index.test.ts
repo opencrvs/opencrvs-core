@@ -17,7 +17,7 @@ import {
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
-import { EventType, SystemRoleType, Status } from '@client/utils/gateway'
+import { EventType, Status } from '@client/utils/gateway'
 import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
 import { storage } from '@client/storage'
@@ -112,6 +112,16 @@ describe('query result filtering tests', () => {
             { id: 'CERTIFIED' },
             { id: 'FAILED' },
             { id: 'CERTIFYING' }
+          ],
+          totalItems: 5
+        },
+        sentForReviewTab: {
+          results: [
+            { id: 'READY_TO_SUBMIT' },
+            { id: 'SUBMITTING' },
+            { id: 'SUBMITTED' },
+            { id: 'FAILED' },
+            { id: 'SUBMITTING' }
           ],
           totalItems: 5
         },
@@ -257,6 +267,10 @@ describe('query result filtering tests', () => {
           results: [{ id: 'CERTIFIED' }, { id: 'FAILED' }],
           totalItems: 2
         },
+        sentForReviewTab: {
+          results: [{ id: 'SUBMITTED' }, { id: 'FAILED' }],
+          totalItems: 2
+        },
         externalValidationTab: {
           results: [{ id: 'WAITING_FOR_VALIDATION' }],
           totalItems: 1
@@ -324,16 +338,17 @@ describe('archiveDeclaration tests', () => {
       creationDate: '2133213212',
       mobile: '09123433',
       role: {
-        _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-        labels: [
-          {
-            lang: 'en',
-            label: 'Field Agent'
-          }
-        ]
+        label: {
+          id: 'userRoles.fieldAgent',
+          defaultMessage: 'Field Agent',
+          description: 'Field Agent'
+        }
       },
       name: [],
-      localRegistrar: { name: [], role: 'FIELD_AGENT' as SystemRoleType }
+      localRegistrar: {
+        name: [],
+        role: 'FIELD_AGENT'
+      }
     }
 
     indexedDB = {

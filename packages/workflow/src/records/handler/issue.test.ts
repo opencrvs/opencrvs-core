@@ -21,6 +21,7 @@ import {
   TransactionResponse
 } from '@opencrvs/commons/types'
 import { CERTIFIED_BIRTH_RECORD } from '@test/mocks/records/certify'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 describe('Issue record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -36,7 +37,7 @@ describe('Issue record endpoint', () => {
 
   it('returns OK for informant issuing a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['certify'] },
+      { scope: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',

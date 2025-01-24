@@ -11,6 +11,7 @@
 module.exports = {
   extends: '../../../../.eslintrc.events.js',
   rules: {
+    'react/jsx-key': 1,
     'react/jsx-no-literals': 1,
     'react/destructuring-assignment': 1,
     'react/jsx-sort-props': [
