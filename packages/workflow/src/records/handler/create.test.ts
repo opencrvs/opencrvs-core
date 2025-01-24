@@ -150,7 +150,7 @@ describe('Create record endpoint', () => {
       })
     )
 
-    // mock country config event hook not being implemented (404)
+    // mock country config event action hook returning a basic 200
     mswServer.use(
       rest.post(
         'http://localhost:3040/events/BIRTH/actions/sent-notification-for-review',
