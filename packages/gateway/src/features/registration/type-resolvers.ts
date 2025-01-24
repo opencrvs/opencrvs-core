@@ -84,14 +84,13 @@ import {
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
   Address,
-  findLastOfficeFromSavedBundle,
   findLastOfficeLocationFromSavedBundle,
   notCorrectedHistory,
   findResourceFromBundleById,
   getUserRoleFromHistory,
   SavedOffice
 } from '@opencrvs/commons/types'
-
+import { findAssignment } from '@opencrvs/commons/assignment'
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 
 import { Context } from '@gateway/graphql/context'
@@ -1051,23 +1050,15 @@ export const typeResolvers: GQLResolver = {
     },
     certificates: resolveCertificates,
     assignment: async (task, _, context) => {
-      const assignmentExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
-        task.extension
-      )
-      const record = context.dataSources.recordsAPI.fetchRecord()
-      const office = record && findLastOfficeFromSavedBundle(record)
+      const record = context.dataSources.recordsAPI.getRecord()
 
-      if (assignmentExtension && record) {
-        const regLastUserExtension = findExtension(
-          `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-          task.extension
-        )!
+      if (!record) {
+        return null
+      }
+      const assignment = findAssignment(record)
 
-        const practitionerId = resourceIdentifierToUUID(
-          regLastUserExtension.valueReference.reference
-        )
-
+      if (assignment) {
+        const practitionerId = assignment?.practitioner.id
         const user = findResourceFromBundleById<Practitioner>(
           record,
           practitionerId
@@ -1077,7 +1068,7 @@ export const typeResolvers: GQLResolver = {
           practitionerId: user.id,
           firstName: user.name[0].given?.join(' '),
           lastName: user.name[0].family,
-          officeName: office?.name || ''
+          officeName: assignment?.office.name || ''
         }
       }
 
@@ -1203,7 +1194,8 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Certificate: {
-    async collector(docRef: DocumentReference, _, context) {
+    async collector(parent: { docRef: DocumentReference }, _, context) {
+      const { docRef } = parent
       const relatedPersonRef =
         docRef.extension &&
         findExtension(
@@ -1221,7 +1213,8 @@ export const typeResolvers: GQLResolver = {
         )
       )
     },
-    async hasShowedVerifiedDocument(docRef: DocumentReference, _) {
+    async hasShowedVerifiedDocument(parent: { docRef: DocumentReference }, _) {
+      const { docRef } = parent
       const hasShowedDocument = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
         docRef.extension as Extension[]
@@ -1237,7 +1230,59 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
-    certificateTemplateId(docRef: DocumentReference, _) {
+    async certifier(
+      parent: { docRef: DocumentReference; task: Saved<Task> },
+      _,
+      context
+    ) {
+      const { docRef, task } = parent
+      const practitionerRef =
+        docRef.extension &&
+        findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/certifier`,
+          docRef.extension
+        )
+
+      if (!practitionerRef) return null
+
+      const practitionerId = resourceIdentifierToUUID(
+        practitionerRef.valueReference.reference as ResourceIdentifier
+      )
+      const practitionerRoleBundle =
+        await context.dataSources.fhirAPI.getPractitionerRoleByPractitionerId(
+          practitionerId
+        )
+
+      const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
+
+      const practitionerRoleHistory =
+        await context.dataSources.fhirAPI.getPractionerRoleHistory(
+          practitionerRoleId
+        )
+      const result = practitionerRoleHistory.find(
+        (it) =>
+          it?.meta?.lastUpdated &&
+          task.lastModified &&
+          it?.meta?.lastUpdated <= task.lastModified!
+      )
+
+      const targetCode = result?.code?.find((element) => {
+        return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
+      })
+
+      const roleId = targetCode?.coding?.[0].code
+      const userResponse =
+        await context.dataSources.usersAPI.getUserByPractitionerId(
+          practitionerId
+        )
+
+      const allRoles = await context.dataSources.countryConfigAPI.getRoles()
+      const role = allRoles.find((role) => role.id === roleId)?.id
+
+      return { ...userResponse, role }
+    },
+    certificateTemplateId(parent: { docRef: DocumentReference }, _) {
+      const docRef = parent.docRef
       const certificateTemplateId = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/certificateTemplateId`,
         docRef.extension as Extension[]
@@ -1504,27 +1549,18 @@ export const typeResolvers: GQLResolver = {
       const practitionerRoleHistory =
         await dataSources.fhirAPI.getPractionerRoleHistory(practitionerRoleId)
 
+      const roleId = getUserRoleFromHistory(
+        practitionerRoleHistory,
+        task.lastModified
+      )
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
         resourceIdentifierToUUID(user.valueReference.reference)
       )
 
-      const { role, systemRole } = getUserRoleFromHistory(
-        practitionerRoleHistory,
-        task.lastModified
-      )
+      const allRoles = await dataSources.countryConfigAPI.getRoles()
+      const role = allRoles.find((role) => role.id === roleId)?.id
 
-      if (role && systemRole) {
-        return {
-          ...userResponse,
-          role: {
-            ...userResponse.role,
-            labels: JSON.parse(role)
-          },
-          systemRole
-        }
-      }
-
-      return userResponse
+      return { ...userResponse, role }
     },
     system: async (task: Task, _: any) => {
       const systemIdentifier = task.identifier?.find(
@@ -2135,8 +2171,11 @@ async function resolveCertificates(
       return null
     }
 
-    return dataSources.fhirAPI.getDocumentReference(
-      resourceIdentifierToUUID(certSection.entry[0].reference)
-    )
+    return {
+      task,
+      docRef: dataSources.fhirAPI.getDocumentReference(
+        resourceIdentifierToUUID(certSection.entry[0].reference)
+      )
+    }
   })
 }

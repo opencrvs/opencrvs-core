@@ -23,7 +23,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { getAllFields } from '@opencrvs/commons'
+import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
 
@@ -35,6 +35,18 @@ function eventToEventIndex(event: EventDocument): EventIndex {
  * This type ensures all properties of EventIndex are present in the mapping
  */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
+
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+
+  if (!hasEventsIndex) {
+    await createIndex(indexName, getAllFields(eventConfiguration))
+  }
+}
 
 export async function createIndex(
   indexName: string,
@@ -64,6 +76,7 @@ export async function createIndex(
       }
     }
   })
+
   return client.indices.putAlias({
     index: indexName,
     name: getEventAliasName()
@@ -71,42 +84,35 @@ export async function createIndex(
 }
 
 function getElasticsearchMappingForType(field: FieldConfig) {
-  if (field.type === 'DATE') {
-    return { type: 'date' }
-  }
-
-  if (
-    field.type === 'TEXT' ||
-    field.type === 'PARAGRAPH' ||
-    field.type === 'BULLET_LIST'
-  ) {
-    return { type: 'text' }
-  }
-
-  if (
-    field.type === 'RADIO_GROUP' ||
-    field.type === 'SELECT' ||
-    field.type === 'COUNTRY' ||
-    field.type === 'CHECKBOX'
-  ) {
-    return { type: 'keyword' }
-  }
-
-  if (field.type === 'FILE') {
-    return {
-      type: 'object',
-      properties: {
-        filename: { type: 'keyword' },
-        originalFilename: { type: 'keyword' },
-        type: { type: 'keyword' }
+  switch (field.type) {
+    case 'DATE':
+      return { type: 'date' }
+    case 'TEXT':
+    case 'PARAGRAPH':
+    case 'BULLET_LIST':
+      return { type: 'text' }
+    case 'RADIO_GROUP':
+    case 'SELECT':
+    case 'COUNTRY':
+    case 'CHECKBOX':
+    case 'LOCATION':
+      return { type: 'keyword' }
+    case 'FILE':
+      return {
+        type: 'object',
+        properties: {
+          filename: { type: 'keyword' },
+          originalFilename: { type: 'keyword' },
+          type: { type: 'keyword' }
+        }
       }
-    }
-  }
 
-  return assertNever(field)
+    default:
+      assertNever(field)
+  }
 }
 
-const assertNever = (n: never): never => {
+function assertNever(_: never): never {
   throw new Error('Should never happen')
 }
 
@@ -136,12 +142,12 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   const transformedStreamData = new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
-    transform: (record, _encoding, callback) => {
+    transform: (record: EventDocument, _encoding, callback) => {
       callback(null, eventToEventIndex(record))
     }
   })
 
-  return esClient.helpers.bulk({
+  await esClient.helpers.bulk({
     retries: 3,
     wait: 3000,
     datasource: stream.pipe(transformedStreamData),
@@ -190,6 +196,9 @@ export async function getIndexedEvents() {
   })
 
   if (!hasEventsIndex) {
+    logger.error(
+      'Event index not created. Sending empty array. Ensure indexing is running.'
+    )
     return []
   }
 

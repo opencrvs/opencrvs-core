@@ -14,7 +14,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope } from '@client/utils/authUtils'
+
 import {
   ColumnContentAlignment,
   Workqueue,
@@ -33,7 +33,11 @@ import {
   dynamicConstantsMessages,
   wqMessages
 } from '@client/i18n/messages'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
@@ -53,6 +57,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { RegStatus } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
@@ -61,11 +66,11 @@ import { useNavigate } from 'react-router-dom'
 
 interface IBaseRejectTabProps {
   theme: ITheme
-  scope: Scope | null
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
   }
+  scope: Scope[] | null
   paginationId: number
   pageSize: number
   onPageChange: (newPageNumber: number) => void
@@ -152,7 +157,15 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
     if (!data || !data.results) {
       return []
     }
-    const isFieldAgent = props.scope?.includes('declare') ? true : false
+
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    const isReviewer = props.scope?.some((x) => validateScopes.includes(x))
+
     const transformedData = transformData(data, props.intl)
     const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
@@ -163,7 +176,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (width > props.theme.grid.breakpoints.lg && !isFieldAgent) {
+        if (width > props.theme.grid.breakpoints.lg && isReviewer) {
           actions.push({
             label: props.intl.formatMessage(buttonMessages.update),
             handler: () => {},
@@ -171,7 +184,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
           })
         }
       } else {
-        if (width > props.theme.grid.breakpoints.lg && !isFieldAgent) {
+        if (width > props.theme.grid.breakpoints.lg && isReviewer) {
           actions.push({
             label: props.intl.formatMessage(buttonMessages.update),
             handler: (
@@ -204,6 +217,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus as DOWNLOAD_STATUS}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
           />
         )
       })

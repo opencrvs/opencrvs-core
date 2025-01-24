@@ -65,6 +65,7 @@ import { getPublicKey } from '@auth/features/authenticate/service'
 import anonymousTokenHandler, {
   responseSchema
 } from './features/anonymousToken/handler'
+import { Boom, badRequest } from '@hapi/boom'
 
 export type AuthServer = {
   server: Hapi.Server
@@ -83,7 +84,22 @@ export async function createServer() {
     port: env.AUTH_PORT,
     routes: {
       cors: { origin: whitelist },
-      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT },
+      response: {
+        failAction: async (req, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`Response validationError: ${err.message}`)
+            throw badRequest(`Invalid response payload returned from handler`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(
+              `${req.path} response has a validation error: ${err.message}`
+            )
+            throw err
+          }
+        }
+      }
     }
   })
 

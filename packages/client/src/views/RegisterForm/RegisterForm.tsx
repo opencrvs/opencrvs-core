@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Stack, ToggleMenu } from '@opencrvs/components/lib'
 import * as React from 'react'
 import { FormikTouched, FormikValues } from 'formik'
 import {
@@ -42,13 +43,12 @@ import {
   writeDeclaration,
   DOWNLOAD_STATUS
 } from '@client/declarations'
-import { Stack, ToggleMenu } from '@client/../../components/lib'
 import {
   FormFieldGenerator,
   ITouchedNestedFields,
   mapFieldsToValues
 } from '@client/components/form'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
 import { TimeMounted } from '@client/components/TimeMounted'
 import {
@@ -88,13 +88,13 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { client } from '@client/utils/apolloClient'
-import { Scope } from '@client/utils/authUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   DECLARED,
   REJECTED,
   VALIDATED
 } from '@client/utils/constants'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { EventType, RegStatus } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import {
@@ -177,7 +177,7 @@ type Props = {
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
   userDetails: UserDetails | null
-  scope: Scope | null
+  scope: Scope[] | null
   config: IOfflineData
 }
 
@@ -288,7 +288,7 @@ function FormAppBar({
       case 'DECLARED':
         return WORKQUEUE_TABS.readyForReview
       case 'DRAFT':
-        return WORKQUEUE_TABS.inProgress
+        return WORKQUEUE_TABS.myDrafts
       case 'IN_PROGRESS':
         return WORKQUEUE_TABS.inProgressFieldAgent
       case 'REJECTED':
@@ -713,11 +713,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    return this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    return (
+      this.props.scope &&
+      this.props.scope.some((x) => validateScopes.includes(x))
+    )
   }
 
   componentDidMount() {
@@ -892,13 +901,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = async () => {
     const { declaration } = this.props
-    const isRegistrarOrRegistrationAgent =
+    const canApproveOrRegister =
       this.userHasRegisterScope() || this.userHasValidateScope()
     const isConfirmationModalApplicable =
       declaration.registrationStatus === DECLARED ||
       declaration.registrationStatus === VALIDATED ||
       declaration.registrationStatus === REJECTED
-    if (isRegistrarOrRegistrationAgent && isConfirmationModalApplicable) {
+    if (canApproveOrRegister && isConfirmationModalApplicable) {
       this.toggleConfirmationModal()
     } else {
       this.writeDeclarationAndGoToHome()
@@ -1000,7 +1009,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       case 'DECLARED':
         return WORKQUEUE_TABS.readyForReview
       case 'DRAFT':
-        return WORKQUEUE_TABS.inProgress
+        return WORKQUEUE_TABS.myDrafts
       case 'IN_PROGRESS':
         return WORKQUEUE_TABS.inProgressFieldAgent
       case 'REJECTED':
@@ -1276,7 +1285,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     )}
                                   </Alert>
                                 )}
-
                               <FormFieldGenerator
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
                                 key={this.state.formFieldKey}

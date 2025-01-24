@@ -30,9 +30,10 @@ jobs:
           repository: 'opencrvs/opencrvs-core'
           ref: ${{ github.ref }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
         with:
+          node-version-file: .nvmrc
           cache: 'yarn'
 
       - name: Install dependencies
@@ -72,9 +73,10 @@ jobs:
           repository: 'opencrvs/opencrvs-core'
           ref: ${{ env.PR_BRANCH }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
         with:
+          node-version-file: .nvmrc
           cache: 'yarn'
 
       - name: Install dependencies
@@ -95,7 +97,7 @@ jobs:
           echo "storybook_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      
+
       - name: Comment on PR with Storybook link
         run: |
           COMMENT="Storybook deployed: ${{ steps.deploy_storybook.outputs.storybook_url }}"

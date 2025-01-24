@@ -11,10 +11,10 @@
 import { MongoClient } from 'mongodb'
 import { inject } from 'vitest'
 
-let client: MongoClient
+let client: MongoClient | undefined
 let databaseName = 'user-mgnt_' + Date.now()
 
-export async function resetServer() {
+export function resetServer() {
   databaseName = 'user-mgnt_' + Date.now()
 }
 

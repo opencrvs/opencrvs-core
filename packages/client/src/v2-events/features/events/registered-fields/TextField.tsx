@@ -12,4 +12,4 @@ import { TextFieldValue } from '@opencrvs/commons/client'
 
 export const INITIAL_TEXT_VALUE = ''
 
-export const textToString = (text: TextFieldValue) => text || ''
+export const textToString = (text: TextFieldValue) => text || INITIAL_TEXT_VALUE

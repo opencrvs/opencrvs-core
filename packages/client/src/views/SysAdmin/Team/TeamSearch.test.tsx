@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TEAM_USER_LIST } from '@client/navigation/routes'
-import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { AppStore } from '@client/store'
 import {
@@ -17,16 +16,18 @@ import {
   createTestStore,
   flushPromises,
   mockUserResponse,
-  registerScopeToken
+  REGISTRAR_DEFAULT_SCOPES,
+  setScopes
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { createMemoryRouter } from 'react-router-dom'
-import { Mock, vi } from 'vitest'
 import { TeamSearch } from './TeamSearch'
+import { vi } from 'vitest'
+import { SCOPES } from '@opencrvs/commons/client'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('Team search test', () => {
   let store: AppStore
@@ -44,6 +45,8 @@ describe('Team search test', () => {
       ;({ component: app, router } = await createTestComponent(<TeamSearch />, {
         store
       }))
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
+
       app.update()
     })
 
@@ -89,7 +92,7 @@ describe('Team search test', () => {
 
   describe('Team search with location in props', () => {
     let testComponent: ReactWrapper<{}, {}>
-    const getItem = window.localStorage.getItem as Mock
+
     const mockFetchUserDetails = vi.fn()
     const nameObj = {
       data: {
@@ -127,12 +130,11 @@ describe('Team search test', () => {
       queries.fetchUserDetails = mockFetchUserDetails
     })
 
-    beforeAll(async () => {
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
-    })
+    beforeAll(async () => {})
 
     beforeEach(async () => {
+      setScopes([SCOPES.USER_READ], store)
+
       testComponent = (
         await createTestComponent(<TeamSearch />, {
           store,

@@ -11,7 +11,7 @@
 import * as elasticsearch from '@elastic/elasticsearch'
 import { env } from '@events/environment'
 
-let client: elasticsearch.Client
+let client: elasticsearch.Client | undefined
 
 export const getOrCreateClient = () => {
   if (!client) {

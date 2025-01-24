@@ -10,7 +10,8 @@
  */
 import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import { AuthServer, createServer } from '@auth/server'
+import { createServer, AuthServer } from '@auth/server'
+import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
 
 const fetch = fetchAny as fetchAny.FetchMock
 describe('authenticate handler receives a request', () => {
@@ -54,7 +55,7 @@ describe('authenticate handler receives a request', () => {
     it('returns 403', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          userId: '1',
+          id: '1',
           status: 'deactivated',
           scope: ['admin']
         })
@@ -78,14 +79,18 @@ describe('authenticate handler receives a request', () => {
 
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
 
-      fetch.mockResponse(
+      fetch.mockResponseOnce(
         JSON.stringify({
-          userId: '1',
+          id: '1',
           status: 'active',
-          scope: ['admin'],
+          role: 'NATIONAL_SYSTEM_ADMIN',
           mobile: `+345345343`
         })
       )
+
+      fetch.mockResponse(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
 
       await server.server.inject({
@@ -109,14 +114,19 @@ describe('authenticate handler receives a request', () => {
 
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
 
-      fetch.mockResponse(
+      fetch.mockResponseOnce(
         JSON.stringify({
-          userId: '1',
+          id: '1',
           status: 'pending',
-          scope: ['admin'],
+          role: 'NATIONAL_SYSTEM_ADMIN',
           mobile: `+345345343`
         })
       )
+
+      fetch.mockResponse(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
+
       const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
 
       await server.server.inject({

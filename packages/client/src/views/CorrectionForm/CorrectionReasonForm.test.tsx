@@ -22,7 +22,7 @@ import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 let wrapper: TestComponentWithRouteMock
 

@@ -14,9 +14,9 @@ import {
   mockDeclarationData,
   goToEndOfForm,
   waitForReady,
-  validateScopeToken,
-  registerScopeToken,
-  flushPromises
+  flushPromises,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -31,11 +31,11 @@ import {
 } from '@client/declarations'
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
+import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
 // eslint-disable-next-line no-restricted-imports
 import * as ReactApollo from '@apollo/client/react'
-import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { waitForElement } from '@client/tests/wait-for-element'
 import {
   birthDraftData,
@@ -66,6 +66,7 @@ describe('when user is previewing the form data', () => {
 
     router = testApp.router
     store = testApp.store
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
     await waitForReady(app)
   })
 
@@ -77,11 +78,12 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      store.dispatch(checkAuth())
+
       await flushPromises()
       const data = deathReviewDraftData
 
       customDraft = { id: uuid(), data, review: true, event: EventType.Death }
+
       store.dispatch(storeDeclaration(customDraft))
       router.navigate(
         formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
@@ -96,6 +98,7 @@ describe('when user is previewing the form data', () => {
 
     it('successfully submits the review form', async () => {
       vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
+
       app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
       app.update()
       app.update().find('#submit_confirm').hostNodes().simulate('click')
@@ -118,7 +121,9 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(
+        `${REGISTRAR_HOME}/my-drafts/1`
+      )
     })
   })
 
@@ -134,6 +139,11 @@ describe('when user is previewing the form data', () => {
         event: EventType.Birth,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       }
+      setScopes(
+        [SCOPES.RECORD_DECLARE_BIRTH, SCOPES.RECORD_SUBMIT_FOR_REVIEW],
+        store
+      )
+      await flushPromises()
       store.dispatch(storeDeclaration(customDraft))
       router.navigate(
         DRAFT_BIRTH_PARENT_FORM.replace(
@@ -151,19 +161,19 @@ describe('when user is previewing the form data', () => {
       })
 
       it('check whether submit button is enabled or not', () => {
-        expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
-          false
-        )
+        expect(
+          app.find('#submit_for_review').hostNodes().prop('disabled')
+        ).toBe(false)
       })
       describe('All sections visited', () => {
         it('Should be able to click SEND FOR REVIEW Button', () => {
-          expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
-            false
-          )
+          expect(
+            app.find('#submit_for_review').hostNodes().prop('disabled')
+          ).toBe(false)
         })
         describe('button clicked', () => {
           beforeEach(async () => {
-            app.find('#submit_form').hostNodes().simulate('click')
+            app.find('#submit_for_review').hostNodes().simulate('click')
           })
 
           it('confirmation screen should show up', () => {
@@ -171,7 +181,9 @@ describe('when user is previewing the form data', () => {
           })
           it('should redirect to home page', () => {
             app.find('#submit_confirm').hostNodes().simulate('click')
-            expect(router.state.location.pathname).toBe(REGISTRAR_HOME)
+            expect(router.state.location.pathname).toBe(
+              `${REGISTRAR_HOME}/my-drafts/1`
+            )
           })
         })
       })
@@ -182,8 +194,8 @@ describe('when user is previewing the form data', () => {
     let customDraft: IDeclaration
 
     beforeEach(async () => {
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
+      await waitForReady(app)
       await flushPromises()
       const data = birthReviewDraftData
 
@@ -217,7 +229,9 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(
+        `${REGISTRAR_HOME}/my-drafts/1`
+      )
     })
   })
 
@@ -229,7 +243,6 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      store.dispatch(checkAuth())
       await flushPromises()
       const data = marriageReviewDraftData
 
@@ -256,8 +269,6 @@ describe('when user is previewing the form data', () => {
 
       app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
-      // app.find('#rejectionReasonduplicate').hostNodes().simulate('change')
-
       app
         .find('#rejectionCommentForHealthWorker')
         .hostNodes()
@@ -269,14 +280,14 @@ describe('when user is previewing the form data', () => {
         })
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(
+        `${REGISTRAR_HOME}/my-drafts/1`
+      )
     })
   })
 
   describe('when user has validate scope', () => {
     beforeEach(async () => {
-      getItem.mockReturnValue(validateScopeToken)
-      await store.dispatch(checkAuth())
       await flushPromises()
       const data = {
         _fhirIDMap: {

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { appRouter } from '@events/router'
+import { appRouter } from '@events/router/router'
 import { t } from '@events/router/trpc'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { Scope, userRoleScopes } from '@opencrvs/commons'
+import { Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
 import { CreatedUser, payloadGenerator } from './generators'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
@@ -33,9 +33,9 @@ export function createTestClient(user: CreatedUser, scopes?: Scope[]) {
   return caller
 }
 
-const createTestToken = (userId: string, scopes?: Scope[]) =>
-  jwt.sign(
-    { scope: scopes ?? userRoleScopes.REGISTRATION_AGENT, sub: userId },
+function createTestToken(userId: string, scopes?: Scope[]): TokenWithBearer {
+  const token = jwt.sign(
+    { scope: scopes ?? SCOPES.RECORD_SUBMIT_FOR_APPROVAL, sub: userId },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -43,6 +43,9 @@ const createTestToken = (userId: string, scopes?: Scope[]) =>
       audience: 'opencrvs:events-user'
     }
   )
+
+  return `Bearer ${token}`
+}
 
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
