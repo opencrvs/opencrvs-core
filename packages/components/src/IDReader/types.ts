@@ -8,8 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+/** The validator function is expected to return a string error message if error, otherwise return undefined  */
+export type Validator = (
+  data: Parameters<Scan['onScan']>[0]
+) => string | undefined
 interface QRReaderType {
-  validator?: (data: Parameters<Scan['onScan']>[0]) => boolean
+  validator?: Validator
   labels: {
     button: string
     scannerDialogSupportingCopy: string

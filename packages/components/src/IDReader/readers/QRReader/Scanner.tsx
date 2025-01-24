@@ -11,13 +11,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import QRScanner from 'qr-scanner'
 import styled from 'styled-components'
-import { ErrorHandler } from 'src/IDReader/types'
+import { ErrorHandler, Validator } from 'src/IDReader/types'
 import { throttle } from 'lodash'
 
 interface ScannerProps {
   onError: ErrorHandler
   onScan: (data: Record<string, unknown>) => void
-  validator?: (data: Record<string, unknown>) => boolean
+  validator?: Validator
 }
 
 const QRReader = styled.div`
