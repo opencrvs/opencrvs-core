@@ -61,7 +61,23 @@ export const ROUTES = {
           ),
           VALIDATE: route('validate/:eventId', {
             params: { eventId: string().defined() }
-          })
+          }),
+          REQUEST_CORRECTION: route(
+            'request-correction/:eventId',
+            {
+              params: { eventId: string().defined() }
+            },
+            {
+              REVIEW: route('review'),
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
+                searchParams: {
+                  from: string()
+                },
+                hash: hashValues()
+              })
+            }
+          )
         }
       ),
       WORKQUEUE: route('workqueue', {

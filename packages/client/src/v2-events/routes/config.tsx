@@ -13,6 +13,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
+import * as RequestCorrection from '@client/v2-events/features/events/actions/correct/request'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import * as Register from '@client/v2-events/features/events/actions/register'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
@@ -88,6 +89,24 @@ export const routesConfig = {
         {
           path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
           element: <Declare.Review />
+        }
+      ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.path,
+      element: <Outlet />,
+      children: [
+        {
+          index: true,
+          element: <RequestCorrection.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.path,
+          element: <RequestCorrection.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.path,
+          element: <RequestCorrection.Review />
         }
       ]
     },

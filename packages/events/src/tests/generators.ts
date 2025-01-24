@@ -14,7 +14,9 @@ import {
   EventInput,
   getUUID,
   ActionType,
-  ValidateActionInput
+  ValidateActionInput,
+  RegisterActionInput,
+  RequestCorrectionActionInput
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
@@ -70,7 +72,55 @@ export function payloadGenerator() {
         data: input.data ?? {},
         duplicates: [],
         eventId
-      })
+      }),
+      register: (
+        eventId: string,
+        input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.REGISTER,
+        transactionId: input.transactionId ?? getUUID(),
+        data: input.data ?? {},
+        eventId
+      }),
+      correct: {
+        request: (
+          eventId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.REQUEST_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data: input.data ?? {},
+          eventId
+        }),
+        approve: (
+          eventId: string,
+          requestId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.APPROVE_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data: input.data ?? {},
+          eventId,
+          requestId
+        }),
+        reject: (
+          eventId: string,
+          requestId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.REJECT_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data: input.data ?? {},
+          eventId,
+          requestId
+        })
+      }
     }
   }
 
