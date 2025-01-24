@@ -182,7 +182,7 @@
     "isomorphic-fetch": "^3.0.0",
     "jsonwebtoken": "^9.0.0",
     "msw": "^2.7.0",
-    "msw-trpc": "^2.0.0-beta.1",
+    "@vafanassieff/msw-trpc": "0.0.1",
     "opener": "^1.5.1",
     "prettier": "2.8.8",
     "qrcode": "^1.5.1",

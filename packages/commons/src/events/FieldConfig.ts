@@ -176,7 +176,10 @@ const SelectOption = z.object({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
-  options: z.array(SelectOption).describe('A list of options'),
+  optionValues: z.array(SelectOption).describe('A list of options'),
+  options: z.object({
+    size: z.enum(['NORMAL', 'LARGE']).optional()
+  }),
   flexDirection: z
     .enum(['row', 'row-reverse', 'column', 'column-reverse'])
     .optional()

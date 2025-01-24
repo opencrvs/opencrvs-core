@@ -14,6 +14,7 @@ import { graphql, HttpResponse } from 'msw'
 import React from 'react'
 import { OfficeHome } from './OfficeHome'
 import { RegistrationHomeQuery } from '@client/utils/gateway'
+import * as routes from '@client/navigation/routes'
 
 const meta: Meta<typeof OfficeHome> = {
   title: 'OfficeHome',
@@ -27,6 +28,10 @@ type Story = StoryObj<typeof OfficeHome>
 
 export const WithData: Story = {
   parameters: {
+    reactRouter: {
+      router: { path: routes.REGISTRAR_HOME, element: <OfficeHome /> },
+      initialPath: routes.REGISTRAR_HOME
+    },
     msw: {
       handlers: {
         registrationHome: [
@@ -136,4 +141,11 @@ export const WithData: Story = {
   }
 }
 
-export const WithoutData: Story = {}
+export const WithoutData: Story = {
+  parameters: {
+    reactRouter: {
+      router: { path: routes.REGISTRAR_HOME, element: <OfficeHome /> },
+      initialPath: routes.REGISTRAR_HOME
+    }
+  }
+}

@@ -12,7 +12,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
+import { router } from '@client/v2-events/features/workqueues/router'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { ROUTES } from '@client/v2-events/routes'
 
 const meta: Meta<typeof WorkqueueIndex> = {
   title: 'Workqueue',
@@ -27,4 +29,11 @@ const meta: Meta<typeof WorkqueueIndex> = {
 }
 
 export default meta
-export const Default: StoryObj<typeof WorkqueueIndex> = {}
+export const Default: StoryObj<typeof WorkqueueIndex> = {
+  parameters: {
+    reactRouter: {
+      router: router,
+      initialPath: ROUTES.V2.WORKQUEUE.buildPath({})
+    }
+  }
+}

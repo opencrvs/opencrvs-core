@@ -302,6 +302,7 @@ export const tennisClubMembershipEvent = {
             {
               id: 'correction.requester.relationship',
               type: 'RADIO_GROUP',
+              options: {},
               label: {
                 id: 'correction.corrector.title',
                 defaultMessage: 'Who is requesting a change to this record?',
@@ -370,6 +371,7 @@ export const tennisClubMembershipEvent = {
             {
               id: 'correction.identity-check.verified',
               type: 'RADIO_GROUP',
+              options: {},
               label: {
                 id: 'correction.corrector.identity.verified.label',
                 defaultMessage: '@todo',

@@ -14,18 +14,21 @@ import { graphql, HttpResponse } from 'msw'
 import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import superjson from 'superjson'
-import { AppRouter } from '@gateway/v2-events/events/router'
-import { createTRPCMsw } from 'msw-trpc'
+import { AppRouter } from '../src/v2-events/trpc'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventIndex
 } from '../src/v2-events/features/events/fixtures'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  baseUrl: '/api/events',
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
   transformer: { input: superjson, output: superjson }
 })
-console.log({tennisClubMembershipEvent});
 
 export const handlers = {
   events: [
@@ -375,29 +378,21 @@ export const handlers = {
       return HttpResponse.json({
         data: {
           getUser: {
-            id: '677e3eb93a423676c3af1b93',
-            userMgntUserID: '677e3eb93a423676c3af1b93',
-            creationDate: '1736326841514',
+            id: '679397db138339c63cdc24e1',
+            userMgntUserID: '679397db138339c63cdc24e1',
+            creationDate: '1737725915295',
             username: 'k.mweene',
-            practitionerId: 'ccf4ca3f-9099-44a0-816c-c27d23df0c83',
+            practitionerId: '6f672b75-ec29-4bdc-84f6-4cb3ff9bb529',
             mobile: '+260933333333',
             email: 'kalushabwalya1.7@gmail.com',
-            systemRole: 'LOCAL_REGISTRAR',
             role: {
-              _id: '677e3eb03a423676c3af1b73',
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Local Registrar',
-                  __typename: 'RoleLabel'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Registraire local',
-                  __typename: 'RoleLabel'
-                }
-              ],
-              __typename: 'Role'
+              label: {
+                id: 'userRole.localRegistrar',
+                defaultMessage: 'Local Registrar',
+                description: 'Name for user role Local Registrar',
+                __typename: 'I18nMessage'
+              },
+              __typename: 'UserRole'
             },
             status: 'active',
             name: [
@@ -409,7 +404,7 @@ export const handlers = {
               }
             ],
             primaryOffice: {
-              id: '028d2c85-ca31-426d-b5d1-2cef545a4902',
+              id: 'dfcd1cbc-30c7-41a4-afd2-020515b4d78b',
               name: 'Ibombo District Office',
               alias: ['Ibombo District Office'],
               status: 'active',

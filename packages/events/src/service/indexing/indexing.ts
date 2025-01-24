@@ -89,6 +89,7 @@ function getElasticsearchMappingForType(field: FieldConfig) {
       return { type: 'date' }
     case 'TEXT':
     case 'PARAGRAPH':
+    case 'PAGE_HEADER':
     case 'BULLET_LIST':
       return { type: 'text' }
     case 'RADIO_GROUP':

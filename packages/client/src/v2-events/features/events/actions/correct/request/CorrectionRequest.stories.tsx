@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { AppRouter } from '@events/router'
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw } from 'msw-trpc'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
 import { ROUTES } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
 import { useCorrectionRequestData } from './useCorrectionRequestData'
 import * as Request from '.'
@@ -32,20 +32,22 @@ export default meta
 
 type Story = StoryObj<typeof Request.Pages>
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  baseUrl: '/api/events',
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
   transformer: { input: superjson, output: superjson }
 })
 
 export const Onboarding: Story = {
   parameters: {
-    parameters: {
-      reactRouter: {
-        router: router,
-        initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-          eventId: tennisClueMembershipEventDocument.id,
-          pageId: 'corrector'
-        })
-      }
+    reactRouter: {
+      router: router,
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+        eventId: tennisClueMembershipEventDocument.id,
+        pageId: 'corrector'
+      })
     },
     msw: {
       handlers: {
@@ -78,13 +80,11 @@ function FormClear() {
 
 export const ReviewWithoutChanges: Story = {
   parameters: {
-    parameters: {
-      reactRouter: {
-        router,
-        initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-          eventId: tennisClueMembershipEventDocument.id
-        })
-      }
+    reactRouter: {
+      router,
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+        eventId: tennisClueMembershipEventDocument.id
+      })
     },
     msw: {
       handlers: {
@@ -100,17 +100,15 @@ export const ReviewWithoutChanges: Story = {
 
 export const ReviewWithChanges: Story = {
   parameters: {
-    parameters: {
-      reactRouter: {
-        router: {
-          path: '/',
-          element: <FormClear />,
-          children: [router]
-        },
-        initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-          eventId: tennisClueMembershipEventDocument.id
-        })
-      }
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <FormClear />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+        eventId: tennisClueMembershipEventDocument.id
+      })
     },
     msw: {
       handlers: {
@@ -126,15 +124,13 @@ export const ReviewWithChanges: Story = {
 
 export const AdditionalDetails: Story = {
   parameters: {
-    parameters: {
-      reactRouter: {
-        router: router,
-        initialPath:
-          ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS.buildPath({
-            eventId: tennisClueMembershipEventDocument.id,
-            pageId: ''
-          })
-      }
+    reactRouter: {
+      router: router,
+      initialPath:
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS.buildPath({
+          eventId: tennisClueMembershipEventDocument.id,
+          pageId: ''
+        })
     },
     msw: {
       handlers: {
@@ -149,17 +145,15 @@ export const AdditionalDetails: Story = {
 }
 export const Summary: Story = {
   parameters: {
-    parameters: {
-      reactRouter: {
-        router: {
-          path: '/',
-          element: <FormClear />,
-          children: [router]
-        },
-        initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
-          eventId: tennisClueMembershipEventDocument.id
-        })
-      }
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <FormClear />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
+        eventId: tennisClueMembershipEventDocument.id
+      })
     },
     msw: {
       handlers: {

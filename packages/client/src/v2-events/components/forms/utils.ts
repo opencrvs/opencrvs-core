@@ -113,7 +113,8 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.CHECKBOX]: null,
   [FieldType.COUNTRY]: null,
   [FieldType.LOCATION]: null,
-  [FieldType.SELECT]: null
+  [FieldType.SELECT]: null,
+  [FieldType.PAGE_HEADER]: null
 }
 
 export function getInitialValues(fields: FieldConfig[]) {
