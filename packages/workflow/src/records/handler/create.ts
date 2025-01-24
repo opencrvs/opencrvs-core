@@ -76,7 +76,7 @@ import {
 } from '@workflow/records/state-transitions'
 import { logger, UUID } from '@opencrvs/commons'
 import { notifyForAction } from '@workflow/utils/country-config-api'
-import { tokenExchangeHandler } from '@workflow/records/token-exchange-handler'
+import { getRecordSpecificToken } from '@workflow/records/token-exchange'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -368,7 +368,7 @@ export default async function createRecordHandler(
     /*
      * Notify country configuration about the event so that countries can hook into actions like "sent-for-approval"
      */
-    const recordSpecificToken = await tokenExchangeHandler(
+    const recordSpecificToken = await getRecordSpecificToken(
       token,
       request.headers,
       getComposition(record).id

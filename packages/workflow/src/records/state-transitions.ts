@@ -109,7 +109,7 @@ import {
   getPractitionerRoleFromToken
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
-import { tokenExchangeHandler } from './token-exchange-handler'
+import { getRecordSpecificToken } from './token-exchange'
 import { invokeRegistrationValidation } from '@workflow/utils/country-config-api'
 
 export async function toCorrected(
@@ -514,7 +514,7 @@ export async function initiateRegistration(
 ): Promise<WaitingForValidationRecord | RejectedRecord> {
   try {
     const composition = getComposition(record)
-    const recordSpecificToken = await tokenExchangeHandler(
+    const recordSpecificToken = await getRecordSpecificToken(
       token,
       headers,
       composition.id
