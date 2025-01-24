@@ -304,6 +304,27 @@ export async function upsertRegistrationIdentifier(
   return taskEntry
 }
 
+type UpdateFieldInput = {
+  fieldId: string
+  valueString?: string
+  valueBoolean?: boolean
+}
+
+export async function updateField(
+  id: string,
+  authHeader: IAuthHeader,
+  details: UpdateFieldInput
+) {
+  const res = await createRequest<ValidRecord>(
+    'POST',
+    `/records/${id}/update-field`,
+    authHeader,
+    details
+  )
+
+  return res
+}
+
 export async function archiveRegistration(
   id: string,
   authHeader: IAuthHeader,
