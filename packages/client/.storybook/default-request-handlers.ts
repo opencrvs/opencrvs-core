@@ -25,11 +25,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   baseUrl: '/api/events',
   transformer: { input: superjson, output: superjson }
 })
-console.log(
-  tRPCMsw.config.get.query(() => {
-    return [tennisClubMembershipEvent]
-  })
-)
+console.log({tennisClubMembershipEvent});
 
 export const handlers = {
   events: [

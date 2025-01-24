@@ -13,7 +13,6 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
-import * as RequestCorrection from '@client/v2-events/features/events/actions/correct/request'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import * as Register from '@client/v2-events/features/events/actions/register'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
@@ -22,6 +21,7 @@ import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventO
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { ROUTES } from './routes'
 
 /**
@@ -92,24 +92,7 @@ export const routesConfig = {
         }
       ]
     },
-    {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.path,
-      element: <Outlet />,
-      children: [
-        {
-          index: true,
-          element: <RequestCorrection.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.path,
-          element: <RequestCorrection.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.path,
-          element: <RequestCorrection.Review />
-        }
-      ]
-    },
+    correctionRouter,
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
       element: <Outlet />,

@@ -12,7 +12,7 @@
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { FormWizard } from '@opencrvs/components'
-import { FormPage } from '@opencrvs/commons'
+import { ActionFormData, FormPage } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -28,7 +28,13 @@ export function Pages({
   showReviewButton,
   formPages,
   onFormPageChange,
-  onSubmit
+  onSubmit,
+  submitButtonText,
+  /*
+   * Replace with Markuses implementation
+   */
+  formData,
+  setFormData
 }: {
   eventId: string
   pageId: string
@@ -36,6 +42,9 @@ export function Pages({
   formPages: FormPage[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
+  submitButtonText?: string
+  formData?: ActionFormData
+  setFormData?: (data: ActionFormData) => void
 }) {
   const intl = useIntl()
 
@@ -51,7 +60,8 @@ export function Pages({
     total
   } = usePagination(formPages.length, Math.max(pageIdx, 0))
   const page = formPages[currentPage]
-  const formValues = getFormValues(eventId, getInitialValues(page.fields))
+  const formValues =
+    formData || getFormValues(eventId, getInitialValues(page.fields))
 
   useEffect(() => {
     const pageChanged = formPages[currentPage].id !== pageId
@@ -66,6 +76,7 @@ export function Pages({
       currentPage={currentPage}
       pageTitle={intl.formatMessage(page.title)}
       showReviewButton={showReviewButton}
+      submitButtonText={submitButtonText}
       totalPages={total}
       onNextPage={next}
       onPreviousPage={previous}
@@ -78,7 +89,7 @@ export function Pages({
         initialValues={formValues}
         setAllFieldsDirty={false}
         onChange={(values) => {
-          setFormValues(eventId, values)
+          setFormData ? setFormData(values) : setFormValues(eventId, values)
         }}
       />
     </FormWizard>

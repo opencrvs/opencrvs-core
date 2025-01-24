@@ -8,10 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { z } from 'zod'
+import { EventConfig } from './EventConfig'
+import { FormConfig, FormConfigInput, FormPage } from './FormConfig'
+export type EventConfigInput = z.input<typeof EventConfig>
 
-import { Pages } from './Pages'
-import { Review } from './Review'
-import { Onboarding } from './Onboarding/Onboarding'
-import { Summary } from './Summary/Summary'
-import { AdditionalDetails } from './AdditionalDetails/AdditionalDetails'
-export { Pages, Review, Onboarding, Summary, AdditionalDetails }
+export const defineForm = (form: FormConfigInput): FormConfig =>
+  FormConfig.parse(form)
+
+export const defineFormPage = (formPage: FormPage): FormPage =>
+  FormPage.parse(formPage)

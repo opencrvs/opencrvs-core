@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { Conditional } from '../conditionals/conditionals'
-import { FormConfig } from './FormConfig'
+import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 
 export const ActionConfigBase = z.object({
@@ -71,7 +71,9 @@ const DeleteConfig = ActionConfigBase.merge(
 
 const RequestCorrectionConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.REQUEST_CORRECTION)
+    type: z.literal(ActionType.REQUEST_CORRECTION),
+    onboardingForm: z.array(FormPage),
+    additionalDetailsForm: z.array(FormPage)
   })
 )
 

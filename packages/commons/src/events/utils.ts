@@ -13,9 +13,11 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { flattenDeep } from 'lodash'
-import { EventConfig, EventConfigInput } from './EventConfig'
+import { EventConfig } from './EventConfig'
+import { EventConfigInput } from './EventConfigInput'
 import { WorkqueueConfigInput } from './WorkqueueConfig'
 import { FieldConfig } from './FieldConfig'
+import { ActionType } from './ActionConfig'
 
 const isMetadataField = <T extends string>(
   field: T | EventMetadataKeys
@@ -43,9 +45,19 @@ export const findInputPageFields = (
  */
 export const findPageFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep(
-    config.actions.map(({ forms }) =>
-      forms.map(({ pages }) => pages.map(({ fields }) => fields))
-    )
+    config.actions.map((action) => {
+      if (action.type === ActionType.REQUEST_CORRECTION) {
+        return [
+          ...action.forms.map(({ pages }) => pages.map(({ fields }) => fields)),
+          ...(action.onboardingForm || []).flatMap(({ fields }) => fields),
+          ...(action.additionalDetailsForm || []).flatMap(
+            ({ fields }) => fields
+          )
+        ]
+      }
+
+      return action.forms.map(({ pages }) => pages.map(({ fields }) => fields))
+    })
   )
 }
 
@@ -111,4 +123,10 @@ export function getAllFields(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
     .flatMap((form) => form.pages.flatMap((page) => page.fields))
+}
+
+export function getAllPages(configuration: EventConfig) {
+  return configuration.actions
+    .flatMap((action) => action.forms.filter((form) => form.active))
+    .flatMap((form) => form.pages)
 }

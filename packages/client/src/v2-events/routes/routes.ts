@@ -68,12 +68,27 @@ export const ROUTES = {
               params: { eventId: string().defined() }
             },
             {
-              REVIEW: route('review'),
+              ONBOARDING: route('onboarding/:pageId', {
+                params: { pageId: string() },
+                hash: hashValues()
+              }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
                   from: string()
                 },
+                hash: hashValues()
+              }),
+              REVIEW: route('review'),
+              ADDITIONAL_DETAILS_INDEX: route('details', {
+                params: { pageId: string() },
+                hash: hashValues()
+              }),
+              ADDITIONAL_DETAILS: route('details/:pageId', {
+                params: { pageId: string() },
+                hash: hashValues()
+              }),
+              SUMMARY: route('summary', {
                 hash: hashValues()
               })
             }

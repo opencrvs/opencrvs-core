@@ -10,7 +10,135 @@
  */
 
 import React from 'react'
+import { useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { v4 as uuid } from 'uuid'
+import {
+  ActionType,
+  getAllFields,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
+import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { FormLayout } from '@client/v2-events/layouts/form'
+import { ROUTES } from '@client/v2-events/routes'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { getInitialValues } from '@client/v2-events/components/forms/utils'
 
+/**
+ *
+ * Preview of event to be registered.
+ */
 export function Review() {
-  return <div />
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const events = useEvents()
+  const intl = useIntl()
+  const [modal, openModal] = useModal()
+  const navigate = useNavigate()
+  const { goToHome } = useEventFormNavigation()
+
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
+
+  const { eventConfiguration: config } = useEventConfiguration(event.type)
+
+  const { forms: formConfigs } = config.actions.filter(
+    (action) => action.type === ActionType.DECLARE
+  )[0]
+
+  const getFormValues = useEventFormData((state) => state.getFormValues)
+
+  const form = getFormValues(eventId)
+
+  async function handleEdit({
+    pageId,
+    fieldId
+  }: {
+    pageId: string
+    fieldId?: string
+  }) {
+    const confirmedEdit = await openModal<boolean | null>((close) => (
+      <ReviewComponent.EditModal close={close} />
+    ))
+
+    if (confirmedEdit) {
+      navigate(
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+          { pageId, eventId },
+          {
+            from: 'review'
+          },
+          fieldId
+        )
+      )
+    }
+    return
+  }
+
+  const previousFormValues = getCurrentEventState(event).data
+  const valuesHaveChanged = Object.entries(form).some(
+    ([key, value]) => previousFormValues[key] !== value
+  )
+  const intlWithData = useIntlFormatMessageWithFlattenedParams()
+  const initialValues = getInitialValues(getAllFields(config))
+  const actionConfig = config.actions.find(
+    (action) => action.type === ActionType.REQUEST_CORRECTION
+  )
+
+  if (!actionConfig) {
+    throw new Error(
+      `Action config for ${ActionType.REQUEST_CORRECTION} was not found. This should never happen`
+    )
+  }
+
+  return (
+    <FormLayout
+      route={ROUTES.V2.EVENTS.REGISTER}
+      onSaveAndExit={() => {
+        events.actions.register.mutate({
+          eventId: event.id,
+          data: form,
+          transactionId: uuid(),
+          draft: true
+        })
+        goToHome()
+      }}
+    >
+      <ReviewComponent.Body
+        eventConfig={config}
+        form={form}
+        formConfig={formConfigs[0]}
+        previousFormValues={previousFormValues}
+        title={intlWithData.formatMessage(actionConfig.label, {
+          ...initialValues,
+          ...previousFormValues
+        })}
+        onEdit={handleEdit}
+      >
+        <PrimaryButton
+          key="continue_button"
+          disabled={!valuesHaveChanged}
+          id="continue_button"
+          onClick={() => {
+            navigate(
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath(
+                {
+                  eventId
+                }
+              )
+            )
+          }}
+        >
+          {intl.formatMessage(buttonMessages.continueButton)}
+        </PrimaryButton>
+        {modal}
+      </ReviewComponent.Body>
+    </FormLayout>
+  )
 }

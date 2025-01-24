@@ -14,14 +14,26 @@ import type { Preview } from '@storybook/react'
 import { initialize, mswLoader } from 'msw-storybook-addon'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { MemoryRouter } from 'react-router-dom'
+import {
+  createMemoryRouter,
+  Outlet,
+  RouteObject,
+  RouterProvider
+} from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { Page } from '../src/components/Page'
 import { I18nContainer } from '../src/i18n/components/I18nContainer'
 import { createStore } from '../src/store'
 import { useApolloClient } from '../src/utils/apolloClient'
 import { ApolloProvider } from '../src/utils/ApolloProvider'
+import { TRPCProvider } from '../src/v2-events/trpc'
 import { handlers } from './default-request-handlers'
+import WebFont from 'webfontloader'
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
+  }
+})
 
 // Initialize MSW
 initialize({
@@ -42,11 +54,12 @@ initialize({
 const { store } = createStore()
 
 interface WrapperProps {
-  children: React.ReactNode
   store: ReturnType<typeof createStore>['store']
+  initialPath: string
+  router: RouteObject
 }
 
-function Wrapper({ children, store }: WrapperProps) {
+function Wrapper({ store, router, initialPath }: WrapperProps) {
   const { client } = useApolloClient(store)
 
   return (
@@ -54,9 +67,26 @@ function Wrapper({ children, store }: WrapperProps) {
       <ThemeProvider theme={getTheme}>
         <Provider store={store}>
           <I18nContainer>
-            <MemoryRouter>
-              <Page>{children}</Page>
-            </MemoryRouter>
+            <TRPCProvider>
+              <RouterProvider
+                router={createMemoryRouter(
+                  [
+                    {
+                      path: '/',
+                      element: (
+                        <Page>
+                          <Outlet />
+                        </Page>
+                      ),
+                      children: [router]
+                    }
+                  ],
+                  {
+                    initialEntries: [initialPath]
+                  }
+                )}
+              ></RouterProvider>
+            </TRPCProvider>
           </I18nContainer>
         </Provider>
       </ThemeProvider>
@@ -65,6 +95,7 @@ function Wrapper({ children, store }: WrapperProps) {
 }
 
 export const parameters = {
+  layout: 'fullscreen',
   msw: {
     handlers: handlers
   }
@@ -79,11 +110,17 @@ const preview: Preview = {
     )
   },
   decorators: [
-    (Story) => (
-      <Wrapper store={store}>
-        <Story />
-      </Wrapper>
-    )
+    (_Story, context) => {
+      return (
+        <Wrapper
+          store={store}
+          router={context.parameters.parameters?.reactRouter?.router}
+          initialPath={
+            context.parameters.parameters?.reactRouter?.initialPath || '/'
+          }
+        ></Wrapper>
+      )
+    }
   ]
 }
 

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { IDeclaration } from '@client/declarations'
 import {
   CorrectionSection,
@@ -21,7 +22,6 @@ import { fieldValueSectionExchangeTransformer } from '@client/forms/register/map
 import { constantsMessages, formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
 import { EventType } from '@client/utils/gateway'
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export enum CorrectorRelationship {
   //death
@@ -198,8 +198,6 @@ export const getCorrectorSection = (
       }
     ]
   }
-
-  console.log(correctorRelationGroup)
 
   const correctorSection: IFormSection = {
     id: CorrectionSection.Corrector,
