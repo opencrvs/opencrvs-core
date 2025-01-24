@@ -45,7 +45,12 @@ import { SCOPES } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import {
+  createBrowserRouter,
+  Outlet,
+  RouteObject,
+  RouterProvider
+} from 'react-router-dom'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
@@ -85,7 +90,7 @@ const MainSection = styled.section`
   background: ${({ theme }) => theme.colors.background};
 `
 
-export const routesConfig = [
+export const routesConfig: RouteObject[] = [
   {
     path: '/',
     element: (

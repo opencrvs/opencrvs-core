@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, RouteObject } from 'react-router-dom'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
@@ -29,7 +29,7 @@ import { ROUTES } from './routes'
  *
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
-export const routesConfig = {
+export const routesConfig: RouteObject = {
   path: ROUTES.V2.path,
   element: (
     <TRPCProvider>
