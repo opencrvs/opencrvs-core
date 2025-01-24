@@ -181,7 +181,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/records/{id}/update-field',
       handler: updateField,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Update a single field in a registration'
       }
