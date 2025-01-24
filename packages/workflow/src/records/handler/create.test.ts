@@ -74,6 +74,29 @@ describe('Create record endpoint', () => {
       }
     )
 
+    // Notification endpoint mockcall
+    mswServer.use(
+      rest.get('http://localhost:3040/record-notification', (_, res, ctx) => {
+        return res(ctx.json({}))
+      })
+    )
+
+    // Token exchange mock call
+    mswServer.use(
+      // The actual more verbose query below, but for simplicity we can keep simpler one unless this causes issues:
+
+      // ?grant_type=urn:opencrvs:oauth:grant-type:token-exchange&subject_token=${token}&subject_token_type=urn:ietf:params:oauth:token-type:access_token
+      // &requested_token_type=urn:opencrvs:oauth:token-type:single_record_token&record_id=${recordId}
+
+      rest.post(`http://localhost:4040/token`, (_, res, ctx) => {
+        return res(
+          ctx.json({
+            access_token: 'some-token'
+          })
+        )
+      })
+    )
+
     // used for checking already created composition with
     // the same draftId
     mswServer.use(
