@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { logger } from '@opencrvs/commons'
 import { Bundle, EVENT_TYPE, Saved, ValidRecord } from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -30,25 +31,18 @@ export async function notifyForAction({
   record: Saved<ValidRecord>
   headers: Record<string, string>
 }) {
-  const response = await fetch(ACTION_NOTIFY_URL(event, action), {
-    method: 'POST',
-    body: JSON.stringify(record),
-    headers: {
-      'Content-Type': 'application/fhir+json',
-      ...headers
-    }
-  })
-
-  if (!response.ok) {
-    throw new Error(
-      `Error notifying country-config as POST ${ACTION_NOTIFY_URL(
-        event,
-        action
-      )} [${response.statusText} ${response.status}]: ${response.text()}`
-    )
+  try {
+    await fetch(ACTION_NOTIFY_URL(event, action), {
+      method: 'POST',
+      body: JSON.stringify(record),
+      headers: {
+        'Content-Type': 'application/fhir+json',
+        ...headers
+      }
+    })
+  } catch (e) {
+    logger.error(e)
   }
-
-  return response
 }
 
 export async function invokeRegistrationValidation(
