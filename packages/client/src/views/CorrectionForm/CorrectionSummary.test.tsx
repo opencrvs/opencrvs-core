@@ -33,8 +33,8 @@ import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getOfflineDataSuccess } from '@client/offline/actions'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { createMemoryRouter } from 'react-router-dom'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 const deathDeclaration: IDeclaration = {
   id: '85bccf72-6117-4cab-827d-47728becb0c1',

@@ -8,8 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
-
+import { COUNTRY_CONFIG_URL, USER_MANAGEMENT_URL } from '@gateway/constants'
+import {
+  Roles,
+  logger,
+  isBase64FileString,
+  joinURL,
+  fetchJSON
+} from '@opencrvs/commons'
 import {
   IUserModelData,
   IUserPayload,
@@ -17,7 +23,6 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   getFullName,
-  hasScope,
   inScope,
   isTokenOwner,
   getUserId
@@ -28,7 +33,6 @@ import {
   GQLSearchFieldAgentResponse,
   GQLUserInput
 } from '@gateway/graphql/schema'
-import { logger, isBase64FileString } from '@opencrvs/commons'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 
 import fetch from '@gateway/fetch'
@@ -36,13 +40,30 @@ import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
 import { rateLimitedResolver } from '@gateway/rate-limit'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import { UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
   Query: {
     getUser: rateLimitedResolver(
       { requestsPerMinute: 20 },
-      async (_, { userId }, { dataSources }) => {
+      async (_, { userId }, { headers: authHeader, dataSources }) => {
+        if (
+          !inScope(authHeader, [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_UPDATE,
+            SCOPES.USER_UPDATE_MY_JURISDICTION
+          ]) &&
+          !isTokenOwner(authHeader, userId!)
+        ) {
+          return await Promise.reject(
+            new Error(
+              `Can not get user information. ${userId} is not the owner of the token`
+            )
+          )
+        }
         const user = await dataSources.usersAPI.getUserById(userId!)
         return user
       }
@@ -68,7 +89,6 @@ export const resolvers: GQLResolver = {
         {
           username = null,
           mobile = null,
-          systemRole = null,
           status = null,
           primaryOfficeId = null,
           locationId = null,
@@ -78,11 +98,17 @@ export const resolvers: GQLResolver = {
         },
         { headers: authHeader }
       ) => {
-        // Only sysadmin or registrar or registration agent should be able to search user
-        if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-          throw new Error(
-            'Search user is only allowed for sysadmin or registrar or registration agent'
-          )
+        // Only users with organisation scope should be able to retrieve the list
+        // of users in a particular office
+        if (
+          !inScope(authHeader, [
+            SCOPES.ORGANISATION_READ_LOCATIONS,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
+            SCOPES.USER_DATA_SEEDING
+          ])
+        ) {
+          throw new Error('Searching other users is not allowed for this user')
         }
 
         let payload: IUserSearchPayload = {
@@ -95,9 +121,6 @@ export const resolvers: GQLResolver = {
         }
         if (mobile) {
           payload = { ...payload, mobile }
-        }
-        if (systemRole) {
-          payload = { ...payload, systemRole }
         }
         if (locationId) {
           payload = { ...payload, locationId }
@@ -136,13 +159,17 @@ export const resolvers: GQLResolver = {
           skip = 0,
           sort = 'desc'
         },
-        { headers: authHeader }
+        { headers: authHeader, dataSources }
       ) => {
         // Only sysadmin or registrar or registration agent should be able to search field agents
-        if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-          throw new Error(
-            'Search field agents is only allowed for sysadmin or registrar or registration agent'
-          )
+        if (
+          !inScope(authHeader, [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE
+          ])
+        ) {
+          throw new Error('Search field agents is not allowed for this user')
         }
 
         if (!locationId && !primaryOfficeId) {
@@ -154,7 +181,6 @@ export const resolvers: GQLResolver = {
         }
 
         let payload: IUserSearchPayload = {
-          systemRole: 'FIELD_AGENT',
           count,
           skip,
           sortOrder: sort
@@ -203,8 +229,12 @@ export const resolvers: GQLResolver = {
           authHeader
         )
 
+        const roles = await dataSources.countryConfigAPI.getRoles()
+
         const fieldAgentList: GQLSearchFieldAgentResponse[] =
           userResponse.results.map((user: IUserModelData) => {
+            const role = roles.find((role) => role.id === user.role)
+
             const metricsData = metricsForPractitioners.find(
               (metricsForPractitioner: { practitionerId: string }) =>
                 metricsForPractitioner.practitionerId === user.practitionerId
@@ -212,7 +242,7 @@ export const resolvers: GQLResolver = {
             return {
               practitionerId: user.practitionerId,
               fullName: getFullName(user, language),
-              role: user.role,
+              role: role,
               status: user.status,
               avatar: user.avatar,
               primaryOfficeId: user.primaryOfficeId,
@@ -258,9 +288,16 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createOrUpdateUser(_, { user }, { headers: authHeader }) {
-      // Only sysadmin should be able to create user
-      if (!hasScope(authHeader, 'sysadmin')) {
-        throw new Error('Create user is only allowed for sysadmin')
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_DATA_SEEDING,
+          SCOPES.USER_CREATE,
+          SCOPES.USER_CREATE_MY_JURISDICTION,
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
+      ) {
+        throw new Error('Create or update user is not allowed for this user')
       }
 
       try {
@@ -271,9 +308,13 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      const userPayload: IUserPayload = createOrUpdateUserPayload(user)
-      const action = userPayload.id ? 'update' : 'create'
-      const res = await fetch(`${USER_MANAGEMENT_URL}${action}User`, {
+      const roles = await fetchJSON<Roles>(
+        joinURL(COUNTRY_CONFIG_URL, '/roles')
+      )
+      const userPayload: IUserPayload = createOrUpdateUserPayload(user, roles)
+      const action = userPayload.id ? 'updateUser' : 'createUser'
+
+      const res = await fetch(joinURL(USER_MANAGEMENT_URL, action), {
         method: 'POST',
         body: JSON.stringify(userPayload),
         headers: {
@@ -305,7 +346,7 @@ export const resolvers: GQLResolver = {
         })
       } else if (res.status !== 201) {
         throw new Error(
-          `Something went wrong on user-mgnt service. Couldn't ${action} user`
+          `Something went wrong on user-mgnt service. Couldn't perform ${action}`
         )
       }
       return await res.json()
@@ -315,6 +356,15 @@ export const resolvers: GQLResolver = {
       { userId, password, securityQNAs },
       { headers: authHeader }
     ) {
+      if (
+        !isTokenOwner(authHeader, userId) &&
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
+      )
+        throw new Error('User can not be activated')
+
       const res = await fetch(`${USER_MANAGEMENT_URL}activateUser`, {
         method: 'POST',
         body: JSON.stringify({ userId, password, securityQNAs }),
@@ -338,9 +388,12 @@ export const resolvers: GQLResolver = {
       { userId, existingPassword, password },
       { headers: authHeader }
     ) {
-      // Only token owner except sysadmin should be able to change their password
+      // Only token owner of CONFIG_UPDATE_ALL should be able to change their password
       if (
-        !hasScope(authHeader, 'sysadmin') &&
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ]) &&
         !isTokenOwner(authHeader, userId)
       ) {
         throw new Error(
@@ -470,7 +523,13 @@ export const resolvers: GQLResolver = {
       { userId, action, reason, comment },
       { headers: authHeader }
     ) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION,
+          SCOPES.USER_DATA_SEEDING
+        ])
+      ) {
         throw new Error(
           `User ${userId} is not allowed to audit for not having the sys admin scope`
         )
@@ -501,10 +560,13 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resendInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
-        throw new Error(
-          'SMS invite can only be resent by a user with sys admin scope'
-        )
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
+      ) {
+        throw new Error('SMS invite can not be resent by this user')
       }
 
       const res = await fetch(`${USER_MANAGEMENT_URL}resendInvite`, {
@@ -526,10 +588,13 @@ export const resolvers: GQLResolver = {
       return true
     },
     async usernameReminder(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
-        throw new Error(
-          'Username reminder can only be resent by a user with sys admin scope'
-        )
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
+      ) {
+        throw new Error('Username reminder can not be resent by this user')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}usernameReminder`, {
         method: 'POST',
@@ -550,10 +615,13 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
-        throw new Error(
-          'Reset password can only be sent by a user with sys admin scope'
-        )
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
+      ) {
+        throw new Error('Reset password can not be sent by this user')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}resetPasswordInvite`, {
         method: 'POST',
@@ -576,14 +644,16 @@ export const resolvers: GQLResolver = {
   }
 }
 
-function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
+function createOrUpdateUserPayload(
+  user: GQLUserInput,
+  roles: Roles
+): IUserPayload {
   const userPayload: IUserPayload = {
     name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
       family: name.familyName?.trim() as string,
       given: [name.firstNames?.trim() || ''] as string[]
     })),
-    systemRole: user.systemRole as string,
     role: user.role as string,
     ...(user.password && { password: user.password }),
     ...(user.status && { status: user.status }),

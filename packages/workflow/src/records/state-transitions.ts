@@ -50,7 +50,8 @@ import {
   toHistoryResource,
   TaskHistory,
   RejectedRecord,
-  SupportedPatientIdentifierCode
+  SupportedPatientIdentifierCode,
+  PractitionerRole
 } from '@opencrvs/commons/types'
 import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
@@ -104,7 +105,8 @@ import {
   withPractitionerDetails,
   mergeChangedResourcesIntoRecord,
   createReinstateTask,
-  mergeBundles
+  mergeBundles,
+  getPractitionerRoleFromToken
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 import { tokenExchangeHandler } from './token-exchange-handler'
@@ -295,13 +297,15 @@ export async function toUpdated(
 export async function toViewed<T extends ValidRecord>(
   record: T,
   token: string
-): Promise<T> {
+) {
   const previousTask: SavedTask = getTaskFromSavedBundle(record)
   const viewedTask = await createViewTask(previousTask, token)
 
   const taskHistoryEntry = resourceToBundleEntry(
     toHistoryResource(previousTask)
   ) as SavedBundleEntry<TaskHistory>
+
+  const practitionerRoleEntry = await getPractitionerRoleFromToken(token)
 
   const filteredEntries = record.entry.filter(
     (e) => e.resource.resourceType !== 'Task'
@@ -318,11 +322,28 @@ export async function toViewed<T extends ValidRecord>(
         )[0].fullUrl,
         resource: viewedTask
       },
-      taskHistoryEntry
+      taskHistoryEntry,
+      /*  PractitionerRole resource is saved in the bundle
+      since PractitionerRole is fetched from bundle
+      in the resolvers during readying history of a record */
+      practitionerRoleEntry
     ]
   } as T
 
-  return viewedRecord
+  const viewedRecordWithSpecificEntries: Bundle = {
+    ...viewedRecord,
+    entry: [
+      {
+        fullUrl: record.entry.filter(
+          (e) => e.resource.resourceType === 'Task'
+        )[0].fullUrl,
+        resource: viewedTask
+      },
+      practitionerRoleEntry
+    ]
+  }
+
+  return { viewedRecord, viewedRecordWithSpecificEntries }
 }
 
 export function toIdentifierUpserted<T extends ValidRecord>(
@@ -361,19 +382,13 @@ export function toIdentifierUpserted<T extends ValidRecord>(
 
 export async function toDownloaded(
   record: ValidRecord,
-  token: string,
-  extensionUrl:
-    | 'http://opencrvs.org/specs/extension/regDownloaded'
-    | 'http://opencrvs.org/specs/extension/regAssigned'
+  token: string
 ): Promise<{
   downloadedRecord: ValidRecord
-  downloadedRecordWithTaskOnly: Bundle<SavedTask>
+  downloadedBundleWithResources: Bundle<SavedTask | PractitionerRole>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerDetails = createDownloadTask(
-    previousTask,
-    extensionUrl
-  )
+  const taskWithoutPractitionerDetails = createDownloadTask(previousTask)
   const [downloadedTask, practitionerDetailsBundle] =
     await withPractitionerDetails(taskWithoutPractitionerDetails, token)
 
@@ -392,9 +407,19 @@ export async function toDownloaded(
     resource: downloadedTask
   }
 
+  /*
+    When a user tries to access a record for the first time,
+    practitionerRoleBundle is necessary to create the history of the record
+  */
+  const practitionerRoleEntry = await getPractitionerRoleFromToken(token)
   const updatedBundle = {
     ...record,
-    entry: [...filteredEntriesWithoutTask, newTaskEntry, taskHistoryEntry]
+    entry: [
+      ...filteredEntriesWithoutTask,
+      newTaskEntry,
+      taskHistoryEntry,
+      practitionerRoleEntry
+    ]
   }
 
   const downloadedRecord = mergeBundles(
@@ -402,13 +427,16 @@ export async function toDownloaded(
     practitionerDetailsBundle
   ) as ValidRecord
 
-  const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
+  const downloadedBundleWithResources: Bundle<SavedTask | PractitionerRole> = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [{ resource: downloadedTask }]
+    entry: [
+      { resource: downloadedTask },
+      { resource: practitionerRoleEntry.resource }
+    ]
   }
 
-  return { downloadedRecord, downloadedRecordWithTaskOnly }
+  return { downloadedRecord, downloadedBundleWithResources }
 }
 
 export async function toRejected(
@@ -997,11 +1025,17 @@ export async function toCertified(
     record
   )
 
+  const practitionerReference = findExtension(
+    'http://opencrvs.org/specs/extension/regLastUser',
+    certifiedTask.extension
+  )!.valueReference.reference
+
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
+    practitionerReference,
     certificateDetails.certificateTemplateId
   )
 
@@ -1088,8 +1122,8 @@ export async function toIssued(
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
-    certificateDetails.certificateTemplateId,
     undefined,
+    certificateDetails.certificateTemplateId,
     paymentReconciliation.fullUrl
   )
 

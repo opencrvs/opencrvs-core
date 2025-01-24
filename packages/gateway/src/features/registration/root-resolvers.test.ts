@@ -15,12 +15,15 @@ import { DOWNLOADED_EXTENSION_URL } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { sign } from 'jsonwebtoken'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import RecordsAPI from '@gateway/features/fhir/recordsAPI'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
 const registerCertifyToken = sign(
-  { scope: ['register', 'certify'] },
+  {
+    scope: [SCOPES.RECORD_REGISTER, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]
+  },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -31,7 +34,7 @@ const registerCertifyToken = sign(
 )
 
 const validateToken = sign(
-  { scope: ['validate'] },
+  { scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL] },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -42,7 +45,13 @@ const validateToken = sign(
 )
 
 const declareToken = sign(
-  { scope: ['declare'] },
+  {
+    scope: [
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE
+    ]
+  },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -53,17 +62,7 @@ const declareToken = sign(
 )
 
 const certifyToken = sign(
-  { scope: ['certify'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
-
-const sysAdminToken = sign(
-  { scope: ['sysadmin'] },
+  { scope: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -85,14 +84,6 @@ const authHeaderCertify = {
 }
 
 const authHeaderNotRegCert = {
-  Authorization: `Bearer ${declareToken}`
-}
-
-const authHeaderSysAdmin = {
-  Authorization: `Bearer ${sysAdminToken}`
-}
-
-const authHeaderNotSysAdmin = {
   Authorization: `Bearer ${declareToken}`
 }
 
@@ -178,148 +169,6 @@ beforeEach(() => {
 })
 
 describe('Registration root resolvers', () => {
-  describe('searchBirthRegistrations()', () => {
-    it('throws an error if the user does not have sysadmin scope', async () => {
-      return expect(
-        resolvers.Query!.searchBirthRegistrations(
-          {},
-          {
-            fromDate: new Date('05 October 2011 14:48 UTC'),
-            toDate: new Date('05 October 2012 14:48 UTC')
-          },
-          authHeaderNotSysAdmin
-        )
-      ).rejects.toThrowError('User does not have a sysadmin scope')
-    })
-
-    it('returns an array of records', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'birth-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'birth-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-
-      const compositions = await resolvers.Query!.searchBirthRegistrations(
-        {},
-        {
-          fromDate: new Date('05 October 2011 14:48 UTC'),
-          toDate: new Date('05 October 2012 14:48 UTC')
-        },
-        { headers: authHeaderSysAdmin }
-      )
-
-      expect(compositions[0].entry[0].resource.id).toBe(
-        '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-      )
-    })
-  })
-
-  describe('searchDeathRegistrations()', () => {
-    it('throws an error if the user does not have sysadmin scope', async () => {
-      return expect(
-        resolvers.Query!.searchDeathRegistrations(
-          {},
-          {
-            fromDate: new Date('05 October 2011 14:48 UTC'),
-            toDate: new Date('05 October 2012 14:48 UTC')
-          },
-          authHeaderNotSysAdmin
-        )
-      ).rejects.toThrowError('User does not have a sysadmin scope')
-    })
-
-    it('returns an array of records', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'death-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'death-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-
-      const compositions = await resolvers.Query!.searchDeathRegistrations(
-        {},
-        {
-          fromDate: new Date('05 October 2011 14:48 UTC'),
-          toDate: new Date('05 October 2012 14:48 UTC')
-        },
-        { headers: authHeaderSysAdmin }
-      )
-
-      expect(compositions[0].entry[0].resource.id).toBe(
-        '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-      )
-    })
-  })
-
   describe('fetchBirthRegistration()', () => {
     it('returns the record in the OpenCRVS format', async () => {
       const mockTaskOfComposition = JSON.stringify({
@@ -421,7 +270,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchDeathRegistration()', () => {
@@ -526,7 +375,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchMarriageRegistration()', () => {
@@ -631,7 +480,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchRegistration()', () => {
@@ -746,7 +595,7 @@ describe('Registration root resolvers', () => {
           { id, reason, comment },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -763,7 +612,7 @@ describe('Registration root resolvers', () => {
           { id },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -780,7 +629,7 @@ describe('Registration root resolvers', () => {
           { id },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1023,7 +872,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           { headers: authHeaderRegCert }
         )
-      ).rejects.toThrowError('User does not have a validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1340,7 +1189,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           { headers: authHeaderRegCert }
         )
-      ).rejects.toThrowError('User does not have a validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1418,6 +1267,8 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [JSON.stringify(mockUserDetails), { status: 200 }],
         [
           JSON.stringify({
@@ -1450,6 +1301,10 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have a certify scope", async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation!.markBirthAsCertified(
@@ -1457,7 +1312,22 @@ describe('Registration root resolvers', () => {
           { id, details },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a certify scope')
+      ).rejects.toThrowError('User does not have enough scope')
+    })
+
+    it('throws an error when the user is not assigned to record', async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121331' }), { status: 200 }]
+      )
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      await expect(
+        resolvers.Mutation!.markBirthAsCertified(
+          {},
+          { id, details },
+          { headers: authHeaderNotRegCert }
+        )
+      ).rejects.toThrowError('User is not assigned to the record')
     })
   })
   describe('markDeathAsCertified()', () => {
@@ -1484,6 +1354,8 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [JSON.stringify(mockUserDetails), { status: 200 }],
         [
           JSON.stringify({
@@ -1518,16 +1390,30 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have a certify scope", async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle), { status: 200 }],
-        [JSON.stringify(mockUserDetails), { status: 200 }]
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
       )
       await expect(
         resolvers.Mutation!.markDeathAsCertified(
           {},
           { details },
-          authHeaderNotRegCert
+          { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a certify scope')
+      ).rejects.toThrowError('User does not have enough scope')
+    })
+
+    it('throws an error when the user is not assigned to the record', async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121331' }), { status: 200 }]
+      )
+      await expect(
+        resolvers.Mutation!.markDeathAsCertified(
+          {},
+          { details },
+          { headers: authHeaderNotRegCert }
+        )
+      ).rejects.toThrowError('User is not assigned to the record')
     })
   })
   describe('markEventAsNotDuplicate()', () => {
@@ -1543,7 +1429,7 @@ describe('Registration root resolvers', () => {
           },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
 
     it('throws an error when the declaration is not assigned', async () => {
@@ -1637,7 +1523,7 @@ describe('Registration root resolvers', () => {
           { identifier: '2019333494BAQFYEG6' },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1892,6 +1778,6 @@ describe('markEventAsUnassigned()', () => {
         { id },
         authHeaderNotRegCert
       )
-    ).rejects.toThrowError('User does not have a register or validate scope')
+    ).rejects.toThrowError('User does not have enough scope')
   })
 })
