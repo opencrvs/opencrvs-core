@@ -16,34 +16,37 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { v4 as uuid } from 'uuid'
-import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { FormLayout } from '@client/v2-events/layouts/form'
 import { ROUTES } from '@client/v2-events/routes'
+import {
+  useEventFormData,
+  useSubscribeEventFormData
+} from '@client/v2-events/features/events/useEventFormData'
+import { FormLayout } from '@client/v2-events/layouts/form'
 import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
+
   const navigate = useNavigate()
   const events = useEvents()
   const { modal, goToHome } = useEventFormNavigation()
-
-  const formEventId = useEventFormData((state) => state.eventId)
-  const setFormValues = useEventFormData((state) => state.setFormValues)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-  const currentState = getCurrentEventState(event)
-  const form = useEventFormData((state) => state.formValues)
+
+  const { eventId: formEventId, formValues } = useSubscribeEventFormData()
+
+  const setFormValues = useEventFormData((state) => state.setFormValues)
 
   useEffect(() => {
     if (formEventId !== event.id) {
-      setFormValues(event.id, currentState.data)
+      setFormValues(event.id, formValues)
     }
-  }, [currentState.data, event.id, formEventId, setFormValues])
+  }, [event.id, setFormValues, formEventId, formValues])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -98,16 +101,18 @@ export function Pages() {
       onSaveAndExit={() => {
         events.actions.declare.mutate({
           eventId: event.id,
-          data: form,
+          data: formValues,
           transactionId: uuid(),
           draft: true
         })
+
         goToHome()
       }}
     >
       {modal}
       <PagesComponent
         eventId={eventId}
+        form={formValues}
         formPages={formPages}
         pageId={currentPageId}
         showReviewButton={searchParams.from === 'review'}

@@ -90,7 +90,9 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        crypto: require.resolve('crypto-js')
+        crypto: 'crypto-js',
+        '@opencrvs/commons/build/dist/authentication':
+          '@opencrvs/commons/authentication'
       }
     },
     plugins: [

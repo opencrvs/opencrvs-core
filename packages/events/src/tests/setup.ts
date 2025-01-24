@@ -22,6 +22,7 @@ vi.mock('@events/storage/mongodb/user-mgnt')
 
 vi.mock('@events/storage/elasticsearch')
 vi.mock('@events/service/config/config', () => ({
+  notifyOnAction: async () => Promise.resolve(),
   getEventConfigurations: async () =>
     Promise.all([
       tennisClubMembershipEvent,

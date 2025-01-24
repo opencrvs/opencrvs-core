@@ -16,7 +16,8 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   getAllPages,
-  getCurrentEventState
+  getCurrentEventState,
+  SCOPES
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -30,15 +31,16 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
+// eslint-disable-next-line no-restricted-imports
+import { getScope } from '@client/profile/profileSelectors'
+
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 import { ROUTES } from '@client/v2-events/routes'
-import { useCorrectionRequestData } from '../useCorrectionRequestData'
+import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
 
 const messages = defineMessages({
   itemLabel: {
@@ -54,6 +56,8 @@ export function Summary() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
+  const scopes = useSelector(getScope)
+
   const [showPrompt, setShowPrompt] = React.useState(false)
 
   const togglePrompt = () => setShowPrompt(!showPrompt)
@@ -61,7 +65,7 @@ export function Summary() {
   const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
-  const user = useSelector(getUserDetails)
+
   const events = useEvents()
   const [event] = events.getEvent.useSuspenseQuery(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -101,9 +105,10 @@ export function Summary() {
       onClick={togglePrompt}
     >
       <Check />
-      {user?.systemRole === ROLE_REGISTRATION_AGENT
-        ? intl.formatMessage(buttonMessages.sendForApproval)
-        : intl.formatMessage(buttonMessages.makeCorrection)}
+
+      {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+        ? intl.formatMessage(buttonMessages.makeCorrection)
+        : intl.formatMessage(buttonMessages.sendForApproval)}
     </Button>
   )
 
@@ -262,18 +267,18 @@ export function Summary() {
         id="withoutCorrectionForApprovalPrompt"
         isOpen={showPrompt}
         title={intl.formatMessage(
-          user?.systemRole === ROLE_REGISTRATION_AGENT
-            ? correctionMessages.correctionForApprovalDialogTitle
-            : correctionMessages.correctRecordDialogTitle
+          scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+            ? correctionMessages.correctRecordDialogTitle
+            : correctionMessages.correctionForApprovalDialogTitle
         )}
         onClose={togglePrompt}
       >
         <p>
           <Text element="p" variant="reg16">
             {intl.formatMessage(
-              user?.systemRole === ROLE_REGISTRATION_AGENT
-                ? correctionMessages.correctionForApprovalDialogDescription
-                : correctionMessages.correctRecordDialogDescription
+              scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+                ? correctionMessages.correctRecordDialogDescription
+                : correctionMessages.correctionForApprovalDialogDescription
             )}
           </Text>
         </p>

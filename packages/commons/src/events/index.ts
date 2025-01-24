@@ -10,6 +10,7 @@
  */
 export * from './ActionConfig'
 export * from './EventConfig'
+export * from './EventConfigInput'
 export * from './FieldConfig'
 export * from './FormConfig'
 export * from './SummaryConfig'

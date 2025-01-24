@@ -27,12 +27,11 @@ const FETCH_USER = gql`
       practitionerId
       mobile
       email
-      systemRole
       role {
-        _id
-        labels {
-          lang
-          label
+        label {
+          id
+          defaultMessage
+          description
         }
       }
       status

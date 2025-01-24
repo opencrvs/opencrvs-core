@@ -17,7 +17,7 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { getUserId } from '@opencrvs/commons/authentication'
+import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'
 import { getUser, logger } from '@opencrvs/commons'
 import { env } from './environment'
@@ -28,13 +28,17 @@ import { getAnonymousToken } from './service/auth'
 const server = createHTTPServer({
   router: appRouter,
   createContext: async function createContext(opts) {
-    const token = opts.req.headers.authorization
+    const parseResult = TokenWithBearer.safeParse(
+      opts.req.headers.authorization
+    )
 
-    if (!token) {
+    if (!parseResult.success) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'
       })
     }
+
+    const token = parseResult.data
 
     const userId = getUserId(token)
 
@@ -55,16 +59,30 @@ const server = createHTTPServer({
         id: userId,
         primaryOfficeId
       },
-      token
+      token: token
     }
   }
 })
 
 export async function main() {
-  const configurations = await getEventConfigurations(await getAnonymousToken())
-  for (const configuration of configurations) {
-    logger.info(`Loaded event configuration: ${configuration.id}`)
-    await ensureIndexExists(configuration)
+  try {
+    const configurations = await getEventConfigurations(
+      await getAnonymousToken()
+    )
+    for (const configuration of configurations) {
+      logger.info(`Loaded event configuration: ${configuration.id}`)
+      await ensureIndexExists(configuration)
+    }
+  } catch (error) {
+    logger.error(error)
+    if (env.isProd) {
+      process.exit(1)
+    }
+    /*
+     * SIGUSR2 tells nodemon to restart the process with waiting for new file changes
+     */
+    setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
+    return
   }
 
   server.listen(5555)
