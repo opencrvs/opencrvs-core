@@ -18,6 +18,7 @@ import { storage } from '@client/storage'
 interface EventFormData {
   formValues: ActionFormData
   setFormValues: (eventId: string, data: ActionFormData) => void
+  setFormValuesIfEmpty: (eventId: string, data: ActionFormData) => void
   getFormValues: (
     eventId: string,
     initialValues?: ActionFormData
@@ -41,6 +42,13 @@ export const useEventFormData = create<EventFormData>()(
       getFormValues: (eventId: string, initialValues?: ActionFormData) =>
         get().eventId === eventId ? get().formValues : initialValues ?? {},
       setFormValues: (eventId: string, data: ActionFormData) => {
+        const formValues = removeUndefinedKeys(data)
+        return set(() => ({ eventId, formValues }))
+      },
+      setFormValuesIfEmpty: (eventId: string, data: ActionFormData) => {
+        if (get().eventId === eventId) {
+          return
+        }
         const formValues = removeUndefinedKeys(data)
         return set(() => ({ eventId, formValues }))
       },

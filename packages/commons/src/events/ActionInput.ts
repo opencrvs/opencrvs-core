@@ -81,7 +81,8 @@ export const RequestCorrectionActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.REQUEST_CORRECTION)
-      .default(ActionType.REQUEST_CORRECTION)
+      .default(ActionType.REQUEST_CORRECTION),
+    metadata: z.record(z.string(), FieldValue)
   })
 )
 

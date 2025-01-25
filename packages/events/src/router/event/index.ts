@@ -116,7 +116,8 @@ export const eventRouter = router({
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
         })
       }),
     declare: publicProcedure
@@ -126,7 +127,8 @@ export const eventRouter = router({
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
         })
       }),
     validate: publicProcedure
@@ -136,7 +138,8 @@ export const eventRouter = router({
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
         })
       }),
     register: publicProcedure
@@ -154,7 +157,8 @@ export const eventRouter = router({
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
           }
         )
       }),
@@ -166,7 +170,8 @@ export const eventRouter = router({
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
           })
         }),
       approve: publicProcedure
@@ -176,7 +181,8 @@ export const eventRouter = router({
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
           })
         }),
       reject: publicProcedure
@@ -186,7 +192,8 @@ export const eventRouter = router({
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
           })
         })
     })

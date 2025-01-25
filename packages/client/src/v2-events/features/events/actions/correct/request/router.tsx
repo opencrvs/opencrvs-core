@@ -20,7 +20,7 @@ export const router = {
   children: [
     {
       index: true,
-      element: <RequestCorrection.Pages />
+      element: <RequestCorrection.Onboarding />
     },
     {
       path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.path,

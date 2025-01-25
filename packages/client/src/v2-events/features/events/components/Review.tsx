@@ -188,11 +188,13 @@ function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
 function Output({
   field,
   value,
-  previousValue
+  previousValue,
+  showPreviouslyMissingValuesAsChanged = true
 }: {
   field: FieldConfig
   value: string
   previousValue?: string
+  showPreviouslyMissingValuesAsChanged: boolean
 }) {
   const ValueOutput = FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
 
@@ -215,7 +217,7 @@ function Output({
       </>
     )
   }
-  if (!previousValue && value) {
+  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
         <Deleted>
@@ -257,6 +259,7 @@ function ReviewComponent({
 
   const stringifiedForm = toString(form)
 
+  const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const stringifiedPreviousForm = previousFormValues
     ? toString(previousFormValues)
     : {}
@@ -334,6 +337,9 @@ function ReviewComponent({
                               <Output
                                 field={field}
                                 previousValue={previousValue}
+                                showPreviouslyMissingValuesAsChanged={
+                                  showPreviouslyMissingValuesAsChanged
+                                }
                                 value={value}
                               />
                             )

@@ -175,12 +175,14 @@ export async function addAction(
     eventId,
     createdBy,
     token,
-    createdAtLocation
+    createdAtLocation,
+    transactionId
   }: {
     eventId: string
     createdBy: string
     createdAtLocation: string
     token: string
+    transactionId: string
   }
 ) {
   const db = await events.getClient()
@@ -213,7 +215,8 @@ export async function addAction(
 
   await db.collection<EventDocument>('events').updateOne(
     {
-      id: eventId
+      id: eventId,
+      'actions.transactionId': { $ne: transactionId }
     },
     {
       $push: {

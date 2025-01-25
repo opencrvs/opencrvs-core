@@ -15,9 +15,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
+  FieldConfig,
   getAllPages,
   getCurrentEventState,
-  SCOPES
+  SCOPES,
+  generateTransactionId
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -50,6 +52,13 @@ const messages = defineMessages({
       'Label for each item in the first column of correction summary table'
   }
 })
+
+function shouldBeShownAsAValue(field: FieldConfig) {
+  if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
+    return false
+  }
+  return true
+}
 
 export function Summary() {
   const { eventId } = useTypedParams(
@@ -219,12 +228,14 @@ export function Summary() {
                     key: 'collectedValue'
                   }
                 ]}
-                content={page.fields.map((field) => {
-                  return {
-                    fieldLabel: intl.formatMessage(field.label),
-                    collectedValue: stringiedRequestData[field.id] || ''
-                  }
-                })}
+                content={page.fields
+                  .filter(shouldBeShownAsAValue)
+                  .map((field) => {
+                    return {
+                      fieldLabel: intl.formatMessage(field.label),
+                      collectedValue: stringiedRequestData[field.id] || ''
+                    }
+                  })}
                 hideTableBottomBorder={true}
                 id="requestedBy"
                 isLoading={false}
@@ -255,8 +266,13 @@ export function Summary() {
             size="medium"
             type="positive"
             onClick={() => {
-              alert('make correction @todo')
-              togglePrompt()
+              events.actions.correct.request.mutate({
+                eventId,
+                data: form,
+                transactionId: generateTransactionId(),
+                metadata: correctionRequestData.getFormValues()
+              })
+              eventFormNavigation.goToHome()
             }}
           >
             {intl.formatMessage(

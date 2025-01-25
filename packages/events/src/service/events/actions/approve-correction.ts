@@ -28,12 +28,14 @@ export async function approveCorrection(
     eventId,
     createdBy,
     token,
-    createdAtLocation
+    createdAtLocation,
+    transactionId
   }: {
     eventId: string
     createdBy: string
     createdAtLocation: string
     token: string
+    transactionId: string
   }
 ) {
   const storedEvent = await getEventById(eventId)
@@ -50,7 +52,8 @@ export async function approveCorrection(
     eventId,
     createdBy,
     token,
-    createdAtLocation
+    createdAtLocation,
+    transactionId
   })
   return event
 }

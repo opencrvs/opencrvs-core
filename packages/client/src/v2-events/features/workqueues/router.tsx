@@ -24,28 +24,17 @@ import { TRPCProvider } from '@client/v2-events/trpc'
  */
 export const router = {
   path: ROUTES.V2.path,
+  // Alternative would be to create a navigation component that would be used here.
   element: (
-    <TRPCProvider>
-      <Outlet />
-      <Debug />
-    </TRPCProvider>
+    <WorkqueueLayout>
+      <WorkqueueIndex />
+    </WorkqueueLayout>
   ),
   children: [
     {
-      path: ROUTES.V2.path,
-      // Alternative would be to create a navigation component that would be used here.
-      element: (
-        <WorkqueueLayout>
-          <WorkqueueIndex />
-        </WorkqueueLayout>
-      ),
-      children: [
-        {
-          index: true,
-          path: ROUTES.V2.WORKQUEUE.path,
-          element: <WorkqueueIndex />
-        }
-      ]
+      index: true,
+      path: ROUTES.V2.WORKQUEUE.path,
+      element: <WorkqueueIndex />
     }
   ]
 }
