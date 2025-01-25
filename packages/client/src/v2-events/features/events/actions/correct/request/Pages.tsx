@@ -75,16 +75,8 @@ export function Pages() {
 
   return (
     <FormLayout
+      canSaveAndExit={false}
       route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}
-      onSaveAndExit={() => {
-        // events.actions.register.mutate({
-        //   eventId: event.id,
-        //   data: form,
-        //   transactionId: uuid(),
-        //   draft: true
-        // })
-        // goToHome()
-      }}
     >
       {modal}
       <PagesComponent

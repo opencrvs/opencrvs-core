@@ -10,8 +10,9 @@
  */
 
 import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { ActionFormData } from '@opencrvs/commons/client'
-
+import { storage } from '@client/storage'
 interface CorrectionRequestData {
   formValues: ActionFormData
   setFormValues: (data: ActionFormData) => void
@@ -26,14 +27,30 @@ function removeUndefinedKeys(data: ActionFormData) {
 }
 
 export const useCorrectionRequestData = create<CorrectionRequestData>()(
-  (set, get) => ({
-    formValues: {},
-    eventId: '',
-    getFormValues: () => get().formValues,
-    setFormValues: (data: ActionFormData) => {
-      const formValues = removeUndefinedKeys(data)
-      return set(() => ({ formValues }))
-    },
-    clear: () => set(() => ({ formValues: {} }))
-  })
+  persist(
+    (set, get) => ({
+      formValues: {},
+      eventId: '',
+      getFormValues: () => get().formValues,
+      setFormValues: (data: ActionFormData) => {
+        const formValues = removeUndefinedKeys(data)
+        return set(() => ({ formValues }))
+      },
+      clear: () => set(() => ({ formValues: {} }))
+    }),
+    {
+      name: 'correction-form-data',
+      storage: createJSONStorage(() => ({
+        getItem: async (key) => {
+          return storage.getItem(key)
+        },
+        setItem: async (key, value) => {
+          await storage.setItem(key, value)
+        },
+        removeItem: async (key) => {
+          await storage.removeItem(key)
+        }
+      }))
+    }
+  )
 )

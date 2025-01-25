@@ -23,6 +23,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 
 const messages = defineMessages({
   title: {
@@ -33,6 +34,13 @@ const messages = defineMessages({
 })
 
 export function Onboarding() {
+  const resetMetadata = useCorrectionRequestData((state) => state.clear)
+  const resetFormData = useEventFormData((state) => state.clear)
+  React.useEffect(() => {
+    resetMetadata()
+    resetFormData()
+  }, [resetFormData, resetMetadata])
+
   const navigate = useNavigate()
 
   const { eventId, pageId } = useTypedParams(

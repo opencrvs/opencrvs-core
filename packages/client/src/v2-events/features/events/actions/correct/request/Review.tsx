@@ -98,18 +98,7 @@ export function Review() {
   }
 
   return (
-    <FormLayout
-      route={ROUTES.V2.EVENTS.REGISTER}
-      onSaveAndExit={() => {
-        events.actions.register.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          draft: true
-        })
-        goToHome()
-      }}
-    >
+    <FormLayout canSaveAndExit={false} route={ROUTES.V2.EVENTS.REGISTER}>
       <ReviewComponent.Body
         eventConfig={config}
         form={form}

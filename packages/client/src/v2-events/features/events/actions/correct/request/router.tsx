@@ -11,8 +11,8 @@
 
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import { ROUTES } from '@client/v2-events/routes'
 import * as RequestCorrection from '@client/v2-events/features/events/actions/correct/request'
+import { ROUTES } from '@client/v2-events/routes'
 
 export const router = {
   path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.path,

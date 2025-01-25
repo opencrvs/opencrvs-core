@@ -16,6 +16,7 @@ import { Frame, Spinner } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
+import { noop } from '@client/v2-events'
 import { FormHeader } from './FormHeader'
 
 type AllowedRoute =
@@ -30,11 +31,13 @@ type AllowedRoute =
 export function FormLayout({
   route,
   children,
-  onSaveAndExit
+  onSaveAndExit,
+  canSaveAndExit
 }: {
   route: AllowedRoute
   children: React.ReactNode
-  onSaveAndExit: () => void
+  onSaveAndExit?: () => void
+  canSaveAndExit?: boolean
 }) {
   const { eventId } = useTypedParams(route)
   const events = useEvents()
@@ -48,7 +51,11 @@ export function FormLayout({
   return (
     <Frame
       header={
-        <FormHeader label={configuration.label} onSaveAndExit={onSaveAndExit} />
+        <FormHeader
+          canSaveAndExit={canSaveAndExit}
+          label={configuration.label}
+          onSaveAndExit={onSaveAndExit || noop}
+        />
       }
       skipToContentText="Skip to form"
     >

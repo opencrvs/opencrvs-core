@@ -180,30 +180,32 @@ export function Summary() {
                 key: 'changed'
               }
             ]}
-            content={Object.entries(stringifiedForm).map(([key, value]) => {
-              const page = pages.find(({ fields }) =>
-                fields.some(({ id }) => id === key)
-              )
-              if (!page) {
-                throw new Error(
-                  `Page containing the given field key ${key} was not found. This should never happen`
+            content={Object.entries(stringifiedForm)
+              .map(([key, value]) => {
+                const page = pages.find(({ fields }) =>
+                  fields.some(({ id }) => id === key)
                 )
-              }
-              const field = page.fields.find(({ id }) => id === key)
-              if (!field) {
-                throw new Error(
-                  `Field not found with the given field key ${key}. This should never happen`
-                )
-              }
-              return {
-                item: intl.formatMessage(messages.itemLabel, {
-                  fieldLabel: intl.formatMessage(field.label),
-                  sectionLabel: intl.formatMessage(page.title)
-                }),
-                original: stringifiedPreviousForm[key] || '-',
-                changed: value
-              }
-            })}
+                if (!page) {
+                  throw new Error(
+                    `Page containing the given field key ${key} was not found. This should never happen`
+                  )
+                }
+                const field = page.fields.find(({ id }) => id === key)
+                if (!field) {
+                  throw new Error(
+                    `Field not found with the given field key ${key}. This should never happen`
+                  )
+                }
+                return {
+                  item: intl.formatMessage(messages.itemLabel, {
+                    fieldLabel: intl.formatMessage(field.label),
+                    sectionLabel: intl.formatMessage(page.title)
+                  }),
+                  original: stringifiedPreviousForm[key] || '-',
+                  changed: value
+                }
+              })
+              .filter(({ original, changed }) => original !== changed)}
             hideTableBottomBorder={true}
             id="diff"
             isLoading={false}
@@ -266,9 +268,17 @@ export function Summary() {
             size="medium"
             type="positive"
             onClick={() => {
+              const formWithOnlyChangedValues = Object.entries(form).reduce<
+                typeof form
+              >((acc, [key, value]) => {
+                if (value !== previousFormValues[key]) {
+                  acc[key] = value
+                }
+                return acc
+              }, {})
               events.actions.correct.request.mutate({
                 eventId,
-                data: form,
+                data: formWithOnlyChangedValues,
                 transactionId: generateTransactionId(),
                 metadata: correctionRequestData.getFormValues()
               })
