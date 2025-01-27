@@ -26,11 +26,13 @@ export async function validate(
     eventId,
     createdBy,
     token,
+    transactionId,
     createdAtLocation
   }: {
     eventId: string
     createdBy: string
     createdAtLocation: string
+    transactionId: string
     token: string
   }
 ) {
@@ -79,6 +81,7 @@ export async function validate(
     {
       eventId,
       createdBy,
+      transactionId,
       token,
       createdAtLocation
     }

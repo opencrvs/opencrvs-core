@@ -92,6 +92,7 @@ export function payloadGenerator() {
           type: ActionType.REQUEST_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
           data: input.data ?? {},
+          metadata: {},
           eventId
         }),
         approve: (
