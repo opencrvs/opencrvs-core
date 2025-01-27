@@ -10,6 +10,7 @@
  */
 import { IntlShape } from 'react-intl'
 import _ from 'lodash'
+import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   BaseField,
@@ -55,6 +56,15 @@ export function handleInitialValue(
   }
 
   return initialValue
+}
+
+export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
+  return !getConditionalActionsForField(field, {
+    $form: form,
+    $now: formatISO(new Date(), {
+      representation: 'date'
+    })
+  }).includes('HIDE')
 }
 
 export function getConditionalActionsForField(

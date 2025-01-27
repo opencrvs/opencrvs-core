@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   FieldConfig,
+  generateTransactionId,
   getAllPages,
   getCurrentEventState,
-  SCOPES,
-  generateTransactionId
+  SCOPES
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -30,28 +30,23 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Check } from '@opencrvs/components/lib/icons'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 
+import {
+  getInitialValues,
+  isFormFieldVisible
+} from '@client/v2-events/components/forms/utils'
+import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 import { ROUTES } from '@client/v2-events/routes'
-import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
-
-const messages = defineMessages({
-  itemLabel: {
-    id: 'correction.summary.itemLabel',
-    defaultMessage: '{fieldLabel} ({sectionLabel})',
-    description:
-      'Label for each item in the first column of correction summary table'
-  }
-})
 
 function shouldBeShownAsAValue(field: FieldConfig) {
   if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
@@ -81,7 +76,18 @@ export function Summary() {
   const { toString } = useTransformer(eventConfiguration.id)
   const previousFormValues = getCurrentEventState(event).data
   const getFormValues = useEventFormData((state) => state.getFormValues)
+
   const form = getFormValues(eventId)
+  const formConfig = eventConfiguration.actions
+    .find((action) => action.type === ActionType.REQUEST_CORRECTION)
+    ?.forms.find(({ active }) => active)
+
+  if (!formConfig) {
+    throw new Error(
+      `No form configuration found for ${ActionType.REQUEST_CORRECTION} found. This should never happen`
+    )
+  }
+
   const stringifiedForm = toString(form)
   const stringifiedPreviousForm = toString(previousFormValues)
   const pages = getAllPages(eventConfiguration)
@@ -98,11 +104,6 @@ export function Summary() {
     eventConfiguration.actions.find(
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.additionalDetailsForm || []
-
-  const countryConfigurableFormPages = [
-    ...onboardingFormPages,
-    ...additionalDetailsFormPages
-  ]
 
   const continueButton = (
     <Button
@@ -152,67 +153,102 @@ export function Summary() {
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
           topActionButtons={[backToReviewButton]}
         >
-          <Table
-            noPagination
-            columns={[
-              {
-                label: intl.formatMessage(
-                  correctionMessages.correctionSummaryItem
-                ),
-                alignment: ColumnContentAlignment.LEFT,
-                width: 34,
-                key: 'item'
-              },
-              {
-                label: intl.formatMessage(
-                  correctionMessages.correctionSummaryOriginal
-                ),
-                width: 33,
-                alignment: ColumnContentAlignment.LEFT,
-                key: 'original'
-              },
-              {
-                label: intl.formatMessage(
-                  correctionMessages.correctionSummaryCorrection
-                ),
-                width: 33,
-                alignment: ColumnContentAlignment.LEFT,
-                key: 'changed'
-              }
-            ]}
-            content={Object.entries(stringifiedForm)
-              .map(([key, value]) => {
-                const page = pages.find(({ fields }) =>
-                  fields.some(({ id }) => id === key)
+          {onboardingFormPages.map((page) => {
+            return (
+              <Table
+                key={page.id}
+                columns={[
+                  {
+                    label: intl.formatMessage(page.title),
+                    width: 34,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'fieldLabel'
+                  },
+                  {
+                    label: '',
+                    width: 64,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'collectedValue'
+                  }
+                ]}
+                content={page.fields
+                  .filter(shouldBeShownAsAValue)
+                  .map((field) => {
+                    return {
+                      fieldLabel: intl.formatMessage(field.label),
+                      collectedValue: stringiedRequestData[field.id] || ''
+                    }
+                  })}
+                hideTableBottomBorder={true}
+                id="requestedBy"
+                isLoading={false}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
+              ></Table>
+            )
+          })}
+
+          {formConfig.pages.map((page) => {
+            const content = page.fields
+              .filter((field) => {
+                const visibilityChanged =
+                  isFormFieldVisible(field, previousFormValues) !==
+                  isFormFieldVisible(field, form)
+
+                return (
+                  stringifiedPreviousForm[field.id] !==
+                    stringifiedForm[field.id] || visibilityChanged
                 )
-                if (!page) {
-                  throw new Error(
-                    `Page containing the given field key ${key} was not found. This should never happen`
-                  )
-                }
-                const field = page.fields.find(({ id }) => id === key)
-                if (!field) {
-                  throw new Error(
-                    `Field not found with the given field key ${key}. This should never happen`
-                  )
-                }
+              })
+              .map((field) => {
+                const wasHidden = !isFormFieldVisible(field, form)
                 return {
-                  item: intl.formatMessage(messages.itemLabel, {
-                    fieldLabel: intl.formatMessage(field.label),
-                    sectionLabel: intl.formatMessage(page.title)
-                  }),
-                  original: stringifiedPreviousForm[key] || '-',
-                  changed: value
+                  item: intl.formatMessage(field.label),
+                  original: stringifiedPreviousForm[field.id] || '-',
+                  changed: wasHidden ? '-' : stringifiedForm[field.id]
                 }
               })
-              .filter(({ original, changed }) => original !== changed)}
-            hideTableBottomBorder={true}
-            id="diff"
-            isLoading={false}
-            noResultText={intl.formatMessage(constantsMessages.noResults)}
-          ></Table>
 
-          {countryConfigurableFormPages.map((page) => {
+            if (content.length === 0) {
+              return null
+            }
+            return (
+              <Table
+                key={page.id}
+                noPagination
+                columns={[
+                  {
+                    label: intl.formatMessage(page.title),
+                    alignment: ColumnContentAlignment.LEFT,
+                    width: 34,
+                    key: 'item'
+                  },
+                  {
+                    label: intl.formatMessage(
+                      correctionMessages.correctionSummaryOriginal
+                    ),
+                    width: 33,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'original'
+                  },
+                  {
+                    label: intl.formatMessage(
+                      correctionMessages.correctionSummaryCorrection
+                    ),
+                    width: 33,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'changed'
+                  }
+                ]}
+                content={content}
+                hideTableBottomBorder={true}
+                id="diff"
+                isLoading={false}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
+              ></Table>
+            )
+          })}
+
+          {additionalDetailsFormPages.map((page) => {
             return (
               <Table
                 key={page.id}
@@ -276,9 +312,28 @@ export function Summary() {
                 }
                 return acc
               }, {})
+
+              const valuesThatGotHidden = formConfig.pages
+                .flatMap((page) => page.fields)
+                .filter((field) => {
+                  const wasVisible = isFormFieldVisible(
+                    field,
+                    previousFormValues
+                  )
+                  const isHidden = !isFormFieldVisible(field, form)
+
+                  return wasVisible && isHidden
+                })
+
+              const nullifiedHiddenValues =
+                getInitialValues(valuesThatGotHidden)
+
               events.actions.correct.request.mutate({
                 eventId,
-                data: formWithOnlyChangedValues,
+                data: {
+                  ...formWithOnlyChangedValues,
+                  ...nullifiedHiddenValues
+                },
                 transactionId: generateTransactionId(),
                 metadata: correctionRequestData.getFormValues()
               })

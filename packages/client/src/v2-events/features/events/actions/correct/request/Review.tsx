@@ -13,7 +13,6 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { v4 as uuid } from 'uuid'
 import {
   ActionType,
   getAllFields,
@@ -21,16 +20,15 @@ import {
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
+import { getInitialValues } from '@client/v2-events/components/forms/utils'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { ROUTES } from '@client/v2-events/routes'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
-import { getInitialValues } from '@client/v2-events/components/forms/utils'
 
 /**
  *
@@ -42,7 +40,6 @@ export function Review() {
   const intl = useIntl()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 

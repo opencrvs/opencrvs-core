@@ -32,7 +32,10 @@ import {
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
-import { getConditionalActionsForField } from '@client/v2-events/components/forms/utils'
+import {
+  getConditionalActionsForField,
+  isFormFieldVisible
+} from '@client/v2-events/components/forms/utils'
 import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 const Deleted = styled.del`
@@ -318,16 +321,7 @@ function ReviewComponent({
                               // An example of this is FileInput, of which files we do not want to render in the value lists
                               FIELD_TYPE_FORMATTERS[field.type] !== null
                           )
-                          .filter(
-                            (field) =>
-                              // Omit hidden fields
-                              !getConditionalActionsForField(field, {
-                                $form: form,
-                                $now: formatISO(new Date(), {
-                                  representation: 'date'
-                                })
-                              }).includes('HIDE')
-                          )
+                          .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
                             const value = stringifiedForm[field.id]
                             const previousValue =

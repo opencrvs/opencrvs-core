@@ -87,37 +87,105 @@ const DEFAULT_FORM = {
       },
       fields: [
         {
-          id: 'recommender.firstname',
-          type: 'TEXT',
-          required: true,
+          id: 'recommender.none',
           conditionals: [],
+          required: false,
           label: {
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.none.label',
+            defaultMessage: 'No recommender',
+            description: 'This is the label for the field'
+          },
+          type: 'CHECKBOX'
+        },
+        {
+          id: 'recommender.firstname',
+          conditionals: [
+            {
+              type: 'HIDE',
+              conditional: {
+                type: 'object',
+                properties: {
+                  $form: {
+                    type: 'object',
+                    properties: {
+                      'recommender.none': {
+                        const: 'true'
+                      }
+                    },
+                    required: ['recommender.none']
+                  }
+                },
+                required: ['$form']
+              }
+            }
+          ],
+          required: true,
+          label: {
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label',
             defaultMessage: "Recommender's first name",
-            description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
-          }
+            description: 'This is the label for the field'
+          },
+          type: 'TEXT'
         },
         {
           id: 'recommender.surname',
-          type: 'TEXT',
+          conditionals: [
+            {
+              type: 'HIDE',
+              conditional: {
+                type: 'object',
+                properties: {
+                  $form: {
+                    type: 'object',
+                    properties: {
+                      'recommender.none': {
+                        const: 'true'
+                      }
+                    },
+                    required: ['recommender.none']
+                  }
+                },
+                required: ['$form']
+              }
+            }
+          ],
           required: true,
-          conditionals: [],
           label: {
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label',
             defaultMessage: "Recommender's surname",
-            description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label'
-          }
+            description: 'This is the label for the field'
+          },
+          type: 'TEXT'
         },
         {
           id: 'recommender.id',
-          type: 'TEXT',
+          conditionals: [
+            {
+              type: 'HIDE',
+              conditional: {
+                type: 'object',
+                properties: {
+                  $form: {
+                    type: 'object',
+                    properties: {
+                      'recommender.none': {
+                        const: 'true'
+                      }
+                    },
+                    required: ['recommender.none']
+                  }
+                },
+                required: ['$form']
+              }
+            }
+          ],
           required: true,
-          conditionals: [],
           label: {
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label',
             defaultMessage: "Recommender's membership ID",
-            description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
-          }
+            description: 'This is the label for the field'
+          },
+          type: 'TEXT'
         }
       ]
     }
