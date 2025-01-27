@@ -75,6 +75,8 @@ import {
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
 import { logger, UUID } from '@opencrvs/commons'
+import { notifyForAction } from '@workflow/utils/country-config-api'
+import { getRecordSpecificToken } from '@workflow/records/token-exchange'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -348,6 +350,8 @@ export default async function createRecordHandler(
   /*
    * We need to initiate registration for a
    * record in waiting validation state
+   *
+   * `initiateRegistration` notifies country configuration about the event which then either confirms or rejects the record.
    */
   if (isWaitingExternalValidation(record)) {
     const rejectedOrWaitingValidationRecord = await initiateRegistration(
@@ -360,6 +364,24 @@ export default async function createRecordHandler(
       await indexBundle(rejectedOrWaitingValidationRecord, token)
       await auditEvent('sent-for-updates', record, token)
     }
+  } else {
+    /*
+     * Notify country configuration about the event so that countries can hook into actions like "sent-for-approval"
+     */
+    const recordSpecificToken = await getRecordSpecificToken(
+      token,
+      request.headers,
+      getComposition(record).id
+    )
+    await notifyForAction({
+      event,
+      action: eventAction,
+      record,
+      headers: {
+        ...request.headers,
+        authorization: `Bearer ${recordSpecificToken.access_token}`
+      }
+    })
   }
 
   return {

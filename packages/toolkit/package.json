@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "0.0.22-scopes",
+  "version": "0.0.28",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
@@ -12,7 +12,8 @@
     "./default": "./dist/default/index.js"
   },
   "scripts": {
-    "build": "./build.sh"
+    "build": "./build.sh",
+    "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit && ./build.sh"
   },
   "dependencies": {
     "ajv": "^8.17.1",

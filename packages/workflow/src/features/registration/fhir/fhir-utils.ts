@@ -312,19 +312,6 @@ export function generateEmptyBundle(): Bundle {
   }
 }
 
-export async function fetchExistingRegStatusCode(taskId: string | undefined) {
-  const existingTaskResource: Task = await getFromFhir(`/Task/${taskId}`)
-  const existingRegStatusCode =
-    existingTaskResource &&
-    existingTaskResource.businessStatus &&
-    existingTaskResource.businessStatus.coding &&
-    existingTaskResource.businessStatus.coding.find((code) => {
-      return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
-    })
-
-  return existingRegStatusCode
-}
-
 function mergeFhirIdentifiers(
   currentIdentifiers: fhir3.Identifier[],
   newIdentifiers: fhir3.Identifier[]

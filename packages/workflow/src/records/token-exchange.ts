@@ -11,7 +11,7 @@
 import { AUTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
-export async function tokenExchangeHandler(
+export async function getRecordSpecificToken(
   token: string,
   headers: Record<string, string>,
   recordId: string

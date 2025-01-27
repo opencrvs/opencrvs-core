@@ -32,6 +32,7 @@ import { eventNotificationHandler } from '@workflow/records/handler/eventNotific
 import * as Hapi from '@hapi/hapi'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { upsertRegistrationHandler } from '@workflow/records/handler/upsert-identifiers'
+import { updateField } from '@workflow/records/handler/update-field'
 
 export const getRoutes = () => {
   const routes: Hapi.ServerRoute[] = [
@@ -175,7 +176,16 @@ export const getRoutes = () => {
     approveCorrectionRoute,
     rejectCorrectionRoute,
     requestCorrectionRoute,
-    makeCorrectionRoute
+    makeCorrectionRoute,
+    {
+      method: 'POST',
+      path: '/records/{id}/update-field',
+      handler: updateField,
+      options: {
+        tags: ['api'],
+        description: 'Update a single field in a registration'
+      }
+    }
   ]
 
   return routes
