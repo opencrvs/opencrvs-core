@@ -55,7 +55,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Link } from '@opencrvs/components/lib/Link'
-import { useAuthorization } from '@client/hooks/useAuthorization'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import formatDate from '@client/utils/date-formatting'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
@@ -162,7 +162,7 @@ function RegistrationListComponent(props: IProps) {
   const recordCount = DEFAULT_PAGE_SIZE * currentPage
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
-  const { isPerformanceManager } = useAuthorization()
+  const { canReadUser } = usePermissions()
 
   const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
@@ -349,7 +349,7 @@ function RegistrationListComponent(props: IProps) {
           width: 20
         },
         {
-          key: 'systemRole',
+          key: 'role',
           label: intl.formatMessage(messages.typeColumnHeader),
           width: 20
         },
@@ -404,7 +404,7 @@ function RegistrationListComponent(props: IProps) {
           avatar={result.registrarPractitioner?.avatar}
         />
         <>
-          {!isPerformanceManager ? (
+          {canReadUser(result.registrarPractitioner) ? (
             <Link
               font="bold14"
               onClick={() => {
@@ -431,7 +431,7 @@ function RegistrationListComponent(props: IProps) {
     ),
     location: (
       <>
-        {!isPerformanceManager ? (
+        {canReadUser(result.registrarPractitioner) ? (
           <Link
             font="bold14"
             onClick={() => {
@@ -451,9 +451,11 @@ function RegistrationListComponent(props: IProps) {
         )}
       </>
     ),
-    systemRole: getFieldAgentTypeLabel(
-      result.registrarPractitioner?.systemRole as string
-    ),
+    role:
+      result.registrarPractitioner &&
+      getFieldAgentTypeLabel(
+        intl.formatMessage(result.registrarPractitioner.role.label) as string
+      ),
     total: String(result.total),
     delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
     delayed_num: getPercentage(result.total, result.delayed),

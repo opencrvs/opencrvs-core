@@ -14,8 +14,12 @@ import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import { isValidDate } from '@client/search/advancedSearch/validators'
 import { TIME_PERIOD } from './utils'
+import { UUID } from '@opencrvs/commons/client'
 
-const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup = {
+const createBirthSearchRegistrationSection = (
+  hasBirthSearchJurisdictionScope?: boolean,
+  userOfficeId?: UUID
+): IFormSectionGroup => ({
   id: 'BirthRegistrationDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
@@ -29,6 +33,9 @@ const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup = {
       initialValue: '',
       searchableResource: ['locations', 'offices'],
       searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
+      ...(hasBirthSearchJurisdictionScope && {
+        userOfficeId
+      }),
       validator: []
     },
     {
@@ -115,7 +122,7 @@ const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup = {
       ]
     }
   ]
-}
+})
 
 const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
   id: 'BirthChildDetails',
@@ -420,11 +427,17 @@ const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
   ]
 }
 
-export const advancedSearchBirthSections = {
-  birthSearchRegistrationSection: advancedSearchBirthSectionRegistrationDetails,
+export const createAdvancedSearchBirthSections = (
+  hasBirthSearchJurisdictionScope?: boolean,
+  userOfficeId?: UUID
+) => ({
+  birthSearchRegistrationSection: createBirthSearchRegistrationSection(
+    hasBirthSearchJurisdictionScope,
+    userOfficeId
+  ),
   birthSearchChildSection: advancedSearchBirthSectionChildDetails,
   birthSearchEventSection: advancedSearchBirthSectionEventDetails,
   birthSearchMotherSection: advancedSearchBirthSectionMotherDetails,
   birthSearchFatherSection: advancedSearchBirthSectionFatherDetails,
   birthSearchInformantSection: advancedSearchBirthSectionInformantDetails
-}
+})

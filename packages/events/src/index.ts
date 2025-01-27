@@ -65,10 +65,24 @@ const server = createHTTPServer({
 })
 
 export async function main() {
-  const configurations = await getEventConfigurations(await getAnonymousToken())
-  for (const configuration of configurations) {
-    logger.info(`Loaded event configuration: ${configuration.id}`)
-    await ensureIndexExists(configuration)
+  try {
+    const configurations = await getEventConfigurations(
+      await getAnonymousToken()
+    )
+    for (const configuration of configurations) {
+      logger.info(`Loaded event configuration: ${configuration.id}`)
+      await ensureIndexExists(configuration)
+    }
+  } catch (error) {
+    logger.error(error)
+    if (env.isProd) {
+      process.exit(1)
+    }
+    /*
+     * SIGUSR2 tells nodemon to restart the process with waiting for new file changes
+     */
+    setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
+    return
   }
 
   server.listen(5555)

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { inScope, Scope, TokenWithBearer, userScopes } from '@opencrvs/commons'
+import { inScope, Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
 import { TRPCError, AnyTRPCMiddlewareFunction } from '@trpc/server'
 
 import { z } from 'zod'
@@ -56,10 +56,8 @@ function createScopeAuthMiddleware(scopes: Scope[]) {
   }
 }
 
-const isNationalSystemAdminUser = createScopeAuthMiddleware([
-  userScopes.nationalSystemAdmin
-])
+const isDataSeedingUser = createScopeAuthMiddleware([SCOPES.USER_DATA_SEEDING])
 
 export const middleware = {
-  isNationalSystemAdminUser
+  isDataSeedingUser
 }

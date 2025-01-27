@@ -16,6 +16,7 @@ import {
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
 import { authProxy, catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import sendVerifyCodeHandler, {
   requestSchema,
   responseSchema
@@ -53,7 +54,12 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Create a health notification',
         auth: {
-          scope: ['declare', 'notification-api']
+          scope: [
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.NOTIFICATION_API
+          ]
         },
         validate: {
           payload: fhirBundleSchema,

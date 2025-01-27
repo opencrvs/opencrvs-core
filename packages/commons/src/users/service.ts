@@ -10,7 +10,6 @@
  */
 
 import fetch from 'node-fetch'
-import { UserRole } from '../authentication'
 
 interface IUserName {
   use: string
@@ -27,7 +26,6 @@ type User = {
   name: IUserName[]
   username: string
   email: string
-  systemRole: UserRole
   role: ObjectId
   practitionerId: string
   primaryOfficeId: string
