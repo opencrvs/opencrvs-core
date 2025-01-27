@@ -19,7 +19,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { IntlShape, useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GET_USER } from '@client/user/queries'
-import { createNamesMap } from '@client/utils/data-formatting'
+import { getLocalisedName } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
@@ -35,11 +35,7 @@ import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import {
-  GetUserQuery,
-  GetUserQueryVariables,
-  HumanName
-} from '@client/utils/gateway'
+import { GetUserQuery, GetUserQueryVariables } from '@client/utils/gateway'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { AppBar, Link } from '@opencrvs/components/lib'
@@ -79,9 +75,7 @@ const transformUserQueryResult = (
               '')) ||
         ''
     },
-    name:
-      createNamesMap(userData.name as HumanName[])[locale] ||
-      createNamesMap(userData.name as HumanName[])[LANG_EN],
+    name: getLocalisedName(intl, userData.name[0]),
     role: userData.role,
     number: userData.mobile,
     email: userData.email,
