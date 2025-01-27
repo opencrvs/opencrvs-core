@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineWorkQueue } from './WorkqueueConfig'
+import { defineWorkqueue } from './WorkqueueConfig'
 
-export const allWorkqueue = defineWorkQueue({
+export const allWorkqueue = defineWorkqueue({
   id: 'all',
   title: {
     defaultMessage: 'All events',

@@ -22,5 +22,5 @@ const rootWorkqueueConfig = z.object({
 
 export type RootWorkqueueConfig = z.infer<typeof rootWorkqueueConfig>
 
-export const defineWorkQueue = (config: RootWorkqueueConfig) =>
+export const defineWorkqueue = (config: RootWorkqueueConfig) =>
   rootWorkqueueConfig.parse(config)

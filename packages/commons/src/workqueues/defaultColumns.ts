@@ -16,9 +16,8 @@ export const WorkQueueColumnConfig = z.object({
   id: z.string(),
   label: TranslationConfig
 })
-const DefaultColumnConfig = z.record(WorkQueueColumnConfig)
 
-export const defaultColumns = DefaultColumnConfig.parse({
+export const defaultColumns = {
   event: {
     id: 'event',
     label: {
@@ -52,7 +51,7 @@ export const defaultColumns = DefaultColumnConfig.parse({
       id: 'workqueue.default.column.modifiedAt'
     }
   }
-})
+} as const
 
 export const DefaultColumnKeys = z.enum(
   Object.keys(defaultColumns) as [string, ...string[]]

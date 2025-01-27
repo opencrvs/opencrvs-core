@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineWorkQueue } from './WorkqueueConfig'
+import { defineWorkqueue } from './WorkqueueConfig'
 
-export const registeredWorkqueue = defineWorkQueue({
+export const registeredWorkqueue = defineWorkqueue({
   id: 'registered',
   title: {
     defaultMessage: 'Ready to print',

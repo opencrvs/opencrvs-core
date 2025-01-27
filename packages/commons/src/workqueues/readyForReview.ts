@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineWorkQueue } from './WorkqueueConfig'
+import { defineWorkqueue } from './WorkqueueConfig'
 
-export const inReviewWorkqueue = defineWorkQueue({
+export const inReviewWorkqueue = defineWorkqueue({
   id: 'ready-for-review',
   title: {
     defaultMessage: 'Ready for review',
