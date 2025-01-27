@@ -1137,14 +1137,6 @@ export const DEATH_BUNDLE: SavedBundle<
                 code: 'REGISTRATION_AGENT'
               }
             ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Registration Agent"},{"lang":"fr","label":"Agent d\'enregistrement"}]'
-              }
-            ]
           }
         ],
         location: [

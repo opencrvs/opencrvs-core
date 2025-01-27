@@ -31,7 +31,6 @@ import {
   getChangedValues
 } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   MARK_EVENT_AS_DUPLICATE,
@@ -103,11 +102,8 @@ export function updateDeclaration(
 }
 
 function updateWorkqueue(store: IStoreState, dispatch: Dispatch) {
-  const systemRole = store.offline.userDetails?.systemRole
-  const isFieldAgent =
-    systemRole && FIELD_AGENT_ROLES.includes(systemRole) ? true : false
   const userId = store.offline.userDetails?.practitionerId
-  dispatch(updateRegistrarWorkqueue(userId, 10, isFieldAgent))
+  dispatch(updateRegistrarWorkqueue(userId, 10))
 }
 
 function isCorrectionAction(action: SubmissionAction) {

@@ -10,7 +10,7 @@
  */
 export function createServerWithEnvironment(env: Record<string, string>) {
   jest.resetModules()
-  process.env = { ...process.env, ...env }
+  process.env = { ...process.env, ...env, LOG_LEVEL: 'error' }
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   return require('../server').createServer()
 }
@@ -22,6 +22,7 @@ export function createProductionEnvironmentServer() {
     AUTH_PORT: '4040',
     CLIENT_APP_URL: 'http://localhost:3000/',
     COUNTRY_CONFIG_URL: 'http://localhost:3040/',
+    COUNTRY_CONFIG_URL_INTERNAL: 'http://localhost:3040/',
     DOMAIN: '*',
     LOGIN_URL: 'http://localhost:3020/',
     METRICS_URL: 'http://localhost:1050',

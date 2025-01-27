@@ -29,13 +29,10 @@ import {
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
-import {
-  clearUserFormData,
-  ISystemRolesMap,
-  modifyUserFormData
-} from '@client/user/userReducer'
-import { Button } from '@opencrvs/components/lib/Button'
+import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
+import { UserRole } from '@client/utils/gateway'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Button } from '@opencrvs/components/lib/Button'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -44,7 +41,6 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { selectSystemRoleMap } from '@client/user/selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -65,8 +61,8 @@ type IProps = {
   activeGroup: IFormSectionGroup
   nextSectionId: string
   nextGroupId: string
-  config: IOfflineData
-  systemRoleMap: ISystemRolesMap
+  offlineCountryConfig: IOfflineData
+  userRoles: UserRole[]
   user: UserDetails | null
 }
 
@@ -90,8 +86,10 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   handleFormAction = () => {
-    const { formData, activeGroup, config, user } = this.props
-    if (hasFormError(activeGroup.fields, formData, config, {}, user)) {
+    const { formData, activeGroup, offlineCountryConfig, user } = this.props
+    if (
+      hasFormError(activeGroup.fields, formData, offlineCountryConfig, {}, user)
+    ) {
       this.showAllValidationErrors()
     } else {
       this.props.userId
@@ -133,8 +131,9 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   modifyData = (values: any) => {
     const { formData } = this.props
     if (values.role) {
-      const getSystemRoles = this.props.systemRoleMap
-      values.systemRole = getSystemRoles[values.role]
+      values.scopes = this.props.userRoles.find(
+        (role) => role.id === values.role
+      )!.scopes
     }
     this.props.modifyUserFormData({ ...formData, ...values })
   }
@@ -197,16 +196,10 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-const mapStateToProps = (
-  state: IStoreState
-): {
-  config: IOfflineData
-  systemRoleMap: ISystemRolesMap
-  user: UserDetails | null
-} => {
+const mapStateToProps = (state: IStoreState) => {
   return {
-    systemRoleMap: selectSystemRoleMap(state),
-    config: getOfflineData(state),
+    offlineCountryConfig: getOfflineData(state),
+    userRoles: state.userForm.userRoles,
     user: getUserDetails(state)
   }
 }
