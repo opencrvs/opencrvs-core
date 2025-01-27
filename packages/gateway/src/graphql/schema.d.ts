@@ -86,6 +86,7 @@ export interface GQLMutation {
   confirmRegistration: string
   rejectRegistration: string
   upsertRegistrationIdentifier: string
+  updateField: boolean
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -572,6 +573,12 @@ export interface GQLConfirmRegistrationInput {
 export interface GQLRejectRegistrationInput {
   reason: string
   comment?: string
+}
+
+export interface GQLUpdateFieldInput {
+  fieldId: string
+  valueString?: string
+  valueBoolean?: boolean
 }
 
 export interface GQLUserInput {
@@ -2376,6 +2383,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
   rejectRegistration?: MutationToRejectRegistrationResolver<TParent>
   upsertRegistrationIdentifier?: MutationToUpsertRegistrationIdentifierResolver<TParent>
+  updateField?: MutationToUpdateFieldResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2951,6 +2959,19 @@ export interface MutationToUpsertRegistrationIdentifierResolver<
   (
     parent: TParent,
     args: MutationToUpsertRegistrationIdentifierArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpdateFieldArgs {
+  id: string
+  details: GQLUpdateFieldInput
+}
+export interface MutationToUpdateFieldResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToUpdateFieldArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
