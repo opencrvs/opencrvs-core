@@ -23,11 +23,12 @@ import {
 } from '@events/service/events/events'
 import { presignFilesInEvent } from '@events/service/files'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
-import { EventConfig, getUUID } from '@opencrvs/commons'
+import { EventConfig, getUUID, logger } from '@opencrvs/commons'
 import {
   DeclareActionInput,
   EventIndex,
   EventInput,
+  FieldValue,
   NotifyActionInput,
   RegisterActionInput,
   ValidateActionInput
@@ -151,5 +152,19 @@ export const eventRouter = router({
         )
       })
   }),
-  list: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents)
+  list: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents),
+  registration: router({
+    confirm: publicProcedure
+      .input(
+        z.object({
+          eventId: z.string(),
+          data: z.record(z.string(), FieldValue)
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        logger.info('Registration confirmed', { eventId: input.eventId })
+        logger.info(input.data)
+        return getEventById(input.eventId)
+      })
+  })
 })
