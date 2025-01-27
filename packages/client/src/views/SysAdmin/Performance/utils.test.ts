@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getJurisidictionType, isUnderJurisdictionOfUser } from './utils'
-import { mockOfflineData } from '@client/tests/util'
+import { getJurisidictionType } from './utils'
 
 describe('Performance util tests', () => {
   describe('getJurisidictionType tests', () => {
@@ -50,28 +49,6 @@ describe('Performance util tests', () => {
       }
 
       expect(getJurisidictionType(mockFacilitiesData)).toEqual(null)
-    })
-  })
-
-  describe('isUnderJurisdictionOfUser', () => {
-    it('returns true if given location is a child location of jurisdictionLocation', () => {
-      const locations = mockOfflineData.locations
-      const locationId = 'a3455e64-164c-4bf4-b834-16640a85efd8' //Cox's Bazaar District
-      const jurisdictionLocation = '8cbc862a-b817-4c29-a490-4a8767ff023c' //Chittagong Division
-
-      expect(
-        isUnderJurisdictionOfUser(locations, locationId, jurisdictionLocation)
-      ).toEqual(true)
-    })
-
-    it('returns false if given location is not a child location of jurisdictionLocation', () => {
-      const locations = mockOfflineData.locations
-      const locationId = 'a3455e64-164c-4bf4-b834-16640a85efd8' //Cox's Bazaar District
-      const jurisdictionLocation = '65cf62cb-864c-45e3-9c0d-5c70f0074cb4' //Barisal Division
-
-      expect(
-        isUnderJurisdictionOfUser(locations, locationId, jurisdictionLocation)
-      ).toEqual(false)
     })
   })
 })

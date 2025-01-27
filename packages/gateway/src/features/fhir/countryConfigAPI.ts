@@ -8,8 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IStoreState } from '@client/store'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
+import { COUNTRY_CONFIG_URL } from '@gateway/constants'
+import { Roles } from '@opencrvs/commons'
 
-export function selectSystemRoleMap(store: IStoreState) {
-  return store.userForm.systemRoleMap
+export default class CountryConfigAPI extends OpenCRVSRESTDataSource {
+  override baseURL = COUNTRY_CONFIG_URL
+
+  getRoles(): Promise<Roles> {
+    return this.get(`/roles`)
+  }
 }

@@ -209,7 +209,6 @@ export const mockDocumentReference = {
 }
 
 export const mockUser = {
-  systemRole: 'CHAIRMAN',
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [
@@ -1777,45 +1776,6 @@ export const mockTaskForError = {
   meta: {
     versionId: '123'
   }
-}
-
-export const mockUserDetails = {
-  _id: '5d027bc403b93b17526323f6',
-  name: [
-    {
-      use: 'en',
-      given: ['Sakib Al'],
-      family: 'Hasan'
-    }
-  ],
-  username: 'sakibal.hasan',
-  mobile: '+8801711111111',
-  email: 'test@test.org',
-  identifiers: [],
-  passwordHash:
-    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-  salt: '12345',
-  scope: ['register'],
-  role: 'Field Agent',
-  status: 'active',
-  practitionerId: '2d11389d-f58e-4d47-a562-b934f1b85936',
-  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'MOTHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ],
-  creationDate: 1559054406433,
-  auditHistory: []
 }
 
 export const mockFhirLocation = {

@@ -79,12 +79,6 @@ const messagesToDefine = {
     defaultMessage: 'Options',
     description: 'Show options'
   },
-  roleUpdateInstruction: {
-    id: 'config.userRoles.roleUpdateInstruction',
-    defaultMessage:
-      'Add the roles to be assigned the system role of {systemRole}',
-    description: 'Instruction for adding/updating role in role management modal'
-  },
   language: {
     id: 'config.userRoles.language',
     defaultMessage: '{language}',
