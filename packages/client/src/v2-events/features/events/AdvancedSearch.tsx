@@ -9,12 +9,36 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { useIntl } from 'react-intl'
+import { Content, ContentSize, FormTabs } from '@opencrvs/components'
+import { advancedSearchMessages as messages } from '@client/v2-events/messages'
 
 function AdvancedSearch() {
+  const intl = useIntl()
+  const activeSections = [
+    {
+      id: '',
+      title: intl.formatMessage(messages.birthTabTitle)
+    }
+  ]
   return (
-    <div>
-      <h1>{'Advanced Search'}</h1>
-    </div>
+    <>
+      <Content
+        size={ContentSize.SMALL}
+        subtitle={intl.formatMessage(messages.advancedSearchInstruction)}
+        tabBarContent={
+          <FormTabs
+            activeTabId={intl.formatMessage(messages.birthTabTitle)}
+            sections={activeSections}
+            onTabClick={() => {
+              alert('tab clicked')
+            }}
+          />
+        }
+        title={intl.formatMessage(messages.advancedSearch)}
+        titleColor={'copy'}
+      ></Content>
+    </>
   )
 }
 
