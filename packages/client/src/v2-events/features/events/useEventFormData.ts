@@ -33,7 +33,18 @@ function removeUndefinedKeys(data: ActionFormData) {
     Object.entries(data).filter(([_, value]) => value !== undefined)
   )
 }
-
+/**
+ * Interface representing the form data and related operations for an event.
+ *
+ * @property {ActionFormData} formValues - The current form values.
+ * @property {function} setFormValues - Sets the form values for a given event ID.
+ * @property {function} setFormValuesIfEmpty - Sets the form values for a given event ID only if they are empty.
+ * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
+ * @property {function} getFormValues - Retrieves the form values for a given event ID.
+ * @property {function} getTouchedFields - Retrieves the fields that have been touched.
+ * @property {function} clear - Clears the form values.
+ * @property {string} eventId - The ID of the event.
+ */
 export const useEventFormData = create<EventFormData>()(
   persist(
     (set, get) => ({
