@@ -118,7 +118,21 @@ export function useEvents() {
       register: useEventAction(
         utils.event.actions.register,
         api.event.actions.register
-      )
+      ),
+      correct: {
+        request: useEventAction(
+          utils.event.actions.correct.request,
+          api.event.actions.correct.request
+        ),
+        approve: useEventAction(
+          utils.event.actions.correct.approve,
+          api.event.actions.correct.approve
+        ),
+        reject: useEventAction(
+          utils.event.actions.correct.reject,
+          api.event.actions.correct.reject
+        )
+      }
     }
   }
 }

@@ -10,8 +10,8 @@
  */
 
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
-import { zod } from 'react-router-typesafe-routes/zod'
-import { z } from 'zod'
+import { routes as correctionRoutes } from '@client/v2-events/features/events/actions/correct/request/routes'
+import { routes as workqueueRoutes } from '@client/v2-events/features/workqueues/routes'
 
 export const ROUTES = {
   V2: route(
@@ -61,16 +61,11 @@ export const ROUTES = {
           ),
           VALIDATE: route('validate/:eventId', {
             params: { eventId: string().defined() }
-          })
+          }),
+          REQUEST_CORRECTION: correctionRoutes
         }
       ),
-      WORKQUEUE: route('workqueue', {
-        searchParams: {
-          id: string(),
-          limit: zod(z.number().min(1).max(100)).default(10),
-          offset: zod(z.number().min(0)).default(0)
-        }
-      })
+      WORKQUEUES: workqueueRoutes
     }
   )
 }
