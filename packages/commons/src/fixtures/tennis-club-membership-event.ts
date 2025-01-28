@@ -55,49 +55,54 @@ export const tennisClubMembershipEvent = defineConfig({
   },
   workqueues: [
     {
-      id: 'in-progress',
-      title: {
-        defaultMessage: 'In progress',
-        description: 'Label for in progress workqueue',
-        id: 'event.tennis-club-membership.workqueue.in-progress.label'
-      },
+      id: 'all',
       fields: [
         {
-          id: 'applicant.firstname',
+          column: 'title',
           label: {
-            defaultMessage: 'First name',
-            description: 'Label for first name',
-            id: 'event.tennis-club-membership.workqueue.in-progress.field.firstname.label'
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.all.name.label'
           }
-        },
+        }
+      ],
+      filters: []
+    },
+    {
+      id: 'ready-for-review',
+
+      fields: [
         {
-          id: 'event.type',
+          column: 'title',
           label: {
-            defaultMessage: 'Type',
-            description: 'Label for type',
-            id: 'event.tennis-club-membership.workqueue.in-progress.field.type.label'
-          }
-        },
-        {
-          id: 'event.createdAt',
-          label: {
-            defaultMessage: 'Created at',
-            description: 'Label for created at',
-            id: 'event.tennis-club-membership.workqueue.in-progress.field.createdAt.label'
-          }
-        },
-        {
-          id: 'event.modifiedAt',
-          label: {
-            defaultMessage: 'Modified at',
-            description: 'Label for modified at',
-            id: 'event.tennis-club-membership.workqueue.in-progress.field.modifiedAt.label'
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.readyForReview.name.label'
           }
         }
       ],
       filters: [
         {
-          status: ['CREATED']
+          status: ['DECLARED']
+        }
+      ]
+    },
+    {
+      id: 'registered',
+
+      fields: [
+        {
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.registered.name.label'
+          }
+        }
+      ],
+      filters: [
+        {
+          status: ['REGISTERED']
         }
       ]
     }

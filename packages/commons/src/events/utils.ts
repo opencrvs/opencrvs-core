@@ -11,13 +11,14 @@
 
 import { TranslationConfig } from './TranslationConfig'
 
-import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
-import { flattenDeep } from 'lodash'
+import { flattenDeep, isEqual } from 'lodash'
+import { workqueues } from '../workqueues'
+import { ActionType } from './ActionConfig'
 import { EventConfig } from './EventConfig'
 import { EventConfigInput } from './EventConfigInput'
-import { WorkqueueConfigInput } from './WorkqueueConfig'
+import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
-import { ActionType } from './ActionConfig'
+import { WorkqueueConfig } from './WorkqueueConfig'
 
 const isMetadataField = <T extends string>(
   field: T | EventMetadataKeys
@@ -103,22 +104,6 @@ export const resolveLabelsFromKnownFields = ({
   })
 }
 
-export const resolveFieldLabels = ({
-  config,
-  pageFields
-}: {
-  config: WorkqueueConfigInput
-  pageFields: { id: string; label: TranslationConfig }[]
-}) => {
-  return {
-    ...config,
-    fields: resolveLabelsFromKnownFields({
-      pageFields,
-      refFields: config.fields
-    })
-  }
-}
-
 export function getAllFields(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
@@ -129,4 +114,29 @@ export function getAllPages(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
     .flatMap((form) => form.pages)
+}
+
+export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
+  workqueueConfigs.map((workqueue) => {
+    const rootWorkqueue = Object.values(workqueues).find(
+      (wq) => wq.id === workqueue.id
+    )
+    if (!rootWorkqueue)
+      throw new Error(
+        `Invalid workqueue configuration: workqueue not found with id:  ${workqueue.id}`
+      )
+
+    const rootWorkqueueFields = rootWorkqueue.columns.map(({ id }) => id).sort()
+
+    const workqueueConfigFields = workqueue.fields
+      .map(({ column }) => column)
+      .sort()
+
+    if (!isEqual(rootWorkqueueFields, workqueueConfigFields))
+      throw new Error(
+        `Invalid workqueue configuration: [${rootWorkqueueFields.join(
+          ','
+        )}] does not match [${workqueueConfigFields.join(',')}]`
+      )
+  })
 }

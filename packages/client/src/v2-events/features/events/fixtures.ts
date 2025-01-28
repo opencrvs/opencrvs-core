@@ -227,71 +227,30 @@ export const tennisClubMembershipEvent = {
   },
   workqueues: [
     {
-      id: 'in-progress',
-      title: {
-        defaultMessage: 'In progress',
-        description: 'Label for in progress workqueue',
-        id: 'event.tennis-club-membership.workqueue.in-progress.label'
-      },
+      id: 'all',
       fields: [
         {
-          id: 'applicant.firstname',
+          column: 'title',
           label: {
-            defaultMessage: 'First name',
-            description: 'Label for the given field on form.',
-            id: 'event.tennis-club-membership.summary.field.firstname.label'
-          }
-        },
-        {
-          id: 'event.type',
-          label: {
-            defaultMessage: 'Type',
-            description: 'Label for type',
-            id: 'event.tennis-club-membership.workqueue.in-progress.field.type.label'
-          }
-        },
-        {
-          id: 'event.createdAt',
-          label: {
-            defaultMessage: 'Created at',
-            description: 'Label for created at',
-            id: 'event.tennis-club-membership.workqueue.in-progress.field.createdAt.label'
-          }
-        },
-        {
-          id: 'event.modifiedAt',
-          label: {
-            defaultMessage: 'Modified at',
-            description: 'Label for modified at',
-            id: 'event.tennis-club-membership.workqueue.in-progress.field.modifiedAt.label'
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.all.name.label'
           }
         }
       ],
-      filters: [
-        {
-          status: ['CREATED']
-        }
-      ]
+      filters: []
     },
     {
       id: 'ready-for-review',
-      title: {
-        defaultMessage: 'Ready for review',
-        description: 'Label for in review workqueue',
-        id: 'event.tennis-club-membership.workqueue.in-review.label'
-      },
+
       fields: [
         {
-          id: 'applicant.firstname'
-        },
-        {
-          id: 'event.type'
-        },
-        {
-          id: 'event.createdAt'
-        },
-        {
-          id: 'event.modifiedAt'
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.readyForReview.name.label'
+          }
         }
       ],
       filters: [
@@ -302,23 +261,15 @@ export const tennisClubMembershipEvent = {
     },
     {
       id: 'registered',
-      title: {
-        defaultMessage: 'Ready to print',
-        description: 'Label for registered workqueue',
-        id: 'event.tennis-club-membership.workqueue.registered.label'
-      },
+
       fields: [
         {
-          id: 'applicant.firstname'
-        },
-        {
-          id: 'event.type'
-        },
-        {
-          id: 'event.createdAt'
-        },
-        {
-          id: 'event.modifiedAt'
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.registered.name.label'
+          }
         }
       ],
       filters: [
