@@ -122,7 +122,9 @@ const TextField = BaseField.extend({
   options: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
-      type: z.enum(['text', 'email', 'password', 'number']).optional()
+      type: z.enum(['text', 'email', 'password', 'number']).optional(),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
     })
     .default({ type: 'text' })
     .optional()

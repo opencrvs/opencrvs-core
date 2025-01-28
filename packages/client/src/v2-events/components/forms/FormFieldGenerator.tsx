@@ -185,7 +185,17 @@ const GeneratedInputField = React.memo(
 
     if (fieldDefinition.type === TEXT) {
       return (
-        <InputField {...inputFieldProps}>
+        <InputField
+          {...inputFieldProps}
+          prefix={
+            fieldDefinition.options?.prefix &&
+            intl.formatMessage(fieldDefinition.options?.prefix)
+          }
+          postfix={
+            fieldDefinition.options?.postfix &&
+            intl.formatMessage(fieldDefinition.options?.postfix)
+          }
+        >
           <TextInput
             type={fieldDefinition.options?.type ?? 'text'}
             {...inputProps}
