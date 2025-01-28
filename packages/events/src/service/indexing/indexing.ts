@@ -88,8 +88,6 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     case 'DATE':
       return { type: 'date' }
     case 'TEXT':
-    case 'PARAGRAPH':
-    case 'BULLET_LIST':
       return { type: 'text' }
     case 'RADIO_GROUP':
     case 'SELECT':
@@ -106,6 +104,10 @@ function getElasticsearchMappingForType(field: FieldConfig) {
           type: { type: 'keyword' }
         }
       }
+    case 'PARAGRAPH':
+    case 'BULLET_LIST':
+    case 'DIVIDER':
+      return {}
 
     default:
       assertNever(field)

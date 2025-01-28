@@ -61,6 +61,7 @@ import { Location } from '@client/v2-events/features/events/registered-fields/Lo
 import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
 import { formatISO } from 'date-fns'
+import { Divider } from '@opencrvs/components'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -296,6 +297,9 @@ const GeneratedInputField = React.memo(
           />
         </InputField>
       )
+    }
+    if (fieldDefinition.type === 'DIVIDER') {
+      return <Divider />
     }
     throw new Error(`Unsupported field ${fieldDefinition}`)
   }

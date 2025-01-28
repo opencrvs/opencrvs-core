@@ -99,7 +99,8 @@ export const FieldType = {
   CHECKBOX: 'CHECKBOX',
   SELECT: 'SELECT',
   COUNTRY: 'COUNTRY',
-  LOCATION: 'LOCATION'
+  LOCATION: 'LOCATION',
+  DIVIDER: 'DIVIDER'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -117,6 +118,10 @@ export interface FieldValueByType {
   [FieldType.FILE]: FileFieldValue
   [FieldType.SELECT]: SelectFieldValue
 }
+
+const Divider = BaseField.extend({
+  type: z.literal(FieldType.DIVIDER)
+})
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
@@ -224,7 +229,8 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Checkbox,
   File,
   Country,
-  Location
+  Location,
+  Divider
 ])
 
 export type SelectField = z.infer<typeof Select>
