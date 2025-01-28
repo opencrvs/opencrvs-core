@@ -11,7 +11,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import QRScanner from 'qr-scanner'
 import styled from 'styled-components'
-import { ErrorHandler, Validator } from 'src/IDReader/types'
+import { ErrorHandler, Validator } from '../../../IDReader/types'
 import { throttle } from 'lodash'
 
 interface ScannerProps {
@@ -53,7 +53,7 @@ const Scanner = (props: ScannerProps) => {
           }
           onScan(data)
         } catch (error) {
-          onError('parse', error)
+          onError('parse', new Error('Invalid JSON format'))
         }
       }
     },
