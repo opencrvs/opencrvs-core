@@ -237,7 +237,7 @@ export async function approveRejectHandler(
   const { eventType, statusType } = request.params
   const bundle = request.payload as { trackingId: string }
 
-  const currentTrigger = `${eventType}/${statusType}`
+  const currentTrigger = `${eventType}/${statusType}`.toLowerCase()
 
   const webhookQueue = getQueue()
 
@@ -248,7 +248,7 @@ export async function approveRejectHandler(
   logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
   for (const webhookToNotify of webhooks) {
     logger.info(`Queueing webhook ${webhookToNotify.trigger} ${currentTrigger}`)
-    if (webhookToNotify.trigger === currentTrigger) {
+    if (webhookToNotify.trigger.toLowerCase() === currentTrigger) {
       const payload = {
         timestamp: new Date().toISOString(),
         id: webhookToNotify.webhookId,
