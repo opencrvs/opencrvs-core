@@ -30,10 +30,17 @@ import {
   Text
 } from '@opencrvs/components'
 
-import { EventConfig } from '@opencrvs/commons'
+import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
-import { getConditionalActionsForField } from '@client/v2-events/components/forms/utils'
+import {
+  getConditionalActionsForField,
+  isFormFieldVisible
+} from '@client/v2-events/components/forms/utils'
 import { useTransformer } from '@client/v2-events/hooks/useTransformer'
+
+const Deleted = styled.del`
+  color: ${({ theme }) => theme.colors.negative};
+`
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -181,6 +188,53 @@ function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
   return <>{value.toString() || ''}</>
 }
 
+function Output({
+  field,
+  value,
+  previousValue,
+  showPreviouslyMissingValuesAsChanged = true
+}: {
+  field: FieldConfig
+  value: string
+  previousValue?: string
+  showPreviouslyMissingValuesAsChanged: boolean
+}) {
+  const ValueOutput = FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
+
+  if (!value) {
+    if (previousValue) {
+      return <ValueOutput value={previousValue} />
+    }
+
+    return ''
+  }
+
+  if (previousValue && previousValue !== value) {
+    return (
+      <>
+        <Deleted>
+          <ValueOutput value={previousValue} />
+        </Deleted>
+        <br />
+        <ValueOutput value={value} />
+      </>
+    )
+  }
+  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
+    return (
+      <>
+        <Deleted>
+          <ValueOutput value={'-'} />
+        </Deleted>
+        <br />
+        <ValueOutput value={value} />
+      </>
+    )
+  }
+
+  return <ValueOutput value={value} />
+}
+
 /**
  * Review component, used to display the "read" version of the form.
  * User can review the data and take actions like declare, reject or edit the data.
@@ -188,6 +242,7 @@ function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
 function ReviewComponent({
   eventConfig,
   formConfig,
+  previousFormValues,
   form,
   onEdit,
   children,
@@ -197,6 +252,7 @@ function ReviewComponent({
   eventConfig: EventConfig
   formConfig: FormConfig
   form: ActionFormData
+  previousFormValues?: EventIndex['data']
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
 }) {
@@ -205,6 +261,11 @@ function ReviewComponent({
   const { toString } = useTransformer(eventConfig.id)
 
   const stringifiedForm = toString(form)
+
+  const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
+  const stringifiedPreviousForm = previousFormValues
+    ? toString(previousFormValues)
+    : {}
 
   return (
     <Row>
@@ -257,31 +318,24 @@ function ReviewComponent({
                             (field) =>
                               // Formatters can explicitly define themselves to be null
                               // this means a value display row in not rendered at all
+                              // An example of this is FileInput, of which files we do not want to render in the value lists
                               FIELD_TYPE_FORMATTERS[field.type] !== null
                           )
-                          .filter(
-                            (field) =>
-                              // Omit hidden fields
-                              !getConditionalActionsForField(field, {
-                                $form: form,
-                                $now: formatISO(new Date(), {
-                                  representation: 'date'
-                                })
-                              }).includes('HIDE')
-                          )
+                          .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
-                            const Output =
-                              FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
-
                             const value = stringifiedForm[field.id]
-                            const hasValue =
-                              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                              value !== null && value !== undefined
+                            const previousValue =
+                              stringifiedPreviousForm[field.id]
 
-                            const valueDisplay = hasValue ? (
-                              <Output value={value} />
-                            ) : (
-                              ''
+                            const valueDisplay = (
+                              <Output
+                                field={field}
+                                previousValue={previousValue}
+                                showPreviouslyMissingValuesAsChanged={
+                                  showPreviouslyMissingValuesAsChanged
+                                }
+                                value={value}
+                              />
                             )
 
                             return (

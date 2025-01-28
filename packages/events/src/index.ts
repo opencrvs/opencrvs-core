@@ -79,7 +79,7 @@ export async function main() {
       process.exit(1)
     }
     /*
-     * SIGUSR2 tells nodemon to restart the process with waiting for new file changes
+     * SIGUSR2 tells nodemon to restart the process without waiting for new file changes
      */
     setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
     return
