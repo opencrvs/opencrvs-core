@@ -115,7 +115,9 @@ const GeneratedInputField = React.memo(
 
     const inputFieldProps = {
       id: fieldDefinition.id,
-      label: intl.formatMessage(fieldDefinition.label),
+      label: fieldDefinition.hideLabel
+        ? undefined
+        : intl.formatMessage(fieldDefinition.label),
       // helperText: fieldDefinition.helperText,
       // tooltip: fieldDefinition.tooltip,
       // description: fieldDefinition.description,
@@ -219,24 +221,32 @@ const GeneratedInputField = React.memo(
       )
     }
     if (fieldDefinition.type === 'BULLET_LIST') {
-      return <BulletList {...fieldDefinition} />
+      return (
+        <InputField {...inputFieldProps}>
+          <BulletList {...fieldDefinition} />
+        </InputField>
+      )
     }
     if (fieldDefinition.type === 'SELECT') {
       return (
-        <Select
-          {...fieldDefinition}
-          value={inputProps.value as SelectFieldValue}
-          onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
-        />
+        <InputField {...inputFieldProps}>
+          <Select
+            {...fieldDefinition}
+            value={inputProps.value as SelectFieldValue}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
     if (fieldDefinition.type === 'COUNTRY') {
       return (
-        <SelectCountry
-          {...fieldDefinition}
-          value={inputProps.value as SelectFieldValue}
-          setFieldValue={setFieldValue}
-        />
+        <InputField {...inputFieldProps}>
+          <SelectCountry
+            {...fieldDefinition}
+            value={inputProps.value as SelectFieldValue}
+            setFieldValue={setFieldValue}
+          />
+        </InputField>
       )
     }
     if (fieldDefinition.type === 'CHECKBOX') {
@@ -250,35 +260,41 @@ const GeneratedInputField = React.memo(
     }
     if (fieldDefinition.type === 'RADIO_GROUP') {
       return (
-        <RadioGroup
-          {...fieldDefinition}
-          value={value as RadioGroupFieldValue}
-          setFieldValue={setFieldValue}
-        />
+        <InputField {...inputFieldProps}>
+          <RadioGroup
+            {...fieldDefinition}
+            value={value as RadioGroupFieldValue}
+            setFieldValue={setFieldValue}
+          />
+        </InputField>
       )
     }
     if (fieldDefinition.type === 'LOCATION') {
       if (fieldDefinition.options.type === 'HEALTH_FACILITY')
         return (
-          <LocationSearch
+          <InputField {...inputFieldProps}>
+            <LocationSearch
+              {...fieldDefinition}
+              value={value as LocationFieldValue}
+              setFieldValue={setFieldValue}
+            />
+          </InputField>
+        )
+      return (
+        <InputField {...inputFieldProps}>
+          <Location
             {...fieldDefinition}
             value={value as LocationFieldValue}
             setFieldValue={setFieldValue}
+            partOf={
+              (fieldDefinition.options?.partOf?.$data &&
+                (makeFormikFieldIdsOpenCRVSCompatible(formData)[
+                  fieldDefinition.options?.partOf.$data
+                ] as string | undefined | null)) ??
+              null
+            }
           />
-        )
-      return (
-        <Location
-          {...fieldDefinition}
-          value={value as LocationFieldValue}
-          setFieldValue={setFieldValue}
-          partOf={
-            (fieldDefinition.options?.partOf?.$data &&
-              (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                fieldDefinition.options?.partOf.$data
-              ] as string | undefined | null)) ??
-            null
-          }
-        />
+        </InputField>
       )
     }
     throw new Error(`Unsupported field ${fieldDefinition}`)

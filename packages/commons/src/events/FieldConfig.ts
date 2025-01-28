@@ -82,7 +82,8 @@ const BaseField = z.object({
     .default([])
     .optional(),
   dependsOn: z.array(FieldId).default([]).optional(),
-  label: TranslationConfig
+  label: TranslationConfig,
+  hideLabel: z.boolean().default(false).optional()
 })
 
 export type BaseField = z.infer<typeof BaseField>
