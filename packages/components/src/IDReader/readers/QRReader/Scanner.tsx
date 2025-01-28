@@ -69,6 +69,10 @@ const Scanner = (props: ScannerProps) => {
   useEffect(() => {
     const currentVideoElement = videoElement?.current
     if (currentVideoElement && !scanner.current) {
+      // implementation does not support the deprecated constructor overloads
+      // but supports the current signature. TS is throwing error. Need to have a closer
+      // look why TS is not able to detect the correct signature
+      // @ts-ignore
       scanner.current = new QRScanner(currentVideoElement, onScanSuccess, {
         onDecodeError: throttle(onScanError, 5000),
         preferredCamera: 'environment',
