@@ -214,6 +214,7 @@ export function SystemList() {
   const systemTypeLabels = {
     HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
+    NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook),
     SELF_SERVICE_PORTAL: intl.formatMessage(
       integrationMessages.selfServicePortal

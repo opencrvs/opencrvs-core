@@ -25,7 +25,6 @@ import {
 } from '@metrics/features/registration/pointGenerator'
 import { badRequest, internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
-import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
 import { createUserAuditPointFromFHIR } from '@metrics/features/audit/service'
 import {
@@ -37,7 +36,6 @@ import {
 } from '@metrics/features/registration/fhirUtils'
 import { EventType } from '@metrics/config/routes'
 import { fetchTaskHistory } from '@metrics/api'
-import { hasScope } from '@opencrvs/commons/authentication'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
@@ -120,9 +118,6 @@ export async function sentNotificationForReviewHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
-
-  const authHeader = { Authorization: request.headers.authorization }
-
   await createUserAuditPointFromFHIR('DECLARED', request)
 
   try {
@@ -133,18 +128,10 @@ export async function sentNotificationForReviewHandler(
       })
     )
     points.push(
-      await generateDeclarationStartedPoint(
-        request.payload as fhir.Bundle,
-        {
-          Authorization: request.headers.authorization,
-          'x-correlation-id': request.headers['x-correlation-id']
-        },
-        hasScope(authHeader, 'validate')
-          ? Events.VALIDATED
-          : hasScope(authHeader, 'register')
-          ? Events.WAITING_EXTERNAL_VALIDATION
-          : Events.READY_FOR_REVIEW
-      )
+      await generateDeclarationStartedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      })
     )
 
     await writePoints(points)
@@ -175,14 +162,10 @@ export async function sentNotificationHandler(
       })
     )
     points.push(
-      await generateDeclarationStartedPoint(
-        request.payload as fhir.Bundle,
-        {
-          Authorization: request.headers.authorization,
-          'x-correlation-id': request.headers['x-correlation-id']
-        },
-        Events.INCOMPLETE
-      )
+      await generateDeclarationStartedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      })
     )
 
     await writePoints(points)

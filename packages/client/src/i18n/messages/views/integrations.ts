@@ -211,6 +211,12 @@ const messagesToDefine = {
     description: 'Label for record search'
   },
 
+  nationalId: {
+    id: 'integrations.type.nationalId',
+    defaultMessage: 'National id',
+    description: 'Label for national id'
+  },
+
   webhook: {
     id: 'integrations.type.webhook',
     defaultMessage: 'Webhook',

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   IPrintableDeclaration,
   modifyDeclaration,
@@ -28,13 +28,10 @@ import {
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { printPDF } from '@client/pdfRenderer'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import {
-  hasRegisterScope,
-  hasRegistrationClerkScope
-} from '@client/utils/authUtils'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { SCOPES, isMinioUrl } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
 import { getLocationHierarchy } from '@client/utils/locationUtils'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
@@ -47,10 +44,10 @@ import {
   getRegisteredDate,
   isCertificateForPrintInAdvance
 } from './utils'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { useNavigate } from 'react-router-dom'
 import { ICertificateData } from '@client/utils/referenceApi'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { isMinioUrl } from '@opencrvs/commons/client'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   async function recursiveTransform(obj: any) {
@@ -148,10 +145,13 @@ export const usePrintableCertificate = (declarationId?: string) => {
   const state = useSelector((store: IStoreState) => store)
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
   const dispatch = useDispatch()
-  const scope = useSelector(getScope)
-  const canUserEditRecord =
+  const { hasAnyScope } = usePermissions()
+  const canUserCorrectRecord =
     declaration?.event !== EventType.Marriage &&
-    (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
+    hasAnyScope([
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+    ])
 
   const certificateTemplateConfig: ICertificateData | undefined =
     offlineData.templates.certificates.find(
@@ -272,7 +272,7 @@ export const usePrintableCertificate = (declarationId?: string) => {
     svgCode,
     handleCertify,
     isPrintInAdvance,
-    canUserEditRecord,
+    canUserCorrectRecord,
     handleEdit
   }
 }

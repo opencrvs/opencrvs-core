@@ -14,11 +14,19 @@ import {
   SUPPORTED_PATIENT_IDENTIFIER_CODES,
   CERTIFIED_STATUS,
   REGISTERED_STATUS,
-  ISSUED_STATUS
+  ISSUED_STATUS,
+  DECLARED_STATUS,
+  REJECTED_STATUS,
+  VALIDATED_STATUS
 } from '@opencrvs/commons/types'
 import { IAdvancedSearchParam } from '@search/features/search/types'
 import { transformDeprecatedParamsToSupported } from './deprecation-support'
 import { resolveLocationChildren } from './location'
+import { UUID } from '@opencrvs/commons'
+import {
+  QueryDslQueryContainer,
+  SearchRequest
+} from '@elastic/elasticsearch/lib/api/types'
 
 export async function advancedQueryBuilder(
   params: IAdvancedSearchParam,
@@ -27,15 +35,9 @@ export async function advancedQueryBuilder(
 ) {
   params = transformDeprecatedParamsToSupported(params)
 
-  const must: any[] = []
-
-  if (params.event) {
-    must.push({
-      match: {
-        event: params.event
-      }
-    })
-  }
+  const must: QueryDslQueryContainer[] = []
+  // filter is used for "pure" filtering, without caring about scores
+  const filter: QueryDslQueryContainer[] = []
 
   if (params.name) {
     must.push({
@@ -68,6 +70,45 @@ export async function advancedQueryBuilder(
     })
   }
 
+  if (params.event && params.event.length > 0) {
+    const shouldMatch: QueryDslQueryContainer[] = []
+    for (const { eventName, jurisdictionId } of params.event) {
+      if (jurisdictionId) {
+        const leafLevelJurisdictionIds = await resolveLocationChildren(
+          jurisdictionId as UUID
+        )
+        shouldMatch.push({
+          bool: {
+            must: [
+              {
+                term: {
+                  'event.keyword': eventName
+                }
+              },
+              {
+                terms: {
+                  'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
+                }
+              }
+            ]
+          }
+        })
+      } else {
+        shouldMatch.push({
+          term: {
+            'event.keyword': eventName
+          }
+        })
+      }
+    }
+
+    filter.push({
+      bool: {
+        should: shouldMatch
+      }
+    })
+  }
+
   if (
     (params.registrationStatuses && params.registrationStatuses.length > 0) ||
     isExternalSearch
@@ -76,7 +117,7 @@ export async function advancedQueryBuilder(
       query_string: {
         default_field: 'type',
         query: isExternalSearch
-          ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS}) OR (${ISSUED_STATUS})`
+          ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS}) OR (${ISSUED_STATUS}) OR (${DECLARED_STATUS}) OR (${REJECTED_STATUS}) OR (${VALIDATED_STATUS})`
           : `(${params.registrationStatuses!.join(') OR (')})`
       }
     })
@@ -156,7 +197,7 @@ export async function advancedQueryBuilder(
       range: {
         lastStatusChangedAt: {
           gte: new Date(params.timePeriodFrom).getTime(),
-          lte: Date.now().toString()
+          lte: Date.now()
         }
       }
     })
@@ -747,10 +788,12 @@ export async function advancedQueryBuilder(
 
   return {
     bool: {
-      must
+      must,
+      filter
     }
-  }
+  } satisfies SearchRequest['query']
 }
+
 export const findPatientPrimaryIdentifier = (patient: Patient) =>
   findPatientIdentifier(
     patient,

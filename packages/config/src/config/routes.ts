@@ -8,15 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  createCertificateHandler,
-  getActiveCertificatesHandler,
-  getCertificateHandler,
-  requestActiveCertificate,
-  requestNewCertificate,
-  updateCertificate,
-  updateCertificateHandler
-} from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
   getLoginConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
@@ -37,17 +28,7 @@ import {
 } from '@config/handlers/locations/handler'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
 import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
-
-export const enum RouteScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin',
-  VALIDATE = 'validate',
-  NATLSYSADMIN = 'natlsysadmin',
-  SELF_SERVICE_PORTAL = 'self-service-portal'
-}
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export default function getRoutes(): ServerRoute[] {
   return [
@@ -74,16 +55,9 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         auth: {
           scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE,
-            RouteScope.SELF_SERVICE_PORTAL,
-            // @TODO: Refer to an enum / constant
-            'record.confirm-registration'
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.USER_DATA_SEEDING,
+            SCOPES.SELF_SERVICE_PORTAL
           ]
         },
         tags: ['api'],
@@ -119,76 +93,6 @@ export default function getRoutes(): ServerRoute[] {
       }
     },
     {
-      method: 'POST',
-      path: '/getCertificate',
-      handler: getCertificateHandler,
-      options: {
-        tags: ['api'],
-        description: 'Retrieves certificate',
-        auth: {
-          scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.VALIDATE
-          ]
-        },
-        validate: {
-          payload: requestActiveCertificate
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/getActiveCertificates',
-      handler: getActiveCertificatesHandler,
-      options: {
-        tags: ['api'],
-        description: 'Retrieves active certificates for birth and death',
-        auth: {
-          scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
-          ]
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/createCertificate',
-      handler: createCertificateHandler,
-      options: {
-        tags: ['api'],
-        description: 'Creates a new Certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: requestNewCertificate
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/updateCertificate',
-      handler: updateCertificateHandler,
-      options: {
-        tags: ['api'],
-        description: 'Updates an existing Certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: updateCertificate
-        }
-      }
-    },
-    {
       method: 'GET',
       path: '/dashboardQueries',
       handler: getDashboardQueries,
@@ -218,7 +122,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: ['natlsysadmin']
+          scope: [SCOPES.CONFIG_UPDATE_ALL, SCOPES.USER_DATA_SEEDING]
         },
         description: 'Create a location',
         validate: {
@@ -246,7 +150,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: ['natlsysadmin']
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         description: 'Update a location or facility',
         validate: {

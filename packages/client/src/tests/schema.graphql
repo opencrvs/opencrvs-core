@@ -1058,7 +1058,6 @@ type Mutation {
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
-  updateRole(systemRole: SystemRoleInput): Response!
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
@@ -1212,8 +1211,6 @@ type Query {
     to: Date
   ): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
-  searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
-  searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(
@@ -1245,7 +1242,6 @@ type Query {
     mobile: String
     email: String
     status: String
-    systemRole: String
     primaryOfficeId: String
     count: Int
     skip: Int
@@ -1786,12 +1782,11 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String
-  systemRole: SystemRoleType!
   role: Role!
   email: String
   status: Status!
   underInvestigation: Boolean
-  primaryOffice: Location
+  primaryOffice: Location!
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -1841,7 +1836,6 @@ input UserInput {
   mobile: String
   password: String
   status: Status
-  systemRole: SystemRoleType!
   role: String
   email: String
   primaryOffice: String

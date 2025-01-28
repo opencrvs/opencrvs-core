@@ -14,8 +14,12 @@ import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import { isValidDate } from '@client/search/advancedSearch/validators'
 import { TIME_PERIOD } from './utils'
+import { UUID } from '@opencrvs/commons/client'
 
-const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup = {
+const createDeathSearchRegistrationSection = (
+  hasDeathSearchJurisdictionScope?: boolean,
+  userOfficeId?: UUID
+): IFormSectionGroup => ({
   id: 'DeathRegistrationDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
@@ -29,6 +33,9 @@ const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup = {
       initialValue: '',
       searchableResource: ['locations', 'offices'],
       searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
+      ...(hasDeathSearchJurisdictionScope && {
+        userOfficeId
+      }),
       validator: []
     },
     {
@@ -115,7 +122,7 @@ const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup = {
       ]
     }
   ]
-}
+})
 
 const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
   id: 'DeathdeceasedDetails',
@@ -352,9 +359,15 @@ const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
   ]
 }
 
-export const advancedSearchDeathSections = {
-  deathSearchRegistrationSection: advancedSearchDeathSectionRegistrationDetails,
+export const createAdvancedSearchDeathSections = (
+  hasDeathSearchJurisdictionScope?: boolean,
+  userOfficeId?: UUID
+) => ({
+  deathSearchRegistrationSection: createDeathSearchRegistrationSection(
+    hasDeathSearchJurisdictionScope,
+    userOfficeId
+  ),
   deathSearchDeceasedSection: advancedSearchDeathSectiondeceasedDetails,
   deathSearchEventSection: advancedSearchDeathSectionEventDetails,
   deathSearchInformantSection: advancedSearchDeathSectionInformantDetails
-}
+})

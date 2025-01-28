@@ -22,15 +22,18 @@ import { Pages as PagesComponent } from '@client/v2-events/features/events/compo
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import {
+  useEventFormData,
+  useSubscribeEventFormData
+} from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
-  const formEventId = useEventFormData((state) => state.eventId)
-  const form = useEventFormData((state) => state.formValues)
+  const { eventId: formEventId, formValues: form } = useSubscribeEventFormData()
+
   const navigate = useNavigate()
   const events = useEvents()
   const { modal, goToHome } = useEventFormNavigation()
@@ -90,8 +93,10 @@ export function Pages() {
       {modal}
       <PagesComponent
         eventId={eventId}
+        form={form}
         formPages={formPages}
         pageId={currentPageId}
+        setFormData={(data) => setFormValues(eventId, data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(

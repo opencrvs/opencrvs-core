@@ -11,15 +11,22 @@
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { createStore } from '@client/store'
-import { createTestComponent } from '@client/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  setScopes
+} from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { createMemoryRouter } from 'react-router-dom'
 import { AdvancedSearchConfig } from './AdvancedSearch'
+import { SCOPES } from '@opencrvs/commons/client'
+import { setUserDetails } from '@client/profile/profileActions'
 
 let testComponent: ReactWrapper
 beforeEach(async () => {
   const { store } = createStore()
+  setScopes([SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_DEATH], store)
   testComponent = (
     await createTestComponent(<AdvancedSearchConfig />, { store })
   )?.component
@@ -51,6 +58,7 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
   let router: ReturnType<typeof createMemoryRouter>
   beforeEach(async () => {
     const { store } = createStore()
+    setScopes([SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_DEATH], store)
     store.dispatch(
       setAdvancedSearchParam({
         event: 'birth',
@@ -58,6 +66,7 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
         registrationStatuses: ['IN_PROGRESS']
       })
     )
+    store.dispatch(setUserDetails(mockUserResponse as any))
     ;({ component: testComponent, router } = await createTestComponent(
       <AdvancedSearchConfig></AdvancedSearchConfig>,
       {

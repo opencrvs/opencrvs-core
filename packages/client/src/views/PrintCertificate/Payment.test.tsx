@@ -14,24 +14,22 @@ import {
   createTestComponent,
   mockDeclarationData,
   mockDeathDeclarationData,
-  validToken,
   mockUserResponse,
-  flushPromises
+  flushPromises,
+  setScopes,
+  REGISTRATION_AGENT_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { storeDeclaration } from '@client/declarations'
 import { EventType } from '@client/utils/gateway'
 import { Payment } from './Payment'
 import { queries } from '@client/profile/queries'
-import { checkAuth } from '@client/profile/profileActions'
 import { Mock } from 'vitest'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB
 } from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
-
-const getItem = window.localStorage.getItem as Mock
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
 
 describe('verify collector tests', () => {
@@ -69,8 +67,7 @@ describe('verify collector tests', () => {
 
   describe('in case of birth declaration', () => {
     beforeAll(async () => {
-      getItem.mockReturnValue(validToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
       await flushPromises()
       // @ts-ignore
       store.dispatch(

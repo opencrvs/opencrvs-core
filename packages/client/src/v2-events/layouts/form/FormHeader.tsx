@@ -43,10 +43,12 @@ const messages = defineMessages({
 
 export function FormHeader({
   label,
-  onSaveAndExit
+  onSaveAndExit,
+  canSaveAndExit = true
 }: {
   label: TranslationConfig
   onSaveAndExit: () => void
+  canSaveAndExit?: boolean
 }) {
   const intl = useIntl()
   const { modal, exit, deleteDeclaration } = useEventFormNavigation()
@@ -74,7 +76,7 @@ export function FormHeader({
       desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
       desktopRight={
         <>
-          {
+          {canSaveAndExit && (
             <Button
               disabled={false}
               id="save-exit-btn"
@@ -85,13 +87,13 @@ export function FormHeader({
               <Icon name="DownloadSimple" />
               {intl.formatMessage(messages.saveExitButton)}
             </Button>
-          }
+          )}
           <Button size="small" type="secondary" onClick={onExit}>
             <Icon name="X" />
             {intl.formatMessage(messages.exitButton)}
           </Button>
           <ToggleMenu
-            id={`event-menu`}
+            id={'event-menu'}
             menuItems={
               isUndeclaredDraft(event)
                 ? [
@@ -130,7 +132,7 @@ export function FormHeader({
             <Icon name="X" />
           </Button>
           <ToggleMenu
-            id={`event-menu`}
+            id={'event-menu'}
             menuItems={[
               {
                 label: 'Delete declaration',

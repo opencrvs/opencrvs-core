@@ -12343,7 +12343,7 @@
             "conditionals": [
               {
                 "action": "hide",
-                "expression": "values.role!==\"LOCAL_REGISTRAR\" && values.role!==\"NATIONAL_REGISTRAR\""
+                "expression": "!values.scopes?.includes('profile.electronic-signature')"
               }
             ],
             "fields": [

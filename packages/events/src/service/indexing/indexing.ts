@@ -23,7 +23,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { getAllFields } from '@opencrvs/commons'
+import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
 
@@ -35,6 +35,18 @@ function eventToEventIndex(event: EventDocument): EventIndex {
  * This type ensures all properties of EventIndex are present in the mapping
  */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
+
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+
+  if (!hasEventsIndex) {
+    await createIndex(indexName, getAllFields(eventConfiguration))
+  }
+}
 
 export async function createIndex(
   indexName: string,
@@ -64,6 +76,7 @@ export async function createIndex(
       }
     }
   })
+
   return client.indices.putAlias({
     index: indexName,
     name: getEventAliasName()
@@ -76,6 +89,7 @@ function getElasticsearchMappingForType(field: FieldConfig) {
       return { type: 'date' }
     case 'TEXT':
     case 'PARAGRAPH':
+    case 'PAGE_HEADER':
     case 'BULLET_LIST':
       return { type: 'text' }
     case 'RADIO_GROUP':
@@ -95,11 +109,11 @@ function getElasticsearchMappingForType(field: FieldConfig) {
       }
 
     default:
-      assertNever(field)
+      assertNever()
   }
 }
 
-function assertNever(_: never): never {
+function assertNever(): never {
   throw new Error('Should never happen')
 }
 
@@ -134,7 +148,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     }
   })
 
-  return esClient.helpers.bulk({
+  await esClient.helpers.bulk({
     retries: 3,
     wait: 3000,
     datasource: stream.pipe(transformedStreamData),
@@ -183,6 +197,9 @@ export async function getIndexedEvents() {
   })
 
   if (!hasEventsIndex) {
+    logger.error(
+      'Event index not created. Sending empty array. Ensure indexing is running.'
+    )
     return []
   }
 

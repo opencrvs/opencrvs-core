@@ -13,16 +13,13 @@ import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { SystemRoleType } from '@client/utils/gateway'
-import { UserDetails } from './userUtils'
-
-export type Scope = string[]
+import { Scope } from '@opencrvs/commons/client'
 
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: Scope
+  scope: Scope[]
 }
 
 export const isTokenStillValid = (decoded: ITokenPayload) => {
@@ -93,39 +90,4 @@ export async function refreshToken() {
     }
   }
   return true
-}
-
-const enum AuthScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin',
-  VALIDATE = 'validate',
-  NATLSYSADMIN = 'natlsysadmin'
-}
-
-export const hasRegisterScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(AuthScope.REGISTER)) {
-    return true
-  }
-  return false
-}
-
-export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(AuthScope.VALIDATE)) {
-    return true
-  }
-  return false
-}
-
-export const hasAccessToRoute = (
-  roles: SystemRoleType[],
-  userDetails: UserDetails
-): boolean => {
-  const userRole = userDetails.systemRole
-  if (roles.includes(userRole)) {
-    return true
-  }
-  return false
 }

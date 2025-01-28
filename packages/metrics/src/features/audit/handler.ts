@@ -12,7 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import { writePoints } from '@metrics/influxdb/client'
 import { internal } from '@hapi/boom'
-import { IUserAuditBody } from '@metrics/features/registration'
+import { IUserAuditBody, IUserModelData } from '@metrics/features/registration'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
 import { countUserAuditEvents, getUserAuditEvents } from './service'
 import { getClientIdFromToken } from '@metrics/utils/authUtils'
@@ -60,10 +60,34 @@ export async function newAuditHandler(
 export async function getUser(
   userId: string,
   authHeader: { Authorization: string }
-) {
+): Promise<IUserModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}/getUser`, {
     method: 'POST',
     body: JSON.stringify({ userId }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve user mobile number. Error: ${
+        res.status
+      } status received. ${await res.text()}`
+    )
+  }
+
+  return await res.json()
+}
+
+export async function getSystem(
+  systemId: string,
+  authHeader: { Authorization: string }
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}/getSystem`, {
+    method: 'POST',
+    body: JSON.stringify({ systemId }),
     headers: {
       'Content-Type': 'application/json',
       ...authHeader

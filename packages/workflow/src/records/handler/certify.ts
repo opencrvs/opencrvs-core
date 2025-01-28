@@ -18,6 +18,9 @@ import { uploadCertificateAttachmentsToDocumentsStore } from '@workflow/document
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
+import { invokeWebhooks } from '@workflow/records/webhooks'
+import { getEventType } from '@workflow/features/registration/utils'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const certifyRoute = createRoute({
   method: 'POST',
@@ -25,6 +28,7 @@ export const certifyRoute = createRoute({
   allowedStartStates: ['REGISTERED'],
   action: 'CERTIFY',
   includeHistoryResources: true,
+  allowedScopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
   handler: async (request, record): Promise<CertifiedRecord> => {
     const token = getToken(request)
     const { certificate: certificateDetailsWithRawAttachments, event } =
@@ -45,6 +49,14 @@ export const certifyRoute = createRoute({
 
     await indexBundle(certifiedRecord, token)
     await auditEvent('certified', certifiedRecord, token)
+
+    await invokeWebhooks({
+      bundle: record,
+      token,
+      event: getEventType(record),
+      isNotRegistered: true,
+      statusType: 'certified'
+    })
 
     return certifiedRecord
   }
