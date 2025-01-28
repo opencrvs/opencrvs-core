@@ -27,6 +27,7 @@ import {
   useSubscribeEventFormData
 } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
+import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -83,7 +84,8 @@ export function Pages() {
    * ID.
    */
   useEffect(() => {
-    const hasTemporaryId = event.id === event.transactionId
+    const hasTemporaryId = isTemporaryId(event.id)
+
     if (eventId !== event.id && !hasTemporaryId) {
       navigate(
         ROUTES.V2.EVENTS.DECLARE.buildPath({
@@ -91,7 +93,7 @@ export function Pages() {
         })
       )
     }
-  }, [event.id, event.transactionId, eventId, navigate])
+  }, [event.id, eventId, navigate])
 
   return (
     <FormLayout
@@ -113,6 +115,7 @@ export function Pages() {
         form={formValues}
         formPages={formPages}
         pageId={currentPageId}
+        setFormData={(data) => setFormValues(eventId, data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(

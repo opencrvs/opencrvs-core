@@ -21,7 +21,5 @@ export const appRouter = router({
   locations: locationRouter
 })
 
-/**
- * @public
- */
+/** @knipignore */
 export type AppRouter = typeof appRouter

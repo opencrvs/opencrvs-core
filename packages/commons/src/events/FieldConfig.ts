@@ -92,6 +92,7 @@ export const FieldType = {
   TEXT: 'TEXT',
   DATE: 'DATE',
   PARAGRAPH: 'PARAGRAPH',
+  PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
   HIDDEN: 'HIDDEN',
@@ -110,6 +111,7 @@ export interface FieldValueByType {
   [FieldType.TEXT]: TextFieldValue
   [FieldType.DATE]: DateFieldValue
   [FieldType.PARAGRAPH]: ParagraphFieldValue
+  [FieldType.PAGE_HEADER]: ParagraphFieldValue
   [FieldType.RADIO_GROUP]: RadioGroupFieldValue
   [FieldType.BULLET_LIST]: BulletListFieldValue
   [FieldType.CHECKBOX]: CheckboxFieldValue
@@ -167,6 +169,10 @@ const Paragraph = BaseField.extend({
     .default({})
 }).describe('A read-only HTML <p> paragraph')
 
+const PageHeader = BaseField.extend({
+  type: z.literal(FieldType.PAGE_HEADER)
+}).describe('A read-only header component for form pages')
+
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE)
 }).describe('File upload')
@@ -178,7 +184,10 @@ const SelectOption = z.object({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
-  options: z.array(SelectOption),
+  optionValues: z.array(SelectOption).describe('A list of options'),
+  options: z.object({
+    size: z.enum(['NORMAL', 'LARGE']).optional()
+  }),
   flexDirection: z
     .enum(['row', 'row-reverse', 'column', 'column-reverse'])
     .optional()
@@ -219,19 +228,41 @@ const Location = BaseField.extend({
   options: LocationOptions
 }).describe('Location input field')
 
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllFields =
+  | typeof TextField
+  | typeof DateField
+  | typeof Paragraph
+  | typeof RadioGroup
+  | typeof BulletList
+  | typeof PageHeader
+  | typeof Select
+  | typeof Checkbox
+  | typeof File
+  | typeof Country
+  | typeof Location
+  | typeof Divider
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
   Paragraph,
   RadioGroup,
   BulletList,
+  PageHeader,
   Select,
   Checkbox,
   File,
   Country,
   Location,
   Divider
-])
+]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>

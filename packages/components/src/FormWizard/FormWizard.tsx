@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { PropsWithChildren } from 'react'
-import { FieldValues } from 'react-hook-form'
 import { Button } from '../Button'
-import { Stack } from '../Stack'
-import { Frame } from '../Frame'
 import { Content } from '../Content'
+import { Frame } from '../Frame'
 import { Icon } from '../Icon'
+import { Stack } from '../Stack'
 
 type FormWizardProps = PropsWithChildren<{
   currentPage: number
@@ -28,6 +27,7 @@ type FormWizardProps = PropsWithChildren<{
   pageTitle: string
 
   showReviewButton?: boolean
+  submitButtonText?: string
 }>
 
 export const FormWizard = ({
@@ -38,6 +38,7 @@ export const FormWizard = ({
   pageTitle,
   onNextPage,
   onPreviousPage,
+  submitButtonText = 'Submit',
   showReviewButton
 }: FormWizardProps) => {
   return (
@@ -56,12 +57,17 @@ export const FormWizard = ({
             {children}
 
             {currentPage + 1 < totalPages ? (
-              <Button type="primary" role="button" onClick={onNextPage}>
+              <Button
+                size="large"
+                type="primary"
+                role="button"
+                onClick={onNextPage}
+              >
                 Continue
               </Button>
             ) : (
-              <Button type="primary" onClick={onSubmit}>
-                Submit
+              <Button size="large" type="primary" onClick={onSubmit}>
+                {submitButtonText}
               </Button>
             )}
             {showReviewButton && (

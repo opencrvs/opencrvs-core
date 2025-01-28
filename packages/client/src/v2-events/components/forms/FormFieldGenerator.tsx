@@ -31,6 +31,7 @@ import {
   ActionFormData,
   CheckboxFieldValue,
   FieldConfig,
+  FieldType,
   FieldValue,
   FileFieldValue,
   LocationFieldValue,
@@ -53,13 +54,14 @@ import {
 } from 'react-intl'
 import { FileInput } from './inputs/FileInput/FileInput'
 
+import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
 import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
+import { Location } from '@client/v2-events/features/events/registered-fields/Location'
+import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
-import { Location } from '@client/v2-events/features/events/registered-fields/Location'
-import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
-import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
+import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
 
@@ -164,7 +166,9 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-
+    if (fieldDefinition.type === 'PAGE_HEADER') {
+      return <SubHeader>{intl.formatMessage(fieldDefinition.label)}</SubHeader>
+    }
     if (fieldDefinition.type === PARAGRAPH) {
       const label = fieldDefinition.label as unknown as MessageDescriptor & {
         values: Record<string, string>
@@ -483,7 +487,10 @@ class FormSectionComponent extends React.Component<AllProps> {
           const isFieldDisabled = conditionalActions.includes('disable')
 
           return (
-            <FormItem key={`${field.id}${language}`}>
+            <FormItem
+              ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
+              key={`${field.id}${language}`}
+            >
               <Field name={field.id}>
                 {(formikFieldProps: FieldProps<any>) => {
                   return (
