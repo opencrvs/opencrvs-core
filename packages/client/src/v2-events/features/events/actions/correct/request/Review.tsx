@@ -30,10 +30,6 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { ROUTES } from '@client/v2-events/routes'
 
-/**
- *
- * Preview of event to be registered.
- */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
   const events = useEvents()
@@ -46,8 +42,16 @@ export function Review() {
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
   const { forms: formConfigs } = config.actions.filter(
-    (action) => action.type === ActionType.DECLARE
+    (action) => action.type === ActionType.REQUEST_CORRECTION
   )[0]
+
+  const formConfig = formConfigs.find((form) => form.active)
+
+  if (!formConfig) {
+    throw new Error(
+      `An active form config not found for action type ${ActionType.REQUEST_CORRECTION}`
+    )
+  }
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
@@ -99,7 +103,7 @@ export function Review() {
       <ReviewComponent.Body
         eventConfig={config}
         form={form}
-        formConfig={formConfigs[0]}
+        formConfig={formConfig}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(actionConfig.label, {
           ...initialValues,

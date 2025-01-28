@@ -11,16 +11,7 @@
 
 import { addAction, getEventById } from '@events/service/events/events'
 import { ApproveCorrectionActionInput } from '@opencrvs/commons'
-import { TRPCError } from '@trpc/server'
-
-class RequestNotFoundError extends TRPCError {
-  constructor(id: string) {
-    super({
-      code: 'NOT_FOUND',
-      message: `Correction request not found with ID: ${id}`
-    })
-  }
-}
+import { RequestNotFoundError } from './correction'
 
 export async function approveCorrection(
   input: ApproveCorrectionActionInput,

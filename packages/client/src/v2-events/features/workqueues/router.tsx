@@ -10,21 +10,12 @@
  */
 
 import React from 'react'
-import { Outlet } from 'react-router-dom'
-import { Debug } from '@client/v2-events/features/debug/debug'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
-import { TRPCProvider } from '@client/v2-events/trpc'
 
-/**
- * Configuration for the routes of the v2-events feature.
- *
- * Each route is defined as a child of the `ROUTES.V2` route.
- */
 export const router = {
-  path: ROUTES.V2.path,
-  // Alternative would be to create a navigation component that would be used here.
+  path: ROUTES.V2.WORKQUEUES.path,
   element: (
     <WorkqueueLayout>
       <WorkqueueIndex />
@@ -33,7 +24,7 @@ export const router = {
   children: [
     {
       index: true,
-      path: ROUTES.V2.WORKQUEUE.path,
+      path: ROUTES.V2.WORKQUEUES.WORKQUEUE.path,
       element: <WorkqueueIndex />
     }
   ]

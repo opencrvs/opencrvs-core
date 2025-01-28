@@ -63,15 +63,11 @@ export function Onboarding() {
 
   if (!actionConfiguration) {
     throw new Error(
-      'User got to a request correction flow without no configuration defined for this action'
+      `User got to a request correction flow without configuration defined for action type: ${ActionType.REQUEST_CORRECTION}, eventId: ${eventId}, pageId: ${pageId}`
     )
   }
 
   const formPages = actionConfiguration.onboardingForm
-
-  if (!formPages) {
-    throw new Error('Form configuration not found for type: ' + event.type)
-  }
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -91,46 +87,44 @@ export function Onboarding() {
   }
 
   return (
-    <>
-      <ActionPageLight
-        hideBackground
-        goBack={() => navigate(-1)}
-        goHome={() =>
-          navigate(
-            generateGoToHomeTabUrl({
-              tabId: WORKQUEUE_TABS.readyForReview
+    <ActionPageLight
+      hideBackground
+      goBack={() => navigate(-1)}
+      goHome={() =>
+        navigate(
+          generateGoToHomeTabUrl({
+            tabId: WORKQUEUE_TABS.readyForReview
+          })
+        )
+      }
+      id="corrector_form"
+      title={intl.formatMessage(messages.title)}
+    >
+      <PagesComponent
+        eventId={event.id}
+        // @TODO: Use subscription if needed
+        form={correctionRequestData.getFormValues()}
+        formPages={formPages}
+        pageId={currentPageId}
+        setFormData={correctionRequestData.setFormValues}
+        showReviewButton={false}
+        submitButtonText={intl.formatMessage(buttonMessages.continueButton)}
+        onFormPageChange={(nextPageId: string) => {
+          return navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+              eventId: event.id,
+              pageId: nextPageId
             })
           )
-        }
-        id="corrector_form"
-        title={intl.formatMessage(messages.title)}
-      >
-        <PagesComponent
-          eventId={event.id}
-          // @TODO: Use subscription if needed
-          form={correctionRequestData.getFormValues()}
-          formPages={formPages}
-          pageId={currentPageId}
-          setFormData={correctionRequestData.setFormValues}
-          showReviewButton={false}
-          submitButtonText={intl.formatMessage(buttonMessages.continueButton)}
-          onFormPageChange={(nextPageId: string) => {
-            return navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-                eventId: event.id,
-                pageId: nextPageId
-              })
-            )
-          }}
-          onSubmit={() => {
-            return navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-                eventId: event.id
-              })
-            )
-          }}
-        />
-      </ActionPageLight>
-    </>
+        }}
+        onSubmit={() => {
+          return navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+              eventId: event.id
+            })
+          )
+        }}
+      />
+    </ActionPageLight>
   )
 }

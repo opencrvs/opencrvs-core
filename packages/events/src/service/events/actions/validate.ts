@@ -67,11 +67,18 @@ export async function validate(
     })
   )
 
+  /*
+   * Takes all hits using all possible deduplication rules and
+   * sorts them by score. Then removes duplicates from the list.
+   */
+
   duplicates = resultsFromAllRules
     .flat()
+    // Sort results to ascending order
     .sort((a, b) => b.score - a.score)
     .filter((hit): hit is { score: number; event: EventIndex } => !!hit.event)
     .map((hit) => hit.event)
+    // Remove duplicates
     .filter((event, index, self) => {
       return self.findIndex((t) => t.id === event.id) === index
     })

@@ -164,11 +164,7 @@ const GeneratedInputField = React.memo(
       )
     }
     if (fieldDefinition.type === 'PAGE_HEADER') {
-      return (
-        <>
-          <SubHeader>{intl.formatMessage(fieldDefinition.label)}</SubHeader>
-        </>
-      )
+      return <SubHeader>{intl.formatMessage(fieldDefinition.label)}</SubHeader>
     }
     if (fieldDefinition.type === PARAGRAPH) {
       const label = fieldDefinition.label as unknown as MessageDescriptor & {

@@ -19,7 +19,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
 import { useCorrectionRequestData } from './useCorrectionRequestData'
-import * as Request from '.'
+import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
   title: 'CorrectionRequest',
@@ -127,9 +127,8 @@ export const AdditionalDetails: Story = {
     reactRouter: {
       router: router,
       initialPath:
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS.buildPath({
-          eventId: tennisClueMembershipEventDocument.id,
-          pageId: ''
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath({
+          eventId: tennisClueMembershipEventDocument.id
         })
     },
     msw: {

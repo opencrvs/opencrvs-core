@@ -59,12 +59,12 @@ export function handleInitialValue(
 }
 
 export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return !getConditionalActionsForField(field, {
+  return getConditionalActionsForField(field, {
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
     })
-  }).includes('HIDE')
+  }).every((fieldAction) => fieldAction !== 'HIDE')
 }
 
 export function getConditionalActionsForField(

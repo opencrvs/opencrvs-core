@@ -71,7 +71,7 @@ function changeSortedColumn(
 
 export function WorkqueueIndex() {
   const { getEvents, getOutbox } = useEvents()
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const [config] = useEventConfigurations()
 

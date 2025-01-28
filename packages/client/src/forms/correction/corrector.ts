@@ -199,8 +199,6 @@ export const getCorrectorSection = (
     ]
   }
 
-  console.log(correctorRelationGroup)
-
   const correctorSection: IFormSection = {
     id: CorrectionSection.Corrector,
     viewType: 'form',

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
@@ -17,8 +18,8 @@ import {
   ActionType,
   FieldConfig,
   generateTransactionId,
-  getAllPages,
   getCurrentEventState,
+  Scope,
   SCOPES
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -53,6 +54,35 @@ function shouldBeShownAsAValue(field: FieldConfig) {
     return false
   }
   return true
+}
+
+function ContinueButton({
+  onClick,
+  disabled = false,
+  scopes
+}: {
+  disabled?: boolean
+  onClick: () => void
+  scopes: Scope[] | null
+}) {
+  const intl = useIntl()
+
+  return (
+    <Button
+      key="make_correction"
+      disabled={disabled}
+      id="make_correction"
+      size="large"
+      type="positive"
+      onClick={onClick}
+    >
+      <Check />
+
+      {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+        ? intl.formatMessage(buttonMessages.makeCorrection)
+        : intl.formatMessage(buttonMessages.sendForApproval)}
+    </Button>
+  )
 }
 
 export function Summary() {
@@ -90,7 +120,6 @@ export function Summary() {
 
   const stringifiedForm = toString(form)
   const stringifiedPreviousForm = toString(previousFormValues)
-  const pages = getAllPages(eventConfiguration)
 
   const correctionRequestData = useCorrectionRequestData()
   const stringiedRequestData = toString(correctionRequestData.getFormValues())
@@ -105,27 +134,52 @@ export function Summary() {
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.additionalDetailsForm || []
 
-  const continueButton = (
-    <Button
-      key="make_correction"
-      disabled={false /* @todo */}
-      id="make_correction"
-      size="large"
-      type="positive"
-      onClick={togglePrompt}
-    >
-      <Check />
+  const submitCorrection = React.useCallback(() => {
+    const formWithOnlyChangedValues = Object.entries(form).reduce<typeof form>(
+      (acc, [key, value]) => {
+        if (value !== previousFormValues[key]) {
+          acc[key] = value
+        }
+        return acc
+      },
+      {}
+    )
 
-      {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
-        ? intl.formatMessage(buttonMessages.makeCorrection)
-        : intl.formatMessage(buttonMessages.sendForApproval)}
-    </Button>
-  )
+    const valuesThatGotHidden = formConfig.pages
+      .flatMap((page) => page.fields)
+      .filter((field) => {
+        const wasVisible = isFormFieldVisible(field, previousFormValues)
+        const isHidden = !isFormFieldVisible(field, form)
+
+        return wasVisible && isHidden
+      })
+
+    const nullifiedHiddenValues = getInitialValues(valuesThatGotHidden)
+
+    events.actions.correct.request.mutate({
+      eventId,
+      data: {
+        ...formWithOnlyChangedValues,
+        ...nullifiedHiddenValues
+      },
+      transactionId: generateTransactionId(),
+      metadata: correctionRequestData.getFormValues()
+    })
+    eventFormNavigation.goToHome()
+  }, [
+    form,
+    previousFormValues,
+    formConfig.pages,
+    events.actions.correct.request,
+    eventId,
+    correctionRequestData,
+    eventFormNavigation
+  ])
 
   const backToReviewButton = (
     <SecondaryButton
-      key="back_to_review"
-      id="back_to_review"
+      key="back-to-review"
+      id="back-to-review"
       onClick={() =>
         navigate(
           ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
@@ -148,7 +202,14 @@ export function Summary() {
         title={intl.formatMessage(correctionMessages.title)}
       >
         <Content
-          bottomActionButtons={[continueButton]}
+          bottomActionButtons={[
+            <ContinueButton
+              key={'make-correction'}
+              disabled={false /* @todo */}
+              scopes={scopes}
+              onClick={togglePrompt}
+            />
+          ]}
           showTitleOnMobile={true}
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
           topActionButtons={[backToReviewButton]}
@@ -180,7 +241,7 @@ export function Summary() {
                     }
                   })}
                 hideTableBottomBorder={true}
-                id="requestedBy"
+                id="onboarding"
                 isLoading={false}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               ></Table>
@@ -275,7 +336,7 @@ export function Summary() {
                     }
                   })}
                 hideTableBottomBorder={true}
-                id="requestedBy"
+                id="additional-details"
                 isLoading={false}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               ></Table>
@@ -303,49 +364,14 @@ export function Summary() {
             id="send"
             size="medium"
             type="positive"
-            onClick={() => {
-              const formWithOnlyChangedValues = Object.entries(form).reduce<
-                typeof form
-              >((acc, [key, value]) => {
-                if (value !== previousFormValues[key]) {
-                  acc[key] = value
-                }
-                return acc
-              }, {})
-
-              const valuesThatGotHidden = formConfig.pages
-                .flatMap((page) => page.fields)
-                .filter((field) => {
-                  const wasVisible = isFormFieldVisible(
-                    field,
-                    previousFormValues
-                  )
-                  const isHidden = !isFormFieldVisible(field, form)
-
-                  return wasVisible && isHidden
-                })
-
-              const nullifiedHiddenValues =
-                getInitialValues(valuesThatGotHidden)
-
-              events.actions.correct.request.mutate({
-                eventId,
-                data: {
-                  ...formWithOnlyChangedValues,
-                  ...nullifiedHiddenValues
-                },
-                transactionId: generateTransactionId(),
-                metadata: correctionRequestData.getFormValues()
-              })
-              eventFormNavigation.goToHome()
-            }}
+            onClick={submitCorrection}
           >
             {intl.formatMessage(
               correctionMessages.correctionForApprovalDialogConfirm
             )}
           </Button>
         ]}
-        id="withoutCorrectionForApprovalPrompt"
+        id="without-correction-for-approval-prompt"
         isOpen={showPrompt}
         title={intl.formatMessage(
           scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
@@ -354,15 +380,13 @@ export function Summary() {
         )}
         onClose={togglePrompt}
       >
-        <p>
-          <Text element="p" variant="reg16">
-            {intl.formatMessage(
-              scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
-                ? correctionMessages.correctRecordDialogDescription
-                : correctionMessages.correctionForApprovalDialogDescription
-            )}
-          </Text>
-        </p>
+        <Text element="p" variant="reg16">
+          {intl.formatMessage(
+            scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+              ? correctionMessages.correctRecordDialogDescription
+              : correctionMessages.correctionForApprovalDialogDescription
+          )}
+        </Text>
       </Dialog>
     </>
   )

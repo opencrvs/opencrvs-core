@@ -33,7 +33,7 @@ export const Default: StoryObj<typeof WorkqueueIndex> = {
   parameters: {
     reactRouter: {
       router: router,
-      initialPath: ROUTES.V2.WORKQUEUE.buildPath({})
+      initialPath: ROUTES.V2.WORKQUEUES.buildPath({})
     }
   }
 }

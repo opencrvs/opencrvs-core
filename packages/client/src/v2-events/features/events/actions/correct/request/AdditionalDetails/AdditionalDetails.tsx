@@ -55,15 +55,11 @@ export function AdditionalDetails() {
 
   if (!actionConfiguration) {
     throw new Error(
-      'User got to a request correction flow without no configuration defined for this action'
+      `User got to a request correction flow without configuration defined for this action. Event ID: ${eventId}, Page ID: ${pageId}, Action Type: ${ActionType.REQUEST_CORRECTION}`
     )
   }
 
   const formPages = actionConfiguration.additionalDetailsForm
-
-  if (!formPages) {
-    throw new Error('Form configuration not found for type: ' + event.type)
-  }
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
