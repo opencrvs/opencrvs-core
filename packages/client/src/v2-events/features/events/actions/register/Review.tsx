@@ -59,10 +59,6 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  if (!config) {
-    throw new Error('Event configuration not found with type: ' + event.type)
-  }
-
   const { forms: formConfigs } = config.actions.filter(
     (action) => action.type === ActionType.REGISTER
   )[0]

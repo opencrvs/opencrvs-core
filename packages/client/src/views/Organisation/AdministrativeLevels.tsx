@@ -36,6 +36,7 @@ import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
 
@@ -61,6 +62,7 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
 export function AdministrativeLevels() {
   const intl = useIntl()
   const { locationId } = useParams<IRouteProps>()
+  const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
 
   const getNewLevel =
@@ -74,15 +76,13 @@ export function AdministrativeLevels() {
         [key: string]: ILocation
       }
 
-      let childLocations = Object.values(locations).filter(
-        (s) => s.partOf === `Location/${location}`
-      )
-
-      if (!childLocations.length) {
-        childLocations = Object.values(offices).filter(
-          (s) => s.partOf === `Location/${location}`
+      const childLocations = Object.values(locations)
+        .filter((s) => s.partOf === `Location/${location}`)
+        .concat(
+          Object.values(offices).filter(
+            (s) => s.partOf === `Location/${location}`
+          )
         )
-      }
 
       let dataOfBreadCrumb: IBreadCrumbData[] = [
         {
@@ -172,15 +172,19 @@ export function AdministrativeLevels() {
                   <ListViewItemSimplified
                     key={index}
                     label={
-                      <Link
-                        element="a"
-                        onClick={(e) => {
-                          if (level.type === 'ADMIN_STRUCTURE') {
+                      level.type === 'ADMIN_STRUCTURE' ? (
+                        <Link
+                          onClick={(e) => {
                             setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
-                          }
-
-                          if (level.type === 'CRVS_OFFICE') {
+                          }}
+                        >
+                          {getLocalizedLocationName(intl, level)}
+                        </Link>
+                      ) : level.type === 'CRVS_OFFICE' ? (
+                        <Link
+                          disabled={!canAccessOffice(level)}
+                          onClick={() =>
                             navigate({
                               pathname: routes.TEAM_USER_LIST,
                               search: stringify({
@@ -188,10 +192,10 @@ export function AdministrativeLevels() {
                               })
                             })
                           }
-                        }}
-                      >
-                        {getLocalizedLocationName(intl, level)}
-                      </Link>
+                        >
+                          {getLocalizedLocationName(intl, level)}
+                        </Link>
+                      ) : null
                     }
                     actions={
                       <Button

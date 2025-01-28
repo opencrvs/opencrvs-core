@@ -19,7 +19,7 @@ import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
 import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
-import { RouteScope } from '@config/config/routes'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const SystemRoleType = [
   'FIELD_AGENT',
@@ -64,12 +64,7 @@ async function getCertificatesConfig(
   }
   const { scope } = decodedOrError.right
 
-  if (
-    scope &&
-    (scope.includes(RouteScope.CERTIFY) ||
-      scope.includes(RouteScope.VALIDATE) ||
-      scope.includes(RouteScope.NATLSYSADMIN))
-  ) {
+  if (scope.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
     const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
     const res = await fetch(url, {
@@ -85,6 +80,7 @@ async function getCertificatesConfig(
   }
   return []
 }
+
 async function getConfigFromCountry(authToken?: string) {
   const url = new URL('application-config', env.COUNTRY_CONFIG_URL).toString()
 
@@ -181,10 +177,8 @@ const applicationConfigResponseValidation = Joi.object({
     DEATH_REGISTRATION: Joi.boolean().required(),
     MARRIAGE_REGISTRATION: Joi.boolean().required(),
     EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean().required(),
-    INFORMANT_SIGNATURE: Joi.boolean().required(),
     PRINT_DECLARATION: Joi.boolean().required(),
-    DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required(),
-    INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required()
+    DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required()
   },
   USER_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),

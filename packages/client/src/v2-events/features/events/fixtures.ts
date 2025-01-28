@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig, FormConfig } from '@opencrvs/commons/client'
+import { EventConfigInput, FormConfig } from '@opencrvs/commons/client'
 
 export const DEFAULT_FORM = {
   label: {
@@ -132,16 +132,24 @@ export const tennisClubMembershipEvent = {
   },
   summary: {
     title: {
-      defaultMessage: '{applicant.firstname} {applicant.surname}',
-      description: 'This is the title of the summary',
-      id: 'event.tennis-club-membership.summary.title'
+      id: 'event.tennis-club-membership.summary.title',
+      label: {
+        defaultMessage: '{applicant.firstname} {applicant.surname}',
+        description: 'This is the title of the summary',
+        id: 'event.tennis-club-membership.summary.title.label'
+      }
     },
     fields: [
       {
         id: 'applicant.firstname',
+        value: {
+          defaultMessage: '{applicant.firstname}',
+          description: 'Value for the matching field on form.',
+          id: 'event.tennis-club-membership.summary.field.firstname.value'
+        },
         label: {
           defaultMessage: 'First name',
-          description: 'Label for the gien field from form.',
+          description: 'Label for the given field on form.',
           id: 'event.tennis-club-membership.summary.field.firstname.label'
         }
       }
@@ -149,51 +157,30 @@ export const tennisClubMembershipEvent = {
   },
   workqueues: [
     {
-      id: 'in-progress',
-      title: {
-        defaultMessage: 'In progress',
-        description: 'Label for in progress workqueue',
-        id: 'event.tennis-club-membership.workqueue.in-progress.label'
-      },
+      id: 'all',
       fields: [
         {
-          id: 'applicant.firstname'
-        },
-        {
-          id: 'event.type'
-        },
-        {
-          id: 'event.createdAt'
-        },
-        {
-          id: 'event.modifiedAt'
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.all.name.label'
+          }
         }
       ],
-      filters: [
-        {
-          status: ['CREATED']
-        }
-      ]
+      filters: []
     },
     {
       id: 'ready-for-review',
-      title: {
-        defaultMessage: 'Ready for review',
-        description: 'Label for in review workqueue',
-        id: 'event.tennis-club-membership.workqueue.in-review.label'
-      },
+
       fields: [
         {
-          id: 'applicant.firstname'
-        },
-        {
-          id: 'event.type'
-        },
-        {
-          id: 'event.createdAt'
-        },
-        {
-          id: 'event.modifiedAt'
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.readyForReview.name.label'
+          }
         }
       ],
       filters: [
@@ -204,23 +191,15 @@ export const tennisClubMembershipEvent = {
     },
     {
       id: 'registered',
-      title: {
-        defaultMessage: 'Ready to print',
-        description: 'Label for registered workqueue',
-        id: 'event.tennis-club-membership.workqueue.registered.label'
-      },
+
       fields: [
         {
-          id: 'applicant.firstname'
-        },
-        {
-          id: 'event.type'
-        },
-        {
-          id: 'event.createdAt'
-        },
-        {
-          id: 'event.modifiedAt'
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.registered.name.label'
+          }
         }
       ],
       filters: [
@@ -241,5 +220,25 @@ export const tennisClubMembershipEvent = {
       },
       forms: [DEFAULT_FORM]
     }
+  ],
+  deduplication: [
+    {
+      id: 'STANDARD CHECK',
+      label: {
+        defaultMessage: 'Standard check',
+        description:
+          'This could be shown to the user in a reason for duplicate detected',
+        id: '...'
+      },
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            fieldId: 'applicant.firstname',
+            type: 'strict'
+          }
+        ]
+      }
+    }
   ]
-} satisfies EventConfig
+} satisfies EventConfigInput

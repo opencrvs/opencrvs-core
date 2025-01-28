@@ -17,6 +17,7 @@ import { createRoute } from '@workflow/states'
 import { auditEvent } from '@workflow/records/audit'
 import { invokeWebhooks } from '@workflow/records/webhooks'
 import { getEventType } from '@workflow/features/registration/utils'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const requestSchema = z.object({
   reason: z.string().optional(),
@@ -29,6 +30,7 @@ export const archiveRoute = createRoute({
   path: '/records/{recordId}/archive',
   allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
   action: 'ARCHIVE',
+  allowedScopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

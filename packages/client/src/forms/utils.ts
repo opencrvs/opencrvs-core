@@ -52,8 +52,13 @@ import {
   IButtonFormField,
   BUTTON,
   Ii18nButtonFormField,
-  IRedirectFormField,
-  REDIRECT
+  ILinkButtonFormField,
+  LINK_BUTTON,
+  IDReaderFormField,
+  ID_READER,
+  Ii18nIDReaderFormField,
+  QRReaderType,
+  ReaderType
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -197,6 +202,14 @@ export const internationaliseFieldObject = (
         field.loadingLabel
       )
     }
+  }
+
+  if (isFieldIDReader(field)) {
+    ;(base as Ii18nIDReaderFormField).dividerLabel = intl.formatMessage(
+      field.dividerLabel
+    )
+    ;(base as Ii18nIDReaderFormField).manualInputInstructionLabel =
+      intl.formatMessage(field.manualInputInstructionLabel)
   }
 
   return base as Ii18nFormField
@@ -510,16 +523,6 @@ export function isDefaultCountry(countryCode: string): boolean {
   return countryCode === window.config.COUNTRY.toUpperCase()
 }
 
-export function getListOfLocations(
-  resource: IOfflineData,
-  resourceType: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
-  >
-) {
-  return resource[resourceType]
-}
-
 interface IVars {
   [key: string]: any
 }
@@ -766,14 +769,28 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
   return field.type === BUTTON
 }
 
+function isFieldIDReader(field: IFormField): field is IDReaderFormField {
+  return field.type === ID_READER
+}
+
+export function isReaderQR(reader: ReaderType): reader is QRReaderType {
+  return reader.type === 'QR'
+}
+
+export function isReaderLinkButton(
+  reader: ReaderType
+): reader is ILinkButtonFormField {
+  return reader.type === LINK_BUTTON
+}
+
 export function isFieldHttp(field: IFormField): field is IHttpFormField {
   return field.type === HTTP
 }
 
-export function isFieldRedirect(
+export function isFieldLinkButton(
   field: IFormField
-): field is IRedirectFormField {
-  return field.type === REDIRECT
+): field is ILinkButtonFormField {
+  return field.type === LINK_BUTTON
 }
 
 function isInitialValueDependencyInfo(

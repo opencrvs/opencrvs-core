@@ -42,14 +42,14 @@ export const routesConfig = {
       // Alternative would be to create a navigation component that would be used here.
       element: (
         <WorkqueueLayout>
-          <WorkqueueIndex />
+          <WorkqueueIndex workqueueId={'all'} />
         </WorkqueueLayout>
       ),
       children: [
         {
           index: true,
           path: ROUTES.V2.WORKQUEUE.path,
-          element: <WorkqueueIndex />
+          element: <WorkqueueIndex workqueueId={'all'} />
         }
       ]
     },

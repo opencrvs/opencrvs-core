@@ -10,7 +10,6 @@
  */
 
 import fetch from 'node-fetch'
-import { UserRole } from '../authentication'
 
 interface IUserName {
   use: string
@@ -27,7 +26,6 @@ type User = {
   name: IUserName[]
   username: string
   email: string
-  systemRole: UserRole
   role: ObjectId
   practitionerId: string
   primaryOfficeId: string
@@ -41,7 +39,11 @@ export async function getUser(
   userId: string,
   token: string
 ) {
-  const res = await fetch(new URL(`getUser`, userManagementHost).href, {
+  const hostWithTrailingSlash = userManagementHost.endsWith('/')
+    ? userManagementHost
+    : userManagementHost + '/'
+
+  const res = await fetch(new URL('getUser', hostWithTrailingSlash).href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {

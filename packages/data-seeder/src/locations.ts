@@ -13,7 +13,13 @@ import { OPENCRVS_SPECIFICATION_URL } from './constants'
 import { env } from './environment'
 import { TypeOf, z } from 'zod'
 import { raise } from './utils'
-import { inspect } from 'util'
+import { fromZodError } from 'zod-validation-error'
+
+const LOCATION_TYPES = [
+  'ADMIN_STRUCTURE',
+  'HEALTH_FACILITY',
+  'CRVS_OFFICE'
+] as const
 
 const LocationSchema = z.array(
   z.object({
@@ -21,7 +27,7 @@ const LocationSchema = z.array(
     name: z.string(),
     alias: z.string().optional(),
     partOf: z.string(),
-    locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
+    locationType: z.enum(LOCATION_TYPES),
     jurisdictionType: z
       .enum([
         'STATE',
@@ -161,9 +167,9 @@ async function getLocations() {
   const parsedLocations = LocationSchema.safeParse(await res.json())
   if (!parsedLocations.success) {
     raise(
-      `Error when getting locations from country-config: ${inspect(
-        parsedLocations.error.issues
-      )}`
+      fromZodError(parsedLocations.error, {
+        prefix: `Error validating locations data returned from ${url}`
+      })
     )
   }
   const adminStructureMap = validateAdminStructure(
@@ -183,36 +189,42 @@ async function getLocations() {
   return parsedLocations.data
 }
 
-function locationBundleToIdentifier(
-  bundle: fhir3.Bundle<fhir3.Location>
-): string[] {
-  return (bundle.entry ?? [])
+const bundleToLocationEntries = (bundle: fhir3.Bundle<fhir3.Location>) =>
+  (bundle.entry ?? [])
     .map((bundleEntry) => bundleEntry.resource)
     .filter((maybeLocation): maybeLocation is fhir3.Location =>
       Boolean(maybeLocation)
     )
-    .map((location) =>
-      location.identifier
-        ?.find(
-          ({ system }) =>
-            system === `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
-            system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-        )
-        ?.value?.split('_')
-        .pop()
-    )
+
+function locationBundleToIdentifier(
+  bundle: fhir3.Bundle<fhir3.Location>
+): string[] {
+  return bundleToLocationEntries(bundle)
+    .map((location) => getExternalIdFromIdentifier(location.identifier))
     .filter((maybeId): maybeId is string => Boolean(maybeId))
 }
+
+/**
+ * Get the externally defined id for location. Defined in country-config.
+ */
+const getExternalIdFromIdentifier = (
+  identifiers: fhir3.Location['identifier']
+) =>
+  identifiers
+    ?.find(({ system }) =>
+      [
+        `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
+        `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
+      ].some((identifierSystem) => identifierSystem === system)
+    )
+    ?.value?.split('_')
+    .pop()
 
 export async function seedLocations(token: string) {
   const savedLocations = (
     await Promise.all(
-      ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
-        fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        })
+      LOCATION_TYPES.map((type) =>
+        getLocationsByType(type)
           .then((res) => res.json())
           .then((bundle: fhir3.Bundle<fhir3.Location>) =>
             locationBundleToIdentifier(bundle)
@@ -241,9 +253,11 @@ export async function seedLocations(token: string) {
         }))
     )
   })
+
   if (!res.ok) {
     raise(await res.json())
   }
+
   const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
   response.entry?.forEach((res, index) => {
     if (res.response?.status !== '201') {
@@ -266,14 +280,37 @@ function updateLocationPartOf(partOf: string) {
   return parent
 }
 
-export async function seedLocationsForV2Events(token: string) {
-  const locations = await getLocations()
+function getLocationsByType(type: string) {
+  return fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    }
+  })
+}
 
-  const simplifiedLocations = locations.map((location) => ({
-    id: location.id,
-    name: location.name,
-    partOf: updateLocationPartOf(location.partOf)
-  }))
+/**
+ * NOTE: Seeding locations for v2 should be done after seeding the legacy locations.
+ * This is because the v2 locations are created based on the legacy location ids to ensure compatibility.
+ */
+export async function seedLocationsForV2Events(token: string) {
+  const locations = (
+    await Promise.all(
+      LOCATION_TYPES.map((type) =>
+        getLocationsByType(type)
+          .then((res) => res.json())
+          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
+            bundleToLocationEntries(bundle).map((location) => ({
+              id: location.id,
+              externalId: getExternalIdFromIdentifier(location.identifier),
+              name: location.name,
+              partOf: location?.partOf?.reference
+                ? updateLocationPartOf(location?.partOf?.reference)
+                : null
+            }))
+          )
+      )
+    )
+  ).flat()
 
   // NOTE: TRPC expects certain format, which may seem unconventional.
   const res = await fetch(`${env.GATEWAY_HOST}/events/locations.set`, {
@@ -282,12 +319,13 @@ export async function seedLocationsForV2Events(token: string) {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ json: simplifiedLocations })
+    body: JSON.stringify({ json: locations })
   })
 
   if (!res.ok) {
     console.error(
       'Unable to seed locations for v2 events. Ensure events service is running.'
     )
+    console.error(JSON.stringify(await res.json()))
   }
 }

@@ -13,6 +13,7 @@ import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
+import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   FieldConfig,
@@ -31,6 +32,8 @@ import {
 
 import { EventConfig } from '@opencrvs/commons'
 import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { getConditionalActionsForField } from '@client/v2-events/components/forms/utils'
+import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -199,6 +202,10 @@ function ReviewComponent({
 }) {
   const intl = useIntl()
 
+  const { toString } = useTransformer(eventConfig.id)
+
+  const stringifiedForm = toString(form)
+
   return (
     <Row>
       <LeftColumn>
@@ -252,11 +259,21 @@ function ReviewComponent({
                               // this means a value display row in not rendered at all
                               FIELD_TYPE_FORMATTERS[field.type] !== null
                           )
+                          .filter(
+                            (field) =>
+                              // Omit hidden fields
+                              !getConditionalActionsForField(field, {
+                                $form: form,
+                                $now: formatISO(new Date(), {
+                                  representation: 'date'
+                                })
+                              }).includes('HIDE')
+                          )
                           .map((field) => {
                             const Output =
                               FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
 
-                            const value = form[field.id]
+                            const value = stringifiedForm[field.id]
                             const hasValue =
                               // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                               value !== null && value !== undefined

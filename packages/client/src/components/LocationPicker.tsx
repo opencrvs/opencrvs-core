@@ -31,15 +31,13 @@ import {
   CancelableArea
 } from '@client/components/DateRangePicker'
 import styled from 'styled-components'
-import { ILocation, LocationType } from '@client/offline/reducer'
+import { ILocation } from '@client/offline/reducer'
 
 const { useState, useEffect } = React
 
 interface IConnectProps {
   offlineLocations: { [key: string]: ILocation }
   offlineOffices: { [key: string]: ILocation }
-  jurisidictionTypeFilter: string[] | undefined
-  locationTypeFilter: LocationType[] | undefined
 }
 
 interface IBaseProps {
@@ -47,8 +45,7 @@ interface IBaseProps {
   selectedLocationId?: string
   disabled?: boolean
   onChangeLocation: (locationId: string) => void
-  requiredJurisdictionTypes?: string
-  requiredLocationTypes?: string
+  locationFilter?: (location: ILocation) => boolean
 }
 
 type LocationPickerProps = IBaseProps & IConnectProps & WrappedComponentProps
@@ -105,11 +102,10 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const {
     offlineLocations,
     offlineOffices,
-    jurisidictionTypeFilter,
+    locationFilter,
     selectedLocationId,
     disabled,
     additionalLocations = [],
-    locationTypeFilter,
     intl
   } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
@@ -117,8 +113,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const offlineSearchableLocations = generateLocations(
     { ...offlineLocations, ...offlineOffices },
     intl,
-    jurisidictionTypeFilter,
-    locationTypeFilter
+    locationFilter
   )
 
   const searchableLocations = [
@@ -199,21 +194,12 @@ function LocationPickerComponent(props: LocationPickerProps) {
   )
 }
 
-function mapStateToProps(state: IStoreState, props: IBaseProps): IConnectProps {
+function mapStateToProps(state: IStoreState): IConnectProps {
   const offlineLocations = getOfflineData(state).locations
   const offlineOffices = getOfflineData(state).offices
-  const jurisidictionTypeFilter =
-    (props.requiredJurisdictionTypes &&
-      props.requiredJurisdictionTypes.split(',')) ||
-    undefined
-  const locationTypeFilter =
-    ((props.requiredLocationTypes &&
-      props.requiredLocationTypes.split(',')) as LocationType[]) || undefined
   return {
     offlineLocations,
-    offlineOffices,
-    jurisidictionTypeFilter,
-    locationTypeFilter
+    offlineOffices
   }
 }
 

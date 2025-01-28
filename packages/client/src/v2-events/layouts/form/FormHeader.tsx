@@ -91,7 +91,7 @@ export function FormHeader({
             {intl.formatMessage(messages.exitButton)}
           </Button>
           <ToggleMenu
-            id={`event-menu`}
+            id={'event-menu'}
             menuItems={
               isUndeclaredDraft(event)
                 ? [
@@ -130,7 +130,7 @@ export function FormHeader({
             <Icon name="X" />
           </Button>
           <ToggleMenu
-            id={`event-menu`}
+            id={'event-menu'}
             menuItems={[
               {
                 label: 'Delete declaration',

@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Returns 404 when not found 1`] = `[TRPCError: Event not found with ID: id-not-persisted]`;

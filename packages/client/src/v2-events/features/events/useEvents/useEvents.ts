@@ -55,7 +55,7 @@ function filterOutboxEventsWithMutation<
 }
 
 export function useEvents() {
-  const eventsList = api.events.get.useQuery().data ?? []
+  const eventsList = api.event.list.useQuery().data ?? []
 
   function getDrafts(): EventDocument[] {
     const queries = queryClient.getQueriesData<EventDocument>({
@@ -98,7 +98,7 @@ export function useEvents() {
   return {
     createEvent,
     getEvent: api.event.get,
-    getEvents: api.events.get,
+    getEvents: api.event.list,
     deleteEvent: useDeleteEventMutation(),
     getOutbox,
     getDrafts,
