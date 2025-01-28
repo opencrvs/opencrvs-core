@@ -31,7 +31,7 @@ import { printPDF } from '@client/pdfRenderer'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { SCOPES } from '@opencrvs/commons/client'
+import { SCOPES, isMinioUrl } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
 import { getLocationHierarchy } from '@client/utils/locationUtils'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
@@ -48,7 +48,6 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import { useNavigate } from 'react-router-dom'
 import { ICertificateData } from '@client/utils/referenceApi'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { isMinioUrl } from '@opencrvs/commons/client'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   async function recursiveTransform(obj: any) {
