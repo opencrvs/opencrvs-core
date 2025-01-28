@@ -1207,7 +1207,7 @@ function findSavedReference(
   }
   return urlReferenceToResourceIdentifier(
     responseBundle.entry[indexInResponseBundle].response.location
-  )
+  ) as ResourceIdentifier
 }
 
 function toSavedComposition(

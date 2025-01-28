@@ -17,29 +17,49 @@ import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
+import { createIntl, createIntlCache } from 'react-intl'
+
+const cache = createIntlCache()
+const intlEngish = createIntl(
+  {
+    locale: 'en',
+    messages: {}
+  },
+  cache
+)
+const intlBangla = createIntl(
+  {
+    locale: 'bn',
+    messages: {}
+  },
+  cache
+)
 
 describe('draftUtils tests', () => {
   describe('getDraftInformantFullName()', () => {
     describe('Birth event', () => {
       it('Returns child english name properly', () => {
         expect(
-          getDeclarationFullName({
-            id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
-            data: {
-              child: {
-                firstNames: 'মুশ্রাফুল',
-                familyName: 'হক',
-                firstNamesEng: 'Mushraful',
-                familyNameEng: 'Hoque'
-              }
+          getDeclarationFullName(
+            {
+              id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
+              data: {
+                child: {
+                  firstNames: 'মুশ্রাফুল',
+                  familyName: 'হক',
+                  firstNamesEng: 'Mushraful',
+                  familyNameEng: 'Hoque'
+                }
+              },
+              event: EventType.Birth,
+              savedOn: 1558037863335,
+              modifiedOn: 1558037867987
             },
-            event: EventType.Birth,
-            savedOn: 1558037863335,
-            modifiedOn: 1558037867987
-          })
+            intlEngish
+          )
         ).toBe('Mushraful Hoque')
       })
-      it('Returns child bangla name properly', () => {
+      it('Returns child English name properly even though localed is Bangla', () => {
         expect(
           getDeclarationFullName(
             {
@@ -55,30 +75,33 @@ describe('draftUtils tests', () => {
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },
-            'bn'
+            intlBangla
           )
-        ).toBe('হক')
+        ).toBe('Mushraful Hoque')
       })
     })
     describe('Death event', () => {
       it('Returns deceased english name properly', () => {
         expect(
-          getDeclarationFullName({
-            id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
-            data: {
-              deceased: {
-                firstNames: 'মুশ্রাফুল',
-                familyName: 'হক',
-                familyNameEng: 'Hoque'
-              }
+          getDeclarationFullName(
+            {
+              id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
+              data: {
+                deceased: {
+                  firstNames: 'মুশ্রাফুল',
+                  familyName: 'হক',
+                  familyNameEng: 'Hoque'
+                }
+              },
+              event: EventType.Death,
+              savedOn: 1558037863335,
+              modifiedOn: 1558037867987
             },
-            event: EventType.Death,
-            savedOn: 1558037863335,
-            modifiedOn: 1558037867987
-          })
+            intlBangla
+          )
         ).toBe('Hoque')
       })
-      it('Returns child bangla name properly', () => {
+      it('Returns child English name properly even when the current locale is Bangla', () => {
         expect(
           getDeclarationFullName(
             {
@@ -95,9 +118,9 @@ describe('draftUtils tests', () => {
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },
-            'bn'
+            intlEngish
           )
-        ).toBe('মুশ্রাফুল হক')
+        ).toBe('Mushraful Hoque')
       })
     })
   })
