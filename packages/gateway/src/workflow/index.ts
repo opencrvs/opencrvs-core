@@ -47,7 +47,6 @@ const createRequest = async <T = any>(
   authHeader: IAuthHeader,
   body?: Record<string, any>
 ): Promise<T> => {
-  console.log('HEY: ', new URL(path, WORKFLOW_URL))
   const response = await fetch(new URL(path, WORKFLOW_URL).href, {
     method,
     headers: {
