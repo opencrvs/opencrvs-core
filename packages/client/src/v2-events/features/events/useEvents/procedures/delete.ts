@@ -26,7 +26,7 @@ function waitUntilEventIsCreated<R>(
     }
 
     const localVersion = utils.event.get.getData(eventId)
-    if (!localVersion || localVersion.id === localVersion.transactionId) {
+    if (!localVersion || isTemporaryId(localVersion.id)) {
       throw new Error('Event that has not been stored yet cannot be deleted')
     }
 

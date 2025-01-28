@@ -24,6 +24,7 @@ import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
 
 export const api = createTRPCReact<AppRouter>()
+export { AppRouter }
 
 function getTrpcClient() {
   return api.createClient({
