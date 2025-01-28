@@ -19,16 +19,11 @@ import { EventStatuses } from './EventMetadata'
 export const WorkqueueConfig = z
   .object({
     id: z.string().describe('Unique identifier for workqueue.'),
-    title: TranslationConfig.describe(
-      'Title for workqueue, used in navigation and header.'
-    ),
     fields: z.array(
       z.object({
         // @TODO: Improve typing by enforcing EventMetadataKeys and form page fields as possible values
-        id: z
-          .string()
-          .describe('Id of a field defined under form pages or system field.'),
-        label: TranslationConfig.optional()
+        column: z.string(),
+        label: TranslationConfig
       })
     ),
     filters: z

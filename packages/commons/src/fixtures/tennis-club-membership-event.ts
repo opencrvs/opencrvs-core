@@ -55,29 +55,54 @@ export const tennisClubMembershipEvent = defineConfig({
   },
   workqueues: [
     {
-      id: 'in-progress',
-      title: {
-        defaultMessage: 'In progress',
-        description: 'Label for in progress workqueue',
-        id: 'event.tennis-club-membership.workqueue.in-progress.label'
-      },
+      id: 'all',
       fields: [
         {
-          id: 'applicant.firstname'
-        },
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.all.name.label'
+          }
+        }
+      ],
+      filters: []
+    },
+    {
+      id: 'ready-for-review',
+
+      fields: [
         {
-          id: 'event.type'
-        },
-        {
-          id: 'event.createdAt'
-        },
-        {
-          id: 'event.modifiedAt'
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.readyForReview.name.label'
+          }
         }
       ],
       filters: [
         {
-          status: ['CREATED']
+          status: ['DECLARED']
+        }
+      ]
+    },
+    {
+      id: 'registered',
+
+      fields: [
+        {
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.registered.name.label'
+          }
+        }
+      ],
+      filters: [
+        {
+          status: ['REGISTERED']
         }
       ]
     }
