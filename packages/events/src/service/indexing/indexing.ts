@@ -86,7 +86,9 @@ export async function createIndex(
 function getElasticsearchMappingForType(field: FieldConfig) {
   switch (field.type) {
     case 'DATE':
-      return { type: 'date' }
+      // @TODO: This should be changed back to 'date'
+      // When we have proper validation of custom fields.
+      return { type: 'text' }
     case 'TEXT':
     case 'PARAGRAPH':
     case 'BULLET_LIST':
