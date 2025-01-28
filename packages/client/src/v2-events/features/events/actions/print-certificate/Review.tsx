@@ -14,7 +14,10 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import styled from 'styled-components'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { ActionType } from '@opencrvs/commons/client'
 import {
   Box,
@@ -28,14 +31,11 @@ import {
 } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
-import { api } from '@client/v2-events/trpc'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 const CertificateContainer = styled.div`
@@ -44,22 +44,18 @@ const CertificateContainer = styled.div`
     max-width: 100%;
   }
 `
+
 const messages = defineMessages({
-  printActionTitle: {
+  printTitle: {
     id: 'printAction.title',
     defaultMessage: 'Print certificate',
     description: 'The title for print action'
   },
-  printActionDescription: {
+  printDescription: {
     id: 'printAction.description',
     defaultMessage:
       'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.',
     description: 'The description for print action'
-  },
-  printActionDeclare: {
-    id: 'printAction.Declare',
-    defaultMessage: 'No, make correction',
-    description: 'The label for declare button of print action'
   },
   printModalTitle: {
     id: 'print.certificate.review.printModalTitle',
@@ -74,107 +70,69 @@ const messages = defineMessages({
   printModalBody: {
     id: 'print.certificate.review.modal.body.print',
     defaultMessage:
-      'A PDF of the certificate will open in a new tab for you to print. This record will then be moved to your ready to issue work-queue',
+      'A PDF of the certificate will open in a new tab for printing. The record will move to the ready-to-issue queue.',
     description: 'Print certificate modal body text'
   },
   printAndIssueModalBody: {
     id: 'print.certificate.review.modal.body.printAndIssue',
     defaultMessage:
-      'A PDF of the certificate will open in a new tab for you to print and issue',
+      'A PDF of the certificate will open in a new tab for printing and issuing.',
     description: 'Print certificate modal body text'
   },
-  confirmAndPrint: {
+  makeCorrection: {
+    id: 'print.certificate.button.makeCorrection',
+    defaultMessage: 'No, make correction',
+    description: 'The label for correction button of print action'
+  },
+  confirmPrint: {
+    id: 'print.certificate.button.confirmPrint',
     defaultMessage: 'Yes, print certificate',
-    description: 'The text for print button',
-    id: 'print.certificate.button.confirmPrint'
-  },
-  reviewTitle: {
-    defaultMessage: 'Ready to certify?',
-    description: 'Certificate review title',
-    id: 'print.certificate.review.title'
-  },
-  reviewDescription: {
-    defaultMessage:
-      'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.',
-    description: 'Certificate review description',
-    id: 'print.certificate.review.description'
+    description: 'The text for print button'
   },
   cancel: {
+    id: 'buttons.cancel',
     defaultMessage: 'Cancel',
-    description: 'Cancel button text in the modal',
-    id: 'buttons.cancel'
+    description: 'Cancel button text in the modal'
   },
   print: {
+    id: 'buttons.print',
     defaultMessage: 'Print',
-    description: 'Print button text',
-    id: 'buttons.print'
+    description: 'Print button text'
   }
 })
 
-/**
- *
- * Preview of event to print certificate.
- */
 export function Review() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.COLLECT_CERTIFICATE)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE)
+  const [{ templateId }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
+  )
   const intl = useIntl()
+  const navigate = useNavigate()
+
+  const { certificatesTemplate, language } = useAppConfig()
   const events = useEvents()
   const [modal, openModal] = useModal()
-  const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
-  const { appConfig, certificatesTemplate, language, initiateAppConfig } =
-    useAppConfig()
-
-  useEffect(() => {
-    initiateAppConfig()
-  }, [initiateAppConfig])
-
-  const collectCertificateMutation = events.actions.collectCertificate
+  const { getFormValues, clear } = useEventFormData()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
   if (!config) {
-    throw new Error('Event configuration not found with type: ' + event.type)
+    throw new Error(`Event configuration not found for type: ${event.type}`)
   }
 
-  const { forms: formConfigs } = config.actions.filter(
-    (action) => action.type === ActionType.COLLECT_CERTIFICATE
-  )[0]
-
-  const getFormValues = useEventFormData((state) => state.getFormValues)
   const form = getFormValues(eventId)
-
+  const certificateConfig = certificatesTemplate.find(
+    (template) => template.id === templateId
+  )
   const { svgCode, handleCertify, isPrintInAdvance, canUserEditRecord } =
-    usePrintableCertificate(form, appConfig, certificatesTemplate, language)
+    usePrintableCertificate(event, form, certificateConfig, language)
 
-  async function handleEdit({
-    pageId,
-    fieldId
-  }: {
-    pageId: string
-    fieldId?: string
-  }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close} />
-    ))
+  const handleCorrection = () =>
+    navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
 
-    if (confirmedEdit) {
-      navigate(
-        ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.PAGES.buildPath(
-          { pageId, eventId },
-          {
-            from: 'review'
-          },
-          fieldId
-        )
-      )
-    }
-    return
-  }
-
-  const confirmAndPrint = async () => {
-    const saveAndExitConfirm = await openModal<boolean>((close) => (
+  const handlePrint = async () => {
+    const confirmed = await openModal<boolean>((close) => (
       <ResponsiveModal
         actions={[
           <Button
@@ -200,40 +158,41 @@ export function Review() {
         handleClose={() => close(false)}
         id="confirm-print-modal"
         show={true}
-        title={
+        title={intl.formatMessage(
           isPrintInAdvance
-            ? intl.formatMessage(messages.printModalTitle)
-            : intl.formatMessage(messages.printAndIssueModalTitle)
-        }
+            ? messages.printModalTitle
+            : messages.printAndIssueModalTitle
+        )}
       >
-        {isPrintInAdvance
-          ? intl.formatMessage(messages.printModalBody)
-          : intl.formatMessage(messages.printAndIssueModalBody)}
+        {intl.formatMessage(
+          isPrintInAdvance
+            ? messages.printModalBody
+            : messages.printAndIssueModalBody
+        )}
       </ResponsiveModal>
     ))
 
-    if (saveAndExitConfirm) {
-      handleCertify && handleCertify()
+    if (confirmed) {
+      handleCertify?.()
+      events.actions.printCertificate.mutate({
+        eventId: event.id,
+        data: form,
+        transactionId: uuid(),
+        type: ActionType.PRINT_CERTIFICATE
+      })
+      clear()
+      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
     }
   }
 
-  if (!svgCode) {
+  if (!svgCode || !templateId) {
     return <Spinner id="review-certificate-loading" />
   }
 
   return (
     <FormLayout
-      action={ActionType.COLLECT_CERTIFICATE}
-      route={ROUTES.V2.EVENTS.COLLECT_CERTIFICATE}
-      onSaveAndExit={() => {
-        events.actions.collectCertificate.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          draft: true
-        })
-        goToHome()
-      }}
+      action={ActionType.PRINT_CERTIFICATE}
+      route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
     >
       <Frame.LayoutCentered>
         <Stack direction="column">
@@ -251,15 +210,10 @@ export function Review() {
                   fullWidth
                   size="large"
                   type="negative"
-                  onClick={async () =>
-                    handleEdit({
-                      pageId: formConfigs[0].pages[0].id,
-                      fieldId: undefined
-                    })
-                  }
+                  onClick={handleCorrection}
                 >
                   <Icon name="X" size="medium" />
-                  {intl.formatMessage(messages.printActionDeclare)}
+                  {intl.formatMessage(messages.makeCorrection)}
                 </Button>
               ) : (
                 <></>
@@ -271,17 +225,17 @@ export function Review() {
                 id="confirm-print"
                 size="large"
                 type="positive"
-                onClick={confirmAndPrint}
+                onClick={handlePrint}
               >
                 <Icon name="Check" size="medium" />
-                {intl.formatMessage(messages.confirmAndPrint)}
+                {intl.formatMessage(messages.confirmPrint)}
               </Button>
             ]}
             bottomActionDirection="row"
-            title={intl.formatMessage(messages.printActionTitle)}
+            title={intl.formatMessage(messages.printTitle)}
           >
             {modal}
-            {intl.formatMessage(messages.reviewDescription)}
+            {intl.formatMessage(messages.printDescription)}
           </Content>
         </Stack>
       </Frame.LayoutCentered>

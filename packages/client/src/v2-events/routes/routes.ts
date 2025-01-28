@@ -62,13 +62,12 @@ export const ROUTES = {
           VALIDATE: route('validate/:eventId', {
             params: { eventId: string().defined() }
           }),
-          COLLECT_CERTIFICATE: route(
-            'collect-certificates/:eventId',
+          PRINT_CERTIFICATE: route(
+            'print-certificate/:eventId',
             {
               params: { eventId: string().defined() }
             },
             {
-              REVIEW: route('review'),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
@@ -76,8 +75,9 @@ export const ROUTES = {
                 },
                 hash: hashValues()
               }),
-              VERIFY: route('pages/verify'),
-              PAYMENT: route('pages/payment')
+              REVIEW: route('review', {
+                searchParams: { templateId: string() }
+              })
             }
           )
         }

@@ -22,7 +22,7 @@ import { ActionType } from '@opencrvs/commons/client'
 type AllowedRoute =
   | typeof ROUTES.V2.EVENTS.REGISTER
   | typeof ROUTES.V2.EVENTS.DECLARE
-  | typeof ROUTES.V2.EVENTS.COLLECT_CERTIFICATE
+  | typeof ROUTES.V2.EVENTS.PRINT_CERTIFICATE
 
 /**
  * Layout for form and review pages.

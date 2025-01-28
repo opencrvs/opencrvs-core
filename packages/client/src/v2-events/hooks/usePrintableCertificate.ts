@@ -14,9 +14,14 @@ import {
   CertificateDataSchema,
   LanguageSchema
 } from '@opencrvs/commons/events'
-import { ActionFormData, isMinioUrl } from '@opencrvs/commons/client'
+import {
+  ActionFormData,
+  EventDocument,
+  isMinioUrl
+} from '@opencrvs/commons/client'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { addFontsToSvg, compileSvg } from './utils/PDFUtils'
+import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './utils/PDFUtils'
+import { printPDF } from '@client/pdfRenderer'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   async function recursiveTransform(obj: any) {
@@ -43,23 +48,18 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
 }
 
 export const usePrintableCertificate = (
+  event: EventDocument,
   form: ActionFormData,
-  appConfig?: ApplicationConfigSchema,
-  certificatesTemplate?: CertificateDataSchema[],
+  certificateConfig?: CertificateDataSchema,
   language?: LanguageSchema
 ) => {
-  const handleCertify = () => {}
-
-  if (!appConfig || !language || !certificatesTemplate) {
+  if (!language || !certificateConfig) {
     return { svgCode: null }
   }
 
   const isPrintInAdvance = false
   const canUserEditRecord = true
   const handleEdit = () => {}
-  const certificateConfig = certificatesTemplate.find(
-    (x) => x.id === form['collector.certificateTemplateId']
-  )
 
   if (!certificateConfig) {
     return { svgCode: null }
@@ -68,6 +68,17 @@ export const usePrintableCertificate = (
   const svgWithoutFonts = compileSvg(certificateConfig.svg, form, language)
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
+  const handleCertify = async () => {
+    const base64ReplacedTemplate = await replaceMinioUrlWithBase64(form)
+    const svgWithoutFonts = compileSvg(
+      certificateConfig.svg,
+      { ...base64ReplacedTemplate, preview: false },
+      language
+    )
+    const svgWithFonts = addFontsToSvg(svgWithoutFonts, certificateFonts)
+    const pdfTemplate = svgToPdfTemplate(svgWithFonts, certificateFonts)
+    printPDF(pdfTemplate, event.id)
+  }
   return {
     svgCode,
     handleCertify,

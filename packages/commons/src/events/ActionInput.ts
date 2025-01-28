@@ -61,11 +61,11 @@ export const DeclareActionInput = BaseActionInput.merge(
   })
 )
 
-export const CollectCertificateActionInput = BaseActionInput.merge(
+export const PrintCertificateActionInput = BaseActionInput.merge(
   z.object({
     type: z
-      .literal(ActionType.COLLECT_CERTIFICATE)
-      .default(ActionType.COLLECT_CERTIFICATE)
+      .literal(ActionType.PRINT_CERTIFICATE)
+      .default(ActionType.PRINT_CERTIFICATE)
   })
 )
 
@@ -99,7 +99,7 @@ export const ActionInput = z.discriminatedUnion('type', [
   DeclareActionInput,
   AssignActionInput,
   UnassignActionInput,
-  CollectCertificateActionInput
+  PrintCertificateActionInput
 ])
 
 export type ActionInput = z.input<typeof ActionInput>

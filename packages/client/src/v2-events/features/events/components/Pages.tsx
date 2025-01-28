@@ -29,7 +29,8 @@ export function Pages({
   formPages,
   form,
   onFormPageChange,
-  onSubmit
+  onSubmit,
+  children
 }: {
   eventId: string
   pageId: string
@@ -38,6 +39,7 @@ export function Pages({
   formPages: FormPage[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
+  children?: React.ReactNode
 }) {
   const intl = useIntl()
 
@@ -70,6 +72,7 @@ export function Pages({
       onPreviousPage={previous}
       onSubmit={onSubmit}
     >
+      {children}
       <FormFieldGenerator
         fields={page.fields}
         formData={form}

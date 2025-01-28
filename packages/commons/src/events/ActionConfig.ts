@@ -34,7 +34,7 @@ export const ActionType = {
   NOTIFY: 'NOTIFY',
   DECLARE: 'DECLARE',
   DELETE: 'DELETE',
-  COLLECT_CERTIFICATE: 'COLLECT_CERTIFICATE',
+  PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
   CUSTOM: 'CUSTOM'
 } as const
 
@@ -71,24 +71,9 @@ const DeleteConfig = ActionConfigBase.merge(
   })
 )
 
-const CollectCertificateActionConfig = ActionConfigBase.merge(
+const PrintCertificateActionConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.COLLECT_CERTIFICATE),
-    verifyId: z
-      .array(
-        z.object({
-          whenRequesterIs: z.string(),
-          andRequesterValueIs: z.string(),
-          verifyTheseFields: z.array(z.string())
-        })
-      )
-      .optional(),
-    payment: z
-      .object({
-        registrationTarget: z.number(),
-        lateRegistrationTarget: z.number()
-      })
-      .optional()
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
   })
 )
 
@@ -104,7 +89,7 @@ export const ActionConfig = z.discriminatedUnion('type', [
   ValidateConfig,
   RegisterConfig,
   DeleteConfig,
-  CollectCertificateActionConfig,
+  PrintCertificateActionConfig,
   CustomConfig
 ])
 

@@ -50,11 +50,18 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-function getData(actions: Array<ActionDocument>) {
+function getData(
+  actions: Array<ActionDocument>,
+  actionTypeToNotInclude?: ActionType
+) {
   return actions.reduce((status, action) => {
     return {
       ...status,
-      ...action.data
+      ...(actionTypeToNotInclude
+        ? action.type === actionTypeToNotInclude
+          ? {}
+          : action.data
+        : action.data)
     }
   }, {})
 }
@@ -65,7 +72,10 @@ export function isUndeclaredDraft(event: EventDocument): boolean {
   )
 }
 
-export function getCurrentEventState(event: EventDocument): EventIndex {
+export function getCurrentEventState(
+  event: EventDocument,
+  actionTypeToNotInclude?: ActionType
+): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
   )
@@ -86,6 +96,6 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     modifiedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(event.actions),
     updatedBy: latestAction.createdBy,
-    data: getData(event.actions)
+    data: getData(event.actions, actionTypeToNotInclude)
   }
 }

@@ -9,54 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { create } from 'zustand'
-import {
-  LanguageSchema,
-  ApplicationConfigSchema,
-  CertificateDataSchema
-} from '@opencrvs/commons/events'
-import { storage } from '@client/storage'
+import { LanguageSchema, CertificateDataSchema } from '@opencrvs/commons/events'
+import { useSelector } from 'react-redux'
+import { getOfflineData } from '@client/offline/selectors'
 
 interface IApplicationConfig {
-  appConfig?: ApplicationConfigSchema
   certificatesTemplate: CertificateDataSchema[]
   language?: LanguageSchema
-  initiateAppConfig: () => Promise<void>
 }
 
-const isTruthyArray = (value: any) => Array.isArray(value) && value.length > 0
+export const useAppConfig = (): IApplicationConfig => {
+  const offlineCountryConfig = useSelector(getOfflineData)
 
-export const useAppConfig = create<IApplicationConfig>((set, get) => ({
-  language: undefined,
-  appConfig: undefined,
-  certificatesTemplate: [],
-  initiateAppConfig: async () => {
-    try {
-      const offlineJsonString = await storage.getItem('offline')
-      if (offlineJsonString) {
-        const offline = JSON.parse(offlineJsonString)
-
-        if (isTruthyArray(offline['languages'])) {
-          const defaultLangue = await storage.getItem('language')
-          const defaultLangueObj: LanguageSchema = offline['languages'].find(
-            (x: LanguageSchema) => x.lang === defaultLangue
-          )
-          set({ language: defaultLangueObj })
-        }
-
-        if (offline['config']) {
-          set({ appConfig: offline['config'] })
-        }
-
-        if (
-          offline['templates'] &&
-          isTruthyArray(offline['templates']['certificates'])
-        ) {
-          set({ certificatesTemplate: offline['templates']['certificates'] })
-        }
-      }
-    } catch (error) {
-      console.error('Error initializing app config:', error)
-    }
+  return {
+    language: offlineCountryConfig.languages[0],
+    certificatesTemplate: offlineCountryConfig.templates.certificates
   }
-}))
+}

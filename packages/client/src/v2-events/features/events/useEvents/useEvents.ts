@@ -119,9 +119,9 @@ export function useEvents() {
         utils.event.actions.register,
         api.event.actions.register
       ),
-      collectCertificate: useEventAction(
-        utils.event.actions.collectCertificate,
-        api.event.actions.collectCertificate
+      printCertificate: useEventAction(
+        utils.event.actions.printCertificate,
+        api.event.actions.printCertificate
       )
     }
   }

@@ -52,7 +52,7 @@ export const ActionIcons: { [key in ActionType]: React.JSX.Element } = {
   NOTIFY: <DeclarationIcon color={getDeclarationIconColor()} />,
   DECLARE: <DeclarationIcon color={getDeclarationIconColor()} />,
   DELETE: <DeclarationIcon color={getDeclarationIconColor()} />,
-  COLLECT_CERTIFICATE: <Print color={getDeclarationIconColor()} />,
+  PRINT_CERTIFICATE: <Print color={getDeclarationIconColor()} />,
   CUSTOM: <DeclarationIcon color={getDeclarationIconColor()} />
 }
 

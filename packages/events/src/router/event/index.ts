@@ -25,7 +25,7 @@ import { presignFilesInEvent } from '@events/service/files'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
 import { EventConfig, getUUID } from '@opencrvs/commons'
 import {
-  CollectCertificateActionInput,
+  PrintCertificateActionInput,
   DeclareActionInput,
   EventIndex,
   EventInput,
@@ -151,8 +151,8 @@ export const eventRouter = router({
           }
         )
       }),
-    collectCertificate: publicProcedure
-      .input(CollectCertificateActionInput)
+    printCertificate: publicProcedure
+      .input(PrintCertificateActionInput)
       .mutation(async (options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,

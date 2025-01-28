@@ -9,4 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from './certificateFormPages'
+import { Review } from './Review'
+import { Pages } from './Pages'
+
+export { Review, Pages }

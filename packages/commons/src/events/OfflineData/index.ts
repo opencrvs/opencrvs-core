@@ -9,6 +9,5 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from './AppConfig'
 export * from './CertificateConfig'
 export * from './Language'

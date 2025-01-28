@@ -9,38 +9,44 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { merge } from 'lodash'
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
-import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
+import { Select } from '@client/v2-events/features/events/registered-fields/Select'
+import { useCertificateTemplateSelectorFieldConfig } from '../../useCertificateTemplateSelectorFieldConfig'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
-    ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.PAGES
+    ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES
   )
   const [searchParams] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.PAGES
+    ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES
   )
-  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const [templateId, setTemplateId] = useState<string>()
   const formEventId = useEventFormData((state) => state.eventId)
-  const form = useEventFormData((state) => state.formValues)
+
   const navigate = useNavigate()
   const events = useEvents()
-  const { modal, goToHome } = useEventFormNavigation()
+  const { modal } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-  const currentState = getCurrentEventState(event)
+
+  const certTemplateFieldConfig =
+    useCertificateTemplateSelectorFieldConfig(event)
+  const currentState = getCurrentEventState(event, ActionType.PRINT_CERTIFICATE)
+  const { setFormValues, getFormValues } = useEventFormData()
+  const form = getFormValues(eventId)
 
   useEffect(() => {
     if (formEventId !== event.id) {
@@ -52,16 +58,8 @@ export function Pages() {
     event.type
   )
   const formPages = configuration.actions
-    .find((action) => action.type === ActionType.COLLECT_CERTIFICATE)
-    ?.forms.find((form) => form.active)?.pages
-
-  const verifyId = configuration.actions.find(
-    (action) => action.type === ActionType.COLLECT_CERTIFICATE
-  )?.verifyId
-
-  const payment = configuration.actions.find(
-    (action) => action.type === ActionType.COLLECT_CERTIFICATE
-  )?.payment
+    .find((action) => action.type === ActionType.PRINT_CERTIFICATE)
+    ?.forms.find((f) => f.active)?.pages
 
   if (!formPages) {
     throw new Error('Form configuration not found for type: ' + event.type)
@@ -77,7 +75,7 @@ export function Pages() {
   useEffect(() => {
     if (pageId !== currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.PAGES.buildPath({
+        ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
           eventId,
           pageId: currentPageId
         }),
@@ -88,8 +86,8 @@ export function Pages() {
 
   return (
     <FormLayout
-      action={ActionType.COLLECT_CERTIFICATE}
-      route={ROUTES.V2.EVENTS.COLLECT_CERTIFICATE}
+      action={ActionType.PRINT_CERTIFICATE}
+      route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
     >
       {modal}
       <PagesComponent
@@ -100,32 +98,33 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.PAGES.buildPath({
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
               eventId,
               pageId: nextPageId
             })
           )
         }
         onSubmit={() => {
-          if (verifyId && verifyId.length > 0) {
+          if (templateId) {
             navigate(
-              ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.VERIFY.buildPath({ eventId })
-            )
-          } else if (payment) {
-            if (verifyId && verifyId.length > 0) {
-              navigate(
-                ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.VERIFY.buildPath({
-                  eventId
-                })
+              ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
+                { eventId },
+                { templateId }
               )
-            }
-          } else {
-            navigate(
-              ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.REVIEW.buildPath({ eventId })
             )
           }
         }}
-      />
+      >
+        <Select
+          onChange={(val: string) => setTemplateId(val)}
+          id={certTemplateFieldConfig.id}
+          label={certTemplateFieldConfig.label}
+          options={certTemplateFieldConfig.options}
+          value={templateId}
+          type="SELECT"
+          required
+        />
+      </PagesComponent>
     </FormLayout>
   )
 }

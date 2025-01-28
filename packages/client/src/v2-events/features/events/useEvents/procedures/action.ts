@@ -51,14 +51,14 @@ type Mutation =
   | typeof api.event.actions.notify
   | typeof api.event.actions.register
   | typeof api.event.actions.validate
-  | typeof api.event.actions.collectCertificate
+  | typeof api.event.actions.printCertificate
 
 type Procedure =
   | typeof utils.event.actions.declare
   | typeof utils.event.actions.notify
   | typeof utils.event.actions.register
   | typeof utils.event.actions.validate
-  | typeof utils.event.actions.collectCertificate
+  | typeof utils.event.actions.printCertificate
 
 /*
  * This makes sure that if you are offline and do
@@ -166,7 +166,7 @@ utils.event.actions.validate.setMutationDefaults(({ canonicalMutationFn }) => ({
   onSuccess: updateLocalEvent
 }))
 
-utils.event.actions.collectCertificate.setMutationDefaults(
+utils.event.actions.printCertificate.setMutationDefaults(
   ({ canonicalMutationFn }) => ({
     retry: true,
     retryDelay: 10000,
