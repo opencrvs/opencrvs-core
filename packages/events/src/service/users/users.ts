@@ -24,7 +24,7 @@ export const getUsersById = async (ids: string[]) => {
     .collection<{
       _id: ObjectId
       name: ResolvedUser['name']
-      systemRole: string
+      role: string
     }>('users')
     .find({
       _id: {
@@ -38,6 +38,6 @@ export const getUsersById = async (ids: string[]) => {
   return results.map((user) => ({
     id: user._id.toString(),
     name: user.name,
-    systemRole: user.systemRole
+    role: user.role
   }))
 }
