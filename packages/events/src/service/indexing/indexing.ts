@@ -91,6 +91,7 @@ function getElasticsearchMappingForType(field: FieldConfig) {
       return { type: 'text' }
     case 'TEXT':
     case 'PARAGRAPH':
+    case 'PAGE_HEADER':
     case 'BULLET_LIST':
       return { type: 'text' }
     case 'RADIO_GROUP':
@@ -110,11 +111,11 @@ function getElasticsearchMappingForType(field: FieldConfig) {
       }
 
     default:
-      assertNever(field)
+      assertNever()
   }
 }
 
-function assertNever(_: never): never {
+function assertNever(): never {
   throw new Error('Should never happen')
 }
 
