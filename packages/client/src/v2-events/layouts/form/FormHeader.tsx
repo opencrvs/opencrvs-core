@@ -110,9 +110,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
+      desktopTitle={intl.formatMessage(label)}
       mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
       mobileRight={
         <>
@@ -145,9 +143,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
+      mobileTitle={intl.formatMessage(label)}
     />
   )
 }
