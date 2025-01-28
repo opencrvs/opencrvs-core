@@ -8,14 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './search'
-export * from './events'
-export * from './scopes'
-export * from './conditionals/conditionals'
-export * from './conditionals/validate'
-export * from './documents'
-export * from './workqueues'
-export * from './uuid'
-export { DEFAULT_ROLES_DEFINITION } from './authentication'
 
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+import { allWorkqueue } from './all'
+import { inReviewWorkqueue } from './readyForReview'
+import { registeredWorkqueue } from './readyToPrint'
+export { RootWorkqueueConfig } from './WorkqueueConfig'
+export { defaultColumns } from './defaultColumns'
+
+export const workqueues = {
+  all: allWorkqueue,
+  registered: registeredWorkqueue,
+  inReview: inReviewWorkqueue
+}
