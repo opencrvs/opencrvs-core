@@ -754,6 +754,10 @@ export interface ILinkButtonFormField extends IFormFieldBase {
 
 export interface QRReaderType {
   type: 'QR'
+  validation: {
+    rule: unknown
+    errorMessage: MessageDescriptor
+  }
 }
 
 export type ReaderType = QRReaderType | ILinkButtonFormField

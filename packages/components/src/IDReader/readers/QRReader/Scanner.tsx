@@ -46,8 +46,10 @@ const Scanner = (props: ScannerProps) => {
       if (result.data) {
         try {
           const data = JSON.parse(result.data)
-          if (validator && !validator(data)) {
-            onError('invalid', new Error('Invalid QR code'))
+          const validationError = validator && validator(data)
+          if (validationError) {
+            onError('invalid', new Error(validationError))
+            return
           }
           onScan(data)
         } catch (error) {

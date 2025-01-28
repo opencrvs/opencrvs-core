@@ -37,11 +37,11 @@ export const QRReader = (props: ScannableQRReader) => {
   const windowSize = useWindowSize()
   const theme = getTheme()
   const isSmallDevice = windowSize.width <= theme.grid.breakpoints.md
-  const [isDataInvalid, setIsDataInvalid] = useState(false)
+  const [error, setError] = useState('')
   const handleScanSuccess = useCallback(
     (data: Parameters<ScannableQRReader['onScan']>[0]) => {
       onScan(data)
-      setIsDataInvalid(false)
+      setError('')
       setScannerDialogOpen(false)
     },
     [onScan]
@@ -49,9 +49,11 @@ export const QRReader = (props: ScannableQRReader) => {
   const handleScanError: ErrorHandler = useCallback(
     (type, error) => {
       if (type === 'invalid' || type === 'parse') {
-        setIsDataInvalid(true)
+        setError(error.message)
       }
-      onError(type, error)
+      if (onError) {
+        onError(type, error)
+      }
     },
     [onError]
   )
@@ -83,9 +85,9 @@ export const QRReader = (props: ScannableQRReader) => {
             onError={handleScanError}
           />
         </ScannerBox>
-        {isDataInvalid && (
+        {error && (
           <Text element="p" variant="bold16" color="redDark">
-            This QR code is not recognised. Please try again.
+            {error}
           </Text>
         )}
         <Info

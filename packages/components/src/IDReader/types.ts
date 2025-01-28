@@ -41,7 +41,7 @@ export type ErrorHandler = (type: ErrorType, error: Error) => void
 
 interface Scan {
   onScan: (code: Record<string, unknown>) => void
-  onError: ErrorHandler
+  onError?: ErrorHandler
 }
 
 export interface ScannableQRReader extends QRReaderType, Scan {}
