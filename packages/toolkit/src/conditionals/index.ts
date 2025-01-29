@@ -99,9 +99,9 @@ export type FieldAPI = {
   inArray: (values: string[]) => FieldAPI
   isBeforeNow: () => FieldAPI
   /**
-   * Checks if the date in the field is `days` or more days before today.
+   * Checks if the date is within `days` days in the past from now.
    */
-  isBefore: (days: number) => FieldAPI
+  isAfter: (days: number) => FieldAPI
   isEqualTo: (value: string) => FieldAPI
   isUndefined: () => FieldAPI
   not: {
@@ -162,7 +162,7 @@ export function field(fieldId: string) {
         },
         required: ['$form', '$now']
       }),
-    isBefore: (days: number) =>
+    isAfter: (days: number) =>
       addCondition({
         type: 'object',
         properties: {
