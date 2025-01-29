@@ -152,7 +152,8 @@ const SEPARATOR = '____'
 export function encodeFieldId(fieldId: string) {
   return fieldId.replaceAll('.', SEPARATOR)
 }
-export function decodeFieldId(fieldId: string) {
+
+function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(SEPARATOR, '.')
 }
 
