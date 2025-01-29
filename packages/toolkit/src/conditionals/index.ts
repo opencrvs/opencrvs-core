@@ -98,6 +98,10 @@ export function eventHasAction(type: ActionDocument['type']) {
 export type FieldAPI = {
   inArray: (values: string[]) => FieldAPI
   isBeforeNow: () => FieldAPI
+  /**
+   * Checks if the date in the field is `days` or more days before today.
+   */
+  isBefore: (days: number) => FieldAPI
   isEqualTo: (value: string) => FieldAPI
   isUndefined: () => FieldAPI
   not: {
@@ -157,6 +161,26 @@ export function field(fieldId: string) {
           }
         },
         required: ['$form', '$now']
+      }),
+    isBefore: (days: number) =>
+      addCondition({
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                type: 'string',
+                format: 'date',
+                formatMinimum: new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+                  .toISOString()
+                  .split('T')[0]
+              }
+            },
+            required: [fieldId]
+          }
+        },
+        required: ['$form']
       }),
     isEqualTo: (value: string) =>
       addCondition({
