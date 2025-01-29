@@ -14,6 +14,7 @@ export * from './scopes'
 export * from './conditionals/conditionals'
 export * from './conditionals/validate'
 export * from './documents'
+export * from './workqueues'
 export * from './uuid'
 export { DEFAULT_ROLES_DEFINITION } from './authentication'
 

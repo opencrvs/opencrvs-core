@@ -86,10 +86,13 @@ export async function createIndex(
 function getElasticsearchMappingForType(field: FieldConfig) {
   switch (field.type) {
     case 'DATE':
-      return { type: 'date' }
+      // @TODO: This should be changed back to 'date'
+      // When we have proper validation of custom fields.
+      return { type: 'text' }
     case 'TEXT':
     case 'PARAGRAPH':
     case 'BULLET_LIST':
+    case 'PAGE_HEADER':
       return { type: 'text' }
     case 'RADIO_GROUP':
     case 'SELECT':
@@ -107,13 +110,15 @@ function getElasticsearchMappingForType(field: FieldConfig) {
           type: { type: 'keyword' }
         }
       }
+    case 'DIVIDER':
+      return {}
 
     default:
-      assertNever(field)
+      assertNever()
   }
 }
 
-function assertNever(_: never): never {
+function assertNever(): never {
   throw new Error('Should never happen')
 }
 

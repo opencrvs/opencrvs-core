@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { FieldValue } from './FieldValue'
 
 const ActionBase = z.object({
+  id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
@@ -67,6 +68,26 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+const RequestedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REQUEST_CORRECTION)
+  })
+)
+
+const ApprovedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.APPROVE_CORRECTION),
+    requestId: z.string()
+  })
+)
+
+const RejectedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT_CORRECTION),
+    requestId: z.string()
+  })
+)
+
 const CustomAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM)
@@ -80,6 +101,9 @@ export const ActionDocument = z.discriminatedUnion('type', [
   RegisterAction,
   DeclareAction,
   AssignedAction,
+  RequestedCorrectionAction,
+  ApprovedCorrectionAction,
+  RejectedCorrectionAction,
   UnassignedAction,
   CustomAction
 ])

@@ -82,7 +82,8 @@ const BaseField = z.object({
     .default([])
     .optional(),
   dependsOn: z.array(FieldId).default([]).optional(),
-  label: TranslationConfig
+  label: TranslationConfig,
+  hideLabel: z.boolean().default(false).optional()
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -91,6 +92,7 @@ export const FieldType = {
   TEXT: 'TEXT',
   DATE: 'DATE',
   PARAGRAPH: 'PARAGRAPH',
+  PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
   HIDDEN: 'HIDDEN',
@@ -99,6 +101,7 @@ export const FieldType = {
   SELECT: 'SELECT',
   COUNTRY: 'COUNTRY',
   LOCATION: 'LOCATION',
+  DIVIDER: 'DIVIDER',
   LOCATION_SEARCH_INPUT: 'LOCATION_SEARCH_INPUT'
 } as const
 
@@ -109,6 +112,7 @@ export interface FieldValueByType {
   [FieldType.TEXT]: TextFieldValue
   [FieldType.DATE]: DateFieldValue
   [FieldType.PARAGRAPH]: ParagraphFieldValue
+  [FieldType.PAGE_HEADER]: ParagraphFieldValue
   [FieldType.RADIO_GROUP]: RadioGroupFieldValue
   [FieldType.BULLET_LIST]: BulletListFieldValue
   [FieldType.CHECKBOX]: CheckboxFieldValue
@@ -118,12 +122,18 @@ export interface FieldValueByType {
   [FieldType.SELECT]: SelectFieldValue
 }
 
+const Divider = BaseField.extend({
+  type: z.literal(FieldType.DIVIDER)
+})
+
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   options: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
-      type: z.enum(['text', 'email', 'password', 'number']).optional()
+      type: z.enum(['text', 'email', 'password', 'number']).optional(),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
     })
     .default({ type: 'text' })
     .optional()
@@ -160,6 +170,10 @@ const Paragraph = BaseField.extend({
     .default({})
 }).describe('A read-only HTML <p> paragraph')
 
+const PageHeader = BaseField.extend({
+  type: z.literal(FieldType.PAGE_HEADER)
+}).describe('A read-only header component for form pages')
+
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE)
 }).describe('File upload')
@@ -171,7 +185,10 @@ const SelectOption = z.object({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
-  options: z.array(SelectOption),
+  optionValues: z.array(SelectOption).describe('A list of options'),
+  options: z.object({
+    size: z.enum(['NORMAL', 'LARGE']).optional()
+  }),
   flexDirection: z
     .enum(['row', 'row-reverse', 'column', 'column-reverse'])
     .optional()
@@ -217,19 +234,43 @@ const LocationSearchInput = BaseField.extend({
   searchableResource: z.array(z.enum(['facilities', 'locations', 'offices']))
 })
 
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllFields =
+  | typeof TextField
+  | typeof DateField
+  | typeof Paragraph
+  | typeof RadioGroup
+  | typeof BulletList
+  | typeof PageHeader
+  | typeof Select
+  | typeof Checkbox
+  | typeof File
+  | typeof Country
+  | typeof Location
+  | typeof Divider
+  | typeof LocationSearchInput
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
   Paragraph,
   RadioGroup,
   BulletList,
+  PageHeader,
   Select,
   Checkbox,
   File,
   Country,
   Location,
+  Divider,
   LocationSearchInput
-])
+]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>

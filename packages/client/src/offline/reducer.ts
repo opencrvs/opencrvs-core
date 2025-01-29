@@ -91,14 +91,15 @@ export interface CRVSOffice extends ILocation {
   physicalType: 'Building'
 }
 
+export interface IForms {
+  version: string
+  birth: ISerializedForm
+  death: ISerializedForm
+  marriage: ISerializedForm
+}
 export interface IOfflineData {
   locations: ILocationDataResponse
-  forms: {
-    version: string
-    birth: ISerializedForm
-    death: ISerializedForm
-    marriage: ISerializedForm
-  }
+  forms: IForms
   facilities: IFacilitiesDataResponse
   offices: IOfficesDataResponse
   languages: ILanguage[]

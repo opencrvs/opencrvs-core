@@ -16,7 +16,6 @@ import {
   SelectOption
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
-import { InputField } from '@client/components/form/InputField'
 
 export function Select({
   onChange,
@@ -36,14 +35,11 @@ export function Select({
   }))
 
   return (
-    <InputField {...props} label={intl.formatMessage(label)} touched={false}>
-      <SelectComponent
-        label={intl.formatMessage(label)}
-        options={formattedOptions}
-        value={value ?? ''}
-        onChange={onChange}
-      />
-    </InputField>
+    <SelectComponent
+      options={formattedOptions}
+      value={value ?? ''}
+      onChange={onChange}
+    />
   )
 }
 
