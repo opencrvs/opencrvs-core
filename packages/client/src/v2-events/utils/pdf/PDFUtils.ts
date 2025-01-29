@@ -18,20 +18,36 @@ import * as Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
 import { Content } from 'pdfmake/interfaces'
 import { LanguageSchema } from '@opencrvs/commons'
-import { IPDFTemplate } from '@client/pdfRenderer'
-import { certificateBaseTemplate } from '@client/templates/register'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import {
-  CertificateConfiguration,
-  FontFamilyTypes
-} from '@client/utils/referenceApi'
+import { IPDFTemplate } from '@client/v2-events/utils/pdf/printPDF'
+
+export type FontFamilyTypes = {
+  normal: string
+  bold: string
+  italics: string
+  bolditalics: string
+}
+
+export type CertificateConfiguration = Partial<{
+  fonts: Record<string, FontFamilyTypes>
+}>
+
+export const certificateBaseTemplate = {
+  definition: {
+    pageMargins: [0, 0, 0, 0] as [number, number, number, number],
+    defaultStyle: {
+      font: 'notosans'
+    },
+    content: []
+  },
+  fonts: {}
+}
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
   obj: Record<string, unknown>
 ): obj is MessageDescriptor & Record<string, string> {
   return (
-    obj !== null &&
     obj.hasOwnProperty('id') &&
     obj.hasOwnProperty('defaultMessage') &&
     typeof (obj as MessageDescriptor).id === 'string' &&
@@ -64,10 +80,7 @@ function formatAllNonStringValues(
             : item
         )
         .join(', ')
-    } else if (
-      typeof templateData[key] === 'object' &&
-      templateData[key] !== null
-    ) {
+    } else if (typeof templateData[key] === 'object') {
       templateData[key] = formatAllNonStringValues(
         templateData[key] as Record<string, TemplateDataType>,
         intl
@@ -81,10 +94,10 @@ const cache = createIntlCache()
 
 export function compileSvg(
   templateString: string,
-  data: Record<string, any> = {},
-  language: LanguageSchema
+  language: LanguageSchema,
+  data: Record<string, any> = {}
 ): string {
-  const intl = createIntl(
+  const intl: IntlShape = createIntl(
     {
       locale: language.lang,
       messages: language.messages
@@ -180,9 +193,9 @@ export function svgToPdfTemplate(
   const foreignObjects = svgElement.getElementsByTagName('foreignObject')
   const absolutelyPositionedHTMLs: Content[] = []
   for (const foreignObject of foreignObjects) {
-    const width = Number.parseInt(foreignObject.getAttribute('width')!)
-    const x = Number.parseInt(foreignObject.getAttribute('x')!)
-    const y = Number.parseInt(foreignObject.getAttribute('y')!)
+    const width = Number.parseInt(foreignObject.getAttribute('width') ?? '0')
+    const x = Number.parseInt(foreignObject.getAttribute('x') ?? '0')
+    const y = Number.parseInt(foreignObject.getAttribute('y') ?? '0')
     const htmlContent = foreignObject.innerHTML
     const pdfmakeContent = htmlToPdfmake(htmlContent, {
       ignoreStyles: ['font-family']

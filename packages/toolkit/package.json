@@ -8,8 +8,7 @@
     "./api": "./dist/api/index.js",
     "./events": "./dist/events/index.js",
     "./scopes": "./dist/scopes/index.js",
-    "./conditionals": "./dist/conditionals/index.js",
-    "./default": "./dist/default/index.js"
+    "./conditionals": "./dist/conditionals/index.js"
   },
   "scripts": {
     "build": "./build.sh",

@@ -9,19 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  ApplicationConfigSchema,
-  CertificateDataSchema,
-  LanguageSchema
-} from '@opencrvs/commons/events'
+import { CertificateDataSchema, LanguageSchema } from '@opencrvs/commons/events'
 import {
   ActionFormData,
   EventDocument,
   isMinioUrl
 } from '@opencrvs/commons/client'
-import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './utils/PDFUtils'
-import { printPDF } from '@client/pdfRenderer'
+
+import {
+  addFontsToSvg,
+  compileSvg,
+  svgToPdfTemplate
+} from '@client/v2-events/utils/pdf/PDFUtils'
+import { printPDF } from '@client/v2-events/utils/pdf/printPDF'
+import { fetchImageAsBase64 } from '@client/v2-events/utils/imageUtils'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   async function recursiveTransform(obj: any) {
@@ -65,7 +66,7 @@ export const usePrintableCertificate = (
     return { svgCode: null }
   }
   const certificateFonts = certificateConfig.fonts ?? {}
-  const svgWithoutFonts = compileSvg(certificateConfig.svg, form, language)
+  const svgWithoutFonts = compileSvg(certificateConfig.svg, language, form)
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   const handleCertify = async () => {

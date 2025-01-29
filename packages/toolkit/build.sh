@@ -34,9 +34,6 @@ npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-o
 mkdir -p ./dist/commons/api
 cp -r ../events/build/types/router/router.d.ts ./dist/commons/api
 
-# Build deafult
-npx esbuild src/default/index.ts --bundle --format=cjs --outdir=./dist/default --allow-overwrite --packages=external
-
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
   find dist -type f -exec sed -i '' 's|@opencrvs/commons|../commons|g' {} +
