@@ -98,7 +98,8 @@ export const FieldType = {
   CHECKBOX: 'CHECKBOX',
   SELECT: 'SELECT',
   COUNTRY: 'COUNTRY',
-  LOCATION: 'LOCATION'
+  LOCATION: 'LOCATION',
+  LOCATION_SEARCH_INPUT: 'LOCATION_SEARCH_INPUT'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -211,6 +212,11 @@ const Location = BaseField.extend({
   options: LocationOptions
 }).describe('Location input field')
 
+const LocationSearchInput = BaseField.extend({
+  type: z.literal(FieldType.LOCATION_SEARCH_INPUT),
+  searchableResource: z.array(z.enum(['facilities', 'locations', 'offices']))
+})
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
@@ -221,7 +227,8 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Checkbox,
   File,
   Country,
-  Location
+  Location,
+  LocationSearchInput
 ])
 
 export type SelectField = z.infer<typeof Select>

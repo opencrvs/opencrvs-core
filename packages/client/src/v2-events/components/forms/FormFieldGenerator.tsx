@@ -247,15 +247,17 @@ const GeneratedInputField = React.memo(
         />
       )
     }
+    if (fieldDefinition.type === 'LOCATION_SEARCH_INPUT')
+      return (
+        <LocationSearch
+          {...fieldDefinition}
+          value={value as LocationFieldValue}
+          searchableResource={fieldDefinition.searchableResource}
+          setFieldValue={setFieldValue}
+        />
+      )
+
     if (fieldDefinition.type === 'LOCATION') {
-      if (fieldDefinition.options.type === 'HEALTH_FACILITY')
-        return (
-          <LocationSearch
-            {...fieldDefinition}
-            value={value as LocationFieldValue}
-            setFieldValue={setFieldValue}
-          />
-        )
       return (
         <Location
           {...fieldDefinition}

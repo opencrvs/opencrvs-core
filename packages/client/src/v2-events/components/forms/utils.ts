@@ -106,6 +106,7 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.DATE]: INITIAL_DATE_VALUE,
   [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
   [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
+  [FieldType.LOCATION_SEARCH_INPUT]: null,
   [FieldType.FILE]: null,
   [FieldType.HIDDEN]: null,
   [FieldType.BULLET_LIST]: null,
@@ -153,6 +154,7 @@ export function fieldValueToString({
       )
     case FieldType.COUNTRY:
       return selectCountryFieldToString(value as SelectFieldValue, intl)
+    case FieldType.LOCATION_SEARCH_INPUT:
     case FieldType.LOCATION: {
       let location
       if (_.isString(value)) {

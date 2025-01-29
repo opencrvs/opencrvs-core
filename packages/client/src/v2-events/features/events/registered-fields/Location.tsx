@@ -52,7 +52,7 @@ export function Location({
   partOf,
   ...props
 }: FieldProps<'LOCATION'> & {
-  setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
+  setFieldValue: (name: string, val: string | undefined) => void
   partOf: string | null
   value?: LocationFieldValue
 }) {
