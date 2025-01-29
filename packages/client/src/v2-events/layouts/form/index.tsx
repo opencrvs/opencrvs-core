@@ -13,17 +13,11 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 
 import { Frame, Spinner } from '@opencrvs/components'
+import { ActionType } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { ROUTES } from '@client/v2-events/routes'
 import { FormHeader } from './FormHeader'
-import { ActionType } from '@opencrvs/commons/client'
-
-type AllowedRoute =
-  | typeof ROUTES.V2.EVENTS.REGISTER
-  | typeof ROUTES.V2.EVENTS.DECLARE
-  | typeof ROUTES.V2.EVENTS.PRINT_CERTIFICATE
-  | typeof ROUTES.V2.EVENTS.REQUEST_CORRECTION
+import { AllowedRouteWithEventId } from './utils'
 
 /**
  * Layout for form and review pages.
@@ -36,7 +30,7 @@ export function FormLayout({
   onSaveAndExit
 }: {
   action: ActionType
-  route: AllowedRoute
+  route: AllowedRouteWithEventId
   children: React.ReactNode
   onSaveAndExit?: () => void
 }) {
@@ -50,12 +44,14 @@ export function FormLayout({
   if (!page) {
     throw new Error('Form page not found')
   }
+
   return (
     <Frame
       header={
         <FormHeader
           action={action}
           label={configuration.label}
+          route={route}
           onSaveAndExit={onSaveAndExit}
         />
       }

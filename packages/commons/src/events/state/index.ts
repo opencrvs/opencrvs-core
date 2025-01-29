@@ -50,15 +50,23 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-function getData(
-  actions: Array<ActionDocument>,
-  actionTypeToNotInclude?: ActionType
-) {
+function getData(actions: Array<ActionDocument>) {
+  /** Types that are not taken into the aggregate values (e.g. while printing certificate)
+   * stop auto filling collector form with previous priint action data)
+   */
+  const excludedActions = [
+    ActionType.REQUEST_CORRECTION,
+    ActionType.PRINT_CERTIFICATE
+  ]
+
   return actions.reduce((status, action) => {
-    if (action.type === ActionType.REQUEST_CORRECTION) {
+    if (
+      excludedActions.some((excludedAction) => excludedAction === action.type)
+    ) {
       return status
     }
 
+    // @TODO: Ask Riku to add a comment specifying the reason for this
     if (action.type === ActionType.APPROVE_CORRECTION) {
       const requestAction = actions.find(({ id }) => id === action.requestId)
       if (!requestAction) {
@@ -72,11 +80,7 @@ function getData(
 
     return {
       ...status,
-      ...(actionTypeToNotInclude
-        ? action.type === actionTypeToNotInclude
-          ? {}
-          : action.data
-        : action.data)
+      ...action.data
     }
   }, {})
 }
@@ -87,10 +91,7 @@ export function isUndeclaredDraft(event: EventDocument): boolean {
   )
 }
 
-export function getCurrentEventState(
-  event: EventDocument,
-  actionTypeToNotInclude?: ActionType
-): EventIndex {
+export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
   )
@@ -111,6 +112,6 @@ export function getCurrentEventState(
     modifiedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(event.actions),
     updatedBy: latestAction.createdBy,
-    data: getData(event.actions, actionTypeToNotInclude)
+    data: getData(event.actions)
   }
 }

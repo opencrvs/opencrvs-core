@@ -9,5 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from './CertificateConfig'
-export * from './Language'
+import { ROUTES } from '@client/v2-events/routes'
+
+/**
+ * @TODO: Check whether these could be derived dynamically from ROUTES config.
+ * We do have the information of which routes have the eventId, so duplicating the information
+ * here is not optimal.
+ */
+export type AllowedRouteWithEventId =
+  | typeof ROUTES.V2.EVENTS.REGISTER
+  | typeof ROUTES.V2.EVENTS.DECLARE
+  | typeof ROUTES.V2.EVENTS.PRINT_CERTIFICATE
+  | typeof ROUTES.V2.EVENTS.REQUEST_CORRECTION

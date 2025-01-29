@@ -10,22 +10,21 @@
  */
 
 import { z } from 'zod'
+import { TranslationConfig } from '../TranslationConfig'
 
-const fontFamilyTypesSchema = z.object({
+const FontFamily = z.object({
   normal: z.string(),
   bold: z.string(),
   italics: z.string(),
   bolditalics: z.string()
 })
-
-export const CertificateConfigDataSchema = z.object({
+/**
+ * Represents API response from country-config
+ */
+export const CertificateConfig = z.object({
   id: z.string(),
   event: z.string(),
-  label: z.object({
-    id: z.string(),
-    defaultMessage: z.string(),
-    description: z.string()
-  }),
+  label: TranslationConfig,
   isDefault: z.boolean(),
   fee: z.object({
     onTime: z.number(),
@@ -33,12 +32,17 @@ export const CertificateConfigDataSchema = z.object({
     delayed: z.number()
   }),
   svgUrl: z.string(),
-  fonts: z.record(fontFamilyTypesSchema).optional()
+  fonts: z.record(FontFamily).optional()
 })
 
-export const CertificateDataSchema = CertificateConfigDataSchema.extend({
+/**
+ * Represents the way client uses it
+ */
+export const CertificateTemplateConfig = CertificateConfig.extend({
   hash: z.string().optional(),
   svg: z.string()
 })
 
-export type CertificateDataSchema = z.infer<typeof CertificateDataSchema>
+export type CertificateTemplateConfig = z.infer<
+  typeof CertificateTemplateConfig
+>

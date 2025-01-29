@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { EventDocument } from '@opencrvs/commons/client'
-import { useEffect } from 'react'
+import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 export const useCertificateTemplateSelectorFieldConfig = (
   event: EventDocument
 ) => {
-  const { certificatesTemplate } = useAppConfig()
+  const { certificateTemplates } = useAppConfig()
   return {
     id: 'templateId',
     type: 'SELECT',
@@ -26,7 +25,7 @@ export const useCertificateTemplateSelectorFieldConfig = (
       description: 'This is the label for the field',
       id: 'event.default.action.certificate.form.section.who.field.surname.label'
     },
-    options: certificatesTemplate
+    options: certificateTemplates
       .filter((x) => x.event === event.type)
       .map((x) => ({ label: x.label, value: x.id }))
   }

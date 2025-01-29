@@ -15,6 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
+import { useIntl } from 'react-intl'
 import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -26,7 +27,6 @@ import { FormLayout } from '@client/v2-events/layouts/form'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { InputField } from '@client/components/form/InputField'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
-import { useIntl } from 'react-intl'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -93,10 +93,11 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        form={form}
         eventId={eventId}
+        form={form}
         formPages={formPages}
         pageId={currentPageId}
+        setFormData={(data) => setFormValues(eventId, data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
@@ -116,24 +117,28 @@ export function Pages() {
             )
           }
         }}
-        setFormData={(data) => setFormValues(eventId, data)}
-      >
-        <InputField
-          id={certTemplateFieldConfig.id}
-          label={intl.formatMessage(certTemplateFieldConfig.label)}
-          touched={false}
-        >
-          <Select
-            id={certTemplateFieldConfig.id}
-            label={certTemplateFieldConfig.label}
-            onChange={(val: string) => setTemplateId(val)}
-            options={certTemplateFieldConfig.options}
-            value={templateId}
-            type="SELECT"
-            required
-          />
-        </InputField>
-      </PagesComponent>
+        // hard coded certificate template selector form field
+        {...(formPages.length &&
+          formPages[0].id === currentPageId && {
+            prefixChildren: (
+              <InputField
+                id={certTemplateFieldConfig.id}
+                label={intl.formatMessage(certTemplateFieldConfig.label)}
+                touched={false}
+              >
+                <Select
+                  required
+                  id={certTemplateFieldConfig.id}
+                  label={certTemplateFieldConfig.label}
+                  options={certTemplateFieldConfig.options}
+                  type="SELECT"
+                  value={templateId}
+                  onChange={(val: string) => setTemplateId(val)}
+                />
+              </InputField>
+            )
+          })}
+      ></PagesComponent>
     </FormLayout>
   )
 }

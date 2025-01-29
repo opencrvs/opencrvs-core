@@ -11,13 +11,14 @@
 
 import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { ActionType, isUndeclaredDraft } from '@opencrvs/commons/client'
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { DeclarationIcon, Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
+import { AllowedRouteWithEventId } from './utils'
 
 function getDeclarationIconColor(): string {
   return 'purple'
@@ -61,18 +62,18 @@ export const ActionIcons: { [key in ActionType]: React.JSX.Element } = {
 export function FormHeader({
   action,
   label,
-  onSaveAndExit
+  onSaveAndExit,
+  route
 }: {
   action: ActionType
   label: TranslationConfig
   onSaveAndExit?: () => void
+  route: AllowedRouteWithEventId
 }) {
   const intl = useIntl()
   const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
 
-  const { eventId } = useParams<{
-    eventId: string
-  }>()
+  const { eventId } = useTypedParams(route)
 
   if (!eventId) {
     throw new Error('Event id is required')

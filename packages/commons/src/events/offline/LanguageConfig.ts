@@ -11,9 +11,15 @@
 
 import { z } from 'zod'
 
-export const LanguageSchema = z.object({
+/**
+ * Translations from country-config for specific language.
+ */
+export const LanguageConfig = z.object({
   lang: z.string(),
+  /**
+   * client.csv contents
+   */
   messages: z.record(z.string())
 })
 
-export type LanguageSchema = z.infer<typeof LanguageSchema>
+export type LanguageConfig = z.infer<typeof LanguageConfig>

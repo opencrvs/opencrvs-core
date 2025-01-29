@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -109,20 +109,13 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
 
-  const { certificatesTemplate, language } = useAppConfig()
-  const events = useEvents()
   const [modal, openModal] = useModal()
+  const events = useEvents()
   const { getFormValues, clear } = useEventFormData()
-
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
-
-  if (!config) {
-    throw new Error(`Event configuration not found for type: ${event.type}`)
-  }
-
   const form = getFormValues(eventId)
-  const certificateConfig = certificatesTemplate.find(
+  const { certificateTemplates, language } = useAppConfig()
+  const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
   const { svgCode, handleCertify, isPrintInAdvance, canUserEditRecord } =

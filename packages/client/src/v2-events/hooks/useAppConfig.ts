@@ -9,20 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { LanguageSchema, CertificateDataSchema } from '@opencrvs/commons/events'
 import { useSelector } from 'react-redux'
-import { getOfflineData } from '@client/offline/selectors'
+import {
+  LanguageConfig,
+  CertificateTemplateConfig
+} from '@opencrvs/commons/events'
+// eslint-disable-next-line no-restricted-imports
+import { getLanguage, getCertificateTemplates } from '@client/offline/selectors'
 
-interface IApplicationConfig {
-  certificatesTemplate: CertificateDataSchema[]
-  language?: LanguageSchema
+interface ApplicationConfig {
+  certificateTemplates: CertificateTemplateConfig[]
+  language?: LanguageConfig
 }
 
-export const useAppConfig = (): IApplicationConfig => {
-  const offlineCountryConfig = useSelector(getOfflineData)
-
+export const useAppConfig = (): ApplicationConfig => {
   return {
-    language: offlineCountryConfig.languages[0],
-    certificatesTemplate: offlineCountryConfig.templates.certificates
+    language: useSelector(getLanguage),
+    certificateTemplates: useSelector(getCertificateTemplates)
   }
 }

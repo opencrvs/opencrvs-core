@@ -28,7 +28,7 @@ export function Pages({
   form,
   onFormPageChange,
   onSubmit,
-  children,
+  prefixChildren,
   submitButtonText,
   setFormData
 }: {
@@ -40,7 +40,10 @@ export function Pages({
   formPages: FormPage[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
-  children?: React.ReactNode
+  /**
+   * @TODO: Remember to add a comment explaining why and how it's used.
+   */
+  prefixChildren?: React.ReactNode
   submitButtonText?: string
 }) {
   const intl = useIntl()
@@ -74,7 +77,7 @@ export function Pages({
       onPreviousPage={previous}
       onSubmit={onSubmit}
     >
-      {children}
+      {prefixChildren}
       <FormFieldGenerator
         fields={page.fields}
         formData={form}
