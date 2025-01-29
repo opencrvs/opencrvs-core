@@ -13,7 +13,7 @@ import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { DeduplicationConfig, EventIndex, getUUID } from '@opencrvs/commons'
 import { searchForDuplicates } from './deduplication'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
-import { encodeEventIndex } from '../indexing/indexing'
+import { encodeEventIndex } from '@events/service/indexing/indexing'
 
 const LEGACY_BIRTH_DEDUPLICATION_RULES = {
   id: 'Legacy birth deduplication check',
