@@ -11,13 +11,14 @@
 
 import { mapKeys, orderBy } from 'lodash'
 import React, { useState } from 'react'
-import { useIntl } from 'react-intl'
+import { useIntl, defineMessages } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
 import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
+import { format } from 'date-fns'
 import {
   defaultColumns,
   EventIndex,
@@ -35,11 +36,20 @@ import {
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { messages } from '@client/v2-events/messages'
+
 import { ROUTES } from '@client/v2-events/routes'
 import { getInitialValues } from '@client/v2-events/components/forms/utils'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
+
+const messages = defineMessages({
+  empty: {
+    defaultMessage: 'Empty message',
+    description: 'Label for workqueue tooltip',
+    id: 'regHome.issued'
+  }
+})
 
 function getOrThrow<T>(x: T, message: string) {
   if (x === undefined || x === null) {
@@ -207,8 +217,8 @@ function Workqueue({
         ...fieldsWithPopulatedValues,
         ...event,
         event: intl.formatMessage(eventConfig.label),
-        createdAt: intl.formatDate(new Date(event.createdAt)),
-        modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
+        createdAt: formattedDuration(new Date(event.createdAt)),
+        modifiedAt: formattedDuration(new Date(event.modifiedAt)),
 
         status: intl.formatMessage(
           {
