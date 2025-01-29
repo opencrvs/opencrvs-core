@@ -25,6 +25,7 @@ import { subDays, addDays } from 'date-fns'
 import {
   decodeEventIndex,
   EncodedEventIndex,
+  encodeEventIndex,
   encodeFieldId
 } from '@events/service/indexing/indexing'
 
@@ -33,7 +34,7 @@ function dataReference(fieldName: string) {
 }
 
 function generateElasticsearchQuery(
-  eventIndex: EventIndex,
+  eventIndex: EncodedEventIndex,
   configuration: ClauseOutput
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
   const matcherFieldWithoutData =
@@ -93,16 +94,17 @@ function generateElasticsearchQuery(
     }
     case 'dateRange': {
       const encodedFieldId = encodeFieldId(configuration.fieldId)
+      const origin = encodeFieldId(configuration.options.origin)
       return {
         range: {
           [dataReference(encodedFieldId)]: {
             // @TODO: Improve types for origin field to be sure it returns a string when accessing data
             gte: subDays(
-              new Date(eventIndex.data[configuration.options.origin] as string),
+              new Date(eventIndex.data[origin] as string),
               configuration.options.days
             ).toISOString(),
             lte: addDays(
-              new Date(eventIndex.data[configuration.options.origin] as string),
+              new Date(eventIndex.data[origin] as string),
               configuration.options.days
             ).toISOString()
           }
@@ -111,11 +113,12 @@ function generateElasticsearchQuery(
     }
     case 'dateDistance': {
       const encodedFieldId = encodeFieldId(configuration.fieldId)
+      const origin = encodeFieldId(configuration.options.origin)
       return {
         distance_feature: {
           field: dataReference(encodedFieldId),
           pivot: `${configuration.options.days}d`,
-          origin: eventIndex.data[configuration.options.origin]
+          origin: eventIndex.data[origin]
         }
       }
     }
@@ -129,7 +132,10 @@ export async function searchForDuplicates(
   const esClient = getOrCreateClient()
   const query = Clause.parse(configuration.query)
 
-  const esQuery = generateElasticsearchQuery(eventIndex, query)
+  const esQuery = generateElasticsearchQuery(
+    encodeEventIndex(eventIndex),
+    query
+  )
 
   if (!esQuery) {
     return []

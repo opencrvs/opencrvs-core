@@ -10,9 +10,10 @@
  */
 
 import { getOrCreateClient } from '@events/storage/elasticsearch'
-import { DeduplicationConfig, getUUID } from '@opencrvs/commons'
+import { DeduplicationConfig, EventIndex, getUUID } from '@opencrvs/commons'
 import { searchForDuplicates } from './deduplication'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
+import { encodeEventIndex } from '../indexing/indexing'
 
 const LEGACY_BIRTH_DEDUPLICATION_RULES = {
   id: 'Legacy birth deduplication check',
@@ -155,11 +156,11 @@ export async function findDuplicates(
     index: getEventIndexName(),
     id: getUUID(),
     body: {
-      doc: {
+      doc: encodeEventIndex({
         id: getUUID(),
         transactionId: getUUID(),
         data: existingComposition
-      },
+      } as unknown as EventIndex),
       doc_as_upsert: true
     },
     refresh: 'wait_for'

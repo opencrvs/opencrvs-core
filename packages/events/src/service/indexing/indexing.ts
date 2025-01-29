@@ -32,7 +32,7 @@ function eventToEventIndex(event: EventDocument): EventIndex {
 }
 
 export type EncodedEventIndex = EventIndex
-function encodeEventIndex(event: EventIndex): EncodedEventIndex {
+export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
   return {
     ...event,
     data: Object.entries(event.data).reduce(
