@@ -76,6 +76,7 @@ export function Pages({
         fields={page.fields}
         formData={form}
         id="locationForm"
+        initialValues={form}
         setAllFieldsDirty={false}
         onChange={(values) => setFormData(values)}
       />
