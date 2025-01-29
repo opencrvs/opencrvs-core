@@ -91,8 +91,8 @@ function getElasticsearchMappingForType(field: FieldConfig) {
       return { type: 'text' }
     case 'TEXT':
     case 'PARAGRAPH':
-    case 'PAGE_HEADER':
     case 'BULLET_LIST':
+    case 'PAGE_HEADER':
       return { type: 'text' }
     case 'RADIO_GROUP':
     case 'SELECT':
@@ -109,6 +109,8 @@ function getElasticsearchMappingForType(field: FieldConfig) {
           type: { type: 'keyword' }
         }
       }
+    case 'DIVIDER':
+      return {}
 
     default:
       assertNever()
