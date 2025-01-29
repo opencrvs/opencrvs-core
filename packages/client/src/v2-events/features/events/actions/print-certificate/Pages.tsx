@@ -24,7 +24,9 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { useCertificateTemplateSelectorFieldConfig } from '../../useCertificateTemplateSelectorFieldConfig'
+import { InputField } from '@client/components/form/InputField'
+import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { useIntl } from 'react-intl'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -35,7 +37,7 @@ export function Pages() {
   )
   const [templateId, setTemplateId] = useState<string>()
   const formEventId = useEventFormData((state) => state.eventId)
-
+  const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
   const { modal } = useEventFormNavigation()
@@ -114,16 +116,23 @@ export function Pages() {
             )
           }
         }}
+        setFormData={(data) => setFormValues(eventId, data)}
       >
-        <Select
-          onChange={(val: string) => setTemplateId(val)}
+        <InputField
           id={certTemplateFieldConfig.id}
-          label={certTemplateFieldConfig.label}
-          options={certTemplateFieldConfig.options}
-          value={templateId}
-          type="SELECT"
-          required
-        />
+          label={intl.formatMessage(certTemplateFieldConfig.label)}
+          touched={false}
+        >
+          <Select
+            id={certTemplateFieldConfig.id}
+            label={certTemplateFieldConfig.label}
+            onChange={(val: string) => setTemplateId(val)}
+            options={certTemplateFieldConfig.options}
+            value={templateId}
+            type="SELECT"
+            required
+          />
+        </InputField>
       </PagesComponent>
     </FormLayout>
   )

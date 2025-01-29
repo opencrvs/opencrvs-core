@@ -55,6 +55,21 @@ function getData(
   actionTypeToNotInclude?: ActionType
 ) {
   return actions.reduce((status, action) => {
+    if (action.type === ActionType.REQUEST_CORRECTION) {
+      return status
+    }
+
+    if (action.type === ActionType.APPROVE_CORRECTION) {
+      const requestAction = actions.find(({ id }) => id === action.requestId)
+      if (!requestAction) {
+        return status
+      }
+      return {
+        ...status,
+        ...requestAction.data
+      }
+    }
+
     return {
       ...status,
       ...(actionTypeToNotInclude

@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "0.0.28",
+  "version": "0.0.32-jr",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
@@ -15,12 +15,14 @@
     "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit && ./build.sh"
   },
   "dependencies": {
+    "uuid": "^9.0.0",
     "ajv": "^8.17.1",
     "superjson": "1.9.0-0",
     "@trpc/client": "^11.0.0-rc.648",
     "@trpc/server": "^11.0.0-rc.532"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.3",
     "esbuild": "^0.24.0",
     "typescript": "^5.6.3",
     "@opencrvs/events": "^1.7.0"

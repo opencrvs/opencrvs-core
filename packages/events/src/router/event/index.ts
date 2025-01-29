@@ -23,17 +23,27 @@ import {
 } from '@events/service/events/events'
 import { presignFilesInEvent } from '@events/service/files'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
-import { EventConfig, getUUID } from '@opencrvs/commons'
+import {
+  EventConfig,
+  getUUID,
+  ApproveCorrectionActionInput,
+  RejectCorrectionActionInput,
+  RequestCorrectionActionInput,
+  logger
+} from '@opencrvs/commons'
 import {
   PrintCertificateActionInput,
   DeclareActionInput,
   EventIndex,
   EventInput,
+  FieldValue,
   NotifyActionInput,
   RegisterActionInput,
   ValidateActionInput
 } from '@opencrvs/commons/events'
 import { router, publicProcedure } from '@events/router/trpc'
+import { approveCorrection } from '@events/service/events/actions/approve-correction'
+import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 
 function validateEventType({
   eventTypes,
@@ -109,7 +119,8 @@ export const eventRouter = router({
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
         })
       }),
     declare: publicProcedure
@@ -119,7 +130,8 @@ export const eventRouter = router({
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
         })
       }),
     validate: publicProcedure
@@ -129,7 +141,8 @@ export const eventRouter = router({
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
         })
       }),
     register: publicProcedure
@@ -147,7 +160,8 @@ export const eventRouter = router({
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
           }
         )
       }),
@@ -158,9 +172,59 @@ export const eventRouter = router({
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
         })
-      })
+      }),
+    correct: router({
+      request: publicProcedure
+        .input(RequestCorrectionActionInput)
+        .mutation(async (options) => {
+          return addAction(options.input, {
+            eventId: options.input.eventId,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
+          })
+        }),
+      approve: publicProcedure
+        .input(ApproveCorrectionActionInput)
+        .mutation(async (options) => {
+          return approveCorrection(options.input, {
+            eventId: options.input.eventId,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
+          })
+        }),
+      reject: publicProcedure
+        .input(RejectCorrectionActionInput)
+        .mutation(async (options) => {
+          return rejectCorrection(options.input, {
+            eventId: options.input.eventId,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
+          })
+        })
+    })
   }),
-  list: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents)
+  list: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents),
+  registration: router({
+    confirm: publicProcedure
+      .input(
+        z.object({
+          eventId: z.string(),
+          data: z.record(z.string(), FieldValue)
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        logger.info('Registration confirmed', { eventId: input.eventId })
+        logger.info(input.data)
+        return getEventById(input.eventId)
+      })
+  })
 })

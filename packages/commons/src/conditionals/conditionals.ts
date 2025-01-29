@@ -35,9 +35,7 @@ export type ConditionalParameters = { $now: string } & (
     }
 )
 
-/**
- * @public
- */
+/** @knipignore */
 export type JSONSchema = Omit<
   JSONSchemaType<ConditionalParameters>,
   'properties'

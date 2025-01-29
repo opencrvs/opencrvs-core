@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -63,8 +63,9 @@ export function Review() {
     (action) => action.type === ActionType.REGISTER
   )[0]
 
-  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const setFormValues = useEventFormData((state) => state.setFormValuesIfEmpty)
   const getFormValues = useEventFormData((state) => state.getFormValues)
+  const previousFormValues = getCurrentEventState(event).data
 
   useEffect(() => {
     setFormValues(eventId, getCurrentEventState(event).data)
@@ -130,6 +131,7 @@ export function Review() {
         eventConfig={config}
         form={form}
         formConfig={formConfigs[0]}
+        previousFormValues={previousFormValues}
         title=""
         onEdit={handleEdit}
       >

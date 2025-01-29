@@ -71,11 +71,10 @@ export const usePrintableCertificate = (
 
   const handleCertify = async () => {
     const base64ReplacedTemplate = await replaceMinioUrlWithBase64(form)
-    const svgWithoutFonts = compileSvg(
-      certificateConfig.svg,
-      { ...base64ReplacedTemplate, preview: false },
-      language
-    )
+    const svgWithoutFonts = compileSvg(certificateConfig.svg, language, {
+      ...base64ReplacedTemplate,
+      preview: false
+    })
     const svgWithFonts = addFontsToSvg(svgWithoutFonts, certificateFonts)
     const pdfTemplate = svgToPdfTemplate(svgWithFonts, certificateFonts)
     printPDF(pdfTemplate, event.id)

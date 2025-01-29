@@ -23,6 +23,7 @@ type AllowedRoute =
   | typeof ROUTES.V2.EVENTS.REGISTER
   | typeof ROUTES.V2.EVENTS.DECLARE
   | typeof ROUTES.V2.EVENTS.PRINT_CERTIFICATE
+  | typeof ROUTES.V2.EVENTS.REQUEST_CORRECTION
 
 /**
  * Layout for form and review pages.
@@ -54,7 +55,7 @@ export function FormLayout({
       header={
         <FormHeader
           action={action}
-          label={page.label}
+          label={configuration.label}
           onSaveAndExit={onSaveAndExit}
         />
       }

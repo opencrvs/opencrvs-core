@@ -11,12 +11,10 @@
 
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
+import { ActionFormData, FormPage } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
-import { FormPage } from '@opencrvs/commons'
-import { ActionFormData } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 
 /**
  *
@@ -30,20 +28,23 @@ export function Pages({
   form,
   onFormPageChange,
   onSubmit,
-  children
+  children,
+  submitButtonText,
+  setFormData
 }: {
   eventId: string
   pageId: string
   form: ActionFormData
+  setFormData: (data: ActionFormData) => void
   showReviewButton?: boolean
   formPages: FormPage[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
   children?: React.ReactNode
+  submitButtonText?: string
 }) {
   const intl = useIntl()
 
-  const setFormValues = useEventFormData((state) => state.setFormValues)
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
 
   const {
@@ -67,6 +68,7 @@ export function Pages({
       currentPage={currentPage}
       pageTitle={intl.formatMessage(page.title)}
       showReviewButton={showReviewButton}
+      submitButtonText={submitButtonText}
       totalPages={total}
       onNextPage={next}
       onPreviousPage={previous}
@@ -79,9 +81,7 @@ export function Pages({
         id="locationForm"
         initialValues={form}
         setAllFieldsDirty={false}
-        onChange={(values) => {
-          setFormValues(eventId, values)
-        }}
+        onChange={(values) => setFormData(values)}
       />
     </FormWizard>
   )

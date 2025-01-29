@@ -18,6 +18,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
+import { createTemporaryId, isTemporaryId } from './create'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   utils.event.get.setData(updatedEvent.id, updatedEvent)
@@ -32,7 +33,7 @@ function waitUntilEventIsCreated<T extends { eventId: string }, R>(
 
     const localVersion = utils.event.get.getData(eventId)
 
-    if (!localVersion || localVersion.id === localVersion.transactionId) {
+    if (!localVersion || isTemporaryId(localVersion.id)) {
       // eslint-disable-next-line no-console
       console.error(
         'Event that has not been stored yet cannot be actioned upon'
@@ -52,6 +53,9 @@ type Mutation =
   | typeof api.event.actions.register
   | typeof api.event.actions.validate
   | typeof api.event.actions.printCertificate
+  | typeof api.event.actions.correct.request
+  | typeof api.event.actions.correct.approve
+  | typeof api.event.actions.correct.reject
 
 type Procedure =
   | typeof utils.event.actions.declare
@@ -59,6 +63,9 @@ type Procedure =
   | typeof utils.event.actions.register
   | typeof utils.event.actions.validate
   | typeof utils.event.actions.printCertificate
+  | typeof utils.event.actions.correct.request
+  | typeof utils.event.actions.correct.approve
+  | typeof utils.event.actions.correct.reject
 
 /*
  * This makes sure that if you are offline and do
@@ -119,6 +126,7 @@ function updateEventOptimistically<T extends ActionInput>(
       actions: [
         ...localEvent.actions,
         {
+          id: createTemporaryId(),
           type: actionType,
           data: variables.data,
           draft: false,
@@ -167,6 +175,33 @@ utils.event.actions.validate.setMutationDefaults(({ canonicalMutationFn }) => ({
 }))
 
 utils.event.actions.printCertificate.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
+
+utils.event.actions.correct.request.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
+
+utils.event.actions.correct.approve.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
+
+utils.event.actions.correct.reject.setMutationDefaults(
   ({ canonicalMutationFn }) => ({
     retry: true,
     retryDelay: 10000,

@@ -47,7 +47,9 @@ export const ActionIcons: { [key in ActionType]: React.JSX.Element } = {
   UNASSIGN: <DeclarationIcon color={getDeclarationIconColor()} />,
   REGISTER: <DeclarationIcon color={getDeclarationIconColor()} />,
   VALIDATE: <DeclarationIcon color={getDeclarationIconColor()} />,
-  CORRECT: <DeclarationIcon color={getDeclarationIconColor()} />,
+  REQUEST_CORRECTION: <DeclarationIcon color={getDeclarationIconColor()} />,
+  REJECT_CORRECTION: <DeclarationIcon color={getDeclarationIconColor()} />,
+  APPROVE_CORRECTION: <DeclarationIcon color={getDeclarationIconColor()} />,
   DETECT_DUPLICATE: <DeclarationIcon color={getDeclarationIconColor()} />,
   NOTIFY: <DeclarationIcon color={getDeclarationIconColor()} />,
   DECLARE: <DeclarationIcon color={getDeclarationIconColor()} />,
@@ -174,9 +176,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
+      mobileTitle={intl.formatMessage(label)}
     />
   )
 }
