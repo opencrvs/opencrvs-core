@@ -9,14 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
 import { ResponsiveModal, Stack } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import { ActionDocument } from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
-import { messages } from './messages'
+
+const messages = defineMessages({
+  'event.history.modal.timeFormat': {
+    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
+    id: 'event.history.timeFormat',
+    description: 'Time format for timestamps in event history'
+  }
+})
 
 /**
  * Detailed view of single Action, showing the history of the event.
@@ -52,7 +59,7 @@ export function EventHistoryModal({
               name,
               format(
                 new Date(history.createdAt),
-                intl.formatMessage(messages['event.history.timeFormat'])
+                intl.formatMessage(messages['event.history.modal.timeFormat'])
               )
             ],
             ' — '
