@@ -104,7 +104,7 @@ function EventOverview({
     : ''
   return (
     <Content
-      icon={() => <IconWithName name={''} status={'orange'} />}
+      icon={() => <IconWithName name={''} status={event.status} />}
       size={ContentSize.LARGE}
       title={title || fallbackTitle}
       titleColor={event.id ? 'copy' : 'grey600'}

@@ -11,21 +11,20 @@
 
 import { mapKeys, orderBy } from 'lodash'
 import React, { useState } from 'react'
-import { useIntl, defineMessages } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
 import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
-import { format } from 'date-fns'
 import {
   defaultColumns,
+  EventConfig,
   EventIndex,
-  RootWorkqueueConfig,
-  workqueues,
   getAllFields,
-  EventConfig
+  RootWorkqueueConfig,
+  workqueues
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -37,9 +36,9 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
-import { ROUTES } from '@client/v2-events/routes'
-import { getInitialValues } from '@client/v2-events/components/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { getInitialValues } from '@client/v2-events/components/forms/utils'
+import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
