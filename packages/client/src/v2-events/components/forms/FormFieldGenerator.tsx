@@ -454,7 +454,9 @@ class FormSectionComponent extends React.Component<AllProps> {
 
     const language = this.props.intl.locale
 
-    const errors = this.props.errors as unknown as Errors
+    const errors = makeFormFieldIdsFormikCompatible(
+      this.props.errors as unknown as Errors
+    )
 
     const fields = fieldsWithDotIds.map((field) => ({
       ...field,
@@ -506,11 +508,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                       error={isFieldDisabled ? '' : error}
                       fields={fields}
                       formData={formData}
-                      touched={
-                        makeFormikFieldIdsOpenCRVSCompatible(touched)[
-                          field.id
-                        ] || false
-                      }
+                      touched={touched[field.id] || false}
                       values={values}
                       onUploadingStateChanged={
                         this.props.onUploadingStateChanged
