@@ -22,6 +22,11 @@ import {
   ClauseOutput
 } from '@opencrvs/commons/events'
 import { subDays, addDays } from 'date-fns'
+import {
+  decodeEventIndex,
+  EncodedEventIndex,
+  encodeFieldId
+} from '@events/service/indexing/indexing'
 
 function dataReference(fieldName: string) {
   return `data.${fieldName}`
@@ -34,7 +39,7 @@ function generateElasticsearchQuery(
   const matcherFieldWithoutData =
     configuration.type !== 'and' &&
     configuration.type !== 'or' &&
-    !eventIndex.data[configuration.fieldId]
+    !eventIndex.data[encodeFieldId(configuration.fieldId)]
 
   if (matcherFieldWithoutData) {
     return null
@@ -66,27 +71,31 @@ function generateElasticsearchQuery(
             )
         }
       }
-    case 'fuzzy':
+    case 'fuzzy': {
+      const encodedFieldId = encodeFieldId(configuration.fieldId)
       return {
         match: {
-          ['data.' + configuration.fieldId]: {
-            query: eventIndex.data[configuration.fieldId],
+          ['data.' + encodedFieldId]: {
+            query: eventIndex.data[encodedFieldId],
             fuzziness: configuration.options.fuzziness,
             boost: configuration.options.boost
           }
         }
       }
-    case 'strict':
+    }
+    case 'strict': {
+      const encodedFieldId = encodeFieldId(configuration.fieldId)
       return {
         match_phrase: {
-          [dataReference(configuration.fieldId)]:
-            eventIndex.data[configuration.fieldId] || ''
+          [dataReference(encodedFieldId)]: eventIndex.data[encodedFieldId] || ''
         }
       }
-    case 'dateRange':
+    }
+    case 'dateRange': {
+      const encodedFieldId = encodeFieldId(configuration.fieldId)
       return {
         range: {
-          [dataReference(configuration.fieldId)]: {
+          [dataReference(encodedFieldId)]: {
             // @TODO: Improve types for origin field to be sure it returns a string when accessing data
             gte: subDays(
               new Date(eventIndex.data[configuration.options.origin] as string),
@@ -99,14 +108,17 @@ function generateElasticsearchQuery(
           }
         }
       }
-    case 'dateDistance':
+    }
+    case 'dateDistance': {
+      const encodedFieldId = encodeFieldId(configuration.fieldId)
       return {
         distance_feature: {
-          field: dataReference(configuration.fieldId),
+          field: dataReference(encodedFieldId),
           pivot: `${configuration.options.days}d`,
           origin: eventIndex.data[configuration.options.origin]
         }
       }
+    }
   }
 }
 
@@ -123,8 +135,8 @@ export async function searchForDuplicates(
     return []
   }
 
-  const result = await esClient.search<EventIndex>({
-    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
+  const result = await esClient.search<EncodedEventIndex>({
+    index: getEventIndexName(eventIndex.type),
     query: {
       bool: {
         should: [esQuery],
@@ -137,6 +149,6 @@ export async function searchForDuplicates(
     .filter((hit) => hit._source)
     .map((hit) => ({
       score: hit._score || 0,
-      event: hit._source
+      event: hit._source && decodeEventIndex(hit._source)
     }))
 }
