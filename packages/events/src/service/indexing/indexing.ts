@@ -28,7 +28,34 @@ import { Transform } from 'stream'
 import { z } from 'zod'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
-  return getCurrentEventState(event)
+  return encodeEventIndex(getCurrentEventState(event))
+}
+
+export type EncodedEventIndex = EventIndex
+export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
+  return {
+    ...event,
+    data: Object.entries(event.data).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [encodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
+}
+
+export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
+  return {
+    ...event,
+    data: Object.entries(event.data).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [decodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
 }
 
 /*
@@ -94,6 +121,7 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     case 'BULLET_LIST':
     case 'PAGE_HEADER':
       return { type: 'text' }
+    case 'DIVIDER':
     case 'RADIO_GROUP':
     case 'SELECT':
     case 'COUNTRY':
@@ -110,8 +138,6 @@ function getElasticsearchMappingForType(field: FieldConfig) {
           type: { type: 'keyword' }
         }
       }
-    case 'DIVIDER':
-      return {}
 
     default:
       assertNever()
@@ -122,11 +148,21 @@ function assertNever(): never {
   throw new Error('Should never happen')
 }
 
+const SEPARATOR = '____'
+
+export function encodeFieldId(fieldId: string) {
+  return fieldId.replaceAll('.', SEPARATOR)
+}
+
+function decodeFieldId(fieldId: string) {
+  return fieldId.replaceAll(SEPARATOR, '.')
+}
+
 function formFieldsToDataMapping(fields: FieldConfig[]) {
   return fields.reduce((acc, field) => {
     return {
       ...acc,
-      [field.id]: getElasticsearchMappingForType(field)
+      [encodeFieldId(field.id)]: getElasticsearchMappingForType(field)
     }
   }, {})
 }
@@ -208,11 +244,18 @@ export async function getIndexedEvents() {
     return []
   }
 
-  const response = await esClient.search({
+  const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     size: 10000,
     request_cache: false
   })
 
-  return z.array(EventIndex).parse(response.hits.hits.map((hit) => hit._source))
+  const events = z.array(EventIndex).parse(
+    response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
+  )
+
+  return events
 }

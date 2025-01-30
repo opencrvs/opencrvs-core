@@ -11,7 +11,11 @@
 
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { ActionFormData, findPageFields } from '@opencrvs/commons/client'
+import {
+  ActionFormData,
+  findPageFields,
+  FieldType
+} from '@opencrvs/commons/client'
 import { fieldValueToString } from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 // eslint-disable-next-line no-restricted-imports
@@ -34,6 +38,10 @@ export const useTransformer = (eventType: string) => {
 
       if (!fieldConfig) {
         throw new Error(`Field not found for ${key}`)
+      }
+
+      if (fieldConfig.type === FieldType.FILE) {
+        continue
       }
 
       stringifiedValues[key] = fieldValueToString({

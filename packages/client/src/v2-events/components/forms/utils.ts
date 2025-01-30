@@ -21,7 +21,8 @@ import {
   validate,
   DateFieldValue,
   TextFieldValue,
-  RadioGroupFieldValue
+  RadioGroupFieldValue,
+  FileFieldValue
 } from '@opencrvs/commons/client'
 import {
   CheckboxFieldValue,
