@@ -23,10 +23,10 @@ import {
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import { SCOPES } from '@opencrvs/commons/authentication'
-import { invokeWebhooks } from '../webhooks'
+import { invokeWebhooks } from '@workflow/records/webhooks'
 import { getEventType } from '@workflow/features/registration/utils'
 
-jest.mock('../webhooks')
+jest.mock('@workflow/records/webhooks')
 
 function getReasonFromTask(task: SavedTask) {
   return task.statusReason?.text

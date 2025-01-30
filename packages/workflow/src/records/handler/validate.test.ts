@@ -22,10 +22,10 @@ import {
   ValidRecord
 } from '@opencrvs/commons/types'
 import { SCOPES } from '@opencrvs/commons/authentication'
-import { invokeWebhooks } from '../webhooks'
 import { getEventType } from '@workflow/features/registration/utils'
+import { invokeWebhooks } from '@workflow/records/webhooks'
 
-jest.mock('../webhooks')
+jest.mock('@workflow/records/webhooks')
 
 describe('Validate record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>

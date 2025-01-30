@@ -22,10 +22,10 @@ import {
 } from '@opencrvs/commons/types'
 import { CERTIFIED_BIRTH_RECORD } from '@test/mocks/records/certify'
 import { SCOPES } from '@opencrvs/commons/authentication'
-import { invokeWebhooks } from '../webhooks'
+import { invokeWebhooks } from '@workflow/records/webhooks'
 import { getEventType } from '@workflow/features/registration/utils'
 
-jest.mock('../webhooks')
+jest.mock('@workflow/records/webhooks')
 
 describe('Issue record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
