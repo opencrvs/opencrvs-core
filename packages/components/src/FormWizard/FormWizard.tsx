@@ -52,7 +52,7 @@ export const FormWizard = ({
         )}
       </Frame.SectionFormBackAction>
       <Frame.Section>
-        <Content title={pageTitle}>
+        <Content title={pageTitle} showTitleOnMobile={true}>
           <Stack direction="column" gap={16} alignItems="stretch">
             {children}
 

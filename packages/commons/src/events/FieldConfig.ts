@@ -82,7 +82,8 @@ const BaseField = z.object({
     .default([])
     .optional(),
   dependsOn: z.array(FieldId).default([]).optional(),
-  label: TranslationConfig
+  label: TranslationConfig,
+  hideLabel: z.boolean().default(false).optional()
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -99,7 +100,8 @@ export const FieldType = {
   CHECKBOX: 'CHECKBOX',
   SELECT: 'SELECT',
   COUNTRY: 'COUNTRY',
-  LOCATION: 'LOCATION'
+  LOCATION: 'LOCATION',
+  DIVIDER: 'DIVIDER'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -119,12 +121,18 @@ export interface FieldValueByType {
   [FieldType.SELECT]: SelectFieldValue
 }
 
+const Divider = BaseField.extend({
+  type: z.literal(FieldType.DIVIDER)
+})
+
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   options: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
-      type: z.enum(['text', 'email', 'password', 'number']).optional()
+      type: z.enum(['text', 'email', 'password', 'number']).optional(),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
     })
     .default({ type: 'text' })
     .optional()
@@ -239,6 +247,7 @@ export type AllFields =
   | typeof File
   | typeof Country
   | typeof Location
+  | typeof Divider
 
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
@@ -251,7 +260,8 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Checkbox,
   File,
   Country,
-  Location
+  Location,
+  Divider
 ]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
 
 export type SelectField = z.infer<typeof Select>
