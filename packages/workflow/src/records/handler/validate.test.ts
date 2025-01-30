@@ -22,6 +22,10 @@ import {
   ValidRecord
 } from '@opencrvs/commons/types'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { invokeWebhooks } from '../webhooks'
+import { getEventType } from '@workflow/features/registration/utils'
+
+jest.mock('../webhooks')
 
 describe('Validate record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -88,6 +92,15 @@ describe('Validate record endpoint', () => {
     const task = getTaskFromSavedBundle(
       JSON.parse(response.payload) as ValidRecord
     )
+
+    expect(invokeWebhooks).toHaveBeenCalledWith({
+      bundle: READY_FOR_REVIEW_BIRTH_RECORD,
+      token,
+      event: getEventType(READY_FOR_REVIEW_BIRTH_RECORD),
+      isNotRegistered: true,
+      statusType: 'validated'
+    })
+
     const businessStatus = getStatusFromTask(task)
 
     expect(response.statusCode).toBe(200)
