@@ -11,7 +11,7 @@
 import React from 'react'
 import { format } from 'date-fns'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
 import { Link } from '@opencrvs/components'
@@ -28,7 +28,6 @@ import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { EventHistoryModal } from './EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
-import { messages } from './messages'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
@@ -39,6 +38,25 @@ const TableDiv = styled.div`
 `
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
+
+const messages = defineMessages({
+  'event.history.timeFormat': {
+    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
+    id: 'event.history.timeFormat',
+    description: 'Time format for timestamps in event history'
+  },
+  'events.history.status': {
+    id: `events.history.status`,
+    defaultMessage:
+      '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} other {Unknown}}'
+  },
+  'event.history.role': {
+    id: 'event.history.role',
+    defaultMessage:
+      '{role, select, LOCAL_REGISTRAR{Local Registrar} other{Unknown}}',
+    description: 'Role of the user in the event history'
+  }
+})
 
 /**
  *  Renders the event history table. Used for audit trail.
@@ -72,7 +90,9 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
             onHistoryRowClick(item, user)
           }}
         >
-          {item.type}
+          {intl.formatMessage(messages['events.history.status'], {
+            status: item.type
+          })}
         </Link>
       ),
       user: (
@@ -95,7 +115,9 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
           />
         </Link>
       ),
-      role: user.systemRole,
+      role: intl.formatMessage(messages['event.history.role'], {
+        role: user.role
+      }),
       location: (
         <Link
           font="bold14"
