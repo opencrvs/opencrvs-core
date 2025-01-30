@@ -126,10 +126,10 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     case 'SELECT':
     case 'COUNTRY':
     case 'CHECKBOX':
+    case 'ADMINISTRATIVE_AREA':
     case 'LOCATION':
-    case 'LOCATION_SEARCH':
-    case 'LOCATION_SEARCH_FACILITIES':
-    case 'LOCATION_SEARCH_OFFICES':
+    case 'FACILITY':
+    case 'OFFICE':
       return { type: 'keyword' }
     case 'FILE':
       return {

@@ -21,8 +21,7 @@ import {
   validate,
   DateFieldValue,
   TextFieldValue,
-  RadioGroupFieldValue,
-  FileFieldValue
+  RadioGroupFieldValue
 } from '@opencrvs/commons/client'
 import {
   CheckboxFieldValue,
@@ -41,7 +40,7 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 import { selectFieldToString } from '@client/v2-events/features/events/registered-fields/Select'
 import { selectCountryFieldToString } from '@client/v2-events/features/events/registered-fields/SelectCountry'
-import { ILocation } from '@client/v2-events/features/events/registered-fields/Location'
+import { ILocation } from '@client/v2-events/features/events/registered-fields/AdministrativeArea'
 import { checkboxToString } from '@client/v2-events/features/events/registered-fields/Checkbox'
 
 export function handleInitialValue(
@@ -118,13 +117,15 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.DATE]: INITIAL_DATE_VALUE,
   [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
   [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
-  [FieldType.LOCATION_SEARCH_INPUT]: null,
+  [FieldType.LOCATION]: null,
+  [FieldType.FACILITY]: null,
+  [FieldType.OFFICE]: null,
   [FieldType.FILE]: null,
   [FieldType.HIDDEN]: null,
   [FieldType.BULLET_LIST]: null,
   [FieldType.CHECKBOX]: null,
   [FieldType.COUNTRY]: null,
-  [FieldType.LOCATION]: null,
+  [FieldType.ADMINISTRATIVE_AREA]: null,
   [FieldType.SELECT]: null,
   [FieldType.PAGE_HEADER]: null,
   [FieldType.DIVIDER]: null
@@ -173,8 +174,10 @@ export function fieldValueToString({
       )
     case FieldType.COUNTRY:
       return selectCountryFieldToString(value as SelectFieldValue, intl)
-    case FieldType.LOCATION_SEARCH_INPUT:
-    case FieldType.LOCATION: {
+    case FieldType.LOCATION:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
+    case FieldType.ADMINISTRATIVE_AREA: {
       let location
       if (_.isString(value)) {
         location = locations[value].name

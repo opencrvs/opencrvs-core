@@ -57,7 +57,7 @@ import { FileInput } from './inputs/FileInput/FileInput'
 import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
 import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
-import { Location } from '@client/v2-events/features/events/registered-fields/Location'
+import { AdministrativeArea } from '@client/v2-events/features/events/registered-fields/AdministrativeArea'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
@@ -275,17 +275,17 @@ const GeneratedInputField = React.memo(
       )
     }
     if (
-      fieldDefinition.type === 'LOCATION_SEARCH' ||
-      fieldDefinition.type === 'LOCATION_SEARCH_FACILITIES' ||
-      fieldDefinition.type === 'LOCATION_SEARCH_OFFICES'
+      fieldDefinition.type === 'LOCATION' ||
+      fieldDefinition.type === 'OFFICE' ||
+      fieldDefinition.type === 'FACILITY'
     ) {
       const resourceMap: Record<
         string,
         ('locations' | 'facilities' | 'offices')[]
       > = {
-        LOCATION_SEARCH: ['locations'],
-        LOCATION_SEARCH_FACILITIES: ['facilities'],
-        LOCATION_SEARCH_OFFICES: ['offices']
+        LOCATION: ['locations'],
+        FACILITY: ['facilities'],
+        OFFICE: ['offices']
       }
 
       return (
@@ -298,10 +298,10 @@ const GeneratedInputField = React.memo(
       )
     }
 
-    if (fieldDefinition.type === 'LOCATION') {
+    if (fieldDefinition.type === 'ADMINISTRATIVE_AREA') {
       return (
         <InputField {...inputFieldProps}>
-          <Location
+          <AdministrativeArea
             {...fieldDefinition}
             value={value as LocationFieldValue}
             setFieldValue={setFieldValue}

@@ -100,11 +100,11 @@ export const FieldType = {
   CHECKBOX: 'CHECKBOX',
   SELECT: 'SELECT',
   COUNTRY: 'COUNTRY',
-  LOCATION: 'LOCATION',
+  ADMINISTRATIVE_AREA: 'ADMINISTRATIVE_AREA',
   DIVIDER: 'DIVIDER',
-  LOCATION_SEARCH: 'LOCATION_SEARCH',
-  LOCATION_SEARCH_FACILITIES: 'LOCATION_SEARCH_FACILITIES',
-  LOCATION_SEARCH_OFFICES: 'LOCATION_SEARCH_OFFICES'
+  LOCATION: 'LOCATION',
+  FACILITY: 'FACILITY',
+  OFFICE: 'OFFICE'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -119,7 +119,7 @@ export interface FieldValueByType {
   [FieldType.BULLET_LIST]: BulletListFieldValue
   [FieldType.CHECKBOX]: CheckboxFieldValue
   [FieldType.COUNTRY]: CountryFieldValue
-  [FieldType.LOCATION]: LocationFieldValue
+  [FieldType.ADMINISTRATIVE_AREA]: LocationFieldValue
   [FieldType.FILE]: FileFieldValue
   [FieldType.SELECT]: SelectFieldValue
 }
@@ -216,7 +216,7 @@ const Country = BaseField.extend({
   type: z.literal(FieldType.COUNTRY)
 }).describe('Country select field')
 
-const LocationOptions = z.object({
+const AdminAreaOptions = z.object({
   partOf: z
     .object({
       $data: z.string()
@@ -226,21 +226,21 @@ const LocationOptions = z.object({
   type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
 })
 
+const AdministrativeArea = BaseField.extend({
+  type: z.literal(FieldType.ADMINISTRATIVE_AREA),
+  options: AdminAreaOptions
+}).describe('Administrative area input field')
+
 const Location = BaseField.extend({
-  type: z.literal(FieldType.LOCATION),
-  options: LocationOptions
-}).describe('Location input field')
-
-const LocationSearch = BaseField.extend({
-  type: z.literal(FieldType.LOCATION_SEARCH)
+  type: z.literal(FieldType.LOCATION)
 })
 
-const LocationSearchFacilities = BaseField.extend({
-  type: z.literal(FieldType.LOCATION_SEARCH_FACILITIES)
+const Facility = BaseField.extend({
+  type: z.literal(FieldType.FACILITY)
 })
 
-const LocationSearchOffices = BaseField.extend({
-  type: z.literal(FieldType.LOCATION_SEARCH_OFFICES)
+const Office = BaseField.extend({
+  type: z.literal(FieldType.OFFICE)
 })
 
 /*
@@ -261,11 +261,11 @@ export type AllFields =
   | typeof Checkbox
   | typeof File
   | typeof Country
-  | typeof Location
+  | typeof AdministrativeArea
   | typeof Divider
-  | typeof LocationSearch
-  | typeof LocationSearchFacilities
-  | typeof LocationSearchOffices
+  | typeof Location
+  | typeof Facility
+  | typeof Office
 
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
@@ -278,18 +278,18 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Checkbox,
   File,
   Country,
-  Location,
+  AdministrativeArea,
   Divider,
-  LocationSearch,
-  LocationSearchFacilities,
-  LocationSearchOffices
+  Location,
+  Facility,
+  Office
 ]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
 
 export type SelectField = z.infer<typeof Select>
-export type LocationField = z.infer<typeof Location>
+export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 export type FieldConfig = z.infer<typeof FieldConfig>
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
-export type LocationOptions = z.infer<typeof LocationOptions>
+export type AdminAreaOptions = z.infer<typeof AdminAreaOptions>
 export type FieldConditional = z.infer<typeof FieldConditional>

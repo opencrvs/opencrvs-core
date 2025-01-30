@@ -46,12 +46,12 @@ function useAdminLocations(partOf: string) {
   }))
 }
 
-export function Location({
+export function AdministrativeArea({
   setFieldValue,
   value,
   partOf,
   ...props
-}: FieldProps<'LOCATION'> & {
+}: FieldProps<'ADMINISTRATIVE_AREA'> & {
   setFieldValue: (name: string, val: string | undefined) => void
   partOf: string | null
   value?: LocationFieldValue

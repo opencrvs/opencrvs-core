@@ -47,9 +47,7 @@ export function LocationSearch({
   value,
   searchableResource,
   ...props
-}: FieldProps<
-  'LOCATION_SEARCH' | 'LOCATION_SEARCH_FACILITIES' | 'LOCATION_SEARCH_OFFICES'
-> & {
+}: FieldProps<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   setFieldValue: (name: string, val: string | undefined) => void
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: LocationFieldValue
