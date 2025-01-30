@@ -21,7 +21,8 @@ import {
   validate,
   DateFieldValue,
   TextFieldValue,
-  RadioGroupFieldValue
+  RadioGroupFieldValue,
+  FileFieldValue
 } from '@opencrvs/commons/client'
 import {
   CheckboxFieldValue,
@@ -124,7 +125,8 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.COUNTRY]: null,
   [FieldType.LOCATION]: null,
   [FieldType.SELECT]: null,
-  [FieldType.PAGE_HEADER]: null
+  [FieldType.PAGE_HEADER]: null,
+  [FieldType.DIVIDER]: null
 }
 
 export function getInitialValues(fields: FieldConfig[]) {

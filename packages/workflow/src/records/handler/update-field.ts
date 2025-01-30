@@ -61,12 +61,7 @@ export async function updateField(
 
   const updatedRecord = {
     ...savedRecord,
-    entry: [
-      ...savedRecord.entry.filter(
-        ({ resource }) => !isQuestionnaireResponse(resource)
-      ),
-      updatedQuestionnaireResponseResource
-    ]
+    entry: [updatedQuestionnaireResponseResource]
   }
 
   await sendBundleToHearth(updatedRecord)
