@@ -274,15 +274,29 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'LOCATION_SEARCH_INPUT')
+    if (
+      fieldDefinition.type === 'LOCATION_SEARCH' ||
+      fieldDefinition.type === 'LOCATION_SEARCH_FACILITIES' ||
+      fieldDefinition.type === 'LOCATION_SEARCH_OFFICES'
+    ) {
+      const resourceMap: Record<
+        string,
+        ('locations' | 'facilities' | 'offices')[]
+      > = {
+        LOCATION_SEARCH: ['locations'],
+        LOCATION_SEARCH_FACILITIES: ['facilities'],
+        LOCATION_SEARCH_OFFICES: ['offices']
+      }
+
       return (
         <LocationSearch
           {...fieldDefinition}
           value={value as LocationFieldValue}
-          searchableResource={fieldDefinition.searchableResource}
+          searchableResource={resourceMap[fieldDefinition.type]}
           setFieldValue={setFieldValue}
         />
       )
+    }
 
     if (fieldDefinition.type === 'LOCATION') {
       return (

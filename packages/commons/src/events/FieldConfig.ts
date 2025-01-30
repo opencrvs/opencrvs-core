@@ -102,7 +102,9 @@ export const FieldType = {
   COUNTRY: 'COUNTRY',
   LOCATION: 'LOCATION',
   DIVIDER: 'DIVIDER',
-  LOCATION_SEARCH_INPUT: 'LOCATION_SEARCH_INPUT'
+  LOCATION_SEARCH: 'LOCATION_SEARCH',
+  LOCATION_SEARCH_FACILITIES: 'LOCATION_SEARCH_FACILITIES',
+  LOCATION_SEARCH_OFFICES: 'LOCATION_SEARCH_OFFICES'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -229,9 +231,16 @@ const Location = BaseField.extend({
   options: LocationOptions
 }).describe('Location input field')
 
-const LocationSearchInput = BaseField.extend({
-  type: z.literal(FieldType.LOCATION_SEARCH_INPUT),
-  searchableResource: z.array(z.enum(['facilities', 'locations', 'offices']))
+const LocationSearch = BaseField.extend({
+  type: z.literal(FieldType.LOCATION_SEARCH)
+})
+
+const LocationSearchFacilities = BaseField.extend({
+  type: z.literal(FieldType.LOCATION_SEARCH_FACILITIES)
+})
+
+const LocationSearchOffices = BaseField.extend({
+  type: z.literal(FieldType.LOCATION_SEARCH_OFFICES)
 })
 
 /*
@@ -254,7 +263,9 @@ export type AllFields =
   | typeof Country
   | typeof Location
   | typeof Divider
-  | typeof LocationSearchInput
+  | typeof LocationSearch
+  | typeof LocationSearchFacilities
+  | typeof LocationSearchOffices
 
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
@@ -269,7 +280,9 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Country,
   Location,
   Divider,
-  LocationSearchInput
+  LocationSearch,
+  LocationSearchFacilities,
+  LocationSearchOffices
 ]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
 
 export type SelectField = z.infer<typeof Select>

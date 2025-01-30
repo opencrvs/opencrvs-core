@@ -127,7 +127,9 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     case 'COUNTRY':
     case 'CHECKBOX':
     case 'LOCATION':
-    case 'LOCATION_SEARCH_INPUT':
+    case 'LOCATION_SEARCH':
+    case 'LOCATION_SEARCH_FACILITIES':
+    case 'LOCATION_SEARCH_OFFICES':
       return { type: 'keyword' }
     case 'FILE':
       return {

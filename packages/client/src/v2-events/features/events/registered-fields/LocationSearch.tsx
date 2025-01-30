@@ -47,8 +47,11 @@ export function LocationSearch({
   value,
   searchableResource,
   ...props
-}: FieldProps<'LOCATION_SEARCH_INPUT'> & {
+}: FieldProps<
+  'LOCATION_SEARCH' | 'LOCATION_SEARCH_FACILITIES' | 'LOCATION_SEARCH_OFFICES'
+> & {
   setFieldValue: (name: string, val: string | undefined) => void
+  searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: LocationFieldValue
 }) {
   const locationList = useAdminLocations(searchableResource)
@@ -61,6 +64,7 @@ export function LocationSearch({
       buttonLabel="Health facility"
       locationList={locationList}
       searchHandler={(location: SearchLocation) =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         setFieldValue(props.id, location.id)
       }
       selectedLocation={selectedLocation}
