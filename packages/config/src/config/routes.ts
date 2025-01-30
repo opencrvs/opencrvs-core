@@ -53,13 +53,6 @@ export default function getRoutes(): ServerRoute[] {
       path: '/config',
       handler: configHandler,
       options: {
-        auth: {
-          scope: [
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.USER_DATA_SEEDING,
-            SCOPES.SELF_SERVICE_PORTAL
-          ]
-        },
         tags: ['api'],
         description: 'Retrieve all configuration'
       }
