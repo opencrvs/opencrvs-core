@@ -29,9 +29,14 @@ import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
   ActionFormData,
+  CheckboxFieldValue,
   FieldConfig,
+  FieldType,
   FieldValue,
-  FileFieldValue
+  FileFieldValue,
+  LocationFieldValue,
+  RadioGroupFieldValue,
+  SelectFieldValue
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -49,13 +54,16 @@ import {
 } from 'react-intl'
 import { FileInput } from './inputs/FileInput/FileInput'
 
+import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
 import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
+import { Location } from '@client/v2-events/features/events/registered-fields/Location'
+import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { countries } from '@client/utils/countries'
-import { SelectOption } from '@opencrvs/commons'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
+import { Divider } from '@opencrvs/components'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -110,7 +118,9 @@ const GeneratedInputField = React.memo(
 
     const inputFieldProps = {
       id: fieldDefinition.id,
-      label: intl.formatMessage(fieldDefinition.label),
+      label: fieldDefinition.hideLabel
+        ? undefined
+        : intl.formatMessage(fieldDefinition.label),
       // helperText: fieldDefinition.helperText,
       // tooltip: fieldDefinition.tooltip,
       // description: fieldDefinition.description,
@@ -156,7 +166,9 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-
+    if (fieldDefinition.type === 'PAGE_HEADER') {
+      return <SubHeader>{intl.formatMessage(fieldDefinition.label)}</SubHeader>
+    }
     if (fieldDefinition.type === PARAGRAPH) {
       const label = fieldDefinition.label as unknown as MessageDescriptor & {
         values: Record<string, string>
@@ -180,7 +192,17 @@ const GeneratedInputField = React.memo(
 
     if (fieldDefinition.type === TEXT) {
       return (
-        <InputField {...inputFieldProps}>
+        <InputField
+          {...inputFieldProps}
+          prefix={
+            fieldDefinition.options?.prefix &&
+            intl.formatMessage(fieldDefinition.options?.prefix)
+          }
+          postfix={
+            fieldDefinition.options?.postfix &&
+            intl.formatMessage(fieldDefinition.options?.postfix)
+          }
+        >
           <TextInput
             type={fieldDefinition.options?.type ?? 'text'}
             {...inputProps}
@@ -204,36 +226,86 @@ const GeneratedInputField = React.memo(
       )
     }
     if (fieldDefinition.type === 'BULLET_LIST') {
-      return <BulletList {...fieldDefinition} />
+      return (
+        <InputField {...inputFieldProps}>
+          <BulletList {...fieldDefinition} />
+        </InputField>
+      )
     }
     if (fieldDefinition.type === 'SELECT') {
       return (
-        <Select
-          {...fieldDefinition}
-          value={inputProps.value as string}
-          onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
-        />
+        <InputField {...inputFieldProps}>
+          <Select
+            {...fieldDefinition}
+            value={inputProps.value as SelectFieldValue}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
     if (fieldDefinition.type === 'COUNTRY') {
       return (
-        <SelectCountry
-          {...fieldDefinition}
-          value={inputProps.value as string}
-          setFieldValue={setFieldValue}
-        />
+        <InputField {...inputFieldProps}>
+          <SelectCountry
+            {...fieldDefinition}
+            value={inputProps.value as SelectFieldValue}
+            setFieldValue={setFieldValue}
+          />
+        </InputField>
       )
     }
     if (fieldDefinition.type === 'CHECKBOX') {
       return (
         <Checkbox
           {...fieldDefinition}
-          value={value as string}
+          value={value as CheckboxFieldValue}
           setFieldValue={setFieldValue}
         />
       )
     }
-    return <div>Unsupported field type {fieldDefinition.type}</div>
+    if (fieldDefinition.type === 'RADIO_GROUP') {
+      return (
+        <InputField {...inputFieldProps}>
+          <RadioGroup
+            {...fieldDefinition}
+            value={value as RadioGroupFieldValue}
+            setFieldValue={setFieldValue}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === 'LOCATION') {
+      if (fieldDefinition.options.type === 'HEALTH_FACILITY')
+        return (
+          <InputField {...inputFieldProps}>
+            <LocationSearch
+              {...fieldDefinition}
+              value={value as LocationFieldValue}
+              setFieldValue={setFieldValue}
+            />
+          </InputField>
+        )
+      return (
+        <InputField {...inputFieldProps}>
+          <Location
+            {...fieldDefinition}
+            value={value as LocationFieldValue}
+            setFieldValue={setFieldValue}
+            partOf={
+              (fieldDefinition.options?.partOf?.$data &&
+                (makeFormikFieldIdsOpenCRVSCompatible(formData)[
+                  fieldDefinition.options?.partOf.$data
+                ] as string | undefined | null)) ??
+              null
+            }
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === 'DIVIDER') {
+      return <Divider />
+    }
+    throw new Error(`Unsupported field ${fieldDefinition}`)
   }
 )
 
@@ -382,7 +454,9 @@ class FormSectionComponent extends React.Component<AllProps> {
 
     const language = this.props.intl.locale
 
-    const errors = this.props.errors as unknown as Errors
+    const errors = makeFormFieldIdsFormikCompatible(
+      this.props.errors as unknown as Errors
+    )
 
     const fields = fieldsWithDotIds.map((field) => ({
       ...field,
@@ -415,7 +489,10 @@ class FormSectionComponent extends React.Component<AllProps> {
           const isFieldDisabled = conditionalActions.includes('disable')
 
           return (
-            <FormItem key={`${field.id}${language}`}>
+            <FormItem
+              ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
+              key={`${field.id}${language}`}
+            >
               <Field name={field.id}>
                 {(formikFieldProps: FieldProps<any>) => {
                   return (
@@ -431,11 +508,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                       error={isFieldDisabled ? '' : error}
                       fields={fields}
                       formData={formData}
-                      touched={
-                        makeFormikFieldIdsOpenCRVSCompatible(touched)[
-                          field.id
-                        ] || false
-                      }
+                      touched={touched[field.id] || false}
                       values={values}
                       onUploadingStateChanged={
                         this.props.onUploadingStateChanged

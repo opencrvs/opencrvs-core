@@ -194,6 +194,8 @@ export async function countRegistrarsByLocation(
   authHeader: IAuthHeader,
   locationId?: string
 ): Promise<{ registrars: number }> {
+  // @TODO: This is broken
+  //        Should we count all users who have a register scope, or refactor UI?
   const res = await fetch(`${USER_MANAGEMENT_URL}/countUsersByLocation`, {
     method: 'POST',
     headers: {
@@ -201,7 +203,6 @@ export async function countRegistrarsByLocation(
       ...authHeader
     },
     body: JSON.stringify({
-      systemRole: 'LOCAL_REGISTRAR',
       locationId
     })
   })

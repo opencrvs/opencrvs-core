@@ -39,11 +39,9 @@ interface Window {
     FEATURES: {
       DEATH_REGISTRATION: boolean
       MARRIAGE_REGISTRATION: boolean
-      INFORMANT_SIGNATURE: boolean
       EXTERNAL_VALIDATION_WORKQUEUE: boolean
       PRINT_DECLARATION: boolean
       DATE_OF_BIRTH_UNKNOWN: boolean
-      INFORMANT_SIGNATURE_REQUIRED: boolean
     }
     LANGUAGES: string
     LOGIN_URL: string

@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Header } from '@client/components/Header/Header'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { Query } from '@client/components/Query'
 import {
   DOWNLOAD_STATUS,
+  getProcessingDeclarationIds,
   IDeclaration,
-  SUBMISSION_STATUS,
-  getProcessingDeclarationIds
+  SUBMISSION_STATUS
 } from '@client/declarations'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { Header } from '@client/components/Header/Header'
-import { Query } from '@client/components/Query'
 import { DownloadAction } from '@client/forms'
 import {
   buttonMessages,
@@ -41,36 +41,34 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { withTheme } from 'styled-components'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope } from '@client/utils/authUtils'
 import { SEARCH_RESULT_SORT } from '@client/utils/constants'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { SearchEventsQuery } from '@client/utils/gateway'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
-import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
-
+import { ITheme } from '@opencrvs/components/lib/theme'
+import styled, { withTheme } from 'styled-components'
+import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   ColumnContentAlignment,
-  Workqueue,
+  COLUMNS,
   IAction,
-  COLUMNS
+  Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Frame } from '@opencrvs/components/lib/Frame'
-
-import * as React from 'react'
+import { Navigation } from '@client/components/interface/Navigation'
+import React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { Navigation } from '@client/components/interface/Navigation'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
+  NameContainer,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import * as routes from '@client/navigation/routes'
@@ -105,7 +103,7 @@ export function getRejectionReasonDisplayValue(reason: string) {
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
-  scope: Scope | null
+  scope: Scope[] | null
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
 }
@@ -163,15 +161,36 @@ function SearchResultView(props: ISearchResultProps) {
   }
 
   function userHasRegisterScope() {
-    return props.scope && props.scope.includes('register')
+    return props.scope && props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   function userHasValidateScope() {
-    return props.scope && props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    return (
+      props.scope && props.scope.some((scope) => validateScopes.includes(scope))
+    )
   }
 
-  function userHasCertifyScope() {
-    return props.scope && props.scope.includes('certify')
+  function hasIssueScope() {
+    return props.scope?.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+  }
+
+  function hasPrintScope() {
+    return props.scope?.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+  }
+
+  function canSearchAnywhere() {
+    const searchScopes: Scope[] = [
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE
+    ]
+    return props.scope?.some((scope) => searchScopes.includes(scope))
   }
 
   const transformSearchContent = (data: QueryData) => {
@@ -235,7 +254,7 @@ function SearchResultView(props: ISearchResultProps) {
         if (width > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
-            userHasCertifyScope()
+            hasPrintScope()
           ) {
             actions.push({
               label: props.intl.formatMessage(buttonMessages.print),
@@ -253,7 +272,7 @@ function SearchResultView(props: ISearchResultProps) {
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (declarationIsCertified && userHasCertifyScope()) {
+          } else if (declarationIsCertified && hasIssueScope()) {
             actions.push({
               label: props.intl.formatMessage(buttonMessages.issue),
               handler: (
@@ -324,12 +343,7 @@ function SearchResultView(props: ISearchResultProps) {
                         name:
                           searchType === SearchCriteria.NAME ? searchText : '',
                         declarationLocationId:
-                          userDetails &&
-                          ![
-                            SystemRoleType.LocalRegistrar,
-                            SystemRoleType.NationalRegistrar,
-                            SystemRoleType.RegistrationAgent
-                          ].includes(userDetails.systemRole)
+                          !canSearchAnywhere() && userDetails
                             ? getUserLocation(userDetails).id
                             : ''
                       },
@@ -345,6 +359,7 @@ function SearchResultView(props: ISearchResultProps) {
                   DownloadAction.LOAD_REVIEW_DECLARATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
+              declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
             />
           )
         })
@@ -447,15 +462,6 @@ function SearchResultView(props: ISearchResultProps) {
           query={SEARCH_EVENTS}
           variables={{
             advancedSearchParameters: {
-              declarationLocationId:
-                userDetails &&
-                ![
-                  SystemRoleType.LocalRegistrar,
-                  SystemRoleType.NationalRegistrar,
-                  SystemRoleType.RegistrationAgent
-                ].includes(userDetails.systemRole)
-                  ? getUserLocation(userDetails).id
-                  : '',
               trackingId:
                 searchType === SearchCriteria.TRACKING_ID ? searchText : '',
               nationalId:

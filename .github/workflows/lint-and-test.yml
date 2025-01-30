@@ -269,6 +269,52 @@ jobs:
       - name: Run linting
         run: cd packages/client && yarn lint
 
+  run-visual-tests:
+    name: Run visual tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      # Without this, the fetch command will fail with
+      # fatal: could not read Username for 'https://github.com': No such device or address
+      - name: Remove extraheader config
+        run: git config --unset http.https://github.com/.extraheader
+
+      - name: Fetch full Git history
+        run: git fetch --prune --unshallow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          workingDir: packages/client
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
   test-client:
     name: Test client
     needs: prepare-client-tests
@@ -361,3 +407,31 @@ jobs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
           exit 1
+
+  build-toolkit:
+    name: Build toolkit
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build commons
+        run: yarn build
+        working-directory: packages/commons
+
+      - name: Build events
+        run: yarn build
+        working-directory: packages/events
+
+      - name: Build toolkit
+        run: yarn build
+        working-directory: packages/toolkit

@@ -12,9 +12,15 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from '../conditionals/conditionals'
 import {
+  BulletListFieldValue,
+  CheckboxFieldValue,
+  CountryFieldValue,
   DateFieldValue,
   FileFieldValue,
+  LocationFieldValue,
   ParagraphFieldValue,
+  RadioGroupFieldValue,
+  SelectFieldValue,
   TextFieldValue
 } from './FieldValue'
 
@@ -76,7 +82,8 @@ const BaseField = z.object({
     .default([])
     .optional(),
   dependsOn: z.array(FieldId).default([]).optional(),
-  label: TranslationConfig
+  label: TranslationConfig,
+  hideLabel: z.boolean().default(false).optional()
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -85,32 +92,47 @@ export const FieldType = {
   TEXT: 'TEXT',
   DATE: 'DATE',
   PARAGRAPH: 'PARAGRAPH',
+  PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
   HIDDEN: 'HIDDEN',
   BULLET_LIST: 'BULLET_LIST',
   CHECKBOX: 'CHECKBOX',
   SELECT: 'SELECT',
-  COUNTRY: 'COUNTRY'
+  COUNTRY: 'COUNTRY',
+  LOCATION: 'LOCATION',
+  DIVIDER: 'DIVIDER'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
 export type FieldType = (typeof fieldTypes)[number]
 
-export type FieldValueByType = {
+export interface FieldValueByType {
   [FieldType.TEXT]: TextFieldValue
   [FieldType.DATE]: DateFieldValue
   [FieldType.PARAGRAPH]: ParagraphFieldValue
-  [FieldType.RADIO_GROUP]: string
+  [FieldType.PAGE_HEADER]: ParagraphFieldValue
+  [FieldType.RADIO_GROUP]: RadioGroupFieldValue
+  [FieldType.BULLET_LIST]: BulletListFieldValue
+  [FieldType.CHECKBOX]: CheckboxFieldValue
+  [FieldType.COUNTRY]: CountryFieldValue
+  [FieldType.LOCATION]: LocationFieldValue
   [FieldType.FILE]: FileFieldValue
+  [FieldType.SELECT]: SelectFieldValue
 }
+
+const Divider = BaseField.extend({
+  type: z.literal(FieldType.DIVIDER)
+})
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   options: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
-      type: z.enum(['text', 'email', 'password', 'number']).optional()
+      type: z.enum(['text', 'email', 'password', 'number']).optional(),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
     })
     .default({ type: 'text' })
     .optional()
@@ -147,18 +169,29 @@ const Paragraph = BaseField.extend({
     .default({})
 }).describe('A read-only HTML <p> paragraph')
 
+const PageHeader = BaseField.extend({
+  type: z.literal(FieldType.PAGE_HEADER)
+}).describe('A read-only header component for form pages')
+
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE)
 }).describe('File upload')
 
+const SelectOption = z.object({
+  value: z.string().describe('The value of the option'),
+  label: TranslationConfig.describe('The label of the option')
+})
+
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
-  options: z.array(
-    z.object({
-      value: z.string().describe('The value of the option'),
-      label: z.string().describe('The label of the option')
-    })
-  )
+  optionValues: z.array(SelectOption).describe('A list of options'),
+  options: z.object({
+    size: z.enum(['NORMAL', 'LARGE']).optional()
+  }),
+  flexDirection: z
+    .enum(['row', 'row-reverse', 'column', 'column-reverse'])
+    .optional()
+    .describe('Direction to stack the options')
 }).describe('Grouped radio options')
 
 const BulletList = BaseField.extend({
@@ -166,11 +199,6 @@ const BulletList = BaseField.extend({
   items: z.array(TranslationConfig).describe('A list of items'),
   font: HTMLFontVariant
 }).describe('A list of bullet points')
-
-const SelectOption = z.object({
-  value: z.string().describe('The value of the option'),
-  label: TranslationConfig.describe('The label of the option')
-})
 
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
@@ -185,20 +213,62 @@ const Country = BaseField.extend({
   type: z.literal(FieldType.COUNTRY)
 }).describe('Country select field')
 
+const LocationOptions = z.object({
+  partOf: z
+    .object({
+      $data: z.string()
+    })
+    .optional()
+    .describe('Parent location'),
+  type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
+})
+
+const Location = BaseField.extend({
+  type: z.literal(FieldType.LOCATION),
+  options: LocationOptions
+}).describe('Location input field')
+
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllFields =
+  | typeof TextField
+  | typeof DateField
+  | typeof Paragraph
+  | typeof RadioGroup
+  | typeof BulletList
+  | typeof PageHeader
+  | typeof Select
+  | typeof Checkbox
+  | typeof File
+  | typeof Country
+  | typeof Location
+  | typeof Divider
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
   Paragraph,
   RadioGroup,
   BulletList,
+  PageHeader,
   Select,
   Checkbox,
   File,
-  Country
-])
+  Country,
+  Location,
+  Divider
+]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
 
+export type SelectField = z.infer<typeof Select>
+export type LocationField = z.infer<typeof Location>
 export type FieldConfig = z.infer<typeof FieldConfig>
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
+export type LocationOptions = z.infer<typeof LocationOptions>
 export type FieldConditional = z.infer<typeof FieldConditional>

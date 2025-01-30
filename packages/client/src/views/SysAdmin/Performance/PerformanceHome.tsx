@@ -29,9 +29,10 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
@@ -72,7 +73,6 @@ import {
 } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
-import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
 import startOfMonth from 'date-fns/startOfMonth'
@@ -202,7 +202,10 @@ type IOnlineStatusProps = {
 }
 
 type Props = WrappedComponentProps &
-  IOnlineStatusProps & { userDetails: UserDetails | null } & IConnectProps & {
+  IOnlineStatusProps & {
+    userDetails: UserDetails | null
+    scopes: Scope[] | null
+  } & IConnectProps & {
     theme: ITheme
   }
 
@@ -239,6 +242,17 @@ const PerformanceHomeComponent = (props: Props) => {
     event: parsedSearch.event || EventType.Birth
   }
 
+  let { locationId } = searchParams
+
+  // Defaults empty URL locationId to your primary office if you don't have access to all locations via scopes
+  if (
+    userDetails &&
+    !locationId &&
+    !props.scopes?.includes(SCOPES.ORGANISATION_READ_LOCATIONS)
+  ) {
+    locationId = userDetails.primaryOffice.id
+  }
+
   const selectedLocation = !searchParams.locationId
     ? getAdditionalLocations(props.intl)[0]
     : selectLocation(
@@ -263,14 +277,14 @@ const PerformanceHomeComponent = (props: Props) => {
       if (
         selectedLocation &&
         isOfficeSelected(selectedLocation) &&
-        userDetails &&
-        userDetails.systemRole
+        userDetails
       ) {
-        if (userDetails?.systemRole === 'NATIONAL_REGISTRAR') {
+        if (props.scopes?.includes(SCOPES.ORGANISATION_READ_LOCATIONS)) {
           return true
-        }
-        if (
-          REGISTRAR_ROLES.includes(userDetails?.systemRole) &&
+        } else if (
+          props.scopes?.includes(
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+          ) &&
           userDetails.primaryOffice?.id === selectedLocation.id
         ) {
           return true
@@ -278,7 +292,7 @@ const PerformanceHomeComponent = (props: Props) => {
       }
       return false
     },
-    [isOfficeSelected, userDetails]
+    [isOfficeSelected, userDetails, props.scopes]
   )
 
   const [toggleStatus, setToggleStatus] = useState(false)
@@ -697,7 +711,7 @@ const PerformanceHomeComponent = (props: Props) => {
 
 function mapStateToProps(state: IStoreState) {
   const offlineCountryConfiguration = getOfflineData(state)
-
+  const scopes = getScope(state)
   const locations = offlineCountryConfiguration.locations
   const offices = offlineCountryConfiguration.offices
 
@@ -705,7 +719,8 @@ function mapStateToProps(state: IStoreState) {
     locations,
     offices,
     userDetails: getUserDetails(state),
-    currency: offlineCountryConfiguration.config.CURRENCY
+    currency: offlineCountryConfiguration.config.CURRENCY,
+    scopes
   }
 }
 

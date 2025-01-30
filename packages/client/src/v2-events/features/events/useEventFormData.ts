@@ -11,12 +11,14 @@
 
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { useEffect, useRef } from 'react'
 import { ActionFormData } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 
 interface EventFormData {
   formValues: ActionFormData
   setFormValues: (eventId: string, data: ActionFormData) => void
+  setFormValuesIfEmpty: (eventId: string, data: ActionFormData) => void
   getFormValues: (
     eventId: string,
     initialValues?: ActionFormData
@@ -31,7 +33,18 @@ function removeUndefinedKeys(data: ActionFormData) {
     Object.entries(data).filter(([_, value]) => value !== undefined)
   )
 }
-
+/**
+ * Interface representing the form data and related operations for an event.
+ *
+ * @property {ActionFormData} formValues - The current form values.
+ * @property {function} setFormValues - Sets the form values for a given event ID.
+ * @property {function} setFormValuesIfEmpty - Sets the form values for a given event ID only if they are empty.
+ * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
+ * @property {function} getFormValues - Retrieves the form values for a given event ID.
+ * @property {function} getTouchedFields - Retrieves the fields that have been touched.
+ * @property {function} clear - Clears the form values.
+ * @property {string} eventId - The ID of the event.
+ */
 export const useEventFormData = create<EventFormData>()(
   persist(
     (set, get) => ({
@@ -40,6 +53,13 @@ export const useEventFormData = create<EventFormData>()(
       getFormValues: (eventId: string, initialValues?: ActionFormData) =>
         get().eventId === eventId ? get().formValues : initialValues ?? {},
       setFormValues: (eventId: string, data: ActionFormData) => {
+        const formValues = removeUndefinedKeys(data)
+        return set(() => ({ eventId, formValues }))
+      },
+      setFormValuesIfEmpty: (eventId: string, data: ActionFormData) => {
+        if (get().eventId === eventId) {
+          return
+        }
         const formValues = removeUndefinedKeys(data)
         return set(() => ({ eventId, formValues }))
       },
@@ -65,3 +85,33 @@ export const useEventFormData = create<EventFormData>()(
     }
   )
 )
+/**
+ * Based on https://github.com/pmndrs/zustand?tab=readme-ov-file#transient-updates-for-often-occurring-state-changes
+ *
+ * Access state through subscription-pattern to avoid re-renders on every state change
+ */
+export const useSubscribeEventFormData = () => {
+  const stateEventIdRef = useRef(useEventFormData.getState().eventId)
+  const stateFormRef = useRef(useEventFormData.getState().formValues)
+
+  useEffect(
+    () =>
+      useEventFormData.subscribe(
+        (state) => (stateEventIdRef.current = state.eventId)
+      ),
+    []
+  )
+
+  useEffect(
+    () =>
+      useEventFormData.subscribe(
+        (state) => (stateFormRef.current = state.formValues)
+      ),
+    []
+  )
+
+  return {
+    eventId: stateEventIdRef.current,
+    formValues: stateFormRef.current
+  }
+}

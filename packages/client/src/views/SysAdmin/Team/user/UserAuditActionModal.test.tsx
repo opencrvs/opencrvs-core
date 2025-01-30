@@ -14,10 +14,10 @@ import { UserAuditActionModal, AUDIT_ACTION } from './UserAuditActionModal'
 import { createTestComponent } from '@client/tests/util'
 import { AppStore, createStore } from '@client/store'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
-import { USER_AUDIT_ACTION } from '@client/user/queries'
+import { GET_USER, USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
-import { vi, Mock } from 'vitest'
-import { SystemRoleType, Status } from '@client/utils/gateway'
+import { vi } from 'vitest'
+import { Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
 const users: UserDetails[] = [
@@ -31,7 +31,6 @@ const users: UserDetails[] = [
       }
     ],
     username: 'r.tagore',
-    systemRole: SystemRoleType.RegistrationAgent,
     localRegistrar: {
       name: [
         {
@@ -40,17 +39,15 @@ const users: UserDetails[] = [
           familyName: 'Huq'
         }
       ],
-      role: SystemRoleType.LocalRegistrar,
+      role: 'LOCAL_REGISTRAR',
       signature: undefined
     },
     role: {
-      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-      labels: [
-        {
-          lang: 'en',
-          label: 'ENTREPENEUR'
-        }
-      ]
+      label: {
+        id: 'userRoles.entrepreneur',
+        defaultMessage: 'Entrepreneur',
+        description: 'Entrepreneur'
+      }
     },
     status: Status.Active,
     creationDate: '2022-10-03T10:42:46.920Z',
@@ -74,15 +71,12 @@ const users: UserDetails[] = [
       }
     ],
     username: 'np.huq',
-    systemRole: SystemRoleType.LocalRegistrar,
     role: {
-      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-      labels: [
-        {
-          lang: 'en',
-          label: 'MAYOR'
-        }
-      ]
+      label: {
+        id: 'userRoles.mayor',
+        defaultMessage: 'Mayor',
+        description: 'Mayor'
+      }
     },
     status: Status.Deactivated,
     localRegistrar: {
@@ -93,7 +87,7 @@ const users: UserDetails[] = [
           familyName: 'Islam'
         }
       ],
-      role: SystemRoleType.LocalRegistrar,
+      role: 'LOCAL_REGISTRAR',
       signature: undefined
     },
     creationDate: '2022-10-03T10:42:46.920Z',
@@ -110,6 +104,19 @@ const users: UserDetails[] = [
 ]
 
 const graphqlMocksOfDeactivate = [
+  {
+    request: {
+      query: GET_USER,
+      variables: {
+        userId: users[0].id
+      }
+    },
+    result: {
+      data: {
+        getUser: users[0]
+      }
+    }
+  },
   {
     request: {
       query: USER_AUDIT_ACTION,
@@ -145,6 +152,19 @@ const graphqlMocksOfDeactivate = [
 const graphqlMocksOfReactivate = [
   {
     request: {
+      query: GET_USER,
+      variables: {
+        userId: users[1].id
+      }
+    },
+    result: {
+      data: {
+        getUser: users[1]
+      }
+    }
+  },
+  {
+    request: {
       query: USER_AUDIT_ACTION,
       variables: {
         userId: '5d08e102542c7a19fc55b793',
@@ -178,12 +198,10 @@ const graphqlMocksOfReactivate = [
 describe('user audit action modal tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let onCloseMock: Mock
+  const onCloseMock = vi.fn()
 
   beforeEach(async () => {
     ;({ store } = await createStore())
-
-    onCloseMock = vi.fn()
   })
 
   afterEach(() => {
@@ -192,14 +210,15 @@ describe('user audit action modal tests', () => {
 
   describe('in case of successful deactivate audit action', () => {
     beforeEach(async () => {
-      const [successMock] = graphqlMocksOfDeactivate
+      const [userDetails, successMock] = graphqlMocksOfDeactivate
+
       const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
           show={true}
-          user={users[0]}
+          userId={users[0].id}
           onClose={onCloseMock}
         />,
-        { store, graphqlMocks: [successMock] }
+        { store, graphqlMocks: [userDetails, successMock] }
       )
       component = testComponent
     })
@@ -254,14 +273,15 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed deactivate audit action', () => {
     beforeEach(async () => {
-      const [, errorMock] = graphqlMocksOfDeactivate
+      const [userDetails, , errorMock] = graphqlMocksOfDeactivate
+
       const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
           show={true}
-          user={users[0]}
+          userId={users[0].id}
           onClose={onCloseMock}
         />,
-        { store, graphqlMocks: [errorMock] }
+        { store, graphqlMocks: [userDetails, errorMock] }
       )
       component = testComponent
     })
@@ -288,14 +308,15 @@ describe('user audit action modal tests', () => {
 
   describe('in case of successful reactivate audit action', () => {
     beforeEach(async () => {
-      const [successMock] = graphqlMocksOfReactivate
+      const [userDetails, successMock] = graphqlMocksOfReactivate
+
       const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
           show={true}
-          user={users[1]}
+          userId={users[1].id}
           onClose={onCloseMock}
         />,
-        { store, graphqlMocks: [successMock] }
+        { store, graphqlMocks: [userDetails, successMock] }
       )
       component = testComponent
     })
@@ -337,14 +358,15 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed reactivate audit action', () => {
     beforeEach(async () => {
-      const [, errorMock] = graphqlMocksOfReactivate
+      const [userDetails, , errorMock] = graphqlMocksOfReactivate
+
       const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
           show={true}
-          user={users[1]}
+          userId={users[1].id}
           onClose={onCloseMock}
         />,
-        { store, graphqlMocks: [errorMock] }
+        { store, graphqlMocks: [userDetails, errorMock] }
       )
       component = testComponent
     })

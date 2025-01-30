@@ -10,7 +10,12 @@
  */
 
 import { env } from '@events/environment'
-import { EventConfig } from '@opencrvs/commons'
+import {
+  ActionInput,
+  EventConfig,
+  EventDocument,
+  logger
+} from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { array } from 'zod'
 
@@ -27,4 +32,29 @@ export async function getEventConfigurations(token: string) {
   }
 
   return array(EventConfig).parse(await res.json())
+}
+
+export async function notifyOnAction(
+  action: ActionInput,
+  event: EventDocument,
+  token: string
+) {
+  try {
+    await fetch(
+      new URL(
+        `/events/${event.type}/actions/${action.type}`,
+        env.COUNTRY_CONFIG_URL
+      ),
+      {
+        method: 'POST',
+        body: JSON.stringify(event),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token
+        }
+      }
+    )
+  } catch (error) {
+    logger.error(error)
+  }
 }

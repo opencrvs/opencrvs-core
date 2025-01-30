@@ -12,7 +12,6 @@ import { storage } from '@client/storage'
 import { IUserData } from './declarations'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
-import { authApi } from './utils/authApi'
 // eslint-disable-next-line import/no-unassigned-import
 import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import
@@ -55,7 +54,6 @@ const config = {
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
-    INFORMANT_SIGNATURE: true,
     PRINT_DECLARATION: true
   },
   LANGUAGES: 'en,bn,fr',
@@ -88,7 +86,7 @@ import {
 } from './tests/util'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
-  createUserForm: mockOfflineData.forms.userForm
+  createUserForm: mockOfflineData.userForms
 }))
 
 vi.mock('@client/forms/handlebarHelpers', async () => {
@@ -195,7 +193,7 @@ vi.doMock(
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
-      loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
+      loadForms: () => Promise.resolve({ forms: mockOfflineData.forms }),
       importConditionals: () => Promise.resolve({}),
       importValidators: () => Promise.resolve({}),
       importHandlebarHelpers: () => Promise.resolve({})
@@ -203,16 +201,12 @@ vi.doMock(
   })
 )
 
-vi.doMock(
-  '@client/utils/authApi',
-  (): {
-    authApi: typeof authApi
-  } => ({
-    authApi: {
-      invalidateToken: () => Promise.resolve()
-    }
-  })
-)
+vi.mock('@client/utils/authApi', () => ({
+  invalidateToken: () => Promise.resolve()
+}))
+vi.mock('@client/pdfRenderer', () => ({
+  printPDF: () => Promise.resolve()
+}))
 
 beforeEach(() => {
   /*

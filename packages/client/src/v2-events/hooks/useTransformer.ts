@@ -9,23 +9,47 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionFormData, findPageFields } from '@opencrvs/commons/client'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
+import {
+  ActionFormData,
+  findPageFields,
+  FieldType
+} from '@opencrvs/commons/client'
 import { fieldValueToString } from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+// eslint-disable-next-line no-restricted-imports
+import { getLocations } from '@client/offline/selectors'
 
 export const useTransformer = (eventType: string) => {
+  const intl = useIntl()
+
+  const locations = useSelector(getLocations)
+
   const { eventConfiguration } = useEventConfiguration(eventType)
 
   const fields = findPageFields(eventConfiguration)
 
   const toString = (values: ActionFormData) => {
     const stringifiedValues: Record<string, string> = {}
+
     for (const [key, value] of Object.entries(values)) {
-      const fieldType = fields.find((field) => field.id === key)?.type
-      if (!fieldType) {
+      const fieldConfig = fields.find((field) => field.id === key)
+
+      if (!fieldConfig) {
         throw new Error(`Field not found for ${key}`)
       }
-      stringifiedValues[key] = fieldValueToString(fieldType, value)
+
+      if (fieldConfig.type === FieldType.FILE) {
+        continue
+      }
+
+      stringifiedValues[key] = fieldValueToString({
+        fieldConfig,
+        value,
+        intl,
+        locations
+      })
     }
     return stringifiedValues
   }

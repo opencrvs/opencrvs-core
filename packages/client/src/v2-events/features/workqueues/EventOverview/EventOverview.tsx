@@ -48,16 +48,21 @@ function EventOverviewContainer() {
   const { getEvents, getEvent } = useEvents()
   const { getUsers } = useUsers()
 
-  const [config] = useEventConfigurations()
+  const configs = useEventConfigurations()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
   const [events] = getEvents.useSuspenseQuery()
   const event = events.find((e) => e.id === params.eventId)
 
+  const config = configs.find((c) => c.id === event?.type)
+
   const userIds = getUserIdsFromActions(fullEvent.actions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
 
+  if (!config) {
+    return null
+  }
   if (!event) {
     return null
   }
@@ -88,18 +93,28 @@ function EventOverview({
   const { eventConfiguration } = useEventConfiguration(event.type)
   const intl = useIntlFormatMessageWithFlattenedParams()
   const initialValues = getInitialValues(getAllFields(eventConfiguration))
+
+  const title = intl.formatMessage(summary.title.label, {
+    ...initialValues,
+    ...event.data
+  })
+
+  const fallbackTitle = summary.title.emptyValueMessage
+    ? intl.formatMessage(summary.title.emptyValueMessage)
+    : ''
   return (
     <Content
-      icon={() => <IconWithName name={''} status={'orange'} />}
+      icon={() => <IconWithName name={''} status={event.status} />}
       size={ContentSize.LARGE}
-      title={intl.formatMessage(summary.title, {
-        ...initialValues,
-        ...event.data
-      })}
+      title={title || fallbackTitle}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
-      <EventSummary event={event} summary={summary} />
+      <EventSummary
+        defaultValues={initialValues}
+        event={event}
+        summary={summary}
+      />
       <EventHistory history={history} />
     </Content>
   )

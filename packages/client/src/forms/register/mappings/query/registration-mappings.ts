@@ -14,7 +14,6 @@ import {
   IFormField,
   IFormSectionData
 } from '@client/forms'
-import { userMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
 import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import {
@@ -60,10 +59,7 @@ export const roleUserTransformer = (
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    history?.user?.systemRole
-      ? (userMessages[history.user.systemRole] as MessageDescriptor &
-          Record<string, string>)
-      : ''
+    history?.user.role.label ?? ''
 }
 export function registrationNumberTransformer(
   transformedData: IFormData,
@@ -102,6 +98,8 @@ export const convertToLocal = (
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
+  alpha3CountryCode = alpha3CountryCode === 'FAR' ? 'ZMB' : alpha3CountryCode
+
   const phoneUtil = PhoneNumberUtil.getInstance()
   const number = phoneUtil.parse(mobileWithCountryCode)
   const countryCode = alpha3CountryCode
@@ -154,7 +152,7 @@ const getUserFullName = (history: History): string => {
 
 const getUserRole = (history: History): MessageDescriptor => {
   return (
-    (history?.user && userMessages[history.user.systemRole]) || {
+    history?.user?.role.label || {
       defaultMessage: ' ',
       description: 'empty string',
       id: 'form.field.label.empty'
