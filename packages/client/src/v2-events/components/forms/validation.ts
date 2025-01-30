@@ -67,9 +67,32 @@ function getValidationErrors(
 
   const validators = field.validation ? field.validation : []
 
-  // if (field.required && !checkValidationErrorsOnly) {
-  //   validators.push(required(requiredErrorMessage))
-  // } else if (isFieldButton(field)) {
+  if (field.required && !checkValidationErrorsOnly) {
+    validators.push({
+      message: {
+        defaultMessage: 'Required for registration',
+        description: 'This is the error message for required fields',
+        id: 'error.required'
+      },
+      validator: {
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [field.id]: {
+                type: 'string',
+                minLength: 1
+              }
+            },
+            required: [field.id]
+          }
+        },
+        required: ['$form']
+      }
+    })
+  }
+  //  else if (isFieldButton(field)) {
   //   const { trigger } = field.options
   //   validators.push(httpErrorResponseValidator(trigger))
   // } else if (field.validateEmpty) {
