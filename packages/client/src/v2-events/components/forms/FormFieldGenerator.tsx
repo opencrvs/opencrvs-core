@@ -462,6 +462,10 @@ class FormSectionComponent extends React.Component<AllProps> {
       ...field,
       id: field.id.replaceAll('.', FIELD_SEPARATOR)
     }))
+    const valuesWithFormattedDate = getValuesWithFormattedDate(
+      fieldsWithDotIds,
+      values
+    )
 
     return (
       <section>
@@ -477,7 +481,9 @@ class FormSectionComponent extends React.Component<AllProps> {
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
             {
-              $form: makeFormikFieldIdsOpenCRVSCompatible(values),
+              $form: makeFormikFieldIdsOpenCRVSCompatible(
+                valuesWithFormattedDate
+              ),
               $now: formatISO(new Date(), { representation: 'date' })
             }
           )
@@ -548,6 +554,36 @@ function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
     ])
   )
 }
+/**
+ *
+ * @param fields field config in OpenCRVS format (separated with `.`)
+ * @param values form values in formik format (separated with `FIELD_SEPARATOR`)
+ * @returns adds 0 before single digit days and months to make them 2 digit
+ * @because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
+ */
+function getValuesWithFormattedDate(
+  fields: FieldConfig[],
+  values: Record<string, FieldValue>
+) {
+  return fields.reduce(
+    (acc, field) => {
+      const fieldId = field.id.replaceAll('.', FIELD_SEPARATOR)
+
+      if (field.type === 'DATE' && fieldId in values) {
+        const value = values[fieldId as keyof typeof values]
+        if (typeof value === 'string') {
+          const formattedDate = value
+            .split('-')
+            .map((d: string) => d.padStart(2, '0'))
+            .join('-')
+          acc[fieldId] = formattedDate
+        }
+      }
+      return acc
+    },
+    { ...values }
+  )
+}
 
 export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
   const intl = useIntl()
@@ -569,7 +605,9 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
-          makeFormikFieldIdsOpenCRVSCompatible(values),
+          makeFormikFieldIdsOpenCRVSCompatible(
+            getValuesWithFormattedDate(props.fields, values)
+          ),
           props.requiredErrorMessage
         )
       }
