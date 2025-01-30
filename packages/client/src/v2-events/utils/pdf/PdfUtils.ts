@@ -17,11 +17,12 @@ import {
 import * as Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
 import { Content } from 'pdfmake/interfaces'
-import { LanguageSchema } from '@opencrvs/commons'
+import { LanguageConfig } from '@opencrvs/commons'
+import { ActionFormData } from '@opencrvs/commons/client'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import { IPDFTemplate } from '@client/v2-events/utils/pdf/printPDF'
+import { PdfTemplate } from '@client/v2-events/utils/pdf/printAndDownloadPdf'
 
-export type FontFamilyTypes = {
+export interface FontFamilyTypes {
   normal: string
   bold: string
   italics: string
@@ -43,59 +44,56 @@ export const certificateBaseTemplate = {
   fonts: {}
 }
 
-type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
-  obj: Record<string, unknown>
+  obj: unknown
 ): obj is MessageDescriptor & Record<string, string> {
   return (
-    obj.hasOwnProperty('id') &&
-    obj.hasOwnProperty('defaultMessage') &&
-    typeof (obj as MessageDescriptor).id === 'string' &&
-    typeof (obj as MessageDescriptor).defaultMessage === 'string'
+    typeof obj === 'object' &&
+    obj !== null &&
+    'id' in obj &&
+    'defaultMessage' in obj &&
+    typeof (obj as { id: unknown }).id === 'string' &&
+    typeof (obj as { defaultMessage: unknown }).defaultMessage === 'string'
   )
 }
 
 function formatAllNonStringValues(
-  templateData: Record<string, TemplateDataType>,
+  templateData: ActionFormData,
   intl: IntlShape
 ): Record<string, string> {
+  const formattedData: Record<string, string> = {}
+
   for (const key of Object.keys(templateData)) {
-    if (
-      typeof templateData[key] === 'object' &&
-      isMessageDescriptor(templateData[key] as Record<string, unknown>)
-    ) {
-      templateData[key] = intl.formatMessage(
-        templateData[key] as MessageDescriptor
-      )
-    } else if (Array.isArray(templateData[key])) {
-      // For address field, country label is a MessageDescriptor
-      // but state, province is string
-      templateData[key] = (
-        templateData[key] as Array<string | MessageDescriptor>
-      )
+    const value = templateData[key]
+
+    if (isMessageDescriptor(value)) {
+      formattedData[key] = intl.formatMessage(value)
+    } else if (Array.isArray(value)) {
+      // Address field: country label is a MessageDescriptor but others are strings
+      formattedData[key] = value
         .filter(Boolean)
         .map((item) =>
-          isMessageDescriptor(item as Record<string, unknown>)
-            ? intl.formatMessage(item as MessageDescriptor)
-            : item
+          isMessageDescriptor(item) ? intl.formatMessage(item) : item
         )
         .join(', ')
-    } else if (typeof templateData[key] === 'object') {
-      templateData[key] = formatAllNonStringValues(
-        templateData[key] as Record<string, TemplateDataType>,
-        intl
+    } else if (typeof value === 'object' && value !== null) {
+      formattedData[key] = JSON.stringify(
+        formatAllNonStringValues(value as ActionFormData, intl)
       )
+    } else {
+      formattedData[key] = String(value)
     }
   }
-  return templateData as Record<string, string>
+
+  return formattedData
 }
 
 const cache = createIntlCache()
 
 export function compileSvg(
   templateString: string,
-  language: LanguageSchema,
-  data: Record<string, any> = {}
+  language: LanguageConfig,
+  data: ActionFormData = {}
 ): string {
   const intl: IntlShape = createIntl(
     {
@@ -153,7 +151,7 @@ export function svgToPdfTemplate(
   svg: string,
   certificateFonts: CertificateConfiguration
 ) {
-  const pdfTemplate: IPDFTemplate = {
+  const pdfTemplate: PdfTemplate = {
     ...certificateBaseTemplate,
     definition: {
       ...certificateBaseTemplate.definition,

@@ -12,17 +12,12 @@
 import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType, isUndeclaredDraft } from '@opencrvs/commons/client'
+import { isUndeclaredDraft } from '@opencrvs/commons/client'
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
-import { DeclarationIcon, Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { AllowedRouteWithEventId } from './utils'
-
-function getDeclarationIconColor(): string {
-  return 'purple'
-}
 
 const messages = defineMessages({
   saveExitButton: {
@@ -42,33 +37,16 @@ const messages = defineMessages({
   }
 })
 
-export const ActionIcons: { [key in ActionType]: React.JSX.Element } = {
-  CREATE: <DeclarationIcon color={getDeclarationIconColor()} />,
-  ASSIGN: <DeclarationIcon color={getDeclarationIconColor()} />,
-  UNASSIGN: <DeclarationIcon color={getDeclarationIconColor()} />,
-  REGISTER: <DeclarationIcon color={getDeclarationIconColor()} />,
-  VALIDATE: <DeclarationIcon color={getDeclarationIconColor()} />,
-  REQUEST_CORRECTION: <DeclarationIcon color={getDeclarationIconColor()} />,
-  REJECT_CORRECTION: <DeclarationIcon color={getDeclarationIconColor()} />,
-  APPROVE_CORRECTION: <DeclarationIcon color={getDeclarationIconColor()} />,
-  DETECT_DUPLICATE: <DeclarationIcon color={getDeclarationIconColor()} />,
-  NOTIFY: <DeclarationIcon color={getDeclarationIconColor()} />,
-  DECLARE: <DeclarationIcon color={getDeclarationIconColor()} />,
-  DELETE: <DeclarationIcon color={getDeclarationIconColor()} />,
-  PRINT_CERTIFICATE: <Print color={getDeclarationIconColor()} />,
-  CUSTOM: <DeclarationIcon color={getDeclarationIconColor()} />
-}
-
 export function FormHeader({
-  action,
   label,
   onSaveAndExit,
-  route
+  route,
+  appbarIcon
 }: {
-  action: ActionType
   label: TranslationConfig
   onSaveAndExit?: () => void
   route: AllowedRouteWithEventId
+  appbarIcon?: React.ReactNode
 }) {
   const intl = useIntl()
   const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
@@ -91,7 +69,7 @@ export function FormHeader({
 
   return (
     <AppBar
-      desktopLeft={ActionIcons[action]}
+      desktopLeft={appbarIcon}
       desktopRight={
         <>
           {onSaveAndExit ? (
@@ -138,7 +116,7 @@ export function FormHeader({
         </>
       }
       desktopTitle={intl.formatMessage(label)}
-      mobileLeft={ActionIcons[action]}
+      mobileLeft={appbarIcon}
       mobileRight={
         <>
           {onSaveAndExit ? (

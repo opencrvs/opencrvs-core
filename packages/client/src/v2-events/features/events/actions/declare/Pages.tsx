@@ -97,7 +97,6 @@ export function Pages() {
 
   return (
     <FormLayout
-      action={ActionType.DECLARE}
       route={ROUTES.V2.EVENTS.DECLARE}
       onSaveAndExit={() => {
         events.actions.declare.mutate({
@@ -112,7 +111,6 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        eventId={eventId}
         form={formValues}
         formPages={formPages}
         pageId={currentPageId}

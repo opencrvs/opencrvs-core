@@ -66,7 +66,12 @@ function getData(actions: Array<ActionDocument>) {
       return status
     }
 
-    // @TODO: Ask Riku to add a comment specifying the reason for this
+    /*
+     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+     * details in the correction. To do this, we find the original request that this
+     * approval is for and merge its details with the current data of the record.
+     */
+
     if (action.type === ActionType.APPROVE_CORRECTION) {
       const requestAction = actions.find(({ id }) => id === action.requestId)
       if (!requestAction) {

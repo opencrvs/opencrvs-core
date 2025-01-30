@@ -11,9 +11,8 @@
 
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-
 import { Frame, Spinner } from '@opencrvs/components'
-import { ActionType } from '@opencrvs/commons/client'
+import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { FormHeader } from './FormHeader'
@@ -24,15 +23,15 @@ import { AllowedRouteWithEventId } from './utils'
  *
  */
 export function FormLayout({
-  action,
   route,
   children,
-  onSaveAndExit
+  onSaveAndExit,
+  appbarIcon = <DeclarationIcon />
 }: {
-  action: ActionType
   route: AllowedRouteWithEventId
   children: React.ReactNode
   onSaveAndExit?: () => void
+  appbarIcon?: React.ReactNode
 }) {
   const { eventId } = useTypedParams(route)
   const events = useEvents()
@@ -40,16 +39,12 @@ export function FormLayout({
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const page = configuration.actions.find((x) => x.type === action)
-  if (!page) {
-    throw new Error('Form page not found')
-  }
 
   return (
     <Frame
       header={
         <FormHeader
-          action={action}
+          appbarIcon={appbarIcon}
           label={configuration.label}
           route={route}
           onSaveAndExit={onSaveAndExit}

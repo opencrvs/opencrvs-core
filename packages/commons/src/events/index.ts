@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './ActionConfig'
-export * from './OfflineData'
+export * from './offline'
 export * from './EventConfig'
 export * from './EventConfigInput'
 export * from './FieldConfig'

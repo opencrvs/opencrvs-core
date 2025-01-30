@@ -68,7 +68,7 @@ export function printPdf(template: PdfTemplate, declarationId: string) {
 not-so-good:
 
 ```
-export interface SVGTemplate {
+export interface ISVGTemplate {
   definition: string
 }
 

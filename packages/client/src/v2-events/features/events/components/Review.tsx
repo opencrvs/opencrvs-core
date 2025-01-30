@@ -470,16 +470,15 @@ function PreviewActionComponent({
 }
 
 function EditModal({
-  changeModalCancel,
-  changeModalContinue,
-  changeModalTitle,
-  changeModalDescription,
+  copy,
   close
 }: {
-  changeModalCancel?: MessageDescriptor
-  changeModalContinue?: MessageDescriptor
-  changeModalTitle?: MessageDescriptor
-  changeModalDescription?: MessageDescriptor
+  copy?: {
+    cancel?: MessageDescriptor
+    continue?: MessageDescriptor
+    title?: MessageDescriptor
+    description?: MessageDescriptor
+  }
   close: (result: boolean | null) => void
 }) {
   const intl = useIntl()
@@ -495,9 +494,7 @@ function EditModal({
             close(null)
           }}
         >
-          {intl.formatMessage(
-            changeModalCancel || reviewMessages.changeModalCancel
-          )}
+          {intl.formatMessage(copy?.cancel || reviewMessages.changeModalCancel)}
         </Button>,
         <Button
           key="confirm_edit"
@@ -508,21 +505,19 @@ function EditModal({
           }}
         >
           {intl.formatMessage(
-            changeModalContinue || reviewMessages.changeModalContinue
+            copy?.continue || reviewMessages.changeModalContinue
           )}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(
-        changeModalTitle || reviewMessages.changeModalTitle
-      )}
+      title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(
-            changeModalDescription || reviewMessages.changeModalDescription
+            copy?.description || reviewMessages.changeModalDescription
           )}
         </Text>
       </Stack>
@@ -531,17 +526,16 @@ function EditModal({
 }
 
 function ActionModal({
-  actionModalCancel,
-  actionModalPrimaryAction,
-  actionModalTitle,
-  actionModalDescription,
+  copy,
   close,
   action
 }: {
-  actionModalCancel?: MessageDescriptor
-  actionModalPrimaryAction?: MessageDescriptor
-  actionModalTitle?: MessageDescriptor
-  actionModalDescription?: MessageDescriptor
+  copy?: {
+    cancel?: MessageDescriptor
+    primaryAction?: MessageDescriptor
+    title?: MessageDescriptor
+    description?: MessageDescriptor
+  }
   close: (result: boolean | null) => void
   action: string
 }) {
@@ -558,9 +552,7 @@ function ActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(
-            actionModalCancel || reviewMessages.actionModalCancel
-          )}
+          {intl.formatMessage(copy?.cancel || reviewMessages.actionModalCancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -571,7 +563,7 @@ function ActionModal({
           }}
         >
           {intl.formatMessage(
-            actionModalPrimaryAction || reviewMessages.actionModalPrimaryAction,
+            copy?.primaryAction || reviewMessages.actionModalPrimaryAction,
             {
               action
             }
@@ -582,14 +574,14 @@ function ActionModal({
       responsive={false}
       show={true}
       title={intl.formatMessage(
-        actionModalTitle || reviewMessages.actionModalTitle,
+        copy?.title || reviewMessages.actionModalTitle,
         { action }
       )}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(
-            actionModalDescription || reviewMessages.actionModalDescription
+            copy?.description || reviewMessages.actionModalDescription
           )}
         </Text>
       </Stack>

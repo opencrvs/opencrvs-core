@@ -40,8 +40,7 @@ export const ActionType = {
   CUSTOM: 'CUSTOM'
 } as const
 
-export const ActionTypeSchema = z.nativeEnum(ActionType)
-export type ActionType = z.infer<typeof ActionTypeSchema>
+export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
 const CreateConfig = ActionConfigBase.merge(
   z.object({

@@ -10,18 +10,21 @@
  */
 import pdfMake from 'pdfmake/build/pdfmake'
 import { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
-import { isMobileDevice } from '@client/v2-events/utils/commonUtils'
+import { isMobileDevice } from '@client/utils/commonUtils'
 
-export interface IPDFTemplate {
+export interface PdfTemplate {
   definition: TDocumentDefinitions
   fonts: Record<string, TFontFamilyTypes>
 }
 
-export interface ISVGTemplate {
+export interface SvgTemplate {
   definition: string
 }
 
-export function printPDF(template: IPDFTemplate, declarationId: string) {
+export function printAndDownloadPdf(
+  template: PdfTemplate,
+  declarationId: string
+) {
   const pdf = pdfMake.createPdf(template.definition, undefined, template.fonts)
   if (isMobileDevice()) {
     pdf.download(`${declarationId}`)

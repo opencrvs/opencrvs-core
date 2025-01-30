@@ -22,6 +22,7 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
+import { ActionType } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -30,7 +31,6 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts/form'
-import { ActionType } from '@opencrvs/commons/client'
 
 const messages = defineMessages({
   reviewActionTitle: {
@@ -182,7 +182,6 @@ export function Review() {
 
   return (
     <FormLayout
-      action={ActionType.DECLARE}
       route={ROUTES.V2.EVENTS.DECLARE}
       onSaveAndExit={() => {
         events.actions.declare.mutate({

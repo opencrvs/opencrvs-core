@@ -29,10 +29,10 @@ import {
   Spinner,
   Stack
 } from '@opencrvs/components'
+import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
@@ -70,13 +70,13 @@ const messages = defineMessages({
   printModalBody: {
     id: 'print.certificate.review.modal.body.print',
     defaultMessage:
-      'A PDF of the certificate will open in a new tab for printing. The record will move to the ready-to-issue queue.',
+      'A Pdf of the certificate will open in a new tab for printing. The record will move to the ready-to-issue queue.',
     description: 'Print certificate modal body text'
   },
   printAndIssueModalBody: {
     id: 'print.certificate.review.modal.body.printAndIssue',
     defaultMessage:
-      'A PDF of the certificate will open in a new tab for printing and issuing.',
+      'A Pdf of the certificate will open in a new tab for printing and issuing.',
     description: 'Print certificate modal body text'
   },
   makeCorrection: {
@@ -184,7 +184,7 @@ export function Review() {
 
   return (
     <FormLayout
-      action={ActionType.PRINT_CERTIFICATE}
+      appbarIcon={<Print />}
       route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
     >
       <Frame.LayoutCentered>

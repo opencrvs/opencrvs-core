@@ -16,9 +16,15 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  FormPage,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
+import { Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
@@ -46,7 +52,7 @@ export function Pages() {
 
   const certTemplateFieldConfig =
     useCertificateTemplateSelectorFieldConfig(event)
-  const currentState = getCurrentEventState(event, ActionType.PRINT_CERTIFICATE)
+  const currentState = getCurrentEventState(event)
   const { setFormValues, getFormValues } = useEventFormData()
   const form = getFormValues(eventId)
 
@@ -88,12 +94,13 @@ export function Pages() {
 
   return (
     <FormLayout
-      action={ActionType.PRINT_CERTIFICATE}
+      appbarIcon={<Print />}
       route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
     >
       {modal}
       <PagesComponent
-        eventId={eventId}
+        // hard coded certificate template selector form field
+
         form={form}
         formPages={formPages}
         pageId={currentPageId}
@@ -117,10 +124,10 @@ export function Pages() {
             )
           }
         }}
-        // hard coded certificate template selector form field
-        {...(formPages.length &&
-          formPages[0].id === currentPageId && {
-            prefixChildren: (
+      >
+        {(page: FormPage) => (
+          <>
+            {formPages[0].id === page.id && (
               <InputField
                 id={certTemplateFieldConfig.id}
                 label={intl.formatMessage(certTemplateFieldConfig.label)}
@@ -136,9 +143,18 @@ export function Pages() {
                   onChange={(val: string) => setTemplateId(val)}
                 />
               </InputField>
-            )
-          })}
-      ></PagesComponent>
+            )}
+            <FormFieldGenerator
+              fields={page.fields}
+              formData={form}
+              id="locationForm"
+              initialValues={form}
+              setAllFieldsDirty={false}
+              onChange={(values) => setFormValues(eventId, values)}
+            />
+          </>
+        )}
+      </PagesComponent>
     </FormLayout>
   )
 }

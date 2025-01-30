@@ -9,24 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { CertificateDataSchema, LanguageSchema } from '@opencrvs/commons/events'
 import {
   ActionFormData,
   EventDocument,
   isMinioUrl
 } from '@opencrvs/commons/client'
+import {
+  CertificateTemplateConfig,
+  LanguageConfig
+} from '@opencrvs/commons/events'
 
 import {
   addFontsToSvg,
   compileSvg,
   svgToPdfTemplate
-} from '@client/v2-events/utils/pdf/PDFUtils'
-import { printPDF } from '@client/v2-events/utils/pdf/printPDF'
-import { fetchImageAsBase64 } from '@client/v2-events/utils/imageUtils'
+} from '@client/v2-events/utils/pdf/PdfUtils'
+import { printAndDownloadPdf } from '@client/v2-events/utils/pdf/printAndDownloadPdf'
+import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   async function recursiveTransform(obj: any) {
     if (typeof obj !== 'object' || obj === null) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return obj
     }
 
@@ -43,6 +47,7 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return transformedObject
   }
   return recursiveTransform(template)
@@ -51,8 +56,8 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
 export const usePrintableCertificate = (
   event: EventDocument,
   form: ActionFormData,
-  certificateConfig?: CertificateDataSchema,
-  language?: LanguageSchema
+  certificateConfig?: CertificateTemplateConfig,
+  language?: LanguageConfig
 ) => {
   if (!language || !certificateConfig) {
     return { svgCode: null }
@@ -62,22 +67,19 @@ export const usePrintableCertificate = (
   const canUserEditRecord = true
   const handleEdit = () => {}
 
-  if (!certificateConfig) {
-    return { svgCode: null }
-  }
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg(certificateConfig.svg, language, form)
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   const handleCertify = async () => {
     const base64ReplacedTemplate = await replaceMinioUrlWithBase64(form)
-    const svgWithoutFonts = compileSvg(certificateConfig.svg, language, {
+    const compiledSvg = compileSvg(certificateConfig.svg, language, {
       ...base64ReplacedTemplate,
       preview: false
     })
-    const svgWithFonts = addFontsToSvg(svgWithoutFonts, certificateFonts)
-    const pdfTemplate = svgToPdfTemplate(svgWithFonts, certificateFonts)
-    printPDF(pdfTemplate, event.id)
+    const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
+    const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
+    printAndDownloadPdf(pdfTemplate, event.id)
   }
   return {
     svgCode,
