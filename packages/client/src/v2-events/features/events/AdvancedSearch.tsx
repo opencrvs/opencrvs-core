@@ -9,9 +9,44 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { Content, ContentSize, FormTabs } from '@opencrvs/components'
-import { advancedSearchMessages as messages } from '@client/v2-events/messages'
+
+const messagesToDefine = {
+  birthTabTitle: {
+    id: 'config.application.birthTabTitle',
+    defaultMessage: 'Birth',
+    description: 'The title for birth tab'
+  },
+  birthTabTitleExport: {
+    id: 'config.application.birthTabTitleExport',
+    defaultMessage: 'Births',
+    description: 'The title for birth tab for VSExport'
+  },
+  deathTabTitle: {
+    id: 'config.application.deathTabTitle',
+    defaultMessage: 'Death',
+    description: 'The title for death tab'
+  },
+  deathTabTitleExport: {
+    id: 'config.application.deathTabTitleExport',
+    defaultMessage: 'Deaths',
+    description: 'The title for death tab for VSExport'
+  },
+  advancedSearch: {
+    id: 'config.advanced.search',
+    defaultMessage: 'Advanced Search',
+    description: 'This is used for the advanced search'
+  },
+  advancedSearchInstruction: {
+    id: 'config.advanced.search.instruction',
+    defaultMessage:
+      'Select the options to build an advanced search. A minimum of two search parameters is required.',
+    description: 'This is used for the advanced search'
+  }
+}
+
+const messages = defineMessages(messagesToDefine)
 
 function AdvancedSearch() {
   const intl = useIntl()
