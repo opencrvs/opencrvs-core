@@ -63,6 +63,7 @@ export const Spinner = ({ id, className, baseColor, size }: ISpinner) => (
     className={className}
     baseColor={baseColor}
     size={size ? size : 48}
+    data-testid="spinner"
   >
     <svg viewBox="0 0 50 50">
       <circle cx="25" cy="25" r="20" fill="none" strokeWidth="4" />

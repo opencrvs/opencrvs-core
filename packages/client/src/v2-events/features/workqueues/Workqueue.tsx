@@ -11,7 +11,7 @@
 
 import { mapKeys, orderBy } from 'lodash'
 import React, { useState } from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
@@ -20,11 +20,11 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
 import {
   defaultColumns,
+  EventConfig,
   EventIndex,
-  RootWorkqueueConfig,
-  workqueues,
   getAllFields,
-  EventConfig
+  RootWorkqueueConfig,
+  workqueues
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -35,11 +35,20 @@ import {
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { messages } from '@client/v2-events/messages'
-import { ROUTES } from '@client/v2-events/routes'
+
+import { formattedDuration } from '@client/utils/date-formatting'
 import { getInitialValues } from '@client/v2-events/components/forms/utils'
+import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
+
+const messages = defineMessages({
+  empty: {
+    defaultMessage: 'Empty message',
+    description: 'Label for workqueue tooltip',
+    id: 'regHome.issued'
+  }
+})
 
 function getOrThrow<T>(x: T, message: string) {
   if (x === undefined || x === null) {
@@ -88,7 +97,7 @@ function changeSortedColumn(
 
 export function WorkqueueIndex({ workqueueId }: { workqueueId: string }) {
   const { getEvents } = useEvents()
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const events = (getEvents.useQuery().data ?? []) satisfies EventIndex[]
   const eventConfigs = useEventConfigurations()
@@ -207,8 +216,8 @@ function Workqueue({
         ...fieldsWithPopulatedValues,
         ...event,
         event: intl.formatMessage(eventConfig.label),
-        createdAt: intl.formatDate(new Date(event.createdAt)),
-        modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
+        createdAt: formattedDuration(new Date(event.createdAt)),
+        modifiedAt: formattedDuration(new Date(event.modifiedAt)),
 
         status: intl.formatMessage(
           {

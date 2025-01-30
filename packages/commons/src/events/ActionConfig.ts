@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { Conditional } from '../conditionals/conditionals'
-import { FormConfig } from './FormConfig'
+import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 
 export const ActionConfigBase = z.object({
@@ -29,7 +29,9 @@ export const ActionType = {
   UNASSIGN: 'UNASSIGN',
   REGISTER: 'REGISTER',
   VALIDATE: 'VALIDATE',
-  CORRECT: 'CORRECT',
+  REQUEST_CORRECTION: 'REQUEST_CORRECTION',
+  REJECT_CORRECTION: 'REJECT_CORRECTION',
+  APPROVE_CORRECTION: 'APPROVE_CORRECTION',
   DETECT_DUPLICATE: 'DETECT_DUPLICATE',
   NOTIFY: 'NOTIFY',
   DECLARE: 'DECLARE',
@@ -67,6 +69,26 @@ const DeleteConfig = ActionConfigBase.merge(
   })
 )
 
+const RequestCorrectionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REQUEST_CORRECTION),
+    onboardingForm: z.array(FormPage),
+    additionalDetailsForm: z.array(FormPage)
+  })
+)
+
+const RejectCorrectionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT_CORRECTION)
+  })
+)
+
+const ApproveCorrectionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.APPROVE_CORRECTION)
+  })
+)
+
 const CustomConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM)
@@ -79,6 +101,9 @@ export const ActionConfig = z.discriminatedUnion('type', [
   ValidateConfig,
   RegisterConfig,
   DeleteConfig,
+  RequestCorrectionConfig,
+  RejectCorrectionConfig,
+  ApproveCorrectionConfig,
   CustomConfig
 ])
 

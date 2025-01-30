@@ -43,10 +43,12 @@ const messages = defineMessages({
 
 export function FormHeader({
   label,
-  onSaveAndExit
+  onSaveAndExit,
+  canSaveAndExit = true
 }: {
   label: TranslationConfig
   onSaveAndExit: () => void
+  canSaveAndExit?: boolean
 }) {
   const intl = useIntl()
   const { modal, exit, deleteDeclaration } = useEventFormNavigation()
@@ -74,7 +76,7 @@ export function FormHeader({
       desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
       desktopRight={
         <>
-          {
+          {canSaveAndExit && (
             <Button
               disabled={false}
               id="save-exit-btn"
@@ -85,7 +87,7 @@ export function FormHeader({
               <Icon name="DownloadSimple" />
               {intl.formatMessage(messages.saveExitButton)}
             </Button>
-          }
+          )}
           <Button size="small" type="secondary" onClick={onExit}>
             <Icon name="X" />
             {intl.formatMessage(messages.exitButton)}
@@ -110,9 +112,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
+      desktopTitle={intl.formatMessage(label)}
       mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
       mobileRight={
         <>
@@ -145,9 +145,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
+      mobileTitle={intl.formatMessage(label)}
     />
   )
 }

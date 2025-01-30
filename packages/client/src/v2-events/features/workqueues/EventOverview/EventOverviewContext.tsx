@@ -28,7 +28,7 @@ const MISSING_USER = {
       family: 'user'
     }
   ],
-  systemRole: '-'
+  role: '-'
 }
 
 /**

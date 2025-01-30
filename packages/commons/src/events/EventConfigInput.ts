@@ -8,13 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { z } from 'zod'
+import { EventConfig } from './EventConfig'
+import { FormConfig, FormConfigInput, FormPage } from './FormConfig'
+export type EventConfigInput = z.input<typeof EventConfig>
 
-import { defineMessages } from 'react-intl'
+export const defineForm = (form: FormConfigInput): FormConfig =>
+  FormConfig.parse(form)
 
-export const messages = defineMessages({
-  'event.history.timeFormat': {
-    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'event.history.timeFormat',
-    description: 'Time format for timestamps in event history'
-  }
-})
+export const defineFormPage = (formPage: FormPage): FormPage =>
+  FormPage.parse(formPage)

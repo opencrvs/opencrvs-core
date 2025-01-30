@@ -20,6 +20,9 @@ export type DateFieldValue = z.infer<typeof DateFieldValue>
 const ParagraphFieldValue = z.string()
 export type ParagraphFieldValue = z.infer<typeof ParagraphFieldValue>
 
+const PageHeaderFieldValue = z.string()
+export type PageHeaderFieldValue = z.infer<typeof PageHeaderFieldValue>
+
 const BulletListFieldValue = z.string()
 export type BulletListFieldValue = z.infer<typeof BulletListFieldValue>
 
