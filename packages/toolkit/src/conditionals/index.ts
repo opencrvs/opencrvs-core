@@ -105,6 +105,7 @@ export type FieldAPI = {
   isEqualTo: (value: string) => FieldAPI
   isUndefined: () => FieldAPI
   not: {
+    isBeforeNow: () => FieldAPI
     inArray: (values: string[]) => FieldAPI
     equalTo: (value: string) => FieldAPI
   }
@@ -229,6 +230,30 @@ export function field(fieldId: string) {
         required: ['$form']
       }),
     not: {
+      isBeforeNow: () =>
+        addCondition({
+          type: 'object',
+          properties: {
+            $form: {
+              type: 'object',
+              properties: {
+                [fieldId]: {
+                  type: 'string',
+                  not: {
+                    format: 'date',
+                    formatMaximum: { $data: '2/$now' }
+                  }
+                }
+              },
+              required: [fieldId]
+            },
+            $now: {
+              type: 'string',
+              format: 'date'
+            }
+          },
+          required: ['$form', '$now']
+        }),
       inArray: (values: string[]) =>
         addCondition({
           type: 'object',
