@@ -90,7 +90,7 @@ const MainSection = styled.section`
   background: ${({ theme }) => theme.colors.background};
 `
 
-export const routesConfig: RouteObject[] = [
+export const routesConfig = [
   {
     path: '/',
     element: (
@@ -320,7 +320,7 @@ export const routesConfig: RouteObject[] = [
       v2RoutesConfig
     ]
   }
-]
+] satisfies RouteObject[]
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
