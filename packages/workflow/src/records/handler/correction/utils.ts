@@ -14,7 +14,10 @@ import {
   isCorrectionRequestedTask,
   isTask,
   OpenCRVSPractitionerName,
-  TransactionResponse
+  TransactionResponse,
+  URLReference,
+  urlReferenceToResourceIdentifier,
+  urlReferenceToUUID
 } from '@opencrvs/commons/types'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import { partition } from 'lodash'
@@ -72,7 +75,11 @@ export async function sendNotification<T extends keyof PayloadMap>(
   return res
 }
 
-const replaceTmpURN = (resource: any, tmpURN: string, fullUrl: string) => {
+const replaceTmpURN = (
+  resource: any,
+  tmpURN: string,
+  fullUrl: URLReference
+) => {
   if (Array.isArray(resource)) {
     resource.forEach((item, index) => {
       if (item === tmpURN) {
@@ -86,7 +93,7 @@ const replaceTmpURN = (resource: any, tmpURN: string, fullUrl: string) => {
       if (resource[key] === tmpURN) {
         resource[key] =
           key === 'reference'
-            ? fullUrl.split('/').slice(2, 4).join('/') // /fhir/Patient/xyz/_history/abc => Patient/xyz
+            ? urlReferenceToResourceIdentifier(fullUrl)
             : fullUrl
       } else {
         replaceTmpURN(resource[key], tmpURN, fullUrl)
@@ -108,7 +115,7 @@ export const updateFullUrl = <T extends Bundle>(
       if (status === '201') {
         others[id].fullUrl &&
           replaceTmpURN(bundle, others[id].fullUrl, location)
-        others[id].resource.id = location.split('/')[3]
+        others[id].resource.id = urlReferenceToUUID(location)
       }
     }
   )
