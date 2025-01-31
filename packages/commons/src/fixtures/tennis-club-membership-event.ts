@@ -230,5 +230,6 @@ export const tennisClubMembershipEvent = defineConfig({
         }
       ]
     }
-  ]
+  ],
+  advancedSearch: []
 })

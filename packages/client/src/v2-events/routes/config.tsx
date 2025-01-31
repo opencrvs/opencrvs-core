@@ -22,7 +22,7 @@ import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventO
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch'
+import { advancedSearchRouter } from '@client/v2-events/features/events/AdvancedSearch/router'
 import { ROUTES } from './routes'
 
 /**
@@ -97,9 +97,6 @@ export const routesConfig = {
         }
       ]
     },
-    {
-      path: ROUTES.V2.ADVANCED_SEARCH.path,
-      element: <AdvancedSearch />
-    }
+    advancedSearchRouter
   ]
 } satisfies RouteObject

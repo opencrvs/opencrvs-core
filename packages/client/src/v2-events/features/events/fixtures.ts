@@ -520,7 +520,8 @@ export const tennisClubMembershipEvent = {
         ]
       }
     }
-  ]
+  ],
+  advancedSearch: []
 } satisfies EventConfig
 
 export const tennisClubMembershipEventIndex: EventIndex = {

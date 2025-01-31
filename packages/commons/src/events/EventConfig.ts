@@ -14,6 +14,7 @@ import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
+import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -30,7 +31,8 @@ export const EventConfig = z.object({
   label: TranslationConfig,
   actions: z.array(ActionConfig),
   workqueues: z.array(WorkqueueConfig),
-  deduplication: z.array(DeduplicationConfig).optional().default([])
+  deduplication: z.array(DeduplicationConfig).optional().default([]),
+  advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
 })
 
 export type EventConfig = z.infer<typeof EventConfig>
