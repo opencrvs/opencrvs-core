@@ -12,8 +12,8 @@
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { Context } from '@gateway/graphql/context'
 import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
-import { AuthenticationError } from '@gateway/utils/graphql-errors'
 import { IUserModelData } from './type-resolvers'
+import { GraphQLError } from 'graphql'
 
 export class UsersAPI extends OpenCRVSRESTDataSource {
   override baseURL = USER_MANAGEMENT_URL
@@ -41,7 +41,8 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
       return await response
     } catch (e) {
       // Don't need to throw errors if unauthorized error is found for no user with this email
-      if (e instanceof AuthenticationError) return null
+      if (e instanceof GraphQLError && e.extensions.code === 'UNAUTHENTICATED')
+        return null
       else throw e
     }
   }
@@ -63,7 +64,8 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
       return await response
     } catch (e) {
       // Don't need to throw errors if unauthorized error is found for no user with this mobile
-      if (e instanceof AuthenticationError) return null
+      if (e instanceof GraphQLError && e.extensions.code === 'UNAUTHENTICATED')
+        return null
       else throw e
     }
   }
