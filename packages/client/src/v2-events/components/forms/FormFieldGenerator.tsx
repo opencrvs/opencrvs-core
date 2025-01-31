@@ -23,7 +23,8 @@ import {
   getConditionalActionsForField,
   getDependentFields,
   handleInitialValue,
-  hasInitialValueDependencyInfo
+  hasInitialValueDependencyInfo,
+  makeDatesFormatted
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 
@@ -462,10 +463,7 @@ class FormSectionComponent extends React.Component<AllProps> {
       ...field,
       id: field.id.replaceAll('.', FIELD_SEPARATOR)
     }))
-    const valuesWithFormattedDate = getValuesWithFormattedDate(
-      fieldsWithDotIds,
-      values
-    )
+    const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
 
     return (
       <section>
@@ -536,7 +534,7 @@ class FormSectionComponent extends React.Component<AllProps> {
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-const FIELD_SEPARATOR = '____'
+export const FIELD_SEPARATOR = '____'
 function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
@@ -552,36 +550,6 @@ function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
       key.replaceAll(FIELD_SEPARATOR, '.'),
       value
     ])
-  )
-}
-/**
- *
- * @param fields field config in OpenCRVS format (separated with `.`)
- * @param values form values in formik format (separated with `FIELD_SEPARATOR`)
- * @returns adds 0 before single digit days and months to make them 2 digit
- * @because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
- */
-function getValuesWithFormattedDate(
-  fields: FieldConfig[],
-  values: Record<string, FieldValue>
-) {
-  return fields.reduce(
-    (acc, field) => {
-      const fieldId = field.id.replaceAll('.', FIELD_SEPARATOR)
-
-      if (field.type === 'DATE' && fieldId in values) {
-        const value = values[fieldId as keyof typeof values]
-        if (typeof value === 'string') {
-          const formattedDate = value
-            .split('-')
-            .map((d: string) => d.padStart(2, '0'))
-            .join('-')
-          acc[fieldId] = formattedDate
-        }
-      }
-      return acc
-    },
-    { ...values }
   )
 }
 
@@ -606,7 +574,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
         getValidationErrorsForForm(
           props.fields,
           makeFormikFieldIdsOpenCRVSCompatible(
-            getValuesWithFormattedDate(props.fields, values)
+            makeDatesFormatted(props.fields, values)
           ),
           props.requiredErrorMessage
         )

@@ -43,6 +43,7 @@ import { selectFieldToString } from '@client/v2-events/features/events/registere
 import { selectCountryFieldToString } from '@client/v2-events/features/events/registered-fields/SelectCountry'
 import { ILocation } from '@client/v2-events/features/events/registered-fields/Location'
 import { checkboxToString } from '@client/v2-events/features/events/registered-fields/Checkbox'
+import { FIELD_SEPARATOR } from './FormFieldGenerator'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -182,4 +183,36 @@ export function fieldValueToString({
     default:
       throw new Error(`Field type ${fieldConfig.type} configuration missing.`)
   }
+}
+
+/**
+ *
+ * @param fields field config in OpenCRVS format (separated with `.`)
+ * @param values form values in formik format (separated with `FIELD_SEPARATOR`)
+ * @returns adds 0 before single digit days and months to make them 2 digit
+ * because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
+ */
+export function makeDatesFormatted(
+  fields: FieldConfig[],
+  values: Record<string, FieldValue>
+) {
+  return fields.reduce((acc, field) => {
+    const fieldId = field.id.replaceAll('.', FIELD_SEPARATOR)
+
+    if (field.type === 'DATE' && fieldId in values) {
+      const value = values[fieldId as keyof typeof values]
+      if (typeof value === 'string') {
+        const formattedDate = formatDateFieldValue(value)
+        return { ...acc, [fieldId]: formattedDate }
+      }
+    }
+    return acc
+  }, values)
+}
+
+function formatDateFieldValue(value: string) {
+  return value
+    .split('-')
+    .map((d: string) => d.padStart(2, '0'))
+    .join('-')
 }
