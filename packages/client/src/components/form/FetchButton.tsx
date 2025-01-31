@@ -187,7 +187,7 @@ const FetchButton = (props: IFullProps) => {
                   <ModalContent>
                     {success && (
                       <>
-                        <Heading>{successTitle}</Heading>
+                        <Heading element='h2' variant='h2'>{successTitle}</Heading>
                         {getModalInfo(intl)}
                         <StyledSuccess id="loader-button-success" />
                       </>
@@ -195,11 +195,11 @@ const FetchButton = (props: IFullProps) => {
 
                     {error && (
                       <>
-                        <Heading>{errorTitle}</Heading>
+                        <Heading element='h2' variant='h2'>{errorTitle}</Heading>
                         {getModalInfo(intl)}
                         <StyledError id="loader-button-error" />
                         {queryData && (
-                          <Info>
+                          <Info element='p' variant='h4'>
                             {!networkError
                               ? intl.formatMessage(queryData.errorText)
                               : intl.formatMessage(queryData.networkErrorText)}
@@ -210,7 +210,7 @@ const FetchButton = (props: IFullProps) => {
 
                     {loading && (
                       <>
-                        <Heading>{modalTitle}</Heading>
+                        <Heading element='h2' variant='h2'>{modalTitle}</Heading>
                         {getModalInfo(intl)}
                         <StyledSpinner id="loader-button-spinner" />
                         <ConfirmButton onClick={hideModal}>

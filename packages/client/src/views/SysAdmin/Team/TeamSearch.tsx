@@ -29,11 +29,6 @@ import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import {Text as StyledText} from '@opencrvs/components/lib/Text'
-
-interface BaseProps {
-  goToTeamUserList: typeof goToTeamUserList
-}
-
 import {
   RouteComponentProps,
   withRouter

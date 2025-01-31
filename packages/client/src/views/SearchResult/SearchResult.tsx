@@ -496,7 +496,7 @@ function SearchResultView(props: ISearchResultProps) {
                     <LoadingIndicator loading={true} />
                   </div>
                 ) : error ? (
-                  <ErrorText id="search-result-error-text">
+                  <ErrorText id="search-result-error-text" element='p' variant='h4'>
                     {intl.formatMessage(errorMessages.queryError)}
                   </ErrorText>
                 ) : (
