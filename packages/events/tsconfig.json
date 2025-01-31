@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "moduleResolution": "node16",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2019"],
+    "lib": ["esnext.asynciterable", "es6", "es2019", "es2021"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,

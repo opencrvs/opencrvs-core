@@ -112,7 +112,7 @@ export type ActionDocument = z.infer<typeof ActionDocument>
 
 export const ResolvedUser = z.object({
   id: z.string(),
-  systemRole: z.string(),
+  role: z.string(),
   name: z.array(
     z.object({
       use: z.string(),
