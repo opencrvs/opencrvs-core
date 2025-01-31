@@ -195,7 +195,7 @@ const transformSectionData = ({
             }
 
             sections[sections.length - 1].items.push({
-              label: <Label>{label}</Label>,
+              label: <Label element='p' variant='h4'>{label}</Label>,
               value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
               actions:
                 !(

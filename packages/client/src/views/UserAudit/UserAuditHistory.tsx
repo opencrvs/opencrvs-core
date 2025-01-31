@@ -246,7 +246,7 @@ function UserAuditHistoryComponent(props: Props) {
             {actionMessage}
           </Link>
         ) : (
-          <BoldContent>{actionMessage}</BoldContent>
+          <BoldContent element='p' variant='h3'>{actionMessage}</BoldContent>
         ),
 
         actionDescriptionWithAuditTime:

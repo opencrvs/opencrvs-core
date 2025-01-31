@@ -96,8 +96,8 @@ const ProfileMenuComponent = ({
 
     return (
       <>
-        <UserName>{userName}</UserName>
-        <UserRole>
+        <UserName element='p' variant='h4'>{userName}</UserName>
+        <UserRole element='p' variant='h4'>
           {userDetails && intl.formatMessage(userDetails.role.label)}
         </UserRole>
       </>

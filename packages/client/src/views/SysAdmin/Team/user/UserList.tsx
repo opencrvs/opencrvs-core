@@ -525,7 +525,7 @@ function UserListComponent(props: IProps) {
                 {name}
               </Link>
             ),
-            value: <Value>{role}</Value>,
+            value: <Value variant='h4' element='p'>{role}</Value>,
             actions: (
               <StatusMenu
                 userDetails={userDetails}
