@@ -94,7 +94,7 @@ export const LinkButtonField = ({
       disabled={isDisabled}
       onClick={() => {
         window.location.href = evalExpressionInFieldDefinition(
-          '`' + to + '`',
+          '`' + decodeURIComponent(to) + '`',
           form,
           config,
           draft,
