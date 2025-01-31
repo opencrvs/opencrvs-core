@@ -424,6 +424,7 @@ input CertificateInput {
 
 type Certificate { # -> Document Reference
   collector: RelatedPerson # -> .extension
+  certifier: User # -> .extension
   hasShowedVerifiedDocument: Boolean # -> .extension
   payments: [Payment] # -> .extension
   certificateTemplateId: String
@@ -532,8 +533,6 @@ union RecordDetails = BirthRegistration | DeathRegistration
 
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
-  searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
-  searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(
@@ -578,6 +577,12 @@ input ConfirmRegistrationInput {
 input RejectRegistrationInput {
   reason: String!
   comment: String
+}
+
+input UpdateFieldInput {
+  fieldId: String!
+  valueString: String
+  valueBoolean: Boolean
 }
 
 type Mutation {
@@ -663,4 +668,5 @@ type Mutation {
     identifierType: String!
     identifierValue: String!
   ): ID!
+  updateField(id: ID!, details: UpdateFieldInput!): Boolean!
 }

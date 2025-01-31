@@ -12,8 +12,9 @@
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
-import { EventIndex } from '@opencrvs/commons/client'
+import { EventIndex, FieldValue } from '@opencrvs/commons/client'
 import { useTransformer } from '@client/v2-events/hooks/useTransformer'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
@@ -21,13 +22,17 @@ import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 export function EventSummary({
   event,
-  summary
+  summary,
+  defaultValues
 }: {
   event: EventIndex
   summary: SummaryConfig
+  defaultValues: Record<string, FieldValue>
 }) {
+  const intl = useIntlFormatMessageWithFlattenedParams()
   const { toString } = useTransformer(event.type)
   const data = toString(event.data)
+
   return (
     <>
       <Summary id="summary">
@@ -36,11 +41,15 @@ export function EventSummary({
             <Summary.Row
               key={field.id}
               data-testid={field.id}
-              label={field.label?.defaultMessage ?? ''}
+              label={intl.formatMessage(field.label)}
               placeholder={
-                '@todo: These placeholder values need to be configurable like "No place of birth"'
+                field.emptyValueMessage &&
+                intl.formatMessage(field.emptyValueMessage)
               }
-              value={data[field.id]}
+              value={intl.formatMessage(field.value, {
+                ...defaultValues,
+                ...data
+              })}
             />
           )
         })}

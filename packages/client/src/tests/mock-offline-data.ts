@@ -8,14 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { readFileSync } from 'fs'
-import { join } from 'path'
-import { System, SystemStatus, SystemType } from '@client/utils/gateway'
+import { ILanguage } from '@client/i18n/reducer'
 import type {
-  Facility,
+  AdminStructure,
   CRVSOffice,
-  AdminStructure
+  Facility,
+  IForms
 } from '@client/offline/reducer'
+import { System, SystemStatus, SystemType } from '@client/utils/gateway'
+import {
+  CertificateConfiguration,
+  ICertificateData
+} from '@client/utils/referenceApi'
+import forms from './forms.json'
+import languages from './languages.json'
+import templates from './templates.json'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -54,11 +61,8 @@ const systems: System[] = [
 ]
 
 export const mockOfflineData = {
-  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString())
-    .forms,
-  userForms: JSON.parse(
-    readFileSync(join(__dirname, './forms.json')).toString()
-  ).userForm,
+  forms: forms.forms as IForms,
+  userForms: forms.userForm,
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -111,6 +115,36 @@ export const mockOfflineData = {
       status: 'active',
       type: 'CRVS_OFFICE',
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
+    },
+    'da672661-eb0a-437b-aa7a-a6d9a1711dd1': {
+      id: 'da672661-eb0a-437b-aa7a-a6d9a1711dd1',
+      name: 'Comilla Union Parishad',
+      alias: 'কুমিল্লা ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '456',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/5926982b-845c-4463-80aa-cbfb86762e0a'
+    },
+    '213ec5f3-e306-4f95-8058-f37893dbfbb6': {
+      id: '213ec5f3-e306-4f95-8058-f37893dbfbb6',
+      name: 'Chittagong Union Parishad',
+      alias: 'চট্টগ্রাম ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '234',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    '93259d69-71af-488f-8ada-32d06678df17': {
+      id: '93259d69-71af-488f-8ada-32d06678df17',
+      name: 'Dhaka Union Parishad',
+      alias: 'ঢাকা ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '345',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
     }
   } satisfies Record<string, CRVSOffice>,
   locations: {
@@ -401,12 +435,11 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE'
     }
   } satisfies Record<string, AdminStructure>,
-  languages: JSON.parse(
-    readFileSync(join(__dirname, './languages.json')).toString()
-  ).data,
-  templates: JSON.parse(
-    readFileSync(join(__dirname, './templates.json')).toString()
-  ),
+  languages: languages.data as unknown as ILanguage[],
+  templates: templates as unknown as {
+    fonts?: CertificateConfiguration['fonts']
+    certificates: ICertificateData[]
+  },
   assets: {
     logo: `data:image;base64,${validImageB64String}`
   },
@@ -429,10 +462,8 @@ export const mockOfflineData = {
       DEATH_REGISTRATION: true,
       MARRIAGE_REGISTRATION: true,
       EXTERNAL_VALIDATION_WORKQUEUE: true,
-      INFORMANT_SIGNATURE: false,
       PRINT_DECLARATION: true,
-      DATE_OF_BIRTH_UNKNOWN: true,
-      INFORMANT_SIGNATURE_REQUIRED: false
+      DATE_OF_BIRTH_UNKNOWN: true
     },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',

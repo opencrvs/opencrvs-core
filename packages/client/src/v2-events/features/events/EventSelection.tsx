@@ -12,7 +12,6 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -26,6 +25,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
+import { createTemporaryId } from './useEvents/procedures/create'
 import { useEvents } from './useEvents/useEvents'
 
 const messages = defineMessages({
@@ -79,7 +79,7 @@ function EventSelector() {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
-    const transactionId = `tmp-${uuid()}`
+    const transactionId = createTemporaryId()
 
     createEvent.mutate({
       type: eventType,
@@ -111,7 +111,7 @@ function EventSelector() {
         {eventConfigurations.map((event) => (
           <RadioButton
             key={`${event.id}event`}
-            id="select_birth_event"
+            id={`select_${event.id}_event`}
             label={intl.formatMessage(event.label)}
             name={`${event.id}event`}
             selected={eventType === event.id ? event.id : ''}

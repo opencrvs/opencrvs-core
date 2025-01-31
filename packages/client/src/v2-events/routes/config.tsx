@@ -11,15 +11,17 @@
 
 import React from 'react'
 import { Outlet } from 'react-router-dom'
+import { Debug } from '@client/v2-events/features/debug/debug'
+import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
+import * as Declare from '@client/v2-events/features/events/actions/declare'
+import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
+import * as Register from '@client/v2-events/features/events/actions/register'
+import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
-import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
+import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
+import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { Debug } from '@client/v2-events/features/debug/debug'
-import * as Declare from '@client/v2-events/features/events/actions/declare'
-import * as Register from '@client/v2-events/features/events/actions/register'
-import { WorkqueueLayout, FormLayout } from '@client/v2-events/layouts'
-import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import { ROUTES } from './routes'
 
 /**
@@ -36,22 +38,7 @@ export const routesConfig = {
     </TRPCProvider>
   ),
   children: [
-    {
-      path: ROUTES.V2.path,
-      // Alternative would be to create a navigation component that would be used here.
-      element: (
-        <WorkqueueLayout>
-          <WorkqueueIndex />
-        </WorkqueueLayout>
-      ),
-      children: [
-        {
-          index: true,
-          path: ROUTES.V2.WORKQUEUE.path,
-          element: <WorkqueueIndex />
-        }
-      ]
-    },
+    workqueueRouter,
     {
       path: ROUTES.V2.EVENTS.OVERVIEW.path,
       element: (
@@ -69,12 +56,12 @@ export const routesConfig = {
       element: <DeleteEvent />
     },
     {
+      path: ROUTES.V2.EVENTS.VALIDATE.path,
+      element: <ValidateEvent />
+    },
+    {
       path: ROUTES.V2.EVENTS.DECLARE.path,
-      element: (
-        <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
-          <Outlet />
-        </FormLayout>
-      ),
+      element: <Outlet />,
       children: [
         {
           index: true,
@@ -90,13 +77,10 @@ export const routesConfig = {
         }
       ]
     },
+    correctionRouter,
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
-      element: (
-        <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
-          <Outlet />
-        </FormLayout>
-      ),
+      element: <Outlet />,
       children: [
         {
           index: true,

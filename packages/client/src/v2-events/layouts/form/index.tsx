@@ -16,11 +16,13 @@ import { Frame, Spinner } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
+import { noop } from '@client/v2-events'
 import { FormHeader } from './FormHeader'
 
 type AllowedRoute =
   | typeof ROUTES.V2.EVENTS.REGISTER
   | typeof ROUTES.V2.EVENTS.DECLARE
+  | typeof ROUTES.V2.EVENTS.REQUEST_CORRECTION
 
 /**
  * Layout for form and review pages.
@@ -28,10 +30,14 @@ type AllowedRoute =
  */
 export function FormLayout({
   route,
-  children
+  children,
+  onSaveAndExit,
+  canSaveAndExit
 }: {
   route: AllowedRoute
   children: React.ReactNode
+  onSaveAndExit?: () => void
+  canSaveAndExit?: boolean
 }) {
   const { eventId } = useTypedParams(route)
   const events = useEvents()
@@ -42,13 +48,15 @@ export function FormLayout({
     event.type
   )
 
-  if (!configuration) {
-    throw new Error('Event configuration not found')
-  }
-
   return (
     <Frame
-      header={<FormHeader label={configuration.label} />}
+      header={
+        <FormHeader
+          canSaveAndExit={canSaveAndExit}
+          label={configuration.label}
+          onSaveAndExit={onSaveAndExit || noop}
+        />
+      }
       skipToContentText="Skip to form"
     >
       <React.Suspense fallback={<Spinner id="event-form-spinner" />}>

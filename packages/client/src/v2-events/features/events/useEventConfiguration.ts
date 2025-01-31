@@ -16,14 +16,8 @@ import { api } from '@client/v2-events/trpc'
  * @returns a list of event configurations
  */
 export function useEventConfigurations() {
-  const [config] = api.config.get.useSuspenseQuery()
+  const [config] = api.event.config.get.useSuspenseQuery()
   return config
-}
-
-export function getAllFields(configuration: EventConfig) {
-  return configuration.actions
-    .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => form.pages.flatMap((page) => page.fields))
 }
 
 /**
@@ -34,7 +28,7 @@ export function getAllFields(configuration: EventConfig) {
 export function useEventConfiguration(eventIdentifier: string): {
   eventConfiguration: EventConfig
 } {
-  const [config] = api.config.get.useSuspenseQuery()
+  const [config] = api.event.config.get.useSuspenseQuery()
   const eventConfiguration = config.find(
     (event) => event.id === eventIdentifier
   )

@@ -12,21 +12,10 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { formatUrl } from '@client/navigation'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
-import {
-  FIELD_AGENT_ROLES,
-  NATL_ADMIN_ROLES,
-  ADVANCED_SEARCH_TEXT,
-  SYS_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES
-} from '@client/utils/constants'
-import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
-
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
 import {
   SearchTool,
@@ -36,7 +25,6 @@ import {
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
@@ -45,15 +33,21 @@ import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
+import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
+import {
+  RECORD_DECLARE_SCOPES,
+  usePermissions
+} from '@client/hooks/useAuthorization'
+import ProtectedComponent from '@client/components/ProtectedComponent'
 import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
-import * as routes from '@client/navigation/routes'
 import { parse, stringify } from 'query-string'
+import { formatUrl } from '@client/navigation'
+import * as routes from '@client/navigation/routes'
 
 type IStateProps = {
-  userDetails: UserDetails | null
   fieldNames: string[]
   language: string
   offlineData: IOfflineData
@@ -63,7 +57,7 @@ type IDispatchProps = {
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
-type IProps = {
+interface IProps {
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -118,30 +112,31 @@ const HeaderRight = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
-  NATL_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES
-)
-
 const HeaderComponent = (props: IFullProps) => {
   const {
     router,
-    userDetails,
     mobileSearchBar,
     offlineData,
     className,
     intl,
     activeMenuItem,
-    title,
     mobileRight,
     setAdvancedSearchParam,
     mapPerformanceClickHandler,
     changeTeamLocation
   } = props
 
+  const {
+    canCreateUser,
+    canSearchRecords,
+    canSearchBirthRecords,
+    canSearchDeathRecords
+  } = usePermissions()
+
+  const canDoAdvanceSearch = canSearchBirthRecords || canSearchDeathRecords
+
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = parse(router.location.search).locationId as string
-
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
         mobileLeft: [
@@ -153,67 +148,74 @@ const HeaderComponent = (props: IFullProps) => {
         mobileRight: [
           {
             icon: () => <Icon name="Activity" size="medium" color="primary" />,
-            handler: () =>
-              mapPerformanceClickHandler && mapPerformanceClickHandler()
+            handler: () => mapPerformanceClickHandler?.()
           }
         ]
       }
-    }
-    if (activeMenuItem === ACTIVE_MENU_ITEM.USERS && changeTeamLocation) {
-      return {
-        mobileLeft: [
-          {
-            icon: () => <Hamburger />,
-            handler: () => {}
-          }
-        ],
-        mobileRight: [
-          {
-            icon: () => (
-              <Icon name="MagnifyingGlass" size="medium" color="primary" />
-            ),
-            handler: () => changeTeamLocation && changeTeamLocation()
-          },
-          {
-            icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
-            handler: () => {
-              if (locationId) {
-                router.navigate(
-                  formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
-                )
+    } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
+      if (changeTeamLocation) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <Hamburger />,
+              handler: () => {}
+            }
+          ],
+          mobileRight: [
+            {
+              icon: () => (
+                <Icon name="MagnifyingGlass" size="medium" color="primary" />
+              ),
+              handler: changeTeamLocation
+            },
+            {
+              icon: () => (
+                <Icon name="UserPlus" size="medium" color="primary" />
+              ),
+              handler: () => {
+                if (locationId) {
+                  router.navigate(
+                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                  )
+                }
               }
             }
-          }
-        ]
-      }
-    }
-    if (
-      activeMenuItem === ACTIVE_MENU_ITEM.USERS &&
-      userDetails?.systemRole &&
-      SYS_ADMIN_ROLES.includes(userDetails?.systemRole)
-    ) {
-      return {
-        mobileLeft: [
-          {
-            icon: () => <Hamburger />,
-            handler: () => {}
-          }
-        ],
-        mobileRight: [
-          {
-            icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
-            handler: () => {
-              if (locationId) {
-                router.navigate(
-                  formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
-                )
+          ]
+        }
+      } else if (canCreateUser) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <Hamburger />,
+              handler: () => {}
+            }
+          ],
+          mobileRight: [
+            {
+              icon: () => (
+                <Icon name="UserPlus" size="medium" color="primary" />
+              ),
+              handler: () => {
+                if (locationId) {
+                  router.navigate(
+                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                  )
+                }
               }
             }
-          }
-        ]
+          ]
+        }
+      } else {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <Hamburger />,
+              handler: () => {}
+            }
+          ]
+        }
       }
-    }
-    if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
+    } else if (!canSearchRecords) {
       return {
         mobileLeft: [
           {
@@ -222,50 +224,39 @@ const HeaderComponent = (props: IFullProps) => {
           }
         ]
       }
-    }
-    if (
-      userDetails?.systemRole &&
-      USERS_WITHOUT_SEARCH.includes(userDetails?.systemRole)
-    ) {
-      return {
-        mobileLeft: [
-          {
-            icon: () => <Hamburger />,
-            handler: () => {}
-          }
-        ]
-      }
-    }
-    if (mobileSearchBar) {
-      return {
-        mobileLeft: [
-          {
-            icon: () => <HistoryNavigator hideForward />,
-            handler: () => {}
-          }
-        ],
-        mobileBody: renderSearchInput(props, true)
-      }
-    }
-    return {
-      mobileLeft: [
-        {
-          icon: () => <Hamburger />,
-          handler: () => {}
+    } else {
+      if (mobileSearchBar) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <HistoryNavigator hideForward />,
+              handler: () => {}
+            }
+          ],
+          mobileBody: renderSearchInput(props, true)
         }
-      ],
-      mobileRight: [
-        {
-          icon: () => (
-            <Icon name="MagnifyingGlass" size="medium" color="primary" />
-          ),
-          handler: () => router.navigate(routes.SEARCH)
+      } else {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <Hamburger />,
+              handler: () => {}
+            }
+          ],
+          mobileRight: [
+            {
+              icon: () => (
+                <Icon name="MagnifyingGlass" size="medium" color="primary" />
+              ),
+              handler: () => router.navigate(routes.SEARCH)
+            }
+          ]
         }
-      ]
+      }
     }
   }
 
-  const renderSearchInput = (props: IFullProps, isMobile?: boolean) => {
+  function renderSearchInput(props: IFullProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType, language, fieldNames } = props
 
     const searchTypeList: ISearchType[] = [
@@ -319,7 +310,7 @@ const HeaderComponent = (props: IFullProps) => {
       })
     }
 
-    const navigationList: INavigationType[] = [
+    const advancedSearchNavigationList: INavigationType[] = [
       {
         label: intl.formatMessage(messages.advancedSearch),
         id: ADVANCED_SEARCH_TEXT,
@@ -339,13 +330,10 @@ const HeaderComponent = (props: IFullProps) => {
           selectedSearchType ?? offlineData.config.SEARCH_DEFAULT_CRITERIA
         }
         searchTypeList={searchTypeList}
-        navigationList={
-          FIELD_AGENT_ROLES.includes(userDetails?.systemRole as string)
-            ? undefined
-            : navigationList
-        }
+        // @TODO: How to hide the navigation list from field agents? Ask JPF
+        navigationList={canDoAdvanceSearch ? advancedSearchNavigationList : []}
         searchHandler={(text, type) =>
-          router.navigate(
+          props.router.navigate(
             {
               pathname: routes.SEARCH_RESULT,
               search: stringify({
@@ -362,8 +350,8 @@ const HeaderComponent = (props: IFullProps) => {
     )
   }
 
-  const headerTitle =
-    title ||
+  const title =
+    props.title ||
     intl.formatMessage(
       activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
         ? constantsMessages.performanceTitle
@@ -389,26 +377,20 @@ const HeaderComponent = (props: IFullProps) => {
     },
     {
       element: (
-        <>
-          {!(
-            userDetails?.systemRole &&
-            USERS_WITHOUT_SEARCH.includes(userDetails?.systemRole)
-          ) && (
-            <HeaderCenter>
-              <Button
-                type="iconPrimary"
-                size="medium"
-                key="newEvent"
-                id="header_new_event"
-                onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
-              >
-                <Icon name="Plus" size="medium" />
-              </Button>
-
-              {renderSearchInput(props)}
-            </HeaderCenter>
-          )}
-        </>
+        <HeaderCenter>
+          <ProtectedComponent scopes={RECORD_DECLARE_SCOPES}>
+            <Button
+              type="iconPrimary"
+              size="medium"
+              key="newEvent"
+              id="header_new_event"
+              onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
+            >
+              <Icon name="Plus" size="medium" />
+            </Button>
+          </ProtectedComponent>
+          {canSearchRecords && renderSearchInput(props)}
+        </HeaderCenter>
       )
     },
     {
@@ -420,11 +402,7 @@ const HeaderComponent = (props: IFullProps) => {
     }
   ]
 
-  if (
-    activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
-    (NATL_ADMIN_ROLES.includes(userDetails?.systemRole as string) ||
-      SYS_ADMIN_ROLES.includes(userDetails?.systemRole as string))
-  ) {
+  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !canSearchRecords) {
     rightMenu = [
       {
         element: <HistoryNavigator />
@@ -447,7 +425,7 @@ const HeaderComponent = (props: IFullProps) => {
       id="register_app_header"
       desktopRightMenu={rightMenu}
       className={className}
-      title={headerTitle}
+      title={title}
       {...mobileHeaderActionPropsWithDefaults}
     />
   )
@@ -474,7 +452,6 @@ export const Header = withRouter(
         ? ACTIVE_MENU_ITEM.VSEXPORTS
         : ACTIVE_MENU_ITEM.DECLARATIONS,
       language: store.i18n.language,
-      userDetails: getUserDetails(store),
       offlineData: getOfflineData(store),
       fieldNames: Object.values(getRegisterForm(store))
         .flatMap((form) => form.sections)

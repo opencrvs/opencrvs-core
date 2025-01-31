@@ -20,18 +20,17 @@ import {
   mockFetchRoleGraphqlOperation,
   mockDataWithRegistarRoleSelected,
   mockRoles,
-  mockUserGraphqlOperation
+  mockUserGraphqlOperation,
+  setScopes
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import {
-  modifyUserFormData,
-  rolesMessageAddData
-} from '@client/user/userReducer'
+import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Mock, describe, expect } from 'vitest'
+import { SCOPES } from '@opencrvs/commons/client'
 import { formatUrl } from '@client/navigation'
 import { CREATE_USER_SECTION } from '@client/navigation/routes'
 import { createMemoryRouter } from 'react-router-dom'
@@ -43,6 +42,7 @@ describe('signature upload tests', () => {
 
   beforeEach(async () => {
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+    setScopes([SCOPES.USER_CREATE], store)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -135,7 +135,6 @@ describe('signature upload tests', () => {
     beforeEach(async () => {
       await flushPromises()
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      store.dispatch(rolesMessageAddData())
       ;({ component: testComponent } = await createTestComponent(
         <CreateNewUser />,
         {

@@ -11,7 +11,7 @@
 
 import { hashKey } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
-import { EventIndex } from '@opencrvs/commons/client'
+import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { useEventAction } from './procedures/action'
 import { createEvent } from './procedures/create'
@@ -55,10 +55,18 @@ function filterOutboxEventsWithMutation<
 }
 
 export function useEvents() {
-  const eventsList = api.events.get.useQuery().data ?? []
+  const eventsList = api.event.list.useQuery().data ?? []
 
-  function getDrafts() {
-    return eventsList.filter((event) => event.status === 'DRAFT')
+  function getDrafts(): EventDocument[] {
+    const queries = queryClient.getQueriesData<EventDocument>({
+      queryKey: getQueryKey(api.event.get)
+    })
+
+    return queries
+      .map((query) => query[1])
+      .filter((event): event is EventDocument =>
+        Boolean(event && event.actions[event.actions.length - 1].draft)
+      )
   }
 
   function getOutbox() {
@@ -66,7 +74,7 @@ export function useEvents() {
       eventsList,
       api.event.actions.declare,
       (event, parameters) => {
-        return event.id === parameters.eventId
+        return event.id === parameters.eventId && !parameters.draft
       }
     )
 
@@ -74,7 +82,7 @@ export function useEvents() {
       eventsList,
       api.event.actions.register,
       (event, parameters) => {
-        return event.id === parameters.eventId
+        return event.id === parameters.eventId && !parameters.draft
       }
     )
 
@@ -90,12 +98,15 @@ export function useEvents() {
   return {
     createEvent,
     getEvent: api.event.get,
-    getEvents: api.events.get,
-    getDrafts,
+    getEvents: api.event.list,
     deleteEvent: useDeleteEventMutation(),
     getOutbox,
+    getDrafts,
     actions: {
-      draft: useEventAction(utils.event.actions.draft, api.event.actions.draft),
+      validate: useEventAction(
+        utils.event.actions.validate,
+        api.event.actions.validate
+      ),
       notify: useEventAction(
         utils.event.actions.notify,
         api.event.actions.notify
@@ -107,7 +118,21 @@ export function useEvents() {
       register: useEventAction(
         utils.event.actions.register,
         api.event.actions.register
-      )
+      ),
+      correct: {
+        request: useEventAction(
+          utils.event.actions.correct.request,
+          api.event.actions.correct.request
+        ),
+        approve: useEventAction(
+          utils.event.actions.correct.approve,
+          api.event.actions.correct.approve
+        ),
+        reject: useEventAction(
+          utils.event.actions.correct.reject,
+          api.event.actions.correct.reject
+        )
+      }
     }
   }
 }

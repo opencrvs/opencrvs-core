@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
+import { formatISO } from 'date-fns'
 import {
   ConditionalParameters,
   FieldConfig,
@@ -27,7 +28,7 @@ export interface Errors {
 }
 
 function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
-  const hasShowRule = field.conditionals.some(
+  const hasShowRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'SHOW'
   )
   const validConditionals = getConditionalActionsForField(field, params)
@@ -36,7 +37,7 @@ function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
 }
 
 function isFieldDisabled(field: FieldConfig, params: ConditionalParameters) {
-  const hasEnableRule = field.conditionals.some(
+  const hasEnableRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'ENABLE'
   )
   const validConditionals = getConditionalActionsForField(field, params)
@@ -52,7 +53,7 @@ function getValidationErrors(
 ) {
   const conditionalParameters = {
     $form: values,
-    $now: new Date().toISOString().split('T')[0]
+    $now: formatISO(new Date(), { representation: 'date' })
   }
 
   if (
@@ -66,9 +67,32 @@ function getValidationErrors(
 
   const validators = field.validation ? field.validation : []
 
-  // if (field.required && !checkValidationErrorsOnly) {
-  //   validators.push(required(requiredErrorMessage))
-  // } else if (isFieldButton(field)) {
+  if (field.required && !checkValidationErrorsOnly) {
+    validators.push({
+      message: {
+        defaultMessage: 'Required for registration',
+        description: 'This is the error message for required fields',
+        id: 'error.required'
+      },
+      validator: {
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [field.id]: {
+                type: 'string',
+                minLength: 1
+              }
+            },
+            required: [field.id]
+          }
+        },
+        required: ['$form']
+      }
+    })
+  }
+  //  else if (isFieldButton(field)) {
   //   const { trigger } = field.options
   //   validators.push(httpErrorResponseValidator(trigger))
   // } else if (field.validateEmpty) {
@@ -80,7 +104,7 @@ function getValidationErrors(
     .filter((validation) => {
       return !validate(validation.validator, {
         $form: values,
-        $now: new Date().toISOString().split('T')[0]
+        $now: formatISO(new Date(), { representation: 'date' })
       })
     })
     .map((validation) => ({ message: validation.message }))

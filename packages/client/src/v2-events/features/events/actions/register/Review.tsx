@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -22,6 +22,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { FormLayout } from '@client/v2-events/layouts/form'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -58,16 +59,13 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  if (!config) {
-    throw new Error('Event configuration not found with type: ' + event.type)
-  }
-
   const { forms: formConfigs } = config.actions.filter(
     (action) => action.type === ActionType.REGISTER
   )[0]
 
-  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const setFormValues = useEventFormData((state) => state.setFormValuesIfEmpty)
   const getFormValues = useEventFormData((state) => state.getFormValues)
+  const previousFormValues = getCurrentEventState(event).data
 
   useEffect(() => {
     setFormValues(eventId, getCurrentEventState(event).data)
@@ -116,22 +114,36 @@ export function Review() {
   }
 
   return (
-    <ReviewComponent.Body
-      eventConfig={config}
-      form={form}
-      formConfig={formConfigs[0]}
-      title=""
-      onEdit={handleEdit}
+    <FormLayout
+      route={ROUTES.V2.EVENTS.REGISTER}
+      onSaveAndExit={() => {
+        events.actions.register.mutate({
+          eventId: event.id,
+          data: form,
+          transactionId: uuid(),
+          draft: true
+        })
+        goToHome()
+      }}
     >
-      <ReviewComponent.Actions
-        messages={{
-          title: messages.registerActionTitle,
-          description: messages.registerActionDescription,
-          onConfirm: messages.registerActionDeclare
-        }}
-        onConfirm={handleRegistration}
-      />
-      {modal}
-    </ReviewComponent.Body>
+      <ReviewComponent.Body
+        eventConfig={config}
+        form={form}
+        formConfig={formConfigs[0]}
+        previousFormValues={previousFormValues}
+        title=""
+        onEdit={handleEdit}
+      >
+        <ReviewComponent.Actions
+          messages={{
+            title: messages.registerActionTitle,
+            description: messages.registerActionDescription,
+            onConfirm: messages.registerActionDeclare
+          }}
+          onConfirm={handleRegistration}
+        />
+        {modal}
+      </ReviewComponent.Body>
+    </FormLayout>
   )
 }

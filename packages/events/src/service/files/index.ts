@@ -18,6 +18,7 @@ import {
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { getEventConfigurations } from '@events/service/config/config'
+import { z } from 'zod'
 
 function getFieldDefinitionForActionDataField(
   configuration: EventConfig,
@@ -40,6 +41,7 @@ function getFieldDefinitionForActionDataField(
     logger.error('Failed to find active form configuration', {
       actionType
     })
+
     throw new Error('Failed to find active form configuration')
   }
 
@@ -64,6 +66,7 @@ export async function presignFilesInEvent(event: EventDocument, token: string) {
     logger.error('Failed to find configuration for event', {
       event: event.type
     })
+
     throw new Error('Failed to find configuration for event')
   }
 
@@ -160,8 +163,11 @@ async function presignFiles(
       status: res.status,
       text: await res.text()
     })
+
     throw new Error('Failed to presign files')
   }
 
-  return res.json()
+  const fileUrls = z.array(z.string()).parse(await res.json())
+
+  return fileUrls
 }

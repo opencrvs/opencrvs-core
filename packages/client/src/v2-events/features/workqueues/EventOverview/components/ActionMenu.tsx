@@ -13,6 +13,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 
 import { useNavigate } from 'react-router-dom'
+import { formatISO } from 'date-fns'
 import { validate, ActionType } from '@opencrvs/commons/client'
 import { type ActionConfig } from '@opencrvs/commons'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
@@ -42,7 +43,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
     const params = {
       $event: event,
       $user: authentication,
-      $now: new Date().toISOString().split('T')[0]
+      $now: formatISO(new Date(), { representation: 'date' })
     }
 
     return validate(action.allowedWhen, params)
@@ -64,6 +65,8 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                 onClick={() => {
                   if (
                     action.type === ActionType.CREATE ||
+                    action.type === ActionType.APPROVE_CORRECTION ||
+                    action.type === ActionType.REJECT_CORRECTION ||
                     action.type === ActionType.CUSTOM
                   ) {
                     alert(`Action ${action.type} is not implemented yet.`)

@@ -15,21 +15,30 @@ import '@opencrvs/commons/monitoring'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
-import { appRouter } from './router'
+import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { getUserId } from '@opencrvs/commons/authentication'
+import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'
+import { getUser, logger } from '@opencrvs/commons'
+import { env } from './environment'
+import { getEventConfigurations } from './service/config/config'
+import { ensureIndexExists } from './service/indexing/indexing'
+import { getAnonymousToken } from './service/auth'
 
 const server = createHTTPServer({
   router: appRouter,
   createContext: async function createContext(opts) {
-    const token = opts.req.headers.authorization
+    const parseResult = TokenWithBearer.safeParse(
+      opts.req.headers.authorization
+    )
 
-    if (!token) {
+    if (!parseResult.success) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'
       })
     }
+
+    const token = parseResult.data
 
     const userId = getUserId(token)
 
@@ -39,14 +48,44 @@ const server = createHTTPServer({
       })
     }
 
+    const { primaryOfficeId } = await getUser(
+      env.USER_MANAGEMENT_URL,
+      userId,
+      token
+    )
+
     return {
       user: {
         id: userId,
-        primaryOfficeId: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176'
+        primaryOfficeId
       },
-      token
+      token: token
     }
   }
 })
 
-server.listen(5555)
+export async function main() {
+  try {
+    const configurations = await getEventConfigurations(
+      await getAnonymousToken()
+    )
+    for (const configuration of configurations) {
+      logger.info(`Loaded event configuration: ${configuration.id}`)
+      await ensureIndexExists(configuration)
+    }
+  } catch (error) {
+    logger.error(error)
+    if (env.isProd) {
+      process.exit(1)
+    }
+    /*
+     * SIGUSR2 tells nodemon to restart the process without waiting for new file changes
+     */
+    setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
+    return
+  }
+
+  server.listen(5555)
+}
+
+void main()

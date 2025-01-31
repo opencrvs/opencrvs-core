@@ -27,21 +27,20 @@ import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
 import { IDeclaration } from '@opencrvs/client/src/declarations'
 import { getScope } from '@client/profile/profileSelectors'
-import { Scope } from '@opencrvs/client/src/utils/authUtils'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
-
 import {
   REGISTRAR_HOME_TAB,
   REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
 } from '@client/navigation/routes'
 import { errorMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {Text} from '@opencrvs/components/lib/Text'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 interface IReviewProps {
   theme: ITheme
-  scope: Scope | null
+  scope: Scope[] | null
   event: EventType
 }
 interface IDeclarationProp {
@@ -61,11 +60,20 @@ const ErrorText = styled(Text)`
 `
 class ReviewFormView extends React.Component<IProps> {
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    return this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    return (
+      this.props.scope &&
+      this.props.scope.some((scope) => validateScopes.includes(scope))
+    )
   }
 
   render() {

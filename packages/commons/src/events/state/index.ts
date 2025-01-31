@@ -20,12 +20,17 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.CREATE) {
       return EventStatus.CREATED
     }
+    if (action.draft) {
+      return status
+    }
     if (action.type === ActionType.DECLARE) {
       return EventStatus.DECLARED
     }
-    if (action.type === ActionType.DRAFT) {
-      return EventStatus.DRAFT
+
+    if (action.type === ActionType.VALIDATE) {
+      return EventStatus.VALIDATED
     }
+
     if (action.type === ActionType.REGISTER) {
       return EventStatus.REGISTERED
     }
@@ -34,24 +39,45 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
 }
 
 function getAssignedUserFromActions(actions: Array<ActionDocument>) {
-  return actions.reduce<null | string>((status, action) => {
+  return actions.reduce<null | string>((user, action) => {
     if (action.type === ActionType.ASSIGN) {
       return action.assignedTo
     }
     if (action.type === ActionType.UNASSIGN) {
       return null
     }
-    return status
+    return user
   }, null)
 }
 
 function getData(actions: Array<ActionDocument>) {
   return actions.reduce((status, action) => {
+    if (action.type === ActionType.REQUEST_CORRECTION) {
+      return status
+    }
+
+    if (action.type === ActionType.APPROVE_CORRECTION) {
+      const requestAction = actions.find(({ id }) => id === action.requestId)
+      if (!requestAction) {
+        return status
+      }
+      return {
+        ...status,
+        ...requestAction.data
+      }
+    }
+
     return {
       ...status,
       ...action.data
     }
   }, {})
+}
+
+export function isUndeclaredDraft(event: EventDocument): boolean {
+  return event.actions.every(
+    ({ type, draft }) => type === ActionType.CREATE || draft
+  )
 }
 
 export function getCurrentEventState(event: EventDocument): EventIndex {

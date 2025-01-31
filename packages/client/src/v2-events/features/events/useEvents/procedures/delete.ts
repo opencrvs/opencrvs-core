@@ -26,7 +26,7 @@ function waitUntilEventIsCreated<R>(
     }
 
     const localVersion = utils.event.get.getData(eventId)
-    if (!localVersion || localVersion.id === localVersion.transactionId) {
+    if (!localVersion || isTemporaryId(localVersion.id)) {
       throw new Error('Event that has not been stored yet cannot be deleted')
     }
 
@@ -43,7 +43,7 @@ utils.event.delete.setMutationDefaults(({ canonicalMutationFn }) => ({
   },
   retryDelay: 10000,
   onSuccess: ({ id }) => {
-    void utils.events.get.invalidate()
+    void utils.event.list.invalidate()
   },
   /*
    * This ensures that when the application is reloaded with pending mutations in IndexedDB, the

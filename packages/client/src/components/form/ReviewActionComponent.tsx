@@ -21,6 +21,10 @@ import React, { useState } from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Text } from '@opencrvs/components/lib/Text'
+import ProtectedComponent from '@client/components/ProtectedComponent'
+import { SCOPES } from '@opencrvs/commons/client'
+import { usePermissions } from '@client/hooks/useAuthorization'
+
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
@@ -90,12 +94,12 @@ const ActionContainer = styled.div`
   flex-flow: row wrap;
   align-items: center;
 
-  button:first-child {
-    margin-right: 16px;
-  }
+  button {
+    margin: 0 16px 8px 0;
 
-  & > button {
-    margin-bottom: 8px;
+    &:last-child {
+      margin-right: 0;
+    }
   }
 `
 
@@ -296,8 +300,6 @@ const ACTION_TO_CONTENT_MAP_SKELETON: (
 
 const ReviewActionComponent = ({
   id,
-  declarationToBeValidated,
-  declarationToBeRegistered,
   alreadyRejectedDeclaration,
   completeDeclaration,
   totalFileSizeExceeded,
@@ -309,6 +311,13 @@ const ReviewActionComponent = ({
   hasErrorsOnFields
 }: IReviewActionProps & IntlShapeProps) => {
   const [showSubmitModal, setShowSubmitModal] = useState(false)
+  const { hasAnyScope, hasScope } = usePermissions()
+
+  const declarationToBeRegistered = hasScope(SCOPES.RECORD_REGISTER)
+  const declarationToBeValidated = hasAnyScope([
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+    SCOPES.RECORD_SUBMIT_FOR_UPDATES
+  ])
 
   const toggleSubmitModalOpen = () => {
     setShowSubmitModal(!showSubmitModal)
@@ -337,6 +346,7 @@ const ReviewActionComponent = ({
         String(draftDeclaration || alreadyRejectedDeclaration)
       ].completionStatus[String(completeDeclaration)]) ||
     null
+
   return !actionContent ? null : (
     <Container id={id}>
       <UnderLayBackground background={background} />
@@ -355,54 +365,74 @@ const ReviewActionComponent = ({
         </Description>
         <ActionContainer>
           {declarationToBeRegistered ? (
-            <Button
-              type="positive"
-              size="large"
-              id="registerDeclarationBtn"
-              onClick={toggleSubmitModalOpen}
-              disabled={!completeDeclaration || totalFileSizeExceeded}
-            >
-              <Icon name="Check" />
-              {intl.formatMessage(buttonMessages.register)}
-            </Button>
+            <ProtectedComponent scopes={[SCOPES.RECORD_REGISTER]}>
+              <Button
+                type="positive"
+                size="large"
+                id="registerDeclarationBtn"
+                onClick={toggleSubmitModalOpen}
+                disabled={!completeDeclaration || totalFileSizeExceeded}
+              >
+                <Icon name="Check" />
+                {intl.formatMessage(buttonMessages.register)}
+              </Button>
+            </ProtectedComponent>
           ) : declarationToBeValidated ? (
-            <Button
-              type="positive"
-              size="large"
-              id="validateDeclarationBtn"
-              onClick={toggleSubmitModalOpen}
-              disabled={!completeDeclaration || totalFileSizeExceeded}
-            >
-              <Icon name="PaperPlaneTilt" />
-              {intl.formatMessage(buttonMessages.sendForApproval)}
-            </Button>
+            <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_APPROVAL]}>
+              <Button
+                type="positive"
+                size="large"
+                id="validateDeclarationBtn"
+                onClick={toggleSubmitModalOpen}
+                disabled={!completeDeclaration || totalFileSizeExceeded}
+              >
+                <Icon name="PaperPlaneTilt" />
+                {intl.formatMessage(buttonMessages.sendForApproval)}
+              </Button>
+            </ProtectedComponent>
+          ) : completeDeclaration ? (
+            <>
+              <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_REVIEW]}>
+                <Button
+                  type="primary"
+                  size="large"
+                  id={'submit_for_review'}
+                  onClick={toggleSubmitModalOpen}
+                  disabled={totalFileSizeExceeded}
+                >
+                  <Upload />
+                  {intl.formatMessage(buttonMessages.sendForReview)}
+                </Button>
+              </ProtectedComponent>
+            </>
           ) : (
-            <Button
-              type="primary"
-              size="large"
-              id="submit_form"
-              onClick={toggleSubmitModalOpen}
-              disabled={hasErrorsOnFields || totalFileSizeExceeded}
-            >
-              <Upload />
-              {intl.formatMessage(
-                completeDeclaration
-                  ? buttonMessages.sendForReview
-                  : buttonMessages.sendIncomplete
-              )}
-            </Button>
+            <>
+              <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_INCOMPLETE]}>
+                <Button
+                  type="primary"
+                  size="large"
+                  id={'submit_incomplete'}
+                  onClick={toggleSubmitModalOpen}
+                  disabled={hasErrorsOnFields || totalFileSizeExceeded}
+                >
+                  <Upload />
+                  {intl.formatMessage(buttonMessages.sendIncomplete)}
+                </Button>
+              </ProtectedComponent>
+            </>
           )}
-
           {rejectDeclarationAction && !alreadyRejectedDeclaration && (
-            <Button
-              type="negative"
-              size="large"
-              id="rejectDeclarationBtn"
-              onClick={rejectDeclarationAction}
-            >
-              <Icon name="X" />
-              {intl.formatMessage(buttonMessages.reject)}
-            </Button>
+            <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_UPDATES]}>
+              <Button
+                type="negative"
+                size="large"
+                id="rejectDeclarationBtn"
+                onClick={rejectDeclarationAction}
+              >
+                <Icon name="X" />
+                {intl.formatMessage(buttonMessages.reject)}
+              </Button>
+            </ProtectedComponent>
           )}
         </ActionContainer>
       </Content>

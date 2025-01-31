@@ -22,8 +22,7 @@ import {
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
   getVisibleSectionGroupsBasedOnConditions,
-  getConditionalActionsForField,
-  getListOfLocations
+  getConditionalActionsForField
 } from '@client/forms/utils'
 import {
   buttonMessages as messages,
@@ -31,14 +30,9 @@ import {
   buttonMessages,
   constantsMessages
 } from '@client/i18n/messages'
-import {
-  generateCreateUserSectionUrl,
-  generateUserReviewFormUrl
-} from '@client/navigation'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { draftToGqlTransformer } from '@client/transformer'
 import {
   modifyUserFormData,
   submitUserFormData
@@ -50,7 +44,11 @@ import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ApolloClient } from '@apollo/client'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
@@ -64,9 +62,12 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
-import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { Link } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/src/Text'
+import { SCOPES } from '@opencrvs/commons/client'
+import { UserRole } from '@client/utils/gateway'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import { draftToGqlTransformer } from '@client/transformer'
 import {
   RouteComponentProps,
   withRouter
@@ -74,6 +75,11 @@ import {
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
+import {
+  generateCreateUserSectionUrl,
+  generateUserReviewFormUrl
+} from '@client/navigation'
+import { getListOfLocations } from '@client/utils/validate'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -82,12 +88,15 @@ interface IUserReviewFormProps {
   client: ApolloClient<unknown>
 }
 
-interface IDispatchProps {
+interface IStateProps {
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
-  modify: (values: IFormSectionData) => void
-  submitForm: (variables: Record<string, any>) => void
+  userRoles: UserRole[]
   userDetails: UserDetails | null
+}
+interface IDispatchProps {
+  submitForm: (variables: Record<string, any>) => void
+  modify: (values: IFormSectionData) => void
 }
 
 interface ISectionData {
@@ -117,151 +126,204 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
+interface ICommonProps {
+  offlineCountryConfiguration: IOfflineData
+  formData: IFormSectionData
+  userRoles: UserRole[]
+  userDetails: UserDetails | null
+  intl: IntlShape
+}
+interface ISectionDataProps {
+  userFormSection: IFormSection
+  userId: string | undefined
+  hasUpdateUserScope: boolean
+  hasCreateUserScope: boolean
+  navigate: ReturnType<typeof useNavigate>
+}
+
+const transformSectionData = ({
+  userFormSection,
+  userId,
+  hasUpdateUserScope,
+  hasCreateUserScope,
+  navigate,
+  ...props
+}: ISectionDataProps & ICommonProps) => {
+  const { formData, intl } = props
+  let nameJoined = false,
+    fieldValue
+  const sections: ISectionData[] = []
+  getVisibleSectionGroupsBasedOnConditions(userFormSection, formData).forEach(
+    (group) => {
+      group.fields.forEach((field: IFormField, idx) => {
+        if (field.hideValueInPreview) {
+          return
+        } else if (field.type === SUBSECTION_HEADER || field.type === DIVIDER) {
+          return
+        } else if (field && field.type === FIELD_GROUP_TITLE) {
+          sections.push({ title: intl.formatMessage(field.label), items: [] })
+        } else if (field && sections.length > 0) {
+          if (field.name === 'username' && !getValue({ ...props, field }))
+            return
+          let label = intl.formatMessage(field.label)
+          if (
+            !getConditionalActionsForField(
+              field,
+              props.formData,
+              props.offlineCountryConfiguration,
+              { user: props.formData },
+              props.userDetails
+            ).includes('hide')
+          ) {
+            fieldValue = getValue({ ...props, field })
+
+            if (['firstNamesEng', 'familyNameEng'].includes(field.name)) {
+              if (nameJoined) return
+              label = intl.formatMessage(constantsMessages.name)
+              fieldValue = getName({ ...props, fields: group.fields })
+              nameJoined = true
+            }
+
+            if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
+              fieldValue = (
+                <SignatureImage
+                  src={
+                    (formData[field.name] as IAttachmentValue | undefined)?.data
+                  }
+                />
+              )
+            }
+
+            sections[sections.length - 1].items.push({
+              label: <Label>{label}</Label>,
+              value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
+              actions:
+                !(
+                  field.name === 'registrationOffice' &&
+                  !(
+                    (userId && hasUpdateUserScope) ||
+                    (!userId && hasCreateUserScope)
+                  )
+                ) && !field.readonly ? (
+                  <Link
+                    id={`btn_change_${field.name}`}
+                    onClick={() => {
+                      userId
+                        ? navigate(
+                            generateUserReviewFormUrl({
+                              userId,
+                              sectionId: userFormSection.id,
+                              groupId: group.id,
+                              userFormFieldNameHash: field.name
+                            })
+                          )
+                        : navigate(
+                            generateCreateUserSectionUrl({
+                              sectionId: userFormSection.id,
+                              groupId: group.id,
+                              userFormFieldNameHash: field.name
+                            })
+                          )
+                    }}
+                  >
+                    {intl.formatMessage(messages.change)}
+                  </Link>
+                ) : (
+                  <></>
+                )
+            })
+          }
+        }
+      })
+    }
+  )
+
+  return sections
+}
+
+const getValue = ({
+  offlineCountryConfiguration,
+  formData,
+  userRoles,
+  intl,
+  field
+}: ICommonProps & { field: IFormField }) => {
+  if (field.type === LOCATION_SEARCH_INPUT) {
+    const offlineLocations = field.searchableResource.reduce(
+      (locations, resource) => {
+        return {
+          ...locations,
+          ...getListOfLocations(offlineCountryConfiguration, resource)
+        }
+      },
+      {}
+    ) as { [key: string]: ILocation }
+
+    const locationId = formData[field.name] as string
+    return offlineLocations[locationId] && offlineLocations[locationId].name
+  }
+
+  const role = userRoles.find(({ id }) => id === formData.role)
+
+  return formData[field.name]
+    ? typeof formData[field.name] !== 'object'
+      ? field.name === 'systemRole'
+        ? intl.formatMessage(userMessages[formData.systemRole as string])
+        : field.name === 'role' && role
+        ? intl.formatMessage(role.label)
+        : String(formData[field.name])
+      : (formData[field.name] as IDynamicValues).label
+    : ''
+}
+
+const getName = ({
+  fields,
+  ...props
+}: ICommonProps & { fields: IFormField[] }) => {
+  const firstNamesEngField = fields.find(
+    (field) => field.name === 'firstNamesEng'
+  ) as IFormField
+  const familyNameEngField = fields.find(
+    (field) => field.name === 'familyNameEng'
+  ) as IFormField
+
+  return `${getValue({
+    ...props,
+    field: firstNamesEngField
+  })} ${getValue({
+    ...props,
+    field: familyNameEngField
+  })}`
+}
+
 const UserReviewFormComponent = ({
   intl,
-  userFormSection,
-  userDetails,
-  formData,
-  offlineCountryConfiguration,
-  userId,
   section,
-  submitForm
-}: IFullProps & IDispatchProps) => {
+  userId,
+  userFormSection,
+  formData,
+  userDetails,
+  offlineCountryConfiguration,
+  submitForm,
+  userRoles
+}: IFullProps & IDispatchProps & IStateProps) => {
   const navigate = useNavigate()
 
+  const { hasAnyScope, canCreateUser } = usePermissions()
+  const hasUpdateUserScope = hasAnyScope([
+    SCOPES.USER_UPDATE,
+    SCOPES.USER_UPDATE_MY_JURISDICTION
+  ])
+
+  let title: string | undefined
+  let actionComponent: JSX.Element
   const locationId = formData['registrationOffice'] as string
+  const locationDetails =
+    offlineCountryConfiguration['locations'][locationId] ||
+    offlineCountryConfiguration['facilities'][locationId] ||
+    offlineCountryConfiguration['offices'][locationId]
 
-  const getValue = (field: IFormField) => {
-    if (field.type === LOCATION_SEARCH_INPUT) {
-      const offlineLocations = field.searchableResource.reduce(
-        (locations, resource) => {
-          return {
-            ...locations,
-            ...getListOfLocations(offlineCountryConfiguration, resource)
-          }
-        },
-        {}
-      ) as { [key: string]: ILocation }
-
-      const locationId = formData[field.name] as string
-      return offlineLocations[locationId] && offlineLocations[locationId].name
-    }
-
-    return formData[field.name]
-      ? typeof formData[field.name] !== 'object'
-        ? field.name === 'systemRole'
-          ? intl.formatMessage(userMessages[formData.systemRole as string])
-          : field.name === 'role'
-          ? intl.formatMessage({
-              id: getUserRoleIntlKey(formData.role as string)
-            })
-          : String(formData[field.name])
-        : (formData[field.name] as IDynamicValues).label
-      : ''
-  }
-
-  const transformSectionData = () => {
-    let nameJoined = false,
-      fieldValue
-    const sections: ISectionData[] = []
-    getVisibleSectionGroupsBasedOnConditions(userFormSection, formData).forEach(
-      (group) => {
-        group.fields.forEach((field: IFormField, idx) => {
-          if (field.hideValueInPreview) {
-            return
-          } else if (
-            field.type === SUBSECTION_HEADER ||
-            field.type === DIVIDER
-          ) {
-            return
-          } else if (field && field.type === FIELD_GROUP_TITLE) {
-            sections.push({ title: intl.formatMessage(field.label), items: [] })
-          } else if (field && sections.length > 0) {
-            if (field.name === 'username' && !getValue(field)) return
-            let label = intl.formatMessage(field.label)
-            if (
-              !getConditionalActionsForField(
-                field,
-                formData,
-                offlineCountryConfiguration,
-                { user: formData },
-                userDetails
-              ).includes('hide')
-            ) {
-              fieldValue = getValue(field)
-
-              if (['firstNamesEng', 'familyNameEng'].includes(field.name)) {
-                if (nameJoined) return
-                label = intl.formatMessage(constantsMessages.name)
-                fieldValue = getName(group.fields)
-                nameJoined = true
-              }
-
-              if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
-                fieldValue = (
-                  <SignatureImage
-                    src={
-                      (formData[field.name] as IAttachmentValue | undefined)
-                        ?.data
-                    }
-                  />
-                )
-              }
-
-              sections[sections.length - 1].items.push({
-                label: <Label variant='bold16' element='span'>{label}</Label>,
-                value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
-                actions:
-                  !(
-                    field.name === 'registrationOffice' &&
-                    userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
-                  ) && !field.readonly ? (
-                    <Link
-                      id={`btn_change_${field.name}`}
-                      onClick={() => {
-                        userId
-                          ? navigate(
-                              generateUserReviewFormUrl({
-                                userId,
-                                sectionId: userFormSection.id,
-                                groupId: group.id,
-                                userFormFieldNameHash: field.name
-                              })
-                            )
-                          : navigate(
-                              generateCreateUserSectionUrl({
-                                sectionId: userFormSection.id,
-                                groupId: group.id,
-                                userFormFieldNameHash: field.name
-                              })
-                            )
-                      }}
-                    >
-                      {intl.formatMessage(messages.change)}
-                    </Link>
-                  ) : (
-                    <></>
-                  )
-              })
-            }
-          }
-        })
-      }
-    )
-
-    return sections
-  }
-
-  const getName = (fields: IFormField[]) => {
-    const firstNamesEngField = fields.find(
-      (field) => field.name === 'firstNamesEng'
-    ) as IFormField
-    const familyNameEngField = fields.find(
-      (field) => field.name === 'familyName'
-    ) as IFormField
-
-    return `${getValue(firstNamesEngField)} ${getValue(familyNameEngField)}`
-  }
+  const userRole = userRoles.find(({ id }) => id === formData.role)
 
   const handleSubmit = () => {
     const variables = draftToGqlTransformer(
@@ -278,26 +340,19 @@ const UserReviewFormComponent = ({
 
     if (variables.user.signature) {
       delete variables.user.signature.name
-      delete variables.user.signature.__typename //to fix updating registrar bug
+      delete variables.user.signature.__typename
     }
-
     submitForm(variables)
   }
 
-  let title: string | undefined
-  let actionComponent: JSX.Element
-  const locationDetails =
-    offlineCountryConfiguration['locations'][locationId] ||
-    offlineCountryConfiguration['facilities'][locationId] ||
-    offlineCountryConfiguration['offices'][locationId]
   if (userId) {
     title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+
     actionComponent = (
       <SuccessButton
         id="submit-edit-user-form"
         disabled={
-          (formData.systemRole === 'LOCAL_REGISTRAR' ||
-            formData.systemRole === 'NATIONAL_REGISTRAR') &&
+          userRole?.scopes?.includes('profile.electronic-signature') &&
           !formData.signature
         }
         onClick={handleSubmit}
@@ -309,6 +364,7 @@ const UserReviewFormComponent = ({
     )
   } else {
     title = section.title && intl.formatMessage(section.title)
+
     actionComponent = (
       <Button
         id="submit_user_form"
@@ -316,8 +372,7 @@ const UserReviewFormComponent = ({
         size="large"
         fullWidth
         disabled={
-          (formData.systemRole === 'LOCAL_REGISTRAR' ||
-            formData.systemRole === 'NATIONAL_REGISTRAR') &&
+          userRole?.scopes?.includes('profile.electronic-signature') &&
           !formData.signature
         }
         onClick={handleSubmit}
@@ -326,6 +381,7 @@ const UserReviewFormComponent = ({
       </Button>
     )
   }
+
   return (
     <ActionPageLight
       title={title}
@@ -351,7 +407,18 @@ const UserReviewFormComponent = ({
     >
       <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
         <Container>
-          {transformSectionData().map((sec, index) => {
+          {transformSectionData({
+            userFormSection,
+            formData,
+            intl,
+            userId,
+            hasUpdateUserScope,
+            hasCreateUserScope: canCreateUser,
+            userRoles,
+            userDetails,
+            offlineCountryConfiguration,
+            navigate
+          }).map((sec, index) => {
             return (
               <React.Fragment key={index}>
                 <ListViewSimplified bottomBorder>
@@ -394,19 +461,21 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
           createOrUpdateUserMutation,
           variables,
           props.formData.registrationOffice as string,
-          Boolean(props.router.match.params.userId), // to detect if update or create,
+          Boolean(props.router.match.params.userId), // to detect if update or create
           navigateToUserList
         )
       )
     }
   }
 }
+
 export const UserReviewForm = withRouter(
   connect((store: IStoreState) => {
     return {
       userFormSection: store.userForm.userForm!.sections[0],
       offlineCountryConfiguration: getOfflineData(store),
-      userDetails: getUserDetails(store)
+      userDetails: getUserDetails(store),
+      userRoles: store.userForm.userRoles
     }
   }, mapDispatchToProps)(injectIntl(UserReviewFormComponent))
 )

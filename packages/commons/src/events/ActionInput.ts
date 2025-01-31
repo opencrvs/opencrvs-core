@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from './ActionConfig'
 import { z } from 'zod'
+import { ActionType } from './ActionConfig'
 import { FieldValue } from './FieldValue'
 
 const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
+  draft: z.boolean().optional().default(false),
   data: z.record(z.string(), FieldValue)
 })
 
@@ -36,11 +37,16 @@ export const RegisterActionInput = BaseActionInput.merge(
   })
 )
 
+export type RegisterActionInput = z.infer<typeof RegisterActionInput>
+
 export const ValidateActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE)
+    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE),
+    duplicates: z.array(z.string())
   })
 )
+
+export type ValidateActionInput = z.infer<typeof ValidateActionInput>
 
 export const NotifyActionInput = BaseActionInput.merge(
   z.object({
@@ -49,13 +55,7 @@ export const NotifyActionInput = BaseActionInput.merge(
   })
 )
 
-export const DraftActionInput = BaseActionInput.merge(
-  z.object({
-    type: z.literal(ActionType.DRAFT).default(ActionType.DRAFT)
-  })
-)
-
-export type DraftActionInput = z.infer<typeof DraftActionInput>
+export type NotifyActionInput = z.infer<typeof NotifyActionInput>
 
 export const DeclareActionInput = BaseActionInput.merge(
   z.object({
@@ -77,6 +77,45 @@ const UnassignActionInput = BaseActionInput.merge(
   })
 )
 
+export const RequestCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.REQUEST_CORRECTION)
+      .default(ActionType.REQUEST_CORRECTION),
+    metadata: z.record(z.string(), FieldValue)
+  })
+)
+
+export type RequestCorrectionActionInput = z.infer<
+  typeof RequestCorrectionActionInput
+>
+
+export const RejectCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    requestId: z.string(),
+    type: z
+      .literal(ActionType.REJECT_CORRECTION)
+      .default(ActionType.REJECT_CORRECTION)
+  })
+)
+
+export type RejectCorrectionActionInput = z.infer<
+  typeof RejectCorrectionActionInput
+>
+
+export const ApproveCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    requestId: z.string(),
+    type: z
+      .literal(ActionType.APPROVE_CORRECTION)
+      .default(ActionType.APPROVE_CORRECTION)
+  })
+)
+
+export type ApproveCorrectionActionInput = z.infer<
+  typeof ApproveCorrectionActionInput
+>
+
 /**
  * ActionInput types are used to validate the input data for the action.
  * In our use case, we use it directly with TRPC to validate the input data for the action.
@@ -88,12 +127,15 @@ const UnassignActionInput = BaseActionInput.merge(
 export const ActionInput = z.discriminatedUnion('type', [
   CreateActionInput,
   ValidateActionInput,
-  DraftActionInput,
   RegisterActionInput,
   NotifyActionInput,
   DeclareActionInput,
   AssignActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  RequestCorrectionActionInput,
+  RejectCorrectionActionInput,
+  ApproveCorrectionActionInput
 ])
 
-export type ActionInput = z.infer<typeof ActionInput>
+export type ActionInput = z.input<typeof ActionInput>
+export type ActionInputWithType = z.infer<typeof ActionInput>
