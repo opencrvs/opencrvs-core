@@ -13,6 +13,7 @@ import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { TestResolvers } from '@gateway/utils/testUtils'
+import { SCOPES } from '@opencrvs/commons/authentication'
 const resolvers = typeResolvers as unknown as TestResolvers
 
 const fetch = fetchAny as any
@@ -27,7 +28,7 @@ describe('Advanced search resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const regsiterToken = jwt.sign(
-        { scope: ['register'] },
+        { scope: [SCOPES.SEARCH_BIRTH] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -91,9 +92,7 @@ describe('Advanced search resolvers', () => {
           },
           'null'
         )
-      ).rejects.toThrowError(
-        'Advanced search is only allowed for registrar or registration agent'
-      )
+      ).rejects.toThrowError('Advanced search is not allowed for this user')
     })
 
     it('throws error when the service response is not 200', async () => {
@@ -124,7 +123,7 @@ describe('Advanced search resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const regsiterToken = jwt.sign(
-        { scope: ['register'] },
+        { scope: [SCOPES.SEARCH_BIRTH] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',

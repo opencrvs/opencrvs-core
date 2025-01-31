@@ -7,66 +7,18 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-type RoleLabel {
-  lang: String!
-  label: String!
+type I18nMessage {
+  id: String!
+  defaultMessage: String!
+  description: String!
 }
 
-type Role {
-  _id: ID!
-  labels: [RoleLabel!]!
-}
-
-type SystemRole {
+type UserRole {
   id: ID!
-  value: SystemRoleType!
-  roles: [Role!]!
-  active: Boolean!
-}
-
-input ComparisonInput {
-  eq: String
-  gt: String
-  lt: String
-  gte: String
-  lte: String
-  in: [String!]
-  ne: String
-  nin: [String!]
-}
-
-input LabelInput {
-  lang: String!
-  label: String!
-}
-
-input RoleInput {
-  _id: ID
-  labels: [LabelInput!]!
-}
-
-input SystemRoleInput {
-  id: ID!
-  value: String
-  active: Boolean
-  roles: [RoleInput!]
-}
-
-type Response {
-  roleIdMap: Map!
+  label: I18nMessage!
+  scopes: [String!]!
 }
 
 type Query {
-  getSystemRoles(
-    title: String
-    value: ComparisonInput
-    role: String
-    active: Boolean
-    sortBy: String
-    sortOrder: String
-  ): [SystemRole!]
-}
-
-type Mutation {
-  updateRole(systemRole: SystemRoleInput): Response!
+  getUserRoles: [UserRole!]!
 }

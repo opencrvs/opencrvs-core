@@ -8,27 +8,31 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { checkAuth } from '@client/profile/profileActions'
+
+import { Navigation } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  mockUserResponse,
   flushPromises,
-  natlSysAdminToken,
-  registerScopeToken
+  mockUserResponse,
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
+  setScopes,
+  SYSTEM_ADMIN_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
+import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { Navigation } from '@client/components/interface/Navigation'
-import { ReactWrapper } from 'enzyme'
-import { Mock, vi } from 'vitest'
+import { scopes as allScopes, Scope, SCOPES } from '@opencrvs/commons/client'
+import { vi } from 'vitest'
 import { createMemoryRouter } from 'react-router-dom'
+import { formatUrl } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
-const getItem = window.localStorage.getItem as Mock
 const mockFetchUserDetails = vi.fn()
 
 const nameObj = {
@@ -42,8 +46,7 @@ const nameObj = {
           __typename: 'HumanName'
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ],
-      systemRole: 'REGISTRATION_AGENT'
+      ]
     }
   }
 }
@@ -59,8 +62,7 @@ const nameObjNatlSysAdmin = {
           __typename: 'HumanName'
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ],
-      systemRole: 'NATIONAL_SYSTEM_ADMIN'
+      ]
     }
   }
 }
@@ -80,8 +82,8 @@ describe('Navigation for national system admin related tests', () => {
     queries.fetchUserDetails = mockFetchUserDetails
     ;({ store } = createStore())
     client = createClient(store)
-    getItem.mockReturnValue(natlSysAdminToken)
-    await store.dispatch(checkAuth())
+
+    setScopes(SYSTEM_ADMIN_DEFAULT_SCOPES, store)
     await flushPromises()
 
     const { component } = await createTestComponent(<OfficeHome />, { store })
@@ -115,8 +117,9 @@ describe('Navigation for Registration agent related tests', () => {
     queries.fetchUserDetails = mockFetchUserDetails
     ;({ store } = createStore())
     client = createClient(store)
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
+
     await flushPromises()
 
     const { component, router: testRouter } = await createTestComponent(
@@ -142,7 +145,7 @@ describe('Navigation for Registration agent related tests', () => {
     expect(testComponent.exists('#navigation_readyForReview')).toBeTruthy()
     expect(testComponent.exists('#navigation_requiresUpdate')).toBeTruthy()
     expect(testComponent.exists('#navigation_print')).toBeTruthy()
-    expect(testComponent.exists('#navigation_waitingValidation')).toBeTruthy()
+    expect(testComponent.exists('#navigation_waitingValidation')).toBeFalsy()
     expect(testComponent.exists('#navigation_approvals')).toBeTruthy()
   })
 
@@ -177,9 +180,6 @@ describe('Navigation for District Registrar related tests', () => {
     queries.fetchUserDetails = mockFetchUserDetails
     ;({ store } = createStore())
     client = createClient(store)
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
-    await flushPromises()
 
     const { component } = await createTestComponent(
       <Navigation menuCollapse={() => {}} />,
@@ -191,5 +191,573 @@ describe('Navigation for District Registrar related tests', () => {
   it('settings and logout exists on navigation mobile view', async () => {
     expect(testComponent.exists('#navigation_settings')).toBeTruthy()
     expect(testComponent.exists('#navigation_logout')).toBeTruthy()
+  })
+})
+
+describe('Given a user with scopes views Navigation', () => {
+  let testComponent: ReactWrapper<{}, {}>
+  let build: () => Promise<ReactWrapper<{}, {}>>
+
+  beforeEach(async () => {
+    ;({ store } = createStore())
+    client = createClient(store)
+
+    build = async () =>
+      (
+        await createTestComponent(<OfficeHome />, {
+          store,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress
+            })
+          ],
+          path: REGISTRAR_HOME_TAB
+        })
+      )?.component
+  })
+  describe('My drafts', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.myDrafts}`
+
+    const requiredScopes = [
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [[requiredScopes[0]], true],
+      [[requiredScopes[1]], true],
+      [[requiredScopes[2]], true],
+      [[requiredScopes[3]], true],
+      [[requiredScopes[4]], true],
+      [[requiredScopes[5]], true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('In progress', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.inProgress}`
+
+    const requiredScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_REGISTER
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [[requiredScopes[0]], true],
+      [[requiredScopes[1]], true],
+      [[requiredScopes[2]], true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Sent for review', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.sentForReview}`
+
+    const requiredScopes = [SCOPES.RECORD_SUBMIT_FOR_REVIEW] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Sent for approval', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.sentForApproval}`
+
+    const requiredScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Requires update', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.requiresUpdate}`
+
+    const requiredScopes = [SCOPES.RECORD_SUBMIT_FOR_UPDATES] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Ready for review', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.readyForReview}`
+
+    const requiredScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_REGISTER
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Ready to print', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.readyToPrint}`
+
+    const requiredScopes = [
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('External validation', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.externalValidation}`
+
+    const requiredScopes = [SCOPES.RECORD_REGISTER] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes} EXTERNAL_VALIDATION_WORKQUEUE is true in config`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE).toBe(true)
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Ready to issue', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.readyToIssue}`
+
+    const requiredScopes = [
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes} and PRINT_IN_ADVANCE is true in config`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(
+          store.getState().offline.offlineData.config?.BIRTH.PRINT_IN_ADVANCE
+        ).toBeTruthy()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Outbox', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.outbox}`
+
+    const requiredScopes = [
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_REVIEW_DUPLICATES,
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_DECLARATION_ARCHIVE,
+      SCOPES.RECORD_DECLARATION_REINSTATE
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Organisation', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.organisation}`
+
+    const requiredScopes = [
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Team', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.team}`
+
+    const requiredScopes = [
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Config', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.config}_main`
+
+    const requiredScopes = [SCOPES.CONFIG_UPDATE_ALL] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Systems', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.systems}`
+
+    const requiredScopes = [SCOPES.CONFIG_UPDATE_ALL] as Scope[]
+
+    const tests = [[requiredScopes, true]]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes} and clicks config expander`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        testComponent
+          .find(`#navigation_${WORKQUEUE_TABS.config}_main`)
+          .hostNodes()
+          .simulate('click')
+
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Communications', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.communications}_main`
+
+    const requiredScopes = [SCOPES.CONFIG_UPDATE_ALL] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Email all users', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.emailAllUsers}`
+
+    const requiredScopes = [SCOPES.CONFIG_UPDATE_ALL] as Scope[]
+
+    const tests = [[requiredScopes, true]]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes} and clicks communciation expander`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        testComponent
+          .find(`#navigation_${WORKQUEUE_TABS.communications}_main`)
+          .hostNodes()
+          .simulate('click')
+
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Dashboard', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.dashboard}`
+
+    const requiredScopes = [SCOPES.PERFORMANCE_READ_DASHBOARDS] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Performance', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.performance}`
+
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Statistics', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.statistics}`
+
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Statistics', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.statistics}`
+
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Statistics', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.leaderboards}`
+
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Exports', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.vsexports}`
+
+    const requiredScopes = [
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
   })
 })

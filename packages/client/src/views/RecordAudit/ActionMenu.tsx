@@ -17,7 +17,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Icon, ResponsiveModal } from '@opencrvs/components'
 import {
   formatUrl,
@@ -26,9 +26,6 @@ import {
   generateIssueCertificateUrl,
   generatePrintCertificateUrl
 } from '@client/navigation'
-import { useIntl } from 'react-intl'
-import { Scope } from '@sentry/react'
-import { IDeclarationData } from './utils'
 import {
   clearCorrectionAndPrintChanges,
   deleteDeclaration,
@@ -40,14 +37,21 @@ import {
 import {
   canBeCorrected,
   isArchivable,
-  isArchived,
-  isCertified,
+  canBeReinstated,
+  isIssuable,
   isPendingCorrection,
   isPrintable,
   isRecordOrDeclaration,
   isReviewableDeclaration,
-  isUpdatableDeclaration
+  isUpdatableDeclaration,
+  isViewable
 } from '@client/declarations/utils'
+import ProtectedComponent from '@client/components/ProtectedComponent'
+import {
+  RECORD_ALLOWED_SCOPES,
+  usePermissions
+} from '@client/hooks/useAuthorization'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { CorrectionSection } from '@client/forms'
 import { useModal } from '@client/hooks/useModal'
 import { buttonMessages } from '@client/i18n/messages'
@@ -61,20 +65,24 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { client } from '@client/utils/apolloClient'
+import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
-import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
+import { useIntl } from 'react-intl'
+import { IDeclarationData } from './utils'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
+import { useDeclaration } from '@client/declarations/selectors'
+import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
-  scope: Scope
   draft: IDeclaration | null
   duplicates?: string[]
   toggleDisplayDialog: () => void
-}> = ({ declaration, scope, draft, toggleDisplayDialog, duplicates }) => {
+}> = ({ declaration, draft, toggleDisplayDialog, duplicates }) => {
   const dispatch = useDispatch()
+  const userDetails = useSelector(getUserDetails)
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
 
@@ -82,9 +90,16 @@ export const ActionMenu: React.FC<{
 
   const { id, type, assignment, status } = declaration
 
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+  const assignedToSelf =
+    assignment?.practitionerId === userDetails?.practitionerId
+  const assignedToOther = !!(
+    assignment && assignment?.practitionerId !== userDetails?.practitionerId
+  )
+
+  const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
+  const isDraft = draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
+  const isActionable = isDownloaded && assignedToSelf
 
   const isDuplicate = (duplicates ?? []).length > 0
 
@@ -98,6 +113,7 @@ export const ActionMenu: React.FC<{
     }
     return
   }
+
   const handleUnassign = async () => {
     const { firstName, lastName, officeName } = assignment || {}
     const unassignConfirm = await openModal<boolean | null>(
@@ -105,14 +121,14 @@ export const ActionMenu: React.FC<{
         assignment && (
           <UnassignModal
             close={close}
-            isDownloaded={isDownloaded}
             name={firstName + ' ' + lastName}
+            assignedSelf={assignedToSelf}
             officeName={officeName}
-          ></UnassignModal>
+          />
         )
     )
     if (unassignConfirm) {
-      dispatch(unassignDeclaration(id, client))
+      dispatch(unassignDeclaration(id, client, [FETCH_DECLARATION_SHORT_INFO]))
     }
     return
   }
@@ -126,7 +142,7 @@ export const ActionMenu: React.FC<{
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {!isDownloaded && assignment && (
+          {assignment && assignedToOther && (
             <>
               <DropdownMenu.Label>
                 {intl.formatMessage(messages.assignedTo, {
@@ -138,62 +154,86 @@ export const ActionMenu: React.FC<{
             </>
           )}
           <ViewAction declarationId={id} declarationStatus={status} />
-          <ReviewAction
-            declarationId={id}
-            declarationStatus={status}
-            type={type}
-            isDownloaded={isDownloaded}
-            scope={scope}
-            isDuplicate={isDuplicate}
-          />
-          <UpdateAction
-            declarationId={id}
-            declarationStatus={status}
-            type={type}
-            isDownloaded={isDownloaded}
-            scope={scope}
-          />
-          <ArchiveAction
-            toggleDisplayDialog={toggleDisplayDialog}
-            isDownloaded={isDownloaded}
-            scope={scope}
-            declarationStatus={status}
-          />
-          <ReinstateAction
-            toggleDisplayDialog={toggleDisplayDialog}
-            isDownloaded={isDownloaded}
-            scope={scope}
-            declarationStatus={status}
-          />
-          <PrintAction
-            declarationStatus={status}
-            declarationId={id}
-            type={type}
-            isDownloaded={isDownloaded}
-            scope={scope}
-          />
-          <IssueAction
-            declarationStatus={status}
-            declarationId={id}
-            isDownloaded={isDownloaded}
-            scope={scope}
-          />
-          <CorrectRecordAction
-            declarationId={id}
-            declarationStatus={status}
-            type={type}
-            isDownloaded={isDownloaded}
-            scope={scope}
-          />
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REVIEW}>
+            <ReviewAction
+              declarationId={id}
+              declarationStatus={status}
+              type={type}
+              isActionable={isActionable}
+              isDuplicate={isDuplicate}
+            />
+          </ProtectedComponent>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION}>
+            <ReviewCorrectionAction
+              declarationId={id}
+              declarationStatus={status}
+              type={type}
+              isActionable={isActionable}
+            />
+          </ProtectedComponent>
+          {isDraft ? (
+            <UpdateAction
+              declarationId={id}
+              declarationStatus={status}
+              type={type}
+              isActionable={isActionable || isDraft}
+            />
+          ) : (
+            <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.UPDATE}>
+              <UpdateAction
+                declarationId={id}
+                declarationStatus={status}
+                type={type}
+                isActionable={isActionable || isDraft}
+              />
+            </ProtectedComponent>
+          )}
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.ARCHIVE}>
+            <ArchiveAction
+              toggleDisplayDialog={toggleDisplayDialog}
+              isActionable={isActionable}
+              declarationStatus={status}
+            />
+          </ProtectedComponent>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REINSTATE}>
+            <ReinstateAction
+              toggleDisplayDialog={toggleDisplayDialog}
+              isActionable={isActionable}
+              declarationStatus={status}
+            />
+          </ProtectedComponent>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.PRINT}>
+            <PrintAction
+              declarationStatus={status}
+              declarationId={id}
+              type={type}
+              isActionable={isActionable}
+            />
+          </ProtectedComponent>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.ISSUE}>
+            <IssueAction
+              declarationStatus={status}
+              declarationId={id}
+              isActionable={isActionable}
+            />
+          </ProtectedComponent>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.CORRECT}>
+            <CorrectRecordAction
+              declarationId={id}
+              declarationStatus={status}
+              type={type}
+              isActionable={isActionable}
+            />
+          </ProtectedComponent>
           <DeleteAction
             handleDelete={handleDelete}
             declarationStatus={status}
           />
           <UnassignAction
             handleUnassign={handleUnassign}
-            isDownloaded={isDownloaded}
-            scope={scope}
-            assignment={assignment}
+            assignedOther={assignedToOther}
+            assignedSelf={assignedToSelf}
+            declarationStatus={status}
           />
         </DropdownMenu.Content>
       </DropdownMenu>
@@ -203,8 +243,7 @@ export const ActionMenu: React.FC<{
 }
 
 interface IActionItemCommonProps {
-  isDownloaded: boolean
-  scope: Scope
+  isActionable: boolean
   declarationStatus?: SUBMISSION_STATUS
 }
 
@@ -219,6 +258,8 @@ const ViewAction: React.FC<{
 }> = ({ declarationStatus, declarationId }) => {
   const navigate = useNavigate()
   const intl = useIntl()
+
+  if (!isViewable(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item
@@ -240,7 +281,7 @@ const ViewAction: React.FC<{
 
 const CorrectRecordAction: React.FC<
   IActionItemCommonProps & IDeclarationProps
-> = ({ declarationId, declarationStatus, type, isDownloaded, scope }) => {
+> = ({ declarationId, declarationStatus, type, isActionable }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const intl = useIntl()
@@ -248,17 +289,7 @@ const CorrectRecordAction: React.FC<
   const isBirthOrDeathEvent =
     type && [EventType.Birth, EventType.Death].includes(type as EventType)
 
-  // @ToDo use: `record.registration-correct` after configurable role pr is merged
-  const userHasRegisterScope =
-    scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
-
-  if (
-    !isBirthOrDeathEvent ||
-    !canBeCorrected(declarationStatus) ||
-    !userHasRegisterScope
-  ) {
+  if (!isBirthOrDeathEvent || !canBeCorrected(declarationStatus)) {
     return null
   }
 
@@ -274,7 +305,7 @@ const CorrectRecordAction: React.FC<
           })
         )
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="NotePencil" color="currentColor" size="large" />
       {intl.formatMessage(messages.correctRecord)}
@@ -284,22 +315,12 @@ const CorrectRecordAction: React.FC<
 
 const ArchiveAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, isDownloaded, declarationStatus, scope }) => {
+> = ({ toggleDisplayDialog, isActionable, declarationStatus }) => {
   const intl = useIntl()
-
-  // @ToDo use: `record.registration-archive` after configurable role pr is merged
-  // @Question: If user has archive scope but not register scope,
-  // can he archive validated record?
-  const userHasArchiveScope =
-    scope &&
-    ((scope as any as string[]).includes('register') ||
-      ((scope as any as string[]).includes('validate') &&
-        declarationStatus !== SUBMISSION_STATUS.VALIDATED))
-
-  if (!isArchivable(declarationStatus) || !userHasArchiveScope) return null
+  if (!isArchivable(declarationStatus)) return null
 
   return (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isActionable}>
       <Icon name="Archive" color="currentColor" size="large" />
       {intl.formatMessage(messages.archiveRecord)}
     </DropdownMenu.Item>
@@ -308,21 +329,12 @@ const ArchiveAction: React.FC<
 
 const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, isDownloaded, declarationStatus, scope }) => {
+> = ({ toggleDisplayDialog, isActionable, declarationStatus }) => {
   const intl = useIntl()
-
-  // @ToDo use: `record.registration-reinstate` after configurable role pr is merged
-  // @Question: If user has reinstate scope but not register scope,
-  // can he reinstate validated record?
-  const userHasReinstateScope =
-    scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
-
-  if (!isArchived(declarationStatus) || !userHasReinstateScope) return null
+  if (!canBeReinstated(declarationStatus)) return null
 
   return (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isActionable}>
       <Icon name="FileArrowUp" color="currentColor" size="large" />
       {intl.formatMessage(messages.reinstateRecord)}
     </DropdownMenu.Item>
@@ -331,25 +343,45 @@ const ReinstateAction: React.FC<
 
 const ReviewAction: React.FC<
   IActionItemCommonProps & IDeclarationProps & { isDuplicate: boolean }
-> = ({
-  declarationId,
-  declarationStatus,
-  type,
-  scope,
-  isDownloaded,
-  isDuplicate
-}) => {
-  const navigate = useNavigate()
+> = ({ declarationId, declarationStatus, type, isActionable, isDuplicate }) => {
   const intl = useIntl()
+  const navigate = useNavigate()
 
-  const userHasReviewScope =
-    scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
+  if (!isReviewableDeclaration(declarationStatus)) {
+    return null
+  }
 
-  if (!userHasReviewScope) return null
+  return (
+    <DropdownMenu.Item
+      onClick={() => {
+        navigate(
+          generateGoToPageUrl({
+            pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
+            declarationId,
+            pageId: 'review',
+            event: type as string
+          })
+        )
+      }}
+      disabled={!isActionable}
+    >
+      <Icon name="PencilLine" color="currentColor" size="large" />
+      {intl.formatMessage(messages.reviewDeclaration, { isDuplicate })}
+    </DropdownMenu.Item>
+  )
+}
 
-  return isPendingCorrection(declarationStatus) ? (
+const ReviewCorrectionAction: React.FC<
+  IActionItemCommonProps & IDeclarationProps
+> = ({ declarationId, declarationStatus, type, isActionable }) => {
+  const intl = useIntl()
+  const navigate = useNavigate()
+
+  if (!isPendingCorrection(declarationStatus)) {
+    return null
+  }
+
+  return (
     <DropdownMenu.Item
       onClick={() => {
         if (type) {
@@ -363,48 +395,24 @@ const ReviewAction: React.FC<
           )
         }
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="PencilLine" color="currentColor" size="large" />
       {intl.formatMessage(messages.reviewCorrection)}
     </DropdownMenu.Item>
-  ) : isReviewableDeclaration(declarationStatus) ? (
-    <DropdownMenu.Item
-      onClick={() => {
-        navigate(
-          generateGoToPageUrl({
-            pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
-            declarationId,
-            pageId: 'review',
-            event: type as string
-          })
-        )
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="PencilLine" color="currentColor" size="large" />
-      {intl.formatMessage(messages.reviewDeclaration, { isDuplicate })}
-    </DropdownMenu.Item>
-  ) : null
+  )
 }
 
 const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   declarationStatus,
   type,
-  scope,
-  isDownloaded
+  isActionable
 }) => {
   const intl = useIntl()
   const navigate = useNavigate()
-
-  // @ToDo use: appropriate scope after configurable role pr is merged
-  const userHasUpdateScope =
-    scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate') ||
-      ((scope as any as string[]).includes('validate') &&
-        declarationStatus === SUBMISSION_STATUS.DRAFT))
+  const declaration = useDeclaration(declarationId)
+  const isDraft = declaration?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   let pageRoute: string, pageId: 'preview' | 'review'
 
@@ -422,8 +430,7 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     pageId = 'review'
   }
 
-  if (!isUpdatableDeclaration(declarationStatus) || !userHasUpdateScope)
-    return null
+  if (!isUpdatableDeclaration(declarationStatus) && !isDraft) return null
 
   return (
     <DropdownMenu.Item
@@ -437,7 +444,7 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
           })
         )
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="PencilCircle" color="currentColor" size="large" />
       {intl.formatMessage(messages.updateDeclaration)}
@@ -448,21 +455,14 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   declarationStatus,
-  scope,
   type,
-  isDownloaded
+  isActionable
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  // @ToDo use: `record.print-records` or other appropriate scope after configurable role pr is merged
-  const userHasPrintScope =
-    scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
-
-  if (!isPrintable(declarationStatus) || !userHasPrintScope) return null
+  if (!isPrintable(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item
@@ -476,7 +476,7 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
           })
         )
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="Printer" color="currentColor" size="large" />
       {intl.formatMessage(messages.printDeclaration)}
@@ -486,21 +486,14 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 
 const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
-  isDownloaded,
-  declarationStatus,
-  scope
+  isActionable,
+  declarationStatus
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  // @ToDo use: `record.print-issue-certified-copies` or other appropriate scope after configurable role pr is merged
-  const userHasIssueScope =
-    scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
-
-  if (!isCertified(declarationStatus) || !userHasIssueScope) return null
+  if (!isIssuable(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item
@@ -512,7 +505,7 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
           })
         )
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="Handshake" color="currentColor" size="large" />
       {intl.formatMessage(messages.issueCertificate)}
@@ -535,18 +528,18 @@ const DeleteAction: React.FC<{
 }
 const UnassignAction: React.FC<{
   handleUnassign: () => void
-  isDownloaded: boolean
-  assignment?: GQLAssignmentData
-  scope: Scope
-}> = ({ handleUnassign, isDownloaded, assignment, scope }) => {
+  assignedOther: boolean
+  assignedSelf: boolean
+  declarationStatus?: SUBMISSION_STATUS
+}> = ({ handleUnassign, assignedOther, assignedSelf, declarationStatus }) => {
+  const { hasScope } = usePermissions()
   const intl = useIntl()
-  const isAssignedToSomeoneElse = !isDownloaded && assignment
 
-  // @ToDo use: appropriate scope after configurable role pr is merged
-  const userHasUnassignScope =
-    scope && (scope as any as string[]).includes('register')
-
-  if (!isDownloaded && (!isAssignedToSomeoneElse || !userHasUnassignScope))
+  if (
+    declarationStatus === SUBMISSION_STATUS.DRAFT ||
+    (!assignedSelf &&
+      (!assignedOther || !hasScope(SCOPES.RECORD_UNASSIGN_OTHERS)))
+  )
     return null
 
   return (
@@ -559,10 +552,10 @@ const UnassignAction: React.FC<{
 
 const UnassignModal: React.FC<{
   close: (result: boolean | null) => void
-  isDownloaded: boolean
+  assignedSelf: boolean
   name: string
-  officeName?: string
-}> = ({ close, isDownloaded, name, officeName }) => {
+  officeName?: string | null
+}> = ({ close, assignedSelf, name, officeName }) => {
   const intl = useIntl()
   return (
     <ResponsiveModal
@@ -592,7 +585,7 @@ const UnassignModal: React.FC<{
       show={true}
       handleClose={() => close(null)}
     >
-      {isDownloaded
+      {assignedSelf
         ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
         : intl.formatMessage(conflictsMessages.regUnassignDesc, {
             name,

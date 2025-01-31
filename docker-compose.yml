@@ -186,6 +186,7 @@ services:
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - METRICS_URL=http://metrics:1050
+      - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   user-mgnt:
     image: opencrvs/ocrvs-user-mgnt:${VERSION}
     #platform: linux/amd64

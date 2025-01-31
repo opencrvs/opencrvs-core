@@ -50,7 +50,7 @@ export async function notifyOnAction(
         body: JSON.stringify(event),
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: token
         }
       }
     )

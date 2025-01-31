@@ -29,7 +29,6 @@ import {
   getFieldType,
   getQueryData,
   getVisibleOptions,
-  getListOfLocations,
   getFieldHelperText,
   getDependentFields,
   evalExpressionInFieldDefinition,
@@ -117,7 +116,7 @@ import {
   FormikValues,
   Formik
 } from 'formik'
-import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { IOfflineData } from '@client/offline/reducer'
 import { isEqual, flatten, cloneDeep, set } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
@@ -142,6 +141,7 @@ import {
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
+import { getListOfLocations } from '@client/utils/validate'
 import { LinkButtonField } from '@client/components/form/LinkButton'
 import { ReaderGenerator } from './ReaderGenerator'
 import { IDVerificationBanner } from './IDVerificationBanner'
@@ -1147,8 +1147,8 @@ class FormSectionComponent extends React.Component<Props> {
                       }
                     }, {}),
                     intl,
-                    undefined,
-                    field.searchableType as LocationType[]
+                    (location) => field.searchableType.includes(location.type),
+                    field.userOfficeId
                   )
                 }
               : field

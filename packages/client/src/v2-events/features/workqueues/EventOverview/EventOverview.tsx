@@ -48,16 +48,21 @@ function EventOverviewContainer() {
   const { getEvents, getEvent } = useEvents()
   const { getUsers } = useUsers()
 
-  const [config] = useEventConfigurations()
+  const configs = useEventConfigurations()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
   const [events] = getEvents.useSuspenseQuery()
   const event = events.find((e) => e.id === params.eventId)
 
+  const config = configs.find((c) => c.id === event?.type)
+
   const userIds = getUserIdsFromActions(fullEvent.actions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
 
+  if (!config) {
+    return null
+  }
   if (!event) {
     return null
   }
@@ -99,7 +104,7 @@ function EventOverview({
     : ''
   return (
     <Content
-      icon={() => <IconWithName name={''} status={'orange'} />}
+      icon={() => <IconWithName name={''} status={event.status} />}
       size={ContentSize.LARGE}
       title={title || fallbackTitle}
       titleColor={event.id ? 'copy' : 'grey600'}

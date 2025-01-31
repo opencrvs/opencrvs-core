@@ -72,10 +72,10 @@ import {
   DIVIDER,
   HIDDEN
 } from '@client/forms'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
-  getListOfLocations,
   getSectionFields,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
@@ -103,7 +103,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
-import { Scope } from '@client/utils/authUtils'
+
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import {
   formatPlainDate,
@@ -119,7 +119,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { ReviewHeader } from './ReviewHeader'
-import { IValidationResult } from '@client/utils/validate'
+import { getListOfLocations, IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadField/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -278,7 +278,7 @@ interface IProps {
     submissionStatus: string,
     action: SubmissionAction
   ) => void
-  scope: Scope | null
+  scope: Scope[] | null
   offlineCountryConfiguration: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm
@@ -829,15 +829,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   userHasRegisterScope() {
     if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('register')
-    } else {
-      return false
-    }
-  }
-
-  userHasValidateScope() {
-    if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('validate')
+      return (
+        this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
+      )
     } else {
       return false
     }
@@ -1708,11 +1702,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         '') as string
     }
 
-    const informantName = getDeclarationFullName(
-      declaration,
-      intl.locale,
-      this.isLastNameFirst()
-    )
+    const informantName = getDeclarationFullName(declaration, intl)
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections.filter(
@@ -1972,8 +1962,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         <ReviewAction
                           completeDeclaration={isComplete}
                           totalFileSizeExceeded={totalFileSizeExceeded}
-                          declarationToBeValidated={this.userHasValidateScope()}
-                          declarationToBeRegistered={this.userHasRegisterScope()}
                           alreadyRejectedDeclaration={
                             this.props.draft.registrationStatus === REJECTED
                           }

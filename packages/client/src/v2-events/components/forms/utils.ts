@@ -10,6 +10,7 @@
  */
 import { IntlShape } from 'react-intl'
 import _ from 'lodash'
+import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   BaseField,
@@ -19,7 +20,9 @@ import {
   FieldValue,
   validate,
   DateFieldValue,
-  TextFieldValue
+  TextFieldValue,
+  RadioGroupFieldValue,
+  FileFieldValue
 } from '@opencrvs/commons/client'
 import {
   CheckboxFieldValue,
@@ -54,6 +57,15 @@ export function handleInitialValue(
   }
 
   return initialValue
+}
+
+export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
+  return getConditionalActionsForField(field, {
+    $form: form,
+    $now: formatISO(new Date(), {
+      representation: 'date'
+    })
+  }).every((fieldAction) => fieldAction !== 'HIDE')
 }
 
 export function getConditionalActionsForField(
@@ -112,7 +124,9 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.CHECKBOX]: null,
   [FieldType.COUNTRY]: null,
   [FieldType.LOCATION]: null,
-  [FieldType.SELECT]: null
+  [FieldType.SELECT]: null,
+  [FieldType.PAGE_HEADER]: null,
+  [FieldType.DIVIDER]: null
 }
 
 export function getInitialValues(fields: FieldConfig[]) {
@@ -145,6 +159,11 @@ export function fieldValueToString({
     case FieldType.CHECKBOX:
       return checkboxToString(value as CheckboxFieldValue)
     case FieldType.RADIO_GROUP:
+      return selectFieldToString(
+        value as RadioGroupFieldValue,
+        fieldConfig.optionValues,
+        intl
+      )
     case FieldType.SELECT:
       return selectFieldToString(
         value as SelectFieldValue,
