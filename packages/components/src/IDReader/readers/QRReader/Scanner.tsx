@@ -55,7 +55,7 @@ const Scanner = (props: ScannerProps) => {
         } catch (error) {
           // log detailed error message to console for debugging
           // eslint-disable-next-line no-console
-          console.error(error?.message)
+          console.error(error)
           onError('parse', new Error('Invalid JSON format'))
         }
       }
