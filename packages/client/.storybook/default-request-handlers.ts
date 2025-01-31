@@ -8,18 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { http } from 'msw'
 
-import { graphql, HttpResponse } from 'msw'
+/* eslint-disable import/no-relative-parent-imports */
+import { http, graphql, HttpResponse } from 'msw'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
 import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
-import superjson from 'superjson'
 import { AppRouter } from '../src/v2-events/trpc'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventIndex
 } from '../src/v2-events/features/events/fixtures'
+import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
@@ -1106,11 +1107,91 @@ export const handlers = {
     })
   ],
   config: [
+    http.get(
+      'http://localhost:6006/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
+      () => {
+        return HttpResponse.text(
+          tennisClubMembershipCertifiedCertificateTemplate
+        )
+      }
+    ),
+    http.get(
+      'http://localhost:6006/api/countryconfig/certificates/tennis-club-membership-certified-certificate.svg',
+      () => {
+        return HttpResponse.text(
+          tennisClubMembershipCertifiedCertificateTemplate
+        )
+      }
+    ),
+
+    http.get(
+      'http://localhost:6006/api/countryconfig/fonts/NotoSans-Regular.ttf',
+      async () => {
+        const fontResponse = await fetch(
+          'http://localhost:3040/fonts/NotoSans-Regular.ttf'
+        )
+        const fontArrayBuffer = await fontResponse.arrayBuffer()
+        return HttpResponse.arrayBuffer(fontArrayBuffer)
+      }
+    ),
+
     http.get('http://localhost:2021/config', () => {
       return HttpResponse.json({
         systems: [],
         config: mockOfflineData.config,
-        certificates: []
+        certificates: [
+          {
+            id: 'tennis-club-membership-certificate',
+            event: 'TENNIS_CLUB_MEMBERSHIP',
+            label: {
+              id: 'certificates.tennis-club-membership.certificate.copy',
+              defaultMessage: 'Tennis Club Membership Certificate copy',
+              description: 'The label for a tennis-club-membership certificate'
+            },
+            isDefault: false,
+            fee: {
+              onTime: 7,
+              late: 10.6,
+              delayed: 18
+            },
+            svgUrl:
+              '/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
+            fonts: {
+              'Noto Sans': {
+                normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+                italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+              }
+            }
+          },
+          {
+            id: 'tennis-club-membership-certified-certificate',
+            event: 'TENNIS_CLUB_MEMBERSHIP',
+            label: {
+              id: 'certificates.tennis-club-membership.certificate.certified-copy',
+              defaultMessage:
+                'Tennis Club Membership Certificate certified copy',
+              description: 'The label for a tennis-club-membership certificate'
+            },
+            isDefault: false,
+            fee: {
+              onTime: 7,
+              late: 10.6,
+              delayed: 18
+            },
+            svgUrl:
+              '/api/countryconfig/certificates/tennis-club-membership-certified-certificate.svg',
+            fonts: {
+              'Noto Sans': {
+                normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+                italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+              }
+            }
+          }
+        ]
       })
     })
   ],

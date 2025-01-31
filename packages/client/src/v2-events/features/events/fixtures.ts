@@ -1220,7 +1220,11 @@ export const tennisClueMembershipEventDocument: EventDocument = {
       id: '8db635cf-ee30-40ca-8117-a7188256a2b1',
       draft: false,
       data: {
-        'applicant.firstname': 'Riku'
+        'applicant.firstname': 'Riku',
+        'applicant.surname': 'Rouvila',
+        'applicant.dob': '2025-01-23',
+        'recommender.firstname': 'Euan',
+        'recommender.surname': 'Miller'
       },
       type: 'DECLARE',
       createdBy: '6780dbf7a263c6515c7b97d2',
@@ -1231,7 +1235,11 @@ export const tennisClueMembershipEventDocument: EventDocument = {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
       draft: false,
       data: {
-        'applicant.firstname': 'Riku'
+        'applicant.firstname': 'Riku',
+        'applicant.surname': 'Rouvila',
+        'applicant.dob': '2025-01-23',
+        'recommender.firstname': 'Euan',
+        'recommender.surname': 'Miller'
       },
       type: 'REGISTER',
       identifiers: {
