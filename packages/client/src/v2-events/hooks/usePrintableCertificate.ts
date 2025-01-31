@@ -23,7 +23,7 @@ import {
   addFontsToSvg,
   compileSvg,
   svgToPdfTemplate
-} from '@client/v2-events/utils/pdf/PdfUtils'
+} from '@client/v2-events/utils/pdf'
 import { printAndDownloadPdf } from '@client/v2-events/utils/pdf/printAndDownloadPdf'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
@@ -63,10 +63,6 @@ export const usePrintableCertificate = (
     return { svgCode: null }
   }
 
-  const isPrintInAdvance = false
-  const canUserEditRecord = true
-  const handleEdit = () => {}
-
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg(certificateConfig.svg, language, form)
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
@@ -83,9 +79,6 @@ export const usePrintableCertificate = (
   }
   return {
     svgCode,
-    handleCertify,
-    isPrintInAdvance,
-    canUserEditRecord,
-    handleEdit
+    handleCertify
   }
 }

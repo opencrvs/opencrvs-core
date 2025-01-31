@@ -19,6 +19,17 @@ type FontFamily = z.infer<typeof FontFamily>
 - Use the same name for file and the main export
 - Prefer variable names without postfix (e.g. schema, data)
 
+## Naming files
+
+good:
+
+```
+- ZodInterfacePascalCase.ts
+- ReactComponentPascalCase.tsx
+- useHookCamelCase.ts
+- anything-else-in-kebab-case.ts
+```
+
 ## Naming interfaces
 
 good:
@@ -82,7 +93,3 @@ export function printPDF(template: PDFTemplate, declarationId: string) {
   }
 }
 ```
-
-[Tech task]
-
-- Figure out how to distinguish the ones already added without

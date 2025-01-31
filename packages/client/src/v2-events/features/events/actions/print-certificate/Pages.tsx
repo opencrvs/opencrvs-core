@@ -99,8 +99,6 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        // hard coded certificate template selector form field
-
         form={form}
         formPages={formPages}
         pageId={currentPageId}
@@ -126,6 +124,7 @@ export function Pages() {
         }}
       >
         {(page: FormPage) => (
+          // hard coded certificate template selector form field
           <>
             {formPages[0].id === page.id && (
               <InputField
