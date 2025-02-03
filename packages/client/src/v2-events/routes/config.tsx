@@ -29,6 +29,7 @@ import { ROUTES } from './routes'
  *
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
+
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
