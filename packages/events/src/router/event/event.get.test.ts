@@ -37,17 +37,26 @@ test('Returns event with all actions', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
-    generator.event.actions.declare(event.id, { data: { name: 'John Doe' } })
+  await client.event.actions.declare(generator.event.actions.declare(event.id))
+
+  await client.event.actions.register(
+    generator.event.actions.register(event.id)
+  )
+  const correctionRequest = await client.event.actions.correction.request(
+    generator.event.actions.correction.request(event.id)
   )
 
+  await client.event.actions.correction.approve(
+    generator.event.actions.correction.approve(
+      correctionRequest.id,
+      correctionRequest.actions[correctionRequest.actions.length - 1].id
+    )
+  )
   await client.event.actions.validate(
-    generator.event.actions.validate(event.id, {
-      data: { favouritePlayer: 'Elena Rybakina' }
-    })
+    generator.event.actions.validate(event.id)
   )
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(fetchedEvent.actions).toHaveLength(3)
+  expect(fetchedEvent.actions).toHaveLength(6)
 })
