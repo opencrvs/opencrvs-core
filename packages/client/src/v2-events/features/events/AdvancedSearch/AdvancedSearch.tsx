@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import {
   Accordion,
@@ -19,7 +19,7 @@ import {
 } from '@opencrvs/components'
 import { EventConfig } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 const messagesToDefine = {
   birthTabTitle: {
     id: 'config.application.birthTabTitle',
@@ -99,24 +99,32 @@ function TabSearch({ sections }: { sections: AdvancedSearchFormConfig }) {
 
 function AdvancedSearch() {
   const intl = useIntl()
-  const activeSections = [
-    {
-      id: '',
-      title: messages.birthTabTitle,
-      fields: [
-        {
-          id: '',
-          label: messages.placeOfRegistrationlabel,
-          type: 'FACILITY'
-        }
-      ]
-    }
-  ] satisfies AdvancedSearchFormConfig
+  const events = useEventConfigurations()
 
-  const formTabSections = activeSections.map((a) => ({
+  const advancedSearchEvents = events.filter(
+    (event) => event.advancedSearch.length > 0
+  )
+
+  const activeSections = advancedSearchEvents.flatMap(
+    (e) => e.advancedSearch
+  ) satisfies AdvancedSearchFormConfig
+
+  const formTabSections = advancedSearchEvents.map((a) => ({
     id: a.id,
-    title: intl.formatMessage(a.title)
+    title: intl.formatMessage(a.label)
   })) satisfies IFormTabProps['sections']
+
+  const [activeTabId, setActiveTabId] = useState<string>(
+    formTabSections[0]?.id || ''
+  )
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTabId(tabId)
+  }
+
+  const currentSection = activeSections.filter(
+    (section) => section.id === activeTabId
+  )
 
   return (
     <>
@@ -125,17 +133,15 @@ function AdvancedSearch() {
         subtitle={intl.formatMessage(messages.advancedSearchInstruction)}
         tabBarContent={
           <FormTabs
-            activeTabId={intl.formatMessage(messages.birthTabTitle)}
+            activeTabId={activeTabId}
             sections={formTabSections}
-            onTabClick={() => {
-              alert('tab clicked')
-            }}
+            onTabClick={handleTabClick}
           />
         }
         title={intl.formatMessage(messages.advancedSearch)}
         titleColor={'copy'}
       >
-        <TabSearch sections={activeSections} />
+        {currentSection.length > 0 && <TabSearch sections={currentSection} />}
       </Content>
     </>
   )
