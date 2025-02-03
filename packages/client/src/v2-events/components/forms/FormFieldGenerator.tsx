@@ -11,7 +11,13 @@
 
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
-import { DATE, IFormFieldValue, PARAGRAPH, TEXT } from '@client/forms'
+import {
+  DATE,
+  IFileValue,
+  IFormFieldValue,
+  PARAGRAPH,
+  TEXT
+} from '@client/forms'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { Text } from '@opencrvs/components/lib/Text'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -64,6 +70,7 @@ import { SelectCountry } from '@client/v2-events/features/events/registered-fiel
 import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
+import { DocumentUploaderWithOption } from '../DocumentUploaderWithOption'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -305,6 +312,42 @@ const GeneratedInputField = React.memo(
     }
     if (fieldDefinition.type === 'DIVIDER') {
       return <Divider />
+    }
+    if (fieldDefinition.type === 'FILE_WITH_OPTIONS') {
+      return (
+        <InputField {...inputFieldProps}>
+          <DocumentUploaderWithOption
+            {...inputProps}
+            extraValue={''}
+            name={fieldDefinition.id}
+            options={fieldDefinition.options.map(({ value, label }) => ({
+              value,
+              label: intl.formatMessage(label)
+            }))}
+            files={value as IFileValue[]}
+            // extraValue={fieldDefinition.extraValue || ''}
+            // hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
+            onComplete={(files: IFileValue[]) => {
+              /*
+               * calling both setFieldTouched and setFieldValue causes the validate
+               * function to be called twice, once with the stale values (due to
+               * setFieldTouched) and the other with the updated values (due to
+               * setFieldValue). So if setFieldTouched is called after
+               * setFieldValue then wrong validations are shown due to the stale
+               * values. We can prevent that by supplying shouldRevalidate =
+               * false to the setFieldTouch function or calling it before
+               * calling setFieldValue.
+               */
+              setFieldTouched(fieldDefinition.id, true)
+              // setFieldValue(fieldDefinition.name, files)
+            }}
+            // compressImagesToSizeMB={fieldDefinition.compressImagesToSizeMB}
+            // maxSizeMB={fieldDefinition.maxSizeMB}
+            // onUploadingStateChanged={}
+            requiredErrorMessage={requiredErrorMessage}
+          />
+        </InputField>
+      )
     }
     throw new Error(`Unsupported field ${fieldDefinition}`)
   }

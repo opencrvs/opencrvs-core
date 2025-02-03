@@ -101,7 +101,8 @@ export const FieldType = {
   SELECT: 'SELECT',
   COUNTRY: 'COUNTRY',
   LOCATION: 'LOCATION',
-  DIVIDER: 'DIVIDER'
+  DIVIDER: 'DIVIDER',
+  FILE_WITH_OPTIONS: 'FILE_WITH_OPTIONS'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -237,6 +238,11 @@ const Location = BaseField.extend({
   options: LocationOptions
 }).describe('Location input field')
 
+const FileUploadWithOptions = BaseField.extend({
+  type: z.literal(FieldType.FILE_WITH_OPTIONS),
+  options: z.array(SelectOption).describe('A list of options')
+}).describe('Select input')
+
 /*
  * This needs to be exported so that Typescript can refer to the type in
  * the declaration output type. If it can't do that, you might start encountering
@@ -257,6 +263,7 @@ export type AllFields =
   | typeof Country
   | typeof Location
   | typeof Divider
+  | typeof FileUploadWithOptions
 
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
@@ -270,7 +277,8 @@ export const FieldConfig = z.discriminatedUnion('type', [
   File,
   Country,
   Location,
-  Divider
+  Divider,
+  FileUploadWithOptions
 ]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
 
 export type SelectField = z.infer<typeof Select>
