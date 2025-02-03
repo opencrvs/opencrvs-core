@@ -10,6 +10,7 @@
  */
 export * from './ActionConfig'
 export * from './EventConfig'
+export * from './EventConfigInput'
 export * from './FieldConfig'
 export * from './FormConfig'
 export * from './SummaryConfig'
@@ -26,3 +27,4 @@ export * from './state'
 export * from './utils'
 export * from './defineConfig'
 export * from './DeduplicationConfig'
+export * from './transactions'

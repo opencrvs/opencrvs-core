@@ -14,7 +14,9 @@ import {
   EventInput,
   getUUID,
   ActionType,
-  ValidateActionInput
+  ValidateActionInput,
+  RegisterActionInput,
+  RequestCorrectionActionInput
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
@@ -28,13 +30,13 @@ interface Name {
 export interface CreatedUser {
   id: string
   primaryOfficeId: string
-  systemRole: string
+  role: string
   name: Array<Name>
 }
 
 interface CreateUser {
   primaryOfficeId: string
-  systemRole?: string
+  role?: string
   name?: Array<Name>
 }
 /**
@@ -70,13 +72,62 @@ export function payloadGenerator() {
         data: input.data ?? {},
         duplicates: [],
         eventId
-      })
+      }),
+      register: (
+        eventId: string,
+        input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.REGISTER,
+        transactionId: input.transactionId ?? getUUID(),
+        data: input.data ?? {},
+        eventId
+      }),
+      correct: {
+        request: (
+          eventId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.REQUEST_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data: input.data ?? {},
+          metadata: {},
+          eventId
+        }),
+        approve: (
+          eventId: string,
+          requestId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.APPROVE_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data: input.data ?? {},
+          eventId,
+          requestId
+        }),
+        reject: (
+          eventId: string,
+          requestId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.REJECT_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data: input.data ?? {},
+          eventId,
+          requestId
+        })
+      }
     }
   }
 
   const user = {
     create: (input: CreateUser) => ({
-      systemRole: input.systemRole ?? 'REGISTRATION_AGENT',
+      role: input.role ?? 'REGISTRATION_AGENT',
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId
     })
@@ -117,7 +168,7 @@ export function seeder() {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
-      systemRole: user.systemRole,
+      role: user.role,
       id: createdUser.insertedId.toString()
     }
   }

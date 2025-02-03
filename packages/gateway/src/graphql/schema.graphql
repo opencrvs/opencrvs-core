@@ -213,6 +213,7 @@ type Mutation {
     identifierType: String!
     identifierValue: String!
   ): ID!
+  updateField(id: ID!, details: UpdateFieldInput!): Boolean!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -689,6 +690,12 @@ input ConfirmRegistrationInput {
 input RejectRegistrationInput {
   reason: String!
   comment: String
+}
+
+input UpdateFieldInput {
+  fieldId: String!
+  valueString: String
+  valueBoolean: Boolean
 }
 
 input UserInput {

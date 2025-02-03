@@ -9,12 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineMessages } from 'react-intl'
-
-export const messages = defineMessages({
-  'event.history.timeFormat': {
-    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'event.history.timeFormat',
-    description: 'Time format for timestamps in event history'
-  }
-})
+import { Pages } from './Pages'
+import { Review } from './Review'
+import { Onboarding } from './Onboarding/Onboarding'
+import { Summary } from './Summary/Summary'
+import { AdditionalDetails } from './AdditionalDetails/AdditionalDetails'
+export { Pages, Review, Onboarding, Summary, AdditionalDetails }

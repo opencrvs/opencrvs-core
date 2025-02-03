@@ -8,19 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IOfficeHomeMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  empty: MessageDescriptor
+import { allWorkqueue } from './all'
+import { inReviewWorkqueue } from './readyForReview'
+import { registeredWorkqueue } from './readyToPrint'
+export { RootWorkqueueConfig } from './WorkqueueConfig'
+export { defaultColumns } from './defaultColumns'
+
+export const workqueues = {
+  all: allWorkqueue,
+  registered: registeredWorkqueue,
+  inReview: inReviewWorkqueue
 }
-
-const messagesToDefine: IOfficeHomeMessages = {
-  empty: {
-    defaultMessage: 'Empty message',
-    description: 'Label for workqueue tooltip',
-    id: 'regHome.issued'
-  }
-}
-
-export const messages: IOfficeHomeMessages = defineMessages(messagesToDefine)
