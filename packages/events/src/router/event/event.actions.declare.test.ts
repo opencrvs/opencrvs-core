@@ -11,7 +11,7 @@
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
-test.only('Validation error message contains all the offending fields fields', async () => {
+test('Validation error message contains all the offending fields fields', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
