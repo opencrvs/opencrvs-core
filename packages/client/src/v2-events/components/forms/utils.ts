@@ -210,7 +210,7 @@ export function makeDatesFormatted(
   }, values)
 }
 
-function formatDateFieldValue(value: string) {
+export function formatDateFieldValue(value: string) {
   return value
     .split('-')
     .map((d: string) => d.padStart(2, '0'))
