@@ -45,7 +45,12 @@ import { SCOPES } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import {
+  createBrowserRouter,
+  Outlet,
+  redirect,
+  RouterProvider
+} from 'react-router-dom'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
@@ -85,237 +90,416 @@ const MainSection = styled.section`
   background: ${({ theme }) => theme.colors.background};
 `
 
-export const routesConfig = [
-  {
-    path: '/',
-    element: (
-      <ScrollToTop>
-        <ReloadModal />
-        <SessionExpireConfirmation />
-        <NotificationComponent>
-          <Page>
-            <MainSection>
-              <ProtectedPage
-                unprotectedRouteElements={['documents', 'affidavit']}
-              >
-                <Outlet />
-              </ProtectedPage>
-            </MainSection>
-          </Page>
-        </NotificationComponent>
-      </ScrollToTop>
-    ),
-    children: [
-      { path: routes.HOME, element: <Home /> },
-      { path: routes.SELECT_VITAL_EVENT, element: <SelectVitalEvent /> },
-      { path: routes.SELECT_DEATH_INFORMANT, element: <DeclarationForm /> },
-      { path: routes.SELECT_MARRIAGE_INFORMANT, element: <DeclarationForm /> },
-      { path: routes.DRAFT_BIRTH_PARENT_FORM, element: <DeclarationForm /> },
-      {
-        path: routes.VIEW_VERIFY_CERTIFICATE,
-        element: <VerifyCertificatePage />
-      },
-      {
-        path: routes.DRAFT_BIRTH_PARENT_FORM_PAGE,
-        element: <DeclarationForm />
-      },
-      {
-        path: routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
-        element: <DeclarationForm />
-      },
-      { path: routes.DRAFT_DEATH_FORM, element: <DeclarationForm /> },
-      { path: routes.DRAFT_DEATH_FORM_PAGE, element: <DeclarationForm /> },
-      { path: routes.DRAFT_MARRIAGE_FORM, element: <DeclarationForm /> },
-      {
-        path: routes.DRAFT_DEATH_FORM_PAGE_GROUP,
-        element: <DeclarationForm />
-      },
-      { path: routes.DRAFT_MARRIAGE_FORM_PAGE, element: <DeclarationForm /> },
-      {
-        path: routes.DRAFT_MARRIAGE_FORM_PAGE_GROUP,
-        element: <DeclarationForm />
-      },
-      { path: routes.REVIEW_EVENT_PARENT_FORM_PAGE, element: <ReviewForm /> },
-      {
-        path: routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
-        element: <ReviewForm />
-      },
-      { path: routes.REVIEW_CORRECTION, element: <ReviewCorrection /> },
-      { path: routes.REGISTRAR_HOME, element: <OfficeHome /> },
-      { path: routes.REGISTRAR_HOME_TAB, element: <OfficeHome /> },
-      { path: routes.REGISTRAR_HOME_TAB_PAGE, element: <OfficeHome /> },
-      {
-        path: routes.ALL_USER_EMAIL,
-        element: (
-          <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
-            <AllUserEmail />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.ADVANCED_SEARCH,
-        element: (
-          <ProtectedRoute
-            scopes={[
-              SCOPES.SEARCH_BIRTH,
-              SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-              SCOPES.SEARCH_DEATH,
-              SCOPES.SEARCH_DEATH_MY_JURISDICTION
-            ]}
-          >
-            <AdvancedSearchConfig />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.ADVANCED_SEARCH_RESULT,
-        element: (
-          <ProtectedRoute
-            scopes={[
-              SCOPES.SEARCH_BIRTH,
-              SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-              SCOPES.SEARCH_DEATH,
-              SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-              SCOPES.SEARCH_MARRIAGE,
-              SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-            ]}
-          >
-            <AdvancedSearchResult />
-          </ProtectedRoute>
-        )
-      },
-      { path: routes.DECLARATION_RECORD_AUDIT, element: <RecordAudit /> },
-      { path: routes.SEARCH, element: <SearchResult /> },
-      { path: routes.SEARCH_RESULT, element: <SearchResult /> },
-      { path: routes.CERTIFICATE_COLLECTOR, element: <CollectorForm /> },
-      { path: routes.VERIFY_COLLECTOR, element: <VerifyCollector /> },
-      { path: routes.VERIFY_CORRECTOR, element: <VerifyCorrector /> },
-      { path: routes.REVIEW_CERTIFICATE, element: <ReviewCertificate /> },
-      { path: routes.PRINT_CERTIFICATE_PAYMENT, element: <Payment /> },
-      { path: routes.CERTIFICATE_CORRECTION, element: <CorrectionForm /> },
-      {
-        path: routes.CERTIFICATE_CORRECTION_REVIEW,
-        element: <CorrectionReviewForm />
-      },
-      { path: routes.SETTINGS, element: <SettingsPage /> },
-      {
-        path: routes.TEAM_USER_LIST,
-        element: (
-          <ProtectedRoute
-            scopes={[
-              SCOPES.ORGANISATION_READ_LOCATIONS,
-              SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-              SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-            ]}
-          >
-            <UserList />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.SYSTEM_LIST,
-        element: (
-          <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
-            <SystemList />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.VS_EXPORTS,
-        element: (
-          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]}>
-            <VSExport />
-          </ProtectedRoute>
-        )
-      },
-      { path: routes.USER_PROFILE, element: <UserAudit /> },
-      { path: routes.VIEW_RECORD, element: <ViewRecord /> },
-      {
-        path: routes.PERFORMANCE_REGISTRATIONS_LIST,
-        element: <RegistrationList />
-      },
-      {
-        path: routes.PERFORMANCE_STATISTICS,
-        element: (
-          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-            <PerformanceStatistics />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.PERFORMANCE_LEADER_BOARDS,
-        element: (
-          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-            <Leaderboards />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.PERFORMANCE_DASHBOARD,
-        element: (
-          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-            <PerformanceDashboard />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.ORGANISATIONS_INDEX,
-        element: (
-          <ProtectedRoute
-            scopes={[
-              SCOPES.ORGANISATION_READ_LOCATIONS,
-              SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-              SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-            ]}
-          >
-            <AdministrativeLevels />
-          </ProtectedRoute>
-        )
-      },
-      { path: routes.ISSUE_COLLECTOR, element: <IssueCertificate /> },
-      { path: routes.ISSUE_VERIFY_COLLECTOR, element: <VerifyCollector /> },
-      { path: routes.ISSUE_CERTIFICATE_PAYMENT, element: <IssuePayment /> },
-      { path: routes.PRINT_RECORD, element: <PrintRecord /> },
-      {
-        path: routes.PERFORMANCE_FIELD_AGENT_LIST,
-        element: <FieldAgentList />
-      },
-      {
-        path: routes.PERFORMANCE_HOME,
-        element: (
-          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ]}>
-            <PerformanceHome />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.EVENT_COMPLETENESS_RATES,
-        element: <CompletenessRates />
-      },
-      {
-        path: routes.WORKFLOW_STATUS,
-        element: <WorkflowStatus />
-      },
-      {
-        path: routes.CREATE_USER_ON_LOCATION,
-        element: <CreateNewUser />
-      },
-      {
-        path: routes.CREATE_USER_SECTION,
-        element: <CreateNewUser />
-      },
-      {
-        path: routes.REVIEW_USER_FORM,
-        element: <CreateNewUser />
-      },
-      {
-        path: routes.REVIEW_USER_DETAILS,
-        element: <CreateNewUser />
-      },
-      v2RoutesConfig
-    ]
+function createRedirect(from: string, to: string) {
+  return {
+    path: from,
+    loader: () => {
+      return redirect(to)
+    }
   }
-]
+}
+
+export const routesConfig = window.config.FEATURES.V2_EVENTS
+  ? [
+      {
+        path: '/',
+        element: (
+          <ScrollToTop>
+            <ReloadModal />
+            <SessionExpireConfirmation />
+            <NotificationComponent>
+              <Page>
+                <MainSection>
+                  <ProtectedPage
+                    unprotectedRouteElements={['documents', 'affidavit']}
+                  >
+                    <Outlet />
+                  </ProtectedPage>
+                </MainSection>
+              </Page>
+            </NotificationComponent>
+          </ScrollToTop>
+        ),
+        children: [
+          v2RoutesConfig,
+          createRedirect('/registration-home/my-drafts/*', '/'),
+          createRedirect('/registration-home/requiresUpdate/*', '/'),
+          createRedirect('/registration-home/progress/*', '/'),
+          createRedirect('/registration-home/outbox/*', '/'),
+          createRedirect('/registration-home/readyToIssue/*', '/'),
+          createRedirect('/registration-home/print/*', '/'),
+          createRedirect('/registration-home/readyForReview/*', '/'),
+          createRedirect('/events', '/events/create'),
+          // Search results,
+          // Advanced search,
+          {
+            path: routes.ALL_USER_EMAIL,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+                <AllUserEmail />
+              </ProtectedRoute>
+            )
+          },
+          { path: routes.SETTINGS, element: <SettingsPage /> },
+          {
+            path: routes.TEAM_USER_LIST,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.ORGANISATION_READ_LOCATIONS,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+                ]}
+              >
+                <UserList />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.SYSTEM_LIST,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+                <SystemList />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.VS_EXPORTS,
+            element: (
+              <ProtectedRoute
+                scopes={[SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]}
+              >
+                <VSExport />
+              </ProtectedRoute>
+            )
+          },
+          { path: routes.USER_PROFILE, element: <UserAudit /> },
+          {
+            path: routes.PERFORMANCE_REGISTRATIONS_LIST,
+            element: <RegistrationList />
+          },
+          {
+            path: routes.PERFORMANCE_STATISTICS,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+                <PerformanceStatistics />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.PERFORMANCE_LEADER_BOARDS,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+                <Leaderboards />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.PERFORMANCE_DASHBOARD,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+                <PerformanceDashboard />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.ORGANISATIONS_INDEX,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.ORGANISATION_READ_LOCATIONS,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+                ]}
+              >
+                <AdministrativeLevels />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.PERFORMANCE_FIELD_AGENT_LIST,
+            element: <FieldAgentList />
+          },
+          {
+            path: routes.PERFORMANCE_HOME,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ]}>
+                <PerformanceHome />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.EVENT_COMPLETENESS_RATES,
+            element: <CompletenessRates />
+          },
+          {
+            path: routes.WORKFLOW_STATUS,
+            element: <WorkflowStatus />
+          },
+          {
+            path: routes.CREATE_USER_ON_LOCATION,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.CREATE_USER_SECTION,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.REVIEW_USER_FORM,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.REVIEW_USER_DETAILS,
+            element: <CreateNewUser />
+          }
+        ]
+      }
+    ]
+  : [
+      {
+        path: '/',
+        element: (
+          <ScrollToTop>
+            <ReloadModal />
+            <SessionExpireConfirmation />
+            <NotificationComponent>
+              <Page>
+                <MainSection>
+                  <ProtectedPage
+                    unprotectedRouteElements={['documents', 'affidavit']}
+                  >
+                    <Outlet />
+                  </ProtectedPage>
+                </MainSection>
+              </Page>
+            </NotificationComponent>
+          </ScrollToTop>
+        ),
+        children: [
+          { path: routes.HOME, element: <Home /> },
+          { path: routes.SELECT_VITAL_EVENT, element: <SelectVitalEvent /> },
+          { path: routes.SELECT_DEATH_INFORMANT, element: <DeclarationForm /> },
+          {
+            path: routes.SELECT_MARRIAGE_INFORMANT,
+            element: <DeclarationForm />
+          },
+          {
+            path: routes.DRAFT_BIRTH_PARENT_FORM,
+            element: <DeclarationForm />
+          },
+          {
+            path: routes.VIEW_VERIFY_CERTIFICATE,
+            element: <VerifyCertificatePage />
+          },
+          {
+            path: routes.DRAFT_BIRTH_PARENT_FORM_PAGE,
+            element: <DeclarationForm />
+          },
+          {
+            path: routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
+            element: <DeclarationForm />
+          },
+          { path: routes.DRAFT_DEATH_FORM, element: <DeclarationForm /> },
+          { path: routes.DRAFT_DEATH_FORM_PAGE, element: <DeclarationForm /> },
+          { path: routes.DRAFT_MARRIAGE_FORM, element: <DeclarationForm /> },
+          {
+            path: routes.DRAFT_DEATH_FORM_PAGE_GROUP,
+            element: <DeclarationForm />
+          },
+          {
+            path: routes.DRAFT_MARRIAGE_FORM_PAGE,
+            element: <DeclarationForm />
+          },
+          {
+            path: routes.DRAFT_MARRIAGE_FORM_PAGE_GROUP,
+            element: <DeclarationForm />
+          },
+          {
+            path: routes.REVIEW_EVENT_PARENT_FORM_PAGE,
+            element: <ReviewForm />
+          },
+          {
+            path: routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
+            element: <ReviewForm />
+          },
+          { path: routes.REVIEW_CORRECTION, element: <ReviewCorrection /> },
+          { path: routes.REGISTRAR_HOME, element: <OfficeHome /> },
+          { path: routes.REGISTRAR_HOME_TAB, element: <OfficeHome /> },
+          { path: routes.REGISTRAR_HOME_TAB_PAGE, element: <OfficeHome /> },
+          {
+            path: routes.ALL_USER_EMAIL,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+                <AllUserEmail />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.ADVANCED_SEARCH,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.SEARCH_BIRTH,
+                  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+                  SCOPES.SEARCH_DEATH,
+                  SCOPES.SEARCH_DEATH_MY_JURISDICTION
+                ]}
+              >
+                <AdvancedSearchConfig />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.ADVANCED_SEARCH_RESULT,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.SEARCH_BIRTH,
+                  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+                  SCOPES.SEARCH_DEATH,
+                  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+                  SCOPES.SEARCH_MARRIAGE,
+                  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+                ]}
+              >
+                <AdvancedSearchResult />
+              </ProtectedRoute>
+            )
+          },
+          { path: routes.DECLARATION_RECORD_AUDIT, element: <RecordAudit /> },
+          { path: routes.SEARCH, element: <SearchResult /> },
+          { path: routes.SEARCH_RESULT, element: <SearchResult /> },
+          { path: routes.CERTIFICATE_COLLECTOR, element: <CollectorForm /> },
+          { path: routes.VERIFY_COLLECTOR, element: <VerifyCollector /> },
+          { path: routes.VERIFY_CORRECTOR, element: <VerifyCorrector /> },
+          { path: routes.REVIEW_CERTIFICATE, element: <ReviewCertificate /> },
+          { path: routes.PRINT_CERTIFICATE_PAYMENT, element: <Payment /> },
+          { path: routes.CERTIFICATE_CORRECTION, element: <CorrectionForm /> },
+          {
+            path: routes.CERTIFICATE_CORRECTION_REVIEW,
+            element: <CorrectionReviewForm />
+          },
+          { path: routes.SETTINGS, element: <SettingsPage /> },
+          {
+            path: routes.TEAM_USER_LIST,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.ORGANISATION_READ_LOCATIONS,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+                ]}
+              >
+                <UserList />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.SYSTEM_LIST,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+                <SystemList />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.VS_EXPORTS,
+            element: (
+              <ProtectedRoute
+                scopes={[SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]}
+              >
+                <VSExport />
+              </ProtectedRoute>
+            )
+          },
+          { path: routes.USER_PROFILE, element: <UserAudit /> },
+          { path: routes.VIEW_RECORD, element: <ViewRecord /> },
+          {
+            path: routes.PERFORMANCE_REGISTRATIONS_LIST,
+            element: <RegistrationList />
+          },
+          {
+            path: routes.PERFORMANCE_STATISTICS,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+                <PerformanceStatistics />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.PERFORMANCE_LEADER_BOARDS,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+                <Leaderboards />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.PERFORMANCE_DASHBOARD,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+                <PerformanceDashboard />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.ORGANISATIONS_INDEX,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.ORGANISATION_READ_LOCATIONS,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+                ]}
+              >
+                <AdministrativeLevels />
+              </ProtectedRoute>
+            )
+          },
+          { path: routes.ISSUE_COLLECTOR, element: <IssueCertificate /> },
+          { path: routes.ISSUE_VERIFY_COLLECTOR, element: <VerifyCollector /> },
+          { path: routes.ISSUE_CERTIFICATE_PAYMENT, element: <IssuePayment /> },
+          { path: routes.PRINT_RECORD, element: <PrintRecord /> },
+          {
+            path: routes.PERFORMANCE_FIELD_AGENT_LIST,
+            element: <FieldAgentList />
+          },
+          {
+            path: routes.PERFORMANCE_HOME,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ]}>
+                <PerformanceHome />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.EVENT_COMPLETENESS_RATES,
+            element: <CompletenessRates />
+          },
+          {
+            path: routes.WORKFLOW_STATUS,
+            element: <WorkflowStatus />
+          },
+          {
+            path: routes.CREATE_USER_ON_LOCATION,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.CREATE_USER_SECTION,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.REVIEW_USER_FORM,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.REVIEW_USER_DETAILS,
+            element: <CreateNewUser />
+          },
+          v2RoutesConfig
+        ]
+      }
+    ]
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>

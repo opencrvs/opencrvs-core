@@ -15,7 +15,7 @@ import { routes as workqueueRoutes } from '@client/v2-events/features/workqueues
 
 export const ROUTES = {
   V2: route(
-    'v2',
+    window.config.FEATURES.V2_EVENTS ? '' : 'v2',
     {},
     {
       EVENTS: route(
