@@ -122,6 +122,7 @@ export const routesConfig = window.config.FEATURES.V2_EVENTS
         ),
         children: [
           v2RoutesConfig,
+          createRedirect('/v2/*', '/'),
           createRedirect('/registration-home/my-drafts/*', '/'),
           createRedirect('/registration-home/requiresUpdate/*', '/'),
           createRedirect('/registration-home/progress/*', '/'),
