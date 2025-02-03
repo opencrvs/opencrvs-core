@@ -872,7 +872,7 @@ export const testDeathCertPayload = {
   entry: [
     {
       fullUrl:
-        '/fhir/PaymentReconciliation/urn:uuid:75a7d7c1-ab9e-43d9-bdb5-8ba14f46cc4a/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57',
+        '/fhir/PaymentReconciliation/75a7d7c1-ab9e-43d9-bdb5-8ba14f46cc4a/_history/94d9feab-78f9-4de7-9b4b-a4bcbef04a57',
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
@@ -977,7 +977,7 @@ export const testDeathCertPayload = {
         },
         focus: {
           reference:
-            'PaymentReconciliation/urn:uuid:75a7d7c1-ab9e-43d9-bdb5-8ba14f46cc4a'
+            'PaymentReconciliation/75a7d7c1-ab9e-43d9-bdb5-8ba14f46cc4a'
         },
         id: 'a633299b-1738-4acc-aad8-a3220f910499',
         identifier: [
