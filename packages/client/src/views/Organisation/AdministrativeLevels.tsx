@@ -221,7 +221,7 @@ export function AdministrativeLevels() {
                   />
                 ))
             ) : (
-              <NoRecord id="no-record" variant='h3' color='copy' element='h3'>
+              <NoRecord id="no-record" variant="h3" color="copy" element="h3">
                 {intl.formatMessage(constantsMessages.noResults)}
               </NoRecord>
             )}

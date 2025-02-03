@@ -447,7 +447,13 @@ export const Table = ({
             )}
           </TableScrollerHorizontal>
           {content.length <= 0 && noResultText && (
-            <ErrorText id="no-record" isFullPage={isFullPage} variant='h3' color='copy' element='h3'>
+            <ErrorText
+              id="no-record"
+              isFullPage={isFullPage}
+              variant="h3"
+              color="copy"
+              element="h3"
+            >
               {noResultText}
             </ErrorText>
           )}

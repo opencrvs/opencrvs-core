@@ -160,8 +160,16 @@ const FetchButton = (props: IFullProps) => {
     const { variables, modalInfoText } = queryData as IQuery
     return (
       <>
-        {modalInfoText && <Info variant='reg16' color='copy' element='span'>{intl.formatMessage(modalInfoText)}</Info>}
-        {variables && <Info variant='reg16' color='copy' element='span'>{Object.values(variables)}</Info>}
+        {modalInfoText && (
+          <Info variant="reg16" color="copy" element="span">
+            {intl.formatMessage(modalInfoText)}
+          </Info>
+        )}
+        {variables && (
+          <Info variant="reg16" color="copy" element="span">
+            {Object.values(variables)}
+          </Info>
+        )}
       </>
     )
   }
@@ -187,7 +195,9 @@ const FetchButton = (props: IFullProps) => {
                   <ModalContent>
                     {success && (
                       <>
-                        <Heading element='h2' variant='h2'>{successTitle}</Heading>
+                        <Heading element="h2" variant="h2">
+                          {successTitle}
+                        </Heading>
                         {getModalInfo(intl)}
                         <StyledSuccess id="loader-button-success" />
                       </>
@@ -195,11 +205,13 @@ const FetchButton = (props: IFullProps) => {
 
                     {error && (
                       <>
-                        <Heading element='h2' variant='h2'>{errorTitle}</Heading>
+                        <Heading element="h2" variant="h2">
+                          {errorTitle}
+                        </Heading>
                         {getModalInfo(intl)}
                         <StyledError id="loader-button-error" />
                         {queryData && (
-                          <Info element='p' variant='h4'>
+                          <Info element="p" variant="h4">
                             {!networkError
                               ? intl.formatMessage(queryData.errorText)
                               : intl.formatMessage(queryData.networkErrorText)}
@@ -210,7 +222,9 @@ const FetchButton = (props: IFullProps) => {
 
                     {loading && (
                       <>
-                        <Heading element='h2' variant='h2'>{modalTitle}</Heading>
+                        <Heading element="h2" variant="h2">
+                          {modalTitle}
+                        </Heading>
                         {getModalInfo(intl)}
                         <StyledSpinner id="loader-button-spinner" />
                         <ConfirmButton onClick={hideModal}>

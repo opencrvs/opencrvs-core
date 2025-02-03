@@ -181,7 +181,7 @@ export function SignatureUploader({
         ]}
         handleClose={() => setSignatureDialogOpen(false)}
       >
-        <SignatureDescription variant='reg16' color='grey500' element='p'>
+        <SignatureDescription variant="reg16" color="grey500" element="p">
           {intl.formatMessage(messages.signatureInputDescription)}
         </SignatureDescription>
         <SignCanvas value={signatureData} onChange={setSignatureValue} />

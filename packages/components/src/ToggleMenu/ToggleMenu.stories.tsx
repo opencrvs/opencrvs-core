@@ -29,8 +29,12 @@ const UserRoleStyle = styled(Text)``
 
 const header = (
   <>
-    <UserNameStyle variant='reg18' element='span'>Atiq Zaman</UserNameStyle>
-    <UserRoleStyle variant='reg12' element='span'>Field Agent</UserRoleStyle>
+    <UserNameStyle variant="reg18" element="span">
+      Atiq Zaman
+    </UserNameStyle>
+    <UserRoleStyle variant="reg12" element="span">
+      Field Agent
+    </UserRoleStyle>
   </>
 )
 

@@ -38,7 +38,9 @@ export function WarningMessage(props: IWarningProps) {
   return (
     <Container ignoreMediaQuery={props.ignoreMediaQuery}>
       <Warning />
-      <StyledParagraph variant='bold16' element='span'>{props.children}</StyledParagraph>
+      <StyledParagraph variant="bold16" element="span">
+        {props.children}
+      </StyledParagraph>
     </Container>
   )
 }

@@ -56,9 +56,20 @@ export const ReviewHeader = (props: IReviewHeaderProps) => {
           justify-content="flex-start"
           gap={6}
         >
-          {title && <TitleContainer id={`${id}_title`} variant='bold14' color='supportingCopy' element='span'>{title}</TitleContainer>}
+          {title && (
+            <TitleContainer
+              id={`${id}_title`}
+              variant="bold14"
+              color="supportingCopy"
+              element="span"
+            >
+              {title}
+            </TitleContainer>
+          )}
           {subject && (
-            <SubjectContainer id={`${id}_subject`} variant='h2' element='h2'>{subject}</SubjectContainer>
+            <SubjectContainer id={`${id}_subject`} variant="h2" element="h2">
+              {subject}
+            </SubjectContainer>
           )}
         </Stack>
       </HeaderContent>

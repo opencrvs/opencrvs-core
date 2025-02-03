@@ -585,7 +585,7 @@ const PerformanceHomeComponent = (props: Props) => {
             ) : (
               <ConnectivityContainer>
                 <NoConnectivity />
-                <Text id="no-connection-text" variant='reg16' element='span'>
+                <Text id="no-connection-text" variant="reg16" element="span">
                   {intl.formatMessage(constantsMessages.noConnection)}
                 </Text>
               </ConnectivityContainer>

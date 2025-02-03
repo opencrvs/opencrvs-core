@@ -99,13 +99,19 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
     >
       <Container>
         <ApplicationNameContainer>
-          <ApplicationName variant='h4' element='h4'>{props.applicationName}</ApplicationName>
+          <ApplicationName variant="h4" element="h4">
+            {props.applicationName}
+          </ApplicationName>
         </ApplicationNameContainer>
         <UserInfo>
           <>
             {props.avatar && props.avatar()}
-            <UserName variant='h4' element='h4'>{props.name && props.name}</UserName>
-            <Role variant='reg12' element='span'>{props.role && props.role}</Role>
+            <UserName variant="h4" element="h4">
+              {props.name && props.name}
+            </UserName>
+            <Role variant="reg12" element="span">
+              {props.role && props.role}
+            </Role>
           </>
         </UserInfo>
       </Container>

@@ -58,14 +58,14 @@ const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
       fallback={
         <PageWrapper>
           <ErrorContainer>
-            <ErrorTitle variant='h1' color='copy' element='span'>
+            <ErrorTitle variant="h1" color="copy" element="span">
               {authError &&
                 intl.formatMessage(errorMessages.errorCodeUnauthorized)}
               {authError
                 ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
                 : intl.formatMessage(errorMessages.errorTitle)}
             </ErrorTitle>
-            <ErrorMessage variant='reg18' color='copy' element='span'>
+            <ErrorMessage variant="reg18" color="copy" element="span">
               {intl.formatMessage(errorMessages.unknownErrorDescription)}
             </ErrorMessage>
             <TertiaryButton

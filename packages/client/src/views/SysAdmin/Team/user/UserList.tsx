@@ -525,7 +525,11 @@ function UserListComponent(props: IProps) {
                 {name}
               </Link>
             ),
-            value: <Value variant='h4' element='p'>{role}</Value>,
+            value: (
+              <Value variant="h4" element="p">
+                {role}
+              </Value>
+            ),
             actions: (
               <StatusMenu
                 userDetails={userDetails}
@@ -631,7 +635,7 @@ function UserListComponent(props: IProps) {
         <>
           <UserTable id="user_list">
             {userContent.length <= 0 ? (
-              <NoRecord id="no-record" variant='h3' color='copy' element='h3'>
+              <NoRecord id="no-record" variant="h3" color="copy" element="h3">
                 {intl.formatMessage(constantsMessages.noResults)}
               </NoRecord>
             ) : (
@@ -835,7 +839,7 @@ function UserListComponent(props: IProps) {
                   </Loading>
                 ) : data ? (
                   <>
-                    <Header id="header" variant='h2' color='copy' element='h2'>
+                    <Header id="header" variant="h2" color="copy" element="h2">
                       {(searchedLocation &&
                         getLocalizedLocationName(intl, searchedLocation)) ||
                         ''}
@@ -868,7 +872,7 @@ function UserListComponent(props: IProps) {
         >
           <ConnectivityContainer>
             <NoConnectivity />
-            <Text id="no-connection-text" variant='reg16' element='span'>
+            <Text id="no-connection-text" variant="reg16" element="span">
               {intl.formatMessage(constantsMessages.noConnection)}
             </Text>
           </ConnectivityContainer>

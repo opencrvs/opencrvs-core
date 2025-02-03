@@ -221,7 +221,14 @@ const WorkqueueComp = ({
         />
       )}
       {!loading && noResultText && content.length <= 0 && (
-        <NoResultText id="no-record" variant='bold16' color='grey600' element='span'>{noResultText}</NoResultText>
+        <NoResultText
+          id="no-record"
+          variant="bold16"
+          color="grey600"
+          element="span"
+        >
+          {noResultText}
+        </NoResultText>
       )}
     </Wrapper>
   )

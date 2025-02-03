@@ -43,7 +43,9 @@ export const SubSectionDivider = ({
   disabled
 }: ISubSectionProps) => (
   <SubSectionWrapper>
-    <Title variant='h3' color='copy' element='h3'>{label}</Title>
+    <Title variant="h3" color="copy" element="h3">
+      {label}
+    </Title>
     {required === false && (
       <Optional disabled={disabled}>
         &nbsp;&nbsp;•&nbsp;{optionalLabel}

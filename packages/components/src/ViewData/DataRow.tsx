@@ -95,7 +95,14 @@ export const DataRow = ({
           <Label id={`${id}_label`}>{label}</Label>
           {value && <Value id={`${id}_value`}>{value}</Value>}
           {placeHolder && (
-            <PlaceHolder id={`${id}_placeholder`} variant='reg16' color='supportingCopy' element='span'>{placeHolder}</PlaceHolder>
+            <PlaceHolder
+              id={`${id}_placeholder`}
+              variant="reg16"
+              color="supportingCopy"
+              element="span"
+            >
+              {placeHolder}
+            </PlaceHolder>
           )}
         </DataContainer>
         {action && (

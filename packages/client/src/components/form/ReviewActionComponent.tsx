@@ -25,7 +25,6 @@ import ProtectedComponent from '@client/components/ProtectedComponent'
 import { SCOPES } from '@opencrvs/commons/client'
 import { usePermissions } from '@client/hooks/useAuthorization'
 
-
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
   draftDeclaration?: boolean
@@ -351,7 +350,7 @@ const ReviewActionComponent = ({
     <Container id={id}>
       <UnderLayBackground background={background} />
       <Content>
-        <Title variant='h2' element='h2'>
+        <Title variant="h2" element="h2">
           {intl.formatMessage(
             actionContent.title.message,
             actionContent.title.payload

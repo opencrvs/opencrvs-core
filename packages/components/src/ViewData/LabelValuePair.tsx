@@ -35,8 +35,12 @@ interface IInfo {
 export function LabelValuePair({ label, value }: IInfo) {
   return (
     <LabelValuePairContainer>
-      <Label variant='h4' element='h4'>{label}: </Label>
-      <Value variant='reg18' element='span'>{value}</Value>
+      <Label variant="h4" element="h4">
+        {label}:{' '}
+      </Label>
+      <Value variant="reg18" element="span">
+        {value}
+      </Value>
     </LabelValuePairContainer>
   )
 }

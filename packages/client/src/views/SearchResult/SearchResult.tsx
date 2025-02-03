@@ -75,7 +75,6 @@ import { useWindowSize } from '@opencrvs/components/src/hooks'
 import * as routes from '@client/navigation/routes'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-
 const ErrorText = styled(Text)`
   text-align: center;
   margin-top: 100px;
@@ -502,7 +501,11 @@ function SearchResultView(props: ISearchResultProps) {
                     <LoadingIndicator loading={true} />
                   </div>
                 ) : error ? (
-                  <ErrorText id="search-result-error-text" element='p' variant='h4'>
+                  <ErrorText
+                    id="search-result-error-text"
+                    element="p"
+                    variant="h4"
+                  >
                     {intl.formatMessage(errorMessages.queryError)}
                   </ErrorText>
                 ) : (

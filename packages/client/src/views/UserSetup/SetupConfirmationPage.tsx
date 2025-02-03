@@ -58,10 +58,10 @@ export function SetupConfirmationPage() {
           <LogoContainer>
             <CountryLogo src={offlineCountryConfig.config.COUNTRY_LOGO.file} />
           </LogoContainer>
-          <TitleHolder variant='h1' element='h1'>
+          <TitleHolder variant="h1" element="h1">
             {intl.formatMessage(messages.setupCompleteTitle)}
           </TitleHolder>
-          <InstructionHolder variant='reg16' element='span'>
+          <InstructionHolder variant="reg16" element="span">
             {intl.formatMessage(messages.userSetupInstruction)}
           </InstructionHolder>
           <LoginButton

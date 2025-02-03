@@ -103,7 +103,13 @@ export const MobileHeader = ({
       {mobileBody ? (
         <SearchBody>{mobileBody}</SearchBody>
       ) : (
-        <HeaderBody>{<Title id="header_title" variant='h4' element='h4'>{title}</Title>}</HeaderBody>
+        <HeaderBody>
+          {
+            <Title id="header_title" variant="h4" element="h4">
+              {title}
+            </Title>
+          }
+        </HeaderBody>
       )}
 
       {mobileRight &&

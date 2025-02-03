@@ -119,9 +119,18 @@ function LegendBody({ dataPoint }: { dataPoint: ILegendDataPoint }) {
 
   return (
     <DataLabel>
-      <DataTitle description={dataPoint.description} variant='reg18' color='secondary' element='span'>{title}</DataTitle>
+      <DataTitle
+        description={dataPoint.description}
+        variant="reg18"
+        color="secondary"
+        element="span"
+      >
+        {title}
+      </DataTitle>
       {!dataPoint.total && dataPoint.description && (
-        <DataDescription variant='reg12' element='span'>{dataPoint.description}</DataDescription>
+        <DataDescription variant="reg12" element="span">
+          {dataPoint.description}
+        </DataDescription>
       )}
     </DataLabel>
   )
@@ -148,7 +157,9 @@ function LegendFooter({
         }
         return (
           <FooterData key={i}>
-            <FooterDataLabel variant='reg12' element='span'>{dataPoint.label}</FooterDataLabel>
+            <FooterDataLabel variant="reg12" element="span">
+              {dataPoint.label}
+            </FooterDataLabel>
             <FooterIconTitle>
               <FooterIcon>{dataPoint.icon()}</FooterIcon>
               {title}

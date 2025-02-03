@@ -1110,7 +1110,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
           )}
         >
           {isErrorOccured && (
-            <ErrorText id="error_message_section" variant='reg16' color='negative' element='span'>
+            <ErrorText
+              id="error_message_section"
+              variant="reg16"
+              color="negative"
+              element="span"
+            >
               {intl.formatMessage(messages.registerFormQueryError)}
             </ErrorText>
           )}

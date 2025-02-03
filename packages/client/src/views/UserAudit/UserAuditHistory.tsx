@@ -246,7 +246,9 @@ function UserAuditHistoryComponent(props: Props) {
             {actionMessage}
           </Link>
         ) : (
-          <BoldContent element='p' variant='h3'>{actionMessage}</BoldContent>
+          <BoldContent element="p" variant="h3">
+            {actionMessage}
+          </BoldContent>
         ),
 
         actionDescriptionWithAuditTime:
@@ -267,7 +269,9 @@ function UserAuditHistoryComponent(props: Props) {
               {actionMessage}
             </Link>
           ) : (
-            <BoldContent variant='bold14' color='grey600' element='span'>{actionMessage}</BoldContent>
+            <BoldContent variant="bold14" color="grey600" element="span">
+              {actionMessage}
+            </BoldContent>
           ),
         trackingId:
           isUserAuditItemWithDeclarationDetials(userAuditItem) &&

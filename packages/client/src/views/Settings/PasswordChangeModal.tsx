@@ -380,12 +380,22 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                   />
                 </InputField>
                 {this.state.passwordMismatched && (
-                  <PasswordMismatch id="passwordMismatch" variant='bold16' color='negative' element='span'>
+                  <PasswordMismatch
+                    id="passwordMismatch"
+                    variant="bold16"
+                    color="negative"
+                    element="span"
+                  >
                     {intl.formatMessage(messages.mismatchedPasswordMsg)}
                   </PasswordMismatch>
                 )}
                 {this.state.passwordMatched && (
-                  <PasswordMatch id="passwordMatch" variant='bold16' color='positive' element='span'>
+                  <PasswordMatch
+                    id="passwordMatch"
+                    variant="bold16"
+                    color="positive"
+                    element="span"
+                  >
                     {intl.formatMessage(messages.matchedPasswordMsg)}
                   </PasswordMatch>
                 )}

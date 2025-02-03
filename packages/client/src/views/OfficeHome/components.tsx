@@ -123,7 +123,11 @@ export const IconWithNameEvent = ({
       )}
       <NameEventContainer id="nameEvent">
         {name}
-        {event && <Event variant='reg16' color='grey500' element='span'>{event}</Event>}
+        {event && (
+          <Event variant="reg16" color="grey500" element="span">
+            {event}
+          </Event>
+        )}
       </NameEventContainer>
     </Flex>
   )

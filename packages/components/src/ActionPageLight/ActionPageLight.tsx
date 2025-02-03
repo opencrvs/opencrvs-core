@@ -77,7 +77,9 @@ export const ActionPageLight = ({
         key="action_page_back_button"
       >
         <CircleButton>{(icon && icon()) || <BackArrowDeepBlue />}</CircleButton>
-        <BackButtonText variant='bold16' element='span'>{backLabel ? backLabel : ''}</BackButtonText>
+        <BackButtonText variant="bold16" element="span">
+          {backLabel ? backLabel : ''}
+        </BackButtonText>
       </BackButtonContainer>
     )
   }

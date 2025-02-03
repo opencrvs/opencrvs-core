@@ -87,14 +87,19 @@ const LoadingIndicatorComp = ({
     )}
     <MobileViewContainer noDeclaration={noDeclaration}>
       {isOnline && hasError && (
-        <ErrorText id="search-result-error-text-count" variant='reg16' color='negative' element='span'>
+        <ErrorText
+          id="search-result-error-text-count"
+          variant="reg16"
+          color="negative"
+          element="span"
+        >
           {intl.formatMessage(errorMessages.queryError)}
         </ErrorText>
       )}
       {!isOnline && (
         <ConnectivityContainer>
           <NoConnectivity />
-          <Text id="wait-connection-text" variant='reg16' element='span'>
+          <Text id="wait-connection-text" variant="reg16" element="span">
             {intl.formatMessage(constantsMessages.noConnection)}
           </Text>
         </ConnectivityContainer>

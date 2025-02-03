@@ -90,7 +90,11 @@ export const Modal = ({
   return (
     <Backdrop className={className}>
       <ModalContent>
-        {title && <Heading variant='h4' color='copy' element='h4'>{title}</Heading>}
+        {title && (
+          <Heading variant="h4" color="copy" element="h4">
+            {title}
+          </Heading>
+        )}
         {handleClose && (
           <TopRight onClick={handleClose}>
             <Cross />

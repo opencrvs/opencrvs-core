@@ -234,7 +234,9 @@ function UserAuditActionModalComponent(
       responsive
       actions={actions}
     >
-      <Subtitle id="modal-subtitle" variant='reg18' color='copy' element='span'>{modalSubtitle}</Subtitle>
+      <Subtitle id="modal-subtitle" variant="reg18" color="copy" element="span">
+        {modalSubtitle}
+      </Subtitle>
       {formError && isErrorVisible && (
         <ErrorText id="form-error">{formError}</ErrorText>
       )}
