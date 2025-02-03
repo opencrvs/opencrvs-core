@@ -95,7 +95,7 @@ export function eventHasAction(type: ActionDocument['type']) {
   }
 }
 
-type dateBoundary = {
+type DateBoundary = {
   now: () => FieldAPI
   date: (
     // date should be in yyyy-mm-dd format
@@ -112,13 +112,13 @@ export type FieldAPI = {
   /**
    * Checks if the date is within `days` days in the past from now.
    */
-  isBefore: () => dateBoundary
-  isAfter: () => dateBoundary
+  isBefore: () => DateBoundary
+  isAfter: () => DateBoundary
   isEqualTo: (value: string) => FieldAPI
   isUndefined: () => FieldAPI
   not: {
-    isBefore: () => dateBoundary
-    isAfter: () => dateBoundary
+    isBefore: () => DateBoundary
+    isAfter: () => DateBoundary
     inArray: (values: string[]) => FieldAPI
     equalTo: (value: string) => FieldAPI
   }
