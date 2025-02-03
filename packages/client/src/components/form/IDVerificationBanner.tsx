@@ -14,6 +14,68 @@ import { useIntl } from 'react-intl'
 import { Pill, Banner, Icon, Button, Text } from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/id-verification-banner'
 
+function Pending() {
+  const intl = useIntl()
+  return (
+    <Pill
+      type="pending"
+      size="small"
+      pillTheme="dark"
+      label={
+        <>
+          <Icon name="QrCode" size="small" />
+          {intl.formatMessage(messages.pending.title)}
+        </>
+      }
+    />
+  )
+}
+
+function Verified() {
+  const intl = useIntl()
+  return (
+    <Pill
+      type="default"
+      size="small"
+      pillTheme="dark"
+      label={
+        <>
+          <Icon name="CircleWavyCheck" size="small" />
+          {intl.formatMessage(messages.success.title)}
+        </>
+      }
+    />
+  )
+}
+
+function Failed() {
+  const intl = useIntl()
+  return (
+    <Pill
+      type="inactive"
+      size="small"
+      pillTheme="dark"
+      label={
+        <>
+          <Icon name="X" size="small" />
+          {intl.formatMessage(messages.failed.title)}
+        </>
+      }
+    />
+  )
+}
+
+export function VerificationPill({ type }: { type: string }) {
+  if (type === 'pending') {
+    return <Pending />
+  } else if (type === 'verified') {
+    return <Verified />
+  } else if (type === 'failed') {
+    return <Failed />
+  }
+  return null
+}
+
 export const IDVerificationBanner = ({
   type,
   idFieldName,
@@ -31,17 +93,7 @@ export const IDVerificationBanner = ({
     return (
       <Banner.Container>
         <Banner.Header type="pending">
-          <Pill
-            type="pending"
-            size="small"
-            pillTheme="dark"
-            label={
-              <>
-                <Icon name="QrCode" size="small" />
-                {intl.formatMessage(messages.pending.title)}
-              </>
-            }
-          />
+          <Pending />
           <Icon name="Clock" size="large" />
         </Banner.Header>
         <Banner.Body>
@@ -60,17 +112,7 @@ export const IDVerificationBanner = ({
     return (
       <Banner.Container>
         <Banner.Header type="default">
-          <Pill
-            type="default"
-            size="small"
-            pillTheme="dark"
-            label={
-              <>
-                <Icon name="CircleWavyCheck" size="small" />
-                {intl.formatMessage(messages.success.title)}
-              </>
-            }
-          />
+          <Verified />
           <Icon name="FilledCheck" size="large" />
         </Banner.Header>
         <Banner.Body>
@@ -89,17 +131,7 @@ export const IDVerificationBanner = ({
     return (
       <Banner.Container>
         <Banner.Header type="inactive">
-          <Pill
-            type="inactive"
-            size="small"
-            pillTheme="dark"
-            label={
-              <>
-                <Icon name="X" size="small" />
-                {intl.formatMessage(messages.failed.title)}
-              </>
-            }
-          />
+          <Failed />
           <Icon name="Close" size="large" />
         </Banner.Header>
         <Banner.Body>
