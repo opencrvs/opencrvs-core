@@ -39,6 +39,8 @@ export const ActionType = {
   CUSTOM: 'CUSTOM'
 } as const
 
+export type ActionType = (typeof ActionType)[keyof typeof ActionType]
+
 const CreateConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.CREATE)

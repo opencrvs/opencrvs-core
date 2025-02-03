@@ -9,13 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { initTRPC } from '@trpc/server'
-import { Context } from './middleware'
-import superjson from 'superjson'
+export function getOrThrow<T>(x: T, message: string) {
+  if (x === undefined || x === null) {
+    throw new Error(message)
+  }
 
-export const t = initTRPC.context<Context>().create({
-  transformer: superjson
-})
-
-export const router = t.router
-export const publicProcedure = t.procedure
+  return x
+}
