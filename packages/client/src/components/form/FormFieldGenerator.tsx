@@ -276,21 +276,23 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
     if (fieldDefinition.type === ID_READER) {
       return (
-        <IDReader
-          dividerLabel={fieldDefinition.dividerLabel}
-          manualInputInstructionLabel={
-            fieldDefinition.manualInputInstructionLabel
-          }
-        >
-          <ReaderGenerator
-            readers={fieldDefinition.readers}
-            form={values}
-            field={fieldDefinition}
-            draft={draftData}
-            fields={fields}
-            setFieldValue={setFieldValue}
-          />
-        </IDReader>
+        <InputField {...inputFieldProps}>
+          <IDReader
+            dividerLabel={fieldDefinition.dividerLabel}
+            manualInputInstructionLabel={
+              fieldDefinition.manualInputInstructionLabel
+            }
+          >
+            <ReaderGenerator
+              readers={fieldDefinition.readers}
+              form={values}
+              field={fieldDefinition}
+              draft={draftData}
+              fields={fields}
+              setFieldValue={setFieldValue}
+            />
+          </IDReader>
+        </InputField>
       )
     }
     if (fieldDefinition.type === ID_VERIFICATION_BANNER) {
