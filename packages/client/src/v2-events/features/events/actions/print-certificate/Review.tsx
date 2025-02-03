@@ -102,7 +102,7 @@ const messages = defineMessages({
 })
 
 export function Review() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
   const [{ templateId }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
@@ -118,8 +118,12 @@ export function Review() {
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
-  const { svgCode, handleCertify, isPrintInAdvance, canUserEditRecord } =
-    usePrintableCertificate(event, form, certificateConfig, language)
+  const { svgCode, handleCertify } = usePrintableCertificate(
+    event,
+    form,
+    certificateConfig,
+    language
+  )
 
   const handleCorrection = () =>
     navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
@@ -151,17 +155,9 @@ export function Review() {
         handleClose={() => close(false)}
         id="confirm-print-modal"
         show={true}
-        title={intl.formatMessage(
-          isPrintInAdvance
-            ? messages.printModalTitle
-            : messages.printAndIssueModalTitle
-        )}
+        title={intl.formatMessage(messages.printAndIssueModalTitle)}
       >
-        {intl.formatMessage(
-          isPrintInAdvance
-            ? messages.printModalBody
-            : messages.printAndIssueModalBody
-        )}
+        {intl.formatMessage(messages.printAndIssueModalBody)}
       </ResponsiveModal>
     ))
 
@@ -197,21 +193,16 @@ export function Review() {
           </Box>
           <Content
             bottomActionButtons={[
-              canUserEditRecord ? (
-                <Button
-                  key="edit-record"
-                  fullWidth
-                  size="large"
-                  type="negative"
-                  onClick={handleCorrection}
-                >
-                  <Icon name="X" size="medium" />
-                  {intl.formatMessage(messages.makeCorrection)}
-                </Button>
-              ) : (
-                <></>
-              ),
-
+              <Button
+                key="edit-record"
+                fullWidth
+                size="large"
+                type="negative"
+                onClick={handleCorrection}
+              >
+                <Icon name="X" size="medium" />
+                {intl.formatMessage(messages.makeCorrection)}
+              </Button>,
               <Button
                 key="confirm-and-print"
                 fullWidth
