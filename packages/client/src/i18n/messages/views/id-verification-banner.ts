@@ -8,33 +8,54 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MessageDescriptor } from 'react-intl'
 
-const pending: Record<string, MessageDescriptor> = {
+const authenticated = {
   title: {
-    id: 'views.idVerification.banner.pending.title',
-    defaultMessage: 'ID Pending Verification'
+    id: 'views.idVerification.banner.authenticated.title',
+    defaultMessage: 'ID Authenticated'
   },
   description: {
-    id: 'views.idVerification.banner.pending.description',
+    id: 'views.idVerification.banner.authenticated.description',
     defaultMessage:
-      'The data has been pre-filled from the notifier’s ID card and can be edited. It will be authenticated after submission'
+      'This identity has been successfully authenticated with the Farajaland’s National ID System. To make edits, please remove the authentication first.'
+  },
+  resetConfirmation: {
+    title: {
+      id: 'views.idVerification.banner.authenticated.resetConfirmation.title',
+      defaultMessage: 'Revoke authenticated ID?'
+    },
+    description: {
+      id: 'views.idVerification.banner.authenticated.resetConfirmation.description',
+      defaultMessage:
+        'By clicking ‘Continue,’ you’ll remove ID Authenticated status and unlock the fields for editing.'
+    }
   }
 }
 
-const success: Record<string, MessageDescriptor> = {
+const verified = {
   title: {
-    id: 'views.idVerification.banner.success.title',
+    id: 'views.idVerification.banner.verified.title',
     defaultMessage: 'ID Verified'
   },
   description: {
-    id: 'views.idVerification.banner.success.description',
+    id: 'views.idVerification.banner.verified.description',
     defaultMessage:
       'This identity data has been successfully verified with the Farajaland’s National ID System. Please note that their identity has not been authenticated using the individuals biometrics. To make edits, please remove the verification first.'
+  },
+  resetConfirmation: {
+    title: {
+      id: 'views.idVerification.banner.verified.resetConfirmation.title',
+      defaultMessage: 'Revoke valid ID?'
+    },
+    description: {
+      id: 'views.idVerification.banner.verified.resetConfirmation.description',
+      defaultMessage:
+        'By clicking ‘Continue,’ you’ll remove ID Verified status and unlock the fields for editing.'
+    }
   }
 }
 
-const failed: Record<string, MessageDescriptor> = {
+const failed = {
   title: {
     id: 'views.idVerification.banner.failed.title',
     defaultMessage: 'ID Verification Failed'
@@ -43,10 +64,21 @@ const failed: Record<string, MessageDescriptor> = {
     id: 'views.idVerification.banner.pending.description',
     defaultMessage:
       'The identity card scanned has not be successfully authenticated'
+  },
+  resetConfirmation: {
+    title: {
+      id: 'views.idVerification.banner.authenticated.resetConfirmation.title',
+      defaultMessage: 'Reset information?'
+    },
+    description: {
+      id: 'views.idVerification.banner.authenticated.resetConfirmation.description',
+      defaultMessage:
+        'By clicking ‘Continue,’ you’ll clear all information to it’s default state.'
+    }
   }
 }
 
-const actions: Record<string, MessageDescriptor> = {
+const actions = {
   revoke: {
     id: 'views.idVerification.banner.actions.revoke',
     defaultMessage: 'Revoke'
@@ -58,8 +90,8 @@ const actions: Record<string, MessageDescriptor> = {
 }
 
 export const messages = {
-  pending,
-  success,
+  authenticated,
+  verified,
   failed,
   actions
 }

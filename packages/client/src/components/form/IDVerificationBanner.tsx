@@ -11,20 +11,30 @@
 import React from 'react'
 import { BannerType, IFormFieldValue } from '@client/forms'
 import { useIntl } from 'react-intl'
-import { Pill, Banner, Icon, Button, Text } from '@opencrvs/components'
+import {
+  Pill,
+  Banner,
+  Icon,
+  Button,
+  Text,
+  ResponsiveModal
+} from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/id-verification-banner'
+import { useModal } from '@client/hooks/useModal'
+import { buttonMessages } from '@client/i18n/messages'
+import styled from 'styled-components'
 
-function Pending() {
+function Authenticated() {
   const intl = useIntl()
   return (
     <Pill
-      type="pending"
+      type="active"
       size="small"
       pillTheme="dark"
       label={
         <>
-          <Icon name="QrCode" size="small" />
-          {intl.formatMessage(messages.pending.title)}
+          <Icon name="Fingerprint" size="small" />
+          {intl.formatMessage(messages.authenticated.title)}
         </>
       }
     />
@@ -41,7 +51,7 @@ function Verified() {
       label={
         <>
           <Icon name="CircleWavyCheck" size="small" />
-          {intl.formatMessage(messages.success.title)}
+          {intl.formatMessage(messages.verified.title)}
         </>
       }
     />
@@ -66,12 +76,95 @@ function Failed() {
 }
 
 export function VerificationPill({ type }: { type: string }) {
-  if (type === 'pending') {
-    return <Pending />
+  if (type === 'authenticated') {
+    return <Authenticated />
   } else if (type === 'verified') {
     return <Verified />
   } else if (type === 'failed') {
     return <Failed />
+  }
+  return null
+}
+
+const ConfirmationModal: React.FC<{
+  close: (result: boolean) => void
+  type: BannerType
+}> = ({ close, type }) => {
+  const intl = useIntl()
+  return (
+    <ResponsiveModal
+      id="assignment"
+      show
+      title={intl.formatMessage(messages[type].resetConfirmation.title)}
+      actions={[
+        <Button
+          key="cancel-btn"
+          id="cancel"
+          type="tertiary"
+          onClick={() => close(false)}
+        >
+          {intl.formatMessage(buttonMessages.cancel)}
+        </Button>,
+        <Button
+          key="confirm-btn"
+          id="confirm"
+          type="negative"
+          onClick={() => close(true)}
+        >
+          {intl.formatMessage(buttonMessages.continueButton)}
+        </Button>
+      ]}
+      autoHeight
+      responsive={false}
+      preventClickOnParent
+      handleClose={() => close(false)}
+    >
+      {intl.formatMessage(messages[type].resetConfirmation.description)}
+    </ResponsiveModal>
+  )
+}
+
+const StyledIcon = styled(Icon)<{ type: BannerType }>`
+  border-radius: 50%;
+  background-color: ${({ theme, type }) =>
+    type === 'authenticated'
+      ? theme.colors.positiveLight
+      : type === 'failed'
+      ? theme.colors.redLight
+      : theme.colors.blueLight};
+`
+
+const StatusIcon = ({ type }: { type: BannerType }) => {
+  if (type === 'authenticated') {
+    return (
+      <StyledIcon
+        name="Check"
+        size="large"
+        weight="bold"
+        color="greenDarker"
+        type={type}
+      />
+    )
+  } else if (type === 'verified') {
+    return (
+      <StyledIcon
+        name="Check"
+        size="large"
+        weight="bold"
+        color="blueDarker"
+        type={type}
+      />
+    )
+  } else if (type === 'failed') {
+    return (
+      <StyledIcon
+        name="X"
+        size="large"
+        weight="bold"
+        color="redDarker"
+        type={type}
+      />
+    )
   }
   return null
 }
@@ -86,38 +179,25 @@ export const IDVerificationBanner = ({
   idFieldName: string
 }) => {
   const intl = useIntl()
-  const handleReset = () => {
-    setFieldValue(idFieldName, '')
+  const [modal, openModal] = useModal()
+  const handleReset = async () => {
+    const confirm = await openModal((close) => (
+      <ConfirmationModal close={close} type={type} />
+    ))
+    if (confirm) {
+      setFieldValue(idFieldName, '')
+    }
   }
-  if (type === 'pending') {
+  if (type === 'authenticated') {
     return (
       <Banner.Container>
-        <Banner.Header type="pending">
-          <Pending />
-          <Icon name="Clock" size="large" />
+        <Banner.Header type="active">
+          <Authenticated />
+          <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>
           <Text variant="reg16" element="span">
-            {intl.formatMessage(messages.pending.description)}
-          </Text>
-        </Banner.Body>
-        <Banner.Footer justifyContent="flex-end">
-          <Button type="secondary" onClick={handleReset}>
-            {intl.formatMessage(messages.actions.reset)}
-          </Button>
-        </Banner.Footer>
-      </Banner.Container>
-    )
-  } else if (type === 'verified') {
-    return (
-      <Banner.Container>
-        <Banner.Header type="default">
-          <Verified />
-          <Icon name="FilledCheck" size="large" />
-        </Banner.Header>
-        <Banner.Body>
-          <Text variant="reg16" element="span">
-            {intl.formatMessage(messages.success.description)}
+            {intl.formatMessage(messages.authenticated.description)}
           </Text>
         </Banner.Body>
         <Banner.Footer justifyContent="flex-end">
@@ -125,6 +205,27 @@ export const IDVerificationBanner = ({
             {intl.formatMessage(messages.actions.revoke)}
           </Button>
         </Banner.Footer>
+        {modal}
+      </Banner.Container>
+    )
+  } else if (type === 'verified') {
+    return (
+      <Banner.Container>
+        <Banner.Header type="default">
+          <Verified />
+          <StatusIcon type={type} />
+        </Banner.Header>
+        <Banner.Body>
+          <Text variant="reg16" element="span">
+            {intl.formatMessage(messages.verified.description)}
+          </Text>
+        </Banner.Body>
+        <Banner.Footer justifyContent="flex-end">
+          <Button type="secondary" onClick={handleReset}>
+            {intl.formatMessage(messages.actions.revoke)}
+          </Button>
+        </Banner.Footer>
+        {modal}
       </Banner.Container>
     )
   } else if (type === 'failed') {
@@ -132,7 +233,7 @@ export const IDVerificationBanner = ({
       <Banner.Container>
         <Banner.Header type="inactive">
           <Failed />
-          <Icon name="Close" size="large" />
+          <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>
           <Text variant="reg16" element="span">
@@ -144,6 +245,7 @@ export const IDVerificationBanner = ({
             {intl.formatMessage(messages.actions.reset)}
           </Button>
         </Banner.Footer>
+        {modal}
       </Banner.Container>
     )
   } else return null
