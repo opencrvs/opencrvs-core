@@ -95,17 +95,30 @@ export function eventHasAction(type: ActionDocument['type']) {
   }
 }
 
+type dateBoundary = {
+  now: () => FieldAPI
+  date: (
+    // date should be in yyyy-mm-dd format
+    date: `${number}${number}${number}${number}-${number}${number}-${number}${number}`
+  ) => FieldAPI
+  days: (days: number) => {
+    inPast: () => FieldAPI
+    inFuture: () => FieldAPI
+  }
+}
+
 export type FieldAPI = {
   inArray: (values: string[]) => FieldAPI
-  isBeforeNow: () => FieldAPI
   /**
    * Checks if the date is within `days` days in the past from now.
    */
-  isAfter: (days: number) => FieldAPI
+  isBefore: () => dateBoundary
+  isAfter: () => dateBoundary
   isEqualTo: (value: string) => FieldAPI
   isUndefined: () => FieldAPI
   not: {
-    isBeforeNow: () => FieldAPI
+    isBefore: () => dateBoundary
+    isAfter: () => dateBoundary
     inArray: (values: string[]) => FieldAPI
     equalTo: (value: string) => FieldAPI
   }
@@ -140,49 +153,76 @@ export function field(fieldId: string) {
     return api
   }
 
-  const api: FieldAPI = {
-    isBeforeNow: () =>
-      addCondition({
+  const getDateFromNow = (days: number) =>
+    new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0]
+
+  const getDateRange = (
+    date: string,
+    clause: 'formatMinimum' | 'formatMaximum'
+  ) => ({
+    type: 'object',
+    properties: {
+      $form: {
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                format: 'date',
-                formatMaximum: { $data: '2/$now' }
-              }
-            },
-            required: [fieldId]
-          },
-          $now: {
+          [fieldId]: {
             type: 'string',
-            format: 'date'
+            format: 'date',
+            [clause]: date
           }
         },
-        required: ['$form', '$now']
-      }),
-    isAfter: (days: number) =>
-      addCondition({
+        required: [fieldId]
+      }
+    },
+    required: ['$form']
+  })
+
+  const getNegativeDateRange = (
+    date: string,
+    clause: 'formatMinimum' | 'formatMaximum'
+  ) => ({
+    type: 'object',
+    properties: {
+      $form: {
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                format: 'date',
-                formatMinimum: new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-                  .toISOString()
-                  .split('T')[0]
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'string',
+            not: {
+              format: 'date',
+              [clause]: date
+            }
           }
         },
-        required: ['$form']
+        required: [fieldId]
+      }
+    },
+    required: ['$form']
+  })
+
+  const api: FieldAPI = {
+    isAfter: () => ({
+      days: (days: number) => ({
+        inPast: () =>
+          addCondition(getDateRange(getDateFromNow(days), 'formatMinimum')),
+        inFuture: () =>
+          addCondition(getDateRange(getDateFromNow(-days), 'formatMinimum'))
       }),
+      date: (date: string) => addCondition(getDateRange(date, 'formatMinimum')),
+      now: () => addCondition(getDateRange(getDateFromNow(0), 'formatMinimum'))
+    }),
+    isBefore: () => ({
+      days: (days: number) => ({
+        inPast: () =>
+          addCondition(getDateRange(getDateFromNow(days), 'formatMaximum')),
+        inFuture: () =>
+          addCondition(getDateRange(getDateFromNow(-days), 'formatMaximum'))
+      }),
+      date: (date: string) => addCondition(getDateRange(date, 'formatMaximum')),
+      now: () => addCondition(getDateRange(getDateFromNow(0), 'formatMaximum'))
+    }),
     isEqualTo: (value: string) =>
       addCondition({
         type: 'object',
@@ -230,30 +270,38 @@ export function field(fieldId: string) {
         required: ['$form']
       }),
     not: {
-      isBeforeNow: () =>
-        addCondition({
-          type: 'object',
-          properties: {
-            $form: {
-              type: 'object',
-              properties: {
-                [fieldId]: {
-                  type: 'string',
-                  not: {
-                    format: 'date',
-                    formatMaximum: { $data: '2/$now' }
-                  }
-                }
-              },
-              required: [fieldId]
-            },
-            $now: {
-              type: 'string',
-              format: 'date'
-            }
-          },
-          required: ['$form', '$now']
+      isAfter: () => ({
+        days: (days: number) => ({
+          inPast: () =>
+            addCondition(
+              getNegativeDateRange(getDateFromNow(days), 'formatMinimum')
+            ),
+          inFuture: () =>
+            addCondition(
+              getNegativeDateRange(getDateFromNow(-days), 'formatMinimum')
+            )
         }),
+        date: (date: string) =>
+          addCondition(getNegativeDateRange(date, 'formatMinimum')),
+        now: () =>
+          addCondition(getNegativeDateRange(getDateFromNow(0), 'formatMinimum'))
+      }),
+      isBefore: () => ({
+        days: (days: number) => ({
+          inPast: () =>
+            addCondition(
+              getNegativeDateRange(getDateFromNow(days), 'formatMaximum')
+            ),
+          inFuture: () =>
+            addCondition(
+              getNegativeDateRange(getDateFromNow(-days), 'formatMaximum')
+            )
+        }),
+        date: (date: string) =>
+          addCondition(getNegativeDateRange(date, 'formatMaximum')),
+        now: () =>
+          addCondition(getNegativeDateRange(getDateFromNow(0), 'formatMaximum'))
+      }),
       inArray: (values: string[]) =>
         addCondition({
           type: 'object',
