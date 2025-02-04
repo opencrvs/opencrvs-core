@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
