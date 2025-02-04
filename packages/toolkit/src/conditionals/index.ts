@@ -9,34 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { JSONSchema } from '@opencrvs/commons/conditionals'
+import { defineConditional, JSONSchema } from '@opencrvs/commons/conditionals'
 import { ActionDocument } from '@opencrvs/commons/events'
 
 export * as deduplication from './deduplication'
 
-export function defineConditional(conditional: JSONSchema): JSONSchema {
-  return conditional
-}
+export { defineConditional } from '@opencrvs/commons/conditionals'
 
 export function and(...conditions: JSONSchema[]): JSONSchema {
-  return {
+  return defineConditional({
     type: 'object',
     allOf: conditions
-  }
+  })
 }
 
 export function or(...conditions: JSONSchema[]): JSONSchema {
-  return {
+  return defineConditional({
     type: 'object',
     anyOf: conditions
-  }
+  })
 }
 
 export function not(condition: JSONSchema): JSONSchema {
-  return {
+  return defineConditional({
     type: 'object',
     not: condition
-  }
+  })
 }
 
 export function userHasScope(scope: string) {
@@ -137,103 +135,39 @@ export function field(fieldId: string) {
 
   const api: FieldAPI = {
     isBeforeNow: () =>
-      addCondition({
-        type: 'object',
-        properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                format: 'date',
-                formatMaximum: { $data: '2/$now' }
-              }
-            },
-            required: [fieldId]
-          },
-          $now: {
-            type: 'string',
-            format: 'date'
-          }
-        },
-        required: ['$form', '$now']
-      }),
-    isEqualTo: (value: string) =>
-      addCondition({
-        type: 'object',
-        properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                const: value
-              }
-            },
-            required: [fieldId]
-          }
-        },
-        required: ['$form']
-      }),
-    isUndefined: () =>
-      addCondition({
-        type: 'object',
-        properties: {
-          $form: {
-            type: 'object',
-            not: {
-              type: 'object',
-              required: [fieldId]
-            }
-          }
-        },
-        required: ['$form']
-      }),
-    inArray: (values: string[]) =>
-      addCondition({
-        type: 'object',
-        properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                enum: values
-              }
-            },
-            required: [fieldId]
-          }
-        },
-        required: ['$form']
-      }),
-    not: {
-      inArray: (values: string[]) =>
-        addCondition({
+      addCondition(
+        defineConditional({
           type: 'object',
           properties: {
             $form: {
               type: 'object',
               properties: {
                 [fieldId]: {
-                  not: {
-                    enum: values
-                  }
+                  type: 'string',
+                  format: 'date',
+                  formatMaximum: { $data: '2/$now' }
                 }
               },
               required: [fieldId]
+            },
+            $now: {
+              type: 'string',
+              format: 'date'
             }
           },
-          required: ['$form']
-        }),
-      equalTo: (value: string) =>
-        addCondition({
+          required: ['$form', '$now']
+        })
+      ),
+    isEqualTo: (value: string) =>
+      addCondition(
+        defineConditional({
           type: 'object',
           properties: {
             $form: {
               type: 'object',
               properties: {
                 [fieldId]: {
-                  not: {
-                    const: value
-                  }
+                  const: value
                 }
               },
               required: [fieldId]
@@ -241,11 +175,89 @@ export function field(fieldId: string) {
           },
           required: ['$form']
         })
+      ),
+    isUndefined: () =>
+      addCondition(
+        defineConditional({
+          type: 'object',
+          properties: {
+            $form: {
+              type: 'object',
+              not: {
+                type: 'object',
+                required: [fieldId]
+              }
+            }
+          },
+          required: ['$form']
+        })
+      ),
+    inArray: (values: string[]) =>
+      addCondition(
+        defineConditional({
+          type: 'object',
+          properties: {
+            $form: {
+              type: 'object',
+              properties: {
+                [fieldId]: {
+                  enum: values
+                }
+              },
+              required: [fieldId]
+            }
+          },
+          required: ['$form']
+        })
+      ),
+    not: {
+      inArray: (values: string[]) =>
+        addCondition(
+          defineConditional({
+            type: 'object',
+            properties: {
+              $form: {
+                type: 'object',
+                properties: {
+                  [fieldId]: {
+                    not: {
+                      enum: values
+                    }
+                  }
+                },
+                required: [fieldId]
+              }
+            },
+            required: ['$form']
+          })
+        ),
+      equalTo: (value: string) =>
+        addCondition(
+          defineConditional({
+            type: 'object',
+            properties: {
+              $form: {
+                type: 'object',
+                properties: {
+                  [fieldId]: {
+                    not: {
+                      const: value
+                    }
+                  }
+                },
+                required: [fieldId]
+              }
+            },
+            required: ['$form']
+          })
+        )
     },
     or: (callback: (field: FieldAPI) => FieldAPI) => {
       const nestedConditions = callback(field(fieldId))._apply()
 
-      return addCondition(ensureWrapper(nestedConditions, 'or'))
+      return addCondition(
+        defineConditional(ensureWrapper(nestedConditions, 'or'))
+      )
     },
     _apply: () => conditions,
     apply: () => {
@@ -268,14 +280,14 @@ type BooleanConnector = 'and' | 'or'
 const ensureWrapper = (
   conditions: JSONSchema[],
   booleanConnector: BooleanConnector
-) => {
+): JSONSchema => {
   const conditionsWithConnector = (
     conditions: JSONSchema[],
     connector: BooleanConnector
   ) => (connector === 'and' ? { allOf: conditions } : { anyOf: conditions })
 
   const needsWrapper = conditions.some(
-    (condition) =>
+    (condition: any) =>
       !(
         condition.type === 'object' &&
         condition.properties &&
@@ -284,7 +296,7 @@ const ensureWrapper = (
   )
 
   if (needsWrapper) {
-    return {
+    return defineConditional({
       type: 'object',
       properties: {
         $form: {
@@ -292,8 +304,10 @@ const ensureWrapper = (
           ...conditionsWithConnector(conditions, booleanConnector)
         }
       }
-    }
+    })
   }
 
-  return conditionsWithConnector(conditions, booleanConnector)
+  return defineConditional(
+    conditionsWithConnector(conditions, booleanConnector)
+  )
 }
