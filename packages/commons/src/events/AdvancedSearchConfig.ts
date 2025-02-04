@@ -10,12 +10,15 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { FieldConfig } from './FieldConfig'
 
 export const AdvancedSearchConfig = z.object({
   id: z.string().describe('Advanced search tab button id'),
   title: TranslationConfig.describe('Advanced search tab title'),
-  fields: z.array(FieldConfig).describe('Advanced search fields.')
+  fields: z
+    .array(z.object({ fieldId: z.string() }))
+    .optional()
+    .default([])
+    .describe('Advanced search fields.')
 })
 
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>

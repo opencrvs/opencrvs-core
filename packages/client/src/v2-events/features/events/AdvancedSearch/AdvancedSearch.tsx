@@ -71,43 +71,51 @@ function TabSearch({ sections }: { sections: AdvancedSearchFormConfig }) {
   const intl = useIntl()
   const accordionShowingLabel = intl.formatMessage(messages.show)
   const accordionHidingLabel = intl.formatMessage(messages.hide)
+  const events = useEventConfigurations()
 
-  return sections.map((section) => (
-    <Accordion
-      key={section.id}
-      expand={true}
-      label={intl.formatMessage(section.title)}
-      labelForHideAction={accordionHidingLabel}
-      labelForShowAction={accordionShowingLabel}
-      name={section.id}
-    >
-      <FormFieldGenerator
-        fields={section.fields}
-        formData={{}}
-        id={section.id}
-        initialValues={
-          {
-            /* provide initial values here */
-          }
-        }
-        setAllFieldsDirty={false}
-        onChange={(values) => {}}
-      />
-    </Accordion>
-  ))
+  const currentEvent = events.filter((e) => e.id === sections[0].id)
+  const allFields = currentEvent.flatMap((event) =>
+    event.actions.flatMap((action) =>
+      action.forms.flatMap((form) => form.pages.flatMap((page) => page.fields))
+    )
+  )
+
+  return sections.map((section) => {
+    const advancedSearchFieldId = section.fields.map(
+      (f: { fieldId: string }) => f.fieldId
+    )
+    const fields = allFields.filter((field) =>
+      advancedSearchFieldId.includes(field.id)
+    )
+
+    return (
+      <Accordion
+        key={section.id}
+        expand={true}
+        label={intl.formatMessage(section.title)}
+        labelForHideAction={accordionHidingLabel}
+        labelForShowAction={accordionShowingLabel}
+        name={section.id}
+      >
+        <FormFieldGenerator
+          fields={fields}
+          formData={{}}
+          id={section.id}
+          setAllFieldsDirty={false}
+          onChange={(values) => {}}
+        />
+      </Accordion>
+    )
+  })
 }
 
 function AdvancedSearch() {
   const intl = useIntl()
-  const events = useEventConfigurations()
+  const allEvents = useEventConfigurations()
 
-  const advancedSearchEvents = events.filter(
+  const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
   )
-
-  const activeSections = advancedSearchEvents.flatMap(
-    (e) => e.advancedSearch
-  ) satisfies AdvancedSearchFormConfig
 
   const formTabSections = advancedSearchEvents.map((a) => ({
     id: a.id,
@@ -122,9 +130,8 @@ function AdvancedSearch() {
     setActiveTabId(tabId)
   }
 
-  const currentSection = activeSections.filter(
-    (section) => section.id === activeTabId
-  )
+  const currentTabSections =
+    allEvents.find((e) => e.id === activeTabId)?.advancedSearch ?? []
 
   return (
     <>
@@ -141,7 +148,9 @@ function AdvancedSearch() {
         title={intl.formatMessage(messages.advancedSearch)}
         titleColor={'copy'}
       >
-        {currentSection.length > 0 && <TabSearch sections={currentSection} />}
+        {currentTabSections.length > 0 && (
+          <TabSearch sections={currentTabSections} />
+        )}
       </Content>
     </>
   )
