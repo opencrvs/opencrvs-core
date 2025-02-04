@@ -469,7 +469,18 @@ function PreviewActionComponent({
   )
 }
 
-function EditModal({ close }: { close: (result: boolean | null) => void }) {
+function EditModal({
+  copy,
+  close
+}: {
+  copy?: {
+    cancel?: MessageDescriptor
+    continue?: MessageDescriptor
+    title?: MessageDescriptor
+    description?: MessageDescriptor
+  }
+  close: (result: boolean | null) => void
+}) {
   const intl = useIntl()
   return (
     <ResponsiveModal
@@ -483,7 +494,7 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
             close(null)
           }}
         >
-          {intl.formatMessage(reviewMessages.changeModalCancel)}
+          {intl.formatMessage(copy?.cancel || reviewMessages.changeModalCancel)}
         </Button>,
         <Button
           key="confirm_edit"
@@ -493,17 +504,21 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
             close(true)
           }}
         >
-          {intl.formatMessage(reviewMessages.changeModalContinue)}
+          {intl.formatMessage(
+            copy?.continue || reviewMessages.changeModalContinue
+          )}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(reviewMessages.changeModalTitle)}
+      title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(reviewMessages.changeModalDescription)}
+          {intl.formatMessage(
+            copy?.description || reviewMessages.changeModalDescription
+          )}
         </Text>
       </Stack>
     </ResponsiveModal>
@@ -511,9 +526,16 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
 }
 
 function ActionModal({
+  copy,
   close,
   action
 }: {
+  copy?: {
+    cancel?: MessageDescriptor
+    primaryAction?: MessageDescriptor
+    title?: MessageDescriptor
+    description?: MessageDescriptor
+  }
   close: (result: boolean | null) => void
   action: string
 }) {
@@ -530,7 +552,7 @@ function ActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(reviewMessages.actionModalCancel)}
+          {intl.formatMessage(copy?.cancel || reviewMessages.actionModalCancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -540,19 +562,27 @@ function ActionModal({
             close(true)
           }}
         >
-          {intl.formatMessage(reviewMessages.actionModalPrimaryAction, {
-            action
-          })}
+          {intl.formatMessage(
+            copy?.primaryAction || reviewMessages.actionModalPrimaryAction,
+            {
+              action
+            }
+          )}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(reviewMessages.actionModalTitle, { action })}
+      title={intl.formatMessage(
+        copy?.title || reviewMessages.actionModalTitle,
+        { action }
+      )}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(reviewMessages.actionModalDescription)}
+          {intl.formatMessage(
+            copy?.description || reviewMessages.actionModalDescription
+          )}
         </Text>
       </Stack>
     </ResponsiveModal>

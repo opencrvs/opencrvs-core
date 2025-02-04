@@ -68,6 +68,12 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+const PrintCertificateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
 const RequestedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION)
@@ -105,6 +111,7 @@ export const ActionDocument = z.discriminatedUnion('type', [
   ApprovedCorrectionAction,
   RejectedCorrectionAction,
   UnassignedAction,
+  PrintCertificateAction,
   CustomAction
 ])
 

@@ -36,8 +36,11 @@ export const ActionType = {
   NOTIFY: 'NOTIFY',
   DECLARE: 'DECLARE',
   DELETE: 'DELETE',
+  PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
   CUSTOM: 'CUSTOM'
 } as const
+
+export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
 const CreateConfig = ActionConfigBase.merge(
   z.object({
@@ -66,6 +69,12 @@ const RegisterConfig = ActionConfigBase.merge(
 const DeleteConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DELETE)
+  })
+)
+
+const PrintCertificateActionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
   })
 )
 
@@ -101,6 +110,7 @@ export const ActionConfig = z.discriminatedUnion('type', [
   ValidateConfig,
   RegisterConfig,
   DeleteConfig,
+  PrintCertificateActionConfig,
   RequestCorrectionConfig,
   RejectCorrectionConfig,
   ApproveCorrectionConfig,

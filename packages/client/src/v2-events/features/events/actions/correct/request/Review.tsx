@@ -99,7 +99,7 @@ export function Review() {
   }
 
   return (
-    <FormLayout canSaveAndExit={false} route={ROUTES.V2.EVENTS.REGISTER}>
+    <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
       <ReviewComponent.Body
         eventConfig={config}
         form={form}

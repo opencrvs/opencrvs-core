@@ -92,7 +92,6 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        eventId={eventId}
         form={form}
         formPages={formPages}
         pageId={currentPageId}
