@@ -10,12 +10,16 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { useIntl } from 'react-intl'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { ISelectOption } from '@opencrvs/components/lib/Select'
 import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
-import { IFileValue, IAttachmentValue } from '@client/forms'
+import {
+  FileFieldValueWithOption,
+  SelectOption
+} from '@opencrvs/commons/client'
+import { IAttachmentValue } from '@client/forms'
 
 const Wrapper = styled.div`
   max-width: 100%;
@@ -54,13 +58,13 @@ const Label = styled.div`
 
 interface Props {
   id?: string
-  documents?: IFileValue[] | null
+  documents?: FileFieldValueWithOption[] | null
   processingDocuments?: Array<{ label: string }>
   attachment?: IAttachmentValue
   label?: string
-  onSelect: (document: IFileValue | IAttachmentValue) => void
-  dropdownOptions?: ISelectOption[]
-  onDelete?: (image: IFileValue | IAttachmentValue) => void
+  onSelect: (document: FileFieldValueWithOption | IAttachmentValue) => void
+  dropdownOptions?: SelectOption[]
+  onDelete?: (image: FileFieldValueWithOption | IAttachmentValue) => void
   inReviewSection?: boolean
 }
 
@@ -75,23 +79,28 @@ export const DocumentListPreview = ({
   onDelete,
   inReviewSection
 }: Props) => {
+  const intl = useIntl()
+
   const getFormattedLabelForDocType = (docType: string) => {
     const matchingOptionForDocType =
       dropdownOptions &&
       dropdownOptions.find((option) => option.value === docType)
-    return matchingOptionForDocType && matchingOptionForDocType.label
+    return (
+      matchingOptionForDocType &&
+      intl.formatMessage(matchingOptionForDocType.label)
+    )
   }
 
   return (
     <Wrapper id={`preview-list-${id}`}>
       {documents &&
-        documents.map((document: IFileValue, key: number) => (
+        documents.map((document: FileFieldValueWithOption, key: number) => (
           <Container key={`preview_${key}`}>
             <Label>
               <Icon color="grey600" name="Paperclip" size="large" />
               <Link
                 key={key}
-                id={`document_${(document.optionValues[1] as string).replace(
+                id={`document_${(document?.option as string).replace(
                   /\s/g,
                   ''
                 )}_link`}
@@ -100,11 +109,9 @@ export const DocumentListPreview = ({
                 <span>
                   {(inReviewSection &&
                     dropdownOptions &&
-                    dropdownOptions[key]?.label) ||
-                    getFormattedLabelForDocType(
-                      document.optionValues[1] as string
-                    ) ||
-                    (document.optionValues[1] as string)}
+                    intl.formatMessage(dropdownOptions[key]?.label)) ||
+                    getFormattedLabelForDocType(document?.option as string) ||
+                    (document?.option as string)}
                 </span>
               </Link>
             </Label>

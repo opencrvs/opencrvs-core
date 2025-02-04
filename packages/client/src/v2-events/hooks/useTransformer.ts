@@ -40,7 +40,10 @@ export const useTransformer = (eventType: string) => {
         throw new Error(`Field not found for ${key}`)
       }
 
-      if (fieldConfig.type === FieldType.FILE) {
+      if (
+        fieldConfig.type === FieldType.FILE ||
+        fieldConfig.type === FieldType.FILE_WITH_OPTIONS
+      ) {
         continue
       }
 

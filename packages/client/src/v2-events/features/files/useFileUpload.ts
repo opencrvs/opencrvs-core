@@ -20,6 +20,7 @@ async function uploadFile({
 }: {
   file: File
   transactionId: string
+  optionKey: string
 }): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
@@ -131,6 +132,7 @@ interface Options {
     originalFilename: string
     type: string
     filename: string
+    option: string
   }) => void
 }
 
@@ -138,7 +140,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   const upload = useMutation({
     mutationFn: uploadFile,
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, transactionId }) => {
+    onMutate: async ({ file, transactionId, optionKey }) => {
       const extension = file.name.split('.').pop()
       const temporaryUrl = `${transactionId}.${extension}`
 
@@ -148,7 +150,8 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
         ...file,
         originalFilename: file.name,
         type: file.type,
-        filename: temporaryUrl
+        filename: temporaryUrl,
+        option: optionKey
       })
     },
     onSuccess: (data) => {
@@ -169,8 +172,12 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     deleteFile: (filename: string) => {
       return del.mutate({ filename })
     },
-    uploadFiles: (file: File) => {
-      return upload.mutate({ file, transactionId: uuid() })
+    uploadFiles: (file: File, optionKey?: string) => {
+      return upload.mutate({
+        file,
+        transactionId: uuid(),
+        optionKey: optionKey ?? 'default'
+      })
     }
   }
 }

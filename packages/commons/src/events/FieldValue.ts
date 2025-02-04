@@ -36,6 +36,20 @@ export const FileFieldValue = z
 
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 
+export const FileFieldValueWithOption = z
+  .object({
+    filename: z.string(),
+    originalFilename: z.string(),
+    type: z.string(),
+    option: z.string()
+  })
+  .nullable()
+
+const FileFieldWithOptionValue = z.array(FileFieldValueWithOption).nullable()
+
+export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
+export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
+
 const RadioGroupFieldValue = z.string()
 export type RadioGroupFieldValue = z.infer<typeof RadioGroupFieldValue>
 
@@ -61,6 +75,8 @@ export type FieldTypeToFieldValue<T extends FieldType> = T extends 'TEXT'
   ? DateFieldValue
   : T extends 'FILE'
   ? FileFieldValue
+  : T extends 'FILE_WITH_OPTIONS'
+  ? FileFieldWithOptionValue
   : T extends 'RADIO_GROUP'
   ? RadioGroupFieldValue
   : T extends 'CHECKBOX'
@@ -81,7 +97,8 @@ export const FieldValue = z.union([
   RadioGroupFieldValue,
   CheckboxFieldValue,
   LocationFieldValue,
-  SelectFieldValue
+  SelectFieldValue,
+  FileFieldWithOptionValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>

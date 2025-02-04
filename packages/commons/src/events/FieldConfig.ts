@@ -17,6 +17,7 @@ import {
   CountryFieldValue,
   DateFieldValue,
   FileFieldValue,
+  FileFieldValueWithOption,
   LocationFieldValue,
   ParagraphFieldValue,
   RadioGroupFieldValue,
@@ -119,6 +120,7 @@ export interface FieldValueByType {
   [FieldType.COUNTRY]: CountryFieldValue
   [FieldType.LOCATION]: LocationFieldValue
   [FieldType.FILE]: FileFieldValue
+  [FieldType.FILE_WITH_OPTIONS]: FileFieldValueWithOption
   [FieldType.SELECT]: SelectFieldValue
 }
 

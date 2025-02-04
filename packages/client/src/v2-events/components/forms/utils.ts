@@ -119,6 +119,7 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
   [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
   [FieldType.FILE]: null,
+  [FieldType.FILE_WITH_OPTIONS]: [],
   [FieldType.HIDDEN]: null,
   [FieldType.BULLET_LIST]: null,
   [FieldType.CHECKBOX]: null,
