@@ -17,7 +17,7 @@ import {
   ValidateActionInput,
   RegisterActionInput,
   RequestCorrectionActionInput,
-  getActiveActionFields,
+  findActiveActionFields,
   EventConfig,
   FieldConfig
 } from '@opencrvs/commons'
@@ -53,7 +53,7 @@ export function generateActionInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const fields = getActiveActionFields(configuration, action) ?? []
+  const fields = findActiveActionFields(configuration, action) ?? []
 
   return fields.reduce(
     (acc, field, i) => ({
