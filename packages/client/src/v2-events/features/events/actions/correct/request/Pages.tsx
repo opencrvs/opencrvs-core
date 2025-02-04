@@ -74,13 +74,9 @@ export function Pages() {
   }, [pageId, currentPageId, navigate, eventId])
 
   return (
-    <FormLayout
-      canSaveAndExit={false}
-      route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}
-    >
+    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       {modal}
       <PagesComponent
-        eventId={eventId}
         form={form}
         formPages={formPages}
         pageId={currentPageId}

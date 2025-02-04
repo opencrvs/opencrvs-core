@@ -32,6 +32,7 @@ import {
   logger
 } from '@opencrvs/commons'
 import {
+  PrintCertificateActionInput,
   DeclareActionInput,
   EventIndex,
   EventInput,
@@ -163,6 +164,17 @@ export const eventRouter = router({
             transactionId: options.input.transactionId
           }
         )
+      }),
+    printCertificate: publicProcedure
+      .input(PrintCertificateActionInput)
+      .mutation(async (options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
+        })
       }),
     correct: router({
       request: publicProcedure

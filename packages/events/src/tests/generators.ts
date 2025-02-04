@@ -82,6 +82,15 @@ export function payloadGenerator() {
         data: input.data ?? {},
         eventId
       }),
+      printCertificate: (
+        eventId: string,
+        input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.PRINT_CERTIFICATE,
+        transactionId: input.transactionId ?? getUUID(),
+        data: input.data ?? {},
+        eventId
+      }),
       correct: {
         request: (
           eventId: string,
