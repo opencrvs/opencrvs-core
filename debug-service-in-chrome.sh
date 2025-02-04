@@ -12,6 +12,7 @@
 SERVICES=(
   "auth:4040"
   "workflow:5050"
+  "events:5555"
   "config:2021"
   "gateway:7070"
   "metrics:1050"

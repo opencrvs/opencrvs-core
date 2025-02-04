@@ -119,6 +119,10 @@ export function useEvents() {
         utils.event.actions.register,
         api.event.actions.register
       ),
+      printCertificate: useEventAction(
+        utils.event.actions.printCertificate,
+        api.event.actions.printCertificate
+      ),
       correct: {
         request: useEventAction(
           utils.event.actions.correction.request,

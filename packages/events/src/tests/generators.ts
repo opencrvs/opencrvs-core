@@ -132,6 +132,15 @@ export function payloadGenerator() {
           generateActionInput(tennisClubMembershipEvent, ActionType.REGISTER),
         eventId
       }),
+      printCertificate: (
+        eventId: string,
+        input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.PRINT_CERTIFICATE,
+        transactionId: input.transactionId ?? getUUID(),
+        data: input.data ?? {},
+        eventId
+      }),
       correction: {
         request: (
           eventId: string,

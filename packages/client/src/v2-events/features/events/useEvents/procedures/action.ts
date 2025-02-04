@@ -52,6 +52,7 @@ type Mutation =
   | typeof api.event.actions.notify
   | typeof api.event.actions.register
   | typeof api.event.actions.validate
+  | typeof api.event.actions.printCertificate
   | typeof api.event.actions.correction.request
   | typeof api.event.actions.correction.approve
   | typeof api.event.actions.correction.reject
@@ -61,6 +62,7 @@ type Procedure =
   | typeof utils.event.actions.notify
   | typeof utils.event.actions.register
   | typeof utils.event.actions.validate
+  | typeof utils.event.actions.printCertificate
   | typeof utils.event.actions.correction.request
   | typeof utils.event.actions.correction.approve
   | typeof utils.event.actions.correction.reject
@@ -171,6 +173,15 @@ utils.event.actions.validate.setMutationDefaults(({ canonicalMutationFn }) => ({
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent
 }))
+
+utils.event.actions.printCertificate.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
 
 utils.event.actions.correction.request.setMutationDefaults(
   ({ canonicalMutationFn }) => ({

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { mapKeys, orderBy } from 'lodash'
 import React, { useState } from 'react'
+import { mapKeys, orderBy } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
@@ -264,14 +264,11 @@ function Workqueue({
   }
 
   function getDefaultColumns(): Array<Column> {
-    // @TODO: Markus should update the types
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return workqueueConfig.defaultColumns.map(
       (column): Column => ({
         label:
           column in defaultColumns
             ? intl.formatMessage(
-                // eslint-disable-next-line
                 defaultColumns[column as keyof typeof defaultColumns].label
               )
             : '',
@@ -286,9 +283,7 @@ function Workqueue({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     if (width > theme.grid.breakpoints.lg) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return workqueueConfig.columns.map((column) => ({
-        // eslint-disable-next-line
         label: intl.formatMessage(column.label),
         width: 35,
         key: column.id,
@@ -296,10 +291,8 @@ function Workqueue({
         isSorted: sortedCol === column.id
       }))
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return workqueueConfig.columns
         .map((column) => ({
-          // eslint-disable-next-line
           label: intl.formatMessage(column.label),
           width: 35,
           key: column.id,
