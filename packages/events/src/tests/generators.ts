@@ -55,7 +55,7 @@ export function generateActionInput(
 ) {
   const fields = getActiveActionFields(configuration, action) ?? []
 
-  return fields?.reduce(
+  return fields.reduce(
     (acc, field, i) => ({
       ...acc,
       [field.id]: mapTypeToMockValue(field, i)
@@ -138,7 +138,12 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.PRINT_CERTIFICATE,
         transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
+        data:
+          input.data ??
+          generateActionInput(
+            tennisClubMembershipEvent,
+            ActionType.PRINT_CERTIFICATE
+          ),
         eventId
       }),
       correction: {

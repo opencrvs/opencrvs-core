@@ -43,6 +43,10 @@ test('Returns event with all actions', async () => {
   await client.event.actions.register(
     generator.event.actions.register(event.id)
   )
+
+  await client.event.actions.printCertificate(
+    generator.event.actions.printCertificate(event.id)
+  )
   const correctionRequest = await client.event.actions.correction.request(
     generator.event.actions.correction.request(event.id)
   )

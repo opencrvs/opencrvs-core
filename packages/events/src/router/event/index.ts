@@ -175,6 +175,7 @@ export const eventRouter = router({
       }),
     printCertificate: publicProcedure
       .input(PrintCertificateActionInput)
+      .use(middleware.validateAction(ActionType.PRINT_CERTIFICATE))
       .mutation(async (options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,

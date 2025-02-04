@@ -466,6 +466,16 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.correction.approve.label'
       }
+    },
+    {
+      type: 'PRINT_CERTIFICATE',
+      label: {
+        defaultMessage: 'Print certificate',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.collect-certificate.label'
+      },
+      forms: [TENNIS_CLUB_FORM]
     }
   ]
 })
