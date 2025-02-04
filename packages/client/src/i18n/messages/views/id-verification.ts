@@ -61,17 +61,17 @@ const failed = {
     defaultMessage: 'ID Verification Failed'
   },
   description: {
-    id: 'views.idVerification.banner.pending.description',
+    id: 'views.idVerification.banner.failed.description',
     defaultMessage:
       'The identity card scanned has not be successfully authenticated'
   },
   resetConfirmation: {
     title: {
-      id: 'views.idVerification.banner.authenticated.resetConfirmation.title',
+      id: 'views.idVerification.banner.failed.resetConfirmation.title',
       defaultMessage: 'Reset information?'
     },
     description: {
-      id: 'views.idVerification.banner.authenticated.resetConfirmation.description',
+      id: 'views.idVerification.banner.failed.resetConfirmation.description',
       defaultMessage:
         'By clicking ‘Continue,’ you’ll clear all information to it’s default state.'
     }
