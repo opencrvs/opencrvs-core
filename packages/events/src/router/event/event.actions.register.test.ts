@@ -18,11 +18,11 @@ test('Validation error message contains all the offending fields', async () => {
   const event = await client.event.create(generator.event.create())
   event.id
 
-  const data = generator.event.actions.declare(event.id, {
+  const data = generator.event.actions.register(event.id, {
     data: {
       'applicant.dob': '02-02'
     }
   })
 
-  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+  await expect(client.event.actions.register(data)).rejects.matchSnapshot()
 })

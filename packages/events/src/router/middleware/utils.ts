@@ -14,7 +14,7 @@ import { AnyTRPCMiddlewareFunction } from '@trpc/server'
 
 import { z } from 'zod'
 
-export const ContextSchema = z.object({
+const ContextSchema = z.object({
   user: z.object({
     id: z.string(),
     primaryOfficeId: z.string()

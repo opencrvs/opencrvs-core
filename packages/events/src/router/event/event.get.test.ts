@@ -10,6 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 test('Returns 404 when not found', async () => {
   const { user } = await setupTestCase()
@@ -58,5 +59,8 @@ test('Returns event with all actions', async () => {
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(fetchedEvent.actions).toHaveLength(6)
+  // should throw when test is not updated after updating fixture or something breaks.
+  expect(fetchedEvent.actions).toHaveLength(
+    tennisClubMembershipEvent.actions.length + 1 // CREATE EVENT
+  )
 })

@@ -13,13 +13,8 @@ import {
   ActionInputWithType,
   ActionType,
   FieldConfig,
-  FieldType,
-  FieldTypeToFieldValue,
-  FieldValue,
-  FileFieldValue,
-  logger
+  FileFieldValue
 } from '@opencrvs/commons'
-import { TRPCError } from '@trpc/server'
 
 import { z } from 'zod'
 import { getActionFormFields } from '@events/service/config/config'
@@ -58,6 +53,7 @@ function mapTypeToZod(type: FieldConfig['type'], required?: boolean) {
 
   return required ? schema : schema.optional()
 }
+
 type InputField = typeof FileFieldValue | z.ZodString | z.ZodBoolean
 
 type OptionalInputField = z.ZodOptional<InputField>
