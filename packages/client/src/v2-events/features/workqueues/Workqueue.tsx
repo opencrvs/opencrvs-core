@@ -23,6 +23,7 @@ import {
   EventConfig,
   EventIndex,
   getAllFields,
+  getOrThrow,
   RootWorkqueueConfig,
   workqueues
 } from '@opencrvs/commons/client'
@@ -49,14 +50,6 @@ const messages = defineMessages({
     id: 'regHome.issued'
   }
 })
-
-function getOrThrow<T>(x: T, message: string) {
-  if (x === undefined || x === null) {
-    throw new Error(message)
-  }
-
-  return x
-}
 
 /**
  * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.

@@ -20,6 +20,7 @@ import { z } from 'zod'
 import { getActionFormFields } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
+import { TRPCError } from '@trpc/server'
 
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
@@ -77,7 +78,14 @@ export function validateAction(actionType: ActionType) {
       eventType
     })
 
-    createValidationSchema(formFields).parse(opts.input.data)
+    const result = createValidationSchema(formFields).safeParse(opts.input.data)
+
+    if (result.error) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: JSON.stringify(result.error.errors)
+      })
+    }
 
     return opts.next()
   }
