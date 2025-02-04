@@ -67,13 +67,19 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 type AdvancedSearchFormConfig = EventConfig['advancedSearch']
 
-function TabSearch({ sections }: { sections: AdvancedSearchFormConfig }) {
+function TabSearch({
+  sections,
+  activeTabId
+}: {
+  sections: AdvancedSearchFormConfig
+  activeTabId: string
+}) {
   const intl = useIntl()
   const accordionShowingLabel = intl.formatMessage(messages.show)
   const accordionHidingLabel = intl.formatMessage(messages.hide)
   const events = useEventConfigurations()
 
-  const currentEvent = events.filter((e) => e.id === sections[0].id)
+  const currentEvent = events.filter((e) => e.id === activeTabId)
   const allFields = currentEvent.flatMap((event) =>
     event.actions.flatMap((action) =>
       action.forms.flatMap((form) => form.pages.flatMap((page) => page.fields))
@@ -149,7 +155,7 @@ function AdvancedSearch() {
         titleColor={'copy'}
       >
         {currentTabSections.length > 0 && (
-          <TabSearch sections={currentTabSections} />
+          <TabSearch activeTabId={activeTabId} sections={currentTabSections} />
         )}
       </Content>
     </>
