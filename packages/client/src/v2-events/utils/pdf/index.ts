@@ -17,8 +17,15 @@ import {
 import * as Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
 import { Content } from 'pdfmake/interfaces'
+import { Location } from '@events/service/locations/locations'
 import { LanguageConfig } from '@opencrvs/commons'
-import { ActionFormData } from '@opencrvs/commons/client'
+import {
+  ActionFormData,
+  EventDocument,
+  EventIndex,
+  User
+} from '@opencrvs/commons/client'
+
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { PdfTemplate } from '@client/v2-events/utils/pdf/printAndDownloadPdf'
 
@@ -92,8 +99,11 @@ const cache = createIntlCache()
 
 export function compileSvg(
   templateString: string,
-  language: LanguageConfig,
-  data: ActionFormData = {}
+  $actions: EventDocument['actions'],
+  $data: EventIndex['data'],
+  locations: Location[],
+  users: User[],
+  language: LanguageConfig
 ): string {
   const intl: IntlShape = createIntl(
     {
@@ -118,8 +128,15 @@ export function compileSvg(
   }
 
   const template = Handlebars.compile(templateString)
-  const formattedTemplateData = formatAllNonStringValues(data, intl)
-  const output = template(formattedTemplateData)
+  $data = formatAllNonStringValues($data, intl)
+  const output = template({
+    $data,
+    $actions,
+    $references: {
+      locations,
+      users
+    }
+  })
   return output
 }
 

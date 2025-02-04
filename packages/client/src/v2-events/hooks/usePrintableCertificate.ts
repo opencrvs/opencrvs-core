@@ -9,10 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { Location } from '@events/service/locations/locations'
 import {
-  ActionFormData,
   EventDocument,
-  isMinioUrl
+  EventIndex,
+  isMinioUrl,
+  User
 } from '@opencrvs/commons/client'
 import {
   CertificateTemplateConfig,
@@ -55,7 +57,9 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
 
 export const usePrintableCertificate = (
   event: EventDocument,
-  form: ActionFormData,
+  form: EventIndex['data'],
+  locations: Location[],
+  users: User[],
   certificateConfig?: CertificateTemplateConfig,
   language?: LanguageConfig
 ) => {
@@ -64,15 +68,29 @@ export const usePrintableCertificate = (
   }
 
   const certificateFonts = certificateConfig.fonts ?? {}
-  const svgWithoutFonts = compileSvg(certificateConfig.svg, language, form)
+  const svgWithoutFonts = compileSvg(
+    certificateConfig.svg,
+    event.actions,
+    form,
+    locations,
+    users,
+    language
+  )
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   const handleCertify = async () => {
     const base64ReplacedTemplate = await replaceMinioUrlWithBase64(form)
-    const compiledSvg = compileSvg(certificateConfig.svg, language, {
-      ...base64ReplacedTemplate,
-      preview: false
-    })
+    const compiledSvg = compileSvg(
+      certificateConfig.svg,
+      event.actions,
+      {
+        ...base64ReplacedTemplate,
+        preview: false
+      },
+      locations,
+      users,
+      language
+    )
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
     const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
     printAndDownloadPdf(pdfTemplate, event.id)

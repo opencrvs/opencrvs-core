@@ -37,6 +37,9 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { getUserIdsFromActions } from '@client/v2-events/utils'
 
 const CertificateContainer = styled.div`
   svg {
@@ -110,17 +113,30 @@ export function Review() {
   const navigate = useNavigate()
 
   const [modal, openModal] = useModal()
-  const events = useEvents()
+
+  const { getEvent, actions } = useEvents()
+  const [fullEvent] = getEvent.useSuspenseQuery(eventId)
+
+  const userIds = getUserIdsFromActions(fullEvent.actions)
+  const { getUsers } = useUsers()
+  const [users] = getUsers.useSuspenseQuery(userIds)
+
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+
   const { getFormValues, clear } = useEventFormData()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
   const form = getFormValues(eventId)
+
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
+
   const { svgCode, handleCertify } = usePrintableCertificate(
-    event,
+    fullEvent,
     form,
+    locations,
+    users,
     certificateConfig,
     language
   )
@@ -163,8 +179,8 @@ export function Review() {
 
     if (confirmed) {
       handleCertify?.()
-      events.actions.printCertificate.mutate({
-        eventId: event.id,
+      actions.printCertificate.mutate({
+        eventId: fullEvent.id,
         data: form,
         transactionId: uuid(),
         type: ActionType.PRINT_CERTIFICATE
