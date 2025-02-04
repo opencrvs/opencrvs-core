@@ -12,7 +12,11 @@ import { messages } from '@client/i18n/messages/views/id-verification'
 import { Pill, Icon } from '@opencrvs/components'
 import React from 'react'
 import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 
+const StyledIcon = styled(Icon)`
+  margin-right: 4px;
+`
 function Authenticated() {
   const intl = useIntl()
   return (
@@ -22,7 +26,7 @@ function Authenticated() {
       pillTheme="dark"
       label={
         <>
-          <Icon name="Fingerprint" size="small" />
+          <StyledIcon name="Fingerprint" size="small" />
           {intl.formatMessage(messages.authenticated.title)}
         </>
       }
@@ -39,7 +43,7 @@ function Verified() {
       pillTheme="dark"
       label={
         <>
-          <Icon name="CircleWavyCheck" size="small" />
+          <StyledIcon name="CircleWavyCheck" size="small" />
           {intl.formatMessage(messages.verified.title)}
         </>
       }
@@ -56,7 +60,7 @@ function Failed() {
       pillTheme="dark"
       label={
         <>
-          <Icon name="X" size="small" />
+          <StyledIcon name="X" size="small" />
           {intl.formatMessage(messages.failed.title)}
         </>
       }
