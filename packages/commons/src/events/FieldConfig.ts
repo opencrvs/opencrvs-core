@@ -230,6 +230,21 @@ export type AllFields =
   | typeof Location
   | typeof Divider
 
+/** @knipignore */
+export type Inferred =
+  | z.infer<typeof TextField>
+  | z.infer<typeof DateField>
+  | z.infer<typeof Paragraph>
+  | z.infer<typeof RadioGroup>
+  | z.infer<typeof BulletList>
+  | z.infer<typeof PageHeader>
+  | z.infer<typeof Select>
+  | z.infer<typeof Checkbox>
+  | z.infer<typeof File>
+  | z.infer<typeof Country>
+  | z.infer<typeof Location>
+  | z.infer<typeof Divider>
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
@@ -243,11 +258,11 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Country,
   Location,
   Divider
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
+]) as unknown as z.ZodType<Inferred, any, Inferred>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
-export type FieldConfig = z.infer<typeof FieldConfig>
+export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
