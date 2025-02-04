@@ -64,7 +64,7 @@ interface Props {
   label?: string
   onSelect: (document: FileFieldValueWithOption | IAttachmentValue) => void
   dropdownOptions?: SelectOption[]
-  onDelete?: (image: FileFieldValueWithOption | IAttachmentValue) => void
+  onDelete?: (fileName: string) => void
   inReviewSection?: boolean
 }
 
@@ -121,7 +121,7 @@ export const DocumentListPreview = ({
                 id="preview_delete"
                 size="small"
                 type="icon"
-                onClick={() => onDelete(document)}
+                onClick={() => document && onDelete(document.filename)}
               >
                 <Icon color="red" name="Trash" size="small" />
               </Button>
@@ -140,7 +140,7 @@ export const DocumentListPreview = ({
             <SpinnerContainer id={`document_${label}_processing`} size={20} />
           </Container>
         ))}
-      {attachment && attachment.data && label && (
+      {/* {attachment && attachment.data && label && (
         <Container>
           <Label>
             <Icon color="grey600" name="Paperclip" size="medium" />
@@ -158,7 +158,7 @@ export const DocumentListPreview = ({
             <Icon color="red" name="Trash" size="small" />
           </Button>
         </Container>
-      )}
+      )} */}
     </Wrapper>
   )
 }

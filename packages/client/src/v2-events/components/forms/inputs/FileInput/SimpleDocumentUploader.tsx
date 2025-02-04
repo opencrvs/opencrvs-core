@@ -56,6 +56,7 @@ type IFullProps = {
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   previewTransformer?: (files: FileFieldValue) => FileFieldValue
+  onlyButton?: boolean
 } & IntlShapeProps
 
 function SimpleDocumentUploaderComponent({
@@ -72,7 +73,8 @@ function SimpleDocumentUploaderComponent({
   disableDeleteInPreview,
   requiredErrorMessage,
   touched,
-  fullWidth
+  fullWidth,
+  onlyButton
 }: IFullProps) {
   const [error, setError] = useState('')
   const [previewImage, setPreviewImage] = useState<FileFieldValue | null>(null)
@@ -110,6 +112,18 @@ function SimpleDocumentUploaderComponent({
     }
   }
 
+  if (onlyButton) {
+    return (
+      <DocumentUploader
+        id="upload_document"
+        name={name}
+        onChange={handleFileChange}
+      >
+        {intl.formatMessage(messages.uploadFile)}
+      </DocumentUploader>
+    )
+  }
+
   function selectForPreview(selectedPreviewImage: FieldValue) {
     if (previewTransformer) {
       return setPreviewImage(
@@ -133,7 +147,6 @@ function SimpleDocumentUploaderComponent({
     error ||
     errorProps ||
     ''
-
   return (
     <>
       {description && <FieldDescription>{description}</FieldDescription>}
