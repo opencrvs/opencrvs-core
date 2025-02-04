@@ -16,8 +16,13 @@ import {
 } from 'react-intl'
 import * as Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
-import { Content } from 'pdfmake/interfaces'
+import {
+  Content,
+  TDocumentDefinitions,
+  TFontFamilyTypes
+} from 'pdfmake/interfaces'
 import { Location } from '@events/service/locations/locations'
+import pdfMake from 'pdfmake/build/pdfmake'
 import { LanguageConfig } from '@opencrvs/commons'
 import {
   ActionFormData,
@@ -27,7 +32,7 @@ import {
 } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import { PdfTemplate } from '@client/v2-events/utils/pdf/printAndDownloadPdf'
+import { isMobileDevice } from '@client/utils/commonUtils'
 
 export interface FontFamilyTypes {
   normal: string
@@ -246,4 +251,25 @@ export function downloadFile(
   downloadLink.setAttribute('href', linkSource)
   downloadLink.setAttribute('download', fileName)
   downloadLink.click()
+}
+
+export interface PdfTemplate {
+  definition: TDocumentDefinitions
+  fonts: Record<string, TFontFamilyTypes>
+}
+
+export interface SvgTemplate {
+  definition: string
+}
+
+export function printAndDownloadPdf(
+  template: PdfTemplate,
+  declarationId: string
+) {
+  const pdf = pdfMake.createPdf(template.definition, undefined, template.fonts)
+  if (isMobileDevice()) {
+    pdf.download(`${declarationId}`)
+  } else {
+    pdf.print()
+  }
 }

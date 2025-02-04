@@ -24,9 +24,9 @@ import {
 import {
   addFontsToSvg,
   compileSvg,
+  printAndDownloadPdf,
   svgToPdfTemplate
-} from '@client/v2-events/utils/pdf'
-import { printAndDownloadPdf } from '@client/v2-events/utils/pdf/printAndDownloadPdf'
+} from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
