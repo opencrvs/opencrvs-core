@@ -11,80 +11,12 @@
 import React from 'react'
 import { BannerType, IFormFieldValue } from '@client/forms'
 import { useIntl } from 'react-intl'
-import {
-  Pill,
-  Banner,
-  Icon,
-  Button,
-  Text,
-  ResponsiveModal
-} from '@opencrvs/components'
-import { messages } from '@client/i18n/messages/views/id-verification-banner'
+import { Banner, Button, Text, ResponsiveModal } from '@opencrvs/components'
+import { messages } from '@client/i18n/messages/views/id-verification'
 import { useModal } from '@client/hooks/useModal'
 import { buttonMessages } from '@client/i18n/messages'
-import styled from 'styled-components'
-
-function Authenticated() {
-  const intl = useIntl()
-  return (
-    <Pill
-      type="active"
-      size="small"
-      pillTheme="dark"
-      label={
-        <>
-          <Icon name="Fingerprint" size="small" />
-          {intl.formatMessage(messages.authenticated.title)}
-        </>
-      }
-    />
-  )
-}
-
-function Verified() {
-  const intl = useIntl()
-  return (
-    <Pill
-      type="default"
-      size="small"
-      pillTheme="dark"
-      label={
-        <>
-          <Icon name="CircleWavyCheck" size="small" />
-          {intl.formatMessage(messages.verified.title)}
-        </>
-      }
-    />
-  )
-}
-
-function Failed() {
-  const intl = useIntl()
-  return (
-    <Pill
-      type="inactive"
-      size="small"
-      pillTheme="dark"
-      label={
-        <>
-          <Icon name="X" size="small" />
-          {intl.formatMessage(messages.failed.title)}
-        </>
-      }
-    />
-  )
-}
-
-export function VerificationPill({ type }: { type: string }) {
-  if (type === 'authenticated') {
-    return <Authenticated />
-  } else if (type === 'verified') {
-    return <Verified />
-  } else if (type === 'failed') {
-    return <Failed />
-  }
-  return null
-}
+import { VerificationPill } from './VerificationPill'
+import { StatusIcon } from './StatusIcon'
 
 const ConfirmationModal: React.FC<{
   close: (result: boolean) => void
@@ -124,51 +56,6 @@ const ConfirmationModal: React.FC<{
   )
 }
 
-const StyledIcon = styled(Icon)<{ type: BannerType }>`
-  border-radius: 50%;
-  background-color: ${({ theme, type }) =>
-    type === 'authenticated'
-      ? theme.colors.positiveLight
-      : type === 'failed'
-      ? theme.colors.redLight
-      : theme.colors.blueLight};
-`
-
-const StatusIcon = ({ type }: { type: BannerType }) => {
-  if (type === 'authenticated') {
-    return (
-      <StyledIcon
-        name="Check"
-        size="large"
-        weight="bold"
-        color="greenDarker"
-        type={type}
-      />
-    )
-  } else if (type === 'verified') {
-    return (
-      <StyledIcon
-        name="Check"
-        size="large"
-        weight="bold"
-        color="blueDarker"
-        type={type}
-      />
-    )
-  } else if (type === 'failed') {
-    return (
-      <StyledIcon
-        name="X"
-        size="large"
-        weight="bold"
-        color="redDarker"
-        type={type}
-      />
-    )
-  }
-  return null
-}
-
 export const IDVerificationBanner = ({
   type,
   idFieldName,
@@ -192,7 +79,7 @@ export const IDVerificationBanner = ({
     return (
       <Banner.Container>
         <Banner.Header type="active">
-          <Authenticated />
+          <VerificationPill type={type} />
           <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>
@@ -212,7 +99,7 @@ export const IDVerificationBanner = ({
     return (
       <Banner.Container>
         <Banner.Header type="default">
-          <Verified />
+          <VerificationPill type={type} />
           <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>
@@ -232,7 +119,7 @@ export const IDVerificationBanner = ({
     return (
       <Banner.Container>
         <Banner.Header type="inactive">
-          <Failed />
+          <VerificationPill type={type} />
           <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>

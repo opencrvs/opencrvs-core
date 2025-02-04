@@ -144,7 +144,7 @@ import { ButtonField } from '@client/components/form/Button'
 import { getListOfLocations } from '@client/utils/validate'
 import { LinkButtonField } from '@client/components/form/LinkButton'
 import { ReaderGenerator } from './ReaderGenerator'
-import { IDVerificationBanner } from './IDVerificationBanner'
+import { IDVerificationBanner } from './IDVerification/Banner'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
