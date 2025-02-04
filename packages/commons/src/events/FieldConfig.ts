@@ -10,7 +10,12 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { Conditional } from '../conditionals/conditionals'
+import {
+  Conditional,
+  EnableConditional,
+  HideConditional,
+  ShowConditional
+} from '../conditionals/conditionals'
 import {
   BulletListFieldValue,
   CheckboxFieldValue,
@@ -24,31 +29,7 @@ import {
   TextFieldValue
 } from './FieldValue'
 
-export const ConditionalTypes = {
-  SHOW: 'SHOW',
-  HIDE: 'HIDE',
-  ENABLE: 'ENABLE'
-} as const
-
-export type ConditionalTypes =
-  (typeof ConditionalTypes)[keyof typeof ConditionalTypes]
-
 const FieldId = z.string()
-
-const ShowConditional = z.object({
-  type: z.literal(ConditionalTypes.SHOW),
-  conditional: Conditional()
-})
-
-const HideConditional = z.object({
-  type: z.literal(ConditionalTypes.HIDE),
-  conditional: Conditional()
-})
-
-const EnableConditional = z.object({
-  type: z.literal(ConditionalTypes.ENABLE),
-  conditional: Conditional()
-})
 
 const FieldConditional = z.discriminatedUnion('type', [
   ShowConditional,

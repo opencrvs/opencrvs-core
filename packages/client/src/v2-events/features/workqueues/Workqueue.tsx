@@ -265,7 +265,6 @@ function Workqueue({
 
   function getDefaultColumns(): Array<Column> {
     // @TODO: Markus should update the types
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return workqueueConfig.defaultColumns.map(
       (column): Column => ({
         label:
@@ -286,7 +285,6 @@ function Workqueue({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     if (width > theme.grid.breakpoints.lg) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return workqueueConfig.columns.map((column) => ({
         // eslint-disable-next-line
         label: intl.formatMessage(column.label),
@@ -296,7 +294,6 @@ function Workqueue({
         isSorted: sortedCol === column.id
       }))
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return workqueueConfig.columns
         .map((column) => ({
           // eslint-disable-next-line
