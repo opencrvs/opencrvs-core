@@ -46,7 +46,7 @@ const messages = defineMessages({
   empty: {
     defaultMessage: 'Empty message',
     description: 'Label for workqueue tooltip',
-    id: 'regHome.issued'
+    id: 'v2.regHome.issued'
   }
 })
 
