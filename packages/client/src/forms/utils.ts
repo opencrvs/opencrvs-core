@@ -86,6 +86,7 @@ import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 import { UserDetails } from '@client/utils/userUtils'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
+import { memoize } from 'lodash'
 
 export const VIEW_TYPE = {
   FORM: 'form',
@@ -364,7 +365,8 @@ export function getNextSectionIds(
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
-export const getFieldOptions = (
+export const getFieldOptionsSlow = (
+  _sectionName: string,
   field:
     | ISelectFormFieldWithOptions
     | ISelectFormFieldWithDynamicOptions
@@ -441,6 +443,22 @@ export const getFieldOptions = (
     return options
   }
 }
+
+/** Due to the large location trees with dependencies, generating options for them can be slow. We fix this by memoizing the options */
+export const getFieldOptions = memoize(
+  getFieldOptionsSlow,
+  (sectionName, field, values) => {
+    if (
+      field.type === SELECT_WITH_OPTIONS ||
+      field.type === DOCUMENT_UPLOADER_WITH_OPTION
+    ) {
+      return `field:${sectionName}.${field.name}`
+    }
+
+    const dependencyVal = values[field.dynamicOptions.dependency!] as string
+    return `field:${sectionName}.${field.name},dependency:${field.dynamicOptions.dependency},dependencyValue:${dependencyVal}`
+  }
+)
 
 interface INested {
   [key: string]: any
