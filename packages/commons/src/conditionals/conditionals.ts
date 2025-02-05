@@ -11,6 +11,7 @@
 
 import { z } from 'zod'
 import { ActionFormData, EventDocument } from '../events'
+import { ITokenPayload } from '../authentication'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -67,6 +68,7 @@ export type ConditionalParameters = { $now: string } & (
   | {
       $event: EventDocument
       $form: ActionFormData
+      $user: ITokenPayload
     }
   | {
       $form: ActionFormData
