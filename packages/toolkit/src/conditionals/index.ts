@@ -9,34 +9,47 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { JSONSchema } from '@opencrvs/commons/conditionals'
-import { ActionDocument } from '@opencrvs/commons/events'
-
+import {
+  ConditionalParameters,
+  defineConditional,
+  JSONSchema
+} from '@opencrvs/commons/conditionals'
+import { ActionType } from '@opencrvs/commons/events'
+import { JSONSchemaType as AjvJSONSchemaType } from 'ajv'
 export * as deduplication from './deduplication'
 
-export function defineConditional(conditional: JSONSchema): JSONSchema {
-  return conditional
-}
+export { defineConditional } from '@opencrvs/commons/conditionals'
 
-export function and(...conditions: JSONSchema[]): JSONSchema {
-  return {
+type ReplacePropertiesWithPartial<T> = {
+  [K in keyof T]: K extends 'properties'
+    ? Partial<T[K]>
+    : T[K] extends Record<string, unknown>
+    ? ReplacePropertiesWithPartial<T[K]>
+    : T[K]
+}
+type AjvJSONSchema = ReplacePropertiesWithPartial<
+  AjvJSONSchemaType<ConditionalParameters>
+>
+
+export function and(...conditions: AjvJSONSchema[]): JSONSchema {
+  return defineConditional({
     type: 'object',
     allOf: conditions
-  }
+  })
 }
 
-export function or(...conditions: JSONSchema[]): JSONSchema {
-  return {
+export function or(...conditions: AjvJSONSchema[]): JSONSchema {
+  return defineConditional({
     type: 'object',
     anyOf: conditions
-  }
+  })
 }
 
-export function not(condition: JSONSchema): JSONSchema {
-  return {
+export function not(condition: AjvJSONSchema): JSONSchema {
+  return defineConditional({
     type: 'object',
     not: condition
-  }
+  })
 }
 
 export function userHasScope(scope: string) {
@@ -58,7 +71,7 @@ export function userHasScope(scope: string) {
   }
 }
 
-export function eventHasAction(type: ActionDocument['type']) {
+export function eventHasAction(type: ActionType) {
   return {
     type: 'object',
     properties: {
@@ -113,7 +126,7 @@ export type FieldAPI = {
    *  @private
    *  @returns array of conditions. Used internally by methods that consolidate multiple conditions into one.
    */
-  _apply: () => JSONSchema[]
+  _apply: () => AjvJSONSchema[]
   /**
    * @public
    * @returns single object for consolidated conditions
@@ -128,9 +141,9 @@ export type FieldAPI = {
  * @returns @see FieldAPI
  */
 export function field(fieldId: string) {
-  const conditions: JSONSchema[] = []
+  const conditions: AjvJSONSchema[] = []
 
-  const addCondition = (rule: JSONSchema) => {
+  const addCondition = (rule: AjvJSONSchema) => {
     conditions.push(rule)
     return api
   }
@@ -166,6 +179,7 @@ export function field(fieldId: string) {
             type: 'object',
             properties: {
               [fieldId]: {
+                type: 'string',
                 const: value
               }
             },
@@ -183,7 +197,8 @@ export function field(fieldId: string) {
             not: {
               type: 'object',
               required: [fieldId]
-            }
+            },
+            required: ['$form']
           }
         },
         required: ['$form']
@@ -196,6 +211,7 @@ export function field(fieldId: string) {
             type: 'object',
             properties: {
               [fieldId]: {
+                type: 'string',
                 enum: values
               }
             },
@@ -213,6 +229,7 @@ export function field(fieldId: string) {
               type: 'object',
               properties: {
                 [fieldId]: {
+                  type: 'string',
                   not: {
                     enum: values
                   }
@@ -231,6 +248,7 @@ export function field(fieldId: string) {
               type: 'object',
               properties: {
                 [fieldId]: {
+                  type: 'string',
                   not: {
                     const: value
                   }
@@ -250,10 +268,10 @@ export function field(fieldId: string) {
     _apply: () => conditions,
     apply: () => {
       if (conditions.length === 1) {
-        return conditions[0]
+        return defineConditional(conditions[0])
       }
 
-      return ensureWrapper(conditions, 'and')
+      return defineConditional(ensureWrapper(conditions, 'and'))
     }
   }
 
@@ -266,13 +284,16 @@ type BooleanConnector = 'and' | 'or'
  * Makes sure JSON Schema conditions are wrapped in an object with a $form property.
  */
 const ensureWrapper = (
-  conditions: JSONSchema[],
+  conditions: AjvJSONSchema[],
   booleanConnector: BooleanConnector
-) => {
+): AjvJSONSchema => {
   const conditionsWithConnector = (
-    conditions: JSONSchema[],
+    conditions: AjvJSONSchema[],
     connector: BooleanConnector
-  ) => (connector === 'and' ? { allOf: conditions } : { anyOf: conditions })
+  ): AjvJSONSchema =>
+    connector === 'and'
+      ? { type: 'object' as const, allOf: conditions, required: [] }
+      : { type: 'object' as const, anyOf: conditions, required: [] }
 
   const needsWrapper = conditions.some(
     (condition) =>
@@ -288,10 +309,10 @@ const ensureWrapper = (
       type: 'object',
       properties: {
         $form: {
-          type: 'object',
           ...conditionsWithConnector(conditions, booleanConnector)
         }
-      }
+      },
+      required: []
     }
   }
 

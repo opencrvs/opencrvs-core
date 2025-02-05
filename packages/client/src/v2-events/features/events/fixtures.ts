@@ -10,7 +10,12 @@
  */
 import { v4 as uuid } from 'uuid'
 import { EventDocument } from '@opencrvs/commons'
-import { EventConfig, EventIndex, FormConfig } from '@opencrvs/commons/client'
+import {
+  defineConditional,
+  EventConfig,
+  EventIndex,
+  FormConfig
+} from '@opencrvs/commons/client'
 
 /* eslint-disable max-lines */
 const DEFAULT_FORM = {
@@ -103,7 +108,7 @@ const DEFAULT_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 type: 'object',
                 properties: {
                   $form: {
@@ -117,7 +122,7 @@ const DEFAULT_FORM = {
                   }
                 },
                 required: ['$form']
-              }
+              })
             }
           ],
           required: true,
@@ -133,7 +138,7 @@ const DEFAULT_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 type: 'object',
                 properties: {
                   $form: {
@@ -147,7 +152,7 @@ const DEFAULT_FORM = {
                   }
                 },
                 required: ['$form']
-              }
+              })
             }
           ],
           required: true,
@@ -163,7 +168,7 @@ const DEFAULT_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 type: 'object',
                 properties: {
                   $form: {
@@ -177,7 +182,7 @@ const DEFAULT_FORM = {
                   }
                 },
                 required: ['$form']
-              }
+              })
             }
           ],
           required: true,
@@ -259,7 +264,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -292,7 +297,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -360,7 +365,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -393,7 +398,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -409,7 +414,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -442,7 +447,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -458,7 +463,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -491,7 +496,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -507,7 +512,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -540,7 +545,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -556,7 +561,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -589,7 +594,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -605,7 +610,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -638,7 +643,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -654,7 +659,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -687,7 +692,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -703,7 +708,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -736,7 +741,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: true,
@@ -753,7 +758,7 @@ const PRINT_CERTIFICATE_FORM = {
           conditionals: [
             {
               type: 'HIDE',
-              conditional: {
+              conditional: defineConditional({
                 anyOf: [
                   {
                     type: 'object',
@@ -786,7 +791,7 @@ const PRINT_CERTIFICATE_FORM = {
                     required: ['$form']
                   }
                 ]
-              }
+              })
             }
           ],
           required: false,
@@ -859,7 +864,6 @@ export const tennisClubMembershipEvent = {
     },
     {
       id: 'ready-for-review',
-
       fields: [
         {
           column: 'title',
@@ -878,7 +882,6 @@ export const tennisClubMembershipEvent = {
     },
     {
       id: 'registered',
-
       fields: [
         {
           column: 'title',
@@ -899,6 +902,7 @@ export const tennisClubMembershipEvent = {
   actions: [
     {
       type: 'DECLARE',
+      conditionals: [],
       label: {
         defaultMessage: 'Send an application',
         description:
@@ -909,6 +913,7 @@ export const tennisClubMembershipEvent = {
     },
     {
       type: 'REQUEST_CORRECTION',
+      conditionals: [],
       label: {
         defaultMessage:
           'Request a correction for {applicant.firstname} {applicant.surname}',
@@ -1121,40 +1126,45 @@ export const tennisClubMembershipEvent = {
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      allowedWhen: {
-        type: 'object',
-        properties: {
-          $event: {
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional: defineConditional({
             type: 'object',
             properties: {
-              actions: {
-                type: 'array',
-                contains: {
-                  type: 'object',
-                  properties: {
-                    type: {
-                      const: 'REGISTER'
-                    },
-                    draft: {
-                      type: 'boolean'
-                    }
-                  },
-                  required: ['type'],
-                  not: {
-                    properties: {
-                      draft: {
-                        const: true
+              $event: {
+                type: 'object',
+                properties: {
+                  actions: {
+                    type: 'array',
+                    contains: {
+                      type: 'object',
+                      properties: {
+                        type: {
+                          const: 'REGISTER'
+                        },
+                        draft: {
+                          type: 'boolean'
+                        }
+                      },
+                      required: ['type'],
+                      not: {
+                        properties: {
+                          draft: {
+                            const: true
+                          }
+                        }
                       }
                     }
                   }
-                }
+                },
+                required: ['actions']
               }
             },
-            required: ['actions']
-          }
-        },
-        required: ['$event']
-      },
+            required: ['$event']
+          })
+        }
+      ],
       type: 'PRINT_CERTIFICATE',
       forms: [PRINT_CERTIFICATE_FORM]
     }

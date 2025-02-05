@@ -15,7 +15,7 @@ module.exports = {
     es6: true
   },
   rules: {
-    'prefer-interface': 'off'
+    '@typescript-eslint/consistent-type-definitions': ['warn', 'type']
   },
   parserOptions: {
     files: ['*.ts'],

@@ -13,7 +13,7 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { flattenDeep, isEqual } from 'lodash'
 import { workqueues } from '../workqueues'
-import { ActionType } from './ActionConfig'
+import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
@@ -52,10 +52,8 @@ export const findPageFields = (config: EventConfig): FieldConfig[] => {
       if (action.type === ActionType.REQUEST_CORRECTION) {
         return [
           ...action.forms.map(({ pages }) => pages.map(({ fields }) => fields)),
-          ...(action.onboardingForm || []).flatMap(({ fields }) => fields),
-          ...(action.additionalDetailsForm || []).flatMap(
-            ({ fields }) => fields
-          )
+          ...action.onboardingForm.flatMap(({ fields }) => fields),
+          ...action.additionalDetailsForm.flatMap(({ fields }) => fields)
         ]
       }
 

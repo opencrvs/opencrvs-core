@@ -202,7 +202,7 @@ const GeneratedInputField = React.memo(
       return (
         <Text
           element="p"
-          variant={field.config.configuration.fontVariant ?? 'reg16'}
+          variant={field.config.configuration?.styles?.fontVariant ?? 'reg16'}
         >
           <span dangerouslySetInnerHTML={{ __html: message }} />
         </Text>
