@@ -8,17 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 module.exports = {
-  extends: '../../.eslintrc.events.js',
+  extends: '../../../../.eslintrc.events.js',
   env: {
     es6: true
   },
-  overrides: [
-    {
-      files: ['*.ts'],
-      parserOptions: {
-        project: ['../tsconfig.json']
-      }
-    }
-  ]
+  rules: {
+    'prefer-interface': 'off'
+  },
+  parserOptions: {
+    files: ['*.ts'],
+    project: ['tsconfig.json']
+  }
 }
