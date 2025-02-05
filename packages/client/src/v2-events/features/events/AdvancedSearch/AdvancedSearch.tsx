@@ -10,6 +10,7 @@
  */
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
+import styled from 'styled-components'
 import {
   Accordion,
   Content,
@@ -18,9 +19,17 @@ import {
   IFormTabProps
 } from '@opencrvs/components'
 import { EventConfig } from '@opencrvs/commons/client'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+
 const messagesToDefine = {
+  search: {
+    defaultMessage: 'Search',
+    description: 'The title of search input submit button',
+    id: 'buttons.search'
+  },
   advancedSearch: {
     id: 'config.advanced.search',
     defaultMessage: 'Advanced Search',
@@ -45,6 +54,11 @@ const messagesToDefine = {
 }
 
 const messages = defineMessages(messagesToDefine)
+
+const SearchButton = styled(Button)`
+  margin-top: 32px;
+`
+
 type AdvancedSearchFormConfig = EventConfig['advancedSearch']
 
 function TabSearch({
@@ -83,22 +97,39 @@ function TabSearch({
     )
 
     return (
-      <Accordion
-        key={section.id}
-        expand={true}
-        label={intl.formatMessage(section.title)}
-        labelForHideAction={intl.formatMessage(messages.hide)}
-        labelForShowAction={intl.formatMessage(messages.show)}
-        name={section.id}
-      >
-        <FormFieldGenerator
-          fields={fields}
-          formData={{}}
-          id={section.id}
-          setAllFieldsDirty={false}
-          onChange={(values) => {}}
-        />
-      </Accordion>
+      <>
+        <Accordion
+          key={section.id}
+          expand={true}
+          label={intl.formatMessage(section.title)}
+          labelForHideAction={intl.formatMessage(messages.hide)}
+          labelForShowAction={intl.formatMessage(messages.show)}
+          name={section.id}
+        >
+          <FormFieldGenerator
+            fields={fields}
+            formData={{}}
+            id={section.id}
+            setAllFieldsDirty={false}
+            onChange={(values) => {}}
+          />
+        </Accordion>
+        <SearchButton
+          key="search"
+          fullWidth
+          disabled={false}
+          id="search"
+          size="large"
+          type="primary"
+          onClick={() => {
+            alert('search')
+          }}
+        >
+          {' '}
+          <Icon name={'MagnifyingGlass'} />
+          {intl.formatMessage(messages.search)}
+        </SearchButton>
+      </>
     )
   })
 }
