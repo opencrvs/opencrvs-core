@@ -18,7 +18,7 @@ import {
   FormTabs,
   IFormTabProps
 } from '@opencrvs/components'
-import { EventConfig } from '@opencrvs/commons/client'
+import { EventConfig, FieldValue } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -70,10 +70,11 @@ function TabSearch({
 }) {
   const intl = useIntl()
   const events = useEventConfigurations()
+  const [formValues, setFormValues] = useState<Record<string, FieldValue>>({})
 
   const currentEvent = events.filter((e) => e.id === activeTabId)
 
-  // extract only unique fields
+  // Extract unique fields
   const allUniqueFields = [
     ...new Map(
       currentEvent
@@ -88,7 +89,14 @@ function TabSearch({
     ).values()
   ]
 
-  return sections.map((section) => {
+  const handleFieldChange = (fieldId: string, value: FieldValue) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [fieldId]: value
+    }))
+  }
+
+  const SectionFields = sections.map((section) => {
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
@@ -97,41 +105,48 @@ function TabSearch({
     )
 
     return (
-      <>
-        <Accordion
-          key={section.id}
-          expand={true}
-          label={intl.formatMessage(section.title)}
-          labelForHideAction={intl.formatMessage(messages.hide)}
-          labelForShowAction={intl.formatMessage(messages.show)}
-          name={section.id}
-        >
-          <FormFieldGenerator
-            fields={fields}
-            formData={{}}
-            id={section.id}
-            setAllFieldsDirty={false}
-            onChange={(values) => {}}
-          />
-        </Accordion>
-        <SearchButton
-          key="search"
-          fullWidth
-          disabled={false}
-          id="search"
-          size="large"
-          type="primary"
-          onClick={() => {
-            alert('search')
+      <Accordion
+        key={section.id}
+        expand={true}
+        label={intl.formatMessage(section.title)}
+        labelForHideAction={intl.formatMessage(messages.hide)}
+        labelForShowAction={intl.formatMessage(messages.show)}
+        name={section.id}
+      >
+        <FormFieldGenerator
+          fields={fields}
+          formData={formValues}
+          id={section.id}
+          setAllFieldsDirty={false}
+          onChange={(updatedValues) => {
+            Object.entries(updatedValues).forEach(([fieldId, value]) => {
+              handleFieldChange(fieldId, value)
+            })
           }}
-        >
-          {' '}
-          <Icon name={'MagnifyingGlass'} />
-          {intl.formatMessage(messages.search)}
-        </SearchButton>
-      </>
+        />
+      </Accordion>
     )
   })
+
+  return (
+    <>
+      {SectionFields}
+      <SearchButton
+        key="search"
+        fullWidth
+        disabled={false}
+        id="search"
+        size="large"
+        type="primary"
+        onClick={() => {
+          alert(JSON.stringify(formValues))
+        }}
+      >
+        <Icon name={'MagnifyingGlass'} />
+        {intl.formatMessage(messages.search)}
+      </SearchButton>
+    </>
+  )
 }
 
 function AdvancedSearch() {
