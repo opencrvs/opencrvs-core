@@ -28,7 +28,6 @@ import {
 } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
-
 import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 export function Pages() {

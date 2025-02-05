@@ -33,6 +33,7 @@ import { FormLayout } from '@client/v2-events/layouts/form'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { InputField } from '@client/components/form/InputField'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -53,14 +54,29 @@ export function Pages() {
   const certTemplateFieldConfig =
     useCertificateTemplateSelectorFieldConfig(event)
   const currentState = getCurrentEventState(event)
+
   const { setFormValues, getFormValues } = useEventFormData()
   const form = getFormValues(eventId)
 
+  const { setFormDefaultsForMissingFields } = useTransformer(event.type)
+
   useEffect(() => {
     if (formEventId !== event.id) {
-      setFormValues(event.id, currentState.data)
+      setFormValues(
+        event.id,
+        setFormDefaultsForMissingFields(
+          ActionType.PRINT_CERTIFICATE,
+          currentState.data
+        )
+      )
     }
-  }, [currentState.data, event.id, formEventId, setFormValues])
+  }, [
+    currentState.data,
+    event.id,
+    formEventId,
+    setFormValues,
+    setFormDefaultsForMissingFields
+  ])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
