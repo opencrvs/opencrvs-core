@@ -54,13 +54,6 @@ export function not(condition: AjvJSONSchema): AjvJSONSchema {
   }
 }
 
-defineConditional(
-  or(
-    eventHasAction('VALIDATE'),
-    and(eventHasAction('DECLARE'), userHasScope('register'))
-  )
-)
-
 export function userHasScope(scope: string): AjvJSONSchema {
   return {
     type: 'object',

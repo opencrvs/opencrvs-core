@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { ActionFormData, EventDocument } from '../events'
-import { ITokenPayload } from 'src/authentication'
+import { ITokenPayload } from '../authentication'
 
 /** @knipignore */
 export type JSONSchema = {
