@@ -30,7 +30,7 @@ const DEFAULT_FORM = {
   },
   review: {
     title: {
-      id: 'event.tennis-club-membership.action.declare.form.review.title',
+      id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
       defaultMessage: 'Member declaration for {firstname} {surname}',
       description: 'Title of the form to show in review page'
     }
@@ -802,7 +802,7 @@ const PRINT_CERTIFICATE_FORM = {
   ],
   review: {
     title: {
-      id: 'event.tennis-club-membership.action.certificate.form.review.title',
+      id: 'v2.event.tennis-club-membership.action.certificate.form.review.title',
       defaultMessage: 'Member certificate collector for {firstname} {surname}',
       description: 'Title of the form to show in review page'
     }
@@ -823,7 +823,7 @@ export const tennisClubMembershipEvent = {
       label: {
         defaultMessage: '{applicant.firstname} {applicant.surname}',
         description: 'This is the title of the summary',
-        id: 'event.tennis-club-membership.summary.title.label'
+        id: 'v2.event.tennis-club-membership.summary.title.label'
       }
     },
     fields: [
@@ -832,7 +832,7 @@ export const tennisClubMembershipEvent = {
         value: {
           defaultMessage: '{applicant.firstname}',
           description: 'Value for the matching field on form.',
-          id: 'event.tennis-club-membership.summary.field.firstname.value'
+          id: 'v2.event.tennis-club-membership.summary.field.firstname.value'
         },
         label: {
           defaultMessage: 'First name',
@@ -851,7 +851,7 @@ export const tennisClubMembershipEvent = {
           label: {
             defaultMessage: '{applicant.firstname} {applicant.surname}',
             description: 'Label for name in all workqueue',
-            id: 'event.tennis-club-membership.workqueue.all.name.label'
+            id: 'v2.event.tennis-club-membership.workqueue.all.name.label'
           }
         }
       ],
@@ -866,7 +866,7 @@ export const tennisClubMembershipEvent = {
           label: {
             defaultMessage: '{applicant.firstname} {applicant.surname}',
             description: 'Label for name in all workqueue',
-            id: 'event.tennis-club-membership.workqueue.readyForReview.name.label'
+            id: 'v2.event.tennis-club-membership.workqueue.readyForReview.name.label'
           }
         }
       ],
@@ -885,7 +885,7 @@ export const tennisClubMembershipEvent = {
           label: {
             defaultMessage: '{applicant.firstname} {applicant.surname}',
             description: 'Label for name in all workqueue',
-            id: 'event.tennis-club-membership.workqueue.registered.name.label'
+            id: 'v2.event.tennis-club-membership.workqueue.registered.name.label'
           }
         }
       ],
@@ -914,7 +914,7 @@ export const tennisClubMembershipEvent = {
           'Request a correction for {applicant.firstname} {applicant.surname}',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.requestCorrection.label'
+        id: 'v2.event.tennis-club-membership.action.requestCorrection.label'
       },
       onboardingForm: [
         {
