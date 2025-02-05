@@ -9,6 +9,20 @@
 - **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
 - **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
 
+## 1.7.1 Release candidate
+
+### Breaking changes
+
+### New features
+
+### Improvements
+
+### Deprecated
+
+### Bug fixes
+
+- Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
+
 ## 1.7.0 Release candidate
 
 ### Breaking changes
