@@ -26,6 +26,7 @@ import {
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -33,6 +34,12 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const intl = useIntl()
+  const allEvents = useEventConfigurations()
+
+  const advancedSearchEvents = allEvents.filter(
+    (event) => event.advancedSearch.length > 0
+  )
+
   const advancedSearchNavigationList: INavigationType[] = [
     {
       label: intl.formatMessage({
@@ -64,7 +71,11 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
 
               <SearchTool
                 language="en"
-                navigationList={advancedSearchNavigationList}
+                navigationList={
+                  advancedSearchEvents.length > 0
+                    ? advancedSearchNavigationList // only available when enable in at least one form
+                    : []
+                }
                 searchHandler={noop}
                 searchTypeList={[
                   {
