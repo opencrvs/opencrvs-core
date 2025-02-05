@@ -23,6 +23,7 @@ import {
   EventConfig,
   EventIndex,
   getAllFields,
+  getOrThrow,
   RootWorkqueueConfig,
   workqueues
 } from '@opencrvs/commons/client'
@@ -49,14 +50,6 @@ const messages = defineMessages({
     id: 'regHome.issued'
   }
 })
-
-function getOrThrow<T>(x: T, message: string) {
-  if (x === undefined || x === null) {
-    throw new Error(message)
-  }
-
-  return x
-}
 
 /**
  * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.
@@ -264,13 +257,11 @@ function Workqueue({
   }
 
   function getDefaultColumns(): Array<Column> {
-    // @TODO: Markus should update the types
     return workqueueConfig.defaultColumns.map(
       (column): Column => ({
         label:
           column in defaultColumns
             ? intl.formatMessage(
-                // eslint-disable-next-line
                 defaultColumns[column as keyof typeof defaultColumns].label
               )
             : '',
@@ -286,7 +277,6 @@ function Workqueue({
   function getColumns(): Array<Column> {
     if (width > theme.grid.breakpoints.lg) {
       return workqueueConfig.columns.map((column) => ({
-        // eslint-disable-next-line
         label: intl.formatMessage(column.label),
         width: 35,
         key: column.id,
@@ -296,7 +286,6 @@ function Workqueue({
     } else {
       return workqueueConfig.columns
         .map((column) => ({
-          // eslint-disable-next-line
           label: intl.formatMessage(column.label),
           width: 35,
           key: column.id,
