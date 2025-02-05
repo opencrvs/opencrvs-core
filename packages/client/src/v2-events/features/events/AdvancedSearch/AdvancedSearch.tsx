@@ -116,9 +116,7 @@ function AdvancedSearch() {
     title: intl.formatMessage(a.label)
   })) satisfies IFormTabProps['sections']
 
-  const [activeTabId, setActiveTabId] = useState<string>(
-    formTabSections[0]?.id || ''
-  )
+  const [activeTabId, setActiveTabId] = useState<string>(formTabSections[0].id)
 
   const handleTabClick = (tabId: string) => {
     setActiveTabId(tabId)

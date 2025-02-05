@@ -38,6 +38,9 @@ function mapTypeToZod(type: FieldConfig['type'], required?: boolean) {
     case 'COUNTRY':
     case 'RADIO_GROUP':
     case 'PARAGRAPH':
+    case 'ADMINISTRATIVE_AREA':
+    case 'FACILITY':
+    case 'OFFICE':
       schema = z.string()
       break
     case 'DATE':

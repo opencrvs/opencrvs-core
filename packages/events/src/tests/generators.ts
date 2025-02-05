@@ -39,6 +39,9 @@ function mapTypeToMockValue(field: FieldConfig, i: number) {
     case 'COUNTRY':
     case 'RADIO_GROUP':
     case 'PARAGRAPH':
+    case 'ADMINISTRATIVE_AREA':
+    case 'FACILITY':
+    case 'OFFICE':
       return `${field.id}-${field.type}-${i}`
     case 'DATE':
       return '2021-01-01'
