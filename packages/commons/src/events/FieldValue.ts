@@ -36,19 +36,18 @@ export const FileFieldValue = z
 
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 
-export const FileFieldValueWithOption = z
-  .object({
-    filename: z.string(),
-    originalFilename: z.string(),
-    type: z.string(),
-    option: z.string()
-  })
-  .nullable()
+export const FileFieldValueWithOption = z.object({
+  filename: z.string(),
+  originalFilename: z.string(),
+  type: z.string(),
+  option: z.string()
+})
 
-const FileFieldWithOptionValue = z.array(FileFieldValueWithOption).nullable()
+export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
+
+export const FileFieldWithOptionValue = z.array(FileFieldValueWithOption)
 
 export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
-export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
 
 const RadioGroupFieldValue = z.string()
 export type RadioGroupFieldValue = z.infer<typeof RadioGroupFieldValue>

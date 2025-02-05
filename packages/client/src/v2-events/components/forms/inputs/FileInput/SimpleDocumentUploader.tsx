@@ -115,9 +115,10 @@ function SimpleDocumentUploaderComponent({
   if (onlyButton) {
     return (
       <DocumentUploader
+        disabled={Boolean(error)}
         id="upload_document"
         name={name}
-        onChange={handleFileChange}
+        onChange={error ? undefined : handleFileChange}
       >
         {intl.formatMessage(messages.uploadFile)}
       </DocumentUploader>

@@ -13,18 +13,19 @@ import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldProps,
   SelectFieldValue,
-  SelectOption
+  SelectOption,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
 
 export function Select({
   onChange,
-  label,
   value,
   ...props
-}: FieldProps<'SELECT'> & {
+}: Omit<FieldProps<'SELECT'>, 'label'> & {
   onChange: (newValue: SelectFieldValue) => void
   value?: SelectFieldValue
+  label?: TranslationConfig
 }) {
   const intl = useIntl()
   const { options } = props

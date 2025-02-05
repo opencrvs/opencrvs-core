@@ -72,7 +72,7 @@ import { SelectCountry } from '@client/v2-events/features/events/registered-fiel
 import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
-import { DocumentUploaderWithOption } from '../DocumentUploaderWithOption'
+import { DocumentUploaderWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
 
 const fadeIn = keyframes`
   from { opacity: 0; }

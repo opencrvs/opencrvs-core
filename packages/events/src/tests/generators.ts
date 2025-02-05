@@ -46,6 +46,8 @@ function mapTypeToMockValue(field: FieldConfig, i: number) {
       return true
     case 'FILE':
       return null
+    case 'FILE_WITH_OPTIONS':
+      return []
   }
 }
 
