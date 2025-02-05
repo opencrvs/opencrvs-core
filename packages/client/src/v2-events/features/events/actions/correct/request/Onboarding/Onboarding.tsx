@@ -101,7 +101,6 @@ export function Onboarding() {
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
-        eventId={event.id}
         // @TODO: Use subscription if needed
         form={correctionRequestData.getFormValues()}
         formPages={formPages}

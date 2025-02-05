@@ -16,6 +16,7 @@ import { router as correctionRouter } from '@client/v2-events/features/events/ac
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import * as Register from '@client/v2-events/features/events/actions/register'
+import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
@@ -29,6 +30,7 @@ import { ROUTES } from './routes'
  *
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
+
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
@@ -93,6 +95,24 @@ export const routesConfig = {
         {
           path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
           element: <Register.Review />
+        }
+      ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,
+      element: <Outlet />,
+      children: [
+        {
+          index: true,
+          element: <PrintCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.path,
+          element: <PrintCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.path,
+          element: <PrintCertificate.Review />
         }
       ]
     }

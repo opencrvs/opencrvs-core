@@ -21,25 +21,25 @@ import { usePagination } from '@client/v2-events/hooks/usePagination'
  * Reusable component for rendering a form with pagination. Used by different action forms
  */
 export function Pages({
-  eventId,
+  form,
   pageId,
   showReviewButton,
   formPages,
-  form,
   onFormPageChange,
   onSubmit,
   submitButtonText,
-  setFormData
+  setFormData,
+  children
 }: {
-  eventId: string
-  pageId: string
   form: ActionFormData
   setFormData: (data: ActionFormData) => void
+  pageId: string
   showReviewButton?: boolean
   formPages: FormPage[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
   submitButtonText?: string
+  children?: (page: FormPage) => React.ReactNode
 }) {
   const intl = useIntl()
 
@@ -72,14 +72,18 @@ export function Pages({
       onPreviousPage={previous}
       onSubmit={onSubmit}
     >
-      <FormFieldGenerator
-        fields={page.fields}
-        formData={form}
-        id="locationForm"
-        initialValues={form}
-        setAllFieldsDirty={false}
-        onChange={(values) => setFormData(values)}
-      />
+      {children ? (
+        children(page)
+      ) : (
+        <FormFieldGenerator
+          fields={page.fields}
+          formData={form}
+          id="locationForm"
+          initialValues={form}
+          setAllFieldsDirty={false}
+          onChange={(values) => setFormData(values)}
+        />
+      )}
     </FormWizard>
   )
 }
