@@ -75,22 +75,30 @@ function TabSearch({
   activeTabId: string
 }) {
   const intl = useIntl()
-  const accordionShowingLabel = intl.formatMessage(messages.show)
-  const accordionHidingLabel = intl.formatMessage(messages.hide)
   const events = useEventConfigurations()
 
   const currentEvent = events.filter((e) => e.id === activeTabId)
-  const allFields = currentEvent.flatMap((event) =>
-    event.actions.flatMap((action) =>
-      action.forms.flatMap((form) => form.pages.flatMap((page) => page.fields))
-    )
-  )
+
+  // extract only unique fields
+  const allUniqueFields = [
+    ...new Map(
+      currentEvent
+        .flatMap((event) =>
+          event.actions.flatMap((action) =>
+            action.forms.flatMap((form) =>
+              form.pages.flatMap((page) => page.fields)
+            )
+          )
+        )
+        .map((field) => [field.id, field])
+    ).values()
+  ]
 
   return sections.map((section) => {
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
-    const fields = allFields.filter((field) =>
+    const fields = allUniqueFields.filter((field) =>
       advancedSearchFieldId.includes(field.id)
     )
 
@@ -99,8 +107,8 @@ function TabSearch({
         key={section.id}
         expand={true}
         label={intl.formatMessage(section.title)}
-        labelForHideAction={accordionHidingLabel}
-        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={intl.formatMessage(messages.hide)}
+        labelForShowAction={intl.formatMessage(messages.show)}
         name={section.id}
       >
         <FormFieldGenerator
