@@ -15,47 +15,58 @@ import {
   JSONSchema
 } from '@opencrvs/commons/conditionals'
 import { ActionDocument } from '@opencrvs/commons/events'
-import { JSONSchemaType as AjvJSONSchemaType } from 'ajv'
+import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 export * as deduplication from './deduplication'
 
 export { defineConditional } from '@opencrvs/commons/conditionals'
 
-type ReplacePropertiesWithPartial<T> = {
-  [K in keyof T]: K extends 'properties'
-    ? Partial<T[K]>
-    : T[K] extends Record<string, unknown>
-    ? ReplacePropertiesWithPartial<T[K]>
-    : T[K]
-}
-type AjvJSONSchema = ReplacePropertiesWithPartial<
-  AjvJSONSchemaType<ConditionalParameters>
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I
+) => void
+  ? I
+  : never
+
+type AjvJSONSchema = AjvJSONSchemaType<
+  UnionToIntersection<ConditionalParameters>
 >
 
-export function and(...conditions: AjvJSONSchema[]): JSONSchema {
-  return defineConditional({
-    type: 'object',
-    allOf: conditions
-  })
-}
-
-export function or(...conditions: AjvJSONSchema[]): JSONSchema {
-  return defineConditional({
-    type: 'object',
-    anyOf: conditions
-  })
-}
-
-export function not(condition: AjvJSONSchema): JSONSchema {
-  return defineConditional({
-    type: 'object',
-    not: condition
-  })
-}
-
-export function userHasScope(scope: string) {
+export function and(...conditions: AjvJSONSchema[]): AjvJSONSchema {
   return {
+    type: 'object',
+    allOf: conditions,
+    required: []
+  }
+}
+
+export function or(...conditions: AjvJSONSchema[]): AjvJSONSchema {
+  return {
+    type: 'object',
+    anyOf: conditions,
+    required: []
+  }
+}
+
+export function not(condition: AjvJSONSchema): AjvJSONSchema {
+  return {
+    type: 'object',
+    not: condition,
+    required: []
+  }
+}
+
+defineConditional(
+  or(
+    eventHasAction('VALIDATE'),
+    and(eventHasAction('DECLARE'), userHasScope('register'))
+  )
+)
+
+export function userHasScope(scope: string): AjvJSONSchema {
+  return {
+    type: 'object',
     properties: {
       $user: {
+        type: 'object',
         required: ['scope'],
         properties: {
           scope: {
@@ -71,7 +82,7 @@ export function userHasScope(scope: string) {
   }
 }
 
-export function eventHasAction(type: ActionDocument['type']) {
+export function eventHasAction(type: ActionDocument['type']): AjvJSONSchema {
   return {
     type: 'object',
     properties: {
