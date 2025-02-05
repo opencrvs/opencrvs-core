@@ -22,6 +22,7 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
+import { ActionType } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'

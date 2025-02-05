@@ -62,7 +62,6 @@ export function LocationSearch({
       buttonLabel="Health facility"
       locationList={locationList}
       searchHandler={(location: SearchLocation) =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         setFieldValue(props.id, location.id)
       }
       selectedLocation={selectedLocation}

@@ -48,7 +48,7 @@ const messages = defineMessages({
   'events.history.status': {
     id: `events.history.status`,
     defaultMessage:
-      '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} other {Unknown}}'
+      '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
   },
   'event.history.role': {
     id: 'event.history.role',

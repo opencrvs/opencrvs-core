@@ -47,6 +47,14 @@ export const getOfflineData = (store: IStoreState): IOfflineData => {
   return data
 }
 
+export const getLanguage = createSelector(
+  getOfflineData,
+  (data) => data.languages[0]
+)
+export const getCertificateTemplates = createSelector(
+  getOfflineData,
+  (data) => data.templates.certificates
+)
 export const getLocations = createSelector(getOfflineData, (data) => ({
   ...data.locations,
   ...data.facilities,

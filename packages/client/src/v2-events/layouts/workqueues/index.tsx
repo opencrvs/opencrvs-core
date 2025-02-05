@@ -25,7 +25,7 @@ import {
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
-import { messages } from '@client/i18n/messages/views/header'
+import { ProfileMenu } from '@client/components/ProfileMenu'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -35,7 +35,11 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const intl = useIntl()
   const advancedSearchNavigationList: INavigationType[] = [
     {
-      label: intl.formatMessage(messages.advancedSearch),
+      label: intl.formatMessage({
+        id: 'home.header.advancedSearch',
+        defaultMessage: 'Advanced Search',
+        description: 'Search menu advanced search type'
+      }),
       id: 'advanced-search',
       onClick: () => {
         navigate(ROUTES.V2.ADVANCED_SEARCH.path)
@@ -73,6 +77,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               />
             </Stack>
           }
+          desktopRight={<ProfileMenu key="profileMenu" />}
         />
       }
       skipToContentText="skip"
