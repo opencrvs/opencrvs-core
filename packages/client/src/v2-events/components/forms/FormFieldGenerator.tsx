@@ -200,7 +200,10 @@ const GeneratedInputField = React.memo(
       })
 
       return (
-        <Text element="p" variant={field.config.options.fontVariant ?? 'reg16'}>
+        <Text
+          element="p"
+          variant={field.config.configuration.fontVariant ?? 'reg16'}
+        >
           <span dangerouslySetInnerHTML={{ __html: message }} />
         </Text>
       )
@@ -211,19 +214,19 @@ const GeneratedInputField = React.memo(
         <InputField
           {...inputFieldProps}
           prefix={
-            field.config.options?.prefix &&
-            intl.formatMessage(field.config.options?.prefix)
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration?.prefix)
           }
           postfix={
-            field.config.options?.postfix &&
-            intl.formatMessage(field.config.options?.postfix)
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration?.postfix)
           }
         >
           <TextInput
-            type={field.config.options?.type ?? 'text'}
+            type={field.config.configuration?.type ?? 'text'}
             {...inputProps}
             isDisabled={disabled}
-            maxLength={field.config.options?.maxLength}
+            maxLength={field.config.configuration?.maxLength}
             value={inputProps.value as string}
           />
         </InputField>

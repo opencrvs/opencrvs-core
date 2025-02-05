@@ -152,7 +152,6 @@ function Workqueue({
 
   if (validEvents.length !== events.length) {
     // eslint-disable-next-line
-    console.log(validEvents.length, events.length)
     console.log('Fields without proper configuration found. Ignoring them')
   }
 

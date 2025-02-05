@@ -83,7 +83,7 @@ const Divider = BaseField.extend({
 export type Divider = z.infer<typeof Divider>
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
-  options: z
+  configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
       type: z.enum(['text', 'email', 'password', 'number']).optional(),
@@ -98,7 +98,7 @@ export type TextField = z.infer<typeof TextField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  options: z
+  configuration: z
     .object({
       notice: TranslationConfig.describe(
         'Text to display above the date input'
@@ -122,9 +122,13 @@ const HTMLFontVariant = z.enum([
 
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
-  options: z
+  configuration: z
     .object({
-      fontVariant: HTMLFontVariant.optional()
+      styles: z
+        .object({
+          fontVariant: HTMLFontVariant.optional()
+        })
+        .optional()
     })
     .default({})
 }).describe('A read-only HTML <p> paragraph')
