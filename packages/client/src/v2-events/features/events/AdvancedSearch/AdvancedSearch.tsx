@@ -21,11 +21,6 @@ import { EventConfig } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 const messagesToDefine = {
-  birthTabTitle: {
-    id: 'config.application.birthTabTitle',
-    defaultMessage: 'Birth',
-    description: 'The title for birth tab'
-  },
   advancedSearch: {
     id: 'config.advanced.search',
     defaultMessage: 'Advanced Search',
@@ -46,21 +41,6 @@ const messagesToDefine = {
     defaultMessage: 'Show',
     description: 'Label for show button when accordion is closed',
     id: 'advancedSearch.accordion.show'
-  },
-  placeOfRegistrationlabel: {
-    defaultMessage: 'Place of registration',
-    description: 'Label for input Place of registration',
-    id: 'advancedSearch.form.placeOfRegistration'
-  },
-  placeOfRegistrationHelperText: {
-    defaultMessage: 'Search for a province, district or registration office',
-    description: 'Helper text for input Place of registration',
-    id: 'advancedSearch.form.placeOfRegistrationHelperText'
-  },
-  formSelectPlaceholder: {
-    defaultMessage: 'Select',
-    description: 'Placeholder text for a select',
-    id: 'form.field.select.placeholder'
   }
 }
 

@@ -116,6 +116,7 @@ export const routesConfig = {
           element: <PrintCertificate.Review />
         }
       ]
-    }
+    },
+    advancedSearchRouter
   ]
 } satisfies RouteObject
