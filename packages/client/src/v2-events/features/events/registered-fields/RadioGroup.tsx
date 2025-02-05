@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { RadioGroupFieldValue, FieldProps } from '@opencrvs/commons/client'
+import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import {
   RadioGroup as RadioGroupComponent,
   RadioSize
@@ -22,25 +22,25 @@ export function RadioGroup({
   setFieldValue,
   value,
   options,
-  optionValues,
+  configuration,
   ...props
 }: FieldProps<'RADIO_GROUP'> & {
-  setFieldValue: (name: string, val: RadioGroupFieldValue | undefined) => void
+  setFieldValue: (name: string, val: string | undefined) => void
   value?: string
 }) {
   const intl = useIntl()
 
-  const radioOptions = optionValues.map((option) => ({
-    ...option,
+  const formattedOptions = options.map((option: SelectOption) => ({
+    value: option.value,
     label: intl.formatMessage(option.label)
   }))
 
   return (
     <RadioGroupComponent
       name={props.id}
-      options={radioOptions}
+      options={formattedOptions}
       size={
-        options && options.size === 'NORMAL'
+        configuration?.styles?.size === 'NORMAL'
           ? RadioSize.NORMAL
           : RadioSize.LARGE
       }

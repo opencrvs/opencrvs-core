@@ -14,9 +14,11 @@ import { useSelector } from 'react-redux'
 import {
   ActionFormData,
   findPageFields,
-  FieldType
+  FieldType,
+  ActionType,
+  findActiveActionFields
 } from '@opencrvs/commons/client'
-import { fieldValueToString } from '@client/v2-events/components/forms/utils'
+import { setFormValueWithFieldTypeDefault } from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
@@ -44,14 +46,43 @@ export const useTransformer = (eventType: string) => {
         continue
       }
 
-      stringifiedValues[key] = fieldValueToString({
+      stringifiedValues[key] = setFormValueWithFieldTypeDefault({
         fieldConfig,
         value,
         intl,
         locations
       })
     }
+
     return stringifiedValues
   }
-  return { toString }
+
+  function setFormDefaultsForMissingFields(
+    action: ActionType,
+    form: ActionFormData
+  ) {
+    const actionFieldConfigs =
+      findActiveActionFields(eventConfiguration, action) ?? []
+
+    return actionFieldConfigs.reduce((formWithDefaults, fieldConfig) => {
+      if (fieldConfig.type === FieldType.FILE) {
+        return formWithDefaults
+      }
+
+      return {
+        ...formWithDefaults,
+        [fieldConfig.id]: setFormValueWithFieldTypeDefault({
+          fieldConfig,
+          value: form[fieldConfig.id],
+          intl,
+          locations
+        })
+      }
+    }, {})
+  }
+
+  return {
+    toString,
+    setFormDefaultsForMissingFields
+  }
 }

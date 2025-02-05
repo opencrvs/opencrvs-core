@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IntlShape } from 'react-intl'
-import _ from 'lodash'
+import { isString, defaultTo } from 'lodash'
 import { formatISO } from 'date-fns'
+import { IntlShape } from 'react-intl'
 import {
   ActionFormData,
   BaseField,
@@ -18,30 +18,12 @@ import {
   FieldConfig,
   FieldType,
   FieldValue,
-  validate,
-  DateFieldValue,
-  TextFieldValue,
-  RadioGroupFieldValue
+  validate
 } from '@opencrvs/commons/client'
-import {
-  CheckboxFieldValue,
-  ParagraphFieldValue,
-  SelectFieldValue
-} from '@opencrvs/commons'
 import { DependencyInfo } from '@client/forms'
-import {
-  dateToString,
-  INITIAL_DATE_VALUE,
-  INITIAL_PARAGRAPH_VALUE,
-  INITIAL_RADIO_GROUP_VALUE,
-  INITIAL_TEXT_VALUE,
-  paragraphToString,
-  textToString
-} from '@client/v2-events/features/events/registered-fields'
-import { selectFieldToString } from '@client/v2-events/features/events/registered-fields/Select'
-import { selectCountryFieldToString } from '@client/v2-events/features/events/registered-fields/SelectCountry'
-import { ILocation } from '@client/v2-events/features/events/registered-fields/Location'
-import { checkboxToString } from '@client/v2-events/features/events/registered-fields/Checkbox'
+// eslint-disable-next-line no-restricted-imports
+import { ILocation } from '@client/offline/reducer'
+import { countries } from '@client/utils/countries'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -112,32 +94,47 @@ export function getDependentFields(
   })
 }
 
-const initialValueMapping: Record<FieldType, FieldValue | null> = {
-  [FieldType.TEXT]: INITIAL_TEXT_VALUE,
-  [FieldType.DATE]: INITIAL_DATE_VALUE,
-  [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
-  [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
-  [FieldType.FILE]: null,
-  [FieldType.HIDDEN]: null,
-  [FieldType.BULLET_LIST]: null,
-  [FieldType.CHECKBOX]: null,
-  [FieldType.COUNTRY]: null,
-  [FieldType.LOCATION]: null,
-  [FieldType.SELECT]: null,
-  [FieldType.PAGE_HEADER]: null,
-  [FieldType.DIVIDER]: null
-}
-
-export function getInitialValues(fields: FieldConfig[]) {
-  return fields.reduce((initialValues: Record<string, FieldValue>, field) => {
+/**
+ * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
+ * For setting default fields for form values @see setFormValueWithFieldTypeDefault
+ *
+ * @returns object based on the fields given with null values.
+ */
+export function setEmptyValuesForFields(fields: FieldConfig[]) {
+  return fields.reduce((initialValues: Record<string, null>, field) => {
     return {
       ...initialValues,
-      [field.id]: initialValueMapping[field.type]
+      [field.id]: null
     }
   }, {})
 }
 
-export function fieldValueToString({
+export function setDefaultsForMissingFields(
+  fields: FieldConfig[],
+  values: ActionFormData
+) {
+  const missingFields = fields.filter((field) => !values[field.id])
+
+  return missingFields.reduce((initialValues: ActionFormData, field) => {
+    return {
+      ...initialValues,
+      [field.id]: setFormValueWithFieldTypeDefault({
+        fieldConfig: field,
+        value: values[field.id],
+        intl: {} as IntlShape,
+        locations: {}
+      })
+    }
+  }, values)
+}
+
+/**
+ *  Used for setting default values for FORM fields (string defaults based on FieldType).
+ * For setting default fields for intl object @see setEmptyValuesForFields
+ *
+ *  @returns sensible default value for the field type given the field configuration.
+ */
+export function setFormValueWithFieldTypeDefault({
   fieldConfig,
   value,
   intl,
@@ -147,38 +144,53 @@ export function fieldValueToString({
   value: FieldValue
   intl: IntlShape
   locations: { [locationId: string]: ILocation }
-}) {
+}): string {
   switch (fieldConfig.type) {
+    case FieldType.BULLET_LIST:
+    case FieldType.DIVIDER:
+    case FieldType.PAGE_HEADER:
     case FieldType.DATE:
-      return dateToString(value as DateFieldValue)
     case FieldType.TEXT:
-      return textToString(value as TextFieldValue)
     case FieldType.PARAGRAPH:
-      return paragraphToString(value as ParagraphFieldValue)
+    case FieldType.FILE:
+      // @TODO:
+      return defaultTo(value as string, '')
+
     case FieldType.CHECKBOX:
-      return checkboxToString(value as CheckboxFieldValue)
+      // @TODO: This should be a boolean?
+      return value === 'true' ? 'Yes' : 'No'
     case FieldType.RADIO_GROUP:
-      return selectFieldToString(
-        value as RadioGroupFieldValue,
-        fieldConfig.optionValues,
-        intl
+    case FieldType.SELECT: {
+      const selectedOption = fieldConfig.options.find(
+        (option) => option.value === value
       )
-    case FieldType.SELECT:
-      return selectFieldToString(
-        value as SelectFieldValue,
-        fieldConfig.options,
-        intl
+
+      return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+    }
+
+    case FieldType.COUNTRY: {
+      if (!value) {
+        return ''
+      }
+
+      const selectedCountry = countries.find(
+        (country) => country.value === value
       )
-    case FieldType.COUNTRY:
-      return selectCountryFieldToString(value as SelectFieldValue, intl)
+      return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
+    }
+
     case FieldType.LOCATION: {
       let location
-      if (_.isString(value)) {
-        location = locations[value].name
+      if (isString(value)) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        location = locations[value] ? locations[value].name : ''
       }
+
       return location ?? ''
     }
     default:
-      throw new Error(`Field type ${fieldConfig.type} configuration missing.`)
+      throw new Error(
+        `Field type for ${JSON.stringify(fieldConfig)} configuration missing.`
+      )
   }
 }

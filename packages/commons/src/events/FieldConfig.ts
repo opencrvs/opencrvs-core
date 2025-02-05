@@ -11,18 +11,7 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from '../conditionals/conditionals'
-import {
-  BulletListFieldValue,
-  CheckboxFieldValue,
-  CountryFieldValue,
-  DateFieldValue,
-  FileFieldValue,
-  LocationFieldValue,
-  ParagraphFieldValue,
-  RadioGroupFieldValue,
-  SelectFieldValue,
-  TextFieldValue
-} from './FieldValue'
+import { FieldType } from './FieldType'
 
 export const ConditionalTypes = {
   SHOW: 'SHOW',
@@ -88,43 +77,10 @@ const BaseField = z.object({
 
 export type BaseField = z.infer<typeof BaseField>
 
-export const FieldType = {
-  TEXT: 'TEXT',
-  DATE: 'DATE',
-  PARAGRAPH: 'PARAGRAPH',
-  PAGE_HEADER: 'PAGE_HEADER',
-  RADIO_GROUP: 'RADIO_GROUP',
-  FILE: 'FILE',
-  HIDDEN: 'HIDDEN',
-  BULLET_LIST: 'BULLET_LIST',
-  CHECKBOX: 'CHECKBOX',
-  SELECT: 'SELECT',
-  COUNTRY: 'COUNTRY',
-  LOCATION: 'LOCATION',
-  DIVIDER: 'DIVIDER'
-} as const
-
-export const fieldTypes = Object.values(FieldType)
-export type FieldType = (typeof fieldTypes)[number]
-
-export interface FieldValueByType {
-  [FieldType.TEXT]: TextFieldValue
-  [FieldType.DATE]: DateFieldValue
-  [FieldType.PARAGRAPH]: ParagraphFieldValue
-  [FieldType.PAGE_HEADER]: ParagraphFieldValue
-  [FieldType.RADIO_GROUP]: RadioGroupFieldValue
-  [FieldType.BULLET_LIST]: BulletListFieldValue
-  [FieldType.CHECKBOX]: CheckboxFieldValue
-  [FieldType.COUNTRY]: CountryFieldValue
-  [FieldType.LOCATION]: LocationFieldValue
-  [FieldType.FILE]: FileFieldValue
-  [FieldType.SELECT]: SelectFieldValue
-}
-
 const Divider = BaseField.extend({
   type: z.literal(FieldType.DIVIDER)
 })
-
+export type Divider = z.infer<typeof Divider>
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   options: z
@@ -138,6 +94,8 @@ const TextField = BaseField.extend({
     .optional()
 }).describe('Text input')
 
+export type TextField = z.infer<typeof TextField>
+
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
   options: z
@@ -148,6 +106,8 @@ const DateField = BaseField.extend({
     })
     .optional()
 }).describe('A single date input (dd-mm-YYYY)')
+
+export type DateField = z.infer<typeof DateField>
 
 const HTMLFontVariant = z.enum([
   'reg12',
@@ -169,13 +129,19 @@ const Paragraph = BaseField.extend({
     .default({})
 }).describe('A read-only HTML <p> paragraph')
 
+export type Paragraph = z.infer<typeof Paragraph>
+
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER)
 }).describe('A read-only header component for form pages')
 
+export type PageHeader = z.infer<typeof PageHeader>
+
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE)
 }).describe('File upload')
+
+export type File = z.infer<typeof File>
 
 const SelectOption = z.object({
   value: z.string().describe('The value of the option'),
@@ -184,21 +150,27 @@ const SelectOption = z.object({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
-  optionValues: z.array(SelectOption).describe('A list of options'),
-  options: z.object({
-    size: z.enum(['NORMAL', 'LARGE']).optional()
-  }),
-  flexDirection: z
-    .enum(['row', 'row-reverse', 'column', 'column-reverse'])
+  options: z.array(SelectOption).describe('A list of options'),
+  configuration: z
+    .object({
+      styles: z
+        .object({
+          size: z.enum(['NORMAL', 'LARGE']).optional()
+        })
+        .optional()
+    })
     .optional()
-    .describe('Direction to stack the options')
 }).describe('Grouped radio options')
+
+export type RadioGroup = z.infer<typeof RadioGroup>
 
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
   items: z.array(TranslationConfig).describe('A list of items'),
   font: HTMLFontVariant
 }).describe('A list of bullet points')
+
+export type BulletList = z.infer<typeof BulletList>
 
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
@@ -207,11 +179,15 @@ const Select = BaseField.extend({
 
 const Checkbox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX)
-}).describe('Check Box')
+}).describe('Boolean checkbox field')
+
+export type Checkbox = z.infer<typeof Checkbox>
 
 const Country = BaseField.extend({
   type: z.literal(FieldType.COUNTRY)
 }).describe('Country select field')
+
+export type Country = z.infer<typeof Country>
 
 const LocationOptions = z.object({
   partOf: z
@@ -227,6 +203,8 @@ const Location = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   options: LocationOptions
 }).describe('Location input field')
+
+export type Location = z.infer<typeof Location>
 
 /*
  * This needs to be exported so that Typescript can refer to the type in

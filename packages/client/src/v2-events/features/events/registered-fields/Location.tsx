@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
+import { FieldProps } from '@opencrvs/commons/client'
 // eslint-disable-next-line no-restricted-imports
 import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Select } from './Select'
@@ -52,9 +52,9 @@ export function Location({
   partOf,
   ...props
 }: FieldProps<'LOCATION'> & {
-  setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
+  setFieldValue: (name: string, val: string | undefined) => void
   partOf: string | null
-  value?: LocationFieldValue
+  value?: string
 }) {
   const options = useAdminLocations(partOf ?? '0')
 

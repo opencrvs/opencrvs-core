@@ -11,7 +11,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
+import { FieldProps } from '@opencrvs/commons/client'
 // eslint-disable-next-line no-restricted-imports
 import { getFacilityLocations } from '@client/offline/selectors'
 import { ILocation } from './Location'
@@ -35,7 +35,7 @@ function toSearchOption(facility: Facility) {
   }
 }
 
-function useAdminLocations(value?: LocationFieldValue) {
+function useAdminLocations(value?: string) {
   const locationMap = useSelector(getFacilityLocations)
 
   const locations = Object.values(locationMap)
@@ -52,8 +52,8 @@ export function LocationSearch({
   value,
   ...props
 }: FieldProps<'LOCATION'> & {
-  setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
-  value?: LocationFieldValue
+  setFieldValue: (name: string, val: string | undefined) => void
+  value?: string
 }) {
   const { options, initialLocation } = useAdminLocations()
 

@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { getInitialValues } from '@client/v2-events/components/forms/utils'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -87,7 +87,7 @@ export function Review() {
     ([key, value]) => previousFormValues[key] !== value
   )
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
-  const initialValues = getInitialValues(getAllFields(config))
+  const initialValues = setEmptyValuesForFields(getAllFields(config))
   const actionConfig = config.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )

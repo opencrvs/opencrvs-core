@@ -12,8 +12,6 @@
 import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
-
-import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   FieldConfig,
@@ -32,10 +30,7 @@ import {
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
-import {
-  getConditionalActionsForField,
-  isFormFieldVisible
-} from '@client/v2-events/components/forms/utils'
+import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 const Deleted = styled.del`

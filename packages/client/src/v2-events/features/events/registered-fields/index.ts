@@ -8,7 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './TextField'
-export * from './DateField'
-export * from './Paragraph'
 export * from './RadioGroup'

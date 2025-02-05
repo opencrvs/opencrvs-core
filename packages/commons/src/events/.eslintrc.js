@@ -8,8 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ParagraphFieldValue } from '@opencrvs/commons/client'
-
-export const INITIAL_PARAGRAPH_VALUE = ''
-
-export const paragraphToString = (text: ParagraphFieldValue) => text || ''
+module.exports = {
+  extends: '../../.eslintrc.events.js',
+  env: {
+    es6: true
+  },
+  overrides: [
+    {
+      files: ['*.ts'],
+      parserOptions: {
+        project: ['../tsconfig.json']
+      }
+    }
+  ]
+}
