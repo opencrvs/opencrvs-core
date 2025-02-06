@@ -322,3 +322,20 @@ const ensureWrapper = (
 
   return conditionsWithConnector(conditions, booleanConnector)
 }
+
+export function objectHasProperty(
+  property: string,
+  type: 'string' | 'number' | 'boolean' | 'array' | 'object',
+  format?: string
+) {
+  return {
+    type: 'object',
+    properties: {
+      [property]: {
+        type,
+        format
+      }
+    },
+    required: [property]
+  }
+}
