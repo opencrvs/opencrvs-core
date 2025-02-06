@@ -23,7 +23,6 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { ROUTES } from '@client/v2-events/routes'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
@@ -38,25 +37,11 @@ export function Pages() {
   const [event] = events.getEvent.useSuspenseQuery(eventId)
   const currentState = getCurrentEventState(event)
 
-  const { setFormDefaultsForMissingFields } = useTransformer(event.type)
-
   useEffect(() => {
     if (formEventId !== event.id) {
-      setFormValues(
-        event.id,
-        setFormDefaultsForMissingFields(
-          ActionType.REQUEST_CORRECTION,
-          currentState.data
-        )
-      )
+      setFormValues(event.id, currentState.data)
     }
-  }, [
-    currentState.data,
-    event.id,
-    formEventId,
-    setFormValues,
-    setFormDefaultsForMissingFields
-  ])
+  }, [currentState.data, event.id, formEventId, setFormValues])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

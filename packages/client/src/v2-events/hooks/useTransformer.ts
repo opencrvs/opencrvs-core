@@ -9,25 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
+import { defaultTo } from 'lodash'
 import {
   ActionFormData,
   findPageFields,
-  FieldType,
-  ActionType,
-  findActiveActionFields
+  FieldType
 } from '@opencrvs/commons/client'
-import { setFormValueWithFieldTypeDefault } from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-// eslint-disable-next-line no-restricted-imports
-import { getLocations } from '@client/offline/selectors'
 
 export const useTransformer = (eventType: string) => {
-  const intl = useIntl()
-
-  const locations = useSelector(getLocations)
-
   const { eventConfiguration } = useEventConfiguration(eventType)
 
   const fields = findPageFields(eventConfiguration)
@@ -46,43 +36,13 @@ export const useTransformer = (eventType: string) => {
         continue
       }
 
-      stringifiedValues[key] = setFormValueWithFieldTypeDefault({
-        fieldConfig,
-        value,
-        intl,
-        locations
-      })
+      stringifiedValues[key] = defaultTo(value.toString(), '')
     }
 
     return stringifiedValues
   }
 
-  function setFormDefaultsForMissingFields(
-    action: ActionType,
-    form: ActionFormData
-  ) {
-    const actionFieldConfigs =
-      findActiveActionFields(eventConfiguration, action) ?? []
-
-    return actionFieldConfigs.reduce((formWithDefaults, fieldConfig) => {
-      if (fieldConfig.type === FieldType.FILE) {
-        return formWithDefaults
-      }
-
-      return {
-        ...formWithDefaults,
-        [fieldConfig.id]: setFormValueWithFieldTypeDefault({
-          fieldConfig,
-          value: form[fieldConfig.id],
-          intl,
-          locations
-        })
-      }
-    }, {})
-  }
-
   return {
-    toString,
-    setFormDefaultsForMissingFields
+    toString
   }
 }

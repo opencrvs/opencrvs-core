@@ -72,3 +72,8 @@ export function FileInput(
 }
 
 export const FileOutput = null
+
+export const File = {
+  Input: FileInput,
+  Output: FileOutput
+}

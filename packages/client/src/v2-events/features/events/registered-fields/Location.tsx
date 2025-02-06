@@ -12,8 +12,12 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { FieldProps } from '@opencrvs/commons/client'
 // eslint-disable-next-line no-restricted-imports
-import { getAdminStructureLocations } from '@client/offline/selectors'
-import { Select } from './Select'
+import {
+  getAdminStructureLocations,
+  getLocations
+} from '@client/offline/selectors'
+import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { SelectInput } from './Select'
 
 export interface ILocation {
   id: string
@@ -46,7 +50,7 @@ function useAdminLocations(partOf: string) {
   }))
 }
 
-export function Location({
+export function LocationInput({
   setFieldValue,
   value,
   partOf,
@@ -59,7 +63,7 @@ export function Location({
   const options = useAdminLocations(partOf ?? '0')
 
   return (
-    <Select
+    <SelectInput
       {...props}
       options={options}
       type="SELECT"
@@ -67,4 +71,17 @@ export function Location({
       onChange={(val: string) => setFieldValue(props.id, val)}
     />
   )
+}
+
+export function LocationOutput({ value }: { value: Stringifiable }) {
+  const locations = useSelector(getLocations)
+
+  const location = value.toString() && locations[value.toString()]
+
+  return location ? location.name : ''
+}
+
+export const Location = {
+  Input: LocationInput,
+  Output: LocationOutput
 }

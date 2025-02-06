@@ -24,7 +24,7 @@ export const FileFieldValue = z.object({
 
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 
-export const CheckboxFieldValue = z.enum(['true', 'false'])
+export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 
 export const FieldValue = z.union([

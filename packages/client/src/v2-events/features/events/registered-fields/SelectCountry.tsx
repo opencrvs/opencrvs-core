@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { useIntl } from 'react-intl'
 import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
-import { Select } from './Select'
+import { SelectInput } from './Select'
 
-export function SelectCountry({
+export function SelectCountryInput({
   setFieldValue,
   value,
   ...props
@@ -22,7 +23,7 @@ export function SelectCountry({
   value?: string
 }) {
   return (
-    <Select
+    <SelectInput
       {...props}
       // @Todo ensure countries are of the same type
       options={countries as SelectOption[]}
@@ -31,4 +32,20 @@ export function SelectCountry({
       onChange={(val: string) => setFieldValue(props.id, val)}
     />
   )
+}
+
+export const SelectCountryOutput = ({
+  value
+}: {
+  value: string | undefined
+}) => {
+  const intl = useIntl()
+  const selectedCountry = countries.find((country) => country.value === value)
+
+  return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
+}
+
+export const SelectCountry = {
+  Input: SelectCountryInput,
+  Output: SelectCountryOutput
 }

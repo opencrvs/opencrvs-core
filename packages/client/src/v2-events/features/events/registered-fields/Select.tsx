@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
 
-export function Select({
+export function SelectInput({
   onChange,
   label,
   value,
@@ -24,17 +24,37 @@ export function Select({
 }) {
   const intl = useIntl()
   const { options } = props
-
+  const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
     label: intl.formatMessage(option.label)
   }))
 
+  const inputValue = selectedOption?.value ?? ''
+
   return (
     <SelectComponent
       options={formattedOptions}
-      value={value ?? ''}
+      value={inputValue}
       onChange={onChange}
     />
   )
+}
+
+export function SelectOutput({
+  value,
+  options
+}: {
+  value: string | undefined
+  options: SelectOption[]
+}) {
+  const intl = useIntl()
+  const selectedOption = options.find((option) => option.value === value)
+
+  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+}
+
+export const Select = {
+  Input: SelectInput,
+  Output: SelectOutput
 }

@@ -134,30 +134,28 @@ export const isParagraphFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: string; config: Paragraph } => {
-  return (
-    field.config.type === FieldType.PARAGRAPH && typeof field.value === 'string'
-  )
+  return field.config.type === FieldType.PARAGRAPH
 }
 
 export const isDateFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: string; config: DateField } => {
-  return field.config.type === FieldType.DATE && typeof field.value === 'string'
+  return field.config.type === FieldType.DATE
 }
 
 export const isPageHeaderFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: string; config: PageHeader } => {
-  return field.config.type === FieldType.DATE && typeof field.value === 'string'
+  return field.config.type === FieldType.DATE
 }
 
 export const isTextFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: string; config: TextField } => {
-  return field.config.type === FieldType.TEXT && typeof field.value === 'string'
+  return field.config.type === FieldType.TEXT
 }
 
 export const isFileFieldType = (field: {
@@ -179,9 +177,7 @@ export const isSelectFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: string; config: SelectField } => {
-  return (
-    field.config.type === FieldType.SELECT && typeof field.value === 'string'
-  )
+  return field.config.type === FieldType.SELECT
 }
 
 export const isCountryFieldType = (field: {
@@ -194,7 +190,7 @@ export const isCountryFieldType = (field: {
 export const isCheckboxFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: 'true' | 'false'; config: Checkbox } => {
+}): field is { value: boolean; config: Checkbox } => {
   // @TODO: check
   return field.config.type === FieldType.CHECKBOX
 }
@@ -203,19 +199,14 @@ export const isRadioGroupFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: string; config: RadioGroup } => {
-  return (
-    field.config.type === FieldType.RADIO_GROUP &&
-    typeof field.value === 'string'
-  )
+  return field.config.type === FieldType.RADIO_GROUP
 }
 
 export const isLocationFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: string; config: Location } => {
-  return (
-    field.config.type === FieldType.LOCATION && typeof field.value === 'string'
-  )
+  return field.config.type === FieldType.LOCATION
 }
 
 export const isDividerFieldType = (field: {

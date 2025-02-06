@@ -8,22 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { isString, defaultTo } from 'lodash'
 import { formatISO } from 'date-fns'
-import { IntlShape } from 'react-intl'
 import {
   ActionFormData,
   BaseField,
   ConditionalParameters,
   FieldConfig,
-  FieldType,
   FieldValue,
   validate
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
-// eslint-disable-next-line no-restricted-imports
-import { ILocation } from '@client/offline/reducer'
-import { countries } from '@client/utils/countries'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -96,7 +90,7 @@ export function getDependentFields(
 
 /**
  * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
- * For setting default fields for form values @see setFormValueWithFieldTypeDefault
+ * For setting default fields for form values @see setFormValueToOutputFormat
  *
  * @returns object based on the fields given with null values.
  */
@@ -109,88 +103,6 @@ export function setEmptyValuesForFields(fields: FieldConfig[]) {
   }, {})
 }
 
-export function setDefaultsForMissingFields(
-  fields: FieldConfig[],
-  values: ActionFormData
-) {
-  const missingFields = fields.filter((field) => !values[field.id])
-
-  return missingFields.reduce((initialValues: ActionFormData, field) => {
-    return {
-      ...initialValues,
-      [field.id]: setFormValueWithFieldTypeDefault({
-        fieldConfig: field,
-        value: values[field.id],
-        intl: {} as IntlShape,
-        locations: {}
-      })
-    }
-  }, values)
-}
-
-/**
- *  Used for setting default values for FORM fields (string defaults based on FieldType).
- * For setting default fields for intl object @see setEmptyValuesForFields
- *
- *  @returns sensible default value for the field type given the field configuration.
- */
-export function setFormValueWithFieldTypeDefault({
-  fieldConfig,
-  value,
-  intl,
-  locations
-}: {
-  fieldConfig: FieldConfig
-  value: FieldValue
-  intl: IntlShape
-  locations: { [locationId: string]: ILocation }
-}): string {
-  switch (fieldConfig.type) {
-    case FieldType.BULLET_LIST:
-    case FieldType.DIVIDER:
-    case FieldType.PAGE_HEADER:
-    case FieldType.DATE:
-    case FieldType.TEXT:
-    case FieldType.PARAGRAPH:
-    case FieldType.FILE:
-      // @TODO:
-      return defaultTo(value as string, '')
-
-    case FieldType.CHECKBOX:
-      // @TODO: This should be a boolean?
-      return value === 'true' ? 'Yes' : 'No'
-    case FieldType.RADIO_GROUP:
-    case FieldType.SELECT: {
-      const selectedOption = fieldConfig.options.find(
-        (option) => option.value === value
-      )
-
-      return selectedOption ? intl.formatMessage(selectedOption.label) : ''
-    }
-
-    case FieldType.COUNTRY: {
-      if (!value) {
-        return ''
-      }
-
-      const selectedCountry = countries.find(
-        (country) => country.value === value
-      )
-      return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
-    }
-
-    case FieldType.LOCATION: {
-      let location
-      if (isString(value)) {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        location = locations[value] ? locations[value].name : ''
-      }
-
-      return location ?? ''
-    }
-    default:
-      throw new Error(
-        `Field type for ${JSON.stringify(fieldConfig)} configuration missing.`
-      )
-  }
+export interface Stringifiable {
+  toString(): string
 }

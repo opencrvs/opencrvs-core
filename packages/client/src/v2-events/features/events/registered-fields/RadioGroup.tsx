@@ -15,10 +15,9 @@ import {
   RadioGroup as RadioGroupComponent,
   RadioSize
 } from '@opencrvs/components'
+import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
-export const INITIAL_RADIO_GROUP_VALUE = ''
-
-export function RadioGroup({
+export function RadioGroupInput({
   setFieldValue,
   value,
   options,
@@ -30,10 +29,13 @@ export function RadioGroup({
 }) {
   const intl = useIntl()
 
+  const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
     label: intl.formatMessage(option.label)
   }))
+
+  const inputValue = selectedOption?.value ?? ''
 
   return (
     <RadioGroupComponent
@@ -44,9 +46,27 @@ export function RadioGroup({
           ? RadioSize.NORMAL
           : RadioSize.LARGE
       }
-      value={value ?? INITIAL_RADIO_GROUP_VALUE}
+      value={inputValue}
       onChange={(val: string) => setFieldValue(props.id, val)}
       {...props}
     />
   )
+}
+
+export function RadioGroupOutput({
+  value,
+  options
+}: {
+  value: Stringifiable
+  options: SelectOption[]
+}) {
+  const intl = useIntl()
+  const selectedOption = options.find((option) => option.value === value)
+
+  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+}
+
+export const RadioGroup = {
+  Input: RadioGroupInput,
+  Output: RadioGroupOutput
 }

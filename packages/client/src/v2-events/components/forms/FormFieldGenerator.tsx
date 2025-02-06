@@ -12,9 +12,7 @@
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
 import { TEXT } from '@client/forms'
-import { DateField } from '@opencrvs/components/lib/DateField'
-import { Text } from '@opencrvs/components/lib/Text'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import * as React from 'react'
 
 import styled, { keyframes } from 'styled-components'
@@ -62,13 +60,18 @@ import {
 } from 'react-intl'
 import { FileInput } from './inputs/FileInput/FileInput'
 
-import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
-import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
-import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
-import { Location } from '@client/v2-events/features/events/registered-fields/Location'
-import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
-import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import {
+  BulletList,
+  Checkbox,
+  Date as DateField,
+  RadioGroup,
+  Location,
+  LocationSearch,
+  Select,
+  SelectCountry,
+  Text
+} from '@client/v2-events/features/events/registered-fields'
+
 import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
@@ -176,7 +179,7 @@ const GeneratedInputField = React.memo(
     if (isDateFieldType(field)) {
       return (
         <InputField {...field.inputFieldProps}>
-          <DateField
+          <DateField.Input
             {...inputProps}
             value={field.value}
             onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
@@ -200,12 +203,12 @@ const GeneratedInputField = React.memo(
       })
 
       return (
-        <Text
+        <TextComponent
           element="p"
           variant={field.config.configuration?.styles?.fontVariant ?? 'reg16'}
         >
           <span dangerouslySetInnerHTML={{ __html: message }} />
-        </Text>
+        </TextComponent>
       )
     }
 
@@ -222,12 +225,12 @@ const GeneratedInputField = React.memo(
             intl.formatMessage(field.config.configuration?.postfix)
           }
         >
-          <TextInput
+          <Text.Input
             type={field.config.configuration?.type ?? 'text'}
             {...inputProps}
             isDisabled={disabled}
             maxLength={field.config.configuration?.maxLength}
-            value={inputProps.value as string}
+            value={field.value}
           />
         </InputField>
       )
@@ -255,7 +258,7 @@ const GeneratedInputField = React.memo(
     if (isSelectFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <Select
+          <Select.Input
             {...field.config}
             value={field.value}
             onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
@@ -266,7 +269,7 @@ const GeneratedInputField = React.memo(
     if (isCountryFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <SelectCountry
+          <SelectCountry.Input
             {...field.config}
             value={field.value}
             setFieldValue={setFieldValue}
@@ -276,7 +279,7 @@ const GeneratedInputField = React.memo(
     }
     if (isCheckboxFieldType(field)) {
       return (
-        <Checkbox
+        <Checkbox.Input
           {...field.config}
           value={field.value}
           setFieldValue={setFieldValue}
@@ -286,7 +289,7 @@ const GeneratedInputField = React.memo(
     if (isRadioGroupFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <RadioGroup
+          <RadioGroup.Input
             {...field.config}
             value={field.value}
             setFieldValue={setFieldValue}
@@ -298,7 +301,7 @@ const GeneratedInputField = React.memo(
       if (field.config.options.type === 'HEALTH_FACILITY')
         return (
           <InputField {...inputFieldProps}>
-            <LocationSearch
+            <LocationSearch.Input
               {...field.config}
               value={field.value}
               setFieldValue={setFieldValue}
@@ -307,7 +310,7 @@ const GeneratedInputField = React.memo(
         )
       return (
         <InputField {...inputFieldProps}>
-          <Location
+          <Location.Input
             {...field.config}
             value={field.value}
             setFieldValue={setFieldValue}

@@ -39,15 +39,14 @@ function useAdminLocations(value?: string) {
   const locationMap = useSelector(getFacilityLocations)
 
   const locations = Object.values(locationMap)
-  const initialLocation =
-    // @TODO: Should disappear when restarting. Otherwise ignore and let markus fix the thing
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    value && locationMap[value] ? toSearchOption(locationMap[value]) : undefined
+
+  const location = value && locationMap[value]
+  const initialLocation = location ? toSearchOption(location) : undefined
   const options = locations.map(toSearchOption)
   return { options, initialLocation }
 }
 
-export function LocationSearch({
+export function LocationSearchInput({
   setFieldValue,
   value,
   ...props
@@ -68,4 +67,9 @@ export function LocationSearch({
       {...props}
     />
   )
+}
+
+export const LocationSearch = {
+  Input: LocationSearchInput,
+  Output: null
 }

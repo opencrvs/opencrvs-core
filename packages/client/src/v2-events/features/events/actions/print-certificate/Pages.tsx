@@ -30,7 +30,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
-import { Select } from '@client/v2-events/features/events/registered-fields/Select'
+import { SelectInput } from '@client/v2-events/features/events/registered-fields/Select'
 import { InputField } from '@client/components/form/InputField'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useTransformer } from '@client/v2-events/hooks/useTransformer'
@@ -58,25 +58,11 @@ export function Pages() {
   const { setFormValues, getFormValues } = useEventFormData()
   const form = getFormValues(eventId)
 
-  const { setFormDefaultsForMissingFields } = useTransformer(event.type)
-
   useEffect(() => {
     if (formEventId !== event.id) {
-      setFormValues(
-        event.id,
-        setFormDefaultsForMissingFields(
-          ActionType.PRINT_CERTIFICATE,
-          currentState.data
-        )
-      )
+      setFormValues(event.id, currentState.data)
     }
-  }, [
-    currentState.data,
-    event.id,
-    formEventId,
-    setFormValues,
-    setFormDefaultsForMissingFields
-  ])
+  }, [currentState.data, event.id, formEventId, setFormValues])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -148,7 +134,7 @@ export function Pages() {
                 label={intl.formatMessage(certTemplateFieldConfig.label)}
                 touched={false}
               >
-                <Select
+                <SelectInput
                   required
                   id={certTemplateFieldConfig.id}
                   label={certTemplateFieldConfig.label}

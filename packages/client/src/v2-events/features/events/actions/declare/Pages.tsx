@@ -28,7 +28,6 @@ import {
 } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -41,24 +40,13 @@ export function Pages() {
 
   const { eventId: formEventId, formValues } = useSubscribeEventFormData()
 
-  const { setFormDefaultsForMissingFields } = useTransformer(event.type)
-
   const setFormValues = useEventFormData((state) => state.setFormValues)
 
   useEffect(() => {
     if (formEventId !== event.id) {
-      setFormValues(
-        event.id,
-        setFormDefaultsForMissingFields(ActionType.DECLARE, formValues)
-      )
+      setFormValues(event.id, formValues)
     }
-  }, [
-    event.id,
-    setFormValues,
-    formEventId,
-    formValues,
-    setFormDefaultsForMissingFields
-  ])
+  }, [event.id, setFormValues, formEventId, formValues])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
