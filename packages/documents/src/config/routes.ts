@@ -15,6 +15,7 @@ import {
 } from '@documents/features/uploadDocument/handler'
 import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/handler'
 import {
+  createPreSignedEventUrl,
   createPreSignedUrl,
   createPresignedUrlsInBulk
 } from '@documents/features/getDocument/handler'
@@ -29,6 +30,15 @@ export const getRoutes = () => {
       method: 'GET',
       path: `/presigned-url/${MINIO_BUCKET}/{fileUri}`,
       handler: createPreSignedUrl,
+      config: {
+        tags: ['api']
+      }
+    },
+    // get presigned URL for events
+    {
+      method: 'GET',
+      path: `/presigned-event-url/${MINIO_BUCKET}/{fileUri}`,
+      handler: createPreSignedEventUrl,
       config: {
         tags: ['api']
       }

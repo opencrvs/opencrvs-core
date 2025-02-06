@@ -15,7 +15,6 @@ import React, { ComponentProps, useState } from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import {
-  FileFieldValue,
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
   SelectOption
@@ -39,7 +38,6 @@ const Flex = styled.div`
 `
 
 const DocumentUploadButton = styled(SimpleDocumentUploader)`
-  height: 60px;
   flex-shrink: 0;
 `
 

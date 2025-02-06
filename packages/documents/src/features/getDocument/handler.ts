@@ -33,6 +33,25 @@ export function createPreSignedUrl(
   }
 }
 
+export function createPreSignedEventUrl(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const fileUri = 'event-attachments/' + request.params.fileUri
+  const payload = (
+    fileUri ? { fileUri: `/${MINIO_BUCKET}/${fileUri}` } : request.payload
+  ) as {
+    fileUri: string
+  }
+
+  try {
+    const presignedURL = signFileUrl(payload.fileUri)
+    return h.response({ presignedURL }).code(200)
+  } catch (error) {
+    return h.response(error).code(400)
+  }
+}
+
 const BulkPayload = z.object({
   filenames: z.array(z.string())
 })

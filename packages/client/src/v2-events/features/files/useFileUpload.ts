@@ -79,6 +79,18 @@ export function getFullURL(filename: string) {
   throw new Error('MINIO_URL is not defined')
 }
 
+export async function getPresignedUrl(fileUri: string) {
+  const response = await fetch('/api/presigned-event-url/' + fileUri, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  const res = await response.json()
+  return res
+}
+
 async function cacheFile(filename: string, file: File) {
   const temporaryBlob = new Blob([file], { type: file.type })
   const cacheKeys = await caches.keys()

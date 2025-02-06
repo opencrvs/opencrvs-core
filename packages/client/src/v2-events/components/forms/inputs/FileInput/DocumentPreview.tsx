@@ -21,7 +21,7 @@ import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanVie
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { FileFieldValueWithOption } from '@opencrvs/commons/client'
-import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
+import { getPresignedUrl } from '@client/v2-events/features/files/useFileUpload'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -68,6 +68,16 @@ export function DocumentPreview({
   disableDelete,
   id
 }: IProps) {
+  const [presignedUrl, setPresignedUrl] = useState<string | null>(null)
+
+  React.useEffect(() => {
+    async function fetchPresignedUrl() {
+      const url = (await getPresignedUrl(previewImage.filename)).presignedURL
+      setPresignedUrl(url)
+    }
+    void fetchPresignedUrl()
+  }, [previewImage.filename])
+
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
 
@@ -152,7 +162,7 @@ export function DocumentPreview({
         <PanViewer
           key={Math.random()}
           id="document_image"
-          image={getFullURL(previewImage.filename)}
+          image={presignedUrl ?? ''}
           rotation={rotation}
           zoom={zoom}
         />
