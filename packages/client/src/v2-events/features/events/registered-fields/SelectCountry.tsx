@@ -12,9 +12,9 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
-import { SelectInput } from './Select'
+import { Select } from './Select'
 
-export function SelectCountryInput({
+function SelectCountryInput({
   setFieldValue,
   value,
   ...props
@@ -23,7 +23,7 @@ export function SelectCountryInput({
   value?: string
 }) {
   return (
-    <SelectInput
+    <Select.Input
       {...props}
       // @Todo ensure countries are of the same type
       options={countries as SelectOption[]}
@@ -34,11 +34,7 @@ export function SelectCountryInput({
   )
 }
 
-export const SelectCountryOutput = ({
-  value
-}: {
-  value: string | undefined
-}) => {
+function SelectCountryOutput({ value }: { value: string | undefined }) {
   const intl = useIntl()
   const selectedCountry = countries.find((country) => country.value === value)
 

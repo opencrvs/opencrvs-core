@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/components'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
-export function RadioGroupInput({
+function RadioGroupInput({
   setFieldValue,
   value,
   options,
@@ -53,7 +53,7 @@ export function RadioGroupInput({
   )
 }
 
-export function RadioGroupOutput({
+function RadioGroupOutput({
   value,
   options
 }: {

@@ -37,6 +37,8 @@ import {
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
  * File is separated from FieldType and FieldConfig to avoid circular dependencies.
+ *
+ * We can move the specific mapFieldTypeTo* functions where they are used once the core fields are implemented.
  */
 
 /**

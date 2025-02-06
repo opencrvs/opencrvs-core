@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
 
-export function SelectInput({
+function SelectInput({
   onChange,
   label,
   value,
@@ -41,7 +41,7 @@ export function SelectInput({
   )
 }
 
-export function SelectOutput({
+function SelectOutput({
   value,
   options
 }: {

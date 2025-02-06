@@ -14,10 +14,9 @@ import {
   DateField,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
-import { FieldProps } from '@opencrvs/commons/client'
 import * as React from 'react'
 
-export function DateInput({
+function DateInput({
   onChange,
   value,
   ...props
@@ -28,7 +27,7 @@ export function DateInput({
   return <DateField {...props} value={value} onChange={onChange} />
 }
 
-export function DateOutput({ value }: { value?: string }) {
+function DateOutput({ value }: { value?: string }) {
   return value ?? ''
 }
 

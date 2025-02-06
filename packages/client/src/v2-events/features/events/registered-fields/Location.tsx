@@ -19,7 +19,7 @@ import {
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { SelectInput } from './Select'
 
-export interface ILocation {
+export interface LocationProps {
   id: string
   name: string
   status: string
@@ -50,7 +50,7 @@ function useAdminLocations(partOf: string) {
   }))
 }
 
-export function LocationInput({
+function LocationInput({
   setFieldValue,
   value,
   partOf,
@@ -73,7 +73,7 @@ export function LocationInput({
   )
 }
 
-export function LocationOutput({ value }: { value: Stringifiable }) {
+function LocationOutput({ value }: { value: Stringifiable }) {
   const locations = useSelector(getLocations)
 
   const location = value.toString() && locations[value.toString()]

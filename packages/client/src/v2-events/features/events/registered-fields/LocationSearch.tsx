@@ -14,7 +14,7 @@ import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons/client'
 // eslint-disable-next-line no-restricted-imports
 import { getFacilityLocations } from '@client/offline/selectors'
-import { ILocation } from './Location'
+import { LocationProps } from './Location'
 
 interface SearchLocation {
   id: string
@@ -22,7 +22,7 @@ interface SearchLocation {
   displayLabel: string
 }
 
-interface Facility extends ILocation {
+interface Facility extends LocationProps {
   type: 'HEALTH_FACILITY'
   physicalType: 'Building'
 }
@@ -35,7 +35,7 @@ function toSearchOption(facility: Facility) {
   }
 }
 
-function useAdminLocations(value?: string) {
+function useFacilityLocations(value?: string) {
   const locationMap = useSelector(getFacilityLocations)
 
   const locations = Object.values(locationMap)
@@ -46,7 +46,7 @@ function useAdminLocations(value?: string) {
   return { options, initialLocation }
 }
 
-export function LocationSearchInput({
+function LocationSearchInput({
   setFieldValue,
   value,
   ...props
@@ -54,7 +54,7 @@ export function LocationSearchInput({
   setFieldValue: (name: string, val: string | undefined) => void
   value?: string
 }) {
-  const { options, initialLocation } = useAdminLocations()
+  const { options, initialLocation } = useFacilityLocations()
 
   return (
     <LocationSearchComponent
