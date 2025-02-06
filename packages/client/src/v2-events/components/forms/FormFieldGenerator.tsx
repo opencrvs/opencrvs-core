@@ -11,13 +11,7 @@
 
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
-import {
-  DATE,
-  IFileValue,
-  IFormFieldValue,
-  PARAGRAPH,
-  TEXT
-} from '@client/forms'
+import { DATE, IFormFieldValue, PARAGRAPH, TEXT } from '@client/forms'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { Text } from '@opencrvs/components/lib/Text'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -40,7 +34,6 @@ import {
   FieldType,
   FieldValue,
   FileFieldValue,
-  FileFieldValueWithOption,
   FileFieldWithOptionValue,
   LocationFieldValue,
   RadioGroupFieldValue,
@@ -72,7 +65,7 @@ import { SelectCountry } from '@client/v2-events/features/events/registered-fiel
 import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
-import { DocumentUploaderWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
+import { DocumentUploaderWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 
 const fadeIn = keyframes`
   from { opacity: 0; }

@@ -62,7 +62,7 @@ interface Props {
   processingDocuments?: Array<{ label: string }>
   attachment?: IAttachmentValue
   label?: string
-  onSelect: (document: FileFieldValueWithOption) => void
+  onSelect: (document: FileFieldValueWithOption | IAttachmentValue) => void
   dropdownOptions?: SelectOption[]
   onDelete?: (fileName: string) => void
   inReviewSection?: boolean
@@ -98,7 +98,7 @@ export const DocumentListPreview = ({
               <Icon color="grey600" name="Paperclip" size="large" />
               <Link
                 key={key}
-                id={`document_${(document?.option as string).replace(
+                id={`document_${(document.option as string).replace(
                   /\s/g,
                   ''
                 )}_link`}
@@ -108,8 +108,8 @@ export const DocumentListPreview = ({
                   {(inReviewSection &&
                     dropdownOptions &&
                     intl.formatMessage(dropdownOptions[key]?.label)) ||
-                    getFormattedLabelForDocType(document?.option as string) ||
-                    (document?.option as string)}
+                    getFormattedLabelForDocType(document.option as string) ||
+                    (document.option as string)}
                 </span>
               </Link>
             </Label>
