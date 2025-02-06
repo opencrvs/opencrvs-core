@@ -17,7 +17,7 @@ import {
   getLocations
 } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
-import { SelectInput } from './Select'
+import { Select } from './Select'
 
 export interface LocationProps {
   id: string
@@ -63,7 +63,7 @@ function LocationInput({
   const options = useAdminLocations(partOf ?? '0')
 
   return (
-    <SelectInput
+    <Select.Input
       {...props}
       options={options}
       type="SELECT"
