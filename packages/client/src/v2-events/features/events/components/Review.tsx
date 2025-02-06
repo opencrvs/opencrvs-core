@@ -26,7 +26,6 @@ import {
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 import { Output } from './Output'
 
 const Row = styled.div<{
@@ -231,13 +230,6 @@ function ReviewComponent({
                     >
                       <ListReview id={'Section_' + page.id}>
                         {page.fields
-                          // .filter(
-                          //   (field) =>
-                          //     // Formatters can explicitly define themselves to be null
-                          //     // this means a value display row in not rendered at all
-                          //     // An example of this is FileInput, of which files we do not want to render in the value lists
-                          //     // FIELD_TYPE_FORMATTERS[field.type] !== null
-                          // )
                           .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
                             const value = form[field.id]

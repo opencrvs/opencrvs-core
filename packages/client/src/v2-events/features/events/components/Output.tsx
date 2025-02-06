@@ -48,9 +48,8 @@ const Deleted = styled.del`
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-
-/* eslint-disable react/destructuring-assignment */
 export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
+  /* eslint-disable react/destructuring-assignment */
   if (isDateFieldType(field)) {
     return <DateField.Output value={field.value} />
   }
@@ -103,7 +102,7 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
 }
 
 function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
-  return <>{value?.toString() || ''}</>
+  return value?.toString() || ''
 }
 
 export function Output({
