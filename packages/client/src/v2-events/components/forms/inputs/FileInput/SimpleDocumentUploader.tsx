@@ -20,7 +20,7 @@ import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { DocumentPreview } from './DocumentPreview'
-import { DocumentListPreview } from './DocumentListPreview'
+import { SingleDocumentPreview } from './SingleDocumentPreview'
 
 const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
   color: ${({ theme }) => theme.colors.primary};
@@ -154,7 +154,7 @@ function SimpleDocumentUploaderComponent({
       {errorMessage && (touched || error) && (
         <ErrorText id="field-error">{errorMessage}</ErrorText>
       )}
-      <DocumentListPreview
+      <SingleDocumentPreview
         attachment={file}
         label={label}
         onDelete={onDelete}

@@ -15,6 +15,7 @@ import React, { ComponentProps, useState } from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import {
+  FileFieldValue,
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
   SelectOption
@@ -25,6 +26,7 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
+import { FileInput } from './FileInput'
 
 const UploadWrapper = styled.div`
   width: 100%;
@@ -46,9 +48,7 @@ function getUpdatedFiles(
   newFile: FileFieldValueWithOption
 ) {
   return [
-    ...prevFiles.filter(
-      (prevFile) => prevFile && newFile && prevFile.option !== newFile.option
-    ),
+    ...prevFiles.filter((prevFile) => prevFile.option !== newFile.option),
     newFile
   ]
 }
@@ -59,23 +59,25 @@ const DocumentTypeRequiredError = {
   description: 'Show error message if the document type is not selected'
 }
 
-export function DocumentUploaderWithOption(
-  props: Omit<
-    ComponentProps<typeof SimpleDocumentUploader>,
-    'onComplete' | 'label' | 'error'
-  > & {
-    value: FileFieldWithOptionValue
-    onChange: (value?: FileFieldValueWithOption[]) => void
-    options: SelectOption[]
-    error?: boolean
-    hideOnEmptyOption?: boolean
-    autoSelectOnlyOption?: boolean
-  }
-) {
+export function DocumentUploaderWithOption({
+  onSingleFileChange,
+  ...props
+}: Omit<
+  ComponentProps<typeof SimpleDocumentUploader>,
+  'onComplete' | 'label' | 'error'
+> & {
+  value: FileFieldWithOptionValue
+  onChange: (value?: FileFieldValueWithOption[]) => void
+  onSingleFileChange: (value?: FileFieldValue) => void
+  options: SelectOption[]
+  error?: boolean
+  hideOnEmptyOption?: boolean
+  autoSelectOnlyOption?: boolean
+}) {
   const intl = useIntl()
 
   const { value, onChange, name, description, allowedDocType } = props
-  const [files, setFiles] = useState(value ?? [])
+  const [files, setFiles] = useState(value)
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
     Array<{ label: string }>
   >([])
@@ -118,14 +120,14 @@ export function DocumentUploaderWithOption(
   function deleteFile(fileName: string) {
     deleteFileFromBackend(fileName)
     setFiles((prevFiles) =>
-      prevFiles.filter((file) => file && file.filename !== fileName)
+      prevFiles.filter((file) => file.filename !== fileName)
     )
-    onChange(files.filter((file) => file && file.filename !== fileName))
+    onChange(files.filter((file) => file.filename !== fileName))
     setPreviewImage(null)
   }
 
   const remainingOptions = props.options.filter(
-    ({ value: val }) => !files.some((file) => file && file.option === val)
+    ({ value: val }) => !files.some((file) => file.option === val)
   )
 
   const documentTypeRequiredErrorMessage = intl.formatMessage(
@@ -138,23 +140,12 @@ export function DocumentUploaderWithOption(
 
   if (props.options.length === 1) {
     return (
-      <DocumentUploadButton
+      <FileInput
         {...props}
-        allowedDocType={allowedDocType}
-        description={description}
-        error={selectedOption ? undefined : documentTypeRequiredErrorMessage}
         fullWidth={true}
-        name={name}
-        onComplete={(newFile) => {
-          if (newFile) {
-            setFilesBeingProcessed((prev) => [
-              ...prev,
-              { label: props.options[0].value }
-            ])
-
-            uploadFiles(newFile, props.options[0].value)
-          }
-        }}
+        label={intl.formatMessage(props.options[0].label)}
+        value={props.value.length === 0 ? undefined : props.value[0]}
+        onChange={onSingleFileChange}
       />
     )
   }
@@ -179,7 +170,9 @@ export function DocumentUploaderWithOption(
         dropdownOptions={props.options}
         processingDocuments={filesBeingProcessed}
         onDelete={deleteFile}
-        onSelect={(document) => setPreviewImage(document)}
+        onSelect={(document) =>
+          setPreviewImage(document as FileFieldValueWithOption)
+        }
       />
 
       <Flex>
