@@ -73,7 +73,7 @@ function getValidationErrors(
       message: {
         defaultMessage: 'Required for registration',
         description: 'This is the error message for required fields',
-        id: 'error.required'
+        id: 'v2.error.required'
       },
       validator: defineConditional({
         type: 'object',
