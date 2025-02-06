@@ -104,6 +104,13 @@ function TabSearch({
       advancedSearchFieldId.includes(field.id)
     )
 
+    const modifiedFields = fields.map((f) => {
+      return {
+        ...f,
+        required: false // advanced search fields need not be required
+      }
+    })
+
     return (
       <Accordion
         key={section.id}
@@ -114,7 +121,7 @@ function TabSearch({
         name={section.id}
       >
         <FormFieldGenerator
-          fields={fields}
+          fields={modifiedFields}
           formData={formValues}
           id={section.id}
           setAllFieldsDirty={false}
@@ -128,23 +135,28 @@ function TabSearch({
     )
   })
 
+  const hasEnoughParams = Object.entries(formValues).length > 0
+  const Search = (
+    <SearchButton
+      key="search"
+      fullWidth
+      disabled={!hasEnoughParams}
+      id="search"
+      size="large"
+      type="primary"
+      onClick={() => {
+        alert(JSON.stringify(formValues))
+      }}
+    >
+      <Icon name={'MagnifyingGlass'} />
+      {intl.formatMessage(messages.search)}
+    </SearchButton>
+  )
+
   return (
     <>
       {SectionFields}
-      <SearchButton
-        key="search"
-        fullWidth
-        disabled={false}
-        id="search"
-        size="large"
-        type="primary"
-        onClick={() => {
-          alert(JSON.stringify(formValues))
-        }}
-      >
-        <Icon name={'MagnifyingGlass'} />
-        {intl.formatMessage(messages.search)}
-      </SearchButton>
+      {Search}
     </>
   )
 }
