@@ -17,6 +17,10 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
+/**
+ *
+ * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
+ */
 export const useTransformer = (eventType: string) => {
   const { eventConfiguration } = useEventConfiguration(eventType)
 
@@ -36,6 +40,7 @@ export const useTransformer = (eventType: string) => {
         continue
       }
 
+      // @TODO: Extend this if we need to modify the value based on the field type
       stringifiedValues[key] = defaultTo(value.toString(), '')
     }
 

@@ -30,10 +30,9 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
-import { SelectInput } from '@client/v2-events/features/events/registered-fields/Select'
+import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { InputField } from '@client/components/form/InputField'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -134,7 +133,7 @@ export function Pages() {
                 label={intl.formatMessage(certTemplateFieldConfig.label)}
                 touched={false}
               >
-                <SelectInput
+                <Select.Input
                   required
                   id={certTemplateFieldConfig.id}
                   label={certTemplateFieldConfig.label}
