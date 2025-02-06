@@ -193,7 +193,6 @@ export const isCheckboxFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: boolean; config: Checkbox } => {
-  // @TODO: check
   return field.config.type === FieldType.CHECKBOX
 }
 

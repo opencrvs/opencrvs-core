@@ -58,7 +58,7 @@ import {
   MessageDescriptor,
   useIntl
 } from 'react-intl'
-import { FileInput } from './inputs/FileInput/FileInput'
+import { File } from './inputs/FileInput/FileInput'
 
 import {
   BulletList,
@@ -235,12 +235,12 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    // @TODO: File input
+
     if (isFileFieldType(field)) {
       const value = formData[fieldDefinition.id] as FileFieldValue
       return (
         <InputField {...inputFieldProps}>
-          <FileInput
+          <File.Input
             {...inputProps}
             value={value}
             onChange={handleFileChange}
