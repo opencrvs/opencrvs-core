@@ -102,10 +102,10 @@ export const getRoutes = () => {
     },
     {
       method: 'GET',
-      path: '/presigned-event-url/{fileUri}',
+      path: '/presigned-url/{fileUri*}',
       handler: async (req, h) => {
         return h.proxy({
-          uri: `${DOCUMENTS_URL}/presigned-event-url/${MINIO_BUCKET}/${req.params.fileUri}`,
+          uri: `${DOCUMENTS_URL}/presigned-url/${MINIO_BUCKET}/${req.params.fileUri}`,
           passThrough: true
         })
       }

@@ -28,7 +28,7 @@ const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   border-radius: 4px;
   ${({ theme }) => theme.fonts.bold14};
-  height: 40px;
+  height: 46px;
   text-transform: initial;
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -116,7 +116,7 @@ function SimpleDocumentUploaderComponent({
     return (
       <DocumentUploader
         disabled={Boolean(error)}
-        id="upload_document"
+        id={name}
         name={name}
         onChange={error ? undefined : handleFileChange}
       >
@@ -172,7 +172,7 @@ function SimpleDocumentUploaderComponent({
       {!file && (
         <DocumentUploader
           fullWidth={fullWidth}
-          id="upload_document"
+          id={name}
           name={name}
           onChange={handleFileChange}
         >
