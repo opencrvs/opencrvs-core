@@ -61,12 +61,6 @@ export function Pages({
     }
   }, [pageId, currentPage, formPages, onFormPageChange])
 
-  // If there are no fields in the page.
-  // Assumes form has always been setup with default form values
-  if (Object.keys(form).length === 0) {
-    return null
-  }
-
   return (
     <FormWizard
       currentPage={currentPage}

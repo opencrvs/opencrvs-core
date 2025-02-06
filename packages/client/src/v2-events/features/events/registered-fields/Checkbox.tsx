@@ -30,14 +30,15 @@ function CheckboxInput({
     <CheckboxComponent
       label={intl.formatMessage(label)}
       name={props.id}
-      selected={!!value}
+      selected={Boolean(value)}
       value={inputValue}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-        setFieldValue(props.id, event.target.value === 'true')
+        setFieldValue(props.id, event.target.value === 'false')
       }}
     />
   )
 }
+
 function CheckboxOutput({ value }: { value?: Stringifiable }) {
   return value === 'true' ? 'Yes' : 'No'
 }
