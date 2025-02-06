@@ -10,8 +10,11 @@
  */
 import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { TRPCProvider } from '@client/v2-events/trpc'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
+import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
+import { tennisClubMembershipEvent } from '@client/v2-events/features/events/fixtures'
 import { advancedSearchRouter } from './router'
 import AdvancedSearch from './AdvancedSearch'
 
@@ -27,6 +30,15 @@ const meta: Meta<typeof AdvancedSearch> = {
   ]
 }
 
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
+
 export default meta
 type Story = StoryObj<typeof AdvancedSearch>
 
@@ -36,6 +48,14 @@ export const AdvancedSearchStory: Story = {
       router: advancedSearchRouter,
       initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
     },
-    msw: {}
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          })
+        ]
+      }
+    }
   }
 }
