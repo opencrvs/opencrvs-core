@@ -60,7 +60,6 @@ const DocumentTypeRequiredError = {
 }
 
 export function DocumentUploaderWithOption({
-  onSingleFileChange,
   ...props
 }: Omit<
   ComponentProps<typeof SimpleDocumentUploader>,
@@ -68,7 +67,6 @@ export function DocumentUploaderWithOption({
 > & {
   value: FileFieldWithOptionValue
   onChange: (value?: FileFieldValueWithOption[]) => void
-  onSingleFileChange: (value?: FileFieldValue) => void
   options: SelectOption[]
   error?: boolean
   hideOnEmptyOption?: boolean
@@ -145,7 +143,11 @@ export function DocumentUploaderWithOption({
         fullWidth={true}
         label={intl.formatMessage(props.options[0].label)}
         value={props.value.length === 0 ? undefined : props.value[0]}
-        onChange={onSingleFileChange}
+        onChange={(file) => {
+          if (file) {
+            onChange([{ ...file, option: props.options[0].value }])
+          }
+        }}
       />
     )
   }

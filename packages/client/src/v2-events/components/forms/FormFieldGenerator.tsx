@@ -321,7 +321,6 @@ const GeneratedInputField = React.memo(
             {...inputProps}
             value={(value ?? []) as FileFieldWithOptionValue}
             onChange={handleFileWithOptionChange}
-            onSingleFileChange={handleFileChange}
             options={fieldDefinition.options}
           />
         </InputField>
