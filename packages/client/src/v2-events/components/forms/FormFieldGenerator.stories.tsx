@@ -36,7 +36,40 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-export const AddressField: StoryObj<typeof FormFieldGenerator> = {
+export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Address field - empty',
+  parameters: {
+    layout: 'centered'
+  },
+  render: function Component(args) {
+    const [formData, setFormData] = React.useState({})
+    return (
+      <StyledFormFieldGenerator
+        fields={[
+          {
+            id: 'storybook.address',
+            type: 'ADDRESS',
+            label: {
+              id: 'storybook.address.label',
+              defaultMessage: 'Address',
+              description: 'The title for the address input'
+            }
+          }
+        ]}
+        formData={formData}
+        id="my-form"
+        setAllFieldsDirty={false}
+        onChange={(data) => {
+          args.onChange(data)
+          setFormData(data)
+        }}
+      />
+    )
+  }
+}
+
+export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Address field - interaction',
   parameters: {
     layout: 'centered'
   },

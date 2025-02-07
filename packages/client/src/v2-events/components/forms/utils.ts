@@ -52,6 +52,7 @@ export function getConditionalActionsForField(
   if (!field.conditionals) {
     return []
   }
+
   return field.conditionals
     .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)

@@ -294,11 +294,15 @@ export function field(fieldId: string) {
         properties: {
           $form: {
             type: 'object',
-            not: {
-              type: 'object',
-              required: [fieldId]
+            properties: {
+              [fieldId]: {
+                type: 'string',
+                enum: ['undefined']
+              }
             },
-            required: ['$form']
+            not: {
+              required: [fieldId]
+            }
           }
         },
         required: ['$form']
