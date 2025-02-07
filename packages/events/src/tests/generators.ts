@@ -40,6 +40,19 @@ function mapTypeToMockValue(field: FieldConfig, i: number) {
     case 'RADIO_GROUP':
     case 'PARAGRAPH':
       return `${field.id}-${field.type}-${i}`
+    case 'ADDRESS':
+      return {
+        country: 'FAR',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'URBAN',
+        town: 'Example Town',
+        residentialArea: 'Example Residential Area',
+        street: 'Example Street',
+        number: '55',
+        zipCode: '123456',
+        village: 'Example Village'
+      }
     case 'DATE':
       return '2021-01-01'
     case 'CHECKBOX':

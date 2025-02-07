@@ -29,6 +29,7 @@ import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
   ActionFormData,
+  AddressFieldValue,
   CheckboxFieldValue,
   FieldConfig,
   FieldType,
@@ -64,6 +65,7 @@ import { SelectCountry } from '@client/v2-events/features/events/registered-fiel
 import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
+import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -232,6 +234,17 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
+    if (fieldDefinition.type === 'ADDRESS') {
+      return (
+        <InputField {...inputFieldProps}>
+          <Address
+            value={value as AddressFieldValue}
+            onChange={(val) => setFieldValue(fieldDefinition.id, val)}
+            {...fieldDefinition}
+          />
+        </InputField>
+      )
+    }
     if (fieldDefinition.type === 'SELECT') {
       return (
         <InputField {...inputFieldProps}>
@@ -285,6 +298,7 @@ const GeneratedInputField = React.memo(
             />
           </InputField>
         )
+
       return (
         <InputField {...inputFieldProps}>
           <Location
@@ -305,7 +319,7 @@ const GeneratedInputField = React.memo(
     if (fieldDefinition.type === 'DIVIDER') {
       return <Divider />
     }
-    throw new Error(`Unsupported field ${fieldDefinition}`)
+    throw new Error(`Unsupported field`)
   }
 )
 
@@ -334,7 +348,11 @@ interface ExposedProps {
   initialValues?: ActionFormData
 }
 
-type AllProps = ExposedProps & IntlShapeProps & FormikProps<ActionFormData>
+type AllProps = ExposedProps &
+  IntlShapeProps &
+  FormikProps<ActionFormData> & {
+    className?: string
+  }
 
 class FormSectionComponent extends React.Component<AllProps> {
   componentDidUpdate(prevProps: AllProps) {
@@ -449,6 +467,7 @@ class FormSectionComponent extends React.Component<AllProps> {
       setFieldTouched,
       touched,
       intl,
+      className,
       formData
     } = this.props
 
@@ -464,7 +483,7 @@ class FormSectionComponent extends React.Component<AllProps> {
     }))
 
     return (
-      <section>
+      <section className={className}>
         {fields.map((field) => {
           let error: string
           const fieldErrors = errors[field.id] && errors[field.id].errors

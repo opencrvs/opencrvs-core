@@ -12,6 +12,7 @@
 import {
   ActionInputWithType,
   ActionType,
+  AddressFieldValue,
   FieldConfig,
   FileFieldValue
 } from '@opencrvs/commons'
@@ -50,12 +51,19 @@ function mapTypeToZod(type: FieldConfig['type'], required?: boolean) {
     case 'FILE':
       schema = FileFieldValue
       break
+    case 'ADDRESS':
+      schema = AddressFieldValue
+      break
   }
 
   return required ? schema : schema.optional()
 }
 
-type InputField = typeof FileFieldValue | z.ZodString | z.ZodBoolean
+type InputField =
+  | typeof AddressFieldValue
+  | typeof FileFieldValue
+  | z.ZodString
+  | z.ZodBoolean
 
 type OptionalInputField = z.ZodOptional<InputField>
 function createValidationSchema(config: FieldConfig[]) {

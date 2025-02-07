@@ -21,7 +21,8 @@ import {
   validate,
   DateFieldValue,
   TextFieldValue,
-  RadioGroupFieldValue
+  RadioGroupFieldValue,
+  Inferred
 } from '@opencrvs/commons/client'
 import {
   CheckboxFieldValue,
@@ -92,7 +93,7 @@ export function evalExpressionInFieldDefinition(
 }
 
 export function hasInitialValueDependencyInfo(
-  value: BaseField['initialValue']
+  value: Inferred['initialValue']
 ): value is DependencyInfo {
   return typeof value === 'object' && 'dependsOn' in value
 }
@@ -117,6 +118,7 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.DATE]: INITIAL_DATE_VALUE,
   [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
   [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
+  [FieldType.ADDRESS]: {},
   [FieldType.FILE]: null,
   [FieldType.HIDDEN]: null,
   [FieldType.BULLET_LIST]: null,

@@ -26,6 +26,24 @@ export type PageHeaderFieldValue = z.infer<typeof PageHeaderFieldValue>
 const BulletListFieldValue = z.string()
 export type BulletListFieldValue = z.infer<typeof BulletListFieldValue>
 
+export const AddressFieldValue = z
+  .object({
+    country: z.string(),
+    province: z.string(),
+    district: z.string(),
+    urbanOrRural: z.string(),
+    town: z.string(),
+    residentialArea: z.string(),
+    street: z.string(),
+    number: z.string(),
+    zipCode: z.string(),
+    village: z.string()
+  })
+  .partial()
+  .nullable()
+
+export type AddressFieldValue = z.infer<typeof AddressFieldValue>
+
 export const FileFieldValue = z
   .object({
     filename: z.string(),
@@ -81,7 +99,8 @@ export const FieldValue = z.union([
   RadioGroupFieldValue,
   CheckboxFieldValue,
   LocationFieldValue,
-  SelectFieldValue
+  SelectFieldValue,
+  AddressFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>

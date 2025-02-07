@@ -15,7 +15,7 @@ import {
   EnableConditional,
   HideConditional,
   ShowConditional
-} from '../conditionals/conditionals'
+} from './Conditional'
 import {
   BulletListFieldValue,
   CheckboxFieldValue,
@@ -70,6 +70,7 @@ const BaseField = z.object({
 export type BaseField = z.infer<typeof BaseField>
 
 export const FieldType = {
+  ADDRESS: 'ADDRESS',
   TEXT: 'TEXT',
   DATE: 'DATE',
   PARAGRAPH: 'PARAGRAPH',
@@ -209,6 +210,11 @@ const Location = BaseField.extend({
   options: LocationOptions
 }).describe('Location input field')
 
+const Address = BaseField.extend({
+  type: z.literal(FieldType.ADDRESS),
+  initialValue: z.object({}).passthrough().optional()
+}).describe('Address input field – a combination of location and text fields')
+
 /*
  * This needs to be exported so that Typescript can refer to the type in
  * the declaration output type. If it can't do that, you might start encountering
@@ -217,6 +223,7 @@ const Location = BaseField.extend({
  */
 /** @knipignore */
 export type AllFields =
+  | typeof Address
   | typeof TextField
   | typeof DateField
   | typeof Paragraph
@@ -232,6 +239,7 @@ export type AllFields =
 
 /** @knipignore */
 export type Inferred =
+  | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof DateField>
   | z.infer<typeof Paragraph>
@@ -246,6 +254,7 @@ export type Inferred =
   | z.infer<typeof Divider>
 
 export const FieldConfig = z.discriminatedUnion('type', [
+  Address,
   TextField,
   DateField,
   Paragraph,
@@ -262,6 +271,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
+export type RadioField = z.infer<typeof RadioGroup>
 export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
