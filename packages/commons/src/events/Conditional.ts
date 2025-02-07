@@ -21,7 +21,7 @@ export function Conditional() {
   return z.custom<JSONSchema>((val) => typeof val === 'object' && val !== null)
 }
 
-export const ConditionalTypes = {
+const ConditionalTypes = {
   SHOW: 'SHOW',
   HIDE: 'HIDE',
   ENABLE: 'ENABLE'
