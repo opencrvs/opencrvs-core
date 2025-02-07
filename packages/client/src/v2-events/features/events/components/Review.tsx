@@ -12,13 +12,7 @@
 import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
-
-import { formatISO } from 'date-fns'
-import {
-  ActionFormData,
-  FieldConfig,
-  FormConfig
-} from '@opencrvs/commons/client'
+import { ActionFormData, FormConfig } from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
@@ -31,16 +25,8 @@ import {
 } from '@opencrvs/components'
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
-import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
-import {
-  getConditionalActionsForField,
-  isFormFieldVisible
-} from '@client/v2-events/components/forms/utils'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
-
-const Deleted = styled.del`
-  color: ${({ theme }) => theme.colors.negative};
-`
+import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import { Output } from './Output'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -171,70 +157,6 @@ const reviewMessages = defineMessages({
   }
 })
 
-interface Stringifiable {
-  toString(): string
-}
-
-const FIELD_TYPE_FORMATTERS: Partial<
-  Record<
-    FieldConfig['type'],
-    null | ((props: { value: Stringifiable }) => JSX.Element)
-  >
-> = {
-  FILE: FileOutput
-}
-
-function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
-  return <>{value.toString() || ''}</>
-}
-
-function Output({
-  field,
-  value,
-  previousValue,
-  showPreviouslyMissingValuesAsChanged = true
-}: {
-  field: FieldConfig
-  value: string
-  previousValue?: string
-  showPreviouslyMissingValuesAsChanged: boolean
-}) {
-  const ValueOutput = FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
-
-  if (!value) {
-    if (previousValue) {
-      return <ValueOutput value={previousValue} />
-    }
-
-    return ''
-  }
-
-  if (previousValue && previousValue !== value) {
-    return (
-      <>
-        <Deleted>
-          <ValueOutput value={previousValue} />
-        </Deleted>
-        <br />
-        <ValueOutput value={value} />
-      </>
-    )
-  }
-  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
-    return (
-      <>
-        <Deleted>
-          <ValueOutput value={'-'} />
-        </Deleted>
-        <br />
-        <ValueOutput value={value} />
-      </>
-    )
-  }
-
-  return <ValueOutput value={value} />
-}
-
 /**
  * Review component, used to display the "read" version of the form.
  * User can review the data and take actions like declare, reject or edit the data.
@@ -258,14 +180,8 @@ function ReviewComponent({
 }) {
   const intl = useIntl()
 
-  const { toString } = useTransformer(eventConfig.id)
-
-  const stringifiedForm = toString(form)
-
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
-  const stringifiedPreviousForm = previousFormValues
-    ? toString(previousFormValues)
-    : {}
+  const previousForm = previousFormValues ?? {}
 
   return (
     <Row>
@@ -314,18 +230,10 @@ function ReviewComponent({
                     >
                       <ListReview id={'Section_' + page.id}>
                         {page.fields
-                          .filter(
-                            (field) =>
-                              // Formatters can explicitly define themselves to be null
-                              // this means a value display row in not rendered at all
-                              // An example of this is FileInput, of which files we do not want to render in the value lists
-                              FIELD_TYPE_FORMATTERS[field.type] !== null
-                          )
                           .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
-                            const value = stringifiedForm[field.id]
-                            const previousValue =
-                              stringifiedPreviousForm[field.id]
+                            const value = form[field.id]
+                            const previousValue = previousForm[field.id]
 
                             const valueDisplay = (
                               <Output

@@ -11,10 +11,8 @@
 
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
-import { DATE, IFormFieldValue, PARAGRAPH, TEXT } from '@client/forms'
-import { DateField } from '@opencrvs/components/lib/DateField'
-import { Text } from '@opencrvs/components/lib/Text'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { TEXT } from '@client/forms'
+import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import * as React from 'react'
 
 import styled, { keyframes } from 'styled-components'
@@ -30,14 +28,22 @@ import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
   ActionFormData,
-  CheckboxFieldValue,
   FieldConfig,
   FieldType,
   FieldValue,
   FileFieldValue,
-  LocationFieldValue,
-  RadioGroupFieldValue,
-  SelectFieldValue
+  isBulletListFieldType,
+  isCheckboxFieldType,
+  isCountryFieldType,
+  isDateFieldType,
+  isDividerFieldType,
+  isFileFieldType,
+  isLocationFieldType,
+  isPageHeaderFieldType,
+  isParagraphFieldType,
+  isRadioGroupFieldType,
+  isSelectFieldType,
+  isTextFieldType
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -53,15 +59,20 @@ import {
   MessageDescriptor,
   useIntl
 } from 'react-intl'
-import { FileInput } from './inputs/FileInput/FileInput'
+import { File } from './inputs/FileInput/FileInput'
 
-import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
-import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
-import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
-import { Location } from '@client/v2-events/features/events/registered-fields/Location'
-import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
-import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import {
+  BulletList,
+  Checkbox,
+  Date as DateField,
+  RadioGroup,
+  Location,
+  LocationSearch,
+  Select,
+  SelectCountry,
+  Text
+} from '@client/v2-events/features/events/registered-fields'
+
 import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
@@ -79,8 +90,8 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-interface GeneratedInputFieldProps<FieldType extends FieldConfig> {
-  fieldDefinition: FieldType
+interface GeneratedInputFieldProps<T extends FieldConfig> {
+  fieldDefinition: T
   fields: FieldConfig[]
   values: ActionFormData
   setFieldValue: (name: string, value: FieldValue | undefined) => void
@@ -88,7 +99,7 @@ interface GeneratedInputFieldProps<FieldType extends FieldConfig> {
   onChange: (e: React.ChangeEvent) => void
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
-  value: IFormFieldValue
+  value: FieldValue
   touched: boolean
   error: string
   formData: ActionFormData
@@ -99,7 +110,7 @@ interface GeneratedInputFieldProps<FieldType extends FieldConfig> {
 }
 
 const GeneratedInputField = React.memo(
-  <FieldType extends FieldConfig>({
+  <T extends FieldConfig>({
     fieldDefinition,
     onChange,
     onBlur,
@@ -114,7 +125,7 @@ const GeneratedInputField = React.memo(
     requiredErrorMessage,
     fields,
     values
-  }: GeneratedInputFieldProps<FieldType>) => {
+  }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
 
     const inputFieldProps = {
@@ -156,21 +167,32 @@ const GeneratedInputField = React.memo(
       [fieldDefinition.id, setFieldValue]
     )
 
-    if (fieldDefinition.type === DATE) {
+    /**
+     * Combines the field definition with the current value and input field props
+     * USED FOR: rendering the correct input field based on the FieldConfig guards
+     */
+    const field = {
+      inputFieldProps,
+      config: fieldDefinition,
+      value
+    }
+
+    if (isDateFieldType(field)) {
       return (
-        <InputField {...inputFieldProps}>
-          <DateField
+        <InputField {...field.inputFieldProps}>
+          <DateField.Input
             {...inputProps}
-            value={value as string}
+            value={field.value}
             onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
           />
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'PAGE_HEADER') {
+    if (isPageHeaderFieldType(field)) {
       return <SubHeader>{intl.formatMessage(fieldDefinition.label)}</SubHeader>
     }
-    if (fieldDefinition.type === PARAGRAPH) {
+
+    if (isParagraphFieldType(field)) {
       const label = fieldDefinition.label as unknown as MessageDescriptor & {
         values: Record<string, string>
       }
@@ -178,47 +200,48 @@ const GeneratedInputField = React.memo(
 
       const message = intl.formatMessage(label, {
         ...values,
-        [fieldDefinition.id]: value as any
+        [fieldDefinition.id]: field.value
       })
 
       return (
-        <Text
+        <TextComponent
           element="p"
-          variant={fieldDefinition.options.fontVariant ?? 'reg16'}
+          variant={field.config.configuration?.styles?.fontVariant ?? 'reg16'}
         >
           <span dangerouslySetInnerHTML={{ __html: message }} />
-        </Text>
+        </TextComponent>
       )
     }
 
-    if (fieldDefinition.type === TEXT) {
+    if (isTextFieldType(field)) {
       return (
         <InputField
           {...inputFieldProps}
           prefix={
-            fieldDefinition.options?.prefix &&
-            intl.formatMessage(fieldDefinition.options?.prefix)
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration?.prefix)
           }
           postfix={
-            fieldDefinition.options?.postfix &&
-            intl.formatMessage(fieldDefinition.options?.postfix)
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration?.postfix)
           }
         >
-          <TextInput
-            type={fieldDefinition.options?.type ?? 'text'}
+          <Text.Input
+            type={field.config.configuration?.type ?? 'text'}
             {...inputProps}
             isDisabled={disabled}
-            maxLength={fieldDefinition.options?.maxLength}
-            value={inputProps.value as string}
+            maxLength={field.config.configuration?.maxLength}
+            value={field.value}
           />
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'FILE') {
+
+    if (isFileFieldType(field)) {
       const value = formData[fieldDefinition.id] as FileFieldValue
       return (
         <InputField {...inputFieldProps}>
-          <FileInput
+          <File.Input
             {...inputProps}
             value={value}
             onChange={handleFileChange}
@@ -226,76 +249,76 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'BULLET_LIST') {
+    if (isBulletListFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <BulletList {...fieldDefinition} />
+          <BulletList {...field.config} />
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'SELECT') {
+    if (isSelectFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <Select
-            {...fieldDefinition}
-            value={inputProps.value as SelectFieldValue}
+          <Select.Input
+            {...field.config}
+            value={field.value}
             onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
           />
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'COUNTRY') {
+    if (isCountryFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <SelectCountry
-            {...fieldDefinition}
-            value={inputProps.value as SelectFieldValue}
+          <SelectCountry.Input
+            {...field.config}
+            value={field.value}
             setFieldValue={setFieldValue}
           />
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'CHECKBOX') {
+    if (isCheckboxFieldType(field)) {
       return (
-        <Checkbox
-          {...fieldDefinition}
-          value={value as CheckboxFieldValue}
+        <Checkbox.Input
+          {...field.config}
+          value={field.value}
           setFieldValue={setFieldValue}
         />
       )
     }
-    if (fieldDefinition.type === 'RADIO_GROUP') {
+    if (isRadioGroupFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <RadioGroup
-            {...fieldDefinition}
-            value={value as RadioGroupFieldValue}
+          <RadioGroup.Input
+            {...field.config}
+            value={field.value}
             setFieldValue={setFieldValue}
           />
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'LOCATION') {
-      if (fieldDefinition.options.type === 'HEALTH_FACILITY')
+    if (isLocationFieldType(field)) {
+      if (field.config.options.type === 'HEALTH_FACILITY')
         return (
           <InputField {...inputFieldProps}>
-            <LocationSearch
-              {...fieldDefinition}
-              value={value as LocationFieldValue}
+            <LocationSearch.Input
+              {...field.config}
+              value={field.value}
               setFieldValue={setFieldValue}
             />
           </InputField>
         )
       return (
         <InputField {...inputFieldProps}>
-          <Location
-            {...fieldDefinition}
-            value={value as LocationFieldValue}
+          <Location.Input
+            {...field.config}
+            value={field.value}
             setFieldValue={setFieldValue}
             partOf={
-              (fieldDefinition.options?.partOf?.$data &&
+              (field.config.options?.partOf?.$data &&
                 (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                  fieldDefinition.options?.partOf.$data
+                  field.config.options?.partOf.$data
                 ] as string | undefined | null)) ??
               null
             }
@@ -303,10 +326,11 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    if (fieldDefinition.type === 'DIVIDER') {
+    if (isDividerFieldType(field)) {
       return <Divider />
     }
-    throw new Error(`Unsupported field ${fieldDefinition}`)
+
+    throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
   }
 )
 

@@ -25,8 +25,7 @@ import {
   REGISTRATION_AGENT_DEFAULT_SCOPES,
   setScopes,
   REGISTRAR_DEFAULT_SCOPES,
-  TestComponentWithRouteMock,
-  flushPromises
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'

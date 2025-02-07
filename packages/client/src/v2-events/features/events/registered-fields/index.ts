@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './TextField'
-export * from './DateField'
-export * from './Paragraph'
+export * from './BulletList'
+export * from './Checkbox'
+export * from './Date'
+export * from './Location'
+export * from './LocationSearch'
 export * from './RadioGroup'
+export * from './Select'
+export * from './SelectCountry'
+export * from './Text'

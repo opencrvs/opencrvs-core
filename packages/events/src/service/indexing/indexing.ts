@@ -14,7 +14,8 @@ import {
   EventDocument,
   EventIndex,
   FieldConfig,
-  getCurrentEventState
+  getCurrentEventState,
+  mapFieldTypeToElasticsearch
 } from '@opencrvs/commons/events'
 import { type estypes } from '@elastic/elasticsearch'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -110,43 +111,6 @@ export async function createIndex(
   })
 }
 
-function getElasticsearchMappingForType(field: FieldConfig) {
-  switch (field.type) {
-    case 'DATE':
-      // @TODO: This should be changed back to 'date'
-      // When we have proper validation of custom fields.
-      return { type: 'text' }
-    case 'TEXT':
-    case 'PARAGRAPH':
-    case 'BULLET_LIST':
-    case 'PAGE_HEADER':
-      return { type: 'text' }
-    case 'DIVIDER':
-    case 'RADIO_GROUP':
-    case 'SELECT':
-    case 'COUNTRY':
-    case 'CHECKBOX':
-    case 'LOCATION':
-      return { type: 'keyword' }
-    case 'FILE':
-      return {
-        type: 'object',
-        properties: {
-          filename: { type: 'keyword' },
-          originalFilename: { type: 'keyword' },
-          type: { type: 'keyword' }
-        }
-      }
-
-    default:
-      assertNever()
-  }
-}
-
-function assertNever(): never {
-  throw new Error('Should never happen')
-}
-
 const SEPARATOR = '____'
 
 export function encodeFieldId(fieldId: string) {
@@ -161,7 +125,7 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
   return fields.reduce((acc, field) => {
     return {
       ...acc,
-      [encodeFieldId(field.id)]: getElasticsearchMappingForType(field)
+      [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
     }
   }, {})
 }

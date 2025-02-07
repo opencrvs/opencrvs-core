@@ -13,7 +13,9 @@ import {
   ActionInputWithType,
   ActionType,
   FieldConfig,
-  FileFieldValue
+  FieldValueSchema,
+  mapFieldTypeToZod,
+  OptionalFieldValueSchema
 } from '@opencrvs/commons'
 
 import { z } from 'zod'
@@ -26,43 +28,11 @@ type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
 }
 
-function mapTypeToZod(type: FieldConfig['type'], required?: boolean) {
-  let schema
-  switch (type) {
-    case 'DIVIDER':
-    case 'TEXT':
-    case 'BULLET_LIST':
-    case 'PAGE_HEADER':
-    case 'LOCATION':
-    case 'SELECT':
-    case 'COUNTRY':
-    case 'RADIO_GROUP':
-    case 'PARAGRAPH':
-      schema = z.string()
-      break
-    case 'DATE':
-      // YYYY-MM-DD
-      schema = z.string().date()
-      break
-    case 'CHECKBOX':
-      schema = z.boolean()
-      break
-    case 'FILE':
-      schema = FileFieldValue
-      break
-  }
-
-  return required ? schema : schema.optional()
-}
-
-type InputField = typeof FileFieldValue | z.ZodString | z.ZodBoolean
-
-type OptionalInputField = z.ZodOptional<InputField>
 function createValidationSchema(config: FieldConfig[]) {
-  const shape: Record<string, InputField | OptionalInputField> = {}
+  const shape: Record<string, FieldValueSchema | OptionalFieldValueSchema> = {}
 
   for (const field of config) {
-    shape[field.id] = mapTypeToZod(field.type, field.required)
+    shape[field.id] = mapFieldTypeToZod(field.type, field.required)
   }
 
   return z.object(shape)
