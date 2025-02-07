@@ -59,7 +59,7 @@ function addInitialValue(initialValues: AddressField['initialValue']) {
   }
 }
 
-export function AddressInput(props: Props) {
+function AddressInput(props: Props) {
   const { onChange, initialValue = {}, value = {}, ...otherProps } = props
 
   let fields: Array<FieldConfigWithoutAddress> = [

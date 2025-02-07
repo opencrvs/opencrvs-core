@@ -41,12 +41,3 @@ export const EnableConditional = z.object({
   type: z.literal(ConditionalTypes.ENABLE),
   conditional: Conditional()
 })
-
-export const ConditionalOperation = z.discriminatedUnion('type', [
-  ShowConditional,
-  HideConditional,
-  EnableConditional
-])
-
-export type ConditionalTypes =
-  (typeof ConditionalTypes)[keyof typeof ConditionalTypes]
