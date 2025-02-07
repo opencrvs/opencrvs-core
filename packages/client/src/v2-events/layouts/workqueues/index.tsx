@@ -23,6 +23,7 @@ import {
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
+import { ProfileMenu } from '@client/components/ProfileMenu'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -59,6 +60,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               />
             </Stack>
           }
+          desktopRight={<ProfileMenu key="profileMenu" />}
         />
       }
       skipToContentText="skip"

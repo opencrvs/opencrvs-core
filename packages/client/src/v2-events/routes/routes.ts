@@ -15,7 +15,7 @@ import { routes as workqueueRoutes } from '@client/v2-events/features/workqueues
 
 export const ROUTES = {
   V2: route(
-    'v2',
+    window.config.FEATURES.V2_EVENTS ? '' : 'v2',
     {},
     {
       EVENTS: route(
@@ -62,6 +62,24 @@ export const ROUTES = {
           VALIDATE: route('validate/:eventId', {
             params: { eventId: string().defined() }
           }),
+          PRINT_CERTIFICATE: route(
+            'print-certificate/:eventId',
+            {
+              params: { eventId: string().defined() }
+            },
+            {
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
+                searchParams: {
+                  from: string()
+                },
+                hash: hashValues()
+              }),
+              REVIEW: route('review', {
+                searchParams: { templateId: string() }
+              })
+            }
+          ),
           REQUEST_CORRECTION: correctionRoutes
         }
       ),

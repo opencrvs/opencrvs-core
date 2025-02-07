@@ -28,7 +28,7 @@ const messages = defineMessages({
   title: {
     defaultMessage: 'Correct Record',
     description: 'Label for correct record button in dropdown menu',
-    id: 'action.correct'
+    id: 'v2.action.correct'
   }
 })
 
@@ -95,7 +95,6 @@ export function AdditionalDetails() {
         title={intl.formatMessage(messages.title)}
       >
         <PagesComponent
-          eventId={event.id}
           // @TODO: Use subscription if needed
           form={correctionRequestData.getFormValues()}
           formPages={formPages}

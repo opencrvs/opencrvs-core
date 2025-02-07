@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './ActionConfig'
+export * from './offline'
 export * from './EventConfig'
 export * from './EventConfigInput'
 export * from './FieldConfig'
@@ -28,3 +29,5 @@ export * from './utils'
 export * from './defineConfig'
 export * from './DeduplicationConfig'
 export * from './transactions'
+export * from './User'
+export * from '../conditionals/conditionals'
