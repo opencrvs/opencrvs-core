@@ -10,9 +10,11 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
+import { fn, expect } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
+import { within, userEvent } from '@storybook/testing-library'
+import * as selectEvent from 'react-select-event'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from './FormFieldGenerator'
 
@@ -37,6 +39,45 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 export const AddressField: StoryObj<typeof FormFieldGenerator> = {
   parameters: {
     layout: 'centered'
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Admin structure dropdowns are shown gradually as the inputs are filled',
+      async () => {
+        // Verify that `District` select is not visible initially
+        await expect(
+          await canvas.queryByTestId('location__district')
+        ).toBeNull()
+
+        // Select a province
+        const province = await canvas.findByTestId('location__province')
+        await userEvent.click(province)
+        await selectEvent.select(province, 'Central')
+
+        // Verify that `District` becomes visible
+        const district = await canvas.findByTestId('location__district')
+        await expect(district).toBeInTheDocument()
+
+        // Select a district
+        await userEvent.click(district)
+        await selectEvent.select(district, 'Ibombo')
+      }
+    )
+
+    await step(
+      'Selecting "Rural" for address details type hides detailed street information',
+      async () => {
+        // Click on the "RURAL" radio option
+        const ruralRadio = await canvas.findByTestId('radio-option__RURAL')
+        await userEvent.click(ruralRadio)
+
+        // Verify that the "village" input appears
+        const villageInput = await canvas.findByTestId('text__village')
+        await expect(villageInput).toBeInTheDocument()
+      }
+    )
   },
   render: function Component(args) {
     const [formData, setFormData] = React.useState({})

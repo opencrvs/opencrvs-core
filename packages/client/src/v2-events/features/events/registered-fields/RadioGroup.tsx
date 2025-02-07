@@ -39,6 +39,7 @@ function RadioGroupInput({
 
   return (
     <RadioGroupComponent
+      data-testid={props.id}
       name={props.id}
       options={formattedOptions}
       size={

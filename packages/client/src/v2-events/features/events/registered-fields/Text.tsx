@@ -28,6 +28,7 @@ function TextInput({
     <TextInputComponent
       type={type ?? 'text'}
       {...props}
+      data-testid={`text__${props.id}`}
       isDisabled={disabled}
       maxLength={maxLength}
       value={inputValue}
