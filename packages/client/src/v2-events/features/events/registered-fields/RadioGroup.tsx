@@ -10,43 +10,63 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { RadioGroupFieldValue, FieldProps } from '@opencrvs/commons/client'
+import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import {
   RadioGroup as RadioGroupComponent,
   RadioSize
 } from '@opencrvs/components'
+import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
-export const INITIAL_RADIO_GROUP_VALUE = ''
-
-export function RadioGroup({
+function RadioGroupInput({
   setFieldValue,
   value,
   options,
-  optionValues,
+  configuration,
   ...props
 }: FieldProps<'RADIO_GROUP'> & {
-  setFieldValue: (name: string, val: RadioGroupFieldValue | undefined) => void
+  setFieldValue: (name: string, val: string | undefined) => void
   value?: string
 }) {
   const intl = useIntl()
 
-  const radioOptions = optionValues.map((option) => ({
-    ...option,
+  const selectedOption = options.find((option) => option.value === value)
+  const formattedOptions = options.map((option: SelectOption) => ({
+    value: option.value,
     label: intl.formatMessage(option.label)
   }))
+
+  const inputValue = selectedOption?.value ?? ''
 
   return (
     <RadioGroupComponent
       name={props.id}
-      options={radioOptions}
+      options={formattedOptions}
       size={
-        options && options.size === 'NORMAL'
+        configuration?.styles?.size === 'NORMAL'
           ? RadioSize.NORMAL
           : RadioSize.LARGE
       }
-      value={value ?? INITIAL_RADIO_GROUP_VALUE}
+      value={inputValue}
       onChange={(val: string) => setFieldValue(props.id, val)}
       {...props}
     />
   )
+}
+
+function RadioGroupOutput({
+  value,
+  options
+}: {
+  value: Stringifiable
+  options: SelectOption[]
+}) {
+  const intl = useIntl()
+  const selectedOption = options.find((option) => option.value === value)
+
+  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+}
+
+export const RadioGroup = {
+  Input: RadioGroupInput,
+  Output: RadioGroupOutput
 }

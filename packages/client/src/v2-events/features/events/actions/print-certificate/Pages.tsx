@@ -53,6 +53,7 @@ export function Pages() {
   const certTemplateFieldConfig =
     useCertificateTemplateSelectorFieldConfig(event)
   const currentState = getCurrentEventState(event)
+
   const { setFormValues, getFormValues } = useEventFormData()
   const form = getFormValues(eventId)
 
@@ -132,7 +133,7 @@ export function Pages() {
                 label={intl.formatMessage(certTemplateFieldConfig.label)}
                 touched={false}
               >
-                <Select
+                <Select.Input
                   required
                   id={certTemplateFieldConfig.id}
                   label={certTemplateFieldConfig.label}

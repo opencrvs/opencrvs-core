@@ -25,7 +25,7 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
-import { FileInput } from './FileInput'
+import { File } from './FileInput'
 
 const UploadWrapper = styled.div`
   width: 100%;
@@ -136,7 +136,7 @@ export function DocumentUploaderWithOption({
 
   if (props.options.length === 1) {
     return (
-      <FileInput
+      <File.Input
         {...props}
         fullWidth={true}
         label={intl.formatMessage(props.options[0].label)}
@@ -176,7 +176,7 @@ export function DocumentUploaderWithOption({
       />
 
       <Flex>
-        <Select
+        <Select.Input
           id={props.name}
           options={remainingOptions}
           type={'SELECT'}

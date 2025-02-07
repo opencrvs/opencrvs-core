@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod'
-import { ActionType } from './ActionConfig'
+import { ActionType } from './ActionType'
 import { FieldValue } from './FieldValue'
 
 const BaseActionInput = z.object({
