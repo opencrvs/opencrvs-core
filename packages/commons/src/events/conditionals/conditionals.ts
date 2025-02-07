@@ -10,9 +10,9 @@
  */
 
 import { z } from 'zod'
-import { EventDocument } from '../events/EventDocument'
-import { ActionFormData } from '../events/ActionDocument'
-import { ITokenPayload } from '../authentication'
+import { EventDocument } from '../EventDocument'
+import { ActionFormData } from '../ActionDocument'
+import { ITokenPayload } from '../../authentication'
 
 /** @knipignore */
 export type JSONSchema = {

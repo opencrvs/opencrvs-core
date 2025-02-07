@@ -12,10 +12,9 @@ import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   BaseField,
-  ConditionalParameters,
   FieldConfig,
   FieldValue,
-  validate
+  getConditionalActionsForField
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 
@@ -41,19 +40,6 @@ export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
       representation: 'date'
     })
   }).every((fieldAction) => fieldAction !== 'HIDE')
-}
-
-export function getConditionalActionsForField(
-  field: FieldConfig,
-  values: ConditionalParameters
-) {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (!field.conditionals) {
-    return []
-  }
-  return field.conditionals
-    .filter((conditional) => validate(conditional.conditional, values))
-    .map((conditional) => conditional.type)
 }
 
 export function evalExpressionInFieldDefinition(

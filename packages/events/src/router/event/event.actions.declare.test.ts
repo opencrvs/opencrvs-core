@@ -26,3 +26,61 @@ test('Validation error message contains all the offending fields', async () => {
 
   await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
 })
+
+test('Allows passing fields that are conditionally removed', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const data = generator.event.actions.declare(event.id, {
+    data: {
+      'applicant.dob': '02-1-2024',
+      'applicant.firstname': 'John',
+      'applicant.surname': 'Doe',
+      'recommender.none': false
+    }
+  })
+
+  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+})
+
+test('discards required fields if they are conditionally hidden', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const data = generator.event.actions.declare(event.id, {
+    data: {
+      'applicant.dob': '2024-02-01',
+      'applicant.firstname': 'John',
+      'applicant.surname': 'Doe',
+      'recommender.none': false
+    }
+  })
+
+  const response = await client.event.actions.declare(data)
+  expect(response).toMatchSnapshot()
+})
+
+test('Prevents adding birth date in future', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const data = generator.event.actions.declare(event.id, {
+    data: {
+      'applicant.dob': '2040-02-01',
+      'applicant.firstname': 'John',
+      'applicant.surname': 'Doe',
+      'recommender.none': false
+    }
+  })
+
+  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+})

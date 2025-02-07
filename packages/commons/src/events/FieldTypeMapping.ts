@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
+import { z } from 'zod'
 import {
   BulletList,
   Checkbox,
@@ -81,37 +81,6 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
   }
 
   return required ? schema : schema.optional()
-}
-
-/**
- * Form error message definitions for Zod validation errors.
- * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
- */
-export const zodTranslatioConfigErrorMap = (
-  issue: ZodIssueOptionalMessage,
-  _ctx: ErrorMapCtx
-) => {
-  if (issue.code === 'too_small' && issue.type === 'string') {
-    return {
-      message: {
-        message: {
-          defaultMessage: 'Required for registration',
-          description: 'This is the error message for required fields',
-          id: 'v2.error.required'
-        }
-      }
-    }
-  }
-
-  return {
-    message: {
-      message: {
-        defaultMessage: 'Required for registration',
-        description: 'This is the error message for required fields',
-        id: 'v2.error.required'
-      }
-    }
-  }
 }
 
 export function createValidationSchema(config: FieldConfig[]) {

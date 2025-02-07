@@ -13,7 +13,7 @@ import {
   EnableConditional,
   HideConditional,
   ShowConditional
-} from '../conditionals/conditionals'
+} from './conditionals/conditionals'
 import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'

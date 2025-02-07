@@ -15,7 +15,7 @@ import {
   EnableConditional,
   HideConditional,
   ShowConditional
-} from '../conditionals/conditionals'
+} from './conditionals/conditionals'
 import { FieldType } from './FieldType'
 
 const FieldId = z.string()
