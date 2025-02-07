@@ -12,9 +12,11 @@ import { MessageDescriptor } from 'react-intl'
 import { formatISO } from 'date-fns'
 import {
   ConditionalParameters,
-  defineConditional,
   FieldConfig,
-  validate
+  FieldValue,
+  mapFieldTypeToZod,
+  validate,
+  zodTranslatioConfigErrorMap
 } from '@opencrvs/commons/client'
 import { ActionFormData } from '@opencrvs/commons'
 import { IValidationResult } from '@client/utils/validate'
@@ -66,42 +68,12 @@ function getValidationErrors(
     }
   }
 
-  const validators = field.validation ? field.validation : []
+  const fieldValidationResult = validateField(
+    { ...field, required: field.required && !checkValidationErrorsOnly },
+    values[field.id]
+  )
 
-  if (field.required && !checkValidationErrorsOnly) {
-    validators.push({
-      message: {
-        defaultMessage: 'Required for registration',
-        description: 'This is the error message for required fields',
-        id: 'v2.error.required'
-      },
-      validator: defineConditional({
-        type: 'object',
-        properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [field.id]: {
-                type: 'string',
-                minLength: 1
-              }
-            },
-            required: [field.id]
-          }
-        },
-        required: ['$form']
-      })
-    })
-  }
-  //  else if (isFieldButton(field)) {
-  //   const { trigger } = field.options
-  //   validators.push(httpErrorResponseValidator(trigger))
-  // } else if (field.validateEmpty) {
-  // } else if (!value && value !== 0) {
-  //   validators = []
-  // }
-
-  const validationResults = validators
+  const customValidationResults = (field.validation ?? [])
     .filter((validation) => {
       return !validate(validation.validator, {
         $form: values,
@@ -111,9 +83,11 @@ function getValidationErrors(
     .map((validation) => ({ message: validation.message }))
 
   return {
-    errors: validationResults
+    // Assumes that custom validation errors are more important than field validation errors
+    errors: [...customValidationResults, ...fieldValidationResult]
   }
 }
+
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: ActionFormData,
@@ -137,4 +111,22 @@ export function getValidationErrorsForForm(
           },
     {}
   )
+}
+/**
+ * Validates primitive fields defined by the FieldConfig type.
+ */
+function validateField(field: FieldConfig, value: FieldValue) {
+  const error = mapFieldTypeToZod(field.type, field.required)
+    .safeParse(value, {
+      // ConfigErrorMap defines the error messages for the validation errors
+      errorMap: zodTranslatioConfigErrorMap
+    })
+    .error?.format()
+
+  if (!error) {
+    return []
+  }
+
+  // We have overridden the standard error messages in zodTranslatioConfigErrorMap
+  return error._errors as unknown as { message: MessageDescriptor }[]
 }
