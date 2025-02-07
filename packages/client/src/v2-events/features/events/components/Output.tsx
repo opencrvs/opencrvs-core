@@ -25,10 +25,10 @@ import {
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
-  isTextFieldType
+  isTextFieldType,
+  isAddressFieldType
 } from '@opencrvs/commons/client'
 
-import { isAddressFieldType } from '@opencrvs/commons'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
   Address,
