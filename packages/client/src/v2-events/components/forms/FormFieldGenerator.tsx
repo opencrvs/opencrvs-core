@@ -21,7 +21,8 @@ import {
   getConditionalActionsForField,
   getDependentFields,
   handleInitialValue,
-  hasInitialValueDependencyInfo
+  hasInitialValueDependencyInfo,
+  makeDatesFormatted
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 
@@ -486,6 +487,7 @@ class FormSectionComponent extends React.Component<AllProps> {
       ...field,
       id: field.id.replaceAll('.', FIELD_SEPARATOR)
     }))
+    const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
 
     return (
       <section>
@@ -501,7 +503,9 @@ class FormSectionComponent extends React.Component<AllProps> {
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
             {
-              $form: makeFormikFieldIdsOpenCRVSCompatible(values),
+              $form: makeFormikFieldIdsOpenCRVSCompatible(
+                valuesWithFormattedDate
+              ),
               $now: formatISO(new Date(), { representation: 'date' })
             }
           )
@@ -554,7 +558,7 @@ class FormSectionComponent extends React.Component<AllProps> {
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-const FIELD_SEPARATOR = '____'
+export const FIELD_SEPARATOR = '____'
 function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
@@ -593,7 +597,9 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
-          makeFormikFieldIdsOpenCRVSCompatible(values),
+          makeFormikFieldIdsOpenCRVSCompatible(
+            makeDatesFormatted(props.fields, values)
+          ),
           props.requiredErrorMessage
         )
       }
