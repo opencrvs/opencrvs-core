@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { ActionType } from '../events'
 import { ITokenPayload } from '../authentication'
-import { ActionDocument, ActionFormData } from '../events/ActionDocument'
+import { ActionFormData } from '../events/ActionDocument'
 import { EventDocument } from '../events/EventDocument'
 
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
@@ -102,7 +103,7 @@ export function userHasScope(scope: string): AjvJSONSchema {
   }
 }
 
-export function eventHasAction(type: ActionDocument['type']): AjvJSONSchema {
+export function eventHasAction(type: ActionType): AjvJSONSchema {
   return {
     type: 'object',
     properties: {
@@ -139,22 +140,38 @@ export function eventHasAction(type: ActionDocument['type']): AjvJSONSchema {
   }
 }
 
-export type FieldConditionalAPI = {
-  inArray: (values: string[]) => FieldConditionalAPI
-  isBeforeNow: () => FieldConditionalAPI
-  isEqualTo: (value: string | boolean) => FieldConditionalAPI
-  isUndefined: () => FieldConditionalAPI
+type DateBoundary = {
+  now: () => FieldAPI
+  date: (
+    // date should be in yyyy-mm-dd format
+    date: `${number}${number}${number}${number}-${number}${number}-${number}${number}`
+  ) => FieldAPI
+  days: (days: number) => {
+    inPast: () => FieldAPI
+    inFuture: () => FieldAPI
+  }
+}
+
+export type FieldAPI = {
+  inArray: (values: string[]) => FieldAPI
+  /**
+   * Checks if the date is within `days` days in the past from now.
+   */
+  isBefore: () => DateBoundary
+  isAfter: () => DateBoundary
+  isEqualTo: (value: string | boolean) => FieldAPI
+  isUndefined: () => FieldAPI
   not: {
-    inArray: (values: string[]) => FieldConditionalAPI
-    equalTo: (value: string | boolean) => FieldConditionalAPI
+    isBefore: () => DateBoundary
+    isAfter: () => DateBoundary
+    inArray: (values: string[]) => FieldAPI
+    equalTo: (value: string | boolean) => FieldAPI
   }
   /**
    * joins multiple conditions with OR instead of AND.
    * @example field('fieldId').or((field) => field.isUndefined().not.inArray(['value1', 'value2'])).apply()
    */
-  or: (
-    callback: (field: FieldConditionalAPI) => FieldConditionalAPI
-  ) => FieldConditionalAPI
+  or: (callback: (field: FieldAPI) => FieldAPI) => FieldAPI
   /**
    *  @private
    *  @returns array of conditions. Used internally by methods that consolidate multiple conditions into one.
@@ -171,7 +188,7 @@ export type FieldConditionalAPI = {
  * Generate conditional rules for a field.
  * @param fieldId - The field ID conditions are being applied to
  *
- * @returns @see FieldConditionalAPI
+ * @returns @see FieldAPI
  */
 export function field(fieldId: string) {
   const conditions: AjvJSONSchema[] = []
@@ -181,29 +198,76 @@ export function field(fieldId: string) {
     return api
   }
 
-  const api: FieldConditionalAPI = {
-    isBeforeNow: () =>
-      addCondition({
+  const getDateFromNow = (days: number) =>
+    new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0]
+
+  const getDateRange = (
+    date: string,
+    clause: 'formatMinimum' | 'formatMaximum'
+  ) => ({
+    type: 'object',
+    properties: {
+      $form: {
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                format: 'date',
-                formatMaximum: { $data: '2/$now' }
-              }
-            },
-            required: [fieldId]
-          },
-          $now: {
+          [fieldId]: {
             type: 'string',
-            format: 'date'
+            format: 'date',
+            [clause]: date
           }
         },
-        required: ['$form', '$now']
+        required: [fieldId]
+      }
+    },
+    required: ['$form']
+  })
+
+  const getNegativeDateRange = (
+    date: string,
+    clause: 'formatMinimum' | 'formatMaximum'
+  ) => ({
+    type: 'object',
+    properties: {
+      $form: {
+        type: 'object',
+        properties: {
+          [fieldId]: {
+            type: 'string',
+            not: {
+              format: 'date',
+              [clause]: date
+            }
+          }
+        },
+        required: [fieldId]
+      }
+    },
+    required: ['$form']
+  })
+
+  const api: FieldAPI = {
+    isAfter: () => ({
+      days: (days: number) => ({
+        inPast: () =>
+          addCondition(getDateRange(getDateFromNow(days), 'formatMinimum')),
+        inFuture: () =>
+          addCondition(getDateRange(getDateFromNow(-days), 'formatMinimum'))
       }),
+      date: (date: string) => addCondition(getDateRange(date, 'formatMinimum')),
+      now: () => addCondition(getDateRange(getDateFromNow(0), 'formatMinimum'))
+    }),
+    isBefore: () => ({
+      days: (days: number) => ({
+        inPast: () =>
+          addCondition(getDateRange(getDateFromNow(days), 'formatMaximum')),
+        inFuture: () =>
+          addCondition(getDateRange(getDateFromNow(-days), 'formatMaximum'))
+      }),
+      date: (date: string) => addCondition(getDateRange(date, 'formatMaximum')),
+      now: () => addCondition(getDateRange(getDateFromNow(0), 'formatMaximum'))
+    }),
     isEqualTo: (value: string | boolean) =>
       addCondition({
         type: 'object',
@@ -215,7 +279,8 @@ export function field(fieldId: string) {
                 oneOf: [
                   { type: 'string', const: value },
                   { type: 'boolean', const: value }
-                ]
+                ],
+                const: value
               }
             },
             required: [fieldId]
@@ -229,15 +294,11 @@ export function field(fieldId: string) {
         properties: {
           $form: {
             type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                enum: ['undefined']
-              }
-            },
             not: {
+              type: 'object',
               required: [fieldId]
-            }
+            },
+            required: ['$form']
           }
         },
         required: ['$form']
@@ -260,6 +321,38 @@ export function field(fieldId: string) {
         required: ['$form']
       }),
     not: {
+      isAfter: () => ({
+        days: (days: number) => ({
+          inPast: () =>
+            addCondition(
+              getNegativeDateRange(getDateFromNow(days), 'formatMinimum')
+            ),
+          inFuture: () =>
+            addCondition(
+              getNegativeDateRange(getDateFromNow(-days), 'formatMinimum')
+            )
+        }),
+        date: (date: string) =>
+          addCondition(getNegativeDateRange(date, 'formatMinimum')),
+        now: () =>
+          addCondition(getNegativeDateRange(getDateFromNow(0), 'formatMinimum'))
+      }),
+      isBefore: () => ({
+        days: (days: number) => ({
+          inPast: () =>
+            addCondition(
+              getNegativeDateRange(getDateFromNow(days), 'formatMaximum')
+            ),
+          inFuture: () =>
+            addCondition(
+              getNegativeDateRange(getDateFromNow(-days), 'formatMaximum')
+            )
+        }),
+        date: (date: string) =>
+          addCondition(getNegativeDateRange(date, 'formatMaximum')),
+        now: () =>
+          addCondition(getNegativeDateRange(getDateFromNow(0), 'formatMaximum'))
+      }),
       inArray: (values: string[]) =>
         addCondition({
           type: 'object',
@@ -287,7 +380,10 @@ export function field(fieldId: string) {
               type: 'object',
               properties: {
                 [fieldId]: {
-                  type: 'string',
+                  oneOf: [
+                    { type: 'string', const: value },
+                    { type: 'boolean', const: value }
+                  ],
                   not: {
                     const: value
                   }
@@ -299,7 +395,7 @@ export function field(fieldId: string) {
           required: ['$form']
         })
     },
-    or: (callback: (field: FieldConditionalAPI) => FieldConditionalAPI) => {
+    or: (callback: (field: FieldAPI) => FieldAPI) => {
       const nestedConditions = callback(field(fieldId))._apply()
 
       return addCondition(ensureWrapper(nestedConditions, 'or'))
