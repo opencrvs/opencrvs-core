@@ -21,7 +21,7 @@ function SelectInput({
 }: FieldProps<'SELECT'> & {
   onChange: (newValue: string) => void
   value?: string
-}) {
+} & { 'data-testid'?: string }) {
   const intl = useIntl()
   const { options } = props
   const selectedOption = options.find((option) => option.value === value)
@@ -31,9 +31,9 @@ function SelectInput({
   }))
 
   const inputValue = selectedOption?.value ?? ''
-
   return (
     <SelectComponent
+      {...props}
       options={formattedOptions}
       value={inputValue}
       onChange={onChange}

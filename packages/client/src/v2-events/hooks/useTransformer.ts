@@ -40,6 +40,10 @@ export const useTransformer = (eventType: string) => {
         continue
       }
 
+      if (fieldConfig.type === FieldType.ADDRESS) {
+        continue
+      }
+
       // @TODO: Extend this if we need to modify the value based on the field type
       stringifiedValues[key] = defaultTo(value.toString(), '')
     }

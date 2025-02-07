@@ -28,10 +28,13 @@ import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
   ActionFormData,
+  AddressFieldValue,
+  CheckboxFieldValue,
   FieldConfig,
   FieldType,
   FieldValue,
   FileFieldValue,
+  isAddressFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
   isCountryFieldType,
@@ -76,6 +79,7 @@ import {
 import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
+import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -256,6 +260,17 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
+    if (isAddressFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Address.Input
+            value={field.value}
+            onChange={(val) => setFieldValue(fieldDefinition.id, val)}
+            {...field.config}
+          />
+        </InputField>
+      )
+    }
     if (isSelectFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
@@ -309,6 +324,7 @@ const GeneratedInputField = React.memo(
             />
           </InputField>
         )
+
       return (
         <InputField {...inputFieldProps}>
           <Location.Input
@@ -359,7 +375,11 @@ interface ExposedProps {
   initialValues?: ActionFormData
 }
 
-type AllProps = ExposedProps & IntlShapeProps & FormikProps<ActionFormData>
+type AllProps = ExposedProps &
+  IntlShapeProps &
+  FormikProps<ActionFormData> & {
+    className?: string
+  }
 
 class FormSectionComponent extends React.Component<AllProps> {
   componentDidUpdate(prevProps: AllProps) {
@@ -474,6 +494,7 @@ class FormSectionComponent extends React.Component<AllProps> {
       setFieldTouched,
       touched,
       intl,
+      className,
       formData
     } = this.props
 
@@ -490,7 +511,7 @@ class FormSectionComponent extends React.Component<AllProps> {
     const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
 
     return (
-      <section>
+      <section className={className}>
         {fields.map((field) => {
           let error: string
           const fieldErrors = errors[field.id] && errors[field.id].errors

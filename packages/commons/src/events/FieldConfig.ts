@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { TranslationConfig } from './TranslationConfig'
 import {
   Conditional,
   EnableConditional,
   HideConditional,
   ShowConditional
-} from '../conditionals/conditionals'
+} from './Conditional'
+import { TranslationConfig } from './TranslationConfig'
+
 import { FieldType } from './FieldType'
 
 const FieldId = z.string()
@@ -191,6 +192,11 @@ const Location = BaseField.extend({
 
 export type Location = z.infer<typeof Location>
 
+const Address = BaseField.extend({
+  type: z.literal(FieldType.ADDRESS),
+  initialValue: z.object({}).passthrough().optional()
+}).describe('Address input field – a combination of location and text fields')
+
 /*
  * This needs to be exported so that Typescript can refer to the type in
  * the declaration output type. If it can't do that, you might start encountering
@@ -199,6 +205,7 @@ export type Location = z.infer<typeof Location>
  */
 /** @knipignore */
 export type AllFields =
+  | typeof Address
   | typeof TextField
   | typeof DateField
   | typeof Paragraph
@@ -214,6 +221,7 @@ export type AllFields =
 
 /** @knipignore */
 export type Inferred =
+  | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof DateField>
   | z.infer<typeof Paragraph>
@@ -228,6 +236,7 @@ export type Inferred =
   | z.infer<typeof Divider>
 
 export const FieldConfig = z.discriminatedUnion('type', [
+  Address,
   TextField,
   DateField,
   Paragraph,
@@ -244,6 +253,8 @@ export const FieldConfig = z.discriminatedUnion('type', [
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
+export type RadioField = z.infer<typeof RadioGroup>
+export type AddressField = z.infer<typeof Address>
 export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>

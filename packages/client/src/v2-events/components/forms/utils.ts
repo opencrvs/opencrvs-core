@@ -11,10 +11,10 @@
 import { formatISO } from 'date-fns'
 import {
   ActionFormData,
-  BaseField,
   ConditionalParameters,
   FieldConfig,
   FieldValue,
+  Inferred,
   validate
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
@@ -52,6 +52,7 @@ export function getConditionalActionsForField(
   if (!field.conditionals) {
     return []
   }
+
   return field.conditionals
     .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)
@@ -69,7 +70,7 @@ export function evalExpressionInFieldDefinition(
 }
 
 export function hasInitialValueDependencyInfo(
-  value: BaseField['initialValue']
+  value: Inferred['initialValue']
 ): value is DependencyInfo {
   return typeof value === 'object' && 'dependsOn' in value
 }
