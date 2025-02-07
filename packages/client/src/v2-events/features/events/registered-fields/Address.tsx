@@ -8,14 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   ActionFormData,
+  AddressField,
   AddressFieldValue,
   defineConditional,
   field,
   FieldConfig,
   FieldProps,
+  FieldType,
   trueConstant
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -38,6 +40,26 @@ function hide(
     })
   }
 }
+
+function addInitialValue(initialValues: AddressField['initialValue']) {
+  if (!initialValues) {
+    return (fieldConfig: FieldConfigWithoutAddress) => fieldConfig
+  }
+
+  return (fieldConfig: FieldConfigWithoutAddress) => {
+    if (!initialValues[fieldConfig.id]) {
+      return fieldConfig
+    }
+
+    return {
+      ...fieldConfig,
+      initialValue: initialValues[
+        fieldConfig.id
+      ] as FieldConfigWithoutAddress['initialValue']
+    }
+  }
+}
+
 export function Address(props: Props) {
   const { onChange, initialValue = {}, value = {}, ...otherProps } = props
 
@@ -45,10 +67,7 @@ export function Address(props: Props) {
     ...ADMIN_STRUCTURE,
     ...URBAN_FIELDS,
     ...RURAL_FIELDS.map(hide)
-  ].map((fieldConfig) => ({
-    ...fieldConfig,
-    initialValue: initialValue[fieldConfig.id] as string | undefined
-  }))
+  ]
 
   if (!value?.district) {
     fields = [
@@ -65,7 +84,7 @@ export function Address(props: Props) {
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={fields}
+      fields={fields.map(addInitialValue(initialValue))}
       formData={value || {}}
       setAllFieldsDirty={false}
       onChange={onChange}
@@ -193,7 +212,7 @@ const ADMIN_STRUCTURE = [
     type: 'LOCATION',
     options: {
       partOf: {
-        $data: 'address.province'
+        $data: 'province'
       },
       type: 'ADMIN_STRUCTURE'
     }
