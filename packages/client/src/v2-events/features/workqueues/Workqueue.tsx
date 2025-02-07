@@ -38,7 +38,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 import { formattedDuration } from '@client/utils/date-formatting'
-import { getInitialValues } from '@client/v2-events/components/forms/utils'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
@@ -184,7 +184,9 @@ function Workqueue({
         return event.status
       }
 
-      const initialValues = getInitialValues(getAllFields(eventConfig))
+      const allPropertiesWithEmptyValues = setEmptyValuesForFields(
+        getAllFields(eventConfig)
+      )
 
       const eventWorkqueue = getOrThrow(
         eventConfig.workqueues.find((wq) => wq.id === workqueueConfig.id),
@@ -196,7 +198,7 @@ function Workqueue({
           (acc, field) => ({
             ...acc,
             [field.column]: flattenedIntl.formatMessage(field.label, {
-              ...initialValues,
+              ...allPropertiesWithEmptyValues,
               ...event
             })
           }),

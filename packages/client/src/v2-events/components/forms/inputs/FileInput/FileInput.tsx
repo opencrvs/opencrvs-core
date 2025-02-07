@@ -14,7 +14,7 @@ import { FileFieldValue } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 
-export function FileInput(
+function FileInput(
   props: Omit<
     ComponentProps<typeof SimpleDocumentUploader>,
     'onComplete' | 'label' | 'error'
@@ -71,4 +71,9 @@ export function FileInput(
   )
 }
 
-export const FileOutput = null
+const FileOutput = null
+
+export const File = {
+  Input: FileInput,
+  Output: FileOutput
+}

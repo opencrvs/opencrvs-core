@@ -9,52 +9,52 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
-import {
-  FieldProps,
-  SelectFieldValue,
-  SelectOption
-} from '@opencrvs/commons/client'
+import { useIntl } from 'react-intl'
+import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
 
-export function Select({
+function SelectInput({
   onChange,
   label,
   value,
   ...props
 }: FieldProps<'SELECT'> & {
-  onChange: (newValue: SelectFieldValue) => void
-  value?: SelectFieldValue
+  onChange: (newValue: string) => void
+  value?: string
 }) {
   const intl = useIntl()
   const { options } = props
-
+  const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
     label: intl.formatMessage(option.label)
   }))
 
+  const inputValue = selectedOption?.value ?? ''
+
   return (
     <SelectComponent
       options={formattedOptions}
-      value={value ?? ''}
+      value={inputValue}
       onChange={onChange}
     />
   )
 }
 
-export const selectFieldToString = (
-  val: SelectFieldValue,
-  options: SelectOption[] | undefined | null,
-  intl: IntlShape
-) => {
-  if (!val) {
-    return ''
-  }
-  if (!options) {
-    return typeof val === 'string' ? val : ''
-  }
+function SelectOutput({
+  value,
+  options
+}: {
+  value: string | undefined
+  options: SelectOption[]
+}) {
+  const intl = useIntl()
+  const selectedOption = options.find((option) => option.value === value)
 
-  const selectedOption = options.find(({ value }) => value === val)
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+}
+
+export const Select = {
+  Input: SelectInput,
+  Output: SelectOutput
 }

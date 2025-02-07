@@ -10,7 +10,8 @@
  */
 
 import { z } from 'zod'
-import { ActionFormData, EventDocument } from '../events'
+import { EventDocument } from '../events/EventDocument'
+import { ActionFormData } from '../events/ActionDocument'
 import { ITokenPayload } from '../authentication'
 
 /** @knipignore */
