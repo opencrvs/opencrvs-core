@@ -150,7 +150,7 @@ export const isPageHeaderFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: string; config: PageHeader } => {
-  return field.config.type === FieldType.DATE
+  return field.config.type === FieldType.PAGE_HEADER
 }
 
 export const isTextFieldType = (field: {
