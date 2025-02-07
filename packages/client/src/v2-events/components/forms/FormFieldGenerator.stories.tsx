@@ -43,13 +43,13 @@ export const AddressField: StoryObj<typeof FormFieldGenerator> = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
+    await canvas.findByText(/Address/)
+
     await step(
       'Admin structure dropdowns are shown gradually as the inputs are filled',
       async () => {
         // Verify that `District` select is not visible initially
-        await expect(
-          await canvas.queryByTestId('location__district')
-        ).toBeNull()
+        await expect(canvas.queryByTestId('location__district')).toBeNull()
 
         // Select a province
         const province = await canvas.findByTestId('location__province')
