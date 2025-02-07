@@ -115,11 +115,11 @@ export function eventHasAction(type: ActionType): AjvJSONSchema {
 export type FieldAPI = {
   inArray: (values: string[]) => FieldAPI
   isBeforeNow: () => FieldAPI
-  isEqualTo: (value: string) => FieldAPI
+  isEqualTo: (value: string | boolean) => FieldAPI
   isUndefined: () => FieldAPI
   not: {
     inArray: (values: string[]) => FieldAPI
-    equalTo: (value: string) => FieldAPI
+    equalTo: (value: string | boolean) => FieldAPI
   }
   /**
    * joins multiple conditions with OR instead of AND.
@@ -175,7 +175,7 @@ export function field(fieldId: string) {
         },
         required: ['$form', '$now']
       }),
-    isEqualTo: (value: string) =>
+    isEqualTo: (value: string | boolean) =>
       addCondition({
         type: 'object',
         properties: {
@@ -183,7 +183,10 @@ export function field(fieldId: string) {
             type: 'object',
             properties: {
               [fieldId]: {
-                type: 'string',
+                oneOf: [
+                  { type: 'string', const: value },
+                  { type: 'boolean', const: value }
+                ],
                 const: value
               }
             },
@@ -244,7 +247,7 @@ export function field(fieldId: string) {
           },
           required: ['$form']
         }),
-      equalTo: (value: string) =>
+      equalTo: (value: string | boolean) =>
         addCondition({
           type: 'object',
           properties: {
@@ -252,7 +255,10 @@ export function field(fieldId: string) {
               type: 'object',
               properties: {
                 [fieldId]: {
-                  type: 'string',
+                  oneOf: [
+                    { type: 'string', const: value },
+                    { type: 'boolean', const: value }
+                  ],
                   not: {
                     const: value
                   }
