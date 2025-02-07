@@ -35,8 +35,6 @@ import {
   FileFieldValue,
   TextValue
 } from './FieldValue'
-import { type estypes } from '@elastic/elasticsearch'
-
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
  * File is separated from FieldType and FieldConfig to avoid circular dependencies.
@@ -83,57 +81,6 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
   }
 
   return required ? schema : schema.optional()
-}
-
-export function mapFieldTypeToElasticsearch(field: FieldConfig) {
-  switch (field.type) {
-    case FieldType.DATE:
-      // @TODO: This should be changed back to 'date'
-      // When we have proper validation of custom fields.
-      return { type: 'text' }
-    case FieldType.TEXT:
-    case FieldType.PARAGRAPH:
-    case FieldType.BULLET_LIST:
-    case FieldType.PAGE_HEADER:
-      return { type: 'text' }
-    case FieldType.DIVIDER:
-    case FieldType.RADIO_GROUP:
-    case FieldType.SELECT:
-    case FieldType.COUNTRY:
-    case FieldType.CHECKBOX:
-    case FieldType.LOCATION:
-      return { type: 'keyword' }
-    case FieldType.ADDRESS:
-      const addressProperties = {
-        country: { type: 'keyword' },
-        province: { type: 'keyword' },
-        district: { type: 'keyword' },
-        urbanOrRural: { type: 'keyword' },
-        town: { type: 'keyword' },
-        residentialArea: { type: 'keyword' },
-        street: { type: 'keyword' },
-        number: { type: 'keyword' },
-        zipCode: { type: 'keyword' },
-        village: { type: 'keyword' }
-      } satisfies {
-        [K in keyof Required<
-          NonNullable<AddressFieldValue>
-        >]: estypes.MappingProperty
-      }
-      return {
-        type: 'object',
-        properties: addressProperties
-      }
-    case FieldType.FILE:
-      return {
-        type: 'object',
-        properties: {
-          filename: { type: 'keyword' },
-          originalFilename: { type: 'keyword' },
-          type: { type: 'keyword' }
-        }
-      }
-  }
 }
 
 /**
