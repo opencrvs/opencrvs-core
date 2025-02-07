@@ -17,7 +17,7 @@ import {
   field,
   FieldConfig,
   FieldProps,
-  trueConstant
+  alwaysTrue
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
@@ -35,7 +35,7 @@ function hide(
     ...fieldConfig,
     conditionals: (fieldConfig.conditionals || []).concat({
       type: 'HIDE',
-      conditional: defineConditional(trueConstant())
+      conditional: defineConditional(alwaysTrue())
     })
   }
 }
@@ -58,7 +58,14 @@ function addInitialValue(initialValues: AddressField['initialValue']) {
     }
   }
 }
-
+/**
+ * AddressInput is a form component for capturing address details based on administrative structure.
+ *
+ * - The form dynamically adjusts the fields displayed based on user input.
+ * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
+ * - All admin structure fields are hidden until the previous field is selected.
+ * - Address details fields are only shown when district is selected (it being the last admin structure field).
+ */
 function AddressInput(props: Props) {
   const { onChange, initialValue = {}, value = {}, ...otherProps } = props
 

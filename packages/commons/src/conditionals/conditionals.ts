@@ -48,7 +48,12 @@ type AjvJSONSchema = AjvJSONSchemaType<
   UnionToIntersection<ConditionalParameters>
 >
 
-export function trueConstant(): AjvJSONSchema {
+/**
+ * Returns an empty JSON Schema object, which is treated as always valid.
+ *
+ * @returns {AjvJSONSchema} An empty schema object `{}` that always evaluates to true.
+ */
+export function alwaysTrue(): AjvJSONSchema {
   return {}
 }
 
