@@ -24,16 +24,16 @@ function CheckboxInput({
   value?: boolean
 }) {
   const intl = useIntl()
-  const inputValue = value ? 'true' : 'false'
+  const inputValue = !!value ? 'true' : 'false'
 
   return (
     <CheckboxComponent
       label={intl.formatMessage(label)}
       name={props.id}
-      selected={Boolean(value)}
+      selected={inputValue === 'true'}
       value={inputValue}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-        setFieldValue(props.id, event.target.value === 'false')
+        setFieldValue(props.id, event.target.value === 'true' ? false : true)
       }}
     />
   )
