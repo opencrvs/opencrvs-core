@@ -58,7 +58,8 @@ import {
   ID_READER,
   Ii18nIDReaderFormField,
   QRReaderType,
-  ReaderType
+  ReaderType,
+  SELECT_WITH_DYNAMIC_OPTIONS
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -444,19 +445,43 @@ export const getFieldOptionsSlow = (
   }
 }
 
+export const getFieldOptions = (
+  _sectionName: string,
+  field:
+    | ISelectFormFieldWithOptions
+    | ISelectFormFieldWithDynamicOptions
+    | IDocumentUploaderWithOptionsFormField,
+  values: IFormSectionData,
+  offlineCountryConfig: IOfflineData,
+  declaration?: IFormData
+) => {
+  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS) {
+    return getMemoisedFieldOptions(
+      _sectionName,
+      field,
+      values,
+      offlineCountryConfig
+    )
+  }
+
+  return getFieldOptionsSlow(
+    _sectionName,
+    field,
+    values,
+    offlineCountryConfig,
+    declaration
+  )
+}
+
 /** Due to the large location trees with dependencies, generating options for them can be slow. We fix this by memoizing the options */
-export const getFieldOptions = memoize(
+const getMemoisedFieldOptions = memoize(
   getFieldOptionsSlow,
   (sectionName, field, values) => {
-    if (
-      field.type === SELECT_WITH_OPTIONS ||
-      field.type === DOCUMENT_UPLOADER_WITH_OPTION
-    ) {
-      return `field:${sectionName}.${field.name}`
-    }
-
-    const dependencyVal = values[field.dynamicOptions.dependency!] as string
-    return `field:${sectionName}.${field.name},dependency:${field.dynamicOptions.dependency},dependencyValue:${dependencyVal}`
+    const dynamicField = field as ISelectFormFieldWithDynamicOptions
+    const dependencyVal = values[
+      dynamicField.dynamicOptions.dependency!
+    ] as string
+    return `field:${sectionName}.${field.name},dependency:${dynamicField.dynamicOptions.dependency},dependencyValue:${dependencyVal}`
   }
 )
 
