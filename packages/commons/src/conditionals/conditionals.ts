@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionDocument, ActionFormData, EventDocument } from '../events'
 import { ITokenPayload } from '../authentication'
+import { ActionDocument, ActionFormData } from '../events/ActionDocument'
+import { EventDocument } from '../events/EventDocument'
 
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 
@@ -136,11 +137,11 @@ export function eventHasAction(type: ActionDocument['type']): AjvJSONSchema {
 export type FieldConditionalAPI = {
   inArray: (values: string[]) => FieldConditionalAPI
   isBeforeNow: () => FieldConditionalAPI
-  isEqualTo: (value: string) => FieldConditionalAPI
+  isEqualTo: (value: string | boolean) => FieldConditionalAPI
   isUndefined: () => FieldConditionalAPI
   not: {
     inArray: (values: string[]) => FieldConditionalAPI
-    equalTo: (value: string) => FieldConditionalAPI
+    equalTo: (value: string | boolean) => FieldConditionalAPI
   }
   /**
    * joins multiple conditions with OR instead of AND.
@@ -198,7 +199,7 @@ export function field(fieldId: string) {
         },
         required: ['$form', '$now']
       }),
-    isEqualTo: (value: string) =>
+    isEqualTo: (value: string | boolean) =>
       addCondition({
         type: 'object',
         properties: {
@@ -206,8 +207,10 @@ export function field(fieldId: string) {
             type: 'object',
             properties: {
               [fieldId]: {
-                type: 'string',
-                const: value
+                oneOf: [
+                  { type: 'string', const: value },
+                  { type: 'boolean', const: value }
+                ]
               }
             },
             required: [fieldId]
@@ -271,7 +274,7 @@ export function field(fieldId: string) {
           },
           required: ['$form']
         }),
-      equalTo: (value: string) =>
+      equalTo: (value: string | boolean) =>
         addCondition({
           type: 'object',
           properties: {

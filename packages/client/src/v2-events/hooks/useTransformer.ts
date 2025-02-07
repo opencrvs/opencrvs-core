@@ -9,23 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
+import { defaultTo } from 'lodash'
 import {
   ActionFormData,
   findPageFields,
   FieldType
 } from '@opencrvs/commons/client'
-import { fieldValueToString } from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-// eslint-disable-next-line no-restricted-imports
-import { getLocations } from '@client/offline/selectors'
 
+/**
+ *
+ * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
+ */
 export const useTransformer = (eventType: string) => {
-  const intl = useIntl()
-
-  const locations = useSelector(getLocations)
-
   const { eventConfiguration } = useEventConfiguration(eventType)
 
   const fields = findPageFields(eventConfiguration)
@@ -44,14 +40,18 @@ export const useTransformer = (eventType: string) => {
         continue
       }
 
-      stringifiedValues[key] = fieldValueToString({
-        fieldConfig,
-        value,
-        intl,
-        locations
-      })
+      if (fieldConfig.type === FieldType.ADDRESS) {
+        continue
+      }
+
+      // @TODO: Extend this if we need to modify the value based on the field type
+      stringifiedValues[key] = defaultTo(value.toString(), '')
     }
+
     return stringifiedValues
   }
-  return { toString }
+
+  return {
+    toString
+  }
 }

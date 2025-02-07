@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export interface User {
+export type User = {
   id: string
   name: { use: string; given: string[]; family: string }[]
   role: string

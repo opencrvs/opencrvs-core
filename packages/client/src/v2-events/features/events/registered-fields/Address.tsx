@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useMemo } from 'react'
+import React from 'react'
 import {
   ActionFormData,
   AddressField,
@@ -17,7 +17,6 @@ import {
   field,
   FieldConfig,
   FieldProps,
-  FieldType,
   trueConstant
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -60,7 +59,7 @@ function addInitialValue(initialValues: AddressField['initialValue']) {
   }
 }
 
-export function Address(props: Props) {
+export function AddressInput(props: Props) {
   const { onChange, initialValue = {}, value = {}, ...otherProps } = props
 
   let fields: Array<FieldConfigWithoutAddress> = [
@@ -234,7 +233,7 @@ const ADMIN_STRUCTURE = [
     hideLabel: true,
     type: 'RADIO_GROUP',
     initialValue: 'URBAN',
-    optionValues: [
+    options: [
       {
         value: 'URBAN',
         label: {
@@ -252,15 +251,17 @@ const ADMIN_STRUCTURE = [
         }
       }
     ],
-    options: {
-      size: 'NORMAL'
-    },
-    flexDirection: 'row'
+    configuration: {
+      styles: { size: 'NORMAL' }
+    }
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-const ALL_FIELDS = [
-  ...ADMIN_STRUCTURE,
-  ...URBAN_FIELDS,
-  ...RURAL_FIELDS
-] as const satisfies FieldConfigWithoutAddress[]
+function AddressOutput({ value }: { value?: AddressFieldValue }) {
+  return 'NOT IMPLEMENTED YET'
+}
+
+export const Address = {
+  Input: AddressInput,
+  Output: AddressOutput
+}

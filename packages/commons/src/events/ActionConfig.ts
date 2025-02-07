@@ -16,6 +16,7 @@ import {
 } from './Conditional'
 import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { ActionType } from './ActionType'
 
 const ActionConditional = z.discriminatedUnion('type', [
   // Action can be shown / hidden
@@ -31,28 +32,6 @@ export const ActionConfigBase = z.object({
   draft: z.boolean().optional(),
   forms: z.array(FormConfig)
 })
-
-/**
- * Actions recognized by the system
- */
-export const ActionType = {
-  CREATE: 'CREATE',
-  ASSIGN: 'ASSIGN',
-  UNASSIGN: 'UNASSIGN',
-  REGISTER: 'REGISTER',
-  VALIDATE: 'VALIDATE',
-  REQUEST_CORRECTION: 'REQUEST_CORRECTION',
-  REJECT_CORRECTION: 'REJECT_CORRECTION',
-  APPROVE_CORRECTION: 'APPROVE_CORRECTION',
-  DETECT_DUPLICATE: 'DETECT_DUPLICATE',
-  NOTIFY: 'NOTIFY',
-  DECLARE: 'DECLARE',
-  DELETE: 'DELETE',
-  PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
-  CUSTOM: 'CUSTOM'
-} as const
-
-export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
 const CreateConfig = ActionConfigBase.merge(
   z.object({

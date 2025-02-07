@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 import { FieldValue } from './FieldValue'
+import { ActionType } from './ActionType'
 
 const ActionBase = z.object({
   id: z.string(),
