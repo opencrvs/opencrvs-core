@@ -46,7 +46,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
+import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
 
 function shouldBeShownAsAValue(field: FieldConfig) {
@@ -103,26 +103,46 @@ export function Summary() {
   const events = useEvents()
   const [event] = events.getEvent.useSuspenseQuery(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { toString } = useTransformer(eventConfiguration.id)
   const previousFormValues = getCurrentEventState(event).data
   const getFormValues = useEventFormData((state) => state.getFormValues)
+  const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues(eventId)
-  const formConfig = eventConfiguration.actions
-    .find((action) => action.type === ActionType.REQUEST_CORRECTION)
-    ?.forms.find(({ active }) => active)
+  const actionConfig = eventConfiguration.actions.find(
+    (action) => action.type === ActionType.REQUEST_CORRECTION
+  )
 
-  if (!formConfig) {
+  if (!actionConfig) {
     throw new Error(
-      `No form configuration found for ${ActionType.REQUEST_CORRECTION} found. This should never happen`
+      `No action configuration found for ${ActionType.REQUEST_CORRECTION} found. This should never happen`
     )
   }
 
-  const stringifiedForm = toString(form)
-  const stringifiedPreviousForm = toString(previousFormValues)
+  const formConfig = actionConfig.forms.find(({ active }) => active)
+
+  if (!formConfig) {
+    throw new Error(
+      `No active form found for ${ActionType.REQUEST_CORRECTION}. This should never happen`
+    )
+  }
+
+  const allFields = [
+    ...formConfig.pages.flatMap((page) => page.fields),
+    ...actionConfig.onboardingForm.flatMap((page) => page.fields),
+    ...actionConfig.additionalDetailsForm.flatMap((page) => page.fields)
+  ]
+
+  const stringifiedForm = stringifyFormData(allFields, form)
+  const stringifiedPreviousForm = stringifyFormData(
+    allFields,
+    previousFormValues
+  )
 
   const correctionRequestData = useCorrectionRequestData()
-  const stringiedRequestData = toString(correctionRequestData.getFormValues())
+  const stringiedRequestData = stringifyFormData(
+    allFields,
+    correctionRequestData.getFormValues()
+  )
 
   const onboardingFormPages =
     eventConfiguration.actions.find(

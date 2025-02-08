@@ -14,18 +14,32 @@ import { MessageDescriptor, useIntl } from 'react-intl'
 
 const INTERNAL_SEPARATOR = '___'
 
+interface RecursiveStringRecord {
+  [key: string]: string | RecursiveStringRecord
+}
 /**
  * Replaces dots with triple underscores in the object keys.
  * This is needed to support dot notation in the message variables.
  */
-function convertDotToTripleUnderscore<T extends {}>(
-  obj: T
-): Dictionary<T[keyof T]> {
-  const keysWithUnderscores = mapKeys(obj, (_, key) => {
-    return key.replace(/\./g, INTERNAL_SEPARATOR)
-  })
+function convertDotToTripleUnderscore(
+  obj: RecursiveStringRecord,
+  parentKey = ''
+): RecursiveStringRecord {
+  const result: Record<string, string> = {}
 
-  return keysWithUnderscores
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey =
+      (parentKey ? parentKey + INTERNAL_SEPARATOR : '') +
+      key.replace(/\./g, INTERNAL_SEPARATOR)
+
+    if (typeof value === 'object') {
+      Object.assign(result, convertDotToTripleUnderscore(value, newKey))
+    } else {
+      result[newKey] = value
+    }
+  }
+
+  return result
 }
 
 /**
@@ -51,6 +65,7 @@ export function useIntlFormatMessageWithFlattenedParams() {
 
   function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
     const variables = convertDotToTripleUnderscore(params ?? {})
+    console.log({ variables })
 
     return (
       intl
