@@ -19,7 +19,6 @@ import { AppRouter } from '../src/v2-events/trpc'
 import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventIndex
-  // tennisClubMembershipEventIndex
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 

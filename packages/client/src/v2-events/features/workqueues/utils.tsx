@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Dictionary, mapKeys } from 'lodash'
 import { MessageDescriptor, useIntl } from 'react-intl'
 
 const INTERNAL_SEPARATOR = '___'
@@ -24,7 +23,7 @@ interface RecursiveStringRecord {
 function convertDotToTripleUnderscore(
   obj: RecursiveStringRecord,
   parentKey = ''
-): RecursiveStringRecord {
+) {
   const result: Record<string, string> = {}
 
   for (const [key, value] of Object.entries(obj)) {
@@ -65,7 +64,6 @@ export function useIntlFormatMessageWithFlattenedParams() {
 
   function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
     const variables = convertDotToTripleUnderscore(params ?? {})
-    console.log({ variables })
 
     return (
       intl
