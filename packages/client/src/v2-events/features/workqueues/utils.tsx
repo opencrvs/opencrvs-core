@@ -10,28 +10,23 @@
  */
 
 import { MessageDescriptor, useIntl } from 'react-intl'
-
+import { PrimitiveType } from 'intl-messageformat'
+import { ActionFormData } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
-interface RecursiveStringRecord {
-  [key: string]: string | RecursiveStringRecord
-}
 /**
  * Replaces dots with triple underscores in the object keys.
  * This is needed to support dot notation in the message variables.
  */
-function convertDotToTripleUnderscore(
-  obj: RecursiveStringRecord,
-  parentKey = ''
-) {
-  const result: Record<string, string> = {}
+function convertDotToTripleUnderscore(obj: ActionFormData, parentKey = '') {
+  const result: Record<string, PrimitiveType> = {}
 
   for (const [key, value] of Object.entries(obj)) {
     const newKey =
       (parentKey ? parentKey + INTERNAL_SEPARATOR : '') +
       key.replace(/\./g, INTERNAL_SEPARATOR)
 
-    if (typeof value === 'object') {
+    if (typeof value === 'object' && value !== null) {
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {
       result[newKey] = value
