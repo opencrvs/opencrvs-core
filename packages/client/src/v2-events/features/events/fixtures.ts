@@ -115,7 +115,7 @@ const DEFAULT_FORM = {
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: false
+                        const: true
                       }
                     },
                     required: ['recommender.none']
@@ -145,7 +145,7 @@ const DEFAULT_FORM = {
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: false
+                        const: true
                       }
                     },
                     required: ['recommender.none']
@@ -175,7 +175,7 @@ const DEFAULT_FORM = {
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: false
+                        const: true
                       }
                     },
                     required: ['recommender.none']
