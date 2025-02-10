@@ -10,6 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { ActionType } from '@opencrvs/commons'
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
@@ -46,24 +47,29 @@ test('Allows passing fields that are conditionally removed', async () => {
   await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
 })
 
-test('discards required fields if they are conditionally hidden', async () => {
+test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
   event.id
 
+  const form = {
+    'applicant.dob': '2024-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': false
+  }
+
   const data = generator.event.actions.declare(event.id, {
-    data: {
-      'applicant.dob': '2024-02-01',
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
-      'recommender.none': false
-    }
+    data: form
   })
 
   const response = await client.event.actions.declare(data)
-  expect(response).toMatchSnapshot()
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.DECLARE
+  )
+  expect(savedAction?.data).toEqual(form)
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -73,14 +79,16 @@ test('Prevents adding birth date in future', async () => {
   const event = await client.event.create(generator.event.create())
   event.id
 
-  const data = generator.event.actions.declare(event.id, {
-    data: {
-      'applicant.dob': '2040-02-01',
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
-      'recommender.none': false
-    }
+  const form = {
+    'applicant.dob': '2040-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': false
+  }
+
+  const payload = generator.event.actions.declare(event.id, {
+    data: form
   })
 
-  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+  await expect(client.event.actions.declare(payload)).rejects.matchSnapshot()
 })

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConditional, defineConfig, defineForm } from '../events'
+import { defineConditional, defineConfig, defineForm, field } from '../events'
 
 const TENNIS_CLUB_FORM = defineForm({
   label: {
@@ -68,6 +68,16 @@ const TENNIS_CLUB_FORM = defineForm({
           type: 'DATE',
           required: true,
           conditionals: [],
+          validation: [
+            {
+              message: {
+                defaultMessage: 'Please enter a valid date',
+                description: 'This is the error message for invalid date',
+                id: 'v2.event.birth.action.declare.form.section.child.field.dob.error'
+              },
+              validator: field('applicant.dob').isBefore().now().apply()
+            }
+          ],
           label: {
             defaultMessage: "Applicant's date of birth",
             description: 'This is the label for the field',

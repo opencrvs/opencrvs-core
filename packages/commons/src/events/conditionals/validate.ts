@@ -71,18 +71,6 @@ const zodToIntlErrorMap = (
   issue: ZodIssueOptionalMessage,
   _ctx: ErrorMapCtx
 ) => {
-  if (issue.code === 'too_small' && issue.type === 'string') {
-    return {
-      message: {
-        message: {
-          defaultMessage: 'Required for registration',
-          description: 'This is the error message for required fields',
-          id: 'v2.error.required'
-        }
-      }
-    }
-  }
-
   if (issue.code === 'invalid_string' && issue.validation === 'date') {
     return {
       message: {

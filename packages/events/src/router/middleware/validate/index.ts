@@ -13,6 +13,7 @@ import {
   ActionInputWithType,
   ActionType,
   FieldConfig,
+  FieldValue,
   getFieldValidationErrors
 } from '@opencrvs/commons'
 
@@ -35,9 +36,9 @@ export function validateAction(actionType: ActionType) {
       eventType
     })
 
-    const errors = formFields.reduce<{ message: string; fieldId: string }[]>(
+    const errors = formFields.reduce(
       (
-        errorResults: { message: string; fieldId: string }[],
+        errorResults: { message: string; id: string; value: FieldValue }[],
         field: FieldConfig
       ) => {
         const fieldErrors = getFieldValidationErrors({
@@ -52,7 +53,8 @@ export function validateAction(actionType: ActionType) {
         // For backend, use the default message without translations.
         const errormessageWithId = fieldErrors.map((error) => ({
           message: error.message.defaultMessage,
-          fieldId: field.id
+          id: field.id,
+          value: opts.input.data[field.id]
         }))
 
         return [...errorResults, ...errormessageWithId]
