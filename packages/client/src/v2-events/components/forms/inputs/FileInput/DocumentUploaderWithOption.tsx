@@ -185,7 +185,10 @@ export function DocumentUploaderWithOption({
             options={remainingOptions}
             type={'SELECT'}
             value={selectedOption}
-            onChange={(val) => setSelectedOption(val)}
+            onChange={(val) => {
+              setSelectedOption(val)
+              setErrorMessage('')
+            }}
           />
         </DorpdownContainer>
         <DocumentUploadButton
