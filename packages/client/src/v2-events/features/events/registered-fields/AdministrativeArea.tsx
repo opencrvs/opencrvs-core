@@ -82,7 +82,7 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   return location ? location.name : ''
 }
 
-export const Location = {
+export const AdministrativeArea = {
   Input: AdministrativeAreaInput,
   Output: AdministrativeAreaOutput
 }

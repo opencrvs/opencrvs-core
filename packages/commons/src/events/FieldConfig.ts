@@ -187,7 +187,7 @@ const AdminAreaOptions = z.object({
 
 const AdministrativeArea = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
-  options: AdminAreaOptions
+  configuration: AdminAreaOptions
 }).describe('Administrative area input field')
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
