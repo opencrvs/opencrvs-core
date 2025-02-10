@@ -11,13 +11,14 @@
 import { formatISO } from 'date-fns'
 import {
   ActionFormData,
-  BaseField,
   ConditionalParameters,
   FieldConfig,
   FieldValue,
+  Inferred,
   validate
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
+import { FIELD_SEPARATOR } from './FormFieldGenerator'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -51,6 +52,7 @@ export function getConditionalActionsForField(
   if (!field.conditionals) {
     return []
   }
+
   return field.conditionals
     .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)
@@ -68,7 +70,7 @@ export function evalExpressionInFieldDefinition(
 }
 
 export function hasInitialValueDependencyInfo(
-  value: BaseField['initialValue']
+  value: Inferred['initialValue']
 ): value is DependencyInfo {
   return typeof value === 'object' && 'dependsOn' in value
 }
@@ -105,4 +107,36 @@ export function setEmptyValuesForFields(fields: FieldConfig[]) {
 
 export interface Stringifiable {
   toString(): string
+}
+
+/**
+ *
+ * @param fields field config in OpenCRVS format (separated with `.`)
+ * @param values form values in formik format (separated with `FIELD_SEPARATOR`)
+ * @returns adds 0 before single digit days and months to make them 2 digit
+ * because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
+ */
+export function makeDatesFormatted(
+  fields: FieldConfig[],
+  values: Record<string, FieldValue>
+) {
+  return fields.reduce((acc, field) => {
+    const fieldId = field.id.replaceAll('.', FIELD_SEPARATOR)
+
+    if (field.type === 'DATE' && fieldId in values) {
+      const value = values[fieldId as keyof typeof values]
+      if (typeof value === 'string') {
+        const formattedDate = formatDateFieldValue(value)
+        return { ...acc, [fieldId]: formattedDate }
+      }
+    }
+    return acc
+  }, values)
+}
+
+export function formatDateFieldValue(value: string) {
+  return value
+    .split('-')
+    .map((d: string) => d.padStart(2, '0'))
+    .join('-')
 }

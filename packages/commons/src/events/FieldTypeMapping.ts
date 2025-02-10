@@ -10,6 +10,7 @@
  */
 
 import {
+  AddressField,
   BulletList,
   Checkbox,
   Country,
@@ -17,6 +18,7 @@ import {
   Divider,
   FieldConfig,
   File,
+  FileUploadWithOptions,
   Location,
   PageHeader,
   Paragraph,
@@ -26,6 +28,7 @@ import {
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
+  AddressFieldValue,
   CheckboxFieldValue,
   DateValue,
   FieldValue,
@@ -34,7 +37,6 @@ import {
   FileFieldWithOptionValue,
   TextValue
 } from './FieldValue'
-
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
  * File is separated from FieldType and FieldConfig to avoid circular dependencies.
@@ -78,6 +80,10 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = FileFieldWithOptionValue
 
       break
+    case FieldType.ADDRESS:
+      schema = AddressFieldValue
+
+      break
   }
 
   return required ? schema : schema.optional()
@@ -93,6 +99,7 @@ export function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
+    case FieldType.ADDRESS:
       return { type: 'text' }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
@@ -137,6 +144,19 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
       return `${field.id}-${field.type}-${i}`
+    case FieldType.ADDRESS:
+      return {
+        country: 'FAR',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'URBAN',
+        town: 'Example Town',
+        residentialArea: 'Example Residential Area',
+        street: 'Example Street',
+        number: '55',
+        zipCode: '123456',
+        village: 'Example Village'
+      }
     case FieldType.DATE:
       return '2021-01-01'
     case FieldType.CHECKBOX:
@@ -183,6 +203,17 @@ export const isFileFieldType = (field: {
   return field.config.type === FieldType.FILE
 }
 
+export const isFileFieldWithOptionType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: FileFieldWithOptionValue
+  config: FileUploadWithOptions
+} => {
+  // @TODO? (same as FILE?)
+  return field.config.type === FieldType.FILE_WITH_OPTIONS
+}
+
 export const isBulletListFieldType = (field: {
   config: FieldConfig
   value: FieldValue
@@ -195,6 +226,13 @@ export const isSelectFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: SelectField } => {
   return field.config.type === FieldType.SELECT
+}
+
+export const isAddressFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: AddressFieldValue; config: AddressField } => {
+  return field.config.type === FieldType.ADDRESS
 }
 
 export const isCountryFieldType = (field: {

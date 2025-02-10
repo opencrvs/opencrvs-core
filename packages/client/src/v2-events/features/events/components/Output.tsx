@@ -28,8 +28,10 @@ import {
   isTextFieldType
 } from '@opencrvs/commons/client'
 
+import { isAddressFieldType } from '@opencrvs/commons'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
+  Address,
   Checkbox,
   RadioGroup,
   Select,
@@ -84,6 +86,10 @@ function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
 
   if (isCheckboxFieldType(field)) {
     return <Checkbox.Output value={field.value} />
+  }
+
+  if (isAddressFieldType(field)) {
+    return <Address.Output value={field.value} />
   }
 
   if (isRadioGroupFieldType(field)) {
