@@ -82,7 +82,13 @@ function LocationOutput({ value }: { value: Stringifiable }) {
   return location ? location.name : ''
 }
 
+function useStringifier() {
+  const locations = useSelector(getLocations)
+  return (value: string) => locations[value].name
+}
+
 export const Location = {
   Input: LocationInput,
-  Output: LocationOutput
+  Output: LocationOutput,
+  useStringifier: useStringifier
 }

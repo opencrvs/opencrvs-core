@@ -13,13 +13,15 @@ import {
   ActionFormData,
   AddressField,
   AddressFieldValue,
+  alwaysTrue,
+  field as createFieldCondition,
   defineConditional,
-  field,
   FieldConfig,
-  FieldProps,
-  alwaysTrue
+  FieldProps
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { Output } from '@client/v2-events/features/events/components/Output'
+import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 type FieldConfigWithoutAddress = Exclude<FieldConfig, { type: 'ADDRESS' }>
 
@@ -28,9 +30,7 @@ type Props = FieldProps<'ADDRESS'> & {
   value?: AddressFieldValue
 }
 
-function hide(
-  fieldConfig: FieldConfigWithoutAddress
-): FieldConfigWithoutAddress {
+function hide<T extends FieldConfig>(fieldConfig: T): T {
   return {
     ...fieldConfig,
     conditionals: (fieldConfig.conditionals || []).concat({
@@ -58,6 +58,7 @@ function addInitialValue(initialValues: AddressField['initialValue']) {
     }
   }
 }
+
 /**
  * AddressInput is a form component for capturing address details based on administrative structure.
  *
@@ -69,13 +70,13 @@ function addInitialValue(initialValues: AddressField['initialValue']) {
 function AddressInput(props: Props) {
   const { onChange, initialValue = {}, value = {}, ...otherProps } = props
 
-  let fields: Array<FieldConfigWithoutAddress> = [
+  let fields = [
     ...ADMIN_STRUCTURE,
     ...URBAN_FIELDS,
     ...RURAL_FIELDS.map(hide)
-  ]
+  ] satisfies Array<FieldConfigWithoutAddress>
 
-  if (!value?.district) {
+  if (!value.district) {
     fields = [
       ...ADMIN_STRUCTURE,
       ...URBAN_FIELDS.map(hide),
@@ -83,7 +84,7 @@ function AddressInput(props: Props) {
     ]
   }
 
-  if (value?.urbanOrRural === 'RURAL') {
+  if (value.urbanOrRural === 'RURAL') {
     fields = [...ADMIN_STRUCTURE, ...URBAN_FIELDS.map(hide), ...RURAL_FIELDS]
   }
 
@@ -91,7 +92,7 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={fields.map(addInitialValue(initialValue))}
-      formData={value || {}}
+      formData={value}
       setAllFieldsDirty={false}
       onChange={onChange}
     />
@@ -187,7 +188,9 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: 'HIDE',
-        conditional: defineConditional(field('country').isUndefined().apply())
+        conditional: defineConditional(
+          createFieldCondition('country').isUndefined().apply()
+        )
       }
     ],
     required: true,
@@ -206,7 +209,9 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: 'HIDE',
-        conditional: defineConditional(field('province').isUndefined().apply())
+        conditional: defineConditional(
+          createFieldCondition('province').isUndefined().apply()
+        )
       }
     ],
     required: true,
@@ -228,7 +233,9 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: 'HIDE',
-        conditional: defineConditional(field('district').isUndefined().apply())
+        conditional: defineConditional(
+          createFieldCondition('district').isUndefined().apply()
+        )
       }
     ],
     required: false,
@@ -264,11 +271,67 @@ const ADMIN_STRUCTURE = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
+const ALL_FIELDS = [...ADMIN_STRUCTURE, ...URBAN_FIELDS, ...RURAL_FIELDS]
+
+type RequiredKeysFromFieldValue = keyof AddressFieldValue
+type EnsureSameUnion<A, B> = [A] extends [B]
+  ? [B] extends [A]
+    ? true
+    : false
+  : false
+type Expect<T extends true> = T
+
+type AllFields = (typeof ALL_FIELDS)[number]['id']
+
+/*
+ * This type ensures that all fields needed in AddressFieldValue type
+ * are actually defined in the field config below.
+ * Comment out one field to see the error.
+ *
+ * If you see a type error, it means that the fields in the component do not
+ * match the fields in the AddressFieldValue type.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type _ExpectTrue = Expect<
+  EnsureSameUnion<AllFields, RequiredKeysFromFieldValue>
+>
+
 function AddressOutput({ value }: { value?: AddressFieldValue }) {
-  return 'NOT IMPLEMENTED YET'
+  if (!value) {
+    return ''
+  }
+
+  return (
+    <>
+      {ALL_FIELDS.map((field) => ({ field, value: value[field.id] }))
+        .filter((field) => field.value)
+        .map((field) => (
+          <>
+            <Output
+              field={field.field}
+              showPreviouslyMissingValuesAsChanged={false}
+              value={field.value}
+            />
+            <br />
+          </>
+        ))}
+    </>
+  )
+}
+
+function useStringifier() {
+  return function useAddressStringifier(value: AddressFieldValue) {
+    /*
+     * As address is just a collection of other form fields, its string formatter just redirects the data back to
+     * form data stringifier so location and other form fields can handle stringifying their own data
+     */
+    const stringifier = useFormDataStringifier()
+    return stringifier(ALL_FIELDS, value as ActionFormData)
+  }
 }
 
 export const Address = {
   Input: AddressInput,
-  Output: AddressOutput
+  Output: AddressOutput,
+  useStringifier: useStringifier
 }

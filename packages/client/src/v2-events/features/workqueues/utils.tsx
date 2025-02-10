@@ -9,23 +9,31 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Dictionary, mapKeys } from 'lodash'
 import { MessageDescriptor, useIntl } from 'react-intl'
-
+import { PrimitiveType } from 'intl-messageformat'
+import { ActionFormData } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
 /**
  * Replaces dots with triple underscores in the object keys.
  * This is needed to support dot notation in the message variables.
  */
-function convertDotToTripleUnderscore<T extends {}>(
-  obj: T
-): Dictionary<T[keyof T]> {
-  const keysWithUnderscores = mapKeys(obj, (_, key) => {
-    return key.replace(/\./g, INTERNAL_SEPARATOR)
-  })
+function convertDotToTripleUnderscore(obj: ActionFormData, parentKey = '') {
+  const result: Record<string, PrimitiveType> = {}
 
-  return keysWithUnderscores
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey =
+      (parentKey ? parentKey + INTERNAL_SEPARATOR : '') +
+      key.replace(/\./g, INTERNAL_SEPARATOR)
+
+    if (typeof value === 'object' && value !== null) {
+      Object.assign(result, convertDotToTripleUnderscore(value, newKey))
+    } else {
+      result[newKey] = value
+    }
+  }
+
+  return result
 }
 
 /**

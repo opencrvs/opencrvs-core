@@ -30,6 +30,7 @@ interface EventFormData {
 
 function removeUndefinedKeys(data: ActionFormData) {
   return Object.fromEntries(
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     Object.entries(data).filter(([_, value]) => value !== undefined)
   )
 }
