@@ -10,6 +10,7 @@
  */
 
 export const FieldType = {
+  ADDRESS: 'ADDRESS',
   TEXT: 'TEXT',
   DATE: 'DATE',
   PARAGRAPH: 'PARAGRAPH',
