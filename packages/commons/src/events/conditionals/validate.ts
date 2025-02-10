@@ -71,7 +71,6 @@ const zodToIntlErrorMap = (
   issue: ZodIssueOptionalMessage,
   _ctx: ErrorMapCtx
 ) => {
-  console.log('issue.code', issue)
   if (issue.code === 'too_small' && issue.type === 'string') {
     return {
       message: {

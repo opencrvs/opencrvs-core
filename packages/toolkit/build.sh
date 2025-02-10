@@ -24,11 +24,6 @@ cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
 npx esbuild src/scopes/index.ts --bundle --format=cjs --outdir=./dist/scopes --allow-overwrite --packages=external
 cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts
 
-# Build common conditionals
-npx esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external
-mkdir -p ./dist/commons/conditionals
-cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/commons/conditionals
-
 # Build api client
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
 mkdir -p ./dist/commons/api

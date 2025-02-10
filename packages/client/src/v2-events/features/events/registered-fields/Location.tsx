@@ -65,6 +65,7 @@ function LocationInput({
   return (
     <Select.Input
       {...props}
+      data-testid={`location__${props.id}`}
       options={options}
       type="SELECT"
       value={value}

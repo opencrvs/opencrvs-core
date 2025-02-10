@@ -33,13 +33,13 @@ export function getValidationErrorsForForm(
         ? errorsForAllFields
         : {
             ...errorsForAllFields,
-            [field.id]: getFieldValidationErrors(
-              {
+            [field.id]: getFieldValidationErrors({
+              field: {
                 ...field,
                 required: field.required && !checkValidationErrorsOnly
               },
               values
-            )
+            })
           },
     {}
   )

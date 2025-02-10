@@ -11,6 +11,7 @@
 
 import { z } from 'zod'
 import {
+  AddressField,
   BulletList,
   Checkbox,
   Country,
@@ -28,6 +29,7 @@ import {
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
+  AddressFieldValue,
   CheckboxFieldValue,
   DateValue,
   EmailValue,
@@ -37,7 +39,6 @@ import {
   OptionalFieldValueSchema,
   TextValue
 } from './FieldValue'
-
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
  * File is separated from FieldType and FieldConfig to avoid circular dependencies.
@@ -78,6 +79,10 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = FileFieldValue
 
       break
+    case FieldType.ADDRESS:
+      schema = AddressFieldValue
+
+      break
   }
 
   return required ? schema : schema.optional()
@@ -91,37 +96,6 @@ export function createValidationSchema(config: FieldConfig[]) {
   }
 
   return z.object(shape)
-}
-
-export function mapFieldTypeToElasticsearch(field: FieldConfig) {
-  switch (field.type) {
-    case FieldType.DATE:
-      // @TODO: This should be changed back to 'date'
-      // When we have proper validation of custom fields.
-      return { type: 'text' }
-    case FieldType.EMAIL:
-    case FieldType.TEXT:
-    case FieldType.PARAGRAPH:
-    case FieldType.BULLET_LIST:
-    case FieldType.PAGE_HEADER:
-      return { type: 'text' }
-    case FieldType.DIVIDER:
-    case FieldType.RADIO_GROUP:
-    case FieldType.SELECT:
-    case FieldType.COUNTRY:
-    case FieldType.CHECKBOX:
-    case FieldType.LOCATION:
-      return { type: 'keyword' }
-    case FieldType.FILE:
-      return {
-        type: 'object',
-        properties: {
-          filename: { type: 'keyword' },
-          originalFilename: { type: 'keyword' },
-          type: { type: 'keyword' }
-        }
-      }
-  }
 }
 
 /**
@@ -141,6 +115,19 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
       return `${field.id}-${field.type}-${i}`
     case FieldType.EMAIL:
       return 'test@opencrvs.org'
+    case FieldType.ADDRESS:
+      return {
+        country: 'FAR',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'URBAN',
+        town: 'Example Town',
+        residentialArea: 'Example Residential Area',
+        street: 'Example Street',
+        number: '55',
+        zipCode: '123456',
+        village: 'Example Village'
+      }
     case FieldType.DATE:
       return '2021-01-01'
     case FieldType.CHECKBOX:
@@ -205,6 +192,13 @@ export const isSelectFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: SelectField } => {
   return field.config.type === FieldType.SELECT
+}
+
+export const isAddressFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: AddressFieldValue; config: AddressField } => {
+  return field.config.type === FieldType.ADDRESS
 }
 
 export const isCountryFieldType = (field: {

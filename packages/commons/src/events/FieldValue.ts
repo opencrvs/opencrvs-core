@@ -27,6 +27,23 @@ export const FileFieldValue = z.object({
 
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 
+export const AddressFieldValue = z
+  .object({
+    country: z.string(),
+    province: z.string(),
+    district: z.string(),
+    urbanOrRural: z.string(),
+    town: z.string(),
+    residentialArea: z.string(),
+    street: z.string(),
+    number: z.string(),
+    zipCode: z.string(),
+    village: z.string()
+  })
+  .partial()
+
+export type AddressFieldValue = z.infer<typeof AddressFieldValue>
+
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 
@@ -34,7 +51,8 @@ export const FieldValue = z.union([
   TextValue,
   DateValue,
   FileFieldValue,
-  CheckboxFieldValue
+  CheckboxFieldValue,
+  AddressFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
@@ -45,6 +63,7 @@ export type FieldValue = z.infer<typeof FieldValue>
 export type FieldValueSchema =
   | typeof FileFieldValue
   | typeof CheckboxFieldValue
+  | typeof AddressFieldValue
   | z.ZodString
   | z.ZodBoolean
 
