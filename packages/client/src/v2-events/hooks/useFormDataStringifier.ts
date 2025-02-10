@@ -67,7 +67,6 @@ export const useFormDataStringifier = () => {
     for (const [key, value] of Object.entries(values)) {
       const fieldConfig = formFields.find((field) => field.id === key)
       if (!fieldConfig) {
-        debugger
         throw new Error(`Field ${key} not found in form config`)
       }
       stringifiedValues[key] = stringifier(fieldConfig, value)
