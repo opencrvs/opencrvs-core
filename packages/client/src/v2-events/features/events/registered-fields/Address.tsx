@@ -76,7 +76,7 @@ function AddressInput(props: Props) {
     ...RURAL_FIELDS.map(hide)
   ] satisfies Array<FieldConfigWithoutAddress>
 
-  if (!value?.district) {
+  if (!value.district) {
     fields = [
       ...ADMIN_STRUCTURE,
       ...URBAN_FIELDS.map(hide),
@@ -84,7 +84,7 @@ function AddressInput(props: Props) {
     ]
   }
 
-  if (value?.urbanOrRural === 'RURAL') {
+  if (value.urbanOrRural === 'RURAL') {
     fields = [...ADMIN_STRUCTURE, ...URBAN_FIELDS.map(hide), ...RURAL_FIELDS]
   }
 

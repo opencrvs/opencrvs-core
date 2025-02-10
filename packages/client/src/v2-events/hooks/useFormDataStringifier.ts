@@ -11,13 +11,11 @@
 
 import {
   ActionFormData,
-  AddressFieldValue,
   FieldConfig,
   FieldValue,
   isAddressFieldType,
   isLocationFieldType,
-  isRadioGroupFieldType,
-  RadioGroup as RadioField
+  isRadioGroupFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -31,31 +29,31 @@ function useFieldStringifier() {
   const stringifyRadioGroup = RadioGroup.useStringifier()
 
   return (fieldConfig: FieldConfig, value: FieldValue) => {
-    if (isLocationFieldType({ config: fieldConfig, value })) {
-      return stringifyLocation(value as string)
+    const field = { config: fieldConfig, value }
+    if (isLocationFieldType(field)) {
+      return stringifyLocation(field.value)
     }
 
-    if (isAddressFieldType({ config: fieldConfig, value })) {
-      return stringifyAddress(value as AddressFieldValue)
+    if (isAddressFieldType(field)) {
+      return stringifyAddress(field.value)
     }
 
-    if (isRadioGroupFieldType({ config: fieldConfig, value })) {
-      return stringifyRadioGroup(value as string, fieldConfig as RadioField)
+    if (isRadioGroupFieldType(field)) {
+      return stringifyRadioGroup(field.value, field.config)
     }
 
     return value.toString()
   }
 }
 
-/**
- *
- * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
- */
-
 interface RecursiveStringRecord {
   [key: string]: string | RecursiveStringRecord
 }
 
+/**
+ *
+ * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
+ */
 export const useFormDataStringifier = () => {
   const stringifier = useFieldStringifier()
   return (

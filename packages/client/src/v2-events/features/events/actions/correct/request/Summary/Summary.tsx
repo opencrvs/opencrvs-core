@@ -17,6 +17,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   FieldConfig,
+  findActiveActionFields,
   generateTransactionId,
   getCurrentEventState,
   Scope,
@@ -38,8 +39,8 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 
 import {
-  setEmptyValuesForFields,
-  isFormFieldVisible
+  isFormFieldVisible,
+  setEmptyValuesForFields
 } from '@client/v2-events/components/forms/utils'
 import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -118,16 +119,19 @@ export function Summary() {
     )
   }
 
-  const formConfig = actionConfig.forms.find(({ active }) => active)
+  const fields = findActiveActionFields(
+    eventConfiguration,
+    ActionType.REQUEST_CORRECTION
+  )
 
-  if (!formConfig) {
+  if (!fields) {
     throw new Error(
       `No active form found for ${ActionType.REQUEST_CORRECTION}. This should never happen`
     )
   }
 
   const allFields = [
-    ...formConfig.pages.flatMap((page) => page.fields),
+    ...fields,
     ...actionConfig.onboardingForm.flatMap((page) => page.fields),
     ...actionConfig.additionalDetailsForm.flatMap((page) => page.fields)
   ]

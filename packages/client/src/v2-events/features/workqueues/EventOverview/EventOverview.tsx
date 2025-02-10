@@ -92,7 +92,8 @@ function EventOverview({
   summary: SummaryConfig
   history: ActionDocument[]
 }) {
-  const { eventConfiguration, allFields } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const allFields = getAllFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
 
   const stringifyFormData = useFormDataStringifier()

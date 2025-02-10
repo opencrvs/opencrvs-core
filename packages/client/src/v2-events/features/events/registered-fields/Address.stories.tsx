@@ -154,8 +154,6 @@ const declarationForm = tennisClubMembershipEvent.actions
   .find(({ type }) => type === ActionType.DECLARE)
   ?.forms.find(({ active }) => active)!
 
-const form = declarationForm
-
 export const AddressReview: StoryObj<typeof Review> = {
   name: 'Review output',
   parameters: {
@@ -179,7 +177,7 @@ export const AddressReview: StoryObj<typeof Review> = {
             village: 'Example Village'
           }
         }}
-        formConfig={form}
+        formConfig={declarationForm}
         title="My address form with address output"
         // eslint-disable-next-line no-console
         onEdit={(values) => console.log(values)}
@@ -212,7 +210,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
             village: 'Example Village'
           }
         }}
-        formConfig={form}
+        formConfig={declarationForm}
         previousFormValues={{
           'applicant.address': {
             country: 'FAR',
@@ -237,7 +235,7 @@ export const AddressInCopy: StoryObj<typeof Review> = {
     layout: 'centered'
   },
   render: function Component() {
-    const allFields = form.pages.map((page) => page.fields).flat()
+    const allFields = declarationForm.pages.map((page) => page.fields).flat()
     const stringifier = useFormDataStringifier()
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
     const FORM_DATA = {

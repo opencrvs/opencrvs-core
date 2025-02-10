@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig, FieldConfig } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  FieldConfig,
+  getAllFields
+} from '@opencrvs/commons/client'
 import { api } from '@client/v2-events/trpc'
 
 /**
@@ -27,7 +31,6 @@ export function useEventConfigurations() {
  */
 export function useEventConfiguration(eventIdentifier: string): {
   eventConfiguration: EventConfig
-  allFields: FieldConfig[]
 } {
   const [config] = api.event.config.get.useSuspenseQuery()
   const eventConfiguration = config.find(
@@ -36,9 +39,5 @@ export function useEventConfiguration(eventIdentifier: string): {
   if (!eventConfiguration) {
     throw new Error('Event configuration not found')
   }
-  const allFields = eventConfiguration.actions
-    .flatMap((action) => action.forms)
-    .flatMap((form) => form.pages)
-    .flatMap((page) => page.fields)
-  return { eventConfiguration, allFields }
+  return { eventConfiguration }
 }
