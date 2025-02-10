@@ -131,6 +131,14 @@ async function removeCached(filename: string) {
   return cache.delete(getFullURL(filename))
 }
 
+export async function precacheFile(filename: string) {
+  const presignedUrl = (await getPresignedUrl(filename)).presignedURL
+  const response = await fetch(presignedUrl)
+  const blob = await response.blob()
+  const file = new File([blob], filename, { type: blob.type })
+  await cacheFile(filename, file)
+}
+
 queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
   retry: true,
   retryDelay: 5000,
@@ -168,9 +176,6 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
         filename: temporaryUrl,
         option: optionKey
       })
-    },
-    onSuccess: (data) => {
-      void removeCached(data.url)
     }
   })
 
