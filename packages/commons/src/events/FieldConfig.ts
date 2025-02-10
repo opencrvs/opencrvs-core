@@ -255,6 +255,9 @@ export type Inferred =
   | z.infer<typeof Country>
   | z.infer<typeof Location>
   | z.infer<typeof Divider>
+  | z.infer<typeof AdministrativeArea>
+  | z.infer<typeof Facility>
+  | z.infer<typeof Office>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
@@ -277,8 +280,9 @@ export const FieldConfig = z.discriminatedUnion('type', [
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
-export type FieldConfig = z.infer<typeof FieldConfig>
+export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
+export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
