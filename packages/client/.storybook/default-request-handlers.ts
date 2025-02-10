@@ -17,8 +17,8 @@ import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
 import {
-  tennisClubMembershipEvent
-  // tennisClubMembershipEventIndex
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventIndex
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
@@ -37,11 +37,8 @@ export const handlers = {
     tRPCMsw.event.config.get.query(() => {
       return [tennisClubMembershipEvent, birthEvent]
     }),
-    // tRPCMsw.events.get.query(() => {
-    //   return [tennisClubMembershipEventIndex]
-    // }),
     tRPCMsw.event.list.query(() => {
-      return []
+      return [tennisClubMembershipEventIndex]
     })
   ],
   registrationHome: [

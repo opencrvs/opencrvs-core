@@ -272,7 +272,6 @@ export const FieldConfig = z.discriminatedUnion('type', [
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
-export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type FieldConfig = Inferred
 
