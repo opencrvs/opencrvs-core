@@ -92,7 +92,7 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={fields.map(addInitialValue(initialValue))}
-      formData={value || {}}
+      formData={value}
       setAllFieldsDirty={false}
       onChange={onChange}
     />

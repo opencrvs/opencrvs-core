@@ -78,6 +78,7 @@ function useStringifier() {
     const option = fieldConfig.options.find((opt) => opt.value === value)
 
     if (!option) {
+      // eslint-disable-next-line no-console
       console.error(
         `Could not find option with value ${value} for field ${fieldConfig.id}`
       )

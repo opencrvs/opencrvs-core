@@ -8,11 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  EventConfig,
-  FieldConfig,
-  getAllFields
-} from '@opencrvs/commons/client'
+import { EventConfig } from '@opencrvs/commons/client'
 import { api } from '@client/v2-events/trpc'
 
 /**
