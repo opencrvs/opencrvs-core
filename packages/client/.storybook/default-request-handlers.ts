@@ -38,9 +38,6 @@ export const handlers = {
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]
-    }),
-    tRPCMsw.event.list.query(() => {
-      return []
     })
   ],
   registrationHome: [
