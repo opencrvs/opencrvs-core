@@ -84,6 +84,75 @@ test(`${ActionType.APPROVE_CORRECTION} validation error message contains all th
   ).rejects.matchSnapshot()
 })
 
+test(`${ActionType.REQUEST_CORRECTION} Allows passing fields that are conditionally removed`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const data = generator.event.actions.correction.request(event.id, {
+    data: {
+      'applicant.dob': '02-1-2024',
+      'applicant.firstname': 'John',
+      'applicant.surname': 'Doe',
+      'recommender.none': false
+    }
+  })
+
+  await expect(
+    client.event.actions.correction.request(data)
+  ).rejects.matchSnapshot()
+})
+
+test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they are conditionally hidden`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const form = {
+    'applicant.dob': '2024-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': false
+  }
+
+  const data = generator.event.actions.correction.request(event.id, {
+    data: form
+  })
+
+  const response = await client.event.actions.correction.request(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.REQUEST_CORRECTION
+  )
+  expect(savedAction?.data).toEqual(form)
+})
+
+test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const form = {
+    'applicant.dob': '2040-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': false
+  }
+
+  const payload = generator.event.actions.correction.request(event.id, {
+    data: form
+  })
+
+  await expect(
+    client.event.actions.correction.request(payload)
+  ).rejects.matchSnapshot()
+})
+
 test('a correction request can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
