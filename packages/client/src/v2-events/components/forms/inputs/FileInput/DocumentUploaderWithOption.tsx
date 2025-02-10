@@ -31,6 +31,9 @@ const UploadWrapper = styled.div`
   width: 100%;
 `
 
+const DorpdownContainer = styled.div`
+  flex-grow: 1;
+`
 const Flex = styled.div`
   display: flex;
   flex-wrap: nowrap;
@@ -176,13 +179,15 @@ export function DocumentUploaderWithOption({
       />
 
       <Flex>
-        <Select.Input
-          id={props.name}
-          options={remainingOptions}
-          type={'SELECT'}
-          value={selectedOption}
-          onChange={(val) => setSelectedOption(val)}
-        />
+        <DorpdownContainer>
+          <Select.Input
+            id={props.name}
+            options={remainingOptions}
+            type={'SELECT'}
+            value={selectedOption}
+            onChange={(val) => setSelectedOption(val)}
+          />
+        </DorpdownContainer>
         <DocumentUploadButton
           {...props}
           allowedDocType={allowedDocType}
@@ -213,7 +218,7 @@ export function DocumentUploaderWithOption({
           previewImage={previewImage}
           title={getFormattedLabelForDocType(previewImage.option)}
           onDelete={(file) => {
-            file && deleteFile(file.filename)
+            deleteFile(file.filename)
           }}
         />
       )}
