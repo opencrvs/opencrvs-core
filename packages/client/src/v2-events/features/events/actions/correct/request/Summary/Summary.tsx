@@ -32,6 +32,7 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Check } from '@opencrvs/components/lib/icons'
+import { findActiveActionForm } from '@opencrvs/commons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
@@ -112,6 +113,16 @@ export function Summary() {
   const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
+  const formConfig = findActiveActionForm(
+    eventConfiguration,
+    ActionType.REQUEST_CORRECTION
+  )
+
+  if (!formConfig) {
+    throw new Error(
+      `No active form found for ${ActionType.REQUEST_CORRECTION}. This should never happen`
+    )
+  }
 
   if (!actionConfig) {
     throw new Error(
@@ -169,14 +180,12 @@ export function Summary() {
       {}
     )
 
-    const valuesThatGotHidden = formConfig.pages
-      .flatMap((page) => page.fields)
-      .filter((field) => {
-        const wasVisible = isFormFieldVisible(field, previousFormValues)
-        const isHidden = !isFormFieldVisible(field, form)
+    const valuesThatGotHidden = fields.filter((field) => {
+      const wasVisible = isFormFieldVisible(field, previousFormValues)
+      const isHidden = !isFormFieldVisible(field, form)
 
-        return wasVisible && isHidden
-      })
+      return wasVisible && isHidden
+    })
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
@@ -194,12 +203,12 @@ export function Summary() {
     eventFormNavigation.goToHome()
   }, [
     form,
-    previousFormValues,
-    formConfig.pages,
+    fields,
     events.actions.correct.request,
     eventId,
     correctionRequestData,
-    eventFormNavigation
+    eventFormNavigation,
+    previousFormValues
   ])
 
   const backToReviewButton = (
