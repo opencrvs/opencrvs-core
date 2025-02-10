@@ -18,6 +18,7 @@ import {
   ActionType,
   FieldConfig,
   findActiveActionFields,
+  findActiveActionForm,
   generateTransactionId,
   getCurrentEventState,
   Scope,
@@ -32,7 +33,6 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Check } from '@opencrvs/components/lib/icons'
-import { findActiveActionForm } from '@opencrvs/commons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
