@@ -321,6 +321,10 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
 
 function useStringifier() {
   return function useAddressStringifier(value: AddressFieldValue) {
+    /*
+     * As address is just a collection of other form fields, its string formatter just redirects the data back to
+     * form data stringifier so location and other form fields can handle stringifying their own data
+     */
     const stringifier = useFormDataStringifier()
     return stringifier(ALL_FIELDS, value as ActionFormData)
   }
