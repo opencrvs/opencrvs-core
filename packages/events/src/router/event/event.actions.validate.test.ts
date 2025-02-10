@@ -10,6 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { ActionType } from '@opencrvs/commons'
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
@@ -25,4 +26,69 @@ test('Validation error message contains all the offending fields', async () => {
   })
 
   await expect(client.event.actions.register(data)).rejects.matchSnapshot()
+})
+
+test('Allows passing fields that are conditionally removed', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const data = generator.event.actions.validate(event.id, {
+    data: {
+      'applicant.dob': '02-1-2024',
+      'applicant.firstname': 'John',
+      'applicant.surname': 'Doe',
+      'recommender.none': false
+    }
+  })
+
+  await expect(client.event.actions.validate(data)).rejects.matchSnapshot()
+})
+
+test('Skips required field validation when they are conditionally hidden', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const form = {
+    'applicant.dob': '2024-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': false
+  }
+
+  const data = generator.event.actions.validate(event.id, {
+    data: form
+  })
+
+  const response = await client.event.actions.validate(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.VALIDATE
+  )
+  expect(savedAction?.data).toEqual(form)
+})
+
+test('Prevents adding birth date in future', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  event.id
+
+  const form = {
+    'applicant.dob': '2040-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': false
+  }
+
+  const payload = generator.event.actions.validate(event.id, {
+    data: form
+  })
+
+  await expect(client.event.actions.validate(payload)).rejects.matchSnapshot()
 })
