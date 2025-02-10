@@ -10,18 +10,18 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, expect } from '@storybook/test'
+import { expect, fn } from '@storybook/test'
+import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
-import styled from 'styled-components'
-import { within, userEvent } from '@storybook/testing-library'
 import * as selectEvent from 'react-select-event'
-import { ActionType, EventConfig, FieldConfig } from '@opencrvs/commons/client'
-import { TRPCProvider } from '@client/v2-events/trpc'
+import styled from 'styled-components'
+import { ActionType, EventConfig } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { tennisClubMembershipEvent } from '@client/v2-events/features/events/fixtures'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
-import { useIntlFormatMessageWithFlattenedParams } from '../../workqueues/utils'
+import { TRPCProvider } from '@client/v2-events/trpc'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Address',
@@ -181,7 +181,8 @@ export const AddressReview: StoryObj<typeof Review> = {
         }}
         formConfig={form}
         title="My address form with address output"
-        onEdit={() => {}}
+        // eslint-disable-next-line no-console
+        onEdit={(values) => console.log(values)}
       >
         <div />
       </Review.Body>
@@ -222,7 +223,8 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           }
         }}
         title="My address form with address changed"
-        onEdit={() => {}}
+        // eslint-disable-next-line no-console
+        onEdit={(values) => console.log(values)}
       >
         <div />
       </Review.Body>

@@ -11,7 +11,6 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import {
-  FieldConfig,
   FieldProps,
   RadioGroup as RadioGroupField,
   SelectOption
