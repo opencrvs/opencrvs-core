@@ -12,7 +12,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
+import { FieldProps } from '@opencrvs/commons/client'
 // eslint-disable-next-line no-restricted-imports
 import { getOfflineData } from '@client/offline/selectors'
 import { getListOfLocations } from '@client/utils/validate'
@@ -42,7 +42,7 @@ function useAdminLocations(
   return locationList
 }
 
-export function LocationSearch({
+function LocationSearchInput({
   setFieldValue,
   value,
   searchableResource,
@@ -50,7 +50,7 @@ export function LocationSearch({
 }: FieldProps<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   setFieldValue: (name: string, val: string | undefined) => void
   searchableResource: ('locations' | 'facilities' | 'offices')[]
-  value?: LocationFieldValue
+  value?: string
 }) {
   const locationList = useAdminLocations(searchableResource)
   const selectedLocation = locationList.find(
@@ -68,4 +68,9 @@ export function LocationSearch({
       {...props}
     />
   )
+}
+
+export const LocationSearch = {
+  Input: LocationSearchInput,
+  Output: null
 }

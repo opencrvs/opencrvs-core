@@ -12,13 +12,7 @@
 import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
-
-import { formatISO } from 'date-fns'
-import {
-  ActionFormData,
-  FieldConfig,
-  FormConfig
-} from '@opencrvs/commons/client'
+import { ActionFormData, FormConfig } from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
@@ -31,16 +25,8 @@ import {
 } from '@opencrvs/components'
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
-import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
-import {
-  getConditionalActionsForField,
-  isFormFieldVisible
-} from '@client/v2-events/components/forms/utils'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
-
-const Deleted = styled.del`
-  color: ${({ theme }) => theme.colors.negative};
-`
+import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import { Output } from './Output'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -123,117 +109,53 @@ const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
   changeButton: {
-    id: 'buttons.change',
+    id: 'v2.buttons.change',
     defaultMessage: 'Change',
     description: 'The label for the change button'
   },
   actionModalCancel: {
-    id: 'actionModal.cancel',
+    id: 'v2.actionModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of action modal'
   },
   actionModalPrimaryAction: {
-    id: 'actionModal.PrimaryAction',
+    id: 'v2.actionModal.PrimaryAction',
     defaultMessage: '{action, select, declare{Declare} other{{action}}}',
     description: 'The label for primary action button of action modal'
   },
   actionModalTitle: {
-    id: 'actionModal.title',
+    id: 'v2.actionModal.title',
     defaultMessage:
       '{action, select, declare{Declare} other{{action}}} the member?',
     description: 'The title for action modal'
   },
   actionModalDescription: {
-    id: 'actionModal.description',
+    id: 'v2.actionModal.description',
     defaultMessage:
       'The declarant will be notified of this action and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
   changeModalCancel: {
-    id: 'changeModal.cancel',
+    id: 'v2.changeModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of change modal'
   },
   changeModalContinue: {
-    id: 'changeModal.continue',
+    id: 'v2.changeModal.continue',
     defaultMessage: 'Continue',
     description: 'The label for continue button of change modal'
   },
   changeModalTitle: {
-    id: 'changeModal.title',
+    id: 'v2.changeModal.title',
     defaultMessage: 'Edit declaration?',
     description: 'The title for change modal'
   },
   changeModalDescription: {
-    id: 'changeModal.description',
+    id: 'v2.changeModal.description',
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
   }
 })
-
-interface Stringifiable {
-  toString(): string
-}
-
-const FIELD_TYPE_FORMATTERS: Partial<
-  Record<
-    FieldConfig['type'],
-    null | ((props: { value: Stringifiable }) => JSX.Element)
-  >
-> = {
-  FILE: FileOutput
-}
-
-function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
-  return <>{value.toString() || ''}</>
-}
-
-function Output({
-  field,
-  value,
-  previousValue,
-  showPreviouslyMissingValuesAsChanged = true
-}: {
-  field: FieldConfig
-  value: string
-  previousValue?: string
-  showPreviouslyMissingValuesAsChanged: boolean
-}) {
-  const ValueOutput = FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
-
-  if (!value) {
-    if (previousValue) {
-      return <ValueOutput value={previousValue} />
-    }
-
-    return ''
-  }
-
-  if (previousValue && previousValue !== value) {
-    return (
-      <>
-        <Deleted>
-          <ValueOutput value={previousValue} />
-        </Deleted>
-        <br />
-        <ValueOutput value={value} />
-      </>
-    )
-  }
-  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
-    return (
-      <>
-        <Deleted>
-          <ValueOutput value={'-'} />
-        </Deleted>
-        <br />
-        <ValueOutput value={value} />
-      </>
-    )
-  }
-
-  return <ValueOutput value={value} />
-}
 
 /**
  * Review component, used to display the "read" version of the form.
@@ -258,14 +180,8 @@ function ReviewComponent({
 }) {
   const intl = useIntl()
 
-  const { toString } = useTransformer(eventConfig.id)
-
-  const stringifiedForm = toString(form)
-
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
-  const stringifiedPreviousForm = previousFormValues
-    ? toString(previousFormValues)
-    : {}
+  const previousForm = previousFormValues ?? {}
 
   return (
     <Row>
@@ -314,18 +230,10 @@ function ReviewComponent({
                     >
                       <ListReview id={'Section_' + page.id}>
                         {page.fields
-                          .filter(
-                            (field) =>
-                              // Formatters can explicitly define themselves to be null
-                              // this means a value display row in not rendered at all
-                              // An example of this is FileInput, of which files we do not want to render in the value lists
-                              FIELD_TYPE_FORMATTERS[field.type] !== null
-                          )
                           .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
-                            const value = stringifiedForm[field.id]
-                            const previousValue =
-                              stringifiedPreviousForm[field.id]
+                            const value = form[field.id]
+                            const previousValue = previousForm[field.id]
 
                             const valueDisplay = (
                               <Output

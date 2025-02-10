@@ -19,38 +19,11 @@ import {
   RequestCorrectionActionInput,
   findActiveActionFields,
   EventConfig,
-  FieldConfig
+  mapFieldTypeToMockValue
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-
-/**
- * Quick-and-dirty mock data generator for event actions.
- */
-function mapTypeToMockValue(field: FieldConfig, i: number) {
-  switch (field.type) {
-    case 'DIVIDER':
-    case 'TEXT':
-    case 'BULLET_LIST':
-    case 'PAGE_HEADER':
-    case 'LOCATION':
-    case 'SELECT':
-    case 'COUNTRY':
-    case 'RADIO_GROUP':
-    case 'PARAGRAPH':
-    case 'ADMINISTRATIVE_AREA':
-    case 'FACILITY':
-    case 'OFFICE':
-      return `${field.id}-${field.type}-${i}`
-    case 'DATE':
-      return '2021-01-01'
-    case 'CHECKBOX':
-      return true
-    case 'FILE':
-      return null
-  }
-}
 
 export function generateActionInput(
   configuration: EventConfig,
@@ -61,7 +34,7 @@ export function generateActionInput(
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
-      [field.id]: mapTypeToMockValue(field, i)
+      [field.id]: mapFieldTypeToMockValue(field, i)
     }),
     {}
   )

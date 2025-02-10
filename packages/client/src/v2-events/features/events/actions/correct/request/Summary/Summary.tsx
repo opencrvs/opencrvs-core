@@ -38,7 +38,7 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 
 import {
-  getInitialValues,
+  setEmptyValuesForFields,
   isFormFieldVisible
 } from '@client/v2-events/components/forms/utils'
 import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
@@ -154,10 +154,12 @@ export function Summary() {
         return wasVisible && isHidden
       })
 
-    const nullifiedHiddenValues = getInitialValues(valuesThatGotHidden)
+    const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
     events.actions.correct.request.mutate({
       eventId,
+      // @TODO:
+      // @ts-ignore
       data: {
         ...formWithOnlyChangedValues,
         ...nullifiedHiddenValues

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from '../ActionConfig'
+import { ActionType } from '../ActionType'
 import { ActionDocument } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'

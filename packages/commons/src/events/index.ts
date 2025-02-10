@@ -30,3 +30,8 @@ export * from './defineConfig'
 export * from './DeduplicationConfig'
 export * from './transactions'
 export * from './User'
+export * from './FieldType'
+export * from './ActionType'
+export * from './FieldTypeMapping'
+// In order to infer types, we need to export the following types along with events
+export * from '../conditionals/conditionals'

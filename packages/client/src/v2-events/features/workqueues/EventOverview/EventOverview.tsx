@@ -15,7 +15,8 @@ import {
   EventIndex,
   ActionDocument,
   getAllFields,
-  SummaryConfig
+  SummaryConfig,
+  FieldValue
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -25,7 +26,8 @@ import {
   useEventConfiguration,
   useEventConfigurations
 } from '@client/v2-events/features/events/useEventConfiguration'
-import { getInitialValues } from '@client/v2-events/components/forms/utils'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
+import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -92,12 +94,18 @@ function EventOverview({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const initialValues = getInitialValues(getAllFields(eventConfiguration))
 
-  const title = intl.formatMessage(summary.title.label, {
-    ...initialValues,
-    ...event.data
-  })
+  // @TODO: this seems bit redundant. Check if we can get rid of one of these.
+  const { toString } = useTransformer(event.type)
+  const eventWithDefaults = toString(event.data)
+
+  const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
+
+  const flattenedEventIndex: Record<string, FieldValue | null> = {
+    ...emptyEvent,
+    ...eventWithDefaults
+  }
+  const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
 
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
@@ -110,11 +118,7 @@ function EventOverview({
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
-      <EventSummary
-        defaultValues={initialValues}
-        event={event}
-        summary={summary}
-      />
+      <EventSummary event={flattenedEventIndex} summary={summary} />
       <EventHistory history={history} />
     </Content>
   )

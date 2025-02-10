@@ -11,34 +11,39 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { Checkbox as CheckboxComponent } from '@opencrvs/components'
-import { FieldProps, CheckboxFieldValue } from '@opencrvs/commons/client'
+import { FieldProps } from '@opencrvs/commons/client'
+import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
-export function Checkbox({
+function CheckboxInput({
   setFieldValue,
   label,
   value,
   ...props
 }: FieldProps<'CHECKBOX'> & {
-  setFieldValue: (name: string, val: CheckboxFieldValue | undefined) => void
-  value?: CheckboxFieldValue
+  setFieldValue: (name: string, val: boolean) => void
+  value?: boolean
 }) {
   const intl = useIntl()
+  const inputValue = !!value ? 'true' : 'false'
 
   return (
     <CheckboxComponent
       label={intl.formatMessage(label)}
       name={props.id}
-      selected={value === 'true'}
-      value={value ?? 'false'}
+      selected={inputValue === 'true'}
+      value={inputValue}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-        setFieldValue(
-          props.id,
-          event.target.value === 'true' ? 'false' : 'true'
-        )
+        setFieldValue(props.id, event.target.value === 'true' ? false : true)
       }}
     />
   )
 }
 
-export const checkboxToString = (value: CheckboxFieldValue) =>
-  value === 'true' ? 'Yes' : 'No'
+function CheckboxOutput({ value }: { value?: Stringifiable }) {
+  return value === 'true' ? 'Yes' : 'No'
+}
+
+export const Checkbox = {
+  Input: CheckboxInput,
+  Output: CheckboxOutput
+}

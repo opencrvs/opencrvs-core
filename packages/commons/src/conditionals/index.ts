@@ -8,8 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { TextFieldValue } from '@opencrvs/commons/client'
-
-export const INITIAL_TEXT_VALUE = ''
-
-export const textToString = (text: TextFieldValue) => text || INITIAL_TEXT_VALUE
+export * from './conditionals'

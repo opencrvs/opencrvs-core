@@ -14,10 +14,11 @@ import pkgUp = require('pkg-up')
 function init() {
   if (process.env.NODE_ENV === 'production') {
     const path = pkgUp.sync()
-
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('elastic-apm-node').start({
       // Override service name from package.json
       // Allowed characters: a-z, A-Z, 0-9, -, _, and space
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       serviceName: require(path!).name.replace('@', '').replace('/', '_'),
       // Set custom APM Server URL (default: http://localhost:8200)
       serverUrl: process.env.APN_SERVICE_URL || 'http://localhost:8200',
