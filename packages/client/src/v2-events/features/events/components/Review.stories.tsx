@@ -96,7 +96,6 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
     const canvas = within(canvasElement)
 
     step('Open modal', async () => {
-      // Open modal
       const [changeButton] = await canvas.findAllByRole('button', {
         name: 'Change'
       })
@@ -105,7 +104,6 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
     })
 
     step('Close modal', async () => {
-      // Close modal
       const cancelButton = await canvas.findByRole('button', {
         name: 'Cancel'
       })
