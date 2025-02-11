@@ -14,7 +14,7 @@ import { createTestApp, flushPromises, waitFor } from '@login/tests/util'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
+import { createMemoryRouter } from 'react-router-dom'
 
 //mock api calls
 const server = setupServer(
@@ -74,14 +74,13 @@ afterAll(() => server.close())
 
 describe('Test phone number verification form', () => {
   let app: ReactWrapper
-  let history: History
+  let router: ReturnType<typeof createMemoryRouter>
   window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
   beforeEach(async () => {
-    const testApp = await createTestApp()
+    const testApp = await createTestApp({ initialEntries: ['/'] })
     app = testApp.app
-    history = testApp.history
+    router = testApp.router
 
-    history.replace('')
     app.update()
 
     window.config.PHONE_NUMBER_PATTERN = /^0(1)[0-9]{1}[0-9]{8}$/
@@ -89,8 +88,10 @@ describe('Test phone number verification form', () => {
 
   describe('Page title', () => {
     it('loads title when username is chosen as the forgotten item', async () => {
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME
+      router.navigate(routes.PHONE_NUMBER_VERIFICATION, {
+        state: {
+          forgottenItem: FORGOTTEN_ITEMS.USERNAME
+        }
       })
 
       expect(app.update().find('#page-title').hostNodes().text()).toContain(
@@ -99,9 +100,15 @@ describe('Test phone number verification form', () => {
     })
 
     it('loads title when password is chosen as the forgotten item', async () => {
-      const { app, history } = await createTestApp()
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+      const { app } = await createTestApp({
+        initialEntries: [
+          {
+            pathname: routes.PHONE_NUMBER_VERIFICATION,
+            state: {
+              forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+            }
+          }
+        ]
       })
 
       expect(app.update().find('#page-title').hostNodes().text()).toContain(
@@ -111,10 +118,20 @@ describe('Test phone number verification form', () => {
   })
 
   describe('Error handling', () => {
-    beforeEach(() => {
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME
+    beforeEach(async () => {
+      const testApp = await createTestApp({
+        initialEntries: [
+          {
+            pathname: routes.PHONE_NUMBER_VERIFICATION,
+            state: {
+              forgottenItem: FORGOTTEN_ITEMS.USERNAME
+            }
+          }
+        ]
       })
+
+      app = testApp.app
+      router = testApp.router
       app.update()
     })
 
@@ -134,17 +151,28 @@ describe('Test phone number verification form', () => {
         .hostNodes()
         .simulate('change', { target: { value: '123' } })
       app.find('#continue').hostNodes().simulate('click')
-      expect(history.location.pathname).toContain(
+
+      expect(router.state.location.pathname).toContain(
         routes.PHONE_NUMBER_VERIFICATION
       )
     })
   })
 
   describe('Valid submission', () => {
-    beforeEach(() => {
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME
+    beforeEach(async () => {
+      const testApp = await createTestApp({
+        initialEntries: [
+          {
+            pathname: routes.PHONE_NUMBER_VERIFICATION,
+            state: {
+              forgottenItem: FORGOTTEN_ITEMS.USERNAME
+            }
+          }
+        ]
       })
+
+      app = testApp.app
+      router = testApp.router
       app.update()
     })
 
@@ -164,9 +192,9 @@ describe('Test phone number verification form', () => {
       app.find('#continue').hostNodes().simulate('submit')
       await flushPromises()
       await waitFor(() =>
-        window.location.pathname.includes(routes.SECURITY_QUESTION)
+        router.state.location.pathname.includes(routes.SECURITY_QUESTION)
       )
-      expect(window.location.pathname).toContain(routes.SECURITY_QUESTION)
+      expect(router.state.location.pathname).toContain(routes.SECURITY_QUESTION)
     })
     it('continue button will redirect to RECOVERY_CODE_ENTRY route', async () => {
       //change verifyUser api response
@@ -192,9 +220,11 @@ describe('Test phone number verification form', () => {
       await flushPromises()
       app.update()
       await waitFor(() =>
-        window.location.pathname.includes(routes.RECOVERY_CODE_ENTRY)
+        router.state.location.pathname.includes(routes.RECOVERY_CODE_ENTRY)
       )
-      expect(window.location.pathname).toContain(routes.RECOVERY_CODE_ENTRY)
+      expect(router.state.location.pathname).toContain(
+        routes.RECOVERY_CODE_ENTRY
+      )
     })
   })
 
@@ -212,9 +242,13 @@ describe('Test phone number verification form', () => {
           }
         )
       )
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME
+
+      router.navigate(routes.PHONE_NUMBER_VERIFICATION, {
+        state: {
+          forgottenItem: FORGOTTEN_ITEMS.USERNAME
+        }
       })
+
       app.update()
       app
         .find('#phone-number-input')

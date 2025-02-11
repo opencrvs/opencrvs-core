@@ -12,17 +12,11 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 import { IntlShape, useIntl } from 'react-intl'
-import {
-  Redirect,
-  useHistory,
-  useLocation,
-  useParams,
-  useRouteMatch
-} from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { useRecord } from '@client/hooks/useRecord'
 import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { useSelector } from 'react-redux'
@@ -695,13 +689,9 @@ function applyCorrectionToData(record: IDeclaration) {
 
 export function ReviewCorrection() {
   const { declarationId } = useParams<URLParams>()
-  const match = useRouteMatch()
-
-  const location = useLocation()
-  const history = useHistory()
 
   const records = useRecord()
-  const record = records.findById(declarationId)
+  const record = declarationId ? records.findById(declarationId) : undefined
 
   const registerForm = useSelector(
     (state: IStoreState) => record && getEventReviewForm(state, record.event)
@@ -709,7 +699,7 @@ export function ReviewCorrection() {
 
   if (!record) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyForReview,
           selectorId: ''
@@ -723,20 +713,17 @@ export function ReviewCorrection() {
   return (
     <>
       <RegisterForm
+        reviewSummaryHeader={
+          <ReviewSummarySection declaration={recordWithProposedChanges} />
+        }
         match={{
-          ...match,
           params: {
             declarationId: record.id,
             pageId: 'review',
             groupId: 'review-view-group'
           }
         }}
-        reviewSummaryHeader={
-          <ReviewSummarySection declaration={recordWithProposedChanges} />
-        }
         pageRoute={''}
-        location={location}
-        history={history}
         registerForm={registerForm!}
         declaration={recordWithProposedChanges}
       />

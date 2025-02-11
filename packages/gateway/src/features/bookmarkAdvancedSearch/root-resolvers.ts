@@ -12,6 +12,7 @@ import fetch from '@gateway/fetch'
 import { inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -21,10 +22,17 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       // Only registrar or registration agent should be able to search user
-      if (!inScope(authHeader, ['register', 'validate'])) {
-        throw new Error(
-          'Advanced search is only allowed for registrar or registration agent'
-        )
+      if (
+        !inScope(authHeader, [
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+        ])
+      ) {
+        throw new Error('Advanced search is not allowed for this user')
       }
 
       const res = await fetch(`${USER_MANAGEMENT_URL}searches`, {
@@ -50,7 +58,16 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       // Only registrar or registration agent should be able to search user
-      if (!inScope(authHeader, ['register', 'validate'])) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+        ])
+      ) {
         throw new Error(
           'Advanced search is only allowed for registrar or registration agent'
         )

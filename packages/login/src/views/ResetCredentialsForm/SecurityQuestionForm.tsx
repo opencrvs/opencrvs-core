@@ -8,12 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  FORGOTTEN_ITEMS,
-  goToPhoneNumberVerificationForm,
-  goToSuccessPage,
-  goToUpdatePasswordForm
-} from '@login/login/actions'
+import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import {
   authApi,
   IVerifySecurityAnswerResponse,
@@ -23,8 +18,6 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { messages as sharedMessages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { Frame } from '@opencrvs/components/lib/Frame'
@@ -33,6 +26,9 @@ import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { RouteComponentProps, withRouter } from '@login/common/WithRouterProps'
+import { useLocation, useNavigate } from 'react-router-dom'
+import * as routes from '@login/navigation/routes'
 
 const Actions = styled.div`
   & > div {
@@ -83,33 +79,16 @@ const messages = {
   }
 }
 
-interface BaseProps
-  extends RouteComponentProps<
-    {},
-    {},
-    {
-      forgottenItem: FORGOTTEN_ITEMS
-      nonce: string
-      securityQuestionKey: QUESTION_KEYS
-    }
-  > {
-  goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
-  goToUpdatePasswordForm: typeof goToUpdatePasswordForm
-  goToSuccessPage: typeof goToSuccessPage
-}
+type Props = WrappedComponentProps
 
-type Props = BaseProps & WrappedComponentProps
-
-const SecurityQuestionComponent = ({
-  goToPhoneNumberVerificationForm,
-  goToUpdatePasswordForm,
-  goToSuccessPage,
-  intl,
-  location
-}: Props) => {
+const SecurityQuestionComponent = ({ intl }: Props) => {
   const [answer, setAnswer] = useState<string>('')
   const [touched, setTouched] = useState<boolean>(false)
   const [error, setError] = useState<boolean>(false)
+
+  const location = useLocation()
+  const navigate = useNavigate()
+
   const [questionKey, setQuestionKey] = useState<QUESTION_KEYS>(
     location.state.securityQuestionKey
   )
@@ -139,10 +118,10 @@ const SecurityQuestionComponent = ({
       }
       if (location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME) {
         await authApi.sendUserName(location.state.nonce)
-        return goToSuccessPage(location.state.forgottenItem)
+        return navigate(routes.SUCCESS, { state: location.state.forgottenItem })
       }
 
-      goToUpdatePasswordForm(result.nonce)
+      navigate(routes.UPDATE_PASSWORD, { state: { nonce: result.nonce } })
     } catch (error) {
       // @todo error handling
       setError(true)
@@ -161,7 +140,11 @@ const SecurityQuestionComponent = ({
                 aria-label="Go back"
                 size="medium"
                 type="icon"
-                onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                onClick={() =>
+                  navigate(routes.PHONE_NUMBER_VERIFICATION, {
+                    state: forgottenItem
+                  })
+                }
               >
                 <Icon name="ArrowLeft" />
               </Button>
@@ -171,7 +154,11 @@ const SecurityQuestionComponent = ({
                 aria-label="Go back"
                 size="medium"
                 type="icon"
-                onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                onClick={() =>
+                  navigate(routes.PHONE_NUMBER_VERIFICATION, {
+                    state: forgottenItem
+                  })
+                }
               >
                 <Icon name="ArrowLeft" />
               </Button>
@@ -243,10 +230,4 @@ const SecurityQuestionComponent = ({
   )
 }
 
-export const SecurityQuestion = withRouter(
-  connect(null, {
-    goToPhoneNumberVerificationForm,
-    goToUpdatePasswordForm,
-    goToSuccessPage
-  })(injectIntl(SecurityQuestionComponent))
-)
+export const SecurityQuestion = injectIntl(SecurityQuestionComponent)

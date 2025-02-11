@@ -9,28 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { FormConfig } from './FormConfig'
+import {
+  EnableConditional,
+  HideConditional,
+  ShowConditional
+} from './Conditional'
+import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { ActionType } from './ActionType'
+
+const ActionConditional = z.discriminatedUnion('type', [
+  // Action can be shown / hidden
+  ShowConditional,
+  HideConditional,
+  // Action can be shown to the user in the list but as disabled
+  EnableConditional
+])
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
+  conditionals: z.array(ActionConditional).optional().default([]),
+  draft: z.boolean().optional(),
   forms: z.array(FormConfig)
 })
-
-/**
- * Actions recognized by the system
- */
-export const ActionType = {
-  CREATE: 'CREATE',
-  ASSIGN: 'ASSIGN',
-  UNASSIGN: 'UNASSIGN',
-  REGISTER: 'REGISTER',
-  VALIDATE: 'VALIDATE',
-  CORRECT: 'CORRECT',
-  DETECT_DUPLICATE: 'DETECT_DUPLICATE',
-  NOTIFY: 'NOTIFY',
-  DECLARE: 'DECLARE'
-} as const
 
 const CreateConfig = ActionConfigBase.merge(
   z.object({
@@ -44,14 +45,67 @@ const DeclareConfig = ActionConfigBase.merge(
   })
 )
 
+const ValidateConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.VALIDATE)
+  })
+)
+
 const RegisterConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER)
   })
 )
 
+const DeleteConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.DELETE)
+  })
+)
+
+const PrintCertificateActionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
+const RequestCorrectionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REQUEST_CORRECTION),
+    onboardingForm: z.array(FormPage),
+    additionalDetailsForm: z.array(FormPage)
+  })
+)
+
+const RejectCorrectionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT_CORRECTION)
+  })
+)
+
+const ApproveCorrectionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.APPROVE_CORRECTION)
+  })
+)
+
+const CustomConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.CUSTOM)
+  })
+)
+
 export const ActionConfig = z.discriminatedUnion('type', [
   CreateConfig,
   DeclareConfig,
-  RegisterConfig
+  ValidateConfig,
+  RegisterConfig,
+  DeleteConfig,
+  PrintCertificateActionConfig,
+  RequestCorrectionConfig,
+  RejectCorrectionConfig,
+  ApproveCorrectionConfig,
+  CustomConfig
 ])
+
+export type ActionConfig = z.infer<typeof ActionConfig>

@@ -13,15 +13,17 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockDeclarationData,
-  mockDeathDeclarationData
+  mockDeathDeclarationData,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { VerifyCollector } from './VerifyCollector'
 import { storeDeclaration } from '@client/declarations'
 import { EventType } from '@client/utils/gateway'
-import { ReactWrapper } from 'enzyme'
+import { formatUrl } from '@client/navigation'
+import { VERIFY_COLLECTOR } from '@client/navigation/routes'
 
 describe('verify collector tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   const birthDeclaration = {
     id: 'mockBirth1234',
@@ -60,44 +62,39 @@ describe('verify collector tests', () => {
     })
 
     it('when mother is collector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <VerifyCollector
-          history={history}
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <VerifyCollector />,
+        {
+          store,
+          path: VERIFY_COLLECTOR,
+          initialEntries: [
+            formatUrl(VERIFY_COLLECTOR, {
               registrationId: 'mockBirth1234',
               eventType: EventType.Birth,
               collector: 'mother'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
-    it('should takes user go back', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <VerifyCollector
-          history={history}
-          match={{
-            params: {
+    it('should take user go back', async () => {
+      const { component: testComponent, router } = await createTestComponent(
+        <VerifyCollector />,
+        {
+          store,
+          path: VERIFY_COLLECTOR,
+          initialEntries: [
+            '/',
+            formatUrl(VERIFY_COLLECTOR, {
               registrationId: 'mockBirth1234',
               eventType: EventType.Birth,
               collector: 'mother'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       testComponent
@@ -111,127 +108,119 @@ describe('verify collector tests', () => {
 
       testComponent.update()
 
-      expect(history.location.pathname).toBe('/')
+      expect(router.state.location.pathname).toBe('/')
     })
 
     describe('when informant is collector', () => {
-      let testComponent: ReactWrapper
+      let testComponent: TestComponentWithRouteMock
       beforeAll(() => {
         // @ts-ignore
         store.dispatch(storeDeclaration(deathDeclaration))
       })
       beforeEach(async () => {
-        testComponent = await createTestComponent(
-          // @ts-ignore
-          <VerifyCollector
-            history={history}
-            match={{
-              params: {
-                registrationId: 'mockDeath1234',
-                eventType: EventType.Death,
-                collector: 'informant'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          { store, history }
-        )
+        testComponent = await createTestComponent(<VerifyCollector />, {
+          store,
+          path: VERIFY_COLLECTOR,
+          initialEntries: [
+            formatUrl(VERIFY_COLLECTOR, {
+              registrationId: 'mockDeath1234',
+              eventType: EventType.Death,
+              collector: 'informant'
+            })
+          ]
+        })
       })
 
       it('renders idVerifier compomnent', () => {
-        expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+        expect(
+          testComponent.component.find('#idVerifier').hostNodes()
+        ).toHaveLength(1)
       })
 
       it('clicking on yes button takes user to review certificate if there is no fee', () => {
-        testComponent
+        testComponent.component
           .find('#idVerifier')
           .find('#verifyPositive')
           .hostNodes()
           .simulate('click')
 
-        expect(history.location.pathname).toContain('review')
+        expect(testComponent.router.state.location.pathname).toContain('review')
       })
 
       describe('when father is collector', () => {
-        let testComponent: ReactWrapper
+        let testComponent: TestComponentWithRouteMock
         beforeAll(() => {
           // @ts-ignore
           store.dispatch(storeDeclaration(birthDeclaration))
         })
         beforeEach(async () => {
-          testComponent = await createTestComponent(
-            // @ts-ignore
-            <VerifyCollector
-              history={history}
-              match={{
-                params: {
-                  registrationId: 'mockBirth1234',
-                  eventType: EventType.Death,
-                  collector: 'father'
-                },
-                isExact: true,
-                path: '',
-                url: ''
-              }}
-            />,
-            { store, history }
-          )
+          testComponent = await createTestComponent(<VerifyCollector />, {
+            store,
+            path: VERIFY_COLLECTOR,
+            initialEntries: [
+              formatUrl(VERIFY_COLLECTOR, {
+                registrationId: 'mockBirth1234',
+                eventType: EventType.Death,
+                collector: 'father'
+              })
+            ]
+          })
         })
 
         it('clicking on send button on modal takes user to payment if there is fee', () => {
-          testComponent
+          testComponent.component
             .find('#idVerifier')
             .find('#verifyNegative')
             .hostNodes()
             .simulate('click')
 
-          testComponent.update()
+          testComponent.component.update()
 
-          testComponent
+          testComponent.component
             .find('#withoutVerificationPrompt')
             .find('#send')
             .hostNodes()
             .simulate('click')
 
-          expect(history.location.pathname).toContain('payment')
+          expect(testComponent.router.state.location.pathname).toContain(
+            'payment'
+          )
         })
       })
 
       it('clicking on no button shows up modal', () => {
-        testComponent
+        testComponent.component
           .find('#idVerifier')
           .find('#verifyNegative')
           .hostNodes()
           .simulate('click')
 
-        testComponent.update()
+        testComponent.component.update()
 
         expect(
-          testComponent.find('#withoutVerificationPrompt').hostNodes()
+          testComponent.component.find('#withoutVerificationPrompt').hostNodes()
         ).toHaveLength(1)
       })
 
       it('clicking on cancel button hides the modal', () => {
-        testComponent
+        testComponent.component
           .find('#idVerifier')
           .find('#verifyNegative')
           .hostNodes()
           .simulate('click')
 
-        testComponent.update()
+        testComponent.component.update()
 
-        testComponent
+        testComponent.component
           .find('#withoutVerificationPrompt')
           .find('#cancel')
           .hostNodes()
           .simulate('click')
 
-        testComponent.update()
+        testComponent.component.update()
 
         expect(
-          testComponent.find('#withoutVerificationPrompt').hostNodes()
+          testComponent.component.find('#withoutVerificationPrompt').hostNodes()
         ).toHaveLength(0)
       })
     })
@@ -244,22 +233,19 @@ describe('verify collector tests', () => {
     })
 
     it('when informant is collector', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <VerifyCollector
-          history={history}
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <VerifyCollector />,
+        {
+          store,
+          path: VERIFY_COLLECTOR,
+          initialEntries: [
+            formatUrl(VERIFY_COLLECTOR, {
               registrationId: 'mockDeath1234',
               eventType: EventType.Death,
               collector: 'informant'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)

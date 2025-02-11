@@ -39,8 +39,8 @@ import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
 import { Text } from '@opencrvs/components/lib/Text/Text'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
-import { Link } from 'react-router-dom'
-import { FORGOTTEN_ITEM } from '@login/navigation/routes'
+import { Link, useNavigate } from 'react-router-dom'
+import { FORGOTTEN_ITEM, STEP_TWO } from '@login/navigation/routes'
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
@@ -107,6 +107,10 @@ export function StepOneContainer() {
   const intl = useIntl()
   const isOffline: boolean = navigator.onLine ? false : true
 
+  const navigate = useNavigate()
+
+  const toStepTwo = () => navigate(STEP_TWO)
+
   const dispatch = useDispatch()
 
   const logo = usePersistentCountryLogo()
@@ -123,7 +127,7 @@ export function StepOneContainer() {
         </LogoContainer>
         <Form
           onSubmit={(values: IAuthenticationData) =>
-            dispatch(actions.authenticate(values))
+            dispatch(actions.authenticate(values, toStepTwo))
           }
         >
           {({ handleSubmit }) => (

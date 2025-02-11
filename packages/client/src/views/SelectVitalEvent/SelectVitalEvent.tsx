@@ -19,43 +19,34 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
-import {
-  goBack,
-  goToHome,
-  goToDeathInformant,
-  goToBirthRegistrationAsParent,
-  goToMarriageInformant
-} from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-
 import {
   storeDeclaration,
   IDeclaration,
   createDeclaration
 } from '@client/declarations'
+import ProtectedComponent from '@client/components/ProtectedComponent'
+
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import * as routes from '@client/navigation/routes'
+
+type DispatchProps = {
+  storeDeclaration: typeof storeDeclaration
+}
 
 type GoToType = '' | EventType
 
 const SelectVitalEventView = (
-  props: IntlShapeProps & {
-    goBack: typeof goBack
-    goToHome: typeof goToHome
-    storeDeclaration: typeof storeDeclaration
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-    goToDeathInformant: typeof goToDeathInformant
-    goToMarriageInformant: typeof goToMarriageInformant
-  }
+  props: IntlShapeProps & RouteComponentProps<IntlShapeProps> & DispatchProps
 ) => {
-  const {
-    intl,
-    goToHome,
-    storeDeclaration,
-    goToBirthRegistrationAsParent,
-    goToDeathInformant,
-    goToMarriageInformant
-  } = props
+  const { intl, storeDeclaration } = props
 
   const [goTo, setGoTo] = useState<GoToType>('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
@@ -69,17 +60,30 @@ const SelectVitalEventView = (
       case EventType.Birth:
         declaration = createDeclaration(EventType.Birth)
         storeDeclaration(declaration)
-        goToBirthRegistrationAsParent(declaration.id)
+
+        props.router.navigate(
+          formatUrl(routes.DRAFT_BIRTH_PARENT_FORM, {
+            declarationId: declaration.id
+          })
+        )
         break
       case EventType.Death:
         declaration = createDeclaration(EventType.Death)
         storeDeclaration(declaration)
-        goToDeathInformant(declaration.id)
+        props.router.navigate(
+          formatUrl(routes.DRAFT_DEATH_FORM, {
+            declarationId: declaration.id
+          })
+        )
         break
       case EventType.Marriage:
         declaration = createDeclaration(EventType.Marriage)
         storeDeclaration(declaration)
-        goToMarriageInformant(declaration.id)
+        props.router.navigate(
+          formatUrl(routes.DRAFT_MARRIAGE_FORM, {
+            declarationId: declaration.id
+          })
+        )
         break
       default:
         throw new Error(`Unknown eventType ${goTo}`)
@@ -97,7 +101,7 @@ const SelectVitalEventView = (
               id="goBack"
               type="secondary"
               size="small"
-              onClick={goToHome}
+              onClick={() => props.router.navigate(routes.HOME)}
             >
               <Icon name="X" />
               {intl.formatMessage(buttonMessages.exitButton)}
@@ -106,7 +110,11 @@ const SelectVitalEventView = (
           mobileLeft={<Icon name="Draft" size="large" />}
           mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileRight={
-            <Button type="icon" size="medium" onClick={goToHome}>
+            <Button
+              type="icon"
+              size="medium"
+              onClick={() => props.router.navigate(routes.HOME)}
+            >
               <Icon name="X" />
             </Button>
           }
@@ -143,48 +151,69 @@ const SelectVitalEventView = (
           alignItems="left"
           gap={0}
         >
-          <RadioButton
-            size="large"
-            key="birthevent"
-            name="birthevent"
-            label={intl.formatMessage(constantsMessages.birth)}
-            value={EventType.Birth}
-            id="select_birth_event"
-            selected={goTo === EventType.Birth ? EventType.Birth : ''}
-            onChange={() => {
-              setGoTo(EventType.Birth)
-              setNoEventSelectedError(false)
-            }}
-          />
-          {window.config.FEATURES.DEATH_REGISTRATION && (
+          <ProtectedComponent
+            scopes={[
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION
+            ]}
+          >
             <RadioButton
               size="large"
-              key="deathevent"
-              name="deathevent"
-              label={intl.formatMessage(constantsMessages.death)}
-              value={EventType.Death}
-              id="select_death_event"
-              selected={goTo === EventType.Death ? EventType.Death : ''}
+              key="birthevent"
+              name="birthevent"
+              label={intl.formatMessage(constantsMessages.birth)}
+              value="birth"
+              id="select_birth_event"
+              selected={goTo === EventType.Birth ? EventType.Birth : ''}
               onChange={() => {
-                setGoTo(EventType.Death)
+                setGoTo(EventType.Birth)
                 setNoEventSelectedError(false)
               }}
             />
+          </ProtectedComponent>
+          {window.config.FEATURES.DEATH_REGISTRATION && (
+            <ProtectedComponent
+              scopes={[
+                SCOPES.RECORD_DECLARE_DEATH,
+                SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION
+              ]}
+            >
+              <RadioButton
+                size="large"
+                key="deathevent"
+                name="deathevent"
+                label={intl.formatMessage(constantsMessages.death)}
+                value="death"
+                id="select_death_event"
+                selected={goTo === EventType.Death ? EventType.Death : ''}
+                onChange={() => {
+                  setGoTo(EventType.Death)
+                  setNoEventSelectedError(false)
+                }}
+              />
+            </ProtectedComponent>
           )}
           {window.config.FEATURES.MARRIAGE_REGISTRATION && (
-            <RadioButton
-              size="large"
-              key="marriagevent"
-              name="marriageevent"
-              label={intl.formatMessage(constantsMessages.marriage)}
-              value={EventType.Marriage}
-              id="select_marriage_event"
-              selected={goTo === EventType.Marriage ? EventType.Marriage : ''}
-              onChange={() => {
-                setGoTo(EventType.Marriage)
-                setNoEventSelectedError(false)
-              }}
-            />
+            <ProtectedComponent
+              scopes={[
+                SCOPES.RECORD_DECLARE_MARRIAGE,
+                SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+              ]}
+            >
+              <RadioButton
+                size="large"
+                key="marriagevent"
+                name="marriageevent"
+                label={intl.formatMessage(constantsMessages.marriage)}
+                value="marriage"
+                id="select_marriage_event"
+                selected={goTo === EventType.Marriage ? EventType.Marriage : ''}
+                onChange={() => {
+                  setGoTo(EventType.Marriage)
+                  setNoEventSelectedError(false)
+                }}
+              />
+            </ProtectedComponent>
           )}
         </Stack>
       </Content>
@@ -192,11 +221,8 @@ const SelectVitalEventView = (
   )
 }
 
-export const SelectVitalEvent = connect(null, {
-  goBack,
-  goToHome,
-  storeDeclaration,
-  goToBirthRegistrationAsParent,
-  goToDeathInformant,
-  goToMarriageInformant
-})(injectIntl(SelectVitalEventView))
+export const SelectVitalEvent = withRouter(
+  connect(null, {
+    storeDeclaration
+  })(injectIntl(SelectVitalEventView))
+)

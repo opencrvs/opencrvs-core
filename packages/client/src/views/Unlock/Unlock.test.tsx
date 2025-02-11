@@ -70,11 +70,11 @@ describe('Unlock page loads Properly', () => {
       async (key: string, value: string) => (indexedDB[key] = value)
     )
 
-    const { store, history } = createStore()
-    testComponent = await createTestComponent(
+    const { store } = createStore()
+    ;({ component: testComponent } = await createTestComponent(
       <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
-      { store, history }
-    )
+      { store }
+    ))
   })
 
   it('Should load the Unlock page properly', () => {
@@ -108,11 +108,12 @@ describe('For wrong inputs', () => {
   beforeEach(async () => {
     await flushPromises()
     vi.clearAllMocks()
-    const { store, history } = createStore()
-    testComponent = await createTestComponent(
+    const { store } = createStore()
+
+    ;({ component: testComponent } = await createTestComponent(
       <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
-      { store, history }
-    )
+      { store }
+    ))
 
     // These tests are only for wrong inputs, so this mock fn only returns a promise of false
     pinValidator.isValidPin = vi.fn(async (pin) => Promise.resolve(false))
@@ -178,11 +179,11 @@ describe('Pin locked session', () => {
       async (key: string, value: string) => (indexedDB[key] = value)
     )
 
-    const { store, history } = createStore()
-    testComponent = await createTestComponent(
+    const { store } = createStore()
+    ;({ component: testComponent } = await createTestComponent(
       <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
-      { store, history }
-    )
+      { store }
+    ))
   })
 
   it('Should not accept correct pin while the account is locked', async () => {
@@ -205,14 +206,14 @@ describe('Logout Sequence', () => {
   const onForgetPinMock: Mock = vi.fn()
 
   it('should clear lock-related indexeddb entries upon logout', async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const redirect = vi.fn()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <Unlock
         onCorrectPinMatch={() => redirect}
         onForgetPin={onForgetPinMock}
       />,
-      { store, history }
+      { store }
     )
     const indexeddb = {
       SCREEN_LOCK: true,

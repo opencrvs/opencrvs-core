@@ -32,10 +32,9 @@ describe('Death registration mutation mapping related tests', () => {
     )
     expect(transformedData.registration.certificates).toEqual([
       {
-        collector: {
-          relationship: 'MOTHER'
-        },
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        certificateTemplateId: 'death-certificate',
+        collector: { relationship: 'MOTHER' }
       }
     ])
   })
@@ -54,24 +53,14 @@ describe('Death registration mutation mapping related tests', () => {
     expect(transformedData.registration.trackingId).toEqual('DDSS0SE')
     expect(transformedData.registration.certificates).toEqual([
       {
+        hasShowedVerifiedDocument: true,
+        certificateTemplateId: 'death-certificate',
         collector: {
           relationship: 'OTHER',
           otherRelationship: 'Uncle',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mushraful',
-              familyName: 'Hoque'
-            }
-          ],
-          identifier: [
-            {
-              id: '123456789',
-              type: 'PASSPORT'
-            }
-          ]
-        },
-        hasShowedVerifiedDocument: true
+          name: [{ use: 'en', firstNames: 'Mushraful', familyName: 'Hoque' }],
+          identifier: [{ id: '123456789', type: 'PASSPORT' }]
+        }
       }
     ])
   })

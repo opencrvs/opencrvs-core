@@ -25,9 +25,8 @@ import {
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
 import {
-  goBack,
-  goToHomeTab,
-  goToCertificateCorrection
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl
 } from '@client/navigation'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -35,18 +34,16 @@ import { connect, useSelector } from 'react-redux'
 import { supportingDocumentsSection } from '@client/forms/correction/supportDocument'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
+import { useNavigate } from 'react-router-dom'
 
 type IProps = {
   declaration: IDeclaration
 }
 
 type IDispatchProps = {
-  goBack: typeof goBack
-  goToHomeTab: typeof goToHomeTab
-  goToCertificateCorrection: typeof goToCertificateCorrection
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
 }
@@ -56,6 +53,7 @@ type IFullProps = IProps & IDispatchProps & IntlShapeProps
 function SupportingDocumentsFormComoponent(props: IFullProps) {
   const { intl, declaration } = props
   const [isFileUploading, setIsFileUploading] = React.useState<boolean>(false)
+  const navigate = useNavigate()
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
   const section = supportingDocumentsSection
@@ -118,7 +116,12 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
 
   const continueButtonHandler = () => {
     props.writeDeclaration(declaration)
-    props.goToCertificateCorrection(declaration.id, CorrectionSection.Reason)
+    navigate(
+      generateCertificateCorrectionUrl({
+        declarationId: declaration.id,
+        pageId: CorrectionSection.Reason
+      })
+    )
   }
 
   return (
@@ -127,8 +130,14 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
         id="corrector_form"
         title={section.title && intl.formatMessage(section.title)}
         hideBackground
-        goBack={props.goBack}
-        goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
+        goBack={() => navigate(-1)}
+        goHome={() =>
+          navigate(
+            generateGoToHomeTabUrl({
+              tabId: WORKQUEUE_TABS.readyForReview
+            })
+          )
+        }
       >
         <Content
           {...contentProps}
@@ -164,9 +173,6 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
 }
 
 export const SupportingDocumentsForm = connect(undefined, {
-  goBack,
-  goToHomeTab,
-  goToCertificateCorrection,
   modifyDeclaration,
   writeDeclaration
 })(injectIntl(SupportingDocumentsFormComoponent))

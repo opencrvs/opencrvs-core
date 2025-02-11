@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { goToUserProfile, IDynamicValues } from '@client/navigation'
+import { IDynamicValues } from '@client/navigation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
@@ -45,6 +45,8 @@ import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
+import { useSelector } from 'react-redux'
+import { getScope } from '@client/profile/profileSelectors'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -406,7 +408,12 @@ const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.collector?.name
+    const name = certificate.certifier?.name
+      ? getIndividualNameObj(
+          certificate.certifier.name,
+          window.config.LANGUAGES
+        )
+      : certificate.collector?.name
       ? getIndividualNameObj(
           certificate.collector.name,
           window.config.LANGUAGES
@@ -421,9 +428,15 @@ const ActionDetailsModalListTable = ({
       }`
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
-      if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        return `${collectorName} (${certificate.collector?.otherRelationship})`
-      }
+
+      if (certificate.certifier?.role)
+        return `${collectorName} (${intl.formatMessage(
+          certificate.certifier.role.label
+        )})`
+
+      if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE')
+        return `${collectorName} (${certificate.collector.otherRelationship})`
+
       return collectorName
     }
 
@@ -446,12 +459,34 @@ const ActionDetailsModalListTable = ({
     {
       key: 'collector',
       label:
+        !collectorData.relationship || // relationship should not be available if certifier is found for certificate
         collectorData.relationship === 'PRINT_IN_ADVANCE'
           ? intl.formatMessage(certificateMessages.printedOnAdvance)
           : intl.formatMessage(certificateMessages.printedOnCollection),
       width: 100
     }
   ]
+
+  const selectedCertificateTemplate = [
+    {
+      key: 'certTemplate',
+      label: intl.formatMessage(
+        certificateMessages.selectedCertificateTemplateLabel
+      ),
+      width: 200
+    }
+  ]
+
+  const certificateTemplateMessageDescriptor =
+    offlineData.templates?.certificates?.find(
+      (x) => x.id === actionDetailsData.certificateTemplateId
+    )?.label
+
+  const selectedCertificateTemplateName = {
+    certTemplate: certificateTemplateMessageDescriptor
+      ? intl.formatMessage(certificateTemplateMessageDescriptor)
+      : ''
+  }
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   const content = prepareComments(actionDetailsData, draft)
   const requesterLabel = requesterLabelMapper(
@@ -609,6 +644,17 @@ const ActionDetailsModalListTable = ({
             onPageChange={pageChangeHandler}
           />
         )}
+      {!isEmpty(collectorData) && !!actionDetailsData.certificateTemplateId && (
+        <Table
+          noResultText=" "
+          columns={selectedCertificateTemplate}
+          content={[selectedCertificateTemplateName]}
+          pageSize={10}
+          totalItems={1}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
+        />
+      )}
 
       {/* Matched to */}
       {actionDetailsData.potentialDuplicates &&
@@ -636,7 +682,6 @@ export const ActionDetailsModal = ({
   toggleActionDetails,
   intl,
   userDetails,
-  goToUser,
   registerForm,
   reviewForm,
   offlineData,
@@ -648,12 +693,12 @@ export const ActionDetailsModal = ({
   toggleActionDetails: (param: History | null) => void
   intl: IntlShape
   userDetails: UserDetails | null
-  goToUser: typeof goToUserProfile
   registerForm: IForm
   reviewForm: IReviewFormState
   offlineData: Partial<IOfflineData>
   draft: IDeclaration | null
 }) => {
+  const scopes = useSelector(getScope)
   if (isEmpty(actionDetailsData)) return <></>
 
   const title = getStatusLabel(
@@ -661,7 +706,8 @@ export const ActionDetailsModal = ({
     actionDetailsData.regStatus,
     intl,
     actionDetailsData.user,
-    userDetails
+    userDetails,
+    scopes
   )
 
   let userName = ''

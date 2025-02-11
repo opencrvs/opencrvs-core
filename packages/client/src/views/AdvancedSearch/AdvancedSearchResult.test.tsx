@@ -9,29 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as React from 'react'
-import {
-  createTestComponent,
-  createRouterProps,
-  flushPromises,
-  userDetails
-} from '@client/tests/util'
-import { AdvancedSearchResult } from './AdvancedSearchResult'
-import { AppStore, createStore } from '@client/store'
-import { ReactWrapper } from 'enzyme'
-import { formatUrl } from '@client/navigation'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
-import { SEARCH_EVENTS } from '@client/search/queries'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import {
   BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION,
   REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION
 } from '@client/profile/mutations'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { SEARCH_EVENTS } from '@client/search/queries'
+import { AppStore, createStore } from '@client/store'
+import {
+  createTestComponent,
+  flushPromises,
+  userDetails
+} from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { EventType } from '@client/utils/gateway'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { AdvancedSearchResult } from './AdvancedSearchResult'
 
 const graphqlMock = [
   {
@@ -145,28 +142,11 @@ const graphqlMock = [
 describe('AdvancedSearchResult Bookmark', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
 
   beforeEach(async () => {
-    const s = createStore()
-    store = s.store
-    history = s.history
-    component = await createTestComponent(
-      // @ts-ignore
-      <AdvancedSearchResult
-        {...createRouterProps(formatUrl(ADVANCED_SEARCH_RESULT, {}), {
-          isNavigatedInsideApp: false
-        })}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: graphqlMock as any
-      }
-    )
-
+    ;({ store } = createStore())
     await flushPromises()
-    component.update()
+
     store.dispatch(
       setAdvancedSearchParam({
         ...advancedSearchInitialState,
@@ -175,9 +155,15 @@ describe('AdvancedSearchResult Bookmark', () => {
         registrationStatuses: ['IN_PROGRESS']
       })
     )
-    component.update()
+
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    component.update()
+    ;({ component } = await createTestComponent(<AdvancedSearchResult />, {
+      store,
+      initialEntries: [ADVANCED_SEARCH_RESULT],
+      path: ADVANCED_SEARCH_RESULT,
+      graphqlMocks: graphqlMock as any
+    }))
+
     await waitForElement(component, 'AdvancedSearchResultComp')
   })
 
@@ -231,6 +217,8 @@ describe('AdvancedSearchResult Bookmark', () => {
   })
 
   it('should bookmark advanced search result & show notification if click on confirm button', async () => {
+    await flushPromises()
+
     component.find('#toggleIconEmpty').hostNodes().simulate('click')
     component.update()
     component
@@ -244,10 +232,7 @@ describe('AdvancedSearchResult Bookmark', () => {
       .find('#bookmark_advanced_search_result')
       .hostNodes()
       .simulate('click')
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
+
     await flushPromises()
     component.update()
     expect(
@@ -256,6 +241,8 @@ describe('AdvancedSearchResult Bookmark', () => {
   })
 
   it('should remove bookmark advanced search & show notification if click on confirm button', async () => {
+    await flushPromises()
+
     store.dispatch(
       setAdvancedSearchParam({
         ...advancedSearchInitialState,
@@ -273,12 +260,10 @@ describe('AdvancedSearchResult Bookmark', () => {
       .find('#remove_advanced_search_bookmark')
       .hostNodes()
       .simulate('click')
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
+
     await flushPromises()
     component.update()
+    await flushPromises()
     expect(
       component.find('#success-save-bookmark-notification').hostNodes()
     ).toHaveLength(1)

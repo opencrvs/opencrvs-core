@@ -16,13 +16,10 @@ import { AppStore } from '@login/store'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
-import { History } from 'history'
 import { Provider } from 'react-redux'
-import { Route, Switch } from 'react-router-dom'
-import { ConnectedRouter } from 'connected-react-router'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { ForgottenItem } from './views/ResetCredentialsForm/ForgottenItemForm'
-import { ResetCredentialsSuccessPage } from './views/ResetCredentialsForm/ResetCredentialsSuccessPage'
 import { AuthDetailsVerification } from './views/ResetCredentialsForm/AuthDetailsVerificationForm'
 import { RecoveryCodeEntry } from './views/ResetCredentialsForm/RecoveryCodeEntryForm'
 import { SecurityQuestion } from './views/ResetCredentialsForm/SecurityQuestionForm'
@@ -31,10 +28,11 @@ import { Page } from './Page'
 import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 import { ReloadModal } from './views/ReloadModal'
+import { ResetCredentialsSuccessPage } from './views/ResetCredentialsForm/ResetCredentialsSuccessPage'
 
 interface IAppProps {
   store: AppStore
-  history: History
+  router: ReturnType<typeof createBrowserRouter>
 }
 
 // Injecting global styles for the body tag - used only once
@@ -45,60 +43,94 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
   }
 `
+export const routesConfig = [
+  {
+    path: '/',
+    element: (
+      <>
+        <ReloadModal />
+        <Page>
+          <Outlet />
+        </Page>
+      </>
+    ),
 
-export const App = ({ store, history }: IAppProps) => (
+    children: [
+      {
+        path: routes.STEP_ONE,
+        element: (
+          <LoginBackgroundWrapper>
+            <StepOneContainer />
+          </LoginBackgroundWrapper>
+        )
+      },
+      {
+        path: routes.STEP_TWO,
+        element: (
+          <LoginBackgroundWrapper>
+            <StepTwoContainer />
+          </LoginBackgroundWrapper>
+        )
+      },
+      {
+        path: routes.FORGOTTEN_ITEM,
+        element: (
+          <PageContainer>
+            <ForgottenItem />
+          </PageContainer>
+        )
+      },
+      {
+        path: routes.PHONE_NUMBER_VERIFICATION,
+        element: (
+          <PageContainer>
+            <AuthDetailsVerification />
+          </PageContainer>
+        )
+      },
+      {
+        path: routes.RECOVERY_CODE_ENTRY,
+        element: (
+          <PageContainer>
+            <RecoveryCodeEntry />
+          </PageContainer>
+        )
+      },
+      {
+        path: routes.SECURITY_QUESTION,
+        element: (
+          <PageContainer>
+            <SecurityQuestion />
+          </PageContainer>
+        )
+      },
+      {
+        path: routes.UPDATE_PASSWORD,
+        element: (
+          <PageContainer>
+            <UpdatePassword />
+          </PageContainer>
+        )
+      },
+      {
+        path: routes.SUCCESS,
+        element: (
+          <PageContainer>
+            <ResetCredentialsSuccessPage />
+          </PageContainer>
+        )
+      }
+    ]
+  }
+]
+
+export const App = ({ store, router }: IAppProps) => (
   <ErrorBoundary>
     <GlobalStyle />
     <Provider store={store}>
       <IntlContainer>
         <ThemeProvider theme={getTheme()}>
-          <ConnectedRouter history={history}>
-            <ReloadModal />
-            <Page>
-              <Switch>
-                <Route exact path={routes.STEP_ONE}>
-                  <LoginBackgroundWrapper>
-                    <StepOneContainer />
-                  </LoginBackgroundWrapper>
-                </Route>
-                <Route exact path={routes.STEP_TWO}>
-                  <LoginBackgroundWrapper>
-                    <StepTwoContainer />
-                  </LoginBackgroundWrapper>
-                </Route>
-                <Route exact path={routes.FORGOTTEN_ITEM}>
-                  <PageContainer>
-                    <ForgottenItem />
-                  </PageContainer>
-                </Route>
-                <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
-                  <PageContainer>
-                    <AuthDetailsVerification />
-                  </PageContainer>
-                </Route>
-                <Route exact path={routes.RECOVERY_CODE_ENTRY}>
-                  <PageContainer>
-                    <RecoveryCodeEntry />
-                  </PageContainer>
-                </Route>
-                <Route exact path={routes.SECURITY_QUESTION}>
-                  <PageContainer>
-                    <SecurityQuestion />
-                  </PageContainer>
-                </Route>
-                <Route exact path={routes.UPDATE_PASSWORD}>
-                  <PageContainer>
-                    <UpdatePassword />
-                  </PageContainer>
-                </Route>
-                <Route
-                  exact
-                  path={routes.SUCCESS}
-                  component={ResetCredentialsSuccessPage}
-                ></Route>
-              </Switch>
-            </Page>
-          </ConnectedRouter>
+          <RouterProvider router={router} />
         </ThemeProvider>
       </IntlContainer>
     </Provider>

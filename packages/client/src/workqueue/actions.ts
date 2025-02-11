@@ -9,7 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { UserDetailsAvailable } from '@client/profile/profileActions'
-import { IQueryData } from './reducer'
+import { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
+
+export interface IQueryData {
+  inProgressTab: GQLEventSearchResultSet
+  notificationTab: GQLEventSearchResultSet
+  reviewTab: GQLEventSearchResultSet
+  rejectTab: GQLEventSearchResultSet
+  sentForReviewTab: GQLEventSearchResultSet
+  approvalTab: GQLEventSearchResultSet
+  printTab: GQLEventSearchResultSet
+  issueTab: GQLEventSearchResultSet
+  externalValidationTab: GQLEventSearchResultSet
+}
 
 export const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
 export const GET_WORKQUEUE_FAILED = 'DECLARATION/GET_WORKQUEUE_FAILED'
@@ -43,7 +55,6 @@ export interface UpdateRegistrarWorkqueueAction {
   payload: {
     pageSize: number
     userId?: string
-    isFieldAgent: boolean
   }
 }
 

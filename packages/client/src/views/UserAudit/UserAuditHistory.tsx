@@ -10,13 +10,11 @@
  */
 import { messages } from '@client/i18n/messages/views/userSetup'
 import styled, { withTheme } from 'styled-components'
-import * as React from 'react'
+import React, { useState } from 'react'
 import Bowser from 'bowser'
-import { goToDeclarationRecordAudit } from '@client/navigation'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
-import { connect } from 'react-redux'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import type {
   GQLUserAuditLogItemWithComposition,
@@ -45,8 +43,11 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import format from '@client/utils/date-formatting'
 import { Link } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
-import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
+import { formatUrl } from '@client/navigation'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -76,17 +77,11 @@ const BoldContent = styled.div`
 interface IBaseProp {
   practitionerId: string
   practitionerName: string | null | undefined
-  loggedInUserRole: string | null | undefined
-}
-
-interface DispatchProps {
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
 type Props = WrappedComponentProps &
   IBaseProp &
-  IOnlineStatusProps &
-  DispatchProps & {
+  IOnlineStatusProps & {
     theme: ITheme
   }
 
@@ -114,10 +109,11 @@ type State = {
 const isUserAuditItemWithDeclarationDetials = (
   item: GQLUserAuditLogResultItem
 ): item is GQLUserAuditLogItemWithComposition => {
-  return (item as any).data
+  return 'data' in item
 }
 
 function UserAuditHistoryComponent(props: Props) {
+  const navigate = useNavigate()
   window.__localeId__ = props.intl.locale
 
   const [state, setState] = useState<State>({
@@ -130,6 +126,8 @@ function UserAuditHistoryComponent(props: Props) {
     showModal: false,
     actionDetailsData: null
   })
+
+  const { canSearchRecords } = usePermissions()
 
   function setDateRangePickerValues(startDate: Date, endDate: Date) {
     setState((prevState) => ({
@@ -227,38 +225,33 @@ function UserAuditHistoryComponent(props: Props) {
       }
       const actionMessage = getActionMessage(userAuditItem)
 
-      const isSystemAdmin =
-        props.loggedInUserRole === 'NATIONAL_SYSTEM_ADMIN' ||
-        props.loggedInUserRole === 'LOCAL_SYSTEM_ADMIN'
-
       return {
-        actionDescription:
-          isSystemAdmin &&
-          isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
-            <Link
-              font="bold14"
-              onClick={() => {
-                toggleActionDetails(userAuditItem)
-              }}
-            >
-              {actionMessage}
-            </Link>
-          ) : !isSystemAdmin &&
-            !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
-            <Link
-              font="bold14"
-              onClick={() => {
-                toggleActionDetails(userAuditItem)
-              }}
-            >
-              {actionMessage}
-            </Link>
-          ) : (
-            <BoldContent>{actionMessage}</BoldContent>
-          ),
+        actionDescription: !isUserAuditItemWithDeclarationDetials(
+          userAuditItem
+        ) ? (
+          <Link
+            font="bold14"
+            onClick={() => {
+              toggleActionDetails(userAuditItem)
+            }}
+          >
+            {actionMessage}
+          </Link>
+        ) : canSearchRecords &&
+          !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
+          <Link
+            font="bold14"
+            onClick={() => {
+              toggleActionDetails(userAuditItem)
+            }}
+          >
+            {actionMessage}
+          </Link>
+        ) : (
+          <BoldContent>{actionMessage}</BoldContent>
+        ),
 
         actionDescriptionWithAuditTime:
-          isSystemAdmin &&
           isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
             <Link
               onClick={() => {
@@ -267,7 +260,7 @@ function UserAuditHistoryComponent(props: Props) {
             >
               {actionMessage}
             </Link>
-          ) : !isSystemAdmin ? (
+          ) : canSearchRecords ? (
             <Link
               onClick={() => {
                 toggleActionDetails(userAuditItem)
@@ -280,13 +273,15 @@ function UserAuditHistoryComponent(props: Props) {
           ),
         trackingId:
           isUserAuditItemWithDeclarationDetials(userAuditItem) &&
-          !isSystemAdmin ? (
+          canSearchRecords ? (
             <Link
               font="bold14"
               onClick={() =>
-                props.goToDeclarationRecordAudit(
-                  'printTab',
-                  userAuditItem.data.compositionId as string
+                navigate(
+                  formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                    tab: 'printTab',
+                    declarationId: userAuditItem.data.compositionId as string
+                  })
                 )
               }
             >
@@ -391,7 +386,7 @@ function UserAuditHistoryComponent(props: Props) {
                       <Pagination
                         currentPage={state.currentPageNumber}
                         totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
-                        onPageChange={(page: any) =>
+                        onPageChange={(page: number) =>
                           setState((prevState) => ({
                             ...prevState,
                             currentPageNumber: page
@@ -434,6 +429,6 @@ function UserAuditHistoryComponent(props: Props) {
   )
 }
 
-export const UserAuditHistory = connect(null, {
-  goToDeclarationRecordAudit
-})(withTheme(injectIntl(withOnlineStatus(UserAuditHistoryComponent))))
+export const UserAuditHistory = withTheme(
+  injectIntl(withOnlineStatus(UserAuditHistoryComponent))
+)

@@ -8,13 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from './ActionConfig'
 import { z } from 'zod'
+import { FieldValue } from './FieldValue'
+import { ActionType } from './ActionType'
 
 const ActionBase = z.object({
-  createdAt: z.date(),
+  id: z.string(),
+  createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.record(z.string(), z.any())
+  data: z.record(z.string(), FieldValue),
+  draft: z.boolean().optional().default(false),
+  createdAtLocation: z.string()
 })
 
 const AssignedAction = ActionBase.merge(
@@ -46,28 +50,87 @@ const DeclareAction = ActionBase.merge(
   })
 )
 
+const ValidateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.VALIDATE)
+  })
+)
+
 const CreatedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.CREATE),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.CREATE)
   })
 )
 
 const NotifiedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.NOTIFY)
+  })
+)
+
+const PrintCertificateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
+const RequestedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REQUEST_CORRECTION)
+  })
+)
+
+const ApprovedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.APPROVE_CORRECTION),
+    requestId: z.string()
+  })
+)
+
+const RejectedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT_CORRECTION),
+    requestId: z.string()
+  })
+)
+
+const CustomAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.CUSTOM)
   })
 )
 
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
+  ValidateAction,
   NotifiedAction,
   RegisterAction,
   DeclareAction,
   AssignedAction,
-  UnassignedAction
+  RequestedCorrectionAction,
+  ApprovedCorrectionAction,
+  RejectedCorrectionAction,
+  UnassignedAction,
+  PrintCertificateAction,
+  CustomAction
 ])
 
 export type ActionDocument = z.infer<typeof ActionDocument>
+
+export const ResolvedUser = z.object({
+  id: z.string(),
+  role: z.string(),
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  )
+})
+
+export type ResolvedUser = z.infer<typeof ResolvedUser>
+
 export type CreatedAction = z.infer<typeof CreatedAction>
+
+export type ActionFormData = ActionDocument['data']

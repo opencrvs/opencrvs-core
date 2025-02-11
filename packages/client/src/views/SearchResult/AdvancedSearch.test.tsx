@@ -8,30 +8,28 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { createRouterProps, createTestComponent } from '@client/tests/util'
-import { AdvancedSearchConfig } from './AdvancedSearch'
-import { createStore } from '@client/store'
+import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { formatUrl } from '@client/navigation'
+import { createStore } from '@client/store'
 import {
-  ADVANCED_SEARCH,
-  ADVANCED_SEARCH_RESULT
-} from '@client/navigation/routes'
+  createTestComponent,
+  mockUserResponse,
+  setScopes
+} from '@client/tests/util'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { createMemoryRouter } from 'react-router-dom'
+import { AdvancedSearchConfig } from './AdvancedSearch'
+import { SCOPES } from '@opencrvs/commons/client'
+import { setUserDetails } from '@client/profile/profileActions'
 
 let testComponent: ReactWrapper
 beforeEach(async () => {
-  const { store, history } = createStore()
-  testComponent = await createTestComponent(
-    // @ts-ignore
-    <AdvancedSearchConfig
-      {...createRouterProps(formatUrl(ADVANCED_SEARCH, {}), {
-        isNavigatedInsideApp: false
-      })}
-    ></AdvancedSearchConfig>,
-    { store, history }
-  )
+  const { store } = createStore()
+  setScopes([SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_DEATH], store)
+  testComponent = (
+    await createTestComponent(<AdvancedSearchConfig />, { store })
+  )?.component
   testComponent.update()
 })
 
@@ -57,8 +55,10 @@ describe('when advancedSearchPage renders with no active params in store', () =>
 
 describe('when advancedSearchPage renders with 2 or more active params in store', () => {
   let testComponent: ReactWrapper
+  let router: ReturnType<typeof createMemoryRouter>
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
+    setScopes([SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_DEATH], store)
     store.dispatch(
       setAdvancedSearchParam({
         event: 'birth',
@@ -66,10 +66,13 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
         registrationStatuses: ['IN_PROGRESS']
       })
     )
-    testComponent = await createTestComponent(
+    store.dispatch(setUserDetails(mockUserResponse as any))
+    ;({ component: testComponent, router } = await createTestComponent(
       <AdvancedSearchConfig></AdvancedSearchConfig>,
-      { store, history }
-    )
+      {
+        store
+      }
+    ))
     testComponent.update()
   })
 
@@ -87,6 +90,8 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
 
   it('goes to advancedSearch Result page if search button is clicked', async () => {
     testComponent.find('#search').hostNodes().simulate('click')
-    expect(window.location.href).toContain(`${ADVANCED_SEARCH_RESULT}`)
+    expect(router.state.location.pathname).toContain(
+      `${ADVANCED_SEARCH_RESULT}`
+    )
   })
 })

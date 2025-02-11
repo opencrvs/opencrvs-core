@@ -68,7 +68,7 @@ export const ALL_USER_EMAIL = '/communications/emailAllUsers'
 export const DECLARATION_RECORD_AUDIT = '/record-audit/:tab/:declarationId'
 
 export const PERFORMANCE_HOME = '/performance'
-export const ADVANCED_SEARCH = '/search-result/advanced-search'
+export const ADVANCED_SEARCH = '/advanced-search'
 export const ADVANCED_SEARCH_RESULT = '/advanced-search/result'
 
 export const VS_EXPORTS = '/vsexports'
@@ -86,7 +86,6 @@ export const PERFORMANCE_STATISTICS = '/performance/statistics'
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'
 
-export const CREATE_USER = '/createUser'
 export const CREATE_USER_ON_LOCATION = '/createUserInLocation/:locationId'
 export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'
 export const REVIEW_USER_FORM = '/user/:userId/:sectionId/:groupId'

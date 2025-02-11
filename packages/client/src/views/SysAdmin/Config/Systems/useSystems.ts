@@ -18,7 +18,6 @@ import {
   DeleteSystemMutation,
   DeleteSystemMutationVariables,
   EventType,
-  IntegratingSystemType,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
   RefreshSystemSecretMutation,

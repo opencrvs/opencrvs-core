@@ -16,6 +16,7 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
+    "zod": "^3.23.8",
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.7.0",

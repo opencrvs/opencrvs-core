@@ -19,7 +19,7 @@ import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
 import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
-import { RouteScope } from '@config/config/routes'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const SystemRoleType = [
   'FIELD_AGENT',
@@ -35,7 +35,7 @@ export default async function configHandler(
 ) {
   try {
     const [certificates, config, systems] = await Promise.all([
-      getCertificates(request, h),
+      getCertificatesConfig(request, h),
       getApplicationConfig(request, h),
       getSystems(request, h)
     ])
@@ -53,7 +53,10 @@ export default async function configHandler(
   }
 }
 
-async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+async function getCertificatesConfig(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
   const authToken = getToken(request)
   const decodedOrError = pipe(authToken, verifyToken)
   if (decodedOrError._tag === 'Left') {
@@ -61,21 +64,23 @@ async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
   }
   const { scope } = decodedOrError.right
 
-  if (
-    scope &&
-    (scope.includes(RouteScope.CERTIFY) ||
-      scope.includes(RouteScope.VALIDATE) ||
-      scope.includes(RouteScope.NATLSYSADMIN))
-  ) {
-    return Promise.all(
-      (['birth', 'death', 'marriage'] as const).map(async (event) => {
-        const response = await getEventCertificate(event, getToken(request))
-        return response
-      })
-    )
+  if (scope.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+    const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${authToken}` }
+    })
+
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch certificates configuration: ${res.statusText} ${url}`
+      )
+    }
+    return res.json()
   }
   return []
 }
+
 async function getConfigFromCountry(authToken?: string) {
   const url = new URL('application-config', env.COUNTRY_CONFIG_URL).toString()
 
@@ -84,27 +89,6 @@ async function getConfigFromCountry(authToken?: string) {
     throw new Error(`Expected to get the application config from ${url}`)
   }
   return res.json()
-}
-
-async function getEventCertificate(
-  event: 'birth' | 'death' | 'marriage',
-  authToken: string
-) {
-  const url = new URL(
-    `/certificates/${event}.svg`,
-    env.COUNTRY_CONFIG_URL
-  ).toString()
-
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${authToken}` }
-  })
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
-  }
-  const responseText = await res.text()
-
-  return { svgCode: responseText, event }
 }
 
 async function getApplicationConfig(
@@ -172,37 +156,18 @@ const applicationConfigResponseValidation = Joi.object({
     .keys({
       REGISTRATION_TARGET: Joi.number().required(),
       LATE_REGISTRATION_TARGET: Joi.number().required(),
-      FEE: Joi.object()
-        .keys({
-          ON_TIME: Joi.number().required(),
-          LATE: Joi.number().required(),
-          DELAYED: Joi.number().required()
-        })
-        .required(),
       PRINT_IN_ADVANCE: Joi.boolean().required()
     })
     .required(),
   DEATH: Joi.object()
     .keys({
       REGISTRATION_TARGET: Joi.number().required(),
-      FEE: Joi.object()
-        .keys({
-          ON_TIME: Joi.number().required(),
-          DELAYED: Joi.number().required()
-        })
-        .required(),
       PRINT_IN_ADVANCE: Joi.boolean().required()
     })
     .required(),
   MARRIAGE: Joi.object()
     .keys({
       REGISTRATION_TARGET: Joi.number().required(),
-      FEE: Joi.object()
-        .keys({
-          ON_TIME: Joi.number().required(),
-          DELAYED: Joi.number().required()
-        })
-        .required(),
       PRINT_IN_ADVANCE: Joi.boolean().required()
     })
     .required(),
@@ -212,10 +177,8 @@ const applicationConfigResponseValidation = Joi.object({
     DEATH_REGISTRATION: Joi.boolean().required(),
     MARRIAGE_REGISTRATION: Joi.boolean().required(),
     EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean().required(),
-    INFORMANT_SIGNATURE: Joi.boolean().required(),
     PRINT_DECLARATION: Joi.boolean().required(),
-    DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required(),
-    INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required()
+    DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required()
   },
   USER_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),

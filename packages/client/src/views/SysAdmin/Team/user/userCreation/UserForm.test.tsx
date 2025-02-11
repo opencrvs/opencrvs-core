@@ -23,25 +23,28 @@ import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
 import * as builtInValidators from '@client/utils/validate'
+import { ISerializedFormSection } from '@client/forms'
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserForm
         section={deserializeFormSection(
-          mockOfflineData.userForms.sections[0],
+          mockOfflineData.userForms
+            .sections[0] as unknown as ISerializedFormSection,
           // Needs to be casted as any as there are non-validator functions in the import
           builtInValidators as Record<string, any>
         )}
         activeGroup={
           deserializeFormSection(
-            mockOfflineData.userForms.sections[0],
+            mockOfflineData.userForms
+              .sections[0] as unknown as ISerializedFormSection,
             // Needs to be casted as any as there are non-validator functions in the import
             builtInValidators as Record<string, any>
           ).groups[0]
@@ -49,7 +52,7 @@ describe('Create new user page tests', () => {
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"
       />,
-      { store, history }
+      { store }
     )
     component = testComponent
   })

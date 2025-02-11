@@ -8,14 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import {
   constantsMessages,
   dynamicConstantsMessages,
   wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
@@ -50,23 +54,22 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { RegStatus } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
 interface IBaseApprovalTabProps {
   theme: ITheme
-  goToPage: typeof goToPage
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
-  scope: Scope | null
+  scope: Scope[] | null
   queryData: {
     data: GQLEventSearchResultSet
   }
@@ -80,11 +83,14 @@ interface IBaseApprovalTabProps {
 type IApprovalTabProps = IntlShapeProps & IBaseApprovalTabProps
 
 function SentForReviewComponent(props: IApprovalTabProps) {
+  const navigate = useNavigate()
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_APPROVAL)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
-  const isFieldAgent = props.scope?.includes('declare')
+  const canSendForApproval = props.scope?.includes(
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+  )
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -121,9 +127,9 @@ function SentForReviewComponent(props: IApprovalTabProps) {
           sortFunction: onColumnClick
         },
         {
-          label: isFieldAgent
-            ? props.intl.formatMessage(navigationMessages.sentForReview)
-            : props.intl.formatMessage(navigationMessages.approvals),
+          label: canSendForApproval
+            ? props.intl.formatMessage(navigationMessages.approvals)
+            : props.intl.formatMessage(navigationMessages.sentForReview),
           width: 18,
           key: COLUMNS.SENT_FOR_APPROVAL,
           isSorted: sortedCol === COLUMNS.SENT_FOR_APPROVAL,
@@ -167,27 +173,22 @@ function SentForReviewComponent(props: IApprovalTabProps) {
       const downloadStatus =
         (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action: DownloadAction.LOAD_REVIEW_DECLARATION,
-                declarationStatus: reg.declarationStatus,
-                assignment: reg.assignment || undefined
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        actions.push({
-          actionComponent: <Downloaded />
-        })
-      }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              action: DownloadAction.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment ?? undefined
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus as DOWNLOAD_STATUS}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
+          />
+        )
+      })
+
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -196,7 +197,7 @@ function SentForReviewComponent(props: IApprovalTabProps) {
         ''
 
       let sentForApproval
-      if (isFieldAgent) {
+      if (!canSendForApproval) {
         sentForApproval =
           getPreviousOperationDateByOperationType(
             reg.operationHistories,
@@ -232,9 +233,12 @@ function SentForReviewComponent(props: IApprovalTabProps) {
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            isFieldAgent
-              ? props.goToDeclarationRecordAudit('reviewTab', reg.id)
-              : props.goToDeclarationRecordAudit('approvalTab', reg.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: canSendForApproval ? 'approvalTab' : 'reviewTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {reg.name}
@@ -243,9 +247,12 @@ function SentForReviewComponent(props: IApprovalTabProps) {
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            isFieldAgent
-              ? props.goToDeclarationRecordAudit('reviewTab', reg.id)
-              : props.goToDeclarationRecordAudit('approvalTab', reg.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: canSendForApproval ? 'approvalTab' : 'reviewTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -306,12 +313,12 @@ function SentForReviewComponent(props: IApprovalTabProps) {
     props.queryData.data.totalItems > pageSize
       ? true
       : false
-  const noResultText = isFieldAgent
-    ? intl.formatMessage(wqMessages.noRecordsSentForReview)
-    : intl.formatMessage(wqMessages.noRecordsSentForApproval)
-  const title = isFieldAgent
-    ? intl.formatMessage(navigationMessages.sentForReview)
-    : intl.formatMessage(navigationMessages.approvals)
+  const noResultText = canSendForApproval
+    ? intl.formatMessage(wqMessages.noRecordsSentForApproval)
+    : intl.formatMessage(wqMessages.noRecordsSentForReview)
+  const title = canSendForApproval
+    ? intl.formatMessage(navigationMessages.approvals)
+    : intl.formatMessage(navigationMessages.sentForReview)
   return (
     <WQContentWrapper
       title={title}
@@ -350,7 +357,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const SentForReview = connect(mapStateToProps, {
-  goToPage,
-  goToDeclarationRecordAudit
-})(injectIntl(withTheme(SentForReviewComponent)))
+export const SentForReview = connect(mapStateToProps)(
+  injectIntl(withTheme(SentForReviewComponent))
+)

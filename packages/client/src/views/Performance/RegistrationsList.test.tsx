@@ -31,7 +31,7 @@ describe('Registrations List test', () => {
   })
 
   beforeEach(async () => {
-    const { history, location, match } = createRouterProps(
+    const { location } = createRouterProps(
       '/performance/registrations',
       { isNavigatedInsideApp: false },
       {
@@ -172,9 +172,13 @@ describe('Registrations List test', () => {
         }
       }
     ]
-    const testComponent = await createTestComponent(
-      <RegistrationList history={history} location={location} match={match} />,
-      { store, history, graphqlMocks: graphqlMock }
+    const { component: testComponent } = await createTestComponent(
+      <RegistrationList />,
+      {
+        store,
+        graphqlMocks: graphqlMock,
+        initialEntries: [location.pathname + '?' + location.search]
+      }
     )
     component = testComponent
   })

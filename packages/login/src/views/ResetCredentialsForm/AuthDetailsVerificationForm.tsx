@@ -8,12 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  FORGOTTEN_ITEMS,
-  goToForgottenItemForm,
-  goToRecoveryCodeEntryForm,
-  goToSecurityQuestionForm
-} from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import { emailAddressFormat, phoneNumberFormat } from '@login/utils/validate'
 import { InputField } from '@opencrvs/components/lib/InputField'
@@ -26,13 +20,13 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 
 import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { convertToMSISDN } from '@login/utils/dataCleanse'
 import { messages as validationMessages } from '@login/i18n/messages/validations'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { useLocation, useNavigate } from 'react-router-dom'
+import * as routes from '@login/navigation/routes'
 
 const Actions = styled.div`
   & > div {
@@ -40,11 +34,6 @@ const Actions = styled.div`
   }
 `
 
-interface BaseProps {
-  goToForgottenItemForm: typeof goToForgottenItemForm
-  goToRecoveryCodeEntryForm: typeof goToRecoveryCodeEntryForm
-  goToSecurityQuestionForm: typeof goToSecurityQuestionForm
-}
 interface State {
   phone: string
   email: string
@@ -54,17 +43,7 @@ interface State {
   notificationMethod: string
 }
 
-type Props = BaseProps &
-  RouteComponentProps<{}, {}, { forgottenItem: FORGOTTEN_ITEMS }> &
-  WrappedComponentProps
-
-const AuthDetailsVerificationComponent = ({
-  intl,
-  goToForgottenItemForm,
-  goToRecoveryCodeEntryForm,
-  goToSecurityQuestionForm,
-  location
-}: Props) => {
+const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [touched, setTouched] = useState(false)
@@ -73,6 +52,10 @@ const AuthDetailsVerificationComponent = ({
   const [notificationMethod] = useState(
     window.config.USER_NOTIFICATION_DELIVERY_METHOD
   )
+
+  // <{ forgottenItem: FORGOTTEN_ITEMS }>
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const handleMobileChange = (value: string) => {
     setPhone(value)
@@ -121,19 +104,23 @@ const AuthDetailsVerificationComponent = ({
       })
 
       if (securityQuestionKey) {
-        return goToSecurityQuestionForm(
-          nonce,
-          securityQuestionKey,
-          location.state.forgottenItem
-        )
+        return navigate(routes.SECURITY_QUESTION, {
+          state: {
+            nonce,
+            securityQuestionKey,
+            forgottenItem: location.state.forgottenItem
+          }
+        })
       }
 
-      goToRecoveryCodeEntryForm(
-        nonce,
-        location.state.forgottenItem,
-        phone,
-        email
-      )
+      navigate(routes.RECOVERY_CODE_ENTRY, {
+        state: {
+          nonce,
+          mobile: phone,
+          email,
+          forgottenItem: location.state.forgottenItem
+        }
+      })
     } catch (err) {
       setError(true)
       setErrorMessage(
@@ -161,7 +148,7 @@ const AuthDetailsVerificationComponent = ({
                 aria-label="Go back"
                 size="medium"
                 type="icon"
-                onClick={goToForgottenItemForm}
+                onClick={() => navigate(routes.FORGOTTEN_ITEM)}
               >
                 <Icon name="ArrowLeft" />
               </Button>
@@ -171,7 +158,7 @@ const AuthDetailsVerificationComponent = ({
                 aria-label="Go back"
                 size="medium"
                 type="icon"
-                onClick={goToForgottenItemForm}
+                onClick={() => navigate(routes.FORGOTTEN_ITEM)}
               >
                 <Icon name="ArrowLeft" />
               </Button>
@@ -277,8 +264,6 @@ const AuthDetailsVerificationComponent = ({
   )
 }
 
-export const AuthDetailsVerification = connect(null, {
-  goToForgottenItemForm,
-  goToRecoveryCodeEntryForm,
-  goToSecurityQuestionForm
-})(withRouter(injectIntl(AuthDetailsVerificationComponent)))
+export const AuthDetailsVerification = injectIntl(
+  AuthDetailsVerificationComponent
+)

@@ -9,7 +9,37 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 module.exports = {
+  extends: '../../../../.eslintrc.events.js',
   rules: {
+    'react/jsx-key': 1,
+    'react/jsx-no-literals': 1,
+    'react/destructuring-assignment': 1,
+    'react/jsx-sort-props': [
+      1,
+      {
+        reservedFirst: true,
+        callbacksLast: true,
+        shorthandFirst: true
+      }
+    ],
+    'import/order': [
+      'error',
+      {
+        pathGroups: [
+          {
+            pattern: '@opencrvs/**',
+            group: 'external',
+            position: 'after'
+          },
+          {
+            pattern: '@client/**',
+            group: 'external',
+            position: 'after'
+          }
+        ],
+        pathGroupsExcludedImportTypes: ['builtin']
+      }
+    ],
     'no-restricted-imports': [
       'error',
       {

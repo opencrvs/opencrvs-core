@@ -1,23 +1,35 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "0.0.5",
+  "version": "0.0.40-ml",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
     "./lib": "./dist/lib.js",
-    "./events": "./dist/events/index.js"
+    "./api": "./dist/api/index.js",
+    "./events": "./dist/events/index.js",
+    "./scopes": "./dist/scopes/index.js",
+    "./conditionals": "./dist/conditionals/index.js"
   },
   "scripts": {
-    "build": "rimraf dist && tsc --build && yarn build-common-events:js && yarn copy-common-events:ts",
-    "build-common-events:js": "esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external",
-    "copy-common-events:ts": "cp -r ../commons/build/dist/common/events/*.d.ts ./dist/events"
+    "build": "./build.sh",
+    "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit && ./build.sh"
   },
-  "dependencies": {},
+  "dependencies": {
+    "uuid": "^9.0.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "superjson": "1.9.0-0",
+    "@trpc/client": "^11.0.0-rc.648",
+    "@trpc/server": "^11.0.0-rc.532"
+  },
   "devDependencies": {
+    "@types/uuid": "^9.0.3",
     "esbuild": "^0.24.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "@opencrvs/events": "^1.7.0"
   },
   "moduleNameMapper": {
-    "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js"
+    "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js",
+    "@opencrvs/commons/scopes": "@opencrvs/commons/build/dist/common/scopes.js"
   }
 }

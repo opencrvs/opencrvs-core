@@ -46,7 +46,7 @@ export const ToggleMenu = ({
       <DropdownMenu.Content>
         {menuHeader && <DropdownMenu.Label>{menuHeader}</DropdownMenu.Label>}
         {menuItems.map((item) => (
-          <DropdownMenu.Item onClick={item.handler}>
+          <DropdownMenu.Item onClick={item.handler} key={item.label}>
             {item.icon} {item.label}
           </DropdownMenu.Item>
         ))}

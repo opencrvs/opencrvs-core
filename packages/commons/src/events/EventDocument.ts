@@ -15,9 +15,8 @@ import { ActionDocument } from './ActionDocument'
 export const EventDocument = z.object({
   id: z.string(),
   type: z.string(),
-  transactionId: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
   actions: z.array(ActionDocument)
 })
 

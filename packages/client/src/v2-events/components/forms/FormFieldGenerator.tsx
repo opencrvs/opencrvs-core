@@ -8,79 +8,44 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FetchButtonField } from '@client/components/form/FetchButton'
+
+/* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
-import {
-  BIG_NUMBER,
-  BULLET_LIST,
-  BUTTON,
-  CHECKBOX,
-  CHECKBOX_GROUP,
-  DATE,
-  DATE_RANGE_PICKER,
-  DependencyInfo,
-  DIVIDER,
-  FETCH_BUTTON,
-  FIELD_GROUP_TITLE,
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
-  HEADING3,
-  HIDDEN,
-  HTTP,
-  IDateRangePickerValue,
-  IDynamicFormField,
-  IFormField,
-  IFormFieldValue,
-  IFormSectionData,
-  Ii18nFormField,
-  Ii18nTextFormField,
-  InitialValue,
-  LINK,
-  LOCATION_SEARCH_INPUT,
-  NUMBER,
-  PARAGRAPH,
-  RADIO_GROUP,
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  SELECT_WITH_OPTIONS,
-  SUBSECTION_HEADER,
-  TEL,
-  TEXT,
-  TEXTAREA,
-  TIME,
-  WARNING
-} from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages/buttons'
-import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
-import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
-import { DateField } from '@opencrvs/components/lib/DateField'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { Link } from '@opencrvs/components/lib/Link'
-import { RadioGroup } from '@opencrvs/components/lib/Radio'
-import { Select } from '@opencrvs/components/lib/Select'
-import { Text } from '@opencrvs/components/lib/Text'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { TimeField } from '@opencrvs/components/lib/TimeField'
+import { TEXT } from '@client/forms'
+import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import * as React from 'react'
+
 import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
-  flatten,
-  getConditionalActionsForField,
   getDependentFields,
-  getFieldType,
   handleInitialValue,
-  internationaliseFieldObject,
-  unflatten
+  hasInitialValueDependencyInfo,
+  makeDatesFormatted
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 
-import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
-
-import { isMobileDevice } from '@client/utils/commonUtils'
-import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
-import { BulletList, Divider } from '@opencrvs/components'
-import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
-import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
+import {
+  ActionFormData,
+  FieldConfig,
+  FieldType,
+  FieldValue,
+  FileFieldValue,
+  getConditionalActionsForField,
+  isAddressFieldType,
+  isBulletListFieldType,
+  isCheckboxFieldType,
+  isCountryFieldType,
+  isDateFieldType,
+  isDividerFieldType,
+  isFileFieldType,
+  isLocationFieldType,
+  isPageHeaderFieldType,
+  isParagraphFieldType,
+  isRadioGroupFieldType,
+  isSelectFieldType,
+  isTextFieldType
+} from '@opencrvs/commons/client'
 import {
   Field,
   FieldProps,
@@ -95,6 +60,24 @@ import {
   MessageDescriptor,
   useIntl
 } from 'react-intl'
+import { File } from './inputs/FileInput/FileInput'
+
+import {
+  BulletList,
+  Checkbox,
+  Date as DateField,
+  RadioGroup,
+  Location,
+  LocationSearch,
+  Select,
+  SelectCountry,
+  Text
+} from '@client/v2-events/features/events/registered-fields'
+
+import { SubHeader } from '@opencrvs/components'
+import { formatISO } from 'date-fns'
+import { Divider } from '@opencrvs/components'
+import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -109,41 +92,27 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-function handleSelectFocus(id: string, isSearchable: boolean) {
-  if (isMobileDevice() && isSearchable) {
-    setTimeout(() => {
-      const inputElement = document.getElementById(`${id}-form-input`)
-
-      if (inputElement) {
-        inputElement.scrollIntoView({
-          behavior: 'smooth'
-        })
-      }
-    }, 20)
-  }
-}
-
-type GeneratedInputFieldProps = {
-  fieldDefinition: Ii18nFormField
-  fields: IFormField[]
-  values: IFormSectionData
-  setFieldValue: (name: string, value: IFormFieldValue) => void
+interface GeneratedInputFieldProps<T extends FieldConfig> {
+  fieldDefinition: T
+  fields: FieldConfig[]
+  values: ActionFormData
+  setFieldValue: (name: string, value: FieldValue | undefined) => void
   onClick?: () => void
   onChange: (e: React.ChangeEvent) => void
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
-  value: IFormFieldValue
+  value: FieldValue
   touched: boolean
   error: string
-  formData: IFormSectionData
+  formData: ActionFormData
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   setFieldTouched: (name: string, isTouched?: boolean) => void
 }
 
-const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
-  ({
+const GeneratedInputField = React.memo(
+  <T extends FieldConfig>({
     fieldDefinition,
     onChange,
     onBlur,
@@ -158,202 +127,74 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     requiredErrorMessage,
     fields,
     values
-  }) => {
+  }: GeneratedInputFieldProps<T>) => {
+    const intl = useIntl()
+
     const inputFieldProps = {
-      id: fieldDefinition.name,
-      label: fieldDefinition.label,
-      helperText: fieldDefinition.helperText,
-      tooltip: fieldDefinition.tooltip,
-      description: fieldDefinition.description,
+      id: fieldDefinition.id,
+      label: fieldDefinition.hideLabel
+        ? undefined
+        : intl.formatMessage(fieldDefinition.label),
+      // helperText: fieldDefinition.helperText,
+      // tooltip: fieldDefinition.tooltip,
+      // description: fieldDefinition.description,
       required: fieldDefinition.required,
       disabled: fieldDefinition.disabled,
-      prefix: fieldDefinition.prefix,
-      postfix: fieldDefinition.postfix,
-      unit: fieldDefinition.unit,
-      hideAsterisk: fieldDefinition.hideAsterisk,
-      hideInputHeader: fieldDefinition.hideHeader,
+      // prefix: fieldDefinition.prefix,
+      // postfix: fieldDefinition.postfix,
+      // unit: fieldDefinition.unit,
+      // hideAsterisk: fieldDefinition.hideAsterisk,
+      // hideInputHeader: fieldDefinition.hideHeader,
       error,
       touched
     }
 
-    const intl = useIntl()
-    const onChangeGroupInput = React.useCallback(
-      (val: string) => setFieldValue(fieldDefinition.name, val),
-      [fieldDefinition.name, setFieldValue]
-    )
-
     const inputProps = {
-      id: fieldDefinition.name,
+      id: fieldDefinition.id,
+      name: fieldDefinition.id,
       onChange,
       onBlur,
       value,
       disabled: fieldDefinition.disabled ?? disabled,
       error: Boolean(error),
       touched: Boolean(touched),
-      placeholder: fieldDefinition.placeholder
-    }
-    if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
-      return (
-        <InputField {...inputFieldProps}>
-          <Select
-            {...inputProps}
-            isDisabled={fieldDefinition.disabled}
-            value={value as string}
-            onChange={(val: string) => {
-              setFieldValue(fieldDefinition.name, val)
-              resetDependentSelectValues(fieldDefinition.name)
-            }}
-            onFocus={() =>
-              handleSelectFocus(
-                fieldDefinition.name,
-                fieldDefinition.options.length > 10
-              )
-            }
-            options={fieldDefinition.options}
-          />
-        </InputField>
-      )
+      placeholder:
+        fieldDefinition.placeholder &&
+        intl.formatMessage(fieldDefinition.placeholder)
     }
 
-    if (fieldDefinition.type === RADIO_GROUP) {
-      return (
-        <InputField {...inputFieldProps}>
-          <RadioGroup
-            {...inputProps}
-            size={fieldDefinition.size}
-            onChange={(val: string) => {
-              resetDependentSelectValues(fieldDefinition.name)
-              setFieldValue(fieldDefinition.name, val)
-            }}
-            options={fieldDefinition.options}
-            name={fieldDefinition.name}
-            value={value as string}
-            notice={fieldDefinition.notice}
-            flexDirection={fieldDefinition.flexDirection}
-          />
-        </InputField>
-      )
+    const handleFileChange = React.useCallback(
+      (value: FileFieldValue | undefined) =>
+        setFieldValue(fieldDefinition.id, value),
+      [fieldDefinition.id, setFieldValue]
+    )
+
+    /**
+     * Combines the field definition with the current value and input field props
+     * USED FOR: rendering the correct input field based on the FieldConfig guards
+     */
+    const field = {
+      inputFieldProps,
+      config: fieldDefinition,
+      value
     }
 
-    if (fieldDefinition.type === CHECKBOX_GROUP) {
+    if (isDateFieldType(field)) {
       return (
-        <InputField {...inputFieldProps}>
-          <CheckboxGroup
+        <InputField {...field.inputFieldProps}>
+          <DateField.Input
             {...inputProps}
-            options={fieldDefinition.options}
-            name={fieldDefinition.name}
-            value={value as string[]}
-            onChange={(val: string[]) =>
-              setFieldValue(fieldDefinition.name, val)
-            }
+            value={field.value}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
           />
         </InputField>
       )
+    }
+    if (isPageHeaderFieldType(field)) {
+      return <SubHeader>{intl.formatMessage(fieldDefinition.label)}</SubHeader>
     }
 
-    if (fieldDefinition.type === CHECKBOX) {
-      const { checkedValue = true, uncheckedValue = false } = fieldDefinition
-      return (
-        <InputField {...inputFieldProps}>
-          <Checkbox
-            {...inputProps}
-            label={fieldDefinition.label}
-            name={fieldDefinition.name}
-            value={String(value)}
-            selected={(value as string) === checkedValue}
-            onChange={(event: { target: { value: string } }) =>
-              setFieldValue(
-                fieldDefinition.name,
-                event.target.value === String(checkedValue)
-                  ? uncheckedValue
-                  : checkedValue
-              )
-            }
-          />
-        </InputField>
-      )
-    }
-
-    if (fieldDefinition.type === DATE) {
-      return (
-        <InputField {...inputFieldProps}>
-          <DateField
-            {...inputProps}
-            notice={fieldDefinition.notice}
-            ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
-            onChange={(val: string) => setFieldValue(fieldDefinition.name, val)}
-            value={value as string}
-          />
-        </InputField>
-      )
-    }
-    if (fieldDefinition.type === TIME) {
-      return (
-        <InputField {...inputFieldProps}>
-          <TimeField
-            {...inputProps}
-            ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
-            onChange={onChangeGroupInput}
-            value={value as string}
-          />
-        </InputField>
-      )
-    }
-    if (fieldDefinition.type === DATE_RANGE_PICKER) {
-      return (
-        <InputField {...inputFieldProps}>
-          <DateRangePickerForFormField
-            inputProps={{ ...inputProps }}
-            notice={fieldDefinition.notice}
-            ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
-            onChange={(val: IDateRangePickerValue) =>
-              setFieldValue(fieldDefinition.name, val)
-            }
-            value={value as IDateRangePickerValue}
-          />
-        </InputField>
-      )
-    }
-    if (fieldDefinition.type === TEXTAREA) {
-      return (
-        <InputField {...inputFieldProps}>
-          <TextArea
-            {...inputProps}
-            maxLength={fieldDefinition.maxLength}
-            value={value.toString()}
-          />
-        </InputField>
-      )
-    }
-    if (fieldDefinition.type === TEL) {
-      return (
-        <InputField {...inputFieldProps}>
-          <TextInput
-            type="tel"
-            {...inputProps}
-            isSmallSized={fieldDefinition.isSmallSized}
-            value={inputProps.value as string}
-          />
-        </InputField>
-      )
-    }
-    if (fieldDefinition.type === DIVIDER) {
-      return <Divider />
-    }
-    if (fieldDefinition.type === HEADING3) {
-      return <Heading3>{fieldDefinition.label}</Heading3>
-    }
-    if (fieldDefinition.type === SUBSECTION_HEADER) {
-      return (
-        <>
-          <Heading2>{fieldDefinition.label}</Heading2>
-        </>
-      )
-    }
-    if (fieldDefinition.type === FIELD_GROUP_TITLE) {
-      return <Heading3>{fieldDefinition.label}</Heading3>
-    }
-    if (fieldDefinition.type === PARAGRAPH) {
+    if (isParagraphFieldType(field)) {
       const label = fieldDefinition.label as unknown as MessageDescriptor & {
         values: Record<string, string>
       }
@@ -361,198 +202,182 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
       const message = intl.formatMessage(label, {
         ...values,
-        [fieldDefinition.name]: value as any
+        [fieldDefinition.id]: field.value
       })
 
       return (
-        <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
-          <span dangerouslySetInnerHTML={{ __html: message }} />
-        </Text>
-      )
-    }
-    if (fieldDefinition.type === BULLET_LIST) {
-      return (
-        <BulletList
-          font={'reg16'}
-          {...inputProps}
-          items={fieldDefinition.items}
-        />
-      )
-    }
-    if (fieldDefinition.type === NUMBER) {
-      return (
-        <InputField {...inputFieldProps}>
-          <TextInput
-            type="number"
-            step={fieldDefinition.step}
-            max={fieldDefinition.max}
-            {...inputProps}
-            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
-                e.preventDefault()
-              }
-              const maxLength = fieldDefinition.maxLength
-              if (maxLength && e.currentTarget.value.length >= maxLength) {
-                e.preventDefault()
-              }
-            }}
-            value={inputProps.value as string}
-            maxLength={fieldDefinition.maxLength}
-            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
-              event.currentTarget.blur()
-            }}
-          />
-        </InputField>
-      )
-    }
-    if (fieldDefinition.type === BIG_NUMBER) {
-      return (
-        <InputField {...inputFieldProps}>
-          <TextInput
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            step={fieldDefinition.step}
-            {...inputProps}
-            value={inputProps.value as string}
-            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
-              event.currentTarget.blur()
-            }}
-          />
-        </InputField>
-      )
-    }
-    if (fieldDefinition.type === WARNING) {
-      return <ErrorText>{fieldDefinition.label}</ErrorText>
-    }
-
-    if (fieldDefinition.type === LINK) {
-      return (
-        <Link
-          type="reg16"
-          onClick={() => setFieldValue(fieldDefinition.name, true)}
+        <TextComponent
+          element="p"
+          variant={field.config.configuration?.styles?.fontVariant ?? 'reg16'}
         >
-          {fieldDefinition.label}
-        </Link>
+          <span dangerouslySetInnerHTML={{ __html: message }} />
+        </TextComponent>
       )
     }
 
-    if (
-      fieldDefinition.type === LOCATION_SEARCH_INPUT &&
-      fieldDefinition.locationList
-    ) {
-      const selectedLocation = fieldDefinition.locationList.find(
-        (location) => location.id === value
-      )
-
+    if (isTextFieldType(field)) {
       return (
-        <InputField {...inputFieldProps}>
-          <LocationSearch
-            buttonLabel={intl.formatMessage(buttonMessages.search)}
+        <InputField
+          {...inputFieldProps}
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration?.prefix)
+          }
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration?.postfix)
+          }
+        >
+          <Text.Input
+            type={field.config.configuration?.type ?? 'text'}
             {...inputProps}
-            selectedLocation={selectedLocation}
-            locationList={fieldDefinition.locationList}
-            searchHandler={(item) => {
-              setFieldValue(fieldDefinition.name, item.id)
-            }}
+            isDisabled={disabled}
+            maxLength={field.config.configuration?.maxLength}
+            value={field.value}
           />
         </InputField>
       )
     }
 
-    if (fieldDefinition.type === FETCH_BUTTON) {
+    if (isFileFieldType(field)) {
+      const value = formData[fieldDefinition.id] as FileFieldValue
       return (
-        <FetchButtonField
-          id={fieldDefinition.name}
-          queryData={fieldDefinition.queryData}
-          modalTitle={fieldDefinition.modalTitle}
-          label={fieldDefinition.label}
-          successTitle={fieldDefinition.successTitle}
-          errorTitle={fieldDefinition.errorTitle}
-          onFetch={fieldDefinition.onFetch}
-          isDisabled={disabled}
+        <InputField {...inputFieldProps}>
+          <File.Input
+            {...inputProps}
+            value={value}
+            onChange={handleFileChange}
+          />
+        </InputField>
+      )
+    }
+    if (isBulletListFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <BulletList {...field.config} />
+        </InputField>
+      )
+    }
+    if (isAddressFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Address.Input
+            value={field.value}
+            onChange={(val) => setFieldValue(fieldDefinition.id, val)}
+            {...field.config}
+          />
+        </InputField>
+      )
+    }
+    if (isSelectFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Select.Input
+            {...field.config}
+            value={field.value}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+    if (isCountryFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <SelectCountry.Input
+            {...field.config}
+            value={field.value}
+            setFieldValue={setFieldValue}
+          />
+        </InputField>
+      )
+    }
+    if (isCheckboxFieldType(field)) {
+      return (
+        <Checkbox.Input
+          {...field.config}
+          value={field.value}
+          setFieldValue={setFieldValue}
         />
       )
     }
-
-    if (fieldDefinition.type === HIDDEN) {
-      const { error, touched, ...allowedInputProps } = inputProps
-
+    if (isRadioGroupFieldType(field)) {
       return (
-        <input
-          type="hidden"
-          {...allowedInputProps}
-          value={inputProps.value as string}
-        />
+        <InputField {...inputFieldProps}>
+          <RadioGroup.Input
+            {...field.config}
+            value={field.value}
+            setFieldValue={setFieldValue}
+          />
+        </InputField>
       )
     }
+    if (isLocationFieldType(field)) {
+      if (field.config.options.type === 'HEALTH_FACILITY')
+        return (
+          <InputField {...inputFieldProps}>
+            <LocationSearch.Input
+              {...field.config}
+              value={field.value}
+              setFieldValue={setFieldValue}
+            />
+          </InputField>
+        )
 
-    if (fieldDefinition.type === HTTP) {
-      return null
+      return (
+        <InputField {...inputFieldProps}>
+          <Location.Input
+            {...field.config}
+            value={field.value}
+            setFieldValue={setFieldValue}
+            partOf={
+              (field.config.options?.partOf?.$data &&
+                (makeFormikFieldIdsOpenCRVSCompatible(formData)[
+                  field.config.options?.partOf.$data
+                ] as string | undefined | null)) ??
+              null
+            }
+          />
+        </InputField>
+      )
+    }
+    if (isDividerFieldType(field)) {
+      return <Divider />
     }
 
-    return (
-      <InputField {...inputFieldProps}>
-        <TextInput
-          type="text"
-          {...inputProps}
-          value={inputProps.value as string}
-          maxLength={(fieldDefinition as Ii18nTextFormField).maxLength}
-          isDisabled={disabled}
-        />
-      </InputField>
-    )
-  },
-
-  // This is a hack to workaround slow renders of Selects.
-  // A proper solution would not pass new props to this component everytime,
-  // rather they should pass the variable / function references.
-  // This may be achieved by useMemo / useCallback'ing the props before passing.
-
-  // If the function returns false, props are not equal and it will re-render
-  // If function returns true, they are equal and no rerender happens
-  (prevProps, nextProps) =>
-    prevProps.fieldDefinition.type === 'SELECT_WITH_OPTIONS' &&
-    nextProps.fieldDefinition.type === 'SELECT_WITH_OPTIONS' &&
-    prevProps.value === nextProps.value &&
-    prevProps.touched === nextProps.touched &&
-    prevProps.error === nextProps.error &&
-    prevProps.disabled === nextProps.disabled &&
-    isEqual(
-      prevProps.fieldDefinition.options,
-      nextProps.fieldDefinition.options
-    )
+    throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
+  }
 )
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-type FormData = Record<string, IFormFieldValue>
+type FormData = Record<string, FieldValue>
 
-const mapFieldsToValues = (fields: IFormField[], formData: FormData) =>
+const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
   fields.reduce((memo, field) => {
-    const fieldInitialValue = handleInitialValue(
-      field.initialValue as InitialValue,
-      formData
-    )
-    return { ...memo, [field.name]: fieldInitialValue }
+    const fieldInitialValue = handleInitialValue(field, formData)
+    return { ...memo, [field.id]: fieldInitialValue }
   }, {})
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 
-type ExposedProps = {
-  fields: IFormField[]
+interface ExposedProps {
+  fields: FieldConfig[]
   id: string
-  fieldsToShowValidationErrors?: IFormField[]
+  fieldsToShowValidationErrors?: FieldConfig[]
   setAllFieldsDirty: boolean
-  onChange: (values: IFormSectionData) => void
-  formData: Record<string, IFormFieldValue>
+  onChange: (values: ActionFormData) => void
+  formData: Record<string, FieldValue>
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IAdvancedSearchFormState
+  initialValues?: ActionFormData
 }
 
-type AllProps = ExposedProps & IntlShapeProps & FormikProps<IFormSectionData>
+type AllProps = ExposedProps &
+  IntlShapeProps &
+  FormikProps<ActionFormData> & {
+    className?: string
+  }
 
 class FormSectionComponent extends React.Component<AllProps> {
   componentDidUpdate(prevProps: AllProps) {
@@ -608,32 +433,39 @@ class FormSectionComponent extends React.Component<AllProps> {
     }
   }
 
-  showValidationErrors(fields: IFormField[]) {
+  showValidationErrors(fields: FieldConfig[]) {
     const touched = fields.reduce((memo, field) => {
-      return { ...memo, [field.name]: true }
+      return { ...memo, [field.id]: true }
     }, {})
 
     this.props.setTouched(touched)
   }
 
-  handleBlur = (e: React.FocusEvent<any>) => {
+  handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     this.props.setFieldTouched(e.target.name)
   }
 
   setFieldValuesWithDependency = (
     fieldName: string,
-    value: IFormFieldValue
+    value: FieldValue | undefined
   ) => {
     const updatedValues = cloneDeep(this.props.values)
     set(updatedValues, fieldName, value)
     const updateDependentFields = (fieldName: string) => {
       const dependentFields = getDependentFields(this.props.fields, fieldName)
       for (const field of dependentFields) {
-        updatedValues[field.name] = evalExpressionInFieldDefinition(
-          (field.initialValue as DependencyInfo).expression,
+        if (
+          !field.initialValue ||
+          !hasInitialValueDependencyInfo(field.initialValue)
+        ) {
+          continue
+        }
+
+        updatedValues[field.id] = evalExpressionInFieldDefinition(
+          field.initialValue.expression,
           { $form: updatedValues }
         )
-        updateDependentFields(field.name)
+        updateDependentFields(field.id)
       }
     }
     updateDependentFields(fieldName)
@@ -644,33 +476,43 @@ class FormSectionComponent extends React.Component<AllProps> {
   resetDependentSelectValues = (fieldName: string) => {
     const fields = this.props.fields
     const fieldsToReset = fields.filter(
-      (field) =>
-        (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-          field.dynamicOptions.dependency === fieldName) ||
-        (field.type === TEXT && field.dependency === fieldName)
+      (field) => field.type === TEXT && field.dependsOn?.includes(fieldName)
     )
 
     fieldsToReset.forEach((fieldToReset) => {
-      this.props.setFieldValue(fieldToReset.name, '')
-      this.resetDependentSelectValues(fieldToReset.name)
+      this.props.setFieldValue(fieldToReset.id, '')
+      this.resetDependentSelectValues(fieldToReset.id)
     })
   }
 
   render() {
-    const { values, fields, setFieldTouched, touched, intl, formData } =
-      this.props
+    const {
+      values,
+      fields: fieldsWithDotIds,
+      setFieldTouched,
+      touched,
+      intl,
+      className,
+      formData
+    } = this.props
 
     const language = this.props.intl.locale
 
-    const errors = this.props.errors as unknown as Errors
+    const errors = makeFormFieldIdsFormikCompatible(
+      this.props.errors as unknown as Errors
+    )
 
-    const sectionName = this.props.id.split('-')[0]
+    const fields = fieldsWithDotIds.map((field) => ({
+      ...field,
+      id: field.id.replaceAll('.', FIELD_SEPARATOR)
+    }))
+    const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
 
     return (
-      <section>
+      <section className={className}>
         {fields.map((field) => {
           let error: string
-          const fieldErrors = errors[field.name] && errors[field.name].errors
+          const fieldErrors = errors[field.id] && errors[field.id].errors
 
           if (fieldErrors && fieldErrors.length > 0) {
             const [firstError] = fieldErrors
@@ -679,153 +521,113 @@ class FormSectionComponent extends React.Component<AllProps> {
 
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            { ...formData, ...values }
+            {
+              $form: makeFormikFieldIdsOpenCRVSCompatible(
+                valuesWithFormattedDate
+              ),
+              $now: formatISO(new Date(), { representation: 'date' })
+            }
           )
 
-          if (conditionalActions.includes('hide')) {
+          if (conditionalActions.includes('HIDE')) {
             return null
           }
 
           const isFieldDisabled = conditionalActions.includes('disable')
-          const isDateField =
-            field.type === DATE ||
-            (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
-              getFieldType(field as IDynamicFormField, values) === DATE)
 
-          const isDateRangePickerField = field.type === DATE_RANGE_PICKER
-
-          const dateFields = [
-            `${field.name}-dd`,
-            `${field.name}-mm`,
-            `${field.name}-yyyy`
-          ]
-          // for date range picker fields
-          const dateRangeFields = [
-            `${field.name}exact-dd`,
-            `${field.name}exact-mm`,
-            `${field.name}exact-yyyy`
-          ]
-
-          const areFieldsTouched = (fields: string[]) =>
-            fields.every((field) => touched[field])
-
-          if (isDateField && areFieldsTouched(dateFields)) {
-            touched[field.name] = areFieldsTouched(dateFields)
-          }
-
-          if (isDateRangePickerField && areFieldsTouched(dateRangeFields)) {
-            touched[field.name] = areFieldsTouched(dateRangeFields)
-          }
-
-          const withDynamicallyGeneratedFields = field
-
-          if (
-            field.type === FETCH_BUTTON ||
-            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === BUTTON
-          ) {
-            return (
-              <FormItem
-                key={`${field.name}`}
-                ignoreBottomMargin={field.ignoreBottomMargin}
-              >
-                <Field name={field.name.replaceAll('.', '___')}>
-                  {(formikFieldProps: FieldProps<any>) => (
+          return (
+            <FormItem
+              ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
+              key={`${field.id}${language}`}
+            >
+              <Field name={field.id}>
+                {(formikFieldProps: FieldProps<any>) => {
+                  return (
                     <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      setFieldValue={this.setFieldValuesWithDependency}
-                      setFieldTouched={setFieldTouched}
+                      fieldDefinition={field}
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
+                      setFieldTouched={setFieldTouched}
+                      setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={error}
-                      fields={fields}
-                      values={values}
-                      formData={formData}
                       disabled={isFieldDisabled}
+                      error={isFieldDisabled ? '' : error}
+                      fields={fields}
+                      formData={formData}
+                      touched={touched[field.id] || false}
+                      values={values}
+                      onUploadingStateChanged={
+                        this.props.onUploadingStateChanged
+                      }
                     />
-                  )}
-                </Field>
-              </FormItem>
-            )
-          } else {
-            return (
-              <FormItem
-                key={`${field.name}${language}`}
-                ignoreBottomMargin={field.ignoreBottomMargin}
-              >
-                <Field name={field.name.replaceAll('.', '___')}>
-                  {(formikFieldProps: FieldProps<any>) => {
-                    return (
-                      <GeneratedInputField
-                        fieldDefinition={internationaliseFieldObject(
-                          intl,
-                          withDynamicallyGeneratedFields
-                        )}
-                        setFieldValue={this.setFieldValuesWithDependency}
-                        setFieldTouched={setFieldTouched}
-                        resetDependentSelectValues={
-                          this.resetDependentSelectValues
-                        }
-                        {...formikFieldProps.field}
-                        touched={touched[field.name] || false}
-                        error={isFieldDisabled ? '' : error}
-                        formData={formData}
-                        fields={fields}
-                        values={values}
-                        disabled={isFieldDisabled}
-                        onUploadingStateChanged={
-                          this.props.onUploadingStateChanged
-                        }
-                      />
-                    )
-                  }}
-                </Field>
-              </FormItem>
-            )
-          }
+                  )
+                }}
+              </Field>
+            </FormItem>
+          )
         })}
       </section>
     )
   }
 }
 
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik. This function unflattens
+ */
+export const FIELD_SEPARATOR = '____'
+function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      key.replaceAll('.', FIELD_SEPARATOR),
+      value
+    ])
+  )
+}
+
+function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      key.replaceAll(FIELD_SEPARATOR, '.'),
+      value
+    ])
+  )
+}
+
 export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
   const intl = useIntl()
 
-  const nestedFormData = unflatten(props.formData)
+  const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
 
-  const onChange = (values: IFormSectionData) => {
-    props.onChange(flatten(values))
+  const onChange = (values: ActionFormData) => {
+    props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
+  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>(
+    props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
+  )
+
   return (
-    <Formik<IFormSectionData>
-      initialValues={
-        props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
-      }
-      onSubmit={() => {}}
+    <Formik<ActionFormData>
+      enableReinitialize={true}
+      initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
-          values,
-          props.requiredErrorMessage
+          makeFormikFieldIdsOpenCRVSCompatible(values)
         )
       }
+      onSubmit={() => {}}
     >
       {(formikProps) => {
         return (
           <FormSectionComponent
             {...props}
             {...formikProps}
-            intl={intl}
             formData={nestedFormData}
+            intl={intl}
             onChange={onChange}
           />
         )

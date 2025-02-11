@@ -18,7 +18,6 @@ import {
 } from '@client/offline/reducer'
 import { System } from '@client/utils/gateway'
 import {
-  CertificateConfiguration,
   IApplicationConfig,
   IApplicationConfigAnonymous,
   IApplicationConfigResponse,
@@ -28,6 +27,7 @@ import {
   LoadConditionalsResponse,
   LoadFormsResponse,
   LoadHandlebarHelpersResponse,
+  ICertificateData,
   LoadValidatorsResponse
 } from '@client/utils/referenceApi'
 import { UserDetails } from '@client/utils/userUtils'
@@ -110,23 +110,15 @@ type ApplicationConfigLoadedAction = {
   payload: IApplicationConfigResponse
 }
 
-const CERTIFICATE_LOAD_FAILED = 'OFFLINE/CERTIFICATE_LOAD_FAILED'
-type CertificateLoadFailedAction = {
-  type: typeof CERTIFICATE_LOAD_FAILED
-  payload: Error
+export const CERTIFICATES_LOADED = 'OFFLINE/CERTIFICATES_LOADED'
+type CertificatesLoadedAction = {
+  type: typeof CERTIFICATES_LOADED
+  payload: ICertificateData[]
 }
 
-export const CERTIFICATE_CONFIGURATION_LOADED =
-  'OFFLINE/CERTIFICATE_CONFIGURATION_LOADED'
-type CertificateConfigurationLoadedAction = {
-  type: typeof CERTIFICATE_CONFIGURATION_LOADED
-  payload: CertificateConfiguration
-}
-
-export const CERTIFICATE_CONFIGURATION_LOAD_FAILED =
-  'OFFLINE/CERTIFICATE_CONFIGURATION_LOAD_FAILED'
-type CertificateConfigurationLoadFailedAction = {
-  type: typeof CERTIFICATE_CONFIGURATION_LOAD_FAILED
+export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
+type CertificatesLoadFailedAction = {
+  type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error
 }
 
@@ -267,17 +259,10 @@ export const configLoaded = (
   payload: payload
 })
 
-export const certificateConfigurationLoaded = (
-  payload: CertificateConfiguration
-): CertificateConfigurationLoadedAction => ({
-  type: CERTIFICATE_CONFIGURATION_LOADED,
-  payload
-})
-
-export const certificateConfigurationLoadFailed = (
-  payload: CertificateConfigurationLoadFailedAction['payload']
-): CertificateConfigurationLoadFailedAction => ({
-  type: CERTIFICATE_CONFIGURATION_LOAD_FAILED,
+export const certificatesLoaded = (
+  payload: ICertificateData[]
+): CertificatesLoadedAction => ({
+  type: CERTIFICATES_LOADED,
   payload
 })
 
@@ -345,12 +330,11 @@ export type Action =
   | ContentFailedAction
   | ContentLoadedAction
   | ApplicationConfigLoadedAction
+  | CertificatesLoadedAction
+  | CertificatesLoadFailedAction
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | CertificateLoadFailedAction
-  | CertificateConfigurationLoadedAction
-  | CertificateConfigurationLoadFailedAction
   | UpdateOfflineSystemsAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>

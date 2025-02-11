@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { goToHome, goToPhoneNumberVerificationForm } from '@login/login/actions'
+
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -19,10 +19,11 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@login/navigation/routes'
 
 const Actions = styled.div`
   & > div {
@@ -30,18 +31,10 @@ const Actions = styled.div`
   }
 `
 
-interface BaseProps {
-  goToHome: typeof goToHome
-  goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
-}
+const ForgottenItemComponent = ({ intl }: WrappedComponentProps) => {
+  const navigate = useNavigate()
 
-type Props = BaseProps & WrappedComponentProps
-
-const ForgottenItemComponent = ({
-  goToHome,
-  goToPhoneNumberVerificationForm,
-  intl
-}: Props) => {
+  const goToHome = () => navigate(routes.STEP_ONE)
   const [forgottenItem, setForgottenItem] = useState<string>('')
   const [error, setError] = useState<boolean>(false)
 
@@ -50,7 +43,10 @@ const ForgottenItemComponent = ({
     if (forgottenItem === '') {
       return setError(true)
     }
-    return goToPhoneNumberVerificationForm(forgottenItem)
+
+    return navigate(routes.PHONE_NUMBER_VERIFICATION, {
+      state: { forgottenItem }
+    })
   }
 
   const forgottenItems = [
@@ -152,7 +148,4 @@ const ForgottenItemComponent = ({
     </>
   )
 }
-export const ForgottenItem = connect(null, {
-  goToHome,
-  goToPhoneNumberVerificationForm
-})(injectIntl(ForgottenItemComponent))
+export const ForgottenItem = injectIntl(ForgottenItemComponent)

@@ -9,22 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  createTestApp,
   mockOfflineData,
   validToken,
   getItem,
   flushPromises,
   setItem,
-  userDetails
+  userDetails,
+  createTestStore
 } from '@client/tests/util'
-import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
 import {
   storeDeclaration,
   IDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { Store } from 'redux'
 import { v4 as uuid } from 'uuid'
 import { draftToGqlTransformer } from '@client/transformer'
@@ -41,8 +38,6 @@ const fetch = createFetchMock(vi)
 fetch.enableMocks()
 
 describe('when draft data is transformed to graphql', () => {
-  let app: ReactWrapper
-  let history: History
   let store: Store
   let customDraft: IDeclaration
   let form: IForm
@@ -55,13 +50,6 @@ describe('when draft data is transformed to graphql', () => {
       [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
       [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
     )
-    const testApp = await createTestApp()
-    app = testApp.app
-    await flushPromises()
-    app.update()
-    history = testApp.history
-    store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
 
     customDraft = {
       id: uuid(),
@@ -69,16 +57,13 @@ describe('when draft data is transformed to graphql', () => {
       event: EventType.Birth,
       submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     }
+    ;({ store } = await createTestStore())
+    await flushPromises()
+
+    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+
     store.dispatch(storeDeclaration(customDraft))
     form = getRegisterForm(store.getState())[EventType.Birth]
-    history.replace(
-      DRAFT_BIRTH_PARENT_FORM.replace(
-        ':declarationId',
-        customDraft.id.toString()
-      )
-    )
-
-    app.update()
   })
 
   describe('when user is in birth registration by parent informant view', () => {
@@ -106,6 +91,7 @@ describe('when draft data is transformed to graphql', () => {
         ).eventLocation.type
       ).toBe('PRIVATE_HOME')
     })
+
     it('Pass false as detailsExist on father section', () => {
       const data = {
         child: birthDraftData.child,
@@ -138,6 +124,7 @@ describe('when draft data is transformed to graphql', () => {
         ).registration.inCompleteFields
       ).toContain('father/father-view-group/reasonNotApplying')
     })
+
     it('Sends inCompleteFields if in-complete data is given', () => {
       const data = {
         child: {},
@@ -156,6 +143,7 @@ describe('when draft data is transformed to graphql', () => {
         ).registration.inCompleteFields
       ).toContain('child/child-view-group/placeOfBirth')
     })
+
     it('Sends inCompleteFields when registration data is also missing', () => {
       const data = {
         child: {},

@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -35,8 +34,10 @@ import {
   toggleEmailAllUsersFeedbackToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { goToDeclarationRecordAudit } from '@client/navigation'
+import * as routes from '@client/navigation/routes'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { RouteComponentProps, withRouter } from './WithRouterProps'
+import { formatUrl } from '@client/navigation'
 
 type NotificationProps = ReturnType<typeof mapStateToProps> & {
   children?: React.ReactNode
@@ -56,14 +57,13 @@ type DispatchProps = {
   hideCreateUserFormDuplicateEmailErrorToast: typeof hideCreateUserFormDuplicateEmailErrorToast
   hideUnassignedDeclarationsToast: typeof hideUnassignedDeclarationsToast
   hideUserReconnectedToast: typeof hideUserReconnectedToast
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   toggleEmailAllUsersFeedbackToast: typeof toggleEmailAllUsersFeedbackToast
 }
 
 type Props = NotificationProps &
   DispatchProps &
   IntlShapeProps &
-  RouteComponentProps<{}> & { isOnline: boolean }
+  RouteComponentProps & { isOnline: boolean }
 
 const Component = ({
   hideConfigurationErrorNotification,
@@ -79,7 +79,6 @@ const Component = ({
   hideCreateUserFormDuplicateEmailErrorToast,
   hideUnassignedDeclarationsToast,
   hideUserReconnectedToast,
-  goToDeclarationRecordAudit,
   toggleEmailAllUsersFeedbackToast,
   children,
   configurationError,
@@ -100,7 +99,8 @@ const Component = ({
   userReconnectedToast,
   isOnline,
   unassignedDeclarations,
-  emailAllUsers
+  emailAllUsers,
+  router
 }: Props) => {
   const hideEmailAllUsersFeedbackToast = () => {
     toggleEmailAllUsersFeedbackToast({ visible: false })
@@ -201,13 +201,16 @@ const Component = ({
                 underline
                 color="white"
                 element="button"
-                onClick={() =>
-                  hideDuplicateRecordsToast() &&
-                  goToDeclarationRecordAudit(
-                    'reviewTab',
-                    duplicateCompositionId
+                onClick={() => {
+                  hideDuplicateRecordsToast()
+
+                  router.navigate(
+                    formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                      tab: 'reviewTab',
+                      declarationId: duplicateCompositionId
+                    })
                   )
-                }
+                }}
               >
                 {duplicateTrackingId}
               </Link>
@@ -329,7 +332,6 @@ export const NotificationComponent = withRouter(
     hideCreateUserErrorToast,
     hideCreateUserFormDuplicateEmailErrorToast,
     hideUserReconnectedToast,
-    goToDeclarationRecordAudit,
     hideUnassignedDeclarationsToast,
     toggleEmailAllUsersFeedbackToast
   })(injectIntl(withOnlineStatus(Component)))

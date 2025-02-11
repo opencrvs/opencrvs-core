@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -23,20 +27,19 @@ import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
 import { IDeclaration } from '@opencrvs/client/src/declarations'
 import { getScope } from '@client/profile/profileSelectors'
-import { Scope } from '@opencrvs/client/src/utils/authUtils'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
-
 import {
   REGISTRAR_HOME_TAB,
   REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
 } from '@client/navigation/routes'
 import { errorMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 interface IReviewProps {
   theme: ITheme
-  scope: Scope | null
+  scope: Scope[] | null
   event: EventType
 }
 interface IDeclarationProp {
@@ -48,7 +51,7 @@ type IProps = IReviewProps &
   IDeclarationProp &
   FullProps &
   IntlShapeProps &
-  RouteComponentProps<{}>
+  RouteComponentProps
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -59,11 +62,20 @@ const ErrorText = styled.div`
 
 class ReviewFormView extends React.Component<IProps> {
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    return this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    return (
+      this.props.scope &&
+      this.props.scope.some((scope) => validateScopes.includes(scope))
+    )
   }
 
   render() {
@@ -77,7 +89,7 @@ class ReviewFormView extends React.Component<IProps> {
     }
     if (!declaration) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyForReview,
             selectorId: ''
@@ -89,6 +101,7 @@ class ReviewFormView extends React.Component<IProps> {
     }
   }
 }
+
 function getEvent(eventType: string) {
   switch (eventType && eventType.toLocaleLowerCase()) {
     case 'birth':
@@ -116,10 +129,11 @@ function mapStatetoProps(
     event: string
   }>
 ) {
-  const { match } = props
-  if (!match.params.event) {
+  const match = props.router.match
+  if (!match?.params?.event) {
     throw new Error('Event is not provided as path param')
   }
+
   const reviewFormState: IReviewFormState = getReviewForm(
     state
   ) as IReviewFormState
@@ -139,6 +153,8 @@ function mapStatetoProps(
   }
 }
 
-export const ReviewForm = connect<any, {}, any, IStoreState>(mapStatetoProps)(
-  injectIntl(withTheme(ReviewFormView))
+export const ReviewForm = withRouter(
+  connect<any, {}, any, IStoreState>(mapStatetoProps)(
+    injectIntl(withTheme(ReviewFormView))
+  )
 )

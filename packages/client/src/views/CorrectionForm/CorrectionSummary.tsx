@@ -8,54 +8,69 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import { FormFieldGenerator } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
-  modifyDeclaration,
   IDeclaration,
+  modifyDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import { connect } from 'react-redux'
-import { get } from 'lodash'
 import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
-import {
-  goBack,
-  goToCertificateCorrection,
-  goToHomeTab,
-  goToPageGroup
-} from '@client/navigation'
-import { messages as registerMessages } from '@client/i18n/messages/views/register'
-import { messages } from '@client/i18n/messages/views/correction'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import {
-  IFormSection,
-  IFormField,
-  IForm,
-  IFormSectionGroup,
-  IFormSectionData,
   CorrectionSection,
-  ReviewSection,
+  IForm,
   IFormData,
+  IFormField,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
   IPreviewGroup,
   REVIEW_OVERRIDE_POSITION,
-  SubmissionAction
+  ReviewSection,
+  SubmissionAction,
+  IFormFieldValue
 } from '@client/forms'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Text } from '@opencrvs/components/lib/Text'
-import { SecondaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Check, PaperClip } from '@opencrvs/components/lib/icons'
-import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
-import styled from 'styled-components'
-import { FormFieldGenerator } from '@client/components/form'
+import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { correctionFeesPaymentSection } from '@client/forms/correction/payment'
+import { CorrectionReason } from '@client/forms/correction/reason'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/correction'
+import { messages as registerMessages } from '@client/i18n/messages/views/register'
+import { getLanguage } from '@client/i18n/selectors'
+import {
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl,
+  generateGoToPageGroupUrl
+} from '@client/navigation'
+import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { UserDetails } from '@client/utils/userUtils'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
+import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
+import { LinkButton, SecondaryButton } from '@opencrvs/components/lib/buttons'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { Check, PaperClip } from '@opencrvs/components/lib/icons'
+import { get } from 'lodash'
+import * as React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
+import styled from 'styled-components'
 import {
   getNestedFieldValue,
   getOverriddenFieldsListForPreview,
@@ -66,24 +81,13 @@ import {
   isVisibleField,
   renderValue,
   sectionHasError,
-  updateDeclarationRegistrationWithCorrection
+  updateDeclarationRegistrationWithCorrection,
+  RenderableFieldType
 } from './utils'
-import { IStoreState } from '@client/store'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getLanguage } from '@client/i18n/selectors'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { CorrectorRelationship } from '@client/forms/correction/corrector'
-import { CorrectionReason } from '@client/forms/correction/reason'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { UserDetails } from '@client/utils/userUtils'
-import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
-import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { SystemRoleType } from '@client/utils/gateway'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -93,15 +97,17 @@ const SupportingDocument = styled.div`
   }
 `
 interface IProps {
+  userPrimaryOffice?: UserDetails['primaryOffice']
   userDetails: UserDetails | null
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
+  scopes: Scope[] | null
 }
 
-type IStateProps = {
+type IStateProps = RouteComponentProps<{
   declaration: IDeclaration
-}
+}>
 
 type IState = {
   isFileUploading: boolean
@@ -109,15 +115,12 @@ type IState = {
 }
 
 type IDispatchProps = {
-  goBack: typeof goBack
   modifyDeclaration: typeof modifyDeclaration
-  goToPageGroup: typeof goToPageGroup
-  goToCertificateCorrection: typeof goToCertificateCorrection
-  goToHomeTab: typeof goToHomeTab
   writeDeclaration: typeof writeDeclaration
 }
 
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
+type NestedItemType = RenderableFieldType | undefined | IFormFieldValue
 
 class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
@@ -144,15 +147,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       registerForm,
       declaration,
       intl,
-      goBack,
       declaration: { event },
       userDetails,
-      offlineResources
+      offlineResources,
+      router
     } = this.props
 
-    const currencySymbol = getCurrencySymbol(
-      this.props.offlineResources.config.CURRENCY
-    )
+    const currencySymbol = getCurrencySymbol(offlineResources.config.CURRENCY)
     const section = correctionFeesPaymentSection(currencySymbol)
 
     const group = {
@@ -205,7 +206,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         }
       >
         <Check />
-        {userDetails?.systemRole === ROLE_REGISTRATION_AGENT
+        {this.props.scopes?.includes(
+          SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+        )
           ? intl.formatMessage(buttonMessages.sendForApproval)
           : intl.formatMessage(buttonMessages.makeCorrection)}
       </Button>
@@ -217,8 +220,14 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           id="corrector_form"
           title={intl.formatMessage(messages.title)}
           hideBackground
-          goBack={goBack}
-          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
+          goBack={() => router.navigate(-1)}
+          goHome={() =>
+            router.navigate(
+              generateGoToHomeTabUrl({
+                tabId: WORKQUEUE_TABS.readyForReview
+              })
+            )
+          }
         >
           <Content
             title={intl.formatMessage(messages.correctionSummaryTitle)}
@@ -382,7 +391,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           id="withoutCorrectionForApprovalPrompt"
           isOpen={showPrompt}
           title={intl.formatMessage(
-            this.props.userDetails?.systemRole === ROLE_REGISTRATION_AGENT
+            this.props.scopes?.includes(
+              SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+            )
               ? messages.correctionForApprovalDialogTitle
               : messages.correctRecordDialogTitle
           )}
@@ -403,7 +414,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               id="send"
               key="continue"
               onClick={() => {
-                this.makeCorrection(this.props.userDetails?.systemRole)
+                this.makeCorrection()
                 this.togglePrompt()
               }}
             >
@@ -414,7 +425,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           <p>
             <Text element="p" variant="reg16">
               {intl.formatMessage(
-                this.props.userDetails?.systemRole === ROLE_REGISTRATION_AGENT
+                this.props.scopes?.includes(
+                  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+                )
                   ? messages.correctionForApprovalDialogDescription
                   : messages.correctRecordDialogDescription
               )}
@@ -668,9 +681,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       language
     } = this.props
     const visitedTags: string[] = []
-    const nestedItems: any[] = []
+    const nestedItems: NestedItemType[] = []
     // parent field
-    let item: any
+    let item: NestedItemType
     item = this.getSinglePreviewField(section, group, field, true)
 
     item && nestedItems.push(item)
@@ -934,9 +947,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         <LinkButton
           id="change-reason-link"
           onClick={() =>
-            this.props.goToCertificateCorrection(
-              this.props.declaration.id,
-              CorrectionSection.Reason
+            this.props.router.navigate(
+              generateCertificateCorrectionUrl({
+                declarationId: this.props.declaration.id,
+                pageId: CorrectionSection.Reason
+              })
             )
           }
         >
@@ -956,9 +971,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         <LinkButton
           id="change-comment-link"
           onClick={() =>
-            this.props.goToCertificateCorrection(
-              this.props.declaration.id,
-              CorrectionSection.Reason
+            this.props.router.navigate(
+              generateCertificateCorrectionUrl({
+                declarationId: this.props.declaration.id,
+                pageId: CorrectionSection.Reason
+              })
             )
           }
         >
@@ -994,9 +1011,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         <LinkButton
           id="upload-supporting-doc-link"
           onClick={() =>
-            this.props.goToCertificateCorrection(
-              this.props.declaration.id,
-              CorrectionSection.SupportingDocuments
+            this.props.router.navigate(
+              generateCertificateCorrectionUrl({
+                declarationId: this.props.declaration.id,
+                pageId: CorrectionSection.SupportingDocuments
+              })
             )
           }
         >
@@ -1006,9 +1025,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     )
   }
 
-  makeCorrection = (userRole: SystemRoleType | undefined) => {
+  makeCorrection = () => {
     const declaration = this.props.declaration
-    if (userRole === ROLE_REGISTRATION_AGENT) {
+    if (
+      this.props.scopes?.includes(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION)
+    ) {
       declaration.action = SubmissionAction.REQUEST_CORRECTION
       declaration.submissionStatus =
         SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
@@ -1031,37 +1052,49 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
     this.props.writeDeclaration(declaration)
 
-    if (userRole === ROLE_REGISTRATION_AGENT) {
-      this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+    if (
+      this.props.scopes?.includes(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION)
+    ) {
+      this.props.router.navigate(
+        generateGoToHomeTabUrl({
+          tabId: WORKQUEUE_TABS.sentForApproval
+        })
+      )
     } else {
-      this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+      this.props.router.navigate(
+        generateGoToHomeTabUrl({
+          tabId: WORKQUEUE_TABS.readyForReview
+        })
+      )
     }
   }
 
   gotoReviewPage = () => {
-    this.props.goToPageGroup(
-      CERTIFICATE_CORRECTION_REVIEW,
-      this.props.declaration.id,
-      ReviewSection.Review,
-      'review-view-group',
-      this.props.declaration.event
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute: CERTIFICATE_CORRECTION_REVIEW,
+        declarationId: this.props.declaration.id,
+        pageId: ReviewSection.Review,
+        groupId: 'review-view-group',
+        event: this.props.declaration.event
+      })
     )
   }
 }
 
-export const CorrectionSummary = connect(
-  (state: IStoreState) => ({
-    registerForm: getRegisterForm(state),
-    offlineResources: getOfflineData(state),
-    language: getLanguage(state),
-    userDetails: getUserDetails(state)
-  }),
-  {
-    modifyDeclaration,
-    writeDeclaration,
-    goBack,
-    goToPageGroup,
-    goToCertificateCorrection,
-    goToHomeTab
-  }
-)(injectIntl(CorrectionSummaryComponent))
+export const CorrectionSummary = withRouter(
+  connect(
+    (state: IStoreState) => ({
+      registerForm: getRegisterForm(state),
+      offlineResources: getOfflineData(state),
+      language: getLanguage(state),
+      userPrimaryOffice: getUserDetails(state)?.primaryOffice,
+      scopes: getScope(state),
+      userDetails: getUserDetails(state)
+    }),
+    {
+      modifyDeclaration,
+      writeDeclaration
+    }
+  )(injectIntl(CorrectionSummaryComponent))
+)

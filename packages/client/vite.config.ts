@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => {
       srcDir: 'src/',
       filename: 'src-sw.ts',
       devOptions: {
-        enabled: false,
+        enabled: true,
         type: 'module',
         navigateFallback: 'index.html'
       }
@@ -77,9 +77,6 @@ export default defineConfig(({ mode }) => {
       'process.env': {},
       APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
-    optimizeDeps: {
-      include: ['@opencrvs/commons/client', '@opencrvs/commons/events']
-    },
     // This changes the output dir from dist to build
     build: {
       outDir: 'build',
@@ -93,7 +90,9 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        crypto: 'crypto-js'
+        crypto: require.resolve('crypto-js'),
+        '@opencrvs/commons/build/dist/authentication':
+          '@opencrvs/commons/authentication'
       }
     },
     plugins: [
@@ -119,10 +118,7 @@ export default defineConfig(({ mode }) => {
       setupFiles: './src/setupTests.ts',
       testTimeout: 60000,
       hookTimeout: 60000,
-      globals: true,
-      coverage: {
-        reporter: ['text', 'json', 'html']
-      }
+      globals: true
     },
     server: {
       // to get the manifest.json and images from country-config during development time

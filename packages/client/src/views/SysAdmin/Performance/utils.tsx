@@ -184,20 +184,6 @@ export function getJurisidictionType(location: GQLLocation): string | null {
   return jurisdictionType
 }
 
-export function isUnderJurisdictionOfUser(
-  locations: { [key: string]: ILocation },
-  locationId: string,
-  jurisdictionLocation: string | undefined | null
-) {
-  if (!jurisdictionLocation) return false
-
-  while (locationId !== jurisdictionLocation && locationId !== '0') {
-    locationId = locations[locationId].partOf.split('/')[1]
-  }
-
-  return locationId !== '0'
-}
-
 export function getPrimaryLocationIdOfOffice(
   locations: { [key: string]: ILocation },
   office: ILocation

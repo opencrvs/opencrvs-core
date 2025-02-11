@@ -42,6 +42,19 @@ export function getMarriageRegistrationSectionTransformer(
       sectionId
     )
   }
+
+  if (
+    Array.isArray(queryData[sectionId].certificates) &&
+    queryData[sectionId].certificates.length > 0
+  ) {
+    const currentCertificate =
+      queryData[sectionId].certificates[
+        queryData[sectionId].certificates.length - 1
+      ]
+    if (currentCertificate?.collector?.relationship === 'PRINT_IN_ADVANCE') {
+      transformedData[sectionId].certificates = [currentCertificate]
+    }
+  }
 }
 
 export function groomSignatureTransformer(

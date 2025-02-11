@@ -18,10 +18,9 @@ import {
 import { IForm, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 import {
-  goBack,
-  goToPageGroup,
-  goToHomeTab,
-  formatUrl
+  formatUrl,
+  generateGoToHomeTabUrl,
+  generateGoToPageGroupUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import {
@@ -31,14 +30,18 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import {
   CERTIFICATE_CORRECTION_REVIEW,
   REGISTRAR_HOME_TAB
 } from '@client/navigation/routes'
 import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 import { TimeMounted } from '@client/components/TimeMounted'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getOfflineData } from '@client/offline/selectors'
@@ -68,11 +71,6 @@ export interface ICertificateCorrectorDefinition {
   [corrector: string]: ICertificateCorrectorField
 }
 
-interface IMatchParams {
-  declarationId: string
-  corrector: string
-}
-
 interface IStateProps {
   declaration: IDeclaration
   form: ICertificateCorrectorDefinition
@@ -81,14 +79,11 @@ interface IStateProps {
   user: UserDetails | null
 }
 interface IDispatchProps {
-  goBack: typeof goBack
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
-  goToPageGroup: typeof goToPageGroup
-  goToHomeTab: typeof goToHomeTab
 }
 
-type IOwnProps = RouteComponentProps<IMatchParams>
+type IOwnProps = RouteComponentProps
 
 type IFullProps = IStateProps & IDispatchProps & IOwnProps & IntlShapeProps
 
@@ -103,14 +98,12 @@ const VerifyCorrectorComponent = ({
   registerForm,
   config,
   user,
-  goBack,
   modifyDeclaration,
   writeDeclaration,
-  goToPageGroup,
-  goToHomeTab,
   intl,
-  match
+  router
 }: IFullProps) => {
+  const { corrector } = router.params
   const handleVerification = (hasShowedVerifiedDocument: boolean) => {
     const changed = {
       ...declaration,
@@ -125,12 +118,14 @@ const VerifyCorrectorComponent = ({
     modifyDeclaration(changed)
     writeDeclaration(changed)
 
-    goToPageGroup(
-      CERTIFICATE_CORRECTION_REVIEW,
-      declaration.id,
-      ReviewSection.Review,
-      'review-view-group',
-      declaration.event
+    router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute: CERTIFICATE_CORRECTION_REVIEW,
+        declarationId: declaration.id,
+        pageId: ReviewSection.Review,
+        groupId: 'review-view-group',
+        event: declaration.event
+      })
     )
   }
 
@@ -216,10 +211,9 @@ const VerifyCorrectorComponent = ({
     modifyDeclaration(updatedDeclaration)
   }
 
-  const { corrector } = match.params
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyForReview,
           selectorId: ''
@@ -227,7 +221,7 @@ const VerifyCorrectorComponent = ({
       />
     )
   }
-  const correctorInfo = getGenericCorrectorInfo(corrector)
+  const correctorInfo = getGenericCorrectorInfo(corrector!)
   const hasNoInfo = Object.values(correctorInfo).every(
     (property) => property === undefined || property === ''
   )
@@ -235,8 +229,14 @@ const VerifyCorrectorComponent = ({
   return (
     <TimeMounted onUnmount={logTime}>
       <ActionPageLight
-        goBack={goBack}
-        goHome={() => goToHomeTab(WORKQUEUE_TABS.readyForReview)}
+        goBack={() => router.navigate(-1)}
+        goHome={() =>
+          router.navigate(
+            generateGoToHomeTabUrl({
+              tabId: WORKQUEUE_TABS.readyForReview
+            })
+          )
+        }
         title={intl.formatMessage(messages.title)}
         hideBackground
       >
@@ -270,7 +270,7 @@ const mapStateToProps = (
   state: IStoreState,
   ownProps: IOwnProps
 ): IStateProps => {
-  const { declarationId } = ownProps.match.params
+  const { declarationId } = ownProps.router.match.params
 
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === declarationId
@@ -285,10 +285,9 @@ const mapStateToProps = (
   }
 }
 
-export const VerifyCorrector = connect(mapStateToProps, {
-  goBack,
-  modifyDeclaration,
-  writeDeclaration,
-  goToPageGroup,
-  goToHomeTab
-})(injectIntl(VerifyCorrectorComponent))
+export const VerifyCorrector = withRouter(
+  connect(mapStateToProps, {
+    modifyDeclaration,
+    writeDeclaration
+  })(injectIntl(VerifyCorrectorComponent))
+)

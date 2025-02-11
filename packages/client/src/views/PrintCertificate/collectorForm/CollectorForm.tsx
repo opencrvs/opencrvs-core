@@ -40,12 +40,11 @@ import { buttonMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
-  goBack,
-  goToHomeTab,
-  goToPrintCertificate,
-  goToPrintCertificatePayment,
-  goToReviewCertificate,
-  goToVerifyCollector
+  generateGoToHomeTabUrl,
+  generatePrintCertificatePaymentUrl,
+  generatePrintCertificateUrl,
+  generateReviewCertificateUrl,
+  generateVerifyCollectorUrl
 } from '@client/navigation'
 import {
   CERTIFICATE_COLLECTOR,
@@ -62,21 +61,24 @@ import {
   isCertificateForPrintInAdvance,
   filterPrintInAdvancedOption
 } from '@client/views/PrintCertificate/utils'
-import { flatten } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
-import { IValidationResult } from '@client/utils/validate'
+import { Navigate } from 'react-router-dom'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getCertificateCollectorFormSection } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getRegisteringOfficeId } from '@client/utils/draftUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import { FormikTouched, FormikValues } from 'formik'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;
@@ -102,20 +104,23 @@ type PropsWhenDeclarationIsNotFound = {
 
 interface IBaseProps {
   theme?: ITheme
-  goBack: typeof goBack
-  goToHomeTab: typeof goToHomeTab
+}
+
+interface DispatchProps {
   storeDeclaration: typeof storeDeclaration
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToVerifyCollector: typeof goToVerifyCollector
-  goToReviewCertificate: typeof goToReviewCertificate
-  goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
 
 type IProps =
-  | (IBaseProps & PropsWhenDeclarationIsFound & IntlShapeProps)
-  | (IBaseProps & PropsWhenDeclarationIsNotFound & IntlShapeProps)
+  | (RouteComponentProps<IBaseProps> &
+      PropsWhenDeclarationIsFound &
+      IntlShapeProps &
+      DispatchProps)
+  | (RouteComponentProps<IBaseProps> &
+      PropsWhenDeclarationIsNotFound &
+      IntlShapeProps &
+      DispatchProps)
 
 function getNextSectionIds(
   formSection: IFormSection,
@@ -162,39 +167,27 @@ const getErrorsOnFieldsBySection = (
     user
   )
 
-  return {
-    [sectionId]: fields.reduce((fields, field) => {
-      const validationErrors: IValidationResult[] = (
-        errors[field.name as keyof typeof errors] as IFieldErrors
-      ).errors
-
-      const value = draft.data[sectionId]
-        ? draft.data[sectionId][field.name]
-        : null
-
-      const informationMissing =
-        validationErrors.length > 0 || value === null ? validationErrors : []
-
-      return { ...fields, [field.name]: informationMissing }
-    }, {})
-  }
+  return Object.values(errors)
+    .map((field) => field.errors[0]?.message)
+    .filter(Boolean)
 }
 
 interface IState {
-  showError: boolean
   showModalForNoSignedAffidavit: boolean
   isFileUploading: boolean
+  showError: boolean
 }
 
 class CollectorFormComponent extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
     this.state = {
-      showError: false,
       showModalForNoSignedAffidavit: false,
-      isFileUploading: false
+      isFileUploading: false,
+      showError: false
     }
   }
+  setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   onUploadingStateChanged = (isUploading: boolean) => {
     this.setState({
@@ -210,7 +203,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const certificates = declaration.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
     const collector = { ...(certificate.collector || {}), ...sectionData }
-
     this.props.modifyDeclaration({
       ...declaration,
       data: {
@@ -220,7 +212,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           certificates: [
             {
               collector: collector,
-              hasShowedVerifiedDocument: false
+              hasShowedVerifiedDocument: false,
+              certificateTemplateId: collector.certificateTemplateId
             }
           ]
         }
@@ -246,10 +239,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       this.props.offlineCountryConfiguration,
       this.props.userDetails
     )
-    const errorValues = Object.values(errors).map(Object.values)
-    const errLength = flatten(errorValues).filter(
-      (errs) => errs.length > 0
-    ).length
 
     const certificates = draft.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
@@ -257,11 +246,18 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       sectionId as keyof typeof certificate
     ] as IFormSectionData
 
-    if (errLength > 0) {
+    if (errors.length > 0) {
+      const formGroup = (
+        this.props as PropsWhenDeclarationIsFound
+      ).formGroup.fields.reduce(
+        (acc, { name }) => ({ ...acc, [name]: true }),
+        {}
+      )
+
+      this.setAllFormFieldsTouched(formGroup)
       this.setState({
         showError: true
       })
-
       return
     }
 
@@ -302,16 +298,32 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       this.props.writeDeclaration(draft)
 
       if (isCertificateForPrintInAdvance(draft)) {
-        this.props.goToReviewCertificate(declarationId, event)
+        this.props.router.navigate(
+          generateReviewCertificateUrl({
+            registrationId: declarationId,
+            event
+          }),
+          {
+            state: { isNavigatedInsideApp: true }
+          }
+        )
       } else {
-        this.props.goToVerifyCollector(
-          declarationId,
-          event,
-          collector.type as string
+        this.props.router.navigate(
+          generateVerifyCollectorUrl({
+            registrationId: declarationId,
+            event,
+            collector: collector.type as string
+          })
         )
       }
     } else {
-      this.props.goToPrintCertificate(declarationId, event, nextGroup)
+      this.props.router.navigate(
+        generatePrintCertificateUrl({
+          registrationId: declarationId,
+          event,
+          groupId: nextGroup
+        })
+      )
     }
   }
 
@@ -324,15 +336,28 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       .props as PropsWhenDeclarationIsFound
     if (
       isFreeOfCost(
-        event,
+        declaration.data.registration.certificates[0],
         getEventDate(declaration.data, event),
         getRegisteredDate(declaration.data),
         offlineCountryConfiguration
       )
     ) {
-      this.props.goToReviewCertificate(declarationId, event)
+      this.props.router.navigate(
+        generateReviewCertificateUrl({
+          registrationId: declarationId,
+          event
+        }),
+        {
+          state: { isNavigatedInsideApp: true }
+        }
+      )
     } else {
-      this.props.goToPrintCertificatePayment(declarationId, event)
+      this.props.router.navigate(
+        generatePrintCertificatePaymentUrl({
+          registrationId: declarationId,
+          event
+        })
+      )
     }
   }
 
@@ -356,7 +381,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const declarationToBeCertified = declaration
     if (!declarationToBeCertified) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyToPrint,
             selectorId: ''
@@ -365,7 +390,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       )
     }
 
-    const { intl, event, declarationId, formSection, formGroup, goBack } = props
+    const { intl, event, declarationId, formSection, formGroup } = props
 
     const nextSectionGroup = getNextSectionIds(
       formSection,
@@ -378,8 +403,17 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           id="collector_form"
           hideBackground
           title={formSection.title && intl.formatMessage(formSection.title)}
-          goBack={goBack}
-          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
+          goBack={() => {
+            this.setState({ showError: false })
+            this.props.router.navigate(-1)
+          }}
+          goHome={() =>
+            this.props.router.navigate(
+              generateGoToHomeTabUrl({
+                tabId: WORKQUEUE_TABS.readyToPrint
+              })
+            )
+          }
         >
           <Content
             title={
@@ -411,7 +445,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               </Button>
             ]}
           >
-            {showError && (
+            {showError && formGroup.error && (
               <ErrorWrapper>
                 <ErrorText id="form_error">
                   {(formGroup.error && intl.formatMessage(formGroup.error)) ||
@@ -434,6 +468,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               fields={formGroup.fields}
               draftData={declarationToBeCertified.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
+              onSetTouched={(setTouchedFunc) =>
+                (this.setAllFormFieldsTouched = setTouchedFunc)
+              }
             />
           </Content>
         </ActionPageLight>
@@ -482,13 +519,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
 const mapStateToProps = (
   state: IStoreState,
-  props: RouteComponentProps<{
-    registrationId: string
-    eventType: string
-    groupId: string
-  }>
-): PropsWhenDeclarationIsFound | PropsWhenDeclarationIsNotFound => {
-  const { registrationId, eventType, groupId } = props.match.params
+  props: RouteComponentProps<IBaseProps>
+) => {
+  const { registrationId, eventType, groupId } = props.router.match.params
   const event = getEvent(eventType)
   const userDetails = getUserDetails(state)
   const offlineCountryConfiguration = getOfflineData(state)
@@ -507,7 +540,10 @@ const mapStateToProps = (
 
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const certFormSection = getCertificateCollectorFormSection(declaration)
+  const certFormSection = getCertificateCollectorFormSection(
+    declaration,
+    state.offline.offlineData.templates?.certificates || []
+  )
 
   const isAllowPrintInAdvance =
     event === EventType.Birth
@@ -545,7 +581,7 @@ const mapStateToProps = (
       declaration.data.registration.certificates &&
       declaration.data.registration.certificates[
         declaration.data.registration.certificates.length - 1
-      ].collector) ||
+      ]?.collector) ||
       {},
     declaration && declaration.data,
     offlineCountryConfiguration,
@@ -568,14 +604,15 @@ const mapStateToProps = (
   }
 }
 
-export const CollectorForm = connect(mapStateToProps, {
-  goBack,
-  goToHomeTab,
-  storeDeclaration,
-  writeDeclaration,
-  modifyDeclaration,
-  goToPrintCertificate,
-  goToVerifyCollector,
-  goToReviewCertificate,
-  goToPrintCertificatePayment
-})(injectIntl<'intl', IProps>(withTheme(CollectorFormComponent)))
+export const CollectorForm = withRouter(
+  connect<
+    ReturnType<typeof mapStateToProps>,
+    DispatchProps,
+    RouteComponentProps<IBaseProps>,
+    IStoreState
+  >(mapStateToProps, {
+    storeDeclaration,
+    writeDeclaration,
+    modifyDeclaration
+  })(injectIntl(withTheme(CollectorFormComponent)))
+)

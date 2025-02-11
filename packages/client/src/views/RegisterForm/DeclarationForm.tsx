@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import {
-  RegisterForm,
-  RouteProps
-} from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP,
@@ -25,7 +22,11 @@ import { connect } from 'react-redux'
 import { IForm } from '@client/forms'
 import { EventType } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 interface IFormProps {
   declaration?: IDeclaration
@@ -40,18 +41,19 @@ const pageRoute: { [key in EventType]: string } = {
   marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
 }
 
-const DeclarationFormView = (props: IFormProps & RouteProps) => {
+const DeclarationFormView = (props: RouteComponentProps<IFormProps>) => {
   const { declaration, ...rest } = props
+
   if (!declaration) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
+
   return <RegisterForm declaration={declaration} {...rest} />
 }
 
-function mapStatetoProps(state: IStoreState, props: RouteProps) {
-  const { match } = props
+function mapStatetoProps(state: IStoreState, props: RouteComponentProps) {
   const declaration = state.declarationsState.declarations.find(
-    ({ id }) => id === match.params.declarationId
+    ({ id }) => id === props.router.params.declarationId
   )
 
   const event = declaration?.event || EventType.Birth
@@ -64,6 +66,6 @@ function mapStatetoProps(state: IStoreState, props: RouteProps) {
   }
 }
 
-export const DeclarationForm = connect<IFormProps, {}, RouteProps, IStoreState>(
-  mapStatetoProps
-)(DeclarationFormView)
+export const DeclarationForm = withRouter(
+  connect(mapStatetoProps)(DeclarationFormView)
+)

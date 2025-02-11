@@ -20,34 +20,27 @@ import {
   selectWorkqueuePagination
 } from '@client/workqueue'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab
-} from '@client/navigation'
+import { generateGoToHomeTabUrl } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { getUserLocation } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
-import { SYNC_WORKQUEUE_TIME, FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { SYNC_WORKQUEUE_TIME } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { Link, RouteComponentProps } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { SentForReview } from './sentForReview/SentForReview'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
 import { RequiresUpdate } from './requiresUpdate/RequiresUpdate'
 import { ReadyForReview } from './readyForReview/ReadyForReview'
 import { InExternalValidationTab } from './inExternalValidation/InExternalValidationTab'
-import {
-  Navigation,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
+import { Navigation } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
@@ -57,8 +50,15 @@ import { ArrayElement } from '@client/SubmissionController'
 import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
+import ProtectedComponent from '@client/components/ProtectedComponent'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import { MyDrafts } from './myDrafts/MyDrafts'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -70,10 +70,6 @@ const FABContainer = styled.div`
 `
 
 interface IDispatchProps {
-  goToPage: typeof goToPage
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToEvents: typeof goToEvents
-  goToHomeTab: typeof goToHomeTab
   getOfflineData: typeof getOfflineData
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   updateWorkqueuePagination: typeof updateWorkqueuePagination
@@ -82,16 +78,17 @@ interface IDispatchProps {
 type IBaseOfficeHomeStateProps = ReturnType<typeof mapStateToProps>
 
 interface IOfficeHomeState {
-  draftCurrentPage: number
   showCertificateToast: boolean
   offlineResources: IOfflineData
 }
 
 type IOfficeHomeProps = IntlShapeProps &
   IDispatchProps &
-  IBaseOfficeHomeStateProps
+  IBaseOfficeHomeStateProps &
+  RouteComponentProps
 
 const DECLARATION_WORKQUEUE_TABS = [
+  WORKQUEUE_TABS.myDrafts,
   WORKQUEUE_TABS.inProgress,
   WORKQUEUE_TABS.sentForApproval,
   WORKQUEUE_TABS.sentForReview,
@@ -127,18 +124,11 @@ class OfficeHomeView extends React.Component<
 > {
   pageSize = 10
   showPaginated = false
-  interval: any = undefined
-  role = this.props.userDetails && this.props.userDetails.systemRole
-  isFieldAgent = this.role
-    ? FIELD_AGENT_ROLES.includes(this.role)
-      ? true
-      : false
-    : false
+  interval: NodeJS.Timeout | undefined = undefined
 
   constructor(props: IOfficeHomeProps) {
     super(props)
     this.state = {
-      draftCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.declarations.filter(
           (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
@@ -151,8 +141,7 @@ class OfficeHomeView extends React.Component<
   updateWorkqueue() {
     this.props.updateRegistrarWorkqueue(
       this.props.userDetails?.practitionerId,
-      this.pageSize,
-      this.isFieldAgent
+      this.pageSize
     )
   }
 
@@ -186,13 +175,11 @@ class OfficeHomeView extends React.Component<
             notificationTab: pageId
           })
           this.updateWorkqueue()
-        } else if (
-          selectorId === SELECTOR_ID.ownDrafts &&
-          pageId !== this.state.draftCurrentPage
-        ) {
-          this.setState({ draftCurrentPage: pageId })
         }
-      } else if (pageId !== this.props[WORKQUEUE_TABS_PAGINATION[tabId]]) {
+      } else if (
+        tabId !== WORKQUEUE_TABS.myDrafts &&
+        pageId !== this.props[WORKQUEUE_TABS_PAGINATION[tabId]]
+      ) {
         this.props.updateWorkqueuePagination({
           [WORKQUEUE_TABS_PAGINATION[tabId]]: pageId
         })
@@ -217,14 +204,6 @@ class OfficeHomeView extends React.Component<
     }
   }
 
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
-  }
-
-  userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
-  }
-
   subtractDeclarationsWithStatus(count: number, status: string[]) {
     const outboxCount = this.props.storedDeclarations.filter(
       (app) => app.submissionStatus && status.includes(app.submissionStatus)
@@ -237,16 +216,24 @@ class OfficeHomeView extends React.Component<
 
     if (isDeclarationWorkqueueTab(tabId)) {
       if (tabId === WORKQUEUE_TABS.inProgress) {
-        this.props.goToHomeTab(
-          WORKQUEUE_TABS.inProgress,
-          Object.values(SELECTOR_ID).includes(selectorId)
-            ? selectorId
-            : SELECTOR_ID.ownDrafts,
-          newPageNumber
+        this.props.router.navigate(
+          generateGoToHomeTabUrl({
+            tabId: WORKQUEUE_TABS.inProgress,
+            selectorId: Object.values(SELECTOR_ID).includes(selectorId)
+              ? selectorId
+              : SELECTOR_ID.fieldAgentDrafts,
+            pageId: newPageNumber
+          })
         )
         return
       }
-      this.props.goToHomeTab(tabId, '', newPageNumber)
+
+      this.props.router.navigate(
+        generateGoToHomeTabUrl({
+          tabId,
+          pageId: newPageNumber
+        })
+      )
     }
   }
 
@@ -255,6 +242,7 @@ class OfficeHomeView extends React.Component<
     healthSystemCurrentPage: number,
     progressCurrentPage: number,
     reviewCurrentPage: number,
+    sentForReviewCurrentPage: number,
     approvalCurrentPage: number,
     printCurrentPage: number,
     issueCurrentPage: number,
@@ -264,7 +252,6 @@ class OfficeHomeView extends React.Component<
     const {
       workqueue,
       tabId,
-      drafts,
       selectorId,
       storedDeclarations,
       offlineResources
@@ -284,17 +271,21 @@ class OfficeHomeView extends React.Component<
 
     return (
       <>
+        {tabId === WORKQUEUE_TABS.myDrafts && (
+          <MyDrafts
+            currentPage={draftCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+          />
+        )}
         {tabId === WORKQUEUE_TABS.inProgress && (
           <InProgress
-            drafts={drafts}
             selectorId={selectorId}
-            isFieldAgent={this.isFieldAgent}
             queryData={{
               inProgressData: filteredData.inProgressTab,
               notificationData: filteredData.notificationTab
             }}
             paginationId={{
-              draftId: draftCurrentPage,
               fieldAgentId: progressCurrentPage,
               healthSystemId: healthSystemCurrentPage
             }}
@@ -304,126 +295,105 @@ class OfficeHomeView extends React.Component<
             error={error}
           />
         )}
-        {!this.isFieldAgent ? (
-          <>
-            {tabId === WORKQUEUE_TABS.readyForReview && (
-              <ReadyForReview
-                queryData={{
-                  data: filteredData.reviewTab
-                }}
-                paginationId={reviewCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {tabId === WORKQUEUE_TABS.requiresUpdate && (
-              <RequiresUpdate
-                queryData={{
-                  data: filteredData.rejectTab
-                }}
-                paginationId={requireUpdateCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-
-            {tabId === WORKQUEUE_TABS.externalValidation &&
-              window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
-                <InExternalValidationTab
-                  queryData={{
-                    data: filteredData.externalValidationTab
-                  }}
-                  paginationId={externalValidationCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
-                  loading={loading}
-                  error={error}
-                />
-              )}
-            {tabId === WORKQUEUE_TABS.sentForApproval && (
-              <SentForReview
-                queryData={{
-                  data: filteredData.approvalTab
-                }}
-                paginationId={approvalCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {tabId === WORKQUEUE_TABS.readyToPrint && (
-              <ReadyToPrint
-                queryData={{
-                  data: filteredData.printTab
-                }}
-                paginationId={printCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {isOnePrintInAdvanceOn && tabId === WORKQUEUE_TABS.readyToIssue && (
-              <ReadyToIssue
-                queryData={{
-                  data: filteredData.issueTab
-                }}
-                pageSize={this.pageSize}
-                paginationId={issueCurrentPage}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-
-            {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
-          </>
-        ) : (
-          <>
-            {tabId === WORKQUEUE_TABS.sentForReview && (
-              <SentForReview
-                queryData={{
-                  data: filteredData.reviewTab
-                }}
-                paginationId={reviewCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {tabId === WORKQUEUE_TABS.requiresUpdate && (
-              <RequiresUpdate
-                queryData={{
-                  data: filteredData.rejectTab
-                }}
-                paginationId={requireUpdateCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
-          </>
+        {tabId === WORKQUEUE_TABS.readyForReview && (
+          <ReadyForReview
+            queryData={{
+              data: filteredData.reviewTab
+            }}
+            paginationId={reviewCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
         )}
+        {tabId === WORKQUEUE_TABS.externalValidation &&
+          window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
+            <InExternalValidationTab
+              queryData={{
+                data: filteredData.externalValidationTab
+              }}
+              paginationId={externalValidationCurrentPage}
+              pageSize={this.pageSize}
+              onPageChange={this.onPageChange}
+              loading={loading}
+              error={error}
+            />
+          )}
+        {tabId === WORKQUEUE_TABS.sentForApproval && (
+          <SentForReview
+            queryData={{
+              data: filteredData.approvalTab
+            }}
+            paginationId={approvalCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {tabId === WORKQUEUE_TABS.readyToPrint && (
+          <ReadyToPrint
+            queryData={{
+              data: filteredData.printTab
+            }}
+            paginationId={printCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {isOnePrintInAdvanceOn && tabId === WORKQUEUE_TABS.readyToIssue && (
+          <ReadyToIssue
+            queryData={{
+              data: filteredData.issueTab
+            }}
+            pageSize={this.pageSize}
+            paginationId={issueCurrentPage}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {tabId === WORKQUEUE_TABS.sentForReview && (
+          <SentForReview
+            queryData={{
+              data: filteredData.sentForReviewTab
+            }}
+            paginationId={sentForReviewCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {tabId === WORKQUEUE_TABS.requiresUpdate && (
+          <RequiresUpdate
+            queryData={{
+              data: filteredData.rejectTab
+            }}
+            paginationId={requireUpdateCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
       </>
     )
   }
 
   render() {
     const { intl } = this.props
-    const { draftCurrentPage } = this.state
 
     const {
+      pageId,
       notificationTab,
       inProgressTab,
       reviewTab,
+      sentForReviewTab,
       approvalTab,
       printTab,
       issueTab,
@@ -444,10 +414,11 @@ class OfficeHomeView extends React.Component<
         navigation={<Navigation loadWorkqueueStatuses={false} />}
       >
         {this.getData(
-          draftCurrentPage,
+          pageId,
           notificationTab,
           inProgressTab,
           reviewTab,
+          sentForReviewTab,
           approvalTab,
           printTab,
           issueTab,
@@ -455,14 +426,25 @@ class OfficeHomeView extends React.Component<
           rejectTab
         )}
 
-        <FABContainer>
-          <Link to={SELECT_VITAL_EVENT}>
-            <FloatingActionButton
-              id="new_event_declaration"
-              icon={() => <PlusTransparentWhite />}
-            />
-          </Link>
-        </FABContainer>
+        <ProtectedComponent
+          scopes={[
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+            SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+            SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+          ]}
+        >
+          <FABContainer>
+            <Link to={SELECT_VITAL_EVENT}>
+              <FloatingActionButton
+                id="new_event_declaration"
+                icon={() => <PlusTransparentWhite />}
+              />
+            </Link>
+          </FABContainer>
+        </ProtectedComponent>
 
         {this.state.showCertificateToast && (
           <Toast
@@ -480,15 +462,8 @@ class OfficeHomeView extends React.Component<
   }
 }
 
-function mapStateToProps(
-  state: IStoreState,
-  props: RouteComponentProps<{
-    tabId: string
-    selectorId?: string
-    pageId?: string
-  }>
-) {
-  const { match } = props
+function mapStateToProps(state: IStoreState, props: RouteComponentProps) {
+  const match = props.router.match
   const userDetails = getUserDetails(state)
   const userLocationId = (userDetails && getUserLocation(userDetails).id) || ''
   const scope = getScope(state)
@@ -496,6 +471,7 @@ function mapStateToProps(
     (match.params.pageId && Number.parseInt(match.params.pageId)) ||
     (match.params.selectorId && Number.parseInt(match.params.selectorId)) ||
     1
+
   return {
     offlineResources: getOfflineData(state),
     declarations: state.declarationsState.declarations,
@@ -531,12 +507,15 @@ function mapStateToProps(
   }
 }
 
-export const OfficeHome = connect(mapStateToProps, {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab,
-  getOfflineData,
-  updateRegistrarWorkqueue,
-  updateWorkqueuePagination
-})(injectIntl(OfficeHomeView))
+export const OfficeHome = withRouter(
+  connect<
+    IBaseOfficeHomeStateProps,
+    IDispatchProps,
+    RouteComponentProps,
+    IStoreState
+  >(mapStateToProps, {
+    getOfflineData,
+    updateRegistrarWorkqueue,
+    updateWorkqueuePagination
+  })(injectIntl(OfficeHomeView))
+)

@@ -71,9 +71,17 @@ export {
   ArchiveBox,
   ArrowCircleDown,
   FileArrowUp,
+  FileDotted,
   PencilLine,
   PencilCircle,
   Handshake,
-  UserCircle
+  UserCircle,
+  Clock,
+  QrCode,
+  Webcam,
+  Sun,
+  DeviceTabletCamera,
+  Globe,
+  Fingerprint
 } from 'phosphor-react'
 export * from './custom-icons'

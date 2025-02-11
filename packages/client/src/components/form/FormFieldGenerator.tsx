@@ -29,7 +29,6 @@ import {
   getFieldType,
   getQueryData,
   getVisibleOptions,
-  getListOfLocations,
   getFieldHelperText,
   getDependentFields,
   evalExpressionInFieldDefinition,
@@ -92,8 +91,10 @@ import {
   InitialValue,
   DependencyInfo,
   Ii18nButtonFormField,
-  REDIRECT,
-  IDocumentUploaderWithOptionsFormField
+  LINK_BUTTON,
+  IDocumentUploaderWithOptionsFormField,
+  ID_READER,
+  ID_VERIFICATION_BANNER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -115,7 +116,7 @@ import {
   FormikValues,
   Formik
 } from 'formik'
-import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { IOfflineData } from '@client/offline/reducer'
 import { isEqual, flatten, cloneDeep, set } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
@@ -130,11 +131,20 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
+import {
+  BulletList,
+  Divider,
+  IDReader,
+  InputLabel,
+  Stack
+} from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
-import { RedirectField } from '@client/components/form/Redirect'
+import { getListOfLocations } from '@client/utils/validate'
+import { LinkButtonField } from '@client/components/form/LinkButton'
+import { ReaderGenerator } from './ReaderGenerator'
+import { IDVerificationBanner } from './IDVerification/Banner'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -184,7 +194,7 @@ type GeneratedInputFieldProps = {
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
-  setFieldTouched: (name: string, isTouched?: boolean) => void
+  setFieldTouched: FormikProps<IFormSectionData>['setFieldTouched']
 } & Omit<IDispatchProps, 'writeDeclaration'>
 
 const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
@@ -263,6 +273,38 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </InputField>
       )
     }
+
+    if (fieldDefinition.type === ID_READER) {
+      return (
+        <InputField {...inputFieldProps}>
+          <IDReader
+            dividerLabel={fieldDefinition.dividerLabel}
+            manualInputInstructionLabel={
+              fieldDefinition.manualInputInstructionLabel
+            }
+          >
+            <ReaderGenerator
+              readers={fieldDefinition.readers}
+              form={values}
+              field={fieldDefinition}
+              draft={draftData}
+              fields={fields}
+              setFieldValue={setFieldValue}
+            />
+          </IDReader>
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === ID_VERIFICATION_BANNER) {
+      return (
+        <IDVerificationBanner
+          type={fieldDefinition.bannerType}
+          idFieldName={fieldDefinition.idFieldName}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+
     if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
       return (
         <InputField {...inputFieldProps}>
@@ -274,8 +316,18 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             extraValue={fieldDefinition.extraValue || ''}
             hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
             onComplete={(files: IFileValue[]) => {
+              /*
+               * calling both setFieldTouched and setFieldValue causes the validate
+               * function to be called twice, once with the stale values (due to
+               * setFieldTouched) and the other with the updated values (due to
+               * setFieldValue). So if setFieldTouched is called after
+               * setFieldValue then wrong validations are shown due to the stale
+               * values. We can prevent that by supplying shouldRevalidate =
+               * false to the setFieldTouch function or calling it before
+               * calling setFieldValue.
+               */
+              setFieldTouched(fieldDefinition.name, true, false)
               setFieldValue(fieldDefinition.name, files)
-              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
             }}
             compressImagesToSizeMB={fieldDefinition.compressImagesToSizeMB}
             maxSizeMB={fieldDefinition.maxSizeMB}
@@ -296,7 +348,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           files={value as IAttachmentValue}
           error={error}
           onComplete={(file) => {
-            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+            setFieldTouched(fieldDefinition.name, true, false)
             setFieldValue(fieldDefinition.name, file)
           }}
           onUploadingStateChanged={onUploadingStateChanged}
@@ -609,12 +661,15 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === REDIRECT) {
+    if (fieldDefinition.type === LINK_BUTTON) {
       return (
-        <RedirectField
-          to={fieldDefinition.options.url}
+        <LinkButtonField
           form={values}
           draft={draftData}
+          fieldDefinition={fieldDefinition}
+          fields={fields}
+          setFieldValue={setFieldValue}
+          isDisabled={disabled}
         />
       )
     }
@@ -1094,8 +1149,8 @@ class FormSectionComponent extends React.Component<Props> {
                       }
                     }, {}),
                     intl,
-                    undefined,
-                    field.searchableType as LocationType[]
+                    (location) => field.searchableType.includes(location.type),
+                    field.userOfficeId
                   )
                 }
               : field

@@ -6,8 +6,6 @@ type Query {
     type: NotificationType = EMAIL
   ): NotificationResult
   fetchBirthRegistration(id: ID!): BirthRegistration
-  searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
-  searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(
@@ -40,7 +38,6 @@ type Query {
     mobile: String
     email: String
     status: String
-    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -138,16 +135,8 @@ type Query {
     skip: Int
     sort: String
   ): EventProgressResultSet
-  getSystemRoles(
-    title: String
-    value: ComparisonInput
-    role: String
-    active: Boolean
-    sortBy: String
-    sortOrder: String
-  ): [SystemRole!]
+  getUserRoles: [UserRole!]!
   fetchSystem(clientId: ID!): System
-  getEvent(eventId: ID!): Event!
 }
 
 type Mutation {
@@ -224,6 +213,7 @@ type Mutation {
     identifierType: String!
     identifierValue: String!
   ): ID!
+  updateField(id: ID!, details: UpdateFieldInput!): Boolean!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -257,7 +247,6 @@ type Mutation {
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
-  updateRole(systemRole: SystemRoleInput): Response!
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
@@ -270,30 +259,6 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
-  createEvent(event: EventInput!): Event!
-  notifyEvent(eventId: ID!, input: NotifyActionInput!): Event!
-  declareEvent(eventId: ID!, input: DeclareActionInput!): Event!
-  registerEvent(eventId: ID!, input: RegisterActionInput!): Event!
-  certifyEvent(eventId: ID!, input: CertifyActionInput!): Event!
-  issueEvent(eventId: ID!, input: IssueActionInput!): Event!
-  revokeEvent(eventId: ID!, input: RevokeActionInput!): Event!
-  reinstateEvent(eventId: ID!, input: ReinstateActionInput!): Event!
-  revokeCorrectionEvent(
-    eventId: ID!
-    input: RevokeCorrectionActionInput!
-  ): Event!
-  requestCorrectionEvent(
-    eventId: ID!
-    input: RequestCorrectionActionInput!
-  ): Event!
-  approveCorrectionEvent(
-    eventId: ID!
-    input: ApproveCorrectionActionInput!
-  ): Event!
-  rejectCorrectionEvent(
-    eventId: ID!
-    input: RejectCorrectionActionInput!
-  ): Event!
 }
 
 type Dummy {
@@ -331,32 +296,6 @@ type BirthRegistration implements EventRegistration {
   history: [History]
 }
 
-scalar Date
-
-type DeathRegistration implements EventRegistration {
-  id: ID!
-  _fhirIDMap: Map
-  registration: Registration
-  deceased: Person
-  informant: RelatedPerson
-  mother: Person
-  father: Person
-  spouse: Person
-  eventLocation: Location
-  questionnaire: [QuestionnaireQuestion]
-  mannerOfDeath: String
-  deathDescription: String
-  causeOfDeathMethod: String
-  causeOfDeathEstablished: String
-  causeOfDeath: String
-  maleDependentsOfDeceased: Float
-  femaleDependentsOfDeceased: Float
-  medicalPractitioner: MedicalPractitioner
-  createdAt: Date
-  updatedAt: Date
-  history: [History]
-}
-
 type Person {
   id: ID
   _fhirID: ID
@@ -384,6 +323,32 @@ type Person {
 type BirthRegResultSet {
   results: [BirthRegistration]
   totalItems: Int
+}
+
+scalar Date
+
+type DeathRegistration implements EventRegistration {
+  id: ID!
+  _fhirIDMap: Map
+  registration: Registration
+  deceased: Person
+  informant: RelatedPerson
+  mother: Person
+  father: Person
+  spouse: Person
+  eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
+  mannerOfDeath: String
+  deathDescription: String
+  causeOfDeathMethod: String
+  causeOfDeathEstablished: String
+  causeOfDeath: String
+  maleDependentsOfDeceased: Float
+  femaleDependentsOfDeceased: Float
+  medicalPractitioner: MedicalPractitioner
+  createdAt: Date
+  updatedAt: Date
+  history: [History]
 }
 
 interface EventRegistration {
@@ -424,12 +389,11 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String
-  systemRole: SystemRoleType!
-  role: Role!
+  role: UserRole!
   email: String
   status: Status!
   underInvestigation: Boolean
-  primaryOffice: Location
+  primaryOffice: Location!
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -613,22 +577,10 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
-type SystemRole {
+type UserRole {
   id: ID!
-  value: SystemRoleType!
-  roles: [Role!]!
-  active: Boolean!
-}
-
-input ComparisonInput {
-  eq: String
-  gt: String
-  lt: String
-  gte: String
-  lte: String
-  in: [String!]
-  ne: String
-  nin: [String!]
+  label: I18nMessage!
+  scopes: [String!]!
 }
 
 type System {
@@ -640,14 +592,6 @@ type System {
   type: SystemType!
   integratingSystemType: IntegratingSystemType
   settings: SystemSettings
-}
-
-type Event {
-  type: String!
-  id: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  actions: [Action!]!
 }
 
 input CorrectionInput {
@@ -740,11 +684,18 @@ type Reinstated {
 input ConfirmRegistrationInput {
   registrationNumber: String!
   identifiers: [IdentifierInput!]
+  comment: String
 }
 
 input RejectRegistrationInput {
   reason: String!
   comment: String
+}
+
+input UpdateFieldInput {
+  fieldId: String!
+  valueString: String
+  valueBoolean: Boolean
 }
 
 input UserInput {
@@ -755,7 +706,6 @@ input UserInput {
   mobile: String
   password: String
   status: Status
-  systemRole: SystemRoleType!
   role: String
   email: String
   primaryOffice: String
@@ -776,17 +726,6 @@ type Avatar {
 input AvatarInput {
   type: String!
   data: String!
-}
-
-type Response {
-  roleIdMap: Map!
-}
-
-input SystemRoleInput {
-  id: ID!
-  value: String
-  active: Boolean
-  roles: [RoleInput!]
 }
 
 type SystemSecret {
@@ -819,54 +758,6 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
-}
-
-input EventInput {
-  type: String!
-}
-
-input NotifyActionInput {
-  data: [FieldInput!]!
-}
-
-input DeclareActionInput {
-  data: [FieldInput!]!
-}
-
-input RegisterActionInput {
-  data: [FieldInput!]!
-}
-
-input CertifyActionInput {
-  data: [FieldInput!]!
-}
-
-input IssueActionInput {
-  data: [FieldInput!]!
-}
-
-input RevokeActionInput {
-  data: [FieldInput!]!
-}
-
-input ReinstateActionInput {
-  data: [FieldInput!]!
-}
-
-input RevokeCorrectionActionInput {
-  data: [FieldInput!]!
-}
-
-input RequestCorrectionActionInput {
-  data: [FieldInput!]!
-}
-
-input ApproveCorrectionActionInput {
-  data: [FieldInput!]!
-}
-
-input RejectCorrectionActionInput {
-  data: [FieldInput!]!
 }
 
 scalar Map
@@ -964,6 +855,7 @@ type History {
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
+  certificateTemplateId: String
   noSupportingDocumentationRequired: Boolean
   otherReason: String
   system: IntegratedSystem
@@ -979,12 +871,6 @@ type History {
   documents: [Attachment!]!
   duplicateOf: String
   potentialDuplicates: [String!]
-}
-
-type MedicalPractitioner {
-  name: String
-  qualification: String
-  lastVisitDate: Date
 }
 
 type IdentityType {
@@ -1048,24 +934,15 @@ type Deceased {
   deathDate: PlainDate
 }
 
+type MedicalPractitioner {
+  name: String
+  qualification: String
+  lastVisitDate: Date
+}
+
 type StatusWiseRegistrationCount {
   status: String!
   count: Int!
-}
-
-enum SystemRoleType {
-  FIELD_AGENT
-  REGISTRATION_AGENT
-  LOCAL_REGISTRAR
-  LOCAL_SYSTEM_ADMIN
-  NATIONAL_SYSTEM_ADMIN
-  PERFORMANCE_MANAGEMENT
-  NATIONAL_REGISTRAR
-}
-
-type Role {
-  _id: ID!
-  labels: [RoleLabel!]!
 }
 
 enum Status {
@@ -1077,7 +954,7 @@ enum Status {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: SystemRoleType!
+  role: String
   signature: Signature
 }
 
@@ -1100,7 +977,7 @@ type BookmarkedSeachItem {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  role: Role
+  role: UserRole
   status: Status
   avatar: Avatar
   primaryOfficeId: String
@@ -1180,6 +1057,12 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
+type I18nMessage {
+  id: String!
+  defaultMessage: String!
+  description: String!
+}
+
 enum SystemStatus {
   active
   deactivated
@@ -1203,10 +1086,6 @@ type SystemSettings {
   openIdProviderBaseUrl: String
   openIdProviderClaims: String
 }
-
-scalar DateTime
-
-union Action = CreateAction | RegisterAction | NotifyAction | DeclareAction
 
 input AttachmentInput {
   _fhirID: ID
@@ -1389,11 +1268,6 @@ input SignatureInput {
   type: String
 }
 
-input RoleInput {
-  _id: ID
-  labels: [LabelInput!]!
-}
-
 input SystemSettingsInput {
   dailyQuota: Int
   webhook: [WebhookInput]
@@ -1402,11 +1276,6 @@ input SystemSettingsInput {
 input WebhookInput {
   event: String!
   permissions: [String]!
-}
-
-input FieldInput {
-  id: String!
-  value: FieldValue!
 }
 
 type AssignmentData {
@@ -1437,9 +1306,10 @@ enum RegistrationType {
 
 type Certificate {
   collector: RelatedPerson
+  certifier: User
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
-  data: String
+  certificateTemplateId: String
 }
 
 type DuplicatesInfo {
@@ -1493,11 +1363,6 @@ type Payment {
   outcome: PaymentOutcomeType!
   date: Date!
   attachmentURL: String
-}
-
-type RoleLabel {
-  lang: String!
-  label: String!
 }
 
 type AdvancedSeachParameters {
@@ -1562,7 +1427,7 @@ type AdvancedSeachParameters {
 }
 
 type EventMetricsByRegistrar {
-  registrarPractitioner: User
+  registrarPractitioner: User!
   total: Int!
   late: Int!
   delayed: Int!
@@ -1691,36 +1556,6 @@ type WebhookPermission {
   permissions: [String!]!
 }
 
-type CreateAction {
-  type: String!
-  createdAt: DateTime!
-  createdBy: String!
-  data: [Field!]!
-}
-
-type RegisterAction {
-  type: String!
-  createdAt: DateTime!
-  createdBy: String!
-  data: [Field!]!
-  identifiers: Identifiers!
-}
-
-type NotifyAction {
-  type: String!
-  createdAt: DateTime!
-  createdBy: String!
-  data: [Field!]!
-}
-
-type DeclareAction {
-  type: String!
-  createdAt: DateTime!
-  createdBy: String!
-  data: [Field!]!
-  identifiers: Identifiers!
-}
-
 enum AttachmentInputStatus {
   approved
   validated
@@ -1791,7 +1626,7 @@ input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  data: String
+  certificateTemplateId: String
 }
 
 input IdentityInput {
@@ -1813,11 +1648,6 @@ input DeceasedInput {
   deathDate: PlainDate
 }
 
-input LabelInput {
-  lang: String!
-  label: String!
-}
-
 interface AuditLogItemBase {
   time: String!
   ipAddress: String!
@@ -1829,16 +1659,6 @@ interface AuditLogItemBase {
 type AdditionalIdWithCompositionId {
   compositionId: String!
   trackingId: String!
-}
-
-type Field {
-  id: String!
-  value: FieldValue!
-}
-
-type Identifiers {
-  trackingId: String!
-  registrationNumber: String!
 }
 
 enum TelecomSystem {

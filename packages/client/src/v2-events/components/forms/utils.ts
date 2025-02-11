@@ -8,293 +8,120 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { formatISO } from 'date-fns'
 import {
-  BULLET_LIST,
-  BUTTON,
-  CHECKBOX_GROUP,
-  DATE,
-  DependencyInfo,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  FETCH_BUTTON,
-  HIDDEN,
-  IButtonFormField,
-  ICheckboxOption,
-  IDynamicFormField,
-  IDynamicFormFieldValidators,
-  IFormField,
-  IFormFieldValue,
-  IFormSectionData,
-  Ii18nFormField,
-  ILoaderButton,
-  INFORMATIVE_RADIO_GROUP,
-  InitialValue,
-  IRadioOption,
-  ISelectOption,
-  RADIO_GROUP,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  SELECT_WITH_OPTIONS
-} from '@client/forms'
-import { Validation } from '@client/utils/validate'
-import { IntlShape, MessageDescriptor } from 'react-intl'
-import { Conditional } from './conditionals'
-
-const internationaliseOptions = (
-  intl: IntlShape,
-  options: Array<ISelectOption | IRadioOption | ICheckboxOption>
-) => {
-  return options.map((opt) => {
-    return {
-      ...opt,
-      label: intl.formatMessage(
-        opt.label,
-        'param' in opt ? opt.param : undefined
-      )
-    }
-  })
-}
-
-const internationaliseListFieldObject = (
-  intl: IntlShape,
-  options: MessageDescriptor[]
-) => {
-  return options.map((opt) => intl.formatMessage(opt))
-}
-
-export const internationaliseFieldObject = (
-  intl: IntlShape,
-  field: IFormField
-): Ii18nFormField => {
-  const internationalisedForAll = {
-    helperText: field.helperText && intl.formatMessage(field.helperText),
-    tooltip: field.tooltip && intl.formatMessage(field.tooltip),
-    unit: field.unit && intl.formatMessage(field.unit),
-    description: field.description && intl.formatMessage(field.description),
-    placeholder: field.placeholder && intl.formatMessage(field.placeholder),
-    label: field.label && intl.formatMessage(field.label),
-    nestedFields: undefined
-  }
-
-  if (field.type === HIDDEN) {
-    return {
-      ...field,
-      ...internationalisedForAll,
-      label: internationalisedForAll.label
-    }
-  }
-
-  if (
-    field.type === SELECT_WITH_OPTIONS ||
-    field.type === INFORMATIVE_RADIO_GROUP ||
-    field.type === CHECKBOX_GROUP ||
-    field.type === DOCUMENT_UPLOADER_WITH_OPTION
-  ) {
-    return {
-      ...field,
-      ...internationalisedForAll,
-      options: internationaliseOptions(intl, field.options)
-    } as Ii18nFormField
-  }
-
-  if (field.type === BULLET_LIST) {
-    return {
-      ...field,
-      ...internationalisedForAll,
-      items: internationaliseListFieldObject(intl, field.items)
-    }
-  }
-
-  if (
-    field.type === RADIO_GROUP ||
-    field.type === RADIO_GROUP_WITH_NESTED_FIELDS
-  ) {
-    return {
-      ...field,
-      ...internationalisedForAll,
-      options: internationaliseOptions(intl, field.options),
-      notice: field.notice && intl.formatMessage(field.notice)
-    } as Ii18nFormField
-  }
-
-  if (field.type === DATE && field.notice) {
-    return {
-      ...field,
-      ...internationalisedForAll,
-      notice: intl.formatMessage(field.notice)
-    }
-  }
-
-  if (field.type === FETCH_BUTTON) {
-    return {
-      ...field,
-      ...internationalisedForAll,
-      modalTitle: intl.formatMessage((field as ILoaderButton).modalTitle),
-      successTitle: intl.formatMessage((field as ILoaderButton).successTitle),
-      errorTitle: intl.formatMessage((field as ILoaderButton).errorTitle)
-    } as Ii18nFormField
-  }
-
-  if (isFieldButton(field)) {
-    return {
-      ...field,
-      ...internationalisedForAll,
-      buttonLabel: intl.formatMessage(field.buttonLabel),
-      loadingLabel: field.loadingLabel && intl.formatMessage(field.loadingLabel)
-    }
-  }
-
-  return { ...field, ...internationalisedForAll } as Ii18nFormField
-}
+  ActionFormData,
+  FieldConfig,
+  Inferred,
+  getConditionalActionsForField,
+  FieldValue
+} from '@opencrvs/commons/client'
+import { DependencyInfo } from '@client/forms'
+import { FIELD_SEPARATOR } from './FormFieldGenerator'
 
 export function handleInitialValue(
-  initialValue: InitialValue,
-  formData: IFormSectionData
-): IFormFieldValue {
-  return isInitialValueDependencyInfo(initialValue)
-    ? (evalExpressionInFieldDefinition(initialValue.expression, {
-        $form: formData
-      }) as IFormFieldValue)
-    : initialValue
-}
+  field: FieldConfig,
+  formData: ActionFormData
+) {
+  const initialValue = field.initialValue
 
-export const getFieldType = (
-  field: IDynamicFormField,
-  values: IFormSectionData
-): string => {
-  if (!field.dynamicDefinitions.type) {
-    return field.type
+  if (hasInitialValueDependencyInfo(initialValue)) {
+    return evalExpressionInFieldDefinition(initialValue.expression, {
+      $form: formData
+    })
   }
 
-  switch (field.dynamicDefinitions.type.kind) {
-    case 'dynamic':
-      return field.dynamicDefinitions.type.typeMapper(
-        values[field.dynamicDefinitions.type.dependency] as string
-      )
-    case 'static':
-    default:
-      return field.dynamicDefinitions.type.staticType
-  }
+  return initialValue
 }
 
-export const getConditionalActionsForField = (
-  field: IFormField,
-  values: IFormSectionData
-): string[] => {
-  if (!field.conditionals) {
-    return []
-  }
-  return field.conditionals
-    .filter((conditional) =>
-      evalExpressionInFieldDefinition(conditional.expression, {
-        $form: values
-      })
-    )
-    .map((conditional: Conditional) => conditional.action)
+export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
+  return getConditionalActionsForField(field, {
+    $form: form,
+    $now: formatISO(new Date(), {
+      representation: 'date'
+    })
+  }).every((fieldAction) => fieldAction !== 'HIDE')
 }
 
-type FormData = Record<string, IFormFieldValue>
-export const evalExpressionInFieldDefinition = (
+export function evalExpressionInFieldDefinition(
   expression: string,
   /*
    * These are used in the eval expression
    */
-  { $form }: { $form: FormData }
-) => {
+  { $form }: { $form: ActionFormData }
+) {
   // eslint-disable-next-line no-eval
-  return eval(expression)
+  return eval(expression) as FieldValue
 }
 
-export function isFieldButton(field: IFormField): field is IButtonFormField {
-  return field.type === BUTTON
-}
-
-export const getFieldValidation = (
-  field: IDynamicFormField,
-  values: IFormSectionData
-): Validation[] => {
-  const validator: Validation[] = []
-  if (
-    field.dynamicDefinitions &&
-    field.dynamicDefinitions.validator &&
-    field.dynamicDefinitions.validator.length > 0
-  ) {
-    field.dynamicDefinitions.validator.map(
-      (element: IDynamicFormFieldValidators) => {
-        const params: unknown[] = []
-        element.dependencies.map((dependency: string) =>
-          params.push(values[dependency])
-        )
-        const fun = element.validator(...params)
-        validator.push(fun)
-        return element
-      }
-    )
-  }
-
-  return validator
-}
-
-function isRecord<V>(value: unknown): value is Record<string, V> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-function isInitialValueDependencyInfo(
-  value: InitialValue
+export function hasInitialValueDependencyInfo(
+  value: Inferred['initialValue']
 ): value is DependencyInfo {
-  return typeof value === 'object' && value !== null && 'dependsOn' in value
+  return typeof value === 'object' && 'dependsOn' in value
 }
 
 export function getDependentFields(
-  fields: IFormField[],
+  fields: FieldConfig[],
   fieldName: string
-): IFormField[] {
-  return fields.filter(
-    ({ initialValue }) =>
-      initialValue &&
-      isInitialValueDependencyInfo(initialValue) &&
-      initialValue.dependsOn.includes(fieldName)
-  )
-}
-
-export function flatten<T>(
-  obj: Record<string, T>,
-  parentKey = '',
-  separator = '.'
-): Record<string, T> {
-  const result: Record<string, T> = {}
-
-  for (const [key, value] of Object.entries(obj)) {
-    const newKey = parentKey ? `${parentKey}${separator}${key}` : key
-
-    if (isRecord(value)) {
-      Object.assign(
-        result,
-        flatten(value as Record<string, T>, newKey, separator)
-      )
-    } else {
-      result[newKey] = value
+): FieldConfig[] {
+  return fields.filter((field) => {
+    if (!field.initialValue) {
+      return false
     }
-  }
-
-  return result
+    if (!hasInitialValueDependencyInfo(field.initialValue)) {
+      return false
+    }
+    return field.initialValue.dependsOn.includes(fieldName)
+  })
 }
 
-export function unflatten<T>(
-  obj: Record<string, T>,
-  separator = '.'
-): Record<string, T | Record<string, T>> {
-  const result: Record<string, T | Record<string, T>> = {}
+/**
+ * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
+ * For setting default fields for form values @see setFormValueToOutputFormat
+ *
+ * @returns object based on the fields given with null values.
+ */
+export function setEmptyValuesForFields(fields: FieldConfig[]) {
+  return fields.reduce((initialValues: Record<string, null>, field) => {
+    return {
+      ...initialValues,
+      [field.id]: null
+    }
+  }, {})
+}
 
-  for (const [key, value] of Object.entries(obj)) {
-    const keys = key.split(separator)
-    let current: Record<string, T | Record<string, T>> = result
+export interface Stringifiable {
+  toString(): string
+}
 
-    keys.forEach((part, index) => {
-      if (!current[part] || typeof current[part] !== 'object') {
-        current[part] = index === keys.length - 1 ? value : {}
+/**
+ *
+ * @param fields field config in OpenCRVS format (separated with `.`)
+ * @param values form values in formik format (separated with `FIELD_SEPARATOR`)
+ * @returns adds 0 before single digit days and months to make them 2 digit
+ * because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
+ */
+export function makeDatesFormatted(
+  fields: FieldConfig[],
+  values: Record<string, FieldValue>
+) {
+  return fields.reduce((acc, field) => {
+    const fieldId = field.id.replaceAll('.', FIELD_SEPARATOR)
+
+    if (field.type === 'DATE' && fieldId in values) {
+      const value = values[fieldId as keyof typeof values]
+      if (typeof value === 'string') {
+        const formattedDate = formatDateFieldValue(value)
+        return { ...acc, [fieldId]: formattedDate }
       }
-      current = current[part] as Record<string, T | Record<string, T>>
-    })
-  }
+    }
+    return acc
+  }, values)
+}
 
-  return result
+export function formatDateFieldValue(value: string) {
+  return value
+    .split('-')
+    .map((d: string) => d.padStart(2, '0'))
+    .join('-')
 }

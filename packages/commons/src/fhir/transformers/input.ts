@@ -34,16 +34,6 @@ const enum Status {
 
 type DateString = string
 
-const enum SystemRoleType {
-  FIELD_AGENT = 'FIELD_AGENT',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
-  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
-  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
-}
-
 /*
  * Enums get converted to string unions so that types generated from GraphQL
  * can be converted to these our core types
@@ -58,7 +48,6 @@ interface User {
   mobile?: string
   password?: string
   status?: EnumToStringUnion<typeof Status>
-  systemRole: EnumToStringUnion<typeof SystemRoleType>
   role?: string
   email?: string
   primaryOffice?: string
@@ -207,7 +196,7 @@ interface Certificate {
   collector?: RelatedPerson
   hasShowedVerifiedDocument?: boolean
   payments?: Array<Payment | null>
-  data?: string
+  certificateTemplateId: string
 }
 interface Deceased {
   deceased?: boolean

@@ -19,7 +19,6 @@ import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
   Bundle,
-  Composition,
   EVENT_TYPE,
   Patient,
   Saved,
@@ -61,16 +60,56 @@ import {
   markNotADuplicate,
   rejectRegistration,
   confirmRegistration,
-  upsertRegistrationIdentifier
+  upsertRegistrationIdentifier,
+  updateField
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
+import { Context } from '@gateway/graphql/context'
+import { GraphQLResolveInfo } from 'graphql'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
   const { token } = await res.json()
   return token
 }
+
+// This should take into account the status
+// of the record like so in useNavigation
+const ACTIONABLE_SCOPES = [
+  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+  SCOPES.RECORD_SUBMIT_INCOMPLETE,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_CORRECT,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_DECLARATION_ARCHIVE
+]
+
+const requireAssignment =
+  <P, A, R>(
+    fn: (
+      parent: P,
+      args: A & { id: string },
+      context: Context,
+      info: GraphQLResolveInfo
+    ) => R
+  ) =>
+  async (...args: Parameters<typeof fn>) => {
+    const assignedToSelf = await checkUserAssignment(
+      args[1].id,
+      args[2].headers
+    )
+    if (!assignedToSelf) {
+      throw new UnassignError('User is not assigned to the record')
+    }
+    return fn(...args)
+  }
 
 export const resolvers: GQLResolver = {
   RecordDetails: {
@@ -81,62 +120,8 @@ export const resolvers: GQLResolver = {
     }
   },
   Query: {
-    async searchBirthRegistrations(
-      _,
-      { fromDate, toDate },
-      { headers: authHeader }
-    ): Promise<Saved<Bundle>[]> {
-      if (!hasScope(authHeader, 'sysadmin')) {
-        throw new Error('User does not have a sysadmin scope')
-      }
-      const res = await fetchFHIR<Saved<Bundle<Saved<Composition>>>>(
-        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
-        authHeader
-      )
-
-      const compositions = res.entry.map(({ resource }) => resource)
-
-      return Promise.all(
-        compositions
-          .filter(({ type }) =>
-            type.coding?.some(({ code }) => code === 'birth-declaration')
-          )
-          .map((composition) =>
-            getRecordById(composition.id, authHeader.Authorization)
-          )
-      )
-    },
-    async searchDeathRegistrations(
-      _,
-      { fromDate, toDate },
-      { headers: authHeader }
-    ): Promise<Saved<Bundle>[]> {
-      if (!hasScope(authHeader, 'sysadmin')) {
-        throw new Error('User does not have a sysadmin scope')
-      }
-      const res = await fetchFHIR<Saved<Bundle<Saved<Composition>>>>(
-        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
-        authHeader
-      )
-
-      const compositions = res.entry.map(({ resource }) => resource)
-
-      return Promise.all(
-        compositions
-          .filter(({ type }) =>
-            type.coding?.some(({ code }) => code === 'death-declaration')
-          )
-          .map((composition) =>
-            getRecordById(composition.id, authHeader.Authorization)
-          )
-      )
-    },
     async fetchBirthRegistration(_, { id }, context): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, 'register') ||
-        hasScope(context.headers, 'validate') ||
-        hasScope(context.headers, 'declare')
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
@@ -144,15 +129,11 @@ export const resolvers: GQLResolver = {
         context.dataSources.recordsAPI.setRecord(record)
         return record
       } else {
-        throw new Error('User does not have a register or validate scope')
+        throw new Error('User does not have enough scope')
       }
     },
     async fetchDeathRegistration(_, { id }, context): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, 'register') ||
-        hasScope(context.headers, 'validate') ||
-        hasScope(context.headers, 'declare')
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
@@ -160,7 +141,7 @@ export const resolvers: GQLResolver = {
         context.dataSources.recordsAPI.setRecord(record)
         return record
       } else {
-        throw new Error('User does not have a register or validate scope')
+        throw new Error('User does not have enough scope')
       }
     },
     async fetchMarriageRegistration(
@@ -168,11 +149,7 @@ export const resolvers: GQLResolver = {
       { id },
       context
     ): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, 'register') ||
-        hasScope(context.headers, 'validate') ||
-        hasScope(context.headers, 'declare')
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
@@ -180,7 +157,7 @@ export const resolvers: GQLResolver = {
         context.dataSources.recordsAPI.setRecord(record)
         return record
       } else {
-        throw new Error('User does not have a register or validate scope')
+        throw new Error('User does not have enough scope')
       }
     },
     async queryRegistrationByIdentifier(
@@ -189,8 +166,8 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ): Promise<Saved<Bundle>> {
       if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, SCOPES.RECORD_REGISTER) ||
+        hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL)
       ) {
         const taskBundle = await fetchFHIR<Bundle<Task>>(
           `/Task?identifier=${identifier}`,
@@ -208,7 +185,7 @@ export const resolvers: GQLResolver = {
 
         return await fetchFHIR(`/${task.focus.reference}`, authHeader)
       } else {
-        throw new Error('User does not have a register or validate scope')
+        throw new Error('User does not have enough scope')
       }
     },
     async fetchRegistration(_, { id }, context): Promise<Saved<Bundle>> {
@@ -227,9 +204,9 @@ export const resolvers: GQLResolver = {
     },
     async queryPersonByIdentifier(_, { identifier }, { headers: authHeader }) {
       if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate') ||
-        hasScope(authHeader, 'declare')
+        hasScope(authHeader, SCOPES.RECORD_REGISTER) ||
+        hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
+        hasScope(authHeader, SCOPES.RECORD_SUBMIT_INCOMPLETE)
       ) {
         const personBundle = await fetchFHIR<Bundle<Patient>>(
           `/Patient?identifier=${identifier}`,
@@ -251,9 +228,11 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate') ||
-        hasScope(authHeader, 'declare')
+        hasScope(authHeader, SCOPES.RECORD_REGISTER) ||
+        hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_BIRTH) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_DEATH) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_MARRIAGE)
       ) {
         const response = await fetch(
           `${COUNTRY_CONFIG_URL}/verify/nid/${country}`,
@@ -282,11 +261,12 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate') ||
-        hasScope(authHeader, 'declare') ||
-        hasScope(authHeader, 'sysadmin') ||
-        hasScope(authHeader, 'performance')
+        hasScope(authHeader, SCOPES.RECORD_REGISTER) ||
+        hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_BIRTH) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_DEATH) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_MARRIAGE) ||
+        hasScope(authHeader, SCOPES.PERFORMANCE_READ)
       ) {
         const payload: {
           declarationJurisdictionId?: string
@@ -371,8 +351,8 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (!hasScope(authHeader, 'validate')) {
-        throw new Error('User does not have a validate scope')
+      if (!hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+        throw new Error('User does not have enough scope')
       } else {
         return await markEventAsValidated(
           id,
@@ -387,8 +367,8 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (!hasScope(authHeader, 'validate')) {
-        throw new Error('User does not have a validate scope')
+      if (!hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+        throw new Error('User does not have enough scope')
       }
       return await markEventAsValidated(
         id,
@@ -402,8 +382,8 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (!hasScope(authHeader, 'validate')) {
-        throw new Error('User does not have a validate scope')
+      if (!hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+        throw new Error('User does not have enough scope')
       } else {
         return await markEventAsValidated(
           id,
@@ -418,7 +398,7 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (hasScope(authHeader, 'register')) {
+      if (hasScope(authHeader, SCOPES.RECORD_REGISTER)) {
         return markEventAsRegistered(id, authHeader, EVENT_TYPE.BIRTH, details)
       } else {
         throw new Error('User does not have a register scope')
@@ -429,7 +409,7 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (hasScope(authHeader, 'register')) {
+      if (hasScope(authHeader, SCOPES.RECORD_REGISTER)) {
         return markEventAsRegistered(id, authHeader, EVENT_TYPE.DEATH, details)
       } else {
         throw new Error('User does not have a register scope')
@@ -444,7 +424,7 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (hasScope(authHeader, 'register')) {
+      if (hasScope(authHeader, SCOPES.RECORD_REGISTER)) {
         return markEventAsRegistered(
           id,
           authHeader,
@@ -464,8 +444,13 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (!inScope(authHeader, ['register', 'validate'])) {
-        throw new Error('User does not have a register or validate scope')
+      if (
+        !inScope(authHeader, [
+          SCOPES.RECORD_REGISTER,
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+        ])
+      ) {
+        throw new Error('User does not have enough scope')
       }
       const taskEntry = await rejectDeclaration(id, authHeader, reason, comment)
       if (!taskEntry) {
@@ -484,8 +469,13 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (!inScope(authHeader, ['register', 'validate'])) {
-        throw new Error('User does not have a register or validate scope')
+      if (
+        !inScope(authHeader, [
+          SCOPES.RECORD_REGISTER,
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+        ])
+      ) {
+        throw new Error('User does not have enough scope')
       }
       const taskEntry = await archiveRegistration(
         id,
@@ -502,8 +492,13 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (!inScope(authHeader, ['register', 'validate'])) {
-        throw new Error('User does not have a register or validate scope')
+      if (
+        !inScope(authHeader, [
+          SCOPES.RECORD_REGISTER,
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+        ])
+      ) {
+        throw new Error('User does not have enough scope')
       }
 
       const { taskId, prevRegStatus } = await reinstateRegistration(
@@ -516,39 +511,53 @@ export const resolvers: GQLResolver = {
         registrationStatus: prevRegStatus
       }
     },
-    async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'certify')) {
-        return Promise.reject(new Error('User does not have a certify scope'))
+    markBirthAsCertified: requireAssignment(
+      async (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
       }
-      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
-    },
-    async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'certify')) {
-        return Promise.reject(new Error('User does not have a certify scope'))
+    ),
+    // @todo: add new query for certify and issue later where require assignment wrapper will be used
+    markBirthAsIssued: (_, { id, details }, { headers: authHeader }) => {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+        throw new Error('User does not have enough scope')
       }
       return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
-    async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'certify')) {
-        return Promise.reject(new Error('User does not have a certify scope'))
+    markDeathAsCertified: requireAssignment(
+      (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
       }
-      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
-    },
-    async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'certify')) {
-        return Promise.reject(new Error('User does not have a certify scope'))
+    ),
+    // @todo: add new query for certify and issue later where require assignment wrapper will be used
+    markDeathAsIssued: (_, { id, details }, { headers: authHeader }) => {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+        throw new Error('User does not have enough scope')
       }
       return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
     },
-    async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'certify')) {
-        return Promise.reject(new Error('User does not have a certify scope'))
+    markMarriageAsCertified: requireAssignment(
+      (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsCertified(
+          id,
+          details,
+          authHeader,
+          EVENT_TYPE.MARRIAGE
+        )
       }
-      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
-    },
-    async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'certify')) {
-        return Promise.reject(new Error('User does not have a certify scope'))
+    ),
+    // @todo: add new query for certify and issue later where require assignment wrapper will be used
+    markMarriageAsIssued: (_, { id, details }, { headers: authHeader }) => {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+        throw new Error('User does not have enough scope')
       }
       return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
     },
@@ -558,26 +567,30 @@ export const resolvers: GQLResolver = {
         throw new UnassignError('User has been unassigned')
       }
       if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, SCOPES.RECORD_REGISTER) ||
+        hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL)
       ) {
         const composition = await markNotADuplicate(id, authHeader)
 
         return composition.id
       } else {
-        throw new Error('User does not have a register scope')
+        throw new Error('User does not have enough scope')
       }
     },
     async markEventAsUnassigned(_, { id }, { headers: authHeader }) {
-      if (!inScope(authHeader, ['register', 'validate'])) {
-        throw new Error('User does not have a register or validate scope')
-      }
-      const task = getTaskFromSavedBundle(
-        await unassignRegistration(id, authHeader)
-      )
+      const assignedToSelf = await checkUserAssignment(id, authHeader)
+      if (
+        assignedToSelf ||
+        inScope(authHeader, [SCOPES.RECORD_UNASSIGN_OTHERS])
+      ) {
+        const task = getTaskFromSavedBundle(
+          await unassignRegistration(id, authHeader)
+        )
 
-      // return the taskId
-      return task.id
+        // return the taskId
+        return task.id
+      }
+      throw new Error('User does not have enough scope')
     },
     async markEventAsDuplicate(
       _,
@@ -588,8 +601,13 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (!inScope(authHeader, ['register', 'validate'])) {
-        throw new Error('User does not have a register or validate scope')
+      if (
+        !inScope(authHeader, [
+          SCOPES.RECORD_REGISTER,
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+        ])
+      ) {
+        throw new Error('User does not have enough scope')
       }
 
       const taskEntry = await duplicateRegistration(
@@ -603,7 +621,7 @@ export const resolvers: GQLResolver = {
       return taskEntry.resource.id
     },
     async confirmRegistration(_, { id, details }, { headers: authHeader }) {
-      if (!inScope(authHeader, ['record.confirm-registration'])) {
+      if (!inScope(authHeader, [SCOPES.RECORD_CONFIRM_REGISTRATION])) {
         throw new Error('User does not have a Confirm Registration scope')
       }
 
@@ -612,10 +630,7 @@ export const resolvers: GQLResolver = {
       }
 
       try {
-        const taskEntry = await confirmRegistration(id, authHeader, {
-          registrationNumber: details.registrationNumber,
-          identifiers: details.identifiers
-        })
+        const taskEntry = await confirmRegistration(id, authHeader, details)
 
         return taskEntry.resource.id
       } catch (error) {
@@ -623,7 +638,7 @@ export const resolvers: GQLResolver = {
       }
     },
     async rejectRegistration(_, { id, details }, { headers: authHeader }) {
-      if (!inScope(authHeader, ['record.reject-registration'])) {
+      if (!inScope(authHeader, [SCOPES.RECORD_REJECT_REGISTRATION])) {
         throw new Error('User does not have a Reject Registration" scope')
       }
 
@@ -660,6 +675,15 @@ export const resolvers: GQLResolver = {
       } catch (error) {
         throw new Error(`Failed to confirm registration: ${error.message}`)
       }
+    },
+    async updateField(_, { id, details }, { headers: authHeader }) {
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record')
+      }
+
+      await updateField(id, authHeader, details)
+
+      return true
     }
   }
 }

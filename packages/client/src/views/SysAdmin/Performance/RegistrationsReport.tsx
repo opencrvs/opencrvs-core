@@ -29,8 +29,8 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { useDispatch } from 'react-redux'
-import { goToRegistrationsList } from '@client/navigation'
+import { generateRegistrationsListUrlConfig } from '@client/navigation'
+import { useNavigate } from 'react-router-dom'
 
 const ActionButton = styled(LinkButton)`
   align-self: baseline;
@@ -50,7 +50,7 @@ export function RegistrationsReport({
   timeEnd,
   locationId
 }: RegistrationsReportProps) {
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const intl = useIntl()
   return (
     <ReportContainer>
@@ -111,13 +111,13 @@ export function RegistrationsReport({
         actions={
           <ActionButton
             onClick={() => {
-              dispatch(
-                goToRegistrationsList(
+              navigate(
+                generateRegistrationsListUrlConfig({
                   timeStart,
                   timeEnd,
                   locationId,
-                  selectedEvent
-                )
+                  event: selectedEvent
+                })
               )
             }}
           >

@@ -16,14 +16,15 @@ import {
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { EventType } from '@client/utils/gateway'
-import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { createStore } from '@client/store'
 import {
-  createRouterProps,
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  REGISTRAR_DEFAULT_SCOPES,
+  resizeWindow,
+  setScopes,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
@@ -32,7 +33,6 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { EVENT_STATUS } from '@client/workqueue'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { ApolloClient } from '@apollo/client'
-import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { ReadyForReview } from './ReadyForReview'
@@ -41,15 +41,8 @@ import type {
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { REGISTRAR_HOME } from '@client/navigation/routes'
-import { formatUrl } from '@client/navigation'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'
 import { vi, Mock } from 'vitest'
-
-const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as Mock
 
 const nameObj = {
   data: {
@@ -232,25 +225,22 @@ const mockReviewTabData = {
 
 describe('OfficeHome sent for review tab related tests', () => {
   let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
   let apolloClient: ApolloClient<{}>
 
   beforeEach(async () => {
     ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
     const createdStore = createStore()
     store = createdStore.store
-    history = createdStore.history
 
     apolloClient = createClient(store)
 
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
   })
 
   it('should show pagination bar if items more than 11 in ReviewTab', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -264,7 +254,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     const pagination = await waitForElement(
@@ -285,7 +275,7 @@ describe('OfficeHome sent for review tab related tests', () => {
   it('renders all items returned from graphql query in ready for review', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: mockReviewTabData
@@ -296,7 +286,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     const workqueue = await waitForElement(testComponent, Workqueue)
@@ -319,7 +309,7 @@ describe('OfficeHome sent for review tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -333,7 +323,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     const workqueue = await waitForElement(testComponent, Workqueue)
@@ -344,7 +334,7 @@ describe('OfficeHome sent for review tab related tests', () => {
   it('redirects to recordAudit page if row is clicked', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -436,21 +426,21 @@ describe('OfficeHome sent for review tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
     const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await waitFor(() =>
-      window.location.href.includes(
+      router.state.location.pathname.includes(
         '/record-audit/reviewTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       )
     )
   })
 
   describe('handles download status', () => {
-    let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: ReactWrapper<{}, {}>
+    let testComponent: TestComponentWithRouteMock
+    let createdTestComponent: TestComponentWithRouteMock
     beforeEach(async () => {
       Date.now = vi.fn(() => 1554055200000)
 
@@ -474,45 +464,40 @@ describe('OfficeHome sent for review tab related tests', () => {
         })
       apolloClient.query = mockListSyncController
 
-      createdTestComponent = await createTestComponent(
-        <OfficeHome
-          {...createRouterProps(
-            formatUrl(REGISTRAR_HOME, {
-              tabId: WORKQUEUE_TABS.readyForReview
-            }),
-            { isNavigatedInsideApp: false },
-            {
-              matchParams: {
-                tabId: WORKQUEUE_TABS.readyForReview
-              }
-            }
-          )}
-        />,
-        { store, history, apolloClient }
-      )
+      createdTestComponent = await createTestComponent(<OfficeHome />, {
+        store,
+        apolloClient
+      })
 
       testComponent = createdTestComponent
     })
     //TODO:: FAILED TEST
     it.skip('downloads declaration after clicking download button', async () => {
-      await waitForElement(testComponent, '#ListItemAction-0-icon')
-      testComponent.find('#ListItemAction-0-icon').hostNodes().simulate('click')
-      testComponent.update()
-      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
+      await waitForElement(testComponent.component, '#ListItemAction-0-icon')
+      testComponent.component
+        .find('#ListItemAction-0-icon')
+        .hostNodes()
+        .simulate('click')
+      testComponent.component.update()
+      expect(
+        testComponent.component.find('#assignment').hostNodes()
+      ).toHaveLength(1)
 
-      testComponent.find('#assign').hostNodes().simulate('click')
+      testComponent.component.find('#assign').hostNodes().simulate('click')
 
       expect(
-        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
+        testComponent.component
+          .find('#action-loading-ListItemAction-0')
+          .hostNodes()
       ).toHaveLength(1)
 
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
+      testComponent.component.update()
 
       const action = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-Review'
       )
       action.hostNodes().simulate('click')
@@ -520,8 +505,8 @@ describe('OfficeHome sent for review tab related tests', () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
-      expect(history.location.pathname).toBe(
+      testComponent.component.update()
+      expect(testComponent.router.state.location.pathname).toBe(
         '/reviews/9a55d213-ad9f-4dcd-9418-340f3a7f6269/events/birth/parent/review'
       )
     })
@@ -535,10 +520,12 @@ describe('OfficeHome sent for review tab related tests', () => {
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(storeDeclaration(downloadedDeclaration))
 
-      testComponent.update()
+      testComponent.component.update()
 
       expect(
-        testComponent.find('#ListItemAction-1-icon-failed').hostNodes()
+        testComponent.component
+          .find('#ListItemAction-1-icon-failed')
+          .hostNodes()
       ).toHaveLength(1)
     })
   })
@@ -547,7 +534,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -612,7 +599,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     const props = testComponent.find('#declaration_icon').first().props().color
@@ -620,8 +607,8 @@ describe('OfficeHome sent for review tab related tests', () => {
   })
 
   describe.skip('handles download status for possible duplicate declaration', () => {
-    let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: ReactWrapper<{}, {}>
+    let testComponent: TestComponentWithRouteMock
+    let createdTestComponent: TestComponentWithRouteMock
     beforeAll(async () => {
       Date.now = vi.fn(() => 1554055200000)
       const graphqlMocks = [
@@ -657,25 +644,26 @@ describe('OfficeHome sent for review tab related tests', () => {
       createdTestComponent = await createTestComponent(
         // @ts-ignore
         <OfficeHome />,
-        { store, history, graphqlMocks }
+        { store, graphqlMocks }
       )
 
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
       testComponent = createdTestComponent
     })
 
     it('starts downloading after clicking download button', async () => {
       const downloadButton = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-1-icon'
       )
 
       downloadButton.hostNodes().simulate('click')
-      testComponent.update()
+      testComponent.component.update()
 
       expect(
-        testComponent.find('#action-loading-ListItemAction-1').hostNodes()
+        testComponent.component
+          .find('#action-loading-ListItemAction-1')
+          .hostNodes()
       ).toHaveLength(1)
     })
 
@@ -689,7 +677,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       store.dispatch(modifyDeclaration(downloadedDeclaration))
 
       const action = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-1-Review'
       )
 
@@ -697,7 +685,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       action.hostNodes().simulate('click')
 
       await waitFor(() =>
-        window.location.href.includes(
+        testComponent.router.state.location.pathname.includes(
           '/duplicates/bc09200d-0160-43b4-9e2b-5b9e90424e95'
         )
       )
@@ -712,10 +700,10 @@ describe('OfficeHome sent for review tab related tests', () => {
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(modifyDeclaration(downloadedDeclaration))
 
-      testComponent.update()
+      testComponent.component.update()
 
       const errorIcon = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-1-download-failed'
       )
 
@@ -725,12 +713,12 @@ describe('OfficeHome sent for review tab related tests', () => {
 })
 
 describe('Tablet tests', () => {
-  let { store, history } = createStore()
+  let { store } = createStore()
 
   beforeAll(async () => {
     const s = createStore()
     store = s.store
-    history = s.history
+
     resizeWindow(800, 1280)
   })
 
@@ -742,7 +730,7 @@ describe('Tablet tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -813,16 +801,15 @@ describe('Tablet tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
     const row = await waitForElement(testComponent, '#name_0')
     row.hostNodes().simulate('click')
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/reviewTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })

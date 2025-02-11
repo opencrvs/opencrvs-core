@@ -65,6 +65,13 @@ import { getPublicKey } from '@auth/features/authenticate/service'
 import anonymousTokenHandler, {
   responseSchema
 } from './features/anonymousToken/handler'
+import { Boom, badRequest } from '@hapi/boom'
+
+export type AuthServer = {
+  server: Hapi.Server
+  start: () => Promise<void>
+  stop: () => Promise<void>
+}
 
 export async function createServer() {
   let whitelist: string[] = [env.DOMAIN]
@@ -77,7 +84,22 @@ export async function createServer() {
     port: env.AUTH_PORT,
     routes: {
       cors: { origin: whitelist },
-      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT },
+      response: {
+        failAction: async (req, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`Response validationError: ${err.message}`)
+            throw badRequest(`Invalid response payload returned from handler`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(
+              `${req.path} response has a validation error: ${err.message}`
+            )
+            throw err
+          }
+        }
+      }
     }
   })
 
@@ -85,7 +107,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-    handler: (request: any, h: any) =>
+    handler: () =>
       // Perform any health checks and return true or false for success prop
       ({
         success: true
@@ -376,7 +398,14 @@ export async function createServer() {
   await server.register(getPlugins())
   server.ext({
     type: 'onRequest',
-    method(request: Hapi.Request & { sentryScope?: any }, h) {
+    method(
+      request: Hapi.Request & {
+        sentryScope?: {
+          setExtra: (key: string, value: unknown) => void
+        }
+      },
+      h
+    ) {
       request.sentryScope?.setExtra('payload', request.payload)
       return h.continue
     }

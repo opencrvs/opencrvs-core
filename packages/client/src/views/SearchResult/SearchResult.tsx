@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Header } from '@client/components/Header/Header'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { Query } from '@client/components/Query'
 import {
   DOWNLOAD_STATUS,
+  getProcessingDeclarationIds,
   IDeclaration,
-  SUBMISSION_STATUS,
-  getProcessingDeclarationIds
+  SUBMISSION_STATUS
 } from '@client/declarations'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { Header } from '@client/components/Header/Header'
-import { Query } from '@client/components/Query'
 import { DownloadAction } from '@client/forms'
 import {
   buttonMessages,
@@ -28,11 +28,10 @@ import { messages as registrarHomeMessages } from '@client/i18n/messages/views/r
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
 import { messages } from '@client/i18n/messages/views/search'
 import {
-  goToDeclarationRecordAudit,
-  goToEvents as goToEventsAction,
-  goToIssueCertificate as goToIssueCertificateAction,
-  goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction
+  formatUrl,
+  generateGoToPageUrl,
+  generateIssueCertificateUrl,
+  generatePrintCertificateUrl
 } from '@client/navigation'
 import {
   REVIEW_CORRECTION,
@@ -42,39 +41,38 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { withTheme } from 'styled-components'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope } from '@client/utils/authUtils'
 import { SEARCH_RESULT_SORT } from '@client/utils/constants'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { SearchEventsQuery } from '@client/utils/gateway'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
-import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
-
+import { ITheme } from '@opencrvs/components/lib/theme'
+import styled, { withTheme } from 'styled-components'
+import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   ColumnContentAlignment,
-  Workqueue,
+  COLUMNS,
   IAction,
-  COLUMNS
+  Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Frame } from '@opencrvs/components/lib/Frame'
-
-import * as React from 'react'
+import { Navigation } from '@client/components/interface/Navigation'
+import React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { Navigation } from '@client/components/interface/Navigation'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
+  NameContainer,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
+import * as routes from '@client/navigation/routes'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -102,45 +100,22 @@ export function getRejectionReasonDisplayValue(reason: string) {
   }
 }
 
-interface ISerachInputCustomProps {
-  searchValue?: string
-  error?: boolean
-  touched?: boolean
-  focusInput?: boolean
-  buttonLabel: string
-  onSearchTextChange?: (searchText: string) => void
-  onSubmit: (searchText: string) => any
-}
-
-export type ISearchInputProps = ISerachInputCustomProps &
-  React.InputHTMLAttributes<HTMLInputElement>
-
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
-  scope: Scope | null
-  goToEvents: typeof goToEventsAction
+  scope: Scope[] | null
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
-  goToPage: typeof goToPageAction
-  goToPrintCertificate: typeof goToPrintCertificateAction
-  goToIssueCertificate: typeof goToIssueCertificateAction
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
-interface IMatchParams {
-  searchText: string
-  searchType: string
-}
-
-type ISearchResultProps = IntlShapeProps &
-  ISearchInputProps &
-  IBaseSearchResultProps &
-  RouteComponentProps<IMatchParams>
+type ISearchResultProps = IntlShapeProps & IBaseSearchResultProps
 
 type QueryData = SearchEventsQuery['searchEvents']
 
 function SearchResultView(props: ISearchResultProps) {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const { width } = useWindowSize()
 
   const getColumns = () => {
@@ -186,15 +161,36 @@ function SearchResultView(props: ISearchResultProps) {
   }
 
   function userHasRegisterScope() {
-    return props.scope && props.scope.includes('register')
+    return props.scope && props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   function userHasValidateScope() {
-    return props.scope && props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    return (
+      props.scope && props.scope.some((scope) => validateScopes.includes(scope))
+    )
   }
 
-  function userHasCertifyScope() {
-    return props.scope && props.scope.includes('certify')
+  function hasIssueScope() {
+    return props.scope?.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+  }
+
+  function hasPrintScope() {
+    return props.scope?.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+  }
+
+  function canSearchAnywhere() {
+    const searchScopes: Scope[] = [
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE
+    ]
+    return props.scope?.some((scope) => searchScopes.includes(scope))
   }
 
   const transformSearchContent = (data: QueryData) => {
@@ -234,7 +230,8 @@ function SearchResultView(props: ISearchResultProps) {
           reg.duplicates.length > 0 &&
           reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
           reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-        const { intl, location, userDetails } = props
+        const { intl, userDetails } = props
+
         const search = location.search
         const params = new URLSearchParams(search)
         const [searchText, searchType] = [
@@ -257,7 +254,7 @@ function SearchResultView(props: ISearchResultProps) {
         if (width > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
-            userHasCertifyScope()
+            hasPrintScope()
           ) {
             actions.push({
               label: props.intl.formatMessage(buttonMessages.print),
@@ -265,18 +262,27 @@ function SearchResultView(props: ISearchResultProps) {
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                props.goToPrintCertificate(reg.id, reg.event)
+
+                navigate(
+                  generatePrintCertificateUrl({
+                    registrationId: reg.id,
+                    event: reg.event
+                  })
+                )
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (declarationIsCertified && userHasCertifyScope()) {
+          } else if (declarationIsCertified && hasIssueScope()) {
             actions.push({
               label: props.intl.formatMessage(buttonMessages.issue),
               handler: (
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                props.goToIssueCertificate(reg.id)
+
+                navigate(
+                  generateIssueCertificateUrl({ registrationId: reg.id })
+                )
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -287,13 +293,16 @@ function SearchResultView(props: ISearchResultProps) {
                   ? props.intl.formatMessage(constantsMessages.update)
                   : props.intl.formatMessage(constantsMessages.review),
               handler: () =>
-                props.goToPage(
-                  reg.declarationStatus === 'CORRECTION_REQUESTED'
-                    ? REVIEW_CORRECTION
-                    : REVIEW_EVENT_PARENT_FORM_PAGE,
-                  reg.id,
-                  'review',
-                  reg.event.toLowerCase()
+                navigate(
+                  generateGoToPageUrl({
+                    pageRoute:
+                      reg.declarationStatus === 'CORRECTION_REQUESTED'
+                        ? REVIEW_CORRECTION
+                        : REVIEW_EVENT_PARENT_FORM_PAGE,
+                    declarationId: reg.id,
+                    pageId: 'review',
+                    event: reg.event.toLowerCase()
+                  })
                 ),
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -334,12 +343,7 @@ function SearchResultView(props: ISearchResultProps) {
                         name:
                           searchType === SearchCriteria.NAME ? searchText : '',
                         declarationLocationId:
-                          userDetails &&
-                          ![
-                            SystemRoleType.LocalRegistrar,
-                            SystemRoleType.NationalRegistrar,
-                            SystemRoleType.RegistrationAgent
-                          ].includes(userDetails.systemRole)
+                          !canSearchAnywhere() && userDetails
                             ? getUserLocation(userDetails).id
                             : ''
                       },
@@ -355,6 +359,7 @@ function SearchResultView(props: ISearchResultProps) {
                   DownloadAction.LOAD_REVIEW_DECLARATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
+              declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
             />
           )
         })
@@ -375,14 +380,28 @@ function SearchResultView(props: ISearchResultProps) {
         const NameComponent = reg.name ? (
           <NameContainer
             id={`name_${index}`}
-            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+            onClick={() =>
+              navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'search',
+                  declarationId: reg.id
+                })
+              )
+            }
           >
             {reg.name}
           </NameContainer>
         ) : (
           <NoNameContainer
             id={`name_${index}`}
-            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+            onClick={() =>
+              navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'search',
+                  declarationId: reg.id
+                })
+              )
+            }
           >
             {intl.formatMessage(constantsMessages.noNameProvided)}
           </NoNameContainer>
@@ -416,7 +435,7 @@ function SearchResultView(props: ISearchResultProps) {
       })
   }
 
-  const { intl, location, userDetails } = props
+  const { intl, userDetails } = props
   const search = location.search
   const params = new URLSearchParams(search)
   const [searchText, searchType] = [
@@ -443,15 +462,6 @@ function SearchResultView(props: ISearchResultProps) {
           query={SEARCH_EVENTS}
           variables={{
             advancedSearchParameters: {
-              declarationLocationId:
-                userDetails &&
-                ![
-                  SystemRoleType.LocalRegistrar,
-                  SystemRoleType.NationalRegistrar,
-                  SystemRoleType.RegistrationAgent
-                ].includes(userDetails.systemRole)
-                  ? getUserLocation(userDetails).id
-                  : '',
               trackingId:
                 searchType === SearchCriteria.TRACKING_ID ? searchText : '',
               nationalId:
@@ -525,18 +535,9 @@ function SearchResultView(props: ISearchResultProps) {
     </Frame>
   )
 }
-export const SearchResult = connect(
-  (state: IStoreState) => ({
-    language: state.i18n.language,
-    scope: getScope(state),
-    userDetails: getUserDetails(state),
-    outboxDeclarations: state.declarationsState.declarations
-  }),
-  {
-    goToEvents: goToEventsAction,
-    goToPage: goToPageAction,
-    goToPrintCertificate: goToPrintCertificateAction,
-    goToIssueCertificate: goToIssueCertificateAction,
-    goToDeclarationRecordAudit
-  }
-)(injectIntl(withTheme(SearchResultView)))
+export const SearchResult = connect((state: IStoreState) => ({
+  language: state.i18n.language,
+  scope: getScope(state),
+  userDetails: getUserDetails(state),
+  outboxDeclarations: state.declarationsState.declarations
+}))(injectIntl(withTheme(SearchResultView)))

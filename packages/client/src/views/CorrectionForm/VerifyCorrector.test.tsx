@@ -14,17 +14,19 @@ import {
   createTestComponent,
   flushPromises,
   mockDeclarationData,
-  mockDeathDeclarationData
+  mockDeathDeclarationData,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { VerifyCorrector } from './VerifyCorrector'
 import { storeDeclaration } from '@client/declarations'
 import { EventType } from '@client/utils/gateway'
-import { ReactWrapper } from 'enzyme'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
+import { VERIFY_CORRECTOR } from '@client/navigation/routes'
 
 describe('verify corrector tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   const birthDeclaration = {
     id: 'mockBirth1234',
@@ -44,63 +46,55 @@ describe('verify corrector tests', () => {
     })
 
     it('when mother is corrector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
-        <VerifyCorrector
-          history={history}
-          location={history.location}
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <VerifyCorrector />,
+        {
+          store,
+          path: VERIFY_CORRECTOR,
+          initialEntries: [
+            formatUrl(VERIFY_CORRECTOR, {
               declarationId: 'mockBirth1234',
               corrector: 'mother'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
     it('when child is corrector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
-        <VerifyCorrector
-          history={history}
-          location={history.location}
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <VerifyCorrector />,
+        {
+          store,
+          path: VERIFY_CORRECTOR,
+          initialEntries: [
+            formatUrl(VERIFY_CORRECTOR, {
               declarationId: 'mockBirth1234',
               corrector: 'child'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
     it('should takes user go back', async () => {
-      const testComponent = await createTestComponent(
-        <VerifyCorrector
-          history={history}
-          location={history.location}
-          match={{
-            params: {
+      const { component: testComponent, router } = await createTestComponent(
+        <VerifyCorrector />,
+        {
+          store,
+          path: VERIFY_CORRECTOR,
+          initialEntries: [
+            '/',
+            formatUrl(VERIFY_CORRECTOR, {
               declarationId: 'mockBirth1234',
               corrector: 'mother'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       testComponent
@@ -112,152 +106,152 @@ describe('verify corrector tests', () => {
 
       testComponent.update()
 
-      expect(history.location.pathname).toBe('/')
+      expect(router.state.location.pathname).toBe('/')
     })
   })
 
   describe('when father is corrector', () => {
-    let testComponent: ReactWrapper
+    let testComponent: TestComponentWithRouteMock
     beforeEach(async () => {
-      testComponent = await createTestComponent(
-        <VerifyCorrector
-          history={history}
-          location={history.location}
-          match={{
-            params: {
-              declarationId: 'mockBirth1234',
-              corrector: 'father'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+      testComponent = await createTestComponent(<VerifyCorrector />, {
+        store,
+        path: VERIFY_CORRECTOR,
+        initialEntries: [
+          formatUrl(VERIFY_CORRECTOR, {
+            declarationId: 'mockBirth1234',
+            corrector: 'father'
+          })
+        ]
+      })
     })
 
     it('renders idVerifier compomnent', () => {
-      expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+      expect(
+        testComponent.component.find('#idVerifier').hostNodes()
+      ).toHaveLength(1)
     })
 
     it('clicking on yes button takes user to review certificate', () => {
       const date = new Date(243885600000)
       vi.setSystemTime(date)
 
-      testComponent
+      testComponent.component
         .find('#idVerifier')
         .find('#verifyPositive')
         .hostNodes()
         .simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      expect(history.location.pathname).not.toContain('/verify')
+      expect(testComponent.router.state.location.pathname).not.toContain(
+        '/verify'
+      )
     })
 
     it('clicking on cancel button hides the modal', () => {
-      testComponent
+      testComponent.component
         .find('#idVerifier')
         .find('#verifyNegative')
         .hostNodes()
         .simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      testComponent
+      testComponent.component
         .find('#withoutVerificationPrompt')
         .find('#cancel')
         .hostNodes()
         .simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
       expect(
-        testComponent.find('#withoutVerificationPrompt').hostNodes()
+        testComponent.component.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(0)
     })
 
     it('clicking on Confirm button and go to review', () => {
-      testComponent
+      testComponent.component
         .find('#idVerifier')
         .find('#verifyNegative')
         .hostNodes()
         .simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      testComponent
+      testComponent.component
         .find('#withoutVerificationPrompt')
         .find('#send')
         .hostNodes()
         .simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      expect(history.location.pathname).toContain('/review-view-group')
+      expect(testComponent.router.state.location.pathname).toContain(
+        '/review-view-group'
+      )
     })
 
     it('go to review page', () => {
-      testComponent.find('#crcl-btn').hostNodes().simulate('click')
+      testComponent.component.find('#crcl-btn').hostNodes().simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
+      expect(testComponent.router.state.location.pathname).toContain(
+        WORKQUEUE_TABS.readyForReview
+      )
     })
   })
 
   describe('in case correction is not father, mother, child or informant', () => {
-    let testComponent: ReactWrapper
+    let testComponent: TestComponentWithRouteMock
     beforeEach(async () => {
-      testComponent = await createTestComponent(
-        <VerifyCorrector
-          history={history}
-          location={history.location}
-          match={{
-            params: {
-              declarationId: 'mockBirth1234',
-              corrector: 'other'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+      testComponent = await createTestComponent(<VerifyCorrector />, {
+        store,
+        path: VERIFY_CORRECTOR,
+        initialEntries: [
+          formatUrl(VERIFY_CORRECTOR, {
+            declarationId: 'mockBirth1234',
+            corrector: 'other'
+          })
+        ]
+      })
     })
 
     it('renders idVerifier compomnent', () => {
-      expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+      expect(
+        testComponent.component.find('#idVerifier').hostNodes()
+      ).toHaveLength(1)
     })
 
     it('clicking on yes button takes user to review certificate', () => {
       const date = new Date(243885600000)
       vi.setSystemTime(date)
 
-      testComponent
+      testComponent.component
         .find('#idVerifier')
         .find('#verifyPositive')
         .hostNodes()
         .simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      expect(history.location.pathname).not.toContain('/verify')
+      expect(testComponent.router.state.location.pathname).not.toContain(
+        '/verify'
+      )
     })
 
     it('clicking on no button shows up modal', () => {
-      testComponent
+      testComponent.component
         .find('#idVerifier')
         .find('#verifyNegative')
         .hostNodes()
         .simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
       expect(
-        testComponent.find('#withoutVerificationPrompt').hostNodes()
+        testComponent.component.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
     })
   })
@@ -268,21 +262,18 @@ describe('verify corrector tests', () => {
     })
 
     it('when informant is corrector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
-        <VerifyCorrector
-          history={history}
-          location={history.location}
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <VerifyCorrector />,
+        {
+          store,
+          path: VERIFY_CORRECTOR,
+          initialEntries: [
+            formatUrl(VERIFY_CORRECTOR, {
               declarationId: 'mockDeath1234',
               corrector: 'informant'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
