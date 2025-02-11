@@ -15,7 +15,7 @@ import styled from 'styled-components'
 
 const IconWrapper = styled.div<{ type: BannerType }>`
   --background-color: ${({ theme, type }) => `
-    ${type === 'verified' ? theme.colors.blueLight : ''}
+    ${type === 'verified' ? theme.colors.primaryLight : ''}
     ${type === 'authenticated' ? theme.colors.greenLight : ''}
     ${type === 'failed' ? theme.colors.redLight : ''}
   `};
