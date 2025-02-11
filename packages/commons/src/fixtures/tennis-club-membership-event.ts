@@ -75,7 +75,7 @@ const TENNIS_CLUB_FORM = defineForm({
                 description: 'This is the error message for invalid date',
                 id: 'v2.event.birth.action.declare.form.section.child.field.dob.error'
               },
-              validator: field('applicant.dob').isBefore().now().apply()
+              validator: field('applicant.dob').isBefore().now()
             }
           ],
           label: {
