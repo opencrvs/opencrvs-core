@@ -321,7 +321,13 @@ const GeneratedInputField = React.memo(
           <AdministrativeArea.Input
             {...field.config}
             value={field.value}
-            partOf={'0'} // @todo add partof property from field config
+            partOf={
+              (field.config.configuration?.partOf?.$data &&
+                (makeFormikFieldIdsOpenCRVSCompatible(formData)[
+                  field.config.configuration?.partOf.$data
+                ] as string | undefined | null)) ??
+              null
+            }
             setFieldValue={setFieldValue}
           />
         </InputField>

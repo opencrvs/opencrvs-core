@@ -18,7 +18,7 @@ import {
   FormTabs,
   IFormTabProps
 } from '@opencrvs/components'
-import { EventConfig, FieldValue } from '@opencrvs/commons/client'
+import { AdvancedSearchConfig, FieldValue } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -28,15 +28,15 @@ const messagesToDefine = {
   search: {
     defaultMessage: 'Search',
     description: 'The title of search input submit button',
-    id: 'buttons.search'
+    id: 'v2.buttons.search'
   },
   advancedSearch: {
-    id: 'config.advanced.search',
+    id: 'v2.config.advanced.search',
     defaultMessage: 'Advanced Search',
     description: 'This is used for the advanced search'
   },
   advancedSearchInstruction: {
-    id: 'config.advanced.search.instruction',
+    id: 'v2.config.advanced.search.instruction',
     defaultMessage:
       'Select the options to build an advanced search. A minimum of two search parameters is required.',
     description: 'This is used for the advanced search'
@@ -44,12 +44,12 @@ const messagesToDefine = {
   hide: {
     defaultMessage: 'Hide',
     description: 'Label for hide button when accordion is closed',
-    id: 'advancedSearch.accordion.hide'
+    id: 'v2.advancedSearch.accordion.hide'
   },
   show: {
     defaultMessage: 'Show',
     description: 'Label for show button when accordion is closed',
-    id: 'advancedSearch.accordion.show'
+    id: 'v2.advancedSearch.accordion.show'
   }
 }
 
@@ -59,13 +59,11 @@ const SearchButton = styled(Button)`
   margin-top: 32px;
 `
 
-type AdvancedSearchFormConfig = EventConfig['advancedSearch']
-
 function TabSearch({
   sections,
   activeTabId
 }: {
-  sections: AdvancedSearchFormConfig
+  sections: AdvancedSearchConfig[]
   activeTabId: string
 }) {
   const intl = useIntl()
@@ -145,7 +143,7 @@ function TabSearch({
       size="large"
       type="primary"
       onClick={() => {
-        alert(JSON.stringify(formValues))
+        alert(JSON.stringify(formValues)) // @todo replace with actual search
       }}
     >
       <Icon name={'MagnifyingGlass'} />
