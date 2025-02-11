@@ -14,6 +14,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import styled from 'styled-components'
 import {
   Button,
   Checkbox,
@@ -22,6 +23,7 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
+import { ActionFormData } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -30,7 +32,6 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts/form'
-import { IFormSectionData } from '@client/forms'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
 const messages = defineMessages({
@@ -88,6 +89,25 @@ const messages = defineMessages({
   }
 })
 
+const AdditionalReviewFieldContainter = styled.div`
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-radius: 4px;
+  margin-bottom: 40px;
+  padding: 24px 32px;
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.copy};
+  &:last-child {
+    margin-bottom: 200px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border: 0;
+    margin: 0;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0;
+  }
+`
+
 // eslint-disable-next-line no-shadow
 enum REJECT_ACTIONS {
   ARCHIVE,
@@ -106,7 +126,7 @@ export function Review() {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
-
+  const [reviewFormValues, setReviewFormValues] = useState<ActionFormData>({})
   const { goToHome } = useEventFormNavigation()
   const declareMutation = events.actions.declare
 
@@ -154,7 +174,8 @@ export function Review() {
       declareMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: uuid()
+        transactionId: uuid(),
+        metadata: reviewFormValues
       })
 
       goToHome()
@@ -189,6 +210,7 @@ export function Review() {
           eventId: event.id,
           data: form,
           transactionId: uuid(),
+          metadata: reviewFormValues,
           draft: true
         })
         goToHome()
@@ -206,16 +228,18 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
       >
-        {formConfigs[0].review.fields && (
-          <FormFieldGenerator
-            fields={formConfigs[0].review.fields}
-            formData={{}}
-            id={'reviewMetadata'}
-            setAllFieldsDirty={false}
-            onChange={function (values: IFormSectionData): void {
-              console.log(values)
-            }}
-          />
+        {formConfigs[0]?.review?.fields?.length && (
+          <AdditionalReviewFieldContainter>
+            <FormFieldGenerator
+              fields={formConfigs[0].review.fields}
+              formData={reviewFormValues}
+              id={eventId}
+              setAllFieldsDirty={false}
+              onChange={function (values: ActionFormData): void {
+                setReviewFormValues(values)
+              }}
+            />
+          </AdditionalReviewFieldContainter>
         )}
         <ReviewComponent.Actions
           messages={{

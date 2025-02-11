@@ -33,7 +33,8 @@ export const RegisterActionInput = BaseActionInput.merge(
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
-    })
+    }),
+    metadata: z.record(z.string(), FieldValue)
   })
 )
 
@@ -59,7 +60,8 @@ export type NotifyActionInput = z.infer<typeof NotifyActionInput>
 
 export const DeclareActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
+    type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE),
+    metadata: z.record(z.string(), FieldValue).optional()
   })
 )
 

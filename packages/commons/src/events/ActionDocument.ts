@@ -40,13 +40,15 @@ const RegisterAction = ActionBase.merge(
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
-    })
+    }),
+    metadata: z.record(z.string(), FieldValue)
   })
 )
 
 const DeclareAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE)
+    type: z.literal(ActionType.DECLARE),
+    metadata: z.record(z.string(), FieldValue)
   })
 )
 
