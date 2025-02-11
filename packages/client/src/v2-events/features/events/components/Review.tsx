@@ -212,7 +212,7 @@ function ReviewComponent({
                   {eventConfig.label.defaultMessage}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
-                  {title || eventConfig.label.defaultMessage}
+                  {title || intl.formatMessage(eventConfig.label)}
                 </SubjectContainer>
               </Stack>
             </HeaderContent>
