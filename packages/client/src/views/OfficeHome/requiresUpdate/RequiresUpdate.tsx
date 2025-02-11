@@ -8,13 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
+import { formatUrl, generateGoToPageUrl } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope } from '@client/utils/authUtils'
+
 import {
   ColumnContentAlignment,
   Workqueue,
@@ -33,7 +33,11 @@ import {
   dynamicConstantsMessages,
   wqMessages
 } from '@client/i18n/messages'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
@@ -53,19 +57,20 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { RegStatus } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 interface IBaseRejectTabProps {
   theme: ITheme
-  scope: Scope | null
-  goToPage: typeof goToPage
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
   }
+  scope: Scope[] | null
   paginationId: number
   pageSize: number
   onPageChange: (newPageNumber: number) => void
@@ -76,6 +81,8 @@ interface IBaseRejectTabProps {
 type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
 
 function RequiresUpdateComponent(props: IRejectTabProps) {
+  const navigate = useNavigate()
+
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.SENT_FOR_UPDATES)
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
@@ -150,7 +157,15 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
     if (!data || !data.results) {
       return []
     }
-    const isFieldAgent = props.scope?.includes('declare') ? true : false
+
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    const isReviewer = props.scope?.some((x) => validateScopes.includes(x))
+
     const transformedData = transformData(data, props.intl)
     const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
@@ -161,7 +176,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (width > props.theme.grid.breakpoints.lg && !isFieldAgent) {
+        if (width > props.theme.grid.breakpoints.lg && isReviewer) {
           actions.push({
             label: props.intl.formatMessage(buttonMessages.update),
             handler: () => {},
@@ -169,18 +184,23 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
           })
         }
       } else {
-        if (width > props.theme.grid.breakpoints.lg && !isFieldAgent) {
+        if (width > props.theme.grid.breakpoints.lg && isReviewer) {
           actions.push({
             label: props.intl.formatMessage(buttonMessages.update),
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
-              e && e.stopPropagation()
-              props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
+              if (e) {
+                e.stopPropagation()
+              }
+
+              navigate(
+                generateGoToPageUrl({
+                  pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
+                  declarationId: reg.id,
+                  pageId: 'review',
+                  event: reg.event ? reg.event.toLowerCase() : ''
+                })
               )
             }
           })
@@ -197,6 +217,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus as DOWNLOAD_STATUS}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
           />
         )
       })
@@ -219,14 +240,28 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          onClick={() => props.goToDeclarationRecordAudit('rejectTab', reg.id)}
+          onClick={() =>
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'rejectTab',
+                declarationId: reg.id
+              })
+            )
+          }
         >
           {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
-          onClick={() => props.goToDeclarationRecordAudit('rejectTab', reg.id)}
+          onClick={() =>
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'rejectTab',
+                declarationId: reg.id
+              })
+            )
+          }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
@@ -308,7 +343,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const RequiresUpdate = connect(mapStateToProps, {
-  goToPage,
-  goToDeclarationRecordAudit
-})(injectIntl(withTheme(RequiresUpdateComponent)))
+export const RequiresUpdate = connect(mapStateToProps)(
+  injectIntl(withTheme(RequiresUpdateComponent))
+)

@@ -12,7 +12,7 @@ import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import * as Sentry from '@sentry/react'
 
-import { App } from '@login/App'
+import { App, routesConfig } from '@login/App'
 import { storage } from '@login/storage'
 import { createStore } from './store'
 import { BrowserTracing } from '@sentry/tracing'
@@ -22,6 +22,7 @@ import WebFont from 'webfontloader'
 import { authApi } from './utils/authApi'
 import { delay } from 'lodash'
 import { applicationConfigLoadedAction } from './login/actions'
+import { createBrowserRouter } from 'react-router-dom'
 
 const RETRY_TIMEOUT = 5000
 
@@ -45,15 +46,17 @@ if (
     })
   }
 }
-const { store, history } = createStore()
+const { store } = createStore()
 
 const container = document.getElementById('root')
 const root = createRoot(container!)
+const router = createBrowserRouter(routesConfig)
 
 async function renderAppWithConfig() {
   return authApi.getApplicationConfig().then((res) => {
     store.dispatch(applicationConfigLoadedAction(res))
-    root.render(<App store={store} history={history} />)
+
+    root.render(<App router={router} store={store} />)
   })
 }
 

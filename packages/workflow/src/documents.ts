@@ -18,36 +18,22 @@ import {
 } from '@opencrvs/commons/types'
 import { CertifyInput, IssueInput } from './records/validations'
 
-const fetchDocuments = async <T = any>(
-  suffix: string,
-  authHeader: IAuthHeader,
-  method = 'GET',
-  body: string | undefined = undefined
-): Promise<T> => {
-  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, {
-    method,
+export async function uploadFileToMinio(
+  fileData: string,
+  authHeader: IAuthHeader
+): Promise<string> {
+  const suffix = '/upload'
+  const request = {
+    method: 'POST',
     headers: {
       ...authHeader,
       'Content-Type': 'application/json'
     },
-    body
-  })
+    body: JSON.stringify({ fileData: fileData })
+  }
+  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, request)
   const res = await result.json()
-  return res
-}
-
-export async function uploadBase64ToMinio(
-  fileData: string,
-  authHeader: IAuthHeader
-): Promise<string> {
-  const docUploadResponse = await fetchDocuments(
-    '/upload',
-    authHeader,
-    'POST',
-    JSON.stringify({ fileData: fileData })
-  )
-
-  return docUploadResponse.refUrl
+  return res.refUrl
 }
 
 export async function uploadCertificateAttachmentsToDocumentsStore<
@@ -58,14 +44,8 @@ export async function uploadCertificateAttachmentsToDocumentsStore<
     certificateDetails.collector.affidavit
   ) {
     for (const affidavit of certificateDetails.collector.affidavit) {
-      affidavit.data = await uploadBase64ToMinio(affidavit.data, authHeader)
+      affidavit.data = await uploadFileToMinio(affidavit.data, authHeader)
     }
-  }
-  if ('data' in certificateDetails) {
-    certificateDetails.data = await uploadBase64ToMinio(
-      certificateDetails.data,
-      authHeader
-    )
   }
   return certificateDetails
 }
@@ -86,7 +66,7 @@ function uploadOrNormaliseSignatureData(
   authHeader: IAuthHeader
 ) {
   if (isBase64FileString(signature)) {
-    return uploadBase64ToMinio(signature, authHeader)
+    return uploadFileToMinio(signature, authHeader)
   }
 
   if (isPresignedUrl(signature)) {
@@ -138,7 +118,7 @@ export async function uploadBase64AttachmentsToDocumentsStore(
   if (record.registration?.attachments) {
     for (const attachment of record.registration.attachments) {
       if (attachment.data && isBase64FileString(attachment.data)) {
-        const fileUri = await uploadBase64ToMinio(attachment.data, authHeader)
+        const fileUri = await uploadFileToMinio(attachment.data, authHeader)
         attachment.data = fileUri
       }
     }
@@ -151,10 +131,7 @@ export async function uploadBase64AttachmentsToDocumentsStore(
       if (certificate.collector.affidavit) {
         for (const affidavit of certificate.collector.affidavit) {
           if (affidavit.data && isBase64FileString(affidavit.data)) {
-            const fileUri = await uploadBase64ToMinio(
-              affidavit.data,
-              authHeader
-            )
+            const fileUri = await uploadFileToMinio(affidavit.data, authHeader)
             affidavit.data = fileUri
           }
         }
@@ -162,7 +139,7 @@ export async function uploadBase64AttachmentsToDocumentsStore(
       if (certificate.collector.photo) {
         for (const photo of certificate.collector.photo) {
           if (photo.data && isBase64FileString(photo.data)) {
-            const fileUri = await uploadBase64ToMinio(photo.data, authHeader)
+            const fileUri = await uploadFileToMinio(photo.data, authHeader)
             photo.data = fileUri
           }
         }
@@ -172,13 +149,13 @@ export async function uploadBase64AttachmentsToDocumentsStore(
   if (record.registration?.correction?.attachments) {
     for (const attachment of record.registration.correction.attachments) {
       if (attachment.data && isBase64FileString(attachment.data)) {
-        const fileUri = await uploadBase64ToMinio(attachment.data, authHeader)
+        const fileUri = await uploadFileToMinio(attachment.data, authHeader)
         attachment.data = fileUri
       }
     }
   }
   if (record.registration?.correction?.payment?.attachmentData) {
-    const fileUri = await uploadBase64ToMinio(
+    const fileUri = await uploadFileToMinio(
       record.registration.correction.payment.attachmentData,
       authHeader
     )

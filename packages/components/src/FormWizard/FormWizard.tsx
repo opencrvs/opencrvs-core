@@ -8,72 +8,76 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { Field, ComponentsMap, FormFieldRenderer } from './FormFieldRenderer'
-import { FormProvider, useForm } from 'react-hook-form'
-import { flatten } from './flatten-object'
+import React, { PropsWithChildren } from 'react'
 import { Button } from '../Button'
+import { Content } from '../Content'
+import { Frame } from '../Frame'
+import { Icon } from '../Icon'
+import { Stack } from '../Stack'
 
-/**
- * @example
- * { "informant.name": "John Doe", "informant.address": "123 Main St" }
- */
-export type Values = Record<string, string>
-
-/**
- * Definition of a page of the form wizard
- */
-type Page<CM extends ComponentsMap> = {
-  fields: Array<Field<CM>>
-}
-
-type FormWizardProps<CM extends ComponentsMap> = {
-  /** The field type to component map the form wizard will use to render the fields */
-  components: CM
+type FormWizardProps = PropsWithChildren<{
   currentPage: number
-  pages: Page<CM>[]
-  defaultValues?: Values
+  totalPages: number
   /** Callback when the user clicks the "Continue" button */
   onNextPage?: () => void
+  onPreviousPage?: () => void
+
   /** Callback when the user submits the form wizard */
-  onSubmit: (data: Values) => void
-}
+  onSubmit: () => void
+  pageTitle: string
 
-export const FormWizard = <CM extends ComponentsMap>({
+  showReviewButton?: boolean
+  submitButtonText?: string
+}>
+
+export const FormWizard = ({
+  children,
   currentPage,
-  pages,
-  defaultValues,
-  components,
+  totalPages,
+  onSubmit,
+  pageTitle,
   onNextPage,
-  onSubmit
-}: FormWizardProps<CM>) => {
-  const methods = useForm({ defaultValues })
-  const page = pages[currentPage]
-
-  if (!page) {
-    throw new Error(`Page #${currentPage} not found!`)
-  }
-
-  /**
-   * By default, react-hook-form extracts `foo.bar.baz` as a deep object,
-   * but we wanna flatten it to `{ "foo.bar.baz": "value" }`.
-   */
-  const flatOnSubmit = (data: Values) => onSubmit(flatten<Values>(data))
-
+  onPreviousPage,
+  submitButtonText = 'Submit',
+  showReviewButton
+}: FormWizardProps) => {
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(flatOnSubmit)}>
-        <FormFieldRenderer fields={page.fields} components={components} />
-
-        {onNextPage ? (
-          <Button type="primary" onClick={onNextPage}>
-            Continue
+    <Frame.LayoutForm>
+      <Frame.SectionFormBackAction>
+        {currentPage > 0 && (
+          <Button type="tertiary" size="small" onClick={onPreviousPage}>
+            <Icon name="ArrowLeft" size="medium" />
+            Back
           </Button>
-        ) : (
-          // Initial simple submit for testing
-          <input type="submit" value="Submit" />
         )}
-      </form>
-    </FormProvider>
+      </Frame.SectionFormBackAction>
+      <Frame.Section>
+        <Content title={pageTitle} showTitleOnMobile={true}>
+          <Stack direction="column" gap={16} alignItems="stretch">
+            {children}
+
+            {currentPage + 1 < totalPages ? (
+              <Button
+                size="large"
+                type="primary"
+                role="button"
+                onClick={onNextPage}
+              >
+                Continue
+              </Button>
+            ) : (
+              <Button size="large" type="primary" onClick={onSubmit}>
+                {submitButtonText}
+              </Button>
+            )}
+            {showReviewButton && (
+              <Button type="secondary" onClick={onSubmit}>
+                Back to review
+              </Button>
+            )}
+          </Stack>
+        </Content>
+      </Frame.Section>
+    </Frame.LayoutForm>
   )
 }

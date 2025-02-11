@@ -8,12 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createServer } from '@auth/server'
+import { AuthServer, createServer } from '@auth/server'
 import { get, setex } from '@auth/database'
 import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
 
 describe('verify token handler', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()

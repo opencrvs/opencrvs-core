@@ -77,10 +77,29 @@ interface ILoginBackground {
   backgroundImage?: string
   imageFit?: string
 }
-export interface ICertificateTemplateData {
+export interface ICertificateConfigData {
+  id: string
   event: EventType
-  svgCode: string
+  label: {
+    id: string
+    defaultMessage: string
+    description: string
+  }
+  isDefault: boolean
+  fee: {
+    onTime: number
+    late: number
+    delayed: number
+  }
+  svgUrl: string
+  fonts?: Record<string, FontFamilyTypes>
 }
+
+export interface ICertificateData extends ICertificateConfigData {
+  hash?: string
+  svg: string
+}
+
 export interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -98,39 +117,24 @@ export interface IApplicationConfig {
   BIRTH: {
     REGISTRATION_TARGET: number
     LATE_REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      LATE: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: {
     REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   MARRIAGE: {
     REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   FEATURES: {
     DEATH_REGISTRATION: boolean
     MARRIAGE_REGISTRATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
-    INFORMANT_SIGNATURE: boolean
     PRINT_DECLARATION: boolean
     DATE_OF_BIRTH_UNKNOWN: boolean
-    INFORMANT_SIGNATURE_REQUIRED: boolean
   }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
@@ -143,7 +147,7 @@ export interface IApplicationConfig {
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
-  certificates: ICertificateTemplateData[]
+  certificates: ICertificateConfigData[]
   systems: System[]
 }
 
@@ -249,33 +253,6 @@ async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
   } catch (error) {
     return {}
   }
-}
-async function loadCertificateConfiguration(): Promise<CertificateConfiguration> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/certificate-configuration`
-
-  const res = await fetch(url, {
-    method: 'GET'
-  })
-
-  // for backward compatibility, if the endpoint is unimplemented
-  if (res.status === 404) {
-    return {
-      fonts: {
-        notosans: {
-          normal: 'NotoSans-Light.ttf',
-          bold: 'NotoSans-Regular.ttf',
-          italics: 'NotoSans-Light.ttf',
-          bolditalics: 'NotoSans-Regular.ttf'
-        }
-      }
-    }
-  }
-
-  if (!res.ok) {
-    throw Error(res.statusText)
-  }
-
-  return res.json()
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -415,7 +392,6 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 export const referenceApi = {
   loadLocations,
   loadFacilities,
-  loadCertificateConfiguration,
   loadContent,
   loadConfig,
   loadForms,

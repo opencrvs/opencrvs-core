@@ -18,9 +18,8 @@ import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
-  goBack as goBackAction,
-  goToHomeTab,
-  goToReviewCertificate as goToReviewCertificateAction
+  generateGoToHomeTabUrl,
+  generateReviewCertificateUrl
 } from '@client/navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
@@ -28,7 +27,12 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+
 import { withTheme } from 'styled-components'
 import {
   calculatePrice,
@@ -38,37 +42,36 @@ import {
 } from './utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { UserDetails } from '@client/utils/userUtils'
 
 interface IProps {
   event: EventType
-  registrationId: string
+  registrationId?: string
   language: string
   declaration: IPrintableDeclaration
   theme: ITheme
-  modifyDeclaration: typeof modifyDeclaration
-  goToReviewCertificate: typeof goToReviewCertificateAction
-  goBack: typeof goBackAction
-  goToHomeTab: typeof goToHomeTab
   userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
 }
 
-type IFullProps = IProps & IntlShapeProps
+interface IDispatchProps {
+  modifyDeclaration: typeof modifyDeclaration
+}
+
+type IFullProps = RouteComponentProps & IProps & IntlShapeProps & IDispatchProps
 
 const PaymentComponent = ({
   declaration,
   intl,
   event,
-  goBack,
   offlineCountryConfig,
   modifyDeclaration,
-  goToReviewCertificate,
   registrationId
 }: IFullProps) => {
+  const navigate = useNavigate()
   const handleContinue = (paymentAmount: string) => {
     const certificates =
       declaration && declaration.data.registration.certificates
@@ -96,12 +99,26 @@ const PaymentComponent = ({
       }
     })
 
-    goToReviewCertificate(registrationId, event)
+    if (!registrationId) {
+      // eslint-disable-next-line no-console
+      console.error('No registrationId in URL')
+      return
+    }
+
+    navigate(
+      generateReviewCertificateUrl({
+        registrationId,
+        event
+      }),
+      {
+        state: { isNavigatedInsideApp: true }
+      }
+    )
   }
 
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToPrint,
           selectorId: ''
@@ -118,7 +135,8 @@ const PaymentComponent = ({
     event,
     eventDate,
     registeredDate,
-    offlineCountryConfig
+    offlineCountryConfig,
+    declaration.data.registration.certificates[0]
   )
 
   const serviceMessage = getServiceMessage(
@@ -133,9 +151,15 @@ const PaymentComponent = ({
     <>
       <ActionPageLight
         title={intl.formatMessage(messages.print)}
-        goBack={goBack}
+        goBack={() => navigate(-1)}
         hideBackground
-        goHome={() => goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
+        goHome={() =>
+          navigate(
+            generateGoToHomeTabUrl({
+              tabId: WORKQUEUE_TABS.readyToPrint
+            })
+          )
+        }
       >
         <Content
           title={intl.formatMessage(messages.payment)}
@@ -192,11 +216,8 @@ const getEvent = (eventType: string | undefined) => {
   }
 }
 
-function mapStatetoProps(
-  state: IStoreState,
-  props: RouteComponentProps<{ registrationId: string; eventType: string }>
-) {
-  const { registrationId, eventType } = props.match.params
+function mapStatetoProps(state: IStoreState, props: RouteComponentProps) {
+  const { registrationId, eventType } = props.router.params
   const event = getEvent(eventType)
   const declaration = state.declarationsState.declarations.find(
     (app) => app.id === registrationId && app.event === event
@@ -212,9 +233,8 @@ function mapStatetoProps(
   }
 }
 
-export const Payment = connect(mapStatetoProps, {
-  goBack: goBackAction,
-  goToHomeTab,
-  modifyDeclaration,
-  goToReviewCertificate: goToReviewCertificateAction
-})(injectIntl(withTheme(PaymentComponent)))
+export const Payment = withRouter(
+  connect(mapStatetoProps, {
+    modifyDeclaration
+  })(injectIntl(withTheme(PaymentComponent)))
+)

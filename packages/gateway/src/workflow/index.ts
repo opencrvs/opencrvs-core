@@ -244,9 +244,9 @@ export async function confirmRegistration(
   id: string,
   authHeader: IAuthHeader,
   details: {
-    error: string | undefined
     registrationNumber: string
     identifiers?: IdentifierInput[]
+    comment?: string
   }
 ) {
   const res: ReadyForReviewRecord = await createRequest(
@@ -279,6 +279,50 @@ export async function rejectRegistration(
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
 
   return taskEntry
+}
+
+export async function upsertRegistrationIdentifier(
+  id: string,
+  authHeader: IAuthHeader,
+  details: {
+    registrationNumber?: string
+    identifiers?: IdentifierInput[]
+  }
+) {
+  const res: ReadyForReviewRecord = await createRequest(
+    'POST',
+    `/records/${id}/upsert-identifiers`,
+    authHeader,
+    details
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')
+  if (!taskEntry) {
+    throw new Error('No task entry found in the confirmation response')
+  }
+
+  return taskEntry
+}
+
+type UpdateFieldInput = {
+  fieldId: string
+  valueString?: string
+  valueBoolean?: boolean
+}
+
+export async function updateField(
+  id: string,
+  authHeader: IAuthHeader,
+  details: UpdateFieldInput
+) {
+  const res = await createRequest<ValidRecord>(
+    'POST',
+    `/records/${id}/update-field`,
+    authHeader,
+    details
+  )
+
+  return res
 }
 
 export async function archiveRegistration(

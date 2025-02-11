@@ -44,7 +44,6 @@ import {
 } from '@client/forms'
 import {
   getConditionalActionsForField,
-  getListOfLocations,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { getValidationErrorsForForm } from '@client/forms/validation'
@@ -69,6 +68,7 @@ import {
 } from '@client/utils/gateway'
 import { generateLocations } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { getListOfLocations } from '@client/utils/validate'
 import { camelCase, clone, flattenDeep, get, isArray, isEqual } from 'lodash'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 
@@ -412,9 +412,13 @@ const getFormFieldValue = (
   let tempField: IFormField
   for (const key in sectionDraftData) {
     tempField = sectionDraftData[key] as IFormField
-    return (tempField &&
+    if (
+      tempField &&
       tempField.nestedFields &&
-      tempField.nestedFields[field.name]) as IFormFieldValue
+      field.name in tempField.nestedFields
+    ) {
+      return tempField.nestedFields[field.name] as IFormFieldValue
+    }
   }
   return ''
 }
@@ -632,6 +636,12 @@ function hasNestedDataChanged(
   return true
 }
 
+export type RenderableFieldType = {
+  item: string
+  original: IFormFieldValue | JSX.Element | undefined
+  changed: IFormFieldValue | JSX.Element | undefined
+}
+
 export function getRenderableField(
   section: IFormSection,
   {
@@ -644,7 +654,7 @@ export function getRenderableField(
   original: IFormFieldValue | JSX.Element | undefined,
   changed: IFormFieldValue | JSX.Element | undefined,
   intl: IntlShape
-) {
+): RenderableFieldType {
   let item = intl.formatMessage(fieldLabel, fieldLabelParams)
   if (section && section.name) {
     item = `${item} (${intl.formatMessage(section.name)})`

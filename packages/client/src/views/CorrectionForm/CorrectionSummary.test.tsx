@@ -12,7 +12,6 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockDeclarationData,
-  createRouterProps,
   flushPromises,
   mockDeathDeclarationData,
   getRegisterFormFromStore,
@@ -34,9 +33,8 @@ import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getOfflineDataSuccess } from '@client/offline/actions'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-
-let wrapper: ReactWrapper<{}, {}>
+import { createMemoryRouter } from 'react-router-dom'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 const deathDeclaration: IDeclaration = {
   id: '85bccf72-6117-4cab-827d-47728becb0c1',
@@ -165,7 +163,10 @@ const birthDeclaration: IDeclaration = {
   timeLoggedMS: 990618
 }
 
-const { store, history } = createStore()
+const { store } = createStore()
+
+let wrapper: ReactWrapper<{}, {}>
+let router: ReturnType<typeof createMemoryRouter>
 
 describe('Correction summary', () => {
   describe('for a birth declaration', () => {
@@ -174,25 +175,17 @@ describe('Correction summary', () => {
       await flushPromises()
       store.dispatch(storeDeclaration(birthDeclaration))
       const form = await getRegisterFormFromStore(store, EventType.Birth)
-      wrapper = await createTestComponent(
-        <CorrectionForm
-          {...createRouterProps(
+      const { component, router: testRouter } = await createTestComponent(
+        <CorrectionForm />,
+        {
+          store,
+          path: CERTIFICATE_CORRECTION,
+          initialEntries: [
             formatUrl(CERTIFICATE_CORRECTION, {
               declarationId: birthDeclaration.id,
               pageId: CorrectionSection.Summary
-            }),
-            { isNavigatedInsideApp: false },
-            {
-              matchParams: {
-                declarationId: birthDeclaration.id,
-                pageId: CorrectionSection.Summary
-              }
-            }
-          )}
-        />,
-        {
-          store,
-          history,
+            })
+          ],
           graphqlMocks: [
             {
               request: {
@@ -214,6 +207,8 @@ describe('Correction summary', () => {
           ]
         }
       )
+      router = testRouter
+      wrapper = component
     })
     it('should disable the mark correction button if fees no is selected', () => {
       expect(
@@ -380,7 +375,7 @@ describe('Correction summary', () => {
       await flushPromises()
       wrapper.update()
 
-      expect(history.location.pathname).toContain('/review-view-group')
+      expect(router.state.location.pathname).toContain('/review-view-group')
     })
 
     it('should cancel the correction when the cross button is pressed', () => {
@@ -388,48 +383,39 @@ describe('Correction summary', () => {
 
       wrapper.update()
 
-      expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
+      expect(router.state.location.pathname).toContain(
+        WORKQUEUE_TABS.readyForReview
+      )
     })
 
-    it('after successful correction request redirects to  reg home review tab', () => {
+    it('after successful correction request redirects to reg home review tab', () => {
       wrapper
         .find('#correctionFees_NOT_REQUIRED')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
       wrapper.update()
       wrapper.find('#make_correction').hostNodes().simulate('click')
+      wrapper.find('#send').hostNodes().simulate('click')
       wrapper.update()
-      expect(history.location.pathname).toContain(
+      expect(router.state.location.pathname).toContain(
         `registration-home/${WORKQUEUE_TABS.readyForReview}`
       )
     })
   })
   describe('for a death declaration', () => {
     beforeEach(async () => {
-      // ;(deathDeclaration.data.corrector.relationship as any).value = 'INFORMANT'
-
       store.dispatch(storeDeclaration(deathDeclaration))
-      wrapper = await createTestComponent(
-        <CorrectionForm
-          {...createRouterProps(
-            formatUrl(CERTIFICATE_CORRECTION, {
-              declarationId: deathDeclaration.id,
-              pageId: CorrectionSection.Summary
-            }),
-            { isNavigatedInsideApp: false },
-            {
-              matchParams: {
-                declarationId: deathDeclaration.id,
-                pageId: CorrectionSection.Summary
-              }
-            }
-          )}
-        />,
-        {
-          store,
-          history
-        }
-      )
+      const { component } = await createTestComponent(<CorrectionForm />, {
+        store,
+        path: CERTIFICATE_CORRECTION,
+        initialEntries: [
+          formatUrl(CERTIFICATE_CORRECTION, {
+            declarationId: deathDeclaration.id,
+            pageId: CorrectionSection.Summary
+          })
+        ]
+      })
+      wrapper = component
     })
     it('should return corrector informat', () => {
       const instance = wrapper

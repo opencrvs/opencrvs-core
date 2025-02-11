@@ -10,9 +10,20 @@
  */
 
 import { env } from '@events/environment'
+import {
+  ActionInput,
+  ActionType,
+  EventConfig,
+  EventDocument,
+  FieldConfig,
+  findActiveActionFields,
+  getOrThrow,
+  logger
+} from '@opencrvs/commons'
 import fetch from 'node-fetch'
+import { array } from 'zod'
 
-export async function getEventsConfig(token: string) {
+export async function getEventConfigurations(token: string) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
@@ -24,5 +35,65 @@ export async function getEventsConfig(token: string) {
     throw new Error('Failed to fetch events config')
   }
 
-  return res.json()
+  return array(EventConfig).parse(await res.json())
+}
+
+async function findEventConfigurationById({
+  token,
+  eventType
+}: {
+  token: string
+  eventType: string
+}) {
+  const configurations = await getEventConfigurations(token)
+
+  return configurations.find((config) => config.id === eventType)
+}
+
+export async function getActionFormFields({
+  token,
+  eventType,
+  action
+}: {
+  token: string
+  eventType: string
+  action: ActionType
+}): Promise<FieldConfig[]> {
+  const configuration = getOrThrow(
+    await findEventConfigurationById({
+      token,
+      eventType
+    }),
+    `No configuration found for event type: ${eventType}`
+  )
+
+  return getOrThrow(
+    findActiveActionFields(configuration, action),
+    `No fields found for action: ${action}`
+  )
+}
+
+export async function notifyOnAction(
+  action: ActionInput,
+  event: EventDocument,
+  token: string
+) {
+  try {
+    await fetch(
+      new URL(
+        `/events/${event.type}/actions/${action.type}`,
+        env.COUNTRY_CONFIG_URL
+      ),
+      {
+        method: 'POST',
+        body: JSON.stringify(event),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token
+        }
+      }
+    )
+  } catch (error) {
+    logger.error(error)
+  }
 }

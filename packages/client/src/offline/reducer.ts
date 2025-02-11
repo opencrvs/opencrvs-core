@@ -8,43 +8,44 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import {
+  loop,
+  Cmd,
+  Loop,
+  liftState,
+  getModel,
+  getCmd,
+  RunCmd
+} from 'redux-loop'
+import * as actions from '@client/offline/actions'
+import * as profileActions from '@client/profile/profileActions'
+import { storage } from '@client/storage'
+import {
+  IApplicationConfig,
+  IApplicationConfigAnonymous,
+  ILocationDataResponse,
+  referenceApi,
+  CertificateConfiguration,
+  IFacilitiesDataResponse,
+  IOfficesDataResponse,
+  ICertificateData
+} from '@client/utils/referenceApi'
+import { ILanguage } from '@client/i18n/reducer'
+import { filterLocations } from '@client/utils/locationUtils'
+import { System } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { isOfflineDataLoaded } from './selectors'
+import { merge } from 'lodash'
+import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
 import { initConditionals } from '@client/forms/conditionals'
 import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { initValidators } from '@client/forms/validators'
-import { ILanguage } from '@client/i18n/reducer'
 import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
-import * as actions from '@client/offline/actions'
-import { ISVGTemplate } from '@client/pdfRenderer'
-import * as profileActions from '@client/profile/profileActions'
-import { storage } from '@client/storage'
-import { isNavigatorOnline } from '@client/utils'
-import { EventType, System } from '@client/utils/gateway'
-import { filterLocations } from '@client/utils/locationUtils'
-import {
-  CertificateConfiguration,
-  IApplicationConfig,
-  IApplicationConfigAnonymous,
-  IFacilitiesDataResponse,
-  ILocationDataResponse,
-  IOfficesDataResponse,
-  referenceApi
-} from '@client/utils/referenceApi'
-import { UserDetails } from '@client/utils/userUtils'
-import { merge } from 'lodash'
-import {
-  Cmd,
-  Loop,
-  RunCmd,
-  getCmd,
-  getModel,
-  liftState,
-  loop
-} from 'redux-loop'
-import { isOfflineDataLoaded } from './selectors'
+import { getToken } from '@client/utils/authUtils'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -90,26 +91,24 @@ export interface CRVSOffice extends ILocation {
   physicalType: 'Building'
 }
 
+export interface IForms {
+  version: string
+  birth: ISerializedForm
+  death: ISerializedForm
+  marriage: ISerializedForm
+}
 export interface IOfflineData {
   locations: ILocationDataResponse
-  forms: {
-    version: string
-    birth: ISerializedForm
-    death: ISerializedForm
-    marriage: ISerializedForm
-  }
+  forms: IForms
   facilities: IFacilitiesDataResponse
   offices: IOfficesDataResponse
   languages: ILanguage[]
   templates: {
     fonts?: CertificateConfiguration['fonts']
-    // Certificates might not be defined in the case of
-    // a field agent using the app.
-    certificates?: {
-      birth: ISVGTemplate
-      death: ISVGTemplate
-      marriage: ISVGTemplate
-    }
+    // TODO: Certificates need to be restricted in the case of
+    // a user who does not have permission to print certificate
+    // (ex: a field agent using the app)
+    certificates: ICertificateData[]
   }
   assets: {
     logo: string
@@ -136,6 +135,43 @@ const initialState: IOfflineDataState = {
 
 async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
+}
+
+async function loadSingleCertificate(certificate: ICertificateData) {
+  const { id } = certificate
+  const res = await fetch(certificate.svgUrl, {
+    headers: {
+      Authorization: getToken(),
+      'If-None-Match': certificate?.hash ?? ''
+    }
+  })
+  if (res.status === 304) {
+    return {
+      ...certificate,
+      svg: certificate.svg,
+      hash: certificate!.hash!
+    }
+  }
+  if (!res.ok) {
+    return Promise.reject(
+      new Error(`Fetching certificate with id: "${id}" failed`)
+    )
+  }
+  return res.text().then((svg) => {
+    return {
+      ...certificate,
+      svg,
+      hash: res.headers.get('etag')!
+    }
+  })
+}
+
+async function loadCertificates(
+  savedCertificates: IOfflineData['templates']['certificates']
+) {
+  return await Promise.all(
+    savedCertificates.map((cert) => loadSingleCertificate(cert))
+  )
 }
 
 function checkIfDone(
@@ -200,14 +236,6 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   failActionCreator: actions.configFailed
 })
 
-const CERTIFICATE_CONFIG_CMD = Cmd.run(
-  () => referenceApi.loadCertificateConfiguration(),
-  {
-    successActionCreator: actions.certificateConfigurationLoaded,
-    failActionCreator: actions.certificateConfigurationLoadFailed
-  }
-)
-
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
@@ -242,7 +270,6 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     CONFIG_CMD,
-    CERTIFICATE_CONFIG_CMD,
     CONDITIONALS_CMD,
     VALIDATORS_CMD,
     HANDLEBARS_CMD,
@@ -368,65 +395,57 @@ function reducer(
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, systems } = action.payload
       merge(window.config, config)
-      const birthCertificateTemplate = certificates.find(
-        ({ event }) => event === EventType.Birth
-      )
 
-      const deathCertificateTemplate = certificates.find(
-        ({ event }) => event === EventType.Death
-      )
-
-      const marriageCertificateTemplate = certificates.find(
-        ({ event }) => event === EventType.Marriage
-      )
-
-      let newOfflineData: Partial<IOfflineData>
-
-      if (
-        birthCertificateTemplate &&
-        deathCertificateTemplate &&
-        marriageCertificateTemplate
-      ) {
-        const certificatesTemplates = {
-          birth: {
-            definition: birthCertificateTemplate.svgCode
-          },
-          death: {
-            definition: deathCertificateTemplate.svgCode
-          },
-          marriage: {
-            definition: marriageCertificateTemplate.svgCode
-          }
-        }
-
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          systems,
-          templates: {
-            ...state.offlineData.templates,
-            certificates: certificatesTemplates
-          }
-        }
-      } else {
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          systems,
-
-          // Field agents do not get certificate templates from the config service.
-          // Our loading logic depends on certificates being present and the app would load infinitely
-          // without a value here.
-          // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
-          // to not expect certificate templates when a field agent is logged in.
-          templates: {}
+      const newOfflineData = {
+        ...state.offlineData,
+        config,
+        systems,
+        templates: {
+          ...state.offlineData.templates,
+          certificates: (certificates as ICertificateData[]).map((x) => {
+            const baseUrl = window.location.origin
+            if (x.fonts) {
+              x.fonts = Object.fromEntries(
+                Object.entries(x.fonts).map(([fontFamily, fontStyles]) => [
+                  fontFamily,
+                  {
+                    normal: `${baseUrl}${fontStyles.normal}`,
+                    bold: `${baseUrl}${fontStyles.bold}`,
+                    italics: `${baseUrl}${fontStyles.italics}`,
+                    bolditalics: `${baseUrl}${fontStyles.bolditalics}`
+                  }
+                ])
+              )
+            }
+            return x
+          })
         }
       }
 
+      return loop(
+        {
+          ...state,
+          offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
+          offlineData: newOfflineData
+        },
+        Cmd.run(loadCertificates, {
+          successActionCreator: actions.certificatesLoaded,
+          args: [newOfflineData.templates?.certificates]
+        })
+      )
+    }
+
+    case actions.CERTIFICATES_LOADED: {
+      const certificates = action.payload
       return {
         ...state,
-        offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
-        offlineData: newOfflineData
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...state.offlineData.templates,
+            certificates
+          }
+        }
       }
     }
 
@@ -475,23 +494,6 @@ function reducer(
         },
         delay(CONTENT_CMD, RETRY_TIMEOUT)
       )
-    }
-
-    case actions.CERTIFICATE_CONFIGURATION_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          templates: {
-            ...state.offlineData.templates,
-            fonts: action.payload.fonts
-          }
-        }
-      }
-    }
-
-    case actions.CERTIFICATE_CONFIGURATION_LOAD_FAILED: {
-      return loop(state, delay(CERTIFICATE_CONFIG_CMD, RETRY_TIMEOUT))
     }
 
     /*

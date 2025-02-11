@@ -9,25 +9,88 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { useIntl } from 'react-intl'
 import {
-  InputField,
-  useFormContext,
-  RadioGroup as RadioGroupComponent
+  FieldProps,
+  RadioGroup as RadioGroupField,
+  SelectOption
+} from '@opencrvs/commons/client'
+import {
+  RadioGroup as RadioGroupComponent,
+  RadioSize
 } from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons'
+import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
-export const RadioGroup = ({ name, options }: FieldProps<'RADIO_GROUP'>) => {
-  const { setValue, watch } = useFormContext()
-  const value = watch(name)
+function RadioGroupInput({
+  setFieldValue,
+  value,
+  options,
+  configuration,
+  ...props
+}: FieldProps<'RADIO_GROUP'> & {
+  setFieldValue: (name: string, val: string | undefined) => void
+  value?: string
+}) {
+  const intl = useIntl()
+
+  const selectedOption = options.find((option) => option.value === value)
+  const formattedOptions = options.map((option: SelectOption) => ({
+    value: option.value,
+    label: intl.formatMessage(option.label)
+  }))
+
+  const inputValue = selectedOption?.value ?? ''
 
   return (
-    <InputField id={name} touched={false}>
-      <RadioGroupComponent
-        options={options}
-        name={name}
-        onChange={(val) => setValue(name, val)}
-        value={value}
-      />
-    </InputField>
+    <RadioGroupComponent
+      data-testid={props.id}
+      name={props.id}
+      options={formattedOptions}
+      size={
+        configuration?.styles?.size === 'NORMAL'
+          ? RadioSize.NORMAL
+          : RadioSize.LARGE
+      }
+      value={inputValue}
+      onChange={(val: string) => setFieldValue(props.id, val)}
+      {...props}
+    />
   )
+}
+
+function RadioGroupOutput({
+  value,
+  options
+}: {
+  value: Stringifiable
+  options: SelectOption[]
+}) {
+  const intl = useIntl()
+  const selectedOption = options.find((option) => option.value === value)
+
+  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+}
+
+function useStringifier() {
+  const intl = useIntl()
+
+  return (value: string, fieldConfig: RadioGroupField) => {
+    const option = fieldConfig.options.find((opt) => opt.value === value)
+
+    if (!option) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `Could not find option with value ${value} for field ${fieldConfig.id}`
+      )
+      return value
+    }
+
+    return intl.formatMessage(option.label)
+  }
+}
+
+export const RadioGroup = {
+  Input: RadioGroupInput,
+  Output: RadioGroupOutput,
+  useStringifier: useStringifier
 }

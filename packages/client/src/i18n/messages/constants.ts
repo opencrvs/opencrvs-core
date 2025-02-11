@@ -163,6 +163,7 @@ interface IConstantsMessages
   refresh: MessageDescriptor
   duplicateOf: MessageDescriptor
   matchedTo: MessageDescriptor
+  humanName: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   action: {
@@ -978,6 +979,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: `{registrationTargetDays} days - 1 year`,
     description: `Label for registrations within {registrationTargetDays} days to 1 year`,
     id: 'constants.withinTargetDaysTo1Year'
+  },
+  humanName: {
+    defaultMessage: `{firstName} {middleName} {lastName}`,
+    description: 'A localized order of the full name',
+    id: 'constants.humanName'
   }
 }
 export const constantsMessages: Record<
@@ -1554,7 +1560,7 @@ const countryMessagesToDefine: Record<
   FAR: {
     id: 'countries.FAR',
     defaultMessage: 'Farajaland',
-    description: 'Fictional country for OpenCRSV demo'
+    description: 'Fictional country for OpenCRVS demo'
   },
   FRO: {
     id: 'countries.FRO',

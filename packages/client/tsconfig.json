@@ -15,8 +15,15 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["vitest/globals", "fhir"]
   },
-  "include": ["src", "typings", "codegen.ts", "vite.config.ts"],
+  "include": [
+    "src",
+    "typings",
+    "codegen.ts",
+    "vite.config.ts",
+    ".storybook/**/*"
+  ],
   "extends": "./tsconfig.paths.json"
 }

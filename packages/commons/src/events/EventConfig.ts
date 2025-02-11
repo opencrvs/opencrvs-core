@@ -10,7 +10,10 @@
  */
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
+import { DeduplicationConfig } from './DeduplicationConfig'
+import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { WorkqueueConfig } from './WorkqueueConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -23,14 +26,11 @@ export const EventConfig = z.object({
     .describe(
       'A machine-readable identifier for the event, e.g. "birth" or "death"'
     ),
+  summary: SummaryConfig,
   label: TranslationConfig,
-  actions: z.array(ActionConfig)
+  actions: z.array(ActionConfig),
+  workqueues: z.array(WorkqueueConfig),
+  deduplication: z.array(DeduplicationConfig).optional().default([])
 })
 
 export type EventConfig = z.infer<typeof EventConfig>
-
-/**
- * Builds a validated configuration for an event
- * @param config - Event specific configuration
- */
-export const defineConfig = (config: EventConfig) => EventConfig.parse(config)

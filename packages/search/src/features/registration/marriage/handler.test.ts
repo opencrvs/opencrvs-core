@@ -24,7 +24,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 500 if invalid payload received', async () => {
-      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
+      const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'
@@ -43,7 +43,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 500 if invalid payload received where composition has no ID', async () => {
-      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
+      const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:search-user'

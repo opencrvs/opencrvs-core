@@ -33,4 +33,17 @@ export function getBirthRegistrationSectionTransformer(
   if (queryData[sectionId].status) {
     transformStatusData(transformedData, queryData[sectionId].status, sectionId)
   }
+
+  if (
+    Array.isArray(queryData[sectionId].certificates) &&
+    queryData[sectionId].certificates.length > 0
+  ) {
+    const currentCertificate =
+      queryData[sectionId].certificates[
+        queryData[sectionId].certificates.length - 1
+      ]
+    if (currentCertificate?.collector?.relationship === 'PRINT_IN_ADVANCE') {
+      transformedData[sectionId].certificates = [currentCertificate]
+    }
+  }
 }

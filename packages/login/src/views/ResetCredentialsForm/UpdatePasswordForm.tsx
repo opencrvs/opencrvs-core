@@ -8,11 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  FORGOTTEN_ITEMS,
-  goToPhoneNumberVerificationForm,
-  goToSuccessPage
-} from '@login/login/actions'
+import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -25,11 +21,11 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { RouteComponentProps, withRouter } from '@login/common/WithRouterProps'
+import * as routes from '@login/navigation/routes'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -72,12 +68,7 @@ type State = {
   continuePressed: boolean
 }
 
-interface IProps extends RouteComponentProps<{}, {}, { nonce: string }> {
-  goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
-  goToSuccessPage: typeof goToSuccessPage
-}
-
-type IFullProps = IProps & IntlShapeProps
+type IFullProps = RouteComponentProps & IntlShapeProps
 
 class UpdatePasswordComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
@@ -146,15 +137,18 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
       this.state.hasNumber &&
       this.state.validLength
     ) {
+      // { nonce: string }
       await authApi.changePassword(
-        this.props.location.state.nonce,
+        this.props.router.location.state.nonce,
         this.state.newPassword
       )
-      this.props.goToSuccessPage(FORGOTTEN_ITEMS.PASSWORD)
+      this.props.router.navigate(routes.SUCCESS, {
+        state: { forgottenItem: FORGOTTEN_ITEMS.PASSWORD }
+      })
     }
   }
   render = () => {
-    const { intl, goToPhoneNumberVerificationForm } = this.props
+    const { intl, router } = this.props
     const forgottenItem = FORGOTTEN_ITEMS.PASSWORD
 
     return (
@@ -167,7 +161,11 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
                   aria-label="Go back"
                   size="medium"
                   type="icon"
-                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                  onClick={() =>
+                    router.navigate(routes.PHONE_NUMBER_VERIFICATION, {
+                      state: { forgottenItem }
+                    })
+                  }
                 >
                   <Icon name="ArrowLeft" />
                 </Button>
@@ -177,7 +175,11 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
                   aria-label="Go back"
                   size="medium"
                   type="icon"
-                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                  onClick={() =>
+                    router.navigate(routes.PHONE_NUMBER_VERIFICATION, {
+                      state: { forgottenItem }
+                    })
+                  }
                 >
                   <Icon name="ArrowLeft" />
                 </Button>
@@ -328,7 +330,4 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
   }
 }
 
-export const UpdatePassword = connect(null, {
-  goToPhoneNumberVerificationForm,
-  goToSuccessPage
-})(withRouter(injectIntl(UpdatePasswordComponent)))
+export const UpdatePassword = withRouter(injectIntl(UpdatePasswordComponent))

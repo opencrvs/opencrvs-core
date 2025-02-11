@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useMemo } from 'react'
 
 /**
  * @example
@@ -24,20 +24,18 @@ export type Field<CM extends ComponentsMap> = {
 } & React.ComponentProps<CM[keyof CM]>
 
 type FormFieldRendererProps<CM extends ComponentsMap> = {
-  fields: Array<Field<CM>>
+  field: Field<CM>
   components: CM
 }
 
 export const FormFieldRenderer = <CM extends ComponentsMap>({
-  fields,
+  field,
   components
 }: FormFieldRendererProps<CM>) => {
-  return (
-    <>
-      {fields.map((field, index) => {
-        const FormFieldComponent = components[field.type]
-        return <FormFieldComponent key={field.id ?? index} {...field} />
-      })}
-    </>
+  const FormFieldComponent = useMemo(
+    () => components[field.type],
+    [components, field.type]
   )
+
+  return <FormFieldComponent key={field.id} {...field} />
 }

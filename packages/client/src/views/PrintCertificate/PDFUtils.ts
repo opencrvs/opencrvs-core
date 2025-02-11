@@ -14,11 +14,7 @@ import {
   createIntl,
   createIntlCache
 } from 'react-intl'
-import {
-  AdminStructure,
-  ILocation,
-  IOfflineData
-} from '@client/offline/reducer'
+import { AdminStructure, ILocation } from '@client/offline/reducer'
 import { IPDFTemplate } from '@client/pdfRenderer'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
@@ -27,7 +23,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import { FontFamilyTypes } from '@client/utils/referenceApi'
+import {
+  CertificateConfiguration,
+  FontFamilyTypes
+} from '@client/utils/referenceApi'
 import htmlToPdfmake from 'html-to-pdfmake'
 import { Content } from 'pdfmake/interfaces'
 
@@ -225,23 +224,23 @@ src: url("${url}") format("truetype");
   const serializer = new XMLSerializer()
   return serializer.serializeToString(svg)
 }
-export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
-  const initialDefaultFont = offlineResource.templates.fonts
-    ? Object.keys(offlineResource.templates.fonts)[0]
-    : null
+export function svgToPdfTemplate(
+  svg: string,
+  certificateFonts: CertificateConfiguration
+) {
   const pdfTemplate: IPDFTemplate = {
     ...certificateBaseTemplate,
     definition: {
       ...certificateBaseTemplate.definition,
       defaultStyle: {
         font:
-          initialDefaultFont ||
+          Object.keys(certificateFonts)[0] ||
           certificateBaseTemplate.definition.defaultStyle.font
       }
     },
     fonts: {
       ...certificateBaseTemplate.fonts,
-      ...offlineResource.templates.fonts
+      ...certificateFonts
     }
   }
 

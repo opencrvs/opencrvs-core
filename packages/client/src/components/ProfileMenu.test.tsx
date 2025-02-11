@@ -19,11 +19,14 @@ import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profi
 describe('when user opens profile menu without user details', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store, history } = createStore()
-    component = await createTestComponent(<ProfileMenu />, {
-      store,
-      history
-    })
+    const { store } = createStore()
+    const { component: testComponent } = await createTestComponent(
+      <ProfileMenu />,
+      {
+        store
+      }
+    )
+    component = testComponent
   })
 
   it('open menu', () => {
@@ -38,7 +41,7 @@ describe('when user opens profile menu without user details', () => {
 describe('when user opens profile menu with user details', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const details = userDetails
     details.name = [
       {
@@ -48,10 +51,13 @@ describe('when user opens profile menu with user details', () => {
       }
     ]
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(details)))
-    component = await createTestComponent(<ProfileMenu />, {
-      store,
-      history
-    })
+    const { component: testComponent } = await createTestComponent(
+      <ProfileMenu />,
+      {
+        store
+      }
+    )
+    component = testComponent
   })
 
   it('open menu', () => {

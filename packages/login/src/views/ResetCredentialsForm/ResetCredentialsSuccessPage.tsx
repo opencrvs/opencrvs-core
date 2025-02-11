@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { goToHome, FORGOTTEN_ITEMS } from '@login/login/actions'
+import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import { storage } from '@login/storage'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
@@ -23,10 +23,12 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
-import { RouteComponentProps } from 'react-router-dom'
+
 import { selectCountryLogo } from '@login/login/selectors'
 import { IStoreState } from '@login/store'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { useLocation, useNavigate } from 'react-router-dom'
+import * as routes from '@login/navigation/routes'
 
 const Container = styled(Box)`
   position: relative;
@@ -35,15 +37,13 @@ const Container = styled(Box)`
   width: min(330px, 90%);
 `
 
-type Props = { goToHome: typeof goToHome } & RouteComponentProps<
-  {},
-  {},
-  { forgottenItem: FORGOTTEN_ITEMS }
-> &
-  IntlShapeProps & { logo: string | undefined }
+type Props = IntlShapeProps & { logo: string | undefined }
 
 const ResetCredentialsSuccessView = (props: Props) => {
-  const { logo, goToHome, intl, location } = props
+  const { logo, intl } = props
+  const location = useLocation()
+  const navigate = useNavigate()
+
   const { forgottenItem } = location.state
 
   const removeUserDetails = async () => {
@@ -99,7 +99,7 @@ const ResetCredentialsSuccessView = (props: Props) => {
               type="primary"
               size="large"
               id="login-button"
-              onClick={goToHome}
+              onClick={() => navigate(routes.STEP_ONE)}
             >
               {intl.formatMessage(messages.loginButtonLabel)}
             </Button>
@@ -110,13 +110,8 @@ const ResetCredentialsSuccessView = (props: Props) => {
   )
 }
 
-export const ResetCredentialsSuccessPage = connect(
-  (state: IStoreState) => {
-    return {
-      logo: selectCountryLogo(state)
-    }
-  },
-  {
-    goToHome
+export const ResetCredentialsSuccessPage = connect((state: IStoreState) => {
+  return {
+    logo: selectCountryLogo(state)
   }
-)(injectIntl(ResetCredentialsSuccessView))
+})(injectIntl(ResetCredentialsSuccessView))

@@ -8,43 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  ElasticsearchContainer,
-  StartedElasticsearchContainer
-} from '@testcontainers/elasticsearch'
 import * as elasticsearch from '@elastic/elasticsearch'
-let server: StartedElasticsearchContainer
-
-export async function setupServer() {
-  if (server) {
-    return
-  }
-
-  server = await new ElasticsearchContainer('elasticsearch:8.14.3')
-    .withExposedPorts(9200)
-    .withStartupTimeout(120_000)
-    .withEnvironment({
-      'discovery.type': 'single-node',
-      'xpack.security.enabled': 'false',
-      'action.destructive_requires_name': 'false'
-    })
-    .start()
-}
-
-export async function resetServer() {
-  const host = server.getHost()
-  const port = server.getMappedPort(9200)
-  return fetch(`http://${host}:${port}/*`, {
-    method: 'DELETE'
-  })
-}
+import { inject, vi } from 'vitest'
 
 /** @knipignore */
-export function getOrCreateClient() {
-  const host = server.getHost()
-  const port = server.getMappedPort(9200)
+export const getEventIndexName = vi.fn()
+/** @knipignore */
+export const getEventAliasName = vi.fn()
 
+export function getOrCreateClient() {
   return new elasticsearch.Client({
-    node: `http://${host}:${port}`
+    node: `http://${inject('ELASTICSEARCH_URI')}`
   })
 }

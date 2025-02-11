@@ -52,11 +52,13 @@ import {
   getResourceFromBundleById,
   TransactionResponse,
   TaskIdentifierSystem,
-  Location
+  Location,
+  PractitionerRole,
+  URLReference
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getTokenPayload, getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
@@ -69,7 +71,9 @@ import { badRequest, internal } from '@hapi/boom'
 import { getUserOrSystem, isSystem } from './user'
 import {
   getLoggedInPractitionerResource,
-  getPractitionerOfficeId
+  getPractitionerOfficeId,
+  getPractitionerRoleByPractitionerId,
+  getUser
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
 import { fetchLocationHierarchy } from '@workflow/utils/location'
@@ -218,7 +222,8 @@ export function createDocumentReferenceEntryForCertificate(
   temporaryRelatedPersonId: UUID,
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
-  attachmentUrl?: string,
+  certifierReference?: ResourceIdentifier,
+  certificateTemplateId?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
   return {
@@ -236,9 +241,23 @@ export function createDocumentReferenceEntryForCertificate(
             reference: `urn:uuid:${temporaryRelatedPersonId}`
           }
         },
+        ...(certifierReference
+          ? [
+              {
+                url: 'http://opencrvs.org/specs/extension/certifier' as const,
+                valueReference: {
+                  reference: certifierReference
+                }
+              }
+            ]
+          : []),
         {
           url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
           valueBoolean: hasShowedVerifiedDocument
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/certificateTemplateId',
+          valueString: certificateTemplateId
         },
         ...(paymentUrl
           ? [
@@ -259,16 +278,7 @@ export function createDocumentReferenceEntryForCertificate(
           }
         ]
       },
-      content: attachmentUrl
-        ? [
-            {
-              attachment: {
-                contentType: 'application/pdf',
-                data: attachmentUrl
-              }
-            }
-          ]
-        : [],
+      content: [],
       status: 'current'
     }
   }
@@ -288,7 +298,7 @@ export function createRelatedPersonEntries(
   collectorDetails: CertifyInput['collector'],
   temporaryRelatedPersonId: UUID,
   record: RegisteredRecord | CertifiedRecord
-): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] {
+): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] | [] {
   const knownRelationships = z.enum([
     'MOTHER',
     'FATHER',
@@ -683,13 +693,10 @@ export async function createViewTask(
   return viewedTask
 }
 
-export function createDownloadTask(
-  previousTask: SavedTask,
-  extensionUrl:
-    | 'http://opencrvs.org/specs/extension/regDownloaded'
-    | 'http://opencrvs.org/specs/extension/regAssigned'
-) {
-  return createNewTaskResource(previousTask, [{ url: extensionUrl }])
+export function createDownloadTask(previousTask: SavedTask) {
+  return createNewTaskResource(previousTask, [
+    { url: 'http://opencrvs.org/specs/extension/regAssigned' }
+  ])
 }
 
 export function createRejectTask(
@@ -763,18 +770,21 @@ export function createWaitingForValidationTask(
   }
 }
 
-export function createRegisterTask(previousTask: SavedTask): Task {
+export function createRegisterTask(
+  previousTask: SavedTask,
+  comment?: string
+): Task {
   const timeLoggedMSExtension = previousTask.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
-  )!
+  )
 
   const registeredTask = createNewTaskResource(
     previousTask,
-    [timeLoggedMSExtension],
+    timeLoggedMSExtension ? [timeLoggedMSExtension] : [],
     'REGISTERED'
   )
 
-  const comments = previousTask?.note?.[0]?.text
+  const comments = comment ?? previousTask?.note?.[0]?.text
 
   return {
     ...registeredTask,
@@ -912,8 +922,20 @@ export async function createUnassignedTask(
   return unassignedTask
 }
 
-export function createCertifiedTask(previousTask: SavedTask): SavedTask {
-  return createNewTaskResource(previousTask, [], 'CERTIFIED')
+export function createCertifiedTask(
+  previousTask: SavedTask,
+  certificateTemplateId: string
+): SavedTask {
+  return createNewTaskResource(
+    previousTask,
+    [
+      {
+        url: 'http://opencrvs.org/specs/extension/certificateTemplateId',
+        valueString: certificateTemplateId
+      }
+    ],
+    'CERTIFIED'
+  )
 }
 
 export function createIssuedTask(
@@ -1154,6 +1176,24 @@ export async function sendBundleToHearth(
   return responseBundle
 }
 
+export async function getPractitionerRoleFromToken(
+  token: string
+): Promise<BundleEntry<PractitionerRole>> {
+  const tokenPayload = getTokenPayload(token)
+  const userDetails = await getUser(tokenPayload.sub, { Authorization: token })
+  const practitionerId = userDetails.practitionerId
+  const practitionerRoleBundle = (await getPractitionerRoleByPractitionerId(
+    practitionerId as UUID
+  )) as Bundle<PractitionerRole>
+
+  const practitionerRoleResource = practitionerRoleBundle.entry[0].resource
+  return {
+    fullUrl:
+      `/fhir/PractitionerRole/${practitionerRoleResource.id}/_history/${practitionerRoleResource.meta?.versionId}` as URLReference,
+    resource: practitionerRoleResource
+  }
+}
+
 function findSavedReference(
   temporaryReference: URNReference,
   resourceBundle: Bundle,
@@ -1167,7 +1207,7 @@ function findSavedReference(
   }
   return urlReferenceToResourceIdentifier(
     responseBundle.entry[indexInResponseBundle].response.location
-  )
+  ) as ResourceIdentifier
 }
 
 function toSavedComposition(

@@ -13,14 +13,12 @@ import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import {
-  goToAdvancedSearch,
-  goToDeclarationRecordAudit,
-  goToEvents as goToEventsAction,
-  goToIssueCertificate as goToIssueCertificateAction,
-  goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction
+  formatUrl,
+  generateGoToPageUrl,
+  generateIssueCertificateUrl,
+  generatePrintCertificateUrl
 } from '@client/navigation'
 import { useIntl } from 'react-intl'
 import {
@@ -31,7 +29,7 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Scope } from '@client/utils/authUtils'
+
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
   buttonMessages,
@@ -40,10 +38,15 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import {
@@ -71,7 +74,6 @@ import {
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 import { isAdvancedSearchFormValid } from '@client/views/SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
 import {
@@ -86,6 +88,8 @@ import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/Bookm
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { UserDetails } from '@client/utils/userUtils'
 import { changeSortedColumn } from '@client/views/OfficeHome/utils'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import * as routes from '@client/navigation/routes'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -105,24 +109,12 @@ type QueryData = SearchEventsQuery['searchEvents']
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
-  scope: Scope | null
-  goToEvents: typeof goToEventsAction
+  scope: Scope[] | null
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
-  goToPage: typeof goToPageAction
-  goToPrintCertificate: typeof goToPrintCertificateAction
-  goToIssueCertificate: typeof goToIssueCertificateAction
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
-interface IMatchParams {
-  searchText: string
-  searchType: string
-}
-
-type IFullProps = ISearchInputProps &
-  IBaseSearchResultProps &
-  RouteComponentProps<IMatchParams>
+type IFullProps = IBaseSearchResultProps & RouteComponentProps
 
 const AdvancedSearchResultComp = (props: IFullProps) => {
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NONE)
@@ -221,15 +213,16 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     }
   }
 
-  const userHasRegisterScope = () => {
-    return props.scope && props.scope.includes('register')
-  }
-  const userHasValidateScope = () => {
-    return props.scope && props.scope.includes('validate')
-  }
-  const userHasCertifyScope = () => {
-    return props.scope && props.scope.includes('certify')
-  }
+  const { hasAnyScope, hasScope, canIssueRecord, canPrintRecord } =
+    usePermissions()
+
+  const userHasRegisterScope = () => hasScope(SCOPES.RECORD_REGISTER)
+
+  const userHasValidateScope = () =>
+    hasAnyScope([
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ])
 
   const transformSearchContent = (data: QueryData) => {
     if (!data || !data.results) {
@@ -283,7 +276,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
-            userHasCertifyScope()
+            canPrintRecord()
           ) {
             actions.push({
               label: intl.formatMessage(buttonMessages.print),
@@ -291,18 +284,29 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                props.goToPrintCertificate(reg.id, reg.event)
+
+                props.router.navigate(
+                  generatePrintCertificateUrl({
+                    registrationId: reg.id,
+                    event: reg.event
+                  })
+                )
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (declarationIsCertified && userHasCertifyScope()) {
+          } else if (declarationIsCertified && canIssueRecord()) {
             actions.push({
               label: intl.formatMessage(buttonMessages.issue),
               handler: (
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                props.goToIssueCertificate(reg.id)
+
+                props.router.navigate(
+                  generateIssueCertificateUrl({
+                    registrationId: reg.id
+                  })
+                )
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -313,13 +317,16 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                   ? intl.formatMessage(constantsMessages.update)
                   : intl.formatMessage(constantsMessages.review),
               handler: () =>
-                props.goToPage(
-                  reg.declarationStatus === 'CORRECTION_REQUESTED'
-                    ? REVIEW_CORRECTION
-                    : REVIEW_EVENT_PARENT_FORM_PAGE,
-                  reg.id,
-                  'review',
-                  reg.event.toLowerCase()
+                props.router.navigate(
+                  generateGoToPageUrl({
+                    pageRoute:
+                      reg.declarationStatus === 'CORRECTION_REQUESTED'
+                        ? REVIEW_CORRECTION
+                        : REVIEW_EVENT_PARENT_FORM_PAGE,
+                    declarationId: reg.id,
+                    pageId: 'review',
+                    event: reg.event.toLowerCase()
+                  })
                 ),
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -347,6 +354,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                   DownloadAction.LOAD_REVIEW_DECLARATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
+              declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
             />
           )
         })
@@ -367,14 +375,28 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         const NameComponent = reg.name ? (
           <NameContainer
             id={`name_${index}`}
-            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+            onClick={() =>
+              props.router.navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'search',
+                  declarationId: reg.id
+                })
+              )
+            }
           >
             {reg.name}
           </NameContainer>
         ) : (
           <NoNameContainer
             id={`name_${index}`}
-            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+            onClick={() =>
+              props.router.navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'search',
+                  declarationId: reg.id
+                })
+              )
+            }
           >
             {intl.formatMessage(constantsMessages.noNameProvided)}
           </NoNameContainer>
@@ -439,7 +461,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 isShowPagination={!loading && total > DEFAULT_PAGE_SIZE}
                 totalPages={Math.ceil(total / DEFAULT_PAGE_SIZE)}
                 paginationId={currentPageNumber}
-                onPageChange={(page: any) => setCurrentPageNumber(page)}
+                onPageChange={(page: number) => setCurrentPageNumber(page)}
                 topActionButtons={[
                   <BookmarkAdvancedSearchResult key="bookmark-advanced-search-result" />
                 ]}
@@ -474,13 +496,13 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
           }}
         </Query>
       )}
-      {!isEnoughParams() && <Redirect to={HOME} />}
+      {!isEnoughParams() && <Navigate to={HOME} />}
     </Frame>
   )
 }
 
 const SearchModifierComponent = () => {
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
   const offlineData = useSelector(getOfflineData)
   const intl = useIntl()
@@ -506,12 +528,7 @@ const SearchModifierComponent = () => {
             ></Pill>
           )
         })}
-        <Link
-          font="bold14"
-          onClick={() => {
-            dispatch(goToAdvancedSearch())
-          }}
-        >
+        <Link font="bold14" onClick={() => navigate(routes.ADVANCED_SEARCH)}>
           {intl.formatMessage(buttonMessages.edit)}
         </Link>
       </SearchParamContainer>
@@ -519,18 +536,11 @@ const SearchModifierComponent = () => {
   )
 }
 
-export const AdvancedSearchResult = connect(
-  (state: IStoreState) => ({
+export const AdvancedSearchResult = withRouter(
+  connect((state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),
     outboxDeclarations: state.declarationsState.declarations
-  }),
-  {
-    goToEvents: goToEventsAction,
-    goToPage: goToPageAction,
-    goToPrintCertificate: goToPrintCertificateAction,
-    goToIssueCertificate: goToIssueCertificateAction,
-    goToDeclarationRecordAudit
-  }
-)(withTheme(AdvancedSearchResultComp))
+  }))(withTheme(AdvancedSearchResultComp))
+)

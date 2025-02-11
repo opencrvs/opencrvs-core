@@ -21,12 +21,13 @@ export default async function anonymousTokenHandler(
   _h: Hapi.ResponseToolkit
 ): Promise<IAuthResponse> {
   const token = await createToken(
-    'ANONYMOUS_USER_FOR_CERTIFICATION_VERIFICATION',
+    '__ANONYMOUS_USER__',
     ['verify'],
     [
       'opencrvs:hearth-user',
       'opencrvs:user-mgnt-user',
-      'opencrvs:workflow-user'
+      'opencrvs:workflow-user',
+      'opencrvs:countryconfig-user'
     ],
     'opencrvs:auth-service',
     true

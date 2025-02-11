@@ -143,7 +143,7 @@ const VSExport = () => {
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
-            onPageChange={(page: any) => setCurrentPageNumber(page)}
+            onPageChange={(page: number) => setCurrentPageNumber(page)}
           />
         )}
       </>

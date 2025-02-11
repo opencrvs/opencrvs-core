@@ -13,85 +13,430 @@ import {
   mockLocalSysAdminUserResponse,
   createTestComponent,
   flushPromises,
+  mockRoles,
+  setScopes,
   mockOfflineDataDispatch,
-  mockUserResponse
+  fetchUserMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { stringify } from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
+import { roleQueries } from '@client/forms/user/query/queries'
 import { vi, Mock } from 'vitest'
+import { SCOPES } from '@opencrvs/commons/client'
+import { SearchUsersQuery, Status } from '@client/utils/gateway'
+import { NetworkStatus } from '@apollo/client'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
+import { createMemoryRouter } from 'react-router-dom'
 
-describe('user list without admin scope', () => {
-  let store: AppStore
-  let history: History<any>
-
-  it('no add user button', async () => {
-    Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
-    const action = {
-      type: actions.SET_USER_DETAILS,
-      payload: mockUserResponse
-    }
-    await store.dispatch(action)
-    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-    await flushPromises()
-
-    const userListMock = [
-      {
-        request: {
-          query: SEARCH_USERS,
-          variables: {
-            primaryOfficeId: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-            count: 10
-          }
-        },
-        result: {
-          data: {
-            searchUsers: {
-              totalItems: 0,
-              results: []
-            }
-          }
+const searchUserResultsMock = (
+  officeId: string,
+  searchUserResults?: NonNullable<SearchUsersQuery['searchUsers']>['results']
+) => [
+  {
+    request: {
+      query: SEARCH_USERS,
+      variables: {
+        primaryOfficeId: officeId,
+        count: 10,
+        skip: 0
+      }
+    },
+    result: {
+      data: {
+        searchUsers: {
+          totalItems: 0,
+          results: searchUserResults ?? []
         }
       }
-    ]
+    }
+  }
+]
 
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
-            locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+const mockRegistrationAgent = (officeId: string) => ({
+  id: '5d08e102542c7a19fc55b790',
+  name: [
+    {
+      use: 'en',
+      firstNames: 'Rabindranath',
+      familyName: 'Tagore'
+    }
+  ],
+  primaryOffice: {
+    id: officeId
+  },
+  role: {
+    id: 'REGISTRATION_AGENT',
+    label: {
+      id: 'userRoles.registrationAgent',
+      defaultMessage: 'Registration_agent',
+      description: ''
+    }
+  },
+  status: Status.Active,
+  underInvestigation: false
+})
+const mockNationalSystemAdmin = (officeId: string) => ({
+  id: '5d08e102542c7a19fc55b791',
+  name: [
+    {
+      use: 'en',
+      firstNames: 'Mohammad',
+      familyName: 'Ashraful'
+    }
+  ],
+  primaryOffice: {
+    id: officeId
+  },
+  role: {
+    id: 'NATIONAL_SYSTEM_ADMIN',
+    label: {
+      id: 'userRoles.nationalSystemAdmin',
+      defaultMessage: 'Natinoal System Admin',
+      description: ''
+    }
+  },
+  status: Status.Active,
+  underInvestigation: false
+})
+
+describe('for user with create my jurisdiction scope', () => {
+  let store: AppStore
+
+  beforeEach(async () => {
+    ;({ store } = createStore())
+    setScopes([SCOPES.USER_CREATE_MY_JURISDICTION], store)
+  })
+
+  it('should show add user button if office is under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
           })
-        }}
-      />,
-      { store, history, graphqlMocks: userListMock }
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId)
+    })
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
     )
     component.update()
-    expect(component.find('#add-user').length).toBe(0)
+    expect(component.find('#add-user').hostNodes().length).toBe(1)
+  })
+
+  it('should not show add user button if office is not under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId)
+    })
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#add-user').hostNodes().length).toBe(0)
+  })
+})
+
+describe('for user with create scope', () => {
+  let store: AppStore
+
+  beforeEach(async () => {
+    ;({ store } = createStore())
+    setScopes([SCOPES.USER_CREATE], store)
+  })
+
+  it('should show add user button if office is under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId)
+    })
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#add-user').hostNodes().length).toBe(1)
+  })
+
+  it('should show add user button even if office is not under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId)
+    })
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#add-user').hostNodes().length).toBe(1)
+  })
+})
+
+describe('for user with update my jurisdiction scope', () => {
+  let store: AppStore
+
+  beforeEach(async () => {
+    ;({ store } = createStore())
+    setScopes([SCOPES.USER_UPDATE_MY_JURISDICTION], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+  })
+
+  it('should show edit user button if office is under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockRegistrationAgent(selectedOfficeId)
+      ])
+    })
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+  })
+
+  it('should not show edit user button if the other user has update all scope even if under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockNationalSystemAdmin(selectedOfficeId)
+      ])
+    })
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(false)
+  })
+
+  it('should not show edit user button if office is not under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockRegistrationAgent(selectedOfficeId)
+      ])
+    })
+
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(false)
+  })
+})
+
+describe('for user with update scope', () => {
+  let store: AppStore
+
+  beforeEach(async () => {
+    ;({ store } = createStore())
+    setScopes([SCOPES.USER_UPDATE], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+  })
+
+  it('should show edit user button if office is under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockRegistrationAgent(selectedOfficeId)
+      ])
+    })
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+  })
+
+  it('should show edit user button even if the other user has update all scope', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockNationalSystemAdmin(selectedOfficeId)
+      ])
+    })
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+  })
+
+  it('should show edit user button even if office is not under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
+            locationId: selectedOfficeId
+          })
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockRegistrationAgent(selectedOfficeId)
+      ])
+    })
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
   })
 })
 
 describe('User list tests', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
+    ;({ store } = createStore())
+    setScopes([SCOPES.USER_UPDATE, SCOPES.USER_CREATE], store)
 
     const action = {
       type: actions.SET_USER_DETAILS,
       payload: mockLocalSysAdminUserResponse
     }
-    await store.dispatch(action)
+    store.dispatch(action)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -118,24 +463,25 @@ describe('User list tests', () => {
           }
         }
       ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const { component, router } = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
       component.update()
       const addUser = await waitForElement(component, '#add-user')
       addUser.hostNodes().simulate('click')
 
       component.update()
 
-      expect(history.location.pathname).toContain('/createUserInLocation')
+      expect(router.state.location.pathname).toContain('/createUserInLocation')
     })
     it('add user button redirects to office selection form for invalid location id', async () => {
       const userListMock = [
@@ -158,17 +504,18 @@ describe('User list tests', () => {
           }
         }
       ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const { component, router } = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
       component.update()
 
       const addUser = await waitForElement(component, '#add-user')
@@ -176,7 +523,7 @@ describe('User list tests', () => {
 
       component.update()
 
-      expect(history.location.pathname).toContain('/createUser')
+      expect(router.state.location.pathname).toContain('/createUser')
     })
   })
 
@@ -202,26 +549,26 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const testComponent = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.update()
-      const app = testComponent
+      testComponent.component.update()
+      const app = testComponent.component
       expect(app.find('#no-record').hostNodes()).toHaveLength(1)
     })
 
@@ -230,6 +577,7 @@ describe('User list tests', () => {
       userMutations.usernameReminderSend = vi.fn()
       userMutations.sendResetPasswordInvite = vi.fn()
       let component: ReactWrapper<{}, {}>
+      let router: ReturnType<typeof createMemoryRouter>
       const userListMock = [
         {
           request: {
@@ -254,10 +602,18 @@ describe('User list tests', () => {
                         familyName: 'Tagore'
                       }
                     ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
+                    role: {
+                      id: 'REGISTRATION_AGENT',
+                      label: {
+                        id: 'userRoles.registrationAgent',
+                        defaultMessage: 'Registration_agent',
+                        description: ''
+                      }
+                    },
+                    status: Status.Active,
                     underInvestigation: false
                   },
                   {
@@ -269,10 +625,18 @@ describe('User list tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        id: 'userRoles.localRegistrar',
+                        defaultMessage: 'Local Registrar',
+                        description: ''
+                      }
+                    },
+                    status: Status.Active,
                     underInvestigation: false
                   },
                   {
@@ -284,10 +648,18 @@ describe('User list tests', () => {
                         familyName: 'Muid Khan'
                       }
                     ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'pending',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
+                    role: {
+                      id: 'DISTRICT_REGISTRAR',
+                      label: {
+                        id: 'userRoles.districtRegistrar',
+                        defaultMessage: 'District Registrar',
+                        description: ''
+                      }
+                    },
+                    status: Status.Pending,
                     underInvestigation: false
                   },
                   {
@@ -299,10 +671,18 @@ describe('User list tests', () => {
                         familyName: 'Huq'
                       }
                     ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'deactivated',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
+                    role: {
+                      id: 'STATE_REGISTRAR',
+                      label: {
+                        id: 'userRoles.stateRegistrar',
+                        defaultMessage: 'State Registrar',
+                        description: ''
+                      }
+                    },
+                    status: Status.Deactivated,
                     underInvestigation: true
                   },
                   {
@@ -314,14 +694,22 @@ describe('User list tests', () => {
                         familyName: 'Islam'
                       }
                     ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'disabled',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
+                    role: {
+                      id: 'FIELD_AGENT',
+                      label: {
+                        id: 'userRoles.fieldAgent',
+                        defaultMessage: 'Field Agent',
+                        description: ''
+                      }
+                    },
+                    status: Status.Disabled,
                     underInvestigation: false
                   }
                 ]
-              }
+              } satisfies SearchUsersQuery['searchUsers']
             }
           }
         }
@@ -333,25 +721,27 @@ describe('User list tests', () => {
           configurable: true,
           value: 1100
         })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
+        const testComponent = await createTestComponent(<UserList />, {
+          store,
+          path: TEAM_USER_LIST,
+          initialEntries: [
+            TEAM_USER_LIST +
+              '?' +
+              stringify({
                 locationId: '0d8474da-0361-4d32-979e-af91f012340a'
               })
-            }}
-          />,
-          { store, history, graphqlMocks: userListMock }
-        )
+          ],
+          graphqlMocks: userListMock
+        })
 
         // wait for mocked data to load mockedProvider
         await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
-        testComponent.update()
-        component = testComponent
+        testComponent.component.update()
+        component = testComponent.component
+        router = testComponent.router
       })
 
       it('renders list of users', () => {
@@ -389,7 +779,9 @@ describe('User list tests', () => {
           .at(0)
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
-        expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
+        expect(router.state.location.pathname).toMatch(
+          /.user\/(\w)+\/preview\/*/
+        )
       })
 
       it('clicking on menu options Resend invite sends invite', async () => {
@@ -648,747 +1040,4 @@ describe('User list tests', () => {
       })
     })
   })
-
-  /* Todo: fix after adding pagination in ListView */
-
-  /*describe('Pagination test', () => {
-    it('renders no pagination block when the total amount of data is not applicable for pagination', async () => {
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 5,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'pending',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'disabled',
-                    underInvestigation: false
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const app = testComponent
-      expect(app.find('#pagination').hostNodes()).toHaveLength(0)
-    })
-    it('renders pagination block with proper page value when the total amount of data is applicable for pagination', async () => {
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 15,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b796',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ashraful',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'ma.alam',
-                    role: 'FIELD_AGENT',
-                    type: 'CHA',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b797',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Lovely',
-                        familyName: 'Khatun'
-                      }
-                    ],
-                    username: 'l.khatun',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b794',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah'
-                      }
-                    ],
-                    username: 'ma.abdullah',
-                    role: 'NATIONAL_REGISTRAR',
-                    type: 'SECRETARY',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b798',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Seikh',
-                        familyName: 'Farid'
-                      }
-                    ],
-                    username: 'ms.farid',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b799',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Jahangir',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'mj.alam',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const app = testComponent
-      expect(app.find('#load_more_button').hostNodes().text()).toContain(
-        'Show next 10'
-      )
-    })
-    it('renders next page of the user list when the next page button is pressed', async () => {
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 15,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b796',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ashraful',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'ma.alam',
-                    role: 'FIELD_AGENT',
-                    type: 'CHA',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b797',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Lovely',
-                        familyName: 'Khatun'
-                      }
-                    ],
-                    username: 'l.khatun',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b794',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah'
-                      }
-                    ],
-                    username: 'ma.abdullah',
-                    role: 'NATIONAL_REGISTRAR',
-                    type: 'SECRETARY',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b798',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Seikh',
-                        familyName: 'Farid'
-                      }
-                    ],
-                    username: 'ms.farid',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b799',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Jahangir',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'mj.alam',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  }
-                ]
-              }
-            }
-          }
-        },
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 20
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 15,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b796',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ashraful',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'ma.alam',
-                    role: 'FIELD_AGENT',
-                    type: 'CHA',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b797',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Lovely',
-                        familyName: 'Khatun'
-                      }
-                    ],
-                    username: 'l.khatun',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b794',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah'
-                      }
-                    ],
-                    username: 'ma.abdullah',
-                    role: 'NATIONAL_REGISTRAR',
-                    type: 'SECRETARY',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b798',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Seikh',
-                        familyName: 'Farid'
-                      }
-                    ],
-                    username: 'ms.farid',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b799',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Jahangir',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'mj.alam',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b800',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Ashraful',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'a.alam',
-                    role: 'FIELD_AGENT',
-                    type: 'CHA',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b801',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Beauty',
-                        familyName: 'Khatun'
-                      }
-                    ],
-                    username: 'b.khatun',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b802',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Abu',
-                        familyName: 'Abdullah'
-                      }
-                    ],
-                    username: 'a.abdullah',
-                    role: 'NATIONAL_REGISTRAR',
-                    type: 'SECRETARY',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b803',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Seikh',
-                        familyName: 'Farid'
-                      }
-                    ],
-                    username: 's.farid',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b804',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Jahangir',
-                        familyName: 'Alam'
-                      }
-                    ],
-                    username: 'j.alam',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active'
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const app = testComponent
-      expect(app.find('#load_more_button').hostNodes()).toHaveLength(1)
-
-      app.find('#load_more_button').hostNodes().simulate('click')
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      expect(app.find('#load_more_button').hostNodes()).toHaveLength(0)
-    })
-  })*/
 })

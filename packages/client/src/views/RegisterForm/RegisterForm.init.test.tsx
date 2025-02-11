@@ -27,9 +27,10 @@ import {
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { vi } from 'vitest'
 
-import { EventType, SystemRoleType, Status } from '@client/utils/gateway'
+import { EventType, Status } from '@client/utils/gateway'
 import { storage } from '@client/storage'
 import { UserDetails } from '@client/utils/userUtils'
+import { formatUrl } from '@client/navigation'
 describe('when user logs in', () => {
   // Some mock data
   const draft1 = createDeclaration(EventType.Birth)
@@ -60,18 +61,18 @@ describe('when user logs in', () => {
       }
     ],
     mobile: '+260921111111',
-    systemRole: SystemRoleType.NationalSystemAdmin,
     role: {
-      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-      labels: [
-        {
-          lang: 'en',
-          label: 'National System Admin'
-        }
-      ]
+      label: {
+        id: 'userRoles.nationalSystemAdmin',
+        defaultMessage: 'National System Admin',
+        description: 'National System Admin'
+      }
     },
     status: 'active' as Status,
-    localRegistrar: { name: [], role: 'FIELD_AGENT' as SystemRoleType }
+    localRegistrar: {
+      name: [],
+      role: 'FIELD_AGENT'
+    }
   }
 
   const indexedDB = {
@@ -185,30 +186,29 @@ describe('when there is no user-data saved', () => {
 
 describe('when user is in the register form before initial draft load', () => {
   it('throws error when draft not found after initial drafts load', async () => {
-    const { store, history } = await createTestStore()
+    const { store } = await createTestStore()
 
-    const mock: any = vi.fn()
     const draft = createDeclaration(EventType.Birth)
     const form = await getRegisterFormFromStore(store, EventType.Birth)
 
     try {
       await createTestComponent(
-        // @ts-ignore
         <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
           registerForm={form}
           declaration={draft}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-          match={{
-            params: { declarationId: '', pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
         />,
-        { store, history }
+        {
+          store,
+          path: DRAFT_BIRTH_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(DRAFT_BIRTH_PARENT_FORM_PAGE, {
+              declarationId: '',
+              pageId: '',
+              groupId: ''
+            })
+          ]
+        }
       )
     } catch (error) {
       expect(error).toBeInstanceOf(Error)

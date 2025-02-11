@@ -9,52 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { appRouter, t } from '@events/router'
-const { createCallerFactory } = t
-import { vi } from 'vitest'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  getEventIndexName,
+  getOrCreateClient
+} from '@events/storage/elasticsearch'
+
 import { indexAllEvents } from './indexing'
-
-import {
-  setupServer as setupMongoServer,
-  resetServer as resetMongoServer
-} from '@events/storage/__mocks__/mongodb'
-import {
-  getOrCreateClient,
-  resetServer as resetESServer,
-  setupServer as setupESServer
-} from '@events/storage/__mocks__/elasticsearch'
-
-vi.mock('@events/storage/mongodb')
-vi.mock('@events/storage/elasticsearch')
-
-function createClient() {
-  const createCaller = createCallerFactory(appRouter)
-  const caller = createCaller({
-    user: { id: '1', primaryOfficeId: '123' },
-    token: 'FAKE_TOKEN'
-  })
-
-  return caller
-}
-
-beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 200000)
-afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
-
-const client = createClient()
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 test('indexes all records from MongoDB with one function call', async () => {
-  await client.event.create({
-    transactionId: '1',
-    type: 'birth'
-  })
-  await resetESServer()
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
 
   const esClient = getOrCreateClient()
 
-  await indexAllEvents()
+  await indexAllEvents(tennisClubMembershipEvent)
+
+  for (let i = 0; i < 2; i++) {
+    await client.event.create(generator.event.create())
+  }
 
   const body = await esClient.search({
-    index: 'events',
+    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
     body: {
       query: {
         match_all: {}
@@ -62,18 +39,18 @@ test('indexes all records from MongoDB with one function call', async () => {
     }
   })
 
-  expect(body.hits.hits).toHaveLength(1)
+  expect(body.hits.hits).toHaveLength(2)
 })
 
-test('records are automatically indexed', async () => {
-  await client.event.create({
-    transactionId: '1',
-    type: 'birth'
-  })
+test('records are automatically indexed when they are created', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  await client.event.create(generator.event.create())
 
   const esClient = getOrCreateClient()
   const body = await esClient.search({
-    index: 'events',
+    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
     body: {
       query: {
         match_all: {}

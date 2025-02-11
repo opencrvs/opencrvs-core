@@ -29,9 +29,13 @@ import { approveCorrectionRoute } from '@workflow/records/handler/correction/app
 import { requestCorrectionRoute } from '@workflow/records/handler/correction/request'
 import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
 import { eventNotificationHandler } from '@workflow/records/handler/eventNotificationHandler'
+import * as Hapi from '@hapi/hapi'
+import { SCOPES } from '@opencrvs/commons/authentication'
+import { upsertRegistrationHandler } from '@workflow/records/handler/upsert-identifiers'
+import { updateField } from '@workflow/records/handler/update-field'
 
 export const getRoutes = () => {
-  const routes = [
+  const routes: Hapi.ServerRoute[] = [
     // used for tests to check JWT auth
     {
       method: 'GET',
@@ -39,7 +43,7 @@ export const getRoutes = () => {
       handler: (request: any, h: any) => {
         return 'success'
       },
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -53,7 +57,7 @@ export const getRoutes = () => {
           success: true
         }
       },
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
@@ -63,7 +67,10 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/records/{id}/confirm',
       handler: markEventAsRegisteredCallbackHandler,
-      config: {
+      options: {
+        auth: {
+          scope: [SCOPES.RECORD_CONFIRM_REGISTRATION]
+        },
         tags: ['api'],
         description:
           'Register event based on tracking id and registration number.'
@@ -71,9 +78,26 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/records/{id}/upsert-identifiers',
+      handler: upsertRegistrationHandler,
+      options: {
+        tags: ['api'],
+        description:
+          'Upsert Register event based on tracking id and registration number.'
+      }
+    },
+    {
+      method: 'POST',
       path: '/create-record',
       handler: createRecordHandler,
-      config: {
+      options: {
+        auth: {
+          scope: [
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE
+          ]
+        },
         tags: ['api'],
         description: 'Create record endpoint'
       }
@@ -82,7 +106,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/download-record',
       handler: downloadRecordHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Download record endpoint'
       }
@@ -91,7 +115,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/unassign-record',
       handler: unassignRecordHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Unassign record endpoint'
       }
@@ -100,7 +124,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/records/{id}/view',
       handler: viewRecordHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'View record endpoint'
       }
@@ -109,7 +133,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/records/{id}/duplicate',
       handler: duplicateRecordHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Unassign record endpoint'
       }
@@ -118,7 +142,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/records/{id}/verify',
       handler: verifyRecordHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Verify record endpoint'
       }
@@ -127,7 +151,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/records/{id}/not-duplicate',
       handler: markAsNotDuplicateHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Mark as not-duplicate record endpoint'
       }
@@ -136,7 +160,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/records/event-notification',
       handler: eventNotificationHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Saves full fhir bundle to search and hearth'
       }
@@ -152,7 +176,16 @@ export const getRoutes = () => {
     approveCorrectionRoute,
     rejectCorrectionRoute,
     requestCorrectionRoute,
-    makeCorrectionRoute
+    makeCorrectionRoute,
+    {
+      method: 'POST',
+      path: '/records/{id}/update-field',
+      handler: updateField,
+      options: {
+        tags: ['api'],
+        description: 'Update a single field in a registration'
+      }
+    }
   ]
 
   return routes

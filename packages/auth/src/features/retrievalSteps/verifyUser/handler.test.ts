@@ -11,12 +11,12 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import * as codeService from '@auth/features/verifyCode/service'
-import { createServer } from '@auth/server'
+import { AuthServer, createServer } from '@auth/server'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('verifyUser handler receives a request', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()
@@ -49,7 +49,7 @@ describe('verifyUser handler receives a request', () => {
       jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
       fetch.mockResponse(
         JSON.stringify({
-          userId: '1',
+          id: '1',
           username: 'fake_user_name',
           status: 'active',
           scope: ['demo'],
@@ -75,7 +75,7 @@ describe('verifyUser handler receives a request', () => {
 
       fetch.mockResponse(
         JSON.stringify({
-          userId: '1',
+          id: '1',
           username: 'fake_user_name',
           status: 'active',
           scope: ['admin'],

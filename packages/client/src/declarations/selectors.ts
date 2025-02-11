@@ -28,12 +28,16 @@ export const getInitialDeclarationsLoaded = (
   getKey(store, 'initialDeclarationsLoaded')
 
 const selectDeclaration =
-  <T extends IDeclaration | undefined>(declarationId: string) =>
+  <T extends IDeclaration | undefined>(declarationId?: string) =>
   (store: IStoreState) =>
-    getKey(store, 'declarations').find(({ id }) => declarationId === id) as T
+    declarationId
+      ? (getKey(store, 'declarations').find(
+          ({ id }) => declarationId === id
+        ) as T)
+      : (undefined as T)
 
 export const useDeclaration = <T extends IDeclaration | undefined>(
-  declarationId: string
+  declarationId?: string
 ) => {
   return useSelector(selectDeclaration<T>(declarationId))
 }

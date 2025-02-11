@@ -9,57 +9,53 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionDocument, CreatedAction, EventDocument } from '@events/schema'
-import { EventIndex, Status } from '@events/schema/EventIndex'
-import { getClient } from '@events/storage'
-import { getOrCreateClient } from '@events/storage/elasticsearch'
+import {
+  AddressFieldValue,
+  EventConfig,
+  EventDocument,
+  EventIndex,
+  FieldConfig,
+  FieldType,
+  getCurrentEventState
+} from '@opencrvs/commons/events'
 import { type estypes } from '@elastic/elasticsearch'
+import * as eventsDb from '@events/storage/mongodb/events'
+import {
+  getEventAliasName,
+  getEventIndexName,
+  getOrCreateClient
+} from '@events/storage/elasticsearch'
+import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
-
-function getStatusFromActions(actions: Array<ActionDocument>) {
-  return actions.reduce<Status>((status, action) => {
-    return status
-  }, 'CREATED')
-}
-
-function getAssignedUserFromActions(actions: Array<ActionDocument>) {
-  return actions.reduce<null | string>((status, action) => {
-    if (action.type === 'ASSIGN') {
-      return action.assignedTo
-    }
-    if (action.type === 'UNASSIGN') {
-      return null
-    }
-    return status
-  }, null)
-}
-
-function getData(actions: Array<ActionDocument>) {
-  return actions.reduce<Record<string, any>>((status, action) => {
-    if (action.type === 'CREATE') {
-      return action.data
-    }
-    return status
-  }, {})
-}
-
+import { z } from 'zod'
 function eventToEventIndex(event: EventDocument): EventIndex {
-  const creationAction = event.actions.find(
-    (action) => action.type === 'CREATE'
-  ) as CreatedAction
-  const latestAction = event.actions[event.actions.length - 1]
+  return encodeEventIndex(getCurrentEventState(event))
+}
 
+export type EncodedEventIndex = EventIndex
+export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
   return {
-    id: event.id,
-    type: event.type,
-    status: getStatusFromActions(event.actions),
-    createdAt: event.createdAt,
-    createdBy: creationAction.createdBy,
-    createdAtLocation: creationAction.createdAtLocation,
-    modifiedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(event.actions),
-    updatedBy: latestAction.createdBy,
-    data: getData(event.actions)
+    ...event,
+    data: Object.entries(event.data).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [encodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
+}
+
+export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
+  return {
+    ...event,
+    data: Object.entries(event.data).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [decodeFieldId(key)]: value
+      }),
+      {}
+    )
   }
 }
 
@@ -68,9 +64,25 @@ function eventToEventIndex(event: EventDocument): EventIndex {
  */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
 
-function createIndex(indexName: string) {
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+
+  if (!hasEventsIndex) {
+    await createIndex(indexName, getAllFields(eventConfiguration))
+  }
+}
+
+export async function createIndex(
+  indexName: string,
+  formFields: FieldConfig[]
+) {
   const client = getOrCreateClient()
-  return client.indices.create({
+
+  await client.indices.create({
     index: indexName,
     body: {
       mappings: {
@@ -84,47 +96,186 @@ function createIndex(indexName: string) {
           modifiedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
-          data: { type: 'object', enabled: true }
+          data: {
+            type: 'object',
+            properties: formFieldsToDataMapping(formFields)
+          }
         } satisfies EventIndexMapping
       }
     }
   })
+
+  return client.indices.putAlias({
+    index: indexName,
+    name: getEventAliasName()
+  })
 }
 
-export async function indexAllEvents() {
-  const mongoClient = await getClient()
-  const esClient = getOrCreateClient()
-  await createIndex('events')
+const SEPARATOR = '____'
 
-  const stream = mongoClient.collection('events').find().stream()
+export function encodeFieldId(fieldId: string) {
+  return fieldId.replaceAll('.', SEPARATOR)
+}
+
+function decodeFieldId(fieldId: string) {
+  return fieldId.replaceAll(SEPARATOR, '.')
+}
+
+function mapFieldTypeToElasticsearch(field: FieldConfig) {
+  switch (field.type) {
+    case FieldType.DATE:
+      // @TODO: This should be changed back to 'date'
+      // When we have proper validation of custom fields.
+      return { type: 'text' }
+    case FieldType.TEXT:
+    case FieldType.PARAGRAPH:
+    case FieldType.BULLET_LIST:
+    case FieldType.PAGE_HEADER:
+    case FieldType.EMAIL:
+      return { type: 'text' }
+    case FieldType.DIVIDER:
+    case FieldType.RADIO_GROUP:
+    case FieldType.SELECT:
+    case FieldType.COUNTRY:
+    case FieldType.CHECKBOX:
+    case FieldType.LOCATION:
+      return { type: 'keyword' }
+    case FieldType.ADDRESS:
+      const addressProperties = {
+        country: { type: 'keyword' },
+        province: { type: 'keyword' },
+        district: { type: 'keyword' },
+        urbanOrRural: { type: 'keyword' },
+        town: { type: 'keyword' },
+        residentialArea: { type: 'keyword' },
+        street: { type: 'keyword' },
+        number: { type: 'keyword' },
+        zipCode: { type: 'keyword' },
+        village: { type: 'keyword' }
+      } satisfies {
+        [K in keyof Required<
+          NonNullable<AddressFieldValue>
+        >]: estypes.MappingProperty
+      }
+      return {
+        type: 'object',
+        properties: addressProperties
+      }
+    case FieldType.FILE:
+      return {
+        type: 'object',
+        properties: {
+          filename: { type: 'keyword' },
+          originalFilename: { type: 'keyword' },
+          type: { type: 'keyword' }
+        }
+      }
+    default:
+      const _exhaustiveCheck: never = field
+      throw new Error(
+        `Unhandled field type: ${JSON.stringify(_exhaustiveCheck)}`
+      )
+  }
+}
+
+function formFieldsToDataMapping(fields: FieldConfig[]) {
+  return fields.reduce((acc, field) => {
+    return {
+      ...acc,
+      [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
+    }
+  }, {})
+}
+
+export async function indexAllEvents(eventConfiguration: EventConfig) {
+  const mongoClient = await eventsDb.getClient()
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+
+  if (!hasEventsIndex) {
+    await createIndex(indexName, getAllFields(eventConfiguration))
+  }
+
+  const stream = mongoClient.collection(indexName).find().stream()
 
   const transformedStreamData = new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
-    transform: (record, _encoding, callback) => {
+    transform: (record: EventDocument, _encoding, callback) => {
       callback(null, eventToEventIndex(record))
     }
   })
 
-  return esClient.helpers.bulk({
+  await esClient.helpers.bulk({
     retries: 3,
     wait: 3000,
     datasource: stream.pipe(transformedStreamData),
     onDocument: (doc: EventIndex) => ({
       index: {
-        _index: 'events',
+        _index: indexName,
         _id: doc.id
       }
     }),
     refresh: 'wait_for'
   })
 }
+
 export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()
-  return esClient.index({
-    index: 'events',
+  const indexName = getEventIndexName(event.type)
+
+  return esClient.update<EventIndex>({
+    index: indexName,
     id: event.id,
-    body: eventToEventIndex(event),
+    body: {
+      doc: eventToEventIndex(event),
+      doc_as_upsert: true
+    },
     refresh: 'wait_for'
   })
+}
+
+export async function deleteEventIndex(event: EventDocument) {
+  const esClient = getOrCreateClient()
+
+  const response = await esClient.delete({
+    index: getEventIndexName(event.type),
+    id: event.id,
+    refresh: 'wait_for'
+  })
+
+  return response
+}
+
+export async function getIndexedEvents() {
+  const esClient = getOrCreateClient()
+
+  const hasEventsIndex = await esClient.indices.exists({
+    index: getEventAliasName()
+  })
+
+  if (!hasEventsIndex) {
+    logger.error(
+      'Event index not created. Sending empty array. Ensure indexing is running.'
+    )
+    return []
+  }
+
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventAliasName(),
+    size: 10000,
+    request_cache: false
+  })
+
+  const events = z.array(EventIndex).parse(
+    response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
+  )
+
+  return events
 }

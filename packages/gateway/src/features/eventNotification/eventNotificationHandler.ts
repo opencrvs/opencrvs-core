@@ -35,7 +35,13 @@ export enum Code {
   HEALTH_FACILITY = 'HEALTH_FACILITY'
 }
 
-const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation', 'QuestionnaireResponse']
+const RESOURCE_TYPES = [
+  'Patient',
+  'RelatedPerson',
+  'Encounter',
+  'Observation',
+  'QuestionnaireResponse'
+]
 
 const resourceSchema = Joi.object({
   resourceType: Joi.string()

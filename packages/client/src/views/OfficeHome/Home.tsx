@@ -8,44 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getUserDetails } from '@client/profile/profileSelectors'
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { PERFORMANCE_HOME, REGISTRAR_HOME } from '@client/navigation/routes'
-import { Redirect } from 'react-router-dom'
-import { getDefaultPerformanceLocationId } from '@client/navigation'
-import { UserDetails } from '@client/utils/userUtils'
-import {
-  NATIONAL_REGISTRAR_ROLES,
-  NATL_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES,
-  SYS_ADMIN_ROLES
-} from '@client/utils/constants'
+import { useHomePage } from '@client/hooks/useHomePage'
+import React from 'react'
+import { Navigate } from 'react-router'
 
 export function Home() {
-  const userDetails = useSelector(getUserDetails)
-  const role = userDetails && userDetails.systemRole
-  const isRoleAdmins =
-    role &&
-    [
-      ...NATL_ADMIN_ROLES,
-      ...PERFORMANCE_MANAGEMENT_ROLES,
-      ...NATIONAL_REGISTRAR_ROLES
-    ].includes(role)
-  const roleIsLocalSysAdmin = role && SYS_ADMIN_ROLES.includes(role)
-
-  if (isRoleAdmins) return <Redirect to={PERFORMANCE_HOME} />
-  if (roleIsLocalSysAdmin)
-    return (
-      <Redirect
-        to={{
-          pathname: PERFORMANCE_HOME,
-          search: `?locationId=${getDefaultPerformanceLocationId(
-            userDetails as UserDetails
-          )}`
-        }}
-      />
-    )
-
-  return <Redirect to={REGISTRAR_HOME} />
+  const { path } = useHomePage()
+  return <Navigate to={path} />
 }

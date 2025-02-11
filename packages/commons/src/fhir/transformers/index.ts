@@ -1049,7 +1049,7 @@ function createQuestionnaireBuilder(): IFieldBuilders<
 
 const builders: IFieldBuilders = {
   _fhirIDMap: {
-    composition: (fhirBundle, fieldValue, context) => {
+    composition: (fhirBundle, fieldValue) => {
       fhirBundle.entry[0].resource.id = fieldValue as string
     },
     encounter: (fhirBundle, fieldValue, context) => {
@@ -1279,7 +1279,7 @@ const builders: IFieldBuilders = {
       )
       mother.id = fieldValue as string
     },
-    gender: (fhirBundle, fieldValue, context) => {
+    gender: (fhirBundle, fieldValue) => {
       const mother = selectOrCreatePersonResource(
         MOTHER_CODE,
         MOTHER_TITLE,
@@ -1290,7 +1290,7 @@ const builders: IFieldBuilders = {
     identifier: createIDBuilder(MOTHER_CODE, MOTHER_TITLE),
     name: createNameBuilder(MOTHER_CODE, MOTHER_TITLE),
     telecom: createTelecomBuilder(MOTHER_CODE, MOTHER_TITLE),
-    birthDate: (fhirBundle, fieldValue, context) => {
+    birthDate: (fhirBundle, fieldValue) => {
       const mother = selectOrCreatePersonResource(
         MOTHER_CODE,
         MOTHER_TITLE,
@@ -1298,7 +1298,7 @@ const builders: IFieldBuilders = {
       )
       mother.birthDate = fieldValue as string
     },
-    maritalStatus: (fhirBundle, fieldValue, context) => {
+    maritalStatus: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         MOTHER_CODE,
         MOTHER_TITLE,
@@ -1314,7 +1314,7 @@ const builders: IFieldBuilders = {
       )
       return createOccupationBulder(person, fieldValue as string)
     },
-    detailsExist: (fhirBundle, fieldValue, context) => {
+    detailsExist: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         MOTHER_CODE,
         MOTHER_TITLE,
@@ -1338,7 +1338,7 @@ const builders: IFieldBuilders = {
       )
       return createAgeOfIndividualInYearsBuilder(person, fieldValue)
     },
-    multipleBirth: (fhirBundle, fieldValue, context) => {
+    multipleBirth: (fhirBundle, fieldValue) => {
       const mother = selectOrCreatePersonResource(
         MOTHER_CODE,
         MOTHER_TITLE,
@@ -1349,7 +1349,7 @@ const builders: IFieldBuilders = {
     address: createAddressBuilder(MOTHER_CODE, MOTHER_TITLE),
     photo: createPhotoBuilder(MOTHER_CODE, MOTHER_TITLE),
     deceased: {
-      deceased: (fhirBundle, fieldValue, context) => {
+      deceased: (fhirBundle, fieldValue) => {
         const person = selectOrCreatePersonResource(
           MOTHER_CODE,
           MOTHER_TITLE,
@@ -1357,7 +1357,7 @@ const builders: IFieldBuilders = {
         )
         person.deceasedBoolean = fieldValue
       },
-      deathDate: (fhirBundle, fieldValue, context) => {
+      deathDate: (fhirBundle, fieldValue) => {
         const person = selectOrCreatePersonResource(
           MOTHER_CODE,
           MOTHER_TITLE,
@@ -1366,7 +1366,7 @@ const builders: IFieldBuilders = {
         person.deceasedDateTime = fieldValue
       }
     },
-    nationality: (fhirBundle, fieldValue, context) => {
+    nationality: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         MOTHER_CODE,
         MOTHER_TITLE,
@@ -1374,7 +1374,7 @@ const builders: IFieldBuilders = {
       )
       return createNationalityBuilder(person, fieldValue)
     },
-    dateOfMarriage: (fhirBundle, fieldValue, context) => {
+    dateOfMarriage: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         MOTHER_CODE,
         MOTHER_TITLE,
@@ -1382,7 +1382,7 @@ const builders: IFieldBuilders = {
       )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
-    educationalAttainment: (fhirBundle, fieldValue, context) => {
+    educationalAttainment: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         MOTHER_CODE,
         MOTHER_TITLE,
@@ -1392,7 +1392,7 @@ const builders: IFieldBuilders = {
     }
   },
   father: {
-    _fhirID: (fhirBundle, fieldValue, context) => {
+    _fhirID: (fhirBundle, fieldValue) => {
       const father = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1400,7 +1400,7 @@ const builders: IFieldBuilders = {
       )
       father.id = fieldValue as string
     },
-    gender: (fhirBundle, fieldValue, context) => {
+    gender: (fhirBundle, fieldValue) => {
       const father = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1411,7 +1411,7 @@ const builders: IFieldBuilders = {
     identifier: createIDBuilder(FATHER_CODE, FATHER_TITLE),
     name: createNameBuilder(FATHER_CODE, FATHER_TITLE),
     telecom: createTelecomBuilder(FATHER_CODE, FATHER_TITLE),
-    birthDate: (fhirBundle, fieldValue, context) => {
+    birthDate: (fhirBundle, fieldValue) => {
       const father = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1419,7 +1419,7 @@ const builders: IFieldBuilders = {
       )
       father.birthDate = fieldValue as string
     },
-    maritalStatus: (fhirBundle, fieldValue, context) => {
+    maritalStatus: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1435,7 +1435,7 @@ const builders: IFieldBuilders = {
       )
       return createOccupationBulder(person, fieldValue as string)
     },
-    detailsExist: (fhirBundle, fieldValue, context) => {
+    detailsExist: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1459,7 +1459,7 @@ const builders: IFieldBuilders = {
       )
       return createAgeOfIndividualInYearsBuilder(person, fieldValue)
     },
-    multipleBirth: (fhirBundle, fieldValue, context) => {
+    multipleBirth: (fhirBundle, fieldValue) => {
       const father = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1470,7 +1470,7 @@ const builders: IFieldBuilders = {
     address: createAddressBuilder(FATHER_CODE, FATHER_TITLE),
     photo: createPhotoBuilder(FATHER_CODE, FATHER_TITLE),
     deceased: {
-      deceased: (fhirBundle, fieldValue, context) => {
+      deceased: (fhirBundle, fieldValue) => {
         const person = selectOrCreatePersonResource(
           FATHER_CODE,
           FATHER_TITLE,
@@ -1478,7 +1478,7 @@ const builders: IFieldBuilders = {
         )
         person.deceasedBoolean = fieldValue
       },
-      deathDate: (fhirBundle, fieldValue, context) => {
+      deathDate: (fhirBundle, fieldValue) => {
         const person = selectOrCreatePersonResource(
           FATHER_CODE,
           FATHER_TITLE,
@@ -1487,7 +1487,7 @@ const builders: IFieldBuilders = {
         person.deceasedDateTime = fieldValue
       }
     },
-    nationality: (fhirBundle, fieldValue, context) => {
+    nationality: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1495,7 +1495,7 @@ const builders: IFieldBuilders = {
       )
       return createNationalityBuilder(person, fieldValue)
     },
-    dateOfMarriage: (fhirBundle, fieldValue, context) => {
+    dateOfMarriage: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1503,7 +1503,7 @@ const builders: IFieldBuilders = {
       )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
-    educationalAttainment: (fhirBundle, fieldValue, context) => {
+    educationalAttainment: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         FATHER_CODE,
         FATHER_TITLE,
@@ -1513,7 +1513,7 @@ const builders: IFieldBuilders = {
     }
   },
   spouse: {
-    _fhirID: (fhirBundle, fieldValue, context) => {
+    _fhirID: (fhirBundle, fieldValue) => {
       const spouse = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1521,7 +1521,7 @@ const builders: IFieldBuilders = {
       )
       spouse.id = fieldValue as string
     },
-    gender: (fhirBundle, fieldValue, context) => {
+    gender: (fhirBundle, fieldValue) => {
       const spouse = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1532,7 +1532,7 @@ const builders: IFieldBuilders = {
     identifier: createIDBuilder(SPOUSE_CODE, SPOUSE_TITLE),
     name: createNameBuilder(SPOUSE_CODE, SPOUSE_TITLE),
     telecom: createTelecomBuilder(SPOUSE_CODE, SPOUSE_TITLE),
-    birthDate: (fhirBundle, fieldValue, context) => {
+    birthDate: (fhirBundle, fieldValue) => {
       const spouse = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1540,7 +1540,7 @@ const builders: IFieldBuilders = {
       )
       spouse.birthDate = fieldValue as string
     },
-    maritalStatus: (fhirBundle, fieldValue, context) => {
+    maritalStatus: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1556,7 +1556,7 @@ const builders: IFieldBuilders = {
       )
       return createOccupationBulder(person, fieldValue as string)
     },
-    detailsExist: (fhirBundle, fieldValue, context) => {
+    detailsExist: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1583,7 +1583,7 @@ const builders: IFieldBuilders = {
     address: createAddressBuilder(SPOUSE_CODE, SPOUSE_TITLE),
     photo: createPhotoBuilder(SPOUSE_CODE, SPOUSE_TITLE),
 
-    nationality: (fhirBundle: Bundle, fieldValue: string, context: any) => {
+    nationality: (fhirBundle: Bundle, fieldValue: string) => {
       const person = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1591,7 +1591,7 @@ const builders: IFieldBuilders = {
       )
       return createNationalityBuilder(person, fieldValue)
     },
-    dateOfMarriage: (fhirBundle: Bundle, fieldValue: string, context: any) => {
+    dateOfMarriage: (fhirBundle: Bundle, fieldValue: string) => {
       const person = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1599,11 +1599,7 @@ const builders: IFieldBuilders = {
       )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
-    educationalAttainment: (
-      fhirBundle: Bundle,
-      fieldValue: string,
-      context: any
-    ) => {
+    educationalAttainment: (fhirBundle: Bundle, fieldValue: string) => {
       const person = selectOrCreatePersonResource(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -1613,7 +1609,7 @@ const builders: IFieldBuilders = {
     }
   },
   child: {
-    _fhirID: (fhirBundle, fieldValue, context) => {
+    _fhirID: (fhirBundle, fieldValue) => {
       const child = selectOrCreatePersonResource(
         CHILD_CODE,
         CHILD_TITLE,
@@ -1621,7 +1617,7 @@ const builders: IFieldBuilders = {
       )
       child.id = fieldValue
     },
-    gender: (fhirBundle, fieldValue, context) => {
+    gender: (fhirBundle, fieldValue) => {
       const child = selectOrCreatePersonResource(
         CHILD_CODE,
         CHILD_TITLE,
@@ -1632,7 +1628,7 @@ const builders: IFieldBuilders = {
     identifier: createIDBuilder(CHILD_CODE, CHILD_TITLE),
     name: createNameBuilder(CHILD_CODE, CHILD_TITLE),
     telecom: createTelecomBuilder(CHILD_CODE, CHILD_TITLE),
-    birthDate: (fhirBundle, fieldValue, context) => {
+    birthDate: (fhirBundle, fieldValue) => {
       const child = selectOrCreatePersonResource(
         CHILD_CODE,
         CHILD_TITLE,
@@ -1640,7 +1636,7 @@ const builders: IFieldBuilders = {
       )
       child.birthDate = fieldValue
     },
-    maritalStatus: (fhirBundle, fieldValue, context) => {
+    maritalStatus: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         CHILD_CODE,
         CHILD_TITLE,
@@ -1648,7 +1644,7 @@ const builders: IFieldBuilders = {
       )
       return createMaritalStatusBuilder(person, fieldValue)
     },
-    multipleBirth: (fhirBundle, fieldValue, context) => {
+    multipleBirth: (fhirBundle, fieldValue) => {
       const child = selectOrCreatePersonResource(
         CHILD_CODE,
         CHILD_TITLE,
@@ -1659,7 +1655,7 @@ const builders: IFieldBuilders = {
     address: createAddressBuilder(CHILD_CODE, CHILD_TITLE),
     photo: createPhotoBuilder(CHILD_CODE, CHILD_TITLE),
     deceased: {
-      deceased: (fhirBundle, fieldValue, context) => {
+      deceased: (fhirBundle, fieldValue) => {
         const person = selectOrCreatePersonResource(
           CHILD_CODE,
           CHILD_TITLE,
@@ -1667,7 +1663,7 @@ const builders: IFieldBuilders = {
         )
         person.deceasedBoolean = fieldValue
       },
-      deathDate: (fhirBundle, fieldValue, context) => {
+      deathDate: (fhirBundle, fieldValue) => {
         const person = selectOrCreatePersonResource(
           CHILD_CODE,
           CHILD_TITLE,
@@ -1676,7 +1672,7 @@ const builders: IFieldBuilders = {
         person.deceasedDateTime = fieldValue
       }
     },
-    nationality: (fhirBundle, fieldValue, context) => {
+    nationality: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         CHILD_CODE,
         CHILD_TITLE,
@@ -1684,7 +1680,7 @@ const builders: IFieldBuilders = {
       )
       return createNationalityBuilder(person, fieldValue)
     },
-    dateOfMarriage: (fhirBundle, fieldValue, context) => {
+    dateOfMarriage: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         CHILD_CODE,
         CHILD_TITLE,
@@ -1692,7 +1688,7 @@ const builders: IFieldBuilders = {
       )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
-    educationalAttainment: (fhirBundle, fieldValue, context) => {
+    educationalAttainment: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         CHILD_CODE,
         CHILD_TITLE,
@@ -1702,7 +1698,7 @@ const builders: IFieldBuilders = {
     }
   },
   deceased: {
-    _fhirID: (fhirBundle, fieldValue, context) => {
+    _fhirID: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1710,7 +1706,7 @@ const builders: IFieldBuilders = {
       )
       person.id = fieldValue
     },
-    gender: (fhirBundle, fieldValue, context) => {
+    gender: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1721,7 +1717,7 @@ const builders: IFieldBuilders = {
     identifier: createIDBuilder(DECEASED_CODE, DECEASED_TITLE),
     name: createNameBuilder(DECEASED_CODE, DECEASED_TITLE),
     telecom: createTelecomBuilder(DECEASED_CODE, DECEASED_TITLE),
-    birthDate: (fhirBundle, fieldValue, context) => {
+    birthDate: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1729,7 +1725,7 @@ const builders: IFieldBuilders = {
       )
       person.birthDate = fieldValue
     },
-    age: (fhirBundle, fieldValue, context) => {
+    age: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1745,7 +1741,7 @@ const builders: IFieldBuilders = {
       )
       return createAgeOfIndividualInYearsBuilder(person, fieldValue)
     },
-    maritalStatus: (fhirBundle, fieldValue, context) => {
+    maritalStatus: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1761,7 +1757,7 @@ const builders: IFieldBuilders = {
       )
       return createOccupationBulder(person, fieldValue as string)
     },
-    multipleBirth: (fhirBundle, fieldValue, context) => {
+    multipleBirth: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1772,7 +1768,7 @@ const builders: IFieldBuilders = {
     address: createAddressBuilder(DECEASED_CODE, DECEASED_TITLE),
     photo: createPhotoBuilder(DECEASED_CODE, DECEASED_TITLE),
     deceased: {
-      deceased: (fhirBundle, fieldValue, context) => {
+      deceased: (fhirBundle, fieldValue) => {
         const person = selectOrCreatePersonResource(
           DECEASED_CODE,
           DECEASED_TITLE,
@@ -1780,7 +1776,7 @@ const builders: IFieldBuilders = {
         )
         person.deceasedBoolean = fieldValue as boolean
       },
-      deathDate: (fhirBundle, fieldValue, context) => {
+      deathDate: (fhirBundle, fieldValue) => {
         const person = selectOrCreatePersonResource(
           DECEASED_CODE,
           DECEASED_TITLE,
@@ -1803,7 +1799,7 @@ const builders: IFieldBuilders = {
         person.deceasedDateTime = fieldValue as string
       }
     },
-    nationality: (fhirBundle, fieldValue, context) => {
+    nationality: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1811,7 +1807,7 @@ const builders: IFieldBuilders = {
       )
       return createNationalityBuilder(person, fieldValue)
     },
-    dateOfMarriage: (fhirBundle, fieldValue, context) => {
+    dateOfMarriage: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1819,7 +1815,7 @@ const builders: IFieldBuilders = {
       )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
-    educationalAttainment: (fhirBundle, fieldValue, context) => {
+    educationalAttainment: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
         DECEASED_TITLE,
@@ -1829,7 +1825,7 @@ const builders: IFieldBuilders = {
     }
   },
   informant: {
-    _fhirID: (fhirBundle, fieldValue, context) => {
+    _fhirID: (fhirBundle, fieldValue) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         INFORMANT_CODE,
         INFORMANT_TITLE,
@@ -1837,7 +1833,7 @@ const builders: IFieldBuilders = {
       )
       relatedPersonResource.id = fieldValue
     },
-    _fhirIDPatient: (fhirBundle, fieldValue, context) => {
+    _fhirIDPatient: (fhirBundle, fieldValue) => {
       const person = selectOrCreateInformantResource(fhirBundle)
 
       /*
@@ -1850,7 +1846,7 @@ const builders: IFieldBuilders = {
         person.id = fieldValue as string
       }
     },
-    gender: (fhirBundle, fieldValue, context) => {
+    gender: (fhirBundle, fieldValue) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       person.gender = fieldValue
     },
@@ -1974,15 +1970,15 @@ const builders: IFieldBuilders = {
         )
       }
     },
-    birthDate: (fhirBundle, fieldValue, context) => {
+    birthDate: (fhirBundle, fieldValue) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       person.birthDate = fieldValue as string
     },
-    maritalStatus: (fhirBundle, fieldValue, context) => {
+    maritalStatus: (fhirBundle, fieldValue) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createMaritalStatusBuilder(person, fieldValue as string)
     },
-    multipleBirth: (fhirBundle, fieldValue, context) => {
+    multipleBirth: (fhirBundle, fieldValue) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       person.multipleBirthInteger = fieldValue as number
     },
@@ -2131,7 +2127,7 @@ const builders: IFieldBuilders = {
         )
       }
     },
-    nationality: (fhirBundle, fieldValue, context) => {
+    nationality: (fhirBundle, fieldValue) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createNationalityBuilder(person, fieldValue)
     },
@@ -2139,11 +2135,11 @@ const builders: IFieldBuilders = {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createOccupationBulder(person, fieldValue as string)
     },
-    dateOfMarriage: (fhirBundle, fieldValue, context) => {
+    dateOfMarriage: (fhirBundle, fieldValue) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createDateOfMarriageBuilder(person, fieldValue)
     },
-    educationalAttainment: (fhirBundle, fieldValue, context) => {
+    educationalAttainment: (fhirBundle, fieldValue) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createEducationalAttainmentBuilder(person, fieldValue)
     },
@@ -2164,7 +2160,7 @@ const builders: IFieldBuilders = {
     identifier: createIDBuilder(BRIDE_CODE, BRIDE_TITLE),
     name: createNameBuilder(BRIDE_CODE, BRIDE_TITLE),
     telecom: createTelecomBuilder(BRIDE_CODE, BRIDE_TITLE),
-    birthDate: (fhirBundle, fieldValue, context) => {
+    birthDate: (fhirBundle, fieldValue) => {
       const bride = selectOrCreatePersonResource(
         BRIDE_CODE,
         BRIDE_TITLE,
@@ -2182,7 +2178,7 @@ const builders: IFieldBuilders = {
     },
     address: createAddressBuilder(BRIDE_CODE, BRIDE_TITLE),
     photo: createPhotoBuilder(BRIDE_CODE, BRIDE_TITLE),
-    nationality: (fhirBundle, fieldValue, context) => {
+    nationality: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         BRIDE_CODE,
         BRIDE_TITLE,
@@ -2190,7 +2186,7 @@ const builders: IFieldBuilders = {
       )
       return createNationalityBuilder(person, fieldValue)
     },
-    dateOfMarriage: (fhirBundle, fieldValue, context) => {
+    dateOfMarriage: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         BRIDE_CODE,
         BRIDE_TITLE,
@@ -2211,7 +2207,7 @@ const builders: IFieldBuilders = {
     identifier: createIDBuilder(GROOM_CODE, GROOM_TITLE),
     name: createNameBuilder(GROOM_CODE, GROOM_TITLE),
     telecom: createTelecomBuilder(GROOM_CODE, GROOM_TITLE),
-    birthDate: (fhirBundle, fieldValue, context) => {
+    birthDate: (fhirBundle, fieldValue) => {
       const groom = selectOrCreatePersonResource(
         GROOM_CODE,
         GROOM_TITLE,
@@ -2229,7 +2225,7 @@ const builders: IFieldBuilders = {
     },
     address: createAddressBuilder(GROOM_CODE, GROOM_TITLE),
     photo: createPhotoBuilder(GROOM_CODE, GROOM_TITLE),
-    nationality: (fhirBundle, fieldValue, context) => {
+    nationality: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         GROOM_CODE,
         GROOM_TITLE,
@@ -2237,7 +2233,7 @@ const builders: IFieldBuilders = {
       )
       return createNationalityBuilder(person, fieldValue)
     },
-    dateOfMarriage: (fhirBundle, fieldValue, context) => {
+    dateOfMarriage: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         GROOM_CODE,
         GROOM_TITLE,
@@ -2247,7 +2243,7 @@ const builders: IFieldBuilders = {
     }
   },
   witnessOne: {
-    _fhirID: (fhirBundle, fieldValue, context) => {
+    _fhirID: (fhirBundle, fieldValue) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         WITNESS_ONE_CODE,
         WITNESS_ONE_TITLE,
@@ -2255,7 +2251,7 @@ const builders: IFieldBuilders = {
       )
       relatedPersonResource.id = fieldValue
     },
-    _fhirIDPatient: (fhirBundle, fieldValue, context) => {
+    _fhirIDPatient: (fhirBundle, fieldValue) => {
       const person = selectOrCreateWitnessResource(
         fhirBundle,
         WITNESS_ONE_CODE,
@@ -2321,7 +2317,7 @@ const builders: IFieldBuilders = {
         )
       }
     },
-    relationship: (fhirBundle, fieldValue, context) => {
+    relationship: (fhirBundle, fieldValue) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         WITNESS_ONE_CODE,
         WITNESS_ONE_TITLE,
@@ -2339,7 +2335,7 @@ const builders: IFieldBuilders = {
         }
       }
     },
-    otherRelationship: (fhirBundle, fieldValue, context) => {
+    otherRelationship: (fhirBundle, fieldValue) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         WITNESS_ONE_CODE,
         WITNESS_ONE_TITLE,
@@ -2360,7 +2356,7 @@ const builders: IFieldBuilders = {
     }
   },
   witnessTwo: {
-    _fhirID: (fhirBundle, fieldValue, context) => {
+    _fhirID: (fhirBundle, fieldValue) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         WITNESS_TWO_CODE,
         WITNESS_TWO_TITLE,
@@ -2368,7 +2364,7 @@ const builders: IFieldBuilders = {
       )
       relatedPersonResource.id = fieldValue
     },
-    _fhirIDPatient: (fhirBundle, fieldValue, context) => {
+    _fhirIDPatient: (fhirBundle, fieldValue) => {
       const person = selectOrCreateWitnessResource(
         fhirBundle,
         WITNESS_TWO_CODE,
@@ -2434,7 +2430,7 @@ const builders: IFieldBuilders = {
         )
       }
     },
-    relationship: (fhirBundle, fieldValue, context) => {
+    relationship: (fhirBundle, fieldValue) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         WITNESS_TWO_CODE,
         WITNESS_TWO_TITLE,
@@ -2452,7 +2448,7 @@ const builders: IFieldBuilders = {
         }
       }
     },
-    otherRelationship: (fhirBundle, fieldValue, context) => {
+    otherRelationship: (fhirBundle, fieldValue) => {
       const relatedPersonResource = selectOrCreateInformantSection(
         WITNESS_TWO_CODE,
         WITNESS_TWO_TITLE,

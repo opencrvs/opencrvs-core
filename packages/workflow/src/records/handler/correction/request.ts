@@ -12,7 +12,7 @@
 import { conflict } from '@hapi/boom'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { CorrectionRequestedRecord } from '@opencrvs/commons/types'
-import { uploadBase64ToMinio } from '@workflow/documents'
+import { uploadFileToMinio } from '@workflow/documents'
 import {
   getLoggedInPractitionerResource,
   getPractitionerOfficeId
@@ -26,6 +26,7 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest } from './utils'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const requestCorrectionRoute = createRoute({
   method: 'POST',
@@ -33,6 +34,7 @@ export const requestCorrectionRoute = createRoute({
   allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
   action: 'REQUEST_CORRECTION',
   includeHistoryResources: true,
+  allowedScopes: [SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION],
   handler: async (request, record): Promise<CorrectionRequestedRecord> => {
     const correctionDetails = validateRequest(
       CorrectionRequestInput,
@@ -51,7 +53,7 @@ export const requestCorrectionRoute = createRoute({
 
     const paymentAttachmentUrl =
       correctionDetails.payment?.attachmentData &&
-      (await uploadBase64ToMinio(
+      (await uploadFileToMinio(
         correctionDetails.payment.attachmentData,
         getAuthHeader(request)
       ))
@@ -59,7 +61,7 @@ export const requestCorrectionRoute = createRoute({
     const proofOfLegalCorrectionAttachments = await Promise.all(
       correctionDetails.attachments.map(async (attachment) => ({
         type: attachment.type,
-        url: await uploadBase64ToMinio(attachment.data, getAuthHeader(request))
+        url: await uploadFileToMinio(attachment.data, getAuthHeader(request))
       }))
     )
 

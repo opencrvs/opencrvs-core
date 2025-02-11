@@ -82,6 +82,7 @@ type AdvancedSeachParameters {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String
@@ -141,6 +142,7 @@ input AdvancedSearchParametersInput {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String
@@ -201,8 +203,6 @@ type ApplicationConfiguration {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  INFORMANT_SIGNATURE: Boolean
-  INFORMANT_SIGNATURE_REQUIRED: Boolean
   USER_NOTIFICATION_DELIVERY_METHOD: String
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
   DATE_OF_BIRTH_UNKNOWN: Boolean
@@ -220,8 +220,6 @@ input ApplicationConfigurationInput {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  INFORMANT_SIGNATURE: Boolean
-  INFORMANT_SIGNATURE_REQUIRED: Boolean
   USER_NOTIFICATION_DELIVERY_METHOD: String
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
   DATE_OF_BIRTH_UNKNOWN: Boolean
@@ -293,7 +291,6 @@ input AvatarInput {
 type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
-  FEE: BirthFee
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -317,22 +314,9 @@ type BirthEventSearchSet implements EventSearchSet {
   fatherIdentifier: String
 }
 
-type BirthFee {
-  ON_TIME: Float
-  LATE: Float
-  DELAYED: Float
-}
-
-input BirthFeeInput {
-  ON_TIME: Float
-  LATE: Float
-  DELAYED: Float
-}
-
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
-  FEE: BirthFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -403,41 +387,14 @@ type Certificate {
   collector: RelatedPerson
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
-  data: String
+  certificateTemplateId: String
 }
 
 input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  data: String
-}
-
-enum CertificateStatus {
-  ACTIVE
-  INACTIVE
-}
-
-type CertificateSVG {
-  id: ID!
-  svgCode: String!
-  svgFilename: String!
-  svgDateUpdated: String!
-  svgDateCreated: String!
-  user: String!
-  event: Event!
-  status: CertificateStatus!
-}
-
-input CertificateSVGInput {
-  id: ID
-  svgCode: String!
-  svgFilename: String!
-  svgDateUpdated: Int
-  svgDateCreated: Int
-  user: String!
-  event: Event!
-  status: CertificateStatus!
+  certificateTemplateId: String
 }
 
 type CertificationMetric {
@@ -572,7 +529,6 @@ scalar FieldValue
 
 type Death {
   REGISTRATION_TARGET: Int
-  FEE: DeathFee
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -586,19 +542,8 @@ type DeathEventSearchSet implements EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
-type DeathFee {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
-input DeathFeeInput {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
 input DeathInput {
   REGISTRATION_TARGET: Int
-  FEE: DeathFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -861,7 +806,6 @@ type IntegratedSystem {
 }
 
 enum IntegratingSystemType {
-  MOSIP
   OSIA
   OTHER
 }
@@ -934,7 +878,6 @@ scalar Map
 
 type Marriage {
   REGISTRATION_TARGET: Int
-  FEE: MarriageFee
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -950,19 +893,8 @@ type MarriageEventSearchSet implements EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
-type MarriageFee {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
-input MarriageFeeInput {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
 input MarriageInput {
   REGISTRATION_TARGET: Int
-  FEE: MarriageFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -1126,7 +1058,6 @@ type Mutation {
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
-  updateRole(systemRole: SystemRoleInput): Response!
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
@@ -1280,8 +1211,6 @@ type Query {
     to: Date
   ): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
-  searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
-  searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(
@@ -1313,7 +1242,6 @@ type Query {
     mobile: String
     email: String
     status: String
-    systemRole: String
     primaryOfficeId: String
     count: Int
     skip: Int
@@ -1417,8 +1345,6 @@ type Query {
     sortBy: String
     sortOrder: String
   ): [SystemRole!]
-  getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
-  getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
   informantSMSNotifications: [SMSNotification!]
 }
@@ -1855,12 +1781,11 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String
-  systemRole: SystemRoleType!
   role: Role!
   email: String
   status: Status!
   underInvestigation: Boolean
-  primaryOffice: Location
+  primaryOffice: Location!
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -1910,7 +1835,6 @@ input UserInput {
   mobile: String
   password: String
   status: Status
-  systemRole: SystemRoleType!
   role: String
   email: String
   primaryOffice: String

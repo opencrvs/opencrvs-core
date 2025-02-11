@@ -14,15 +14,15 @@ import { createStore } from '@client/store'
 import { CreatePassword } from './CreatePassword'
 import { ReactWrapper } from 'enzyme'
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('CreatePassword page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <CreatePassword goToStep={() => {}} setupData={{ userId: '123' }} />,
-      { store, history }
+      { store }
     )
 
     component = testComponent

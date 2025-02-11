@@ -15,7 +15,6 @@ import {
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { EventType } from '@client/utils/gateway'
-import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
@@ -23,13 +22,15 @@ import {
   createTestComponent,
   mockUserResponse,
   resizeWindow,
-  registrationClerkScopeToken
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { RequiresUpdate } from './RequiresUpdate'
@@ -38,13 +39,11 @@ import type {
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'
-import { vi, Mock } from 'vitest'
-
-const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as Mock
+import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
+import { REGISTRAR_HOME_TAB_PAGE } from '@client/navigation/routes'
 
 const mockFetchUserDetails = vi.fn()
 const mockListSyncController = vi.fn()
@@ -159,12 +158,11 @@ storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
 describe('OfficeHome sent for update tab related tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   const client = createClient(store)
 
   beforeAll(async () => {
-    getItem.mockReturnValue(registrationClerkScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
   })
 
   it('renders all items returned from graphql query in sent for update tab', async () => {
@@ -172,7 +170,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const birthEventRejectedDate = '2019-10-20T11:03:20.660Z'
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{
@@ -281,7 +279,7 @@ describe('OfficeHome sent for update tab related tests', () => {
           }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     const table = await waitForElement(testComponent, Workqueue)
@@ -301,7 +299,7 @@ describe('OfficeHome sent for update tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{
@@ -311,7 +309,7 @@ describe('OfficeHome sent for update tab related tests', () => {
           }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     const table = await waitForElement(testComponent, Workqueue)
@@ -321,8 +319,8 @@ describe('OfficeHome sent for update tab related tests', () => {
   })
 
   describe('handles download status', () => {
-    let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: ReactWrapper<{}, {}>
+    let testComponent: TestComponentWithRouteMock
+    let createdTestComponent: TestComponentWithRouteMock
     beforeEach(async () => {
       const TIME_STAMP = '1544188309380'
       Date.now = vi.fn(() => 1554055200000)
@@ -414,47 +412,45 @@ describe('OfficeHome sent for update tab related tests', () => {
 
       createdTestComponent = await createTestComponent(
         // @ts-ignore
-        <OfficeHome
-          match={{
-            params: {
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB_PAGE,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB_PAGE, {
               tabId: WORKQUEUE_TABS.requiresUpdate
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, apolloClient: client }
+            })
+          ]
+        }
       )
       testComponent = createdTestComponent
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
     })
 
     it('downloads the declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-icon'
       )
 
       downloadButton.hostNodes().simulate('click')
 
-      testComponent.update()
-
-      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
-      testComponent.find('#assign').hostNodes().simulate('click')
+      testComponent.component.update()
 
       expect(
-        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
+        testComponent.component.find('#assignment').hostNodes()
       ).toHaveLength(1)
+      testComponent.component.find('#assign').hostNodes().simulate('click')
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
+      expect(
+        testComponent.component
+          .find('#action-loading-ListItemAction-0')
+          .hostNodes()
+      )
 
       const action = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-Update'
       )
       action.hostNodes().simulate('click')
@@ -462,8 +458,9 @@ describe('OfficeHome sent for update tab related tests', () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
-      expect(history.location.pathname).toBe(
+      testComponent.component.update()
+
+      expect(testComponent.router.state.location.pathname).toBe(
         '/reviews/9a55d213-ad9f-4dcd-9418-340f3a7f6269/events/birth/parent/review'
       )
     })
@@ -476,20 +473,21 @@ describe('OfficeHome sent for update tab related tests', () => {
       )
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(storeDeclaration(downloadedDeclaration))
-      testComponent.update()
+      testComponent.component.update()
       expect(
-        testComponent.find('#ListItemAction-1-icon-failed').hostNodes()
+        testComponent.component
+          .find('#ListItemAction-1-icon-failed')
+          .hostNodes()
       ).toHaveLength(1)
     })
   })
 })
 
 describe('Tablet tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   beforeAll(async () => {
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
     resizeWindow(800, 1280)
   })
 
@@ -501,7 +499,7 @@ describe('Tablet tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{
@@ -568,7 +566,7 @@ describe('Tablet tests', () => {
           }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     const element = await waitForElement(testComponent, '#name_0')
@@ -579,7 +577,7 @@ describe('Tablet tests', () => {
     })
     testComponent.update()
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/rejectTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })

@@ -19,7 +19,6 @@ import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
-import { goToHome } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -36,7 +35,14 @@ import { isEmpty } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import * as routes from '@client/navigation/routes'
 import styled from 'styled-components'
+import ProtectedComponent from '@client/components/ProtectedComponent'
+import { SCOPES } from '@opencrvs/commons/client'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -48,14 +54,10 @@ interface IState {
 }
 interface IProps {
   draftId: string
-  config: IOfflineData
-  user: UserDetails | null
   declaration: IDeclaration
   event: EventType
   duplicate?: boolean
   onClose: () => void
-  archiveDeclaration: typeof archiveDeclaration
-  goToHome: typeof goToHome
   confirmRejectionEvent: (
     declaration: IDeclaration,
     status: string,
@@ -64,7 +66,20 @@ interface IProps {
   ) => void
 }
 
-type IFullProps = IntlShapeProps & IProps & { form: IRejectRegistrationForm }
+type IDispatchProps = {
+  archiveDeclaration: typeof archiveDeclaration
+}
+
+type StateProps = {
+  config: IOfflineData
+  user: UserDetails | null
+  form: IRejectRegistrationForm
+}
+
+type IFullProps = IntlShapeProps &
+  RouteComponentProps<IProps> &
+  StateProps &
+  IDispatchProps
 
 class RejectRegistrationView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
@@ -156,23 +171,28 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
             >
               {intl.formatMessage(buttonMessages.cancel)}
             </Button>,
-            <Button
-              key="submit_archive"
-              id="submit_archive"
-              size="medium"
-              type="secondaryNegative"
-              onClick={() => {
-                this.props.archiveDeclaration(
-                  payload.id,
-                  payload.reason as string,
-                  payload.comment as string
-                )
-                this.props.goToHome()
-              }}
-              disabled={!this.state.enableArchiveBtn}
+            <ProtectedComponent
+              key="protected_submit_archive"
+              scopes={[SCOPES.RECORD_DECLARATION_ARCHIVE]}
             >
-              {intl.formatMessage(buttonMessages.archive)}
-            </Button>,
+              <Button
+                key="submit_archive"
+                id="submit_archive"
+                size="medium"
+                type="secondaryNegative"
+                onClick={() => {
+                  this.props.archiveDeclaration(
+                    payload.id,
+                    payload.reason as string,
+                    payload.comment as string
+                  )
+                  this.props.router.navigate(routes.HOME)
+                }}
+                disabled={!this.state.enableArchiveBtn}
+              >
+                {intl.formatMessage(buttonMessages.archive)}
+              </Button>
+            </ProtectedComponent>,
             <Button
               key="submit_reject_form"
               size="medium"
@@ -208,14 +228,15 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 }
 
-export const RejectRegistrationForm = connect(
-  (state: IStoreState) => ({
-    form: rejectRegistration,
-    config: getOfflineData(state),
-    user: getUserDetails(state)
-  }),
-  {
-    archiveDeclaration,
-    goToHome
-  }
-)(injectIntl(RejectRegistrationView))
+export const RejectRegistrationForm = withRouter(
+  connect<StateProps, IDispatchProps, RouteComponentProps<IProps>, IStoreState>(
+    (state: IStoreState) => ({
+      form: rejectRegistration,
+      config: getOfflineData(state),
+      user: getUserDetails(state)
+    }),
+    {
+      archiveDeclaration
+    }
+  )(injectIntl(RejectRegistrationView))
+)

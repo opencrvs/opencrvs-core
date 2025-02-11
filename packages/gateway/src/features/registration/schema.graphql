@@ -159,6 +159,7 @@ type History {
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
+  certificateTemplateId: String
   noSupportingDocumentationRequired: Boolean
   otherReason: String
   #This doesn't resolve to the System model properly rather
@@ -418,14 +419,15 @@ input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  data: String
+  certificateTemplateId: String
 }
 
 type Certificate { # -> Document Reference
   collector: RelatedPerson # -> .extension
+  certifier: User # -> .extension
   hasShowedVerifiedDocument: Boolean # -> .extension
   payments: [Payment] # -> .extension
-  data: String # -> .content.attachment.data base64
+  certificateTemplateId: String
 }
 
 input QuestionnaireQuestionInput {
@@ -531,8 +533,6 @@ union RecordDetails = BirthRegistration | DeathRegistration
 
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
-  searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
-  searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(
@@ -570,13 +570,19 @@ input IdentifierInput {
 
 input ConfirmRegistrationInput {
   registrationNumber: String!
-  error: String
   identifiers: [IdentifierInput!]
+  comment: String # For record audit
 }
 
 input RejectRegistrationInput {
   reason: String!
   comment: String
+}
+
+input UpdateFieldInput {
+  fieldId: String!
+  valueString: String
+  valueBoolean: Boolean
 }
 
 type Mutation {
@@ -657,4 +663,10 @@ type Mutation {
   ): ID!
   confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
   rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
+  upsertRegistrationIdentifier(
+    id: ID!
+    identifierType: String!
+    identifierValue: String!
+  ): ID!
+  updateField(id: ID!, details: UpdateFieldInput!): Boolean!
 }

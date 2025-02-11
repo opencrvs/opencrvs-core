@@ -11,10 +11,14 @@
 import {
   mockDeclarationData,
   createTestApp,
-  flushPromises
+  flushPromises,
+  setScopes,
+  waitForReady,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ReviewSection } from '@client/forms'
+import { SCOPES } from '@opencrvs/commons/client'
 import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   IDeclaration,
@@ -25,13 +29,12 @@ import {
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { Store } from 'redux'
-import { History } from 'history'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-let wrapper: ReactWrapper<{}, {}>
+let wrapper: ReactWrapper
 let store: Store
-let history: History
+let router: TestComponentWithRouteMock['router']
 
 const declaration: IDeclaration = createReviewDeclaration(
   '72c18939-70c1-40b4-9b80-b162c4871160',
@@ -59,21 +62,34 @@ declaration.data.registration = {
 
 describe('Review form for an declaration', () => {
   beforeEach(async () => {
-    const appBundle = await createTestApp()
+    await flushPromises()
 
-    wrapper = appBundle.app
-    store = appBundle.store
-    history = appBundle.history
-
-    store.dispatch(storeDeclaration(declaration))
-
-    history.replace(
+    const appBundle = await createTestApp(undefined, [
       formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
         declarationId: declaration.id,
         pageId: ReviewSection.Review,
         groupId: 'review-view-group'
       })
+    ])
+
+    wrapper = appBundle.app
+    store = appBundle.store
+    router = appBundle.router
+
+    setScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION], store)
+    await waitForReady(wrapper)
+    store.dispatch(storeDeclaration(declaration))
+
+    await flushPromises()
+    router.navigate(
+      formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
+        declarationId: declaration.id,
+        pageId: ReviewSection.Review,
+        groupId: 'review-view-group'
+      }),
+      { replace: true }
     )
+
     await waitForElement(wrapper, 'CorrectionReviewFormComponent')
   })
 
@@ -100,7 +116,7 @@ describe('Review form for an declaration', () => {
     wrapper.find('#exit-btn').hostNodes().simulate('click')
     wrapper.update()
 
-    expect(history.location.pathname).toContain(WORKQUEUE_TABS.inProgress)
+    expect(router.state.location.pathname).toContain(WORKQUEUE_TABS.inProgress)
   })
 
   it('should disable the continue button if no changes have been made', async () => {
@@ -150,6 +166,6 @@ describe('Review form for an declaration', () => {
     wrapper.find('#continue_button').hostNodes().simulate('click')
     wrapper.update()
 
-    expect(history.location.pathname).toContain('/supportingDocuments')
+    expect(router.state.location.pathname).toContain('/supportingDocuments')
   })
 })

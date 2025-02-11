@@ -13,9 +13,9 @@ import {
   createTestComponent,
   mockDeclarationData,
   mockDeathDeclarationData,
-  createRouterProps
+  TestComponentWithRouteMock
 } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
+
 import * as React from 'react'
 import { CorrectorForm } from './CorrectorForm'
 import { CorrectionSection } from '@client/forms'
@@ -24,9 +24,9 @@ import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
-let wrapper: ReactWrapper<{}, {}>
+let wrapper: TestComponentWithRouteMock
 
 const birthDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
@@ -40,56 +40,47 @@ const deathDeclaration: IDeclaration = {
   event: EventType.Death
 }
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('Corrector form', () => {
   describe('for a birth registration', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
-      wrapper = await createTestComponent(
-        <CorrectionForm
-          {...createRouterProps(
-            formatUrl(CERTIFICATE_CORRECTION, {
-              declarationId: birthDeclaration.id,
-              pageId: CorrectionSection.Corrector
-            }),
-            { isNavigatedInsideApp: false },
-            {
-              matchParams: {
-                declarationId: birthDeclaration.id,
-                pageId: CorrectionSection.Corrector
-              }
-            }
-          )}
-        />,
-        {
-          store,
-          history
-        }
-      )
+
+      //  NOTE this is different component than **CorrectorForm**
+      wrapper = await createTestComponent(<CorrectionForm />, {
+        store,
+        path: CERTIFICATE_CORRECTION,
+        initialEntries: [
+          formatUrl(CERTIFICATE_CORRECTION, {
+            declarationId: birthDeclaration.id,
+            pageId: CorrectionSection.Corrector
+          })
+        ]
+      })
     })
 
     it('should disable the continue button if no option is selected', () => {
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeTruthy()
     })
 
     it('should not disable the continue button if an option is selected', () => {
-      wrapper
+      wrapper.component
         .find('#relationship_FATHER')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
-      wrapper.update()
+      wrapper.component.update()
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeFalsy()
     })
 
     it('should go to verify section', () => {
-      wrapper.find('#confirm_form').hostNodes().simulate('click')
-      wrapper.update()
-      expect(history.location.pathname).toContain('/verify/father')
+      wrapper.component.find('#confirm_form').hostNodes().simulate('click')
+      wrapper.component.update()
+      expect(wrapper.router.state.location.pathname).toContain('/verify/father')
     })
   })
   describe('for a birth registration with father details', () => {
@@ -108,12 +99,21 @@ describe('Corrector form', () => {
         <CorrectorForm declaration={declaration} />,
         {
           store,
-          history
+          path: CERTIFICATE_CORRECTION,
+          initialEntries: [
+            formatUrl(CERTIFICATE_CORRECTION, {
+              declarationId: birthDeclaration.id,
+              pageId: CorrectionSection.Corrector
+            })
+          ]
         }
       )
     })
+
     it('should show the father option', () => {
-      expect(wrapper.find('#relationship_FATHER').hostNodes()).toHaveLength(1)
+      expect(
+        wrapper.component.find('#relationship_FATHER').hostNodes()
+      ).toHaveLength(1)
     })
   })
 
@@ -132,56 +132,44 @@ describe('Corrector form', () => {
       wrapper = await createTestComponent(
         <CorrectorForm declaration={declaration} />,
         {
-          store,
-          history
+          store
         }
       )
     })
     it('should not show the father option', () => {
-      expect(wrapper.exists('#relationship_FATHER')).toBeFalsy()
+      expect(wrapper.component.exists('#relationship_FATHER')).toBeFalsy()
     })
   })
 
   describe('for a death registration', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(deathDeclaration))
-      wrapper = await createTestComponent(
-        <CorrectionForm
-          {...createRouterProps(
-            formatUrl(CERTIFICATE_CORRECTION, {
-              declarationId: deathDeclaration.id,
-              pageId: CorrectionSection.Corrector
-            }),
-            { isNavigatedInsideApp: false },
-            {
-              matchParams: {
-                declarationId: deathDeclaration.id,
-                pageId: CorrectionSection.Corrector
-              }
-            }
-          )}
-        />,
-        {
-          store,
-          history
-        }
-      )
+      wrapper = await createTestComponent(<CorrectionForm />, {
+        store,
+        path: CERTIFICATE_CORRECTION,
+        initialEntries: [
+          formatUrl(CERTIFICATE_CORRECTION, {
+            declarationId: deathDeclaration.id,
+            pageId: CorrectionSection.Corrector
+          })
+        ]
+      })
     })
 
     it('should disable the continue button if no option is selected', () => {
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeTruthy()
     })
 
     it('should not disable the continue button if an option is selected', () => {
-      wrapper
+      wrapper.component
         .find('#relationship_INFORMANT_SPOUSE')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
-      wrapper.update()
+      wrapper.component.update()
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeFalsy()
     })
   })
@@ -189,48 +177,37 @@ describe('Corrector form', () => {
   describe('for an declaration', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
-      wrapper = await createTestComponent(
-        <CorrectionForm
-          {...createRouterProps(
-            formatUrl(CERTIFICATE_CORRECTION, {
-              declarationId: birthDeclaration.id,
-              pageId: CorrectionSection.Corrector
-            }),
-            { isNavigatedInsideApp: false },
-            {
-              matchParams: {
-                declarationId: birthDeclaration.id,
-                pageId: CorrectionSection.Corrector
-              }
-            }
-          )}
-        />,
-        {
-          store,
-          history
-        }
-      )
+      wrapper = await createTestComponent(<CorrectionForm />, {
+        store,
+        path: CERTIFICATE_CORRECTION,
+        initialEntries: [
+          formatUrl(CERTIFICATE_CORRECTION, {
+            declarationId: birthDeclaration.id,
+            pageId: CorrectionSection.Corrector
+          })
+        ]
+      })
     })
 
     it('should disable the continue button if others option is selected without specifying the relationship', () => {
-      wrapper
+      wrapper.component
         .find('#relationship_OTHER')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
-      wrapper.update()
+      wrapper.component.update()
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeTruthy()
     })
 
     it('should not disable the continue button if others option is selected with the relationship specified', () => {
-      wrapper
+      wrapper.component
         .find('#relationship_OTHER')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
-      wrapper.update()
+      wrapper.component.update()
 
-      wrapper
+      wrapper.component
         .find('input[name="relationship.nestedFields.otherRelationship"]')
         .simulate('change', {
           target: {
@@ -238,18 +215,20 @@ describe('Corrector form', () => {
             value: 'Grandma'
           }
         })
-      wrapper.update()
+      wrapper.component.update()
 
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeFalsy()
     })
 
     it('should cancel the correction when the cross button is pressed', () => {
-      wrapper.find('#crcl-btn').hostNodes().simulate('click')
-      wrapper.update()
+      wrapper.component.find('#crcl-btn').hostNodes().simulate('click')
+      wrapper.component.update()
 
-      expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
+      expect(wrapper.router.state.location.pathname).toContain(
+        WORKQUEUE_TABS.readyForReview
+      )
     })
   })
 })

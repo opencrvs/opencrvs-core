@@ -13,8 +13,14 @@ export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc'
 }
+
+type EventPayload = {
+  eventName: string
+  jurisdictionId?: string
+}
+
 export interface IAdvancedSearchParam {
-  event?: string
+  event?: EventPayload[]
   name?: string
   registrationStatuses?: string[]
   dateOfEvent?: string
@@ -45,6 +51,8 @@ export interface IAdvancedSearchParam {
   eventLocationLevel4?: UUID
   /** @deprecated The specific event location level's will get deleted in the future in favor of directly using `eventJurisdictionId` */
   eventLocationLevel5?: UUID
+  /** @deprecated The specific event location level's will get deleted in the future in favor of directly using `eventJurisdictionId` */
+  eventLocationLevel6?: UUID
   childFirstNames?: string
   childLastName?: string
   childDoB?: string

@@ -8,46 +8,45 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { TEAM_SEARCH } from '@client/navigation/routes'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
+import { queries } from '@client/profile/queries'
 import { AppStore } from '@client/store'
 import {
-  createTestApp,
   createTestComponent,
   createTestStore,
   flushPromises,
   mockUserResponse,
-  registerScopeToken
+  REGISTRAR_DEFAULT_SCOPES,
+  setScopes
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
+import { merge } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { checkAuth } from '@client/profile/profileActions'
-import { Mock, vi } from 'vitest'
-import { merge } from 'lodash'
-import { queries } from '@client/profile/queries'
+import { vi } from 'vitest'
+import { SCOPES } from '@opencrvs/commons/client'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('Team search test', () => {
   let store: AppStore
-  let history: History<any>
+  let router: ReturnType<typeof createMemoryRouter>
 
   beforeAll(async () => {
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
   })
 
   describe('Team search without location in props', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = await createTestComponent(<TeamSearch history={history} />, {
-        store,
-        history
-      })
+      ;({ component: app, router } = await createTestComponent(<TeamSearch />, {
+        store
+      }))
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
+
       app.update()
     })
 
@@ -84,17 +83,16 @@ describe('Team search test', () => {
       app.update()
       flushPromises()
 
-      expect(parse(history.location.search)).toEqual({
+      expect(parse(router.state.location.search)).toEqual({
         locationId: '0d8474da-0361-4d32-979e-af91f012340a'
       })
-      expect(history.location.pathname).toContain('/team/users')
+      expect(router.state.location.pathname).toContain('/team/users')
     })
   })
 
   describe('Team search with location in props', () => {
-    let app: ReactWrapper
-    let history: History
-    const getItem = window.localStorage.getItem as Mock
+    let testComponent: ReactWrapper<{}, {}>
+
     const mockFetchUserDetails = vi.fn()
     const nameObj = {
       data: {
@@ -126,38 +124,40 @@ describe('Team search test', () => {
       }
     }
 
-    // storage.getItem = vi.fn()
-    // storage.setItem = vi.fn()
-
     beforeAll(async () => {
       merge(mockUserResponse, nameObj)
       mockFetchUserDetails.mockReturnValue(mockUserResponse)
       queries.fetchUserDetails = mockFetchUserDetails
     })
 
-    beforeAll(async () => {
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
-    })
+    beforeAll(async () => {})
 
     beforeEach(async () => {
-      const testApp = await createTestApp()
-      app = testApp.app
-      history = testApp.history
+      setScopes([SCOPES.USER_READ], store)
 
-      history.replace(TEAM_SEARCH, {
-        selectedLocation: {
-          id: '',
-          searchableText: '',
-          displayLabel: 'Alokbali Union Parishad'
-        }
-      })
+      testComponent = (
+        await createTestComponent(<TeamSearch />, {
+          store,
+          initialEntries: [
+            {
+              pathname: TEAM_USER_LIST,
+              state: {
+                selectedLocation: {
+                  id: '',
+                  searchableText: '',
+                  displayLabel: 'Alokbali Union Parishad'
+                }
+              }
+            }
+          ]
+        })
+      )?.component
     })
 
     it('loads the location in the search input box', async () => {
-      await waitForElement(app, '#locationSearchInput')
+      await waitForElement(testComponent, '#locationSearchInput')
       expect(
-        app.find('#locationSearchInput').hostNodes().props().value
+        testComponent.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Alokbali Union Parishad')
     })
   })

@@ -10,4 +10,4 @@
  */
 export * from './FormWizard'
 export * from './FormFieldRenderer'
-export { useFormContext } from 'react-hook-form'
+export { useFormContext, FieldValues, get } from 'react-hook-form'

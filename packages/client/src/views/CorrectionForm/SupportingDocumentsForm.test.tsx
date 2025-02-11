@@ -10,11 +10,11 @@
  */
 import { createStore } from '@client/store'
 import {
-  createRouterProps,
   createTestComponent,
-  mockDeclarationData
+  mockDeclarationData,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
+
 import * as React from 'react'
 import { CorrectionSection } from '@client/forms'
 import { EventType } from '@client/utils/gateway'
@@ -22,9 +22,9 @@ import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 import { CorrectionForm } from './CorrectionForm'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
-let wrapper: ReactWrapper<{}, {}>
+let wrapper: TestComponentWithRouteMock
 
 const birthDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
@@ -32,53 +32,44 @@ const birthDeclaration: IDeclaration = {
   event: EventType.Birth
 }
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('for an declaration', () => {
   beforeEach(async () => {
     store.dispatch(storeDeclaration(birthDeclaration))
-    wrapper = await createTestComponent(
-      <CorrectionForm
-        {...createRouterProps(
-          formatUrl(CERTIFICATE_CORRECTION, {
-            declarationId: birthDeclaration.id,
-            pageId: CorrectionSection.SupportingDocuments
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              declarationId: birthDeclaration.id,
-              pageId: CorrectionSection.SupportingDocuments
-            }
-          }
-        )}
-      />,
-      {
-        store,
-        history
-      }
-    )
+    wrapper = await createTestComponent(<CorrectionForm />, {
+      store,
+      path: CERTIFICATE_CORRECTION,
+      initialEntries: [
+        formatUrl(CERTIFICATE_CORRECTION, {
+          declarationId: birthDeclaration.id,
+          pageId: CorrectionSection.SupportingDocuments
+        })
+      ]
+    })
   })
 
   it('should disable the continue button', () => {
     expect(
-      wrapper.find('#confirm_form').hostNodes().props().disabled
+      wrapper.component.find('#confirm_form').hostNodes().props().disabled
     ).toBeTruthy()
   })
 
   it('should enable the continue button if any radio button is selected', () => {
-    wrapper
+    wrapper.component
       .find('#supportDocumentRequiredForCorrection_true')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
-    wrapper.update()
+    wrapper.component.update()
     expect(
-      wrapper.find('#confirm_form').hostNodes().props().disabled
+      wrapper.component.find('#confirm_form').hostNodes().props().disabled
     ).toBeFalsy()
   })
   it('should goto home if cross button is pressed', () => {
-    wrapper.find('#crcl-btn').hostNodes().simulate('click')
-    wrapper.update()
-    expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
+    wrapper.component.find('#crcl-btn').hostNodes().simulate('click')
+    wrapper.component.update()
+    expect(wrapper.router.state.location.pathname).toContain(
+      WORKQUEUE_TABS.readyForReview
+    )
   })
 })

@@ -8,12 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Document, model, Schema, Types } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import {
-  UserRole as CommonUserRole,
-  userScopes
-} from '@opencrvs/commons/authentication'
+import { Document, model, Schema } from 'mongoose'
 
 export enum AUDIT_REASON {
   TERMINATED,
@@ -90,6 +86,7 @@ export interface ISearch {
     eventLocationLevel3?: string
     eventLocationLevel4?: string
     eventLocationLevel5?: string
+    eventLocationLevel6?: string
     childFirstNames?: string
     childLastName?: string
     childDoB?: string
@@ -133,11 +130,9 @@ export interface IUser {
   passwordHash: string
   oldPasswordHash?: string
   salt: string
-  systemRole: CommonUserRole
-  role: Types.ObjectId
+  role: string
   practitionerId: string
   primaryOfficeId: string
-  scope: string[]
   signature: ISignature
   localRegistrar?: ILocalRegistrar
   status: string
@@ -242,6 +237,7 @@ const AdvanceSearchParameters = new Schema(
     eventLocationLevel3: { type: String },
     eventLocationLevel4: { type: String },
     eventLocationLevel5: { type: String },
+    eventLocationLevel6: { type: String },
     childFirstNames: { type: String },
     childLastName: { type: String },
     childDoB: { type: String },
@@ -306,11 +302,9 @@ const userSchema = new Schema({
   passwordHash: { type: String, required: true },
   oldPasswordHash: { type: String },
   salt: { type: String, required: true },
-  systemRole: { type: String, required: true },
-  role: { type: Schema.Types.ObjectId, ref: 'UserRole' },
+  role: { type: String },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
-  scope: { type: [String], enum: Object.values(userScopes), required: true },
   status: {
     type: String,
     enum: [
@@ -329,31 +323,4 @@ const userSchema = new Schema({
   searches: [SearchesSchema]
 })
 
-export interface IUserRole {
-  labels: Label[]
-}
-
-type Label = {
-  lang: string
-  label: string
-}
-
-export interface IUserRoleModel extends IUserRole, Document {}
-
-const LabelSchema = new Schema(
-  {
-    lang: String,
-    label: String
-  },
-  { _id: false }
-)
-
-const UserRoleSchema = new Schema(
-  {
-    labels: [LabelSchema]
-  },
-  { timestamps: true }
-)
-
-export const UserRole = model<IUserRoleModel>('UserRole', UserRoleSchema)
 export default model<IUserModel>('User', userSchema)

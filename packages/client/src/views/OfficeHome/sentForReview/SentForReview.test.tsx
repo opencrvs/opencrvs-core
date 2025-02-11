@@ -8,17 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { checkAuth } from '@client/profile/profileActions'
+
 import { AppStore, createStore } from '@client/store'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
+  resizeWindow,
+  setScopes
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
+
 import { merge } from 'lodash'
 import * as React from 'react'
 import { SentForReview } from './SentForReview'
@@ -27,19 +28,8 @@ import type {
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { History } from 'history'
-import { vi, Mock } from 'vitest'
+import { vi } from 'vitest'
 import { EventType } from '@client/utils/gateway'
-
-const validateScopeToken = jwt.sign(
-  { scope: ['validate'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
 
 const nameObj = {
   data: {
@@ -135,15 +125,12 @@ for (let i = 0; i < 14; i++) {
 }
 merge(mockUserResponse, nameObj)
 
-const getItem = window.localStorage.getItem as Mock
-
 describe('RegistrationHome sent for approval tab related tests', () => {
   let store: AppStore
-  let history: History
+
   beforeEach(async () => {
-    ;({ store, history } = createStore())
-    getItem.mockReturnValue(validateScopeToken)
-    await store.dispatch(checkAuth())
+    ;({ store } = createStore())
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
   })
 
   it('renders all items returned from graphql query in sent for approval', async () => {
@@ -151,7 +138,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = vi.fn(() => 1554055200000)
 
     const sentForApprovalDate = '2019-10-20T11:03:20.660Z'
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -243,7 +230,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -265,7 +252,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -279,7 +266,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     const data = (await waitForElement(testComponent, Workqueue)).prop(
@@ -291,7 +278,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('should show pagination if items more than 10 in Approval Tab', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -305,7 +292,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     expect(
@@ -322,7 +309,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('should show pagination and page number as per need ', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -336,7 +323,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     expect(
@@ -348,7 +335,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('redirect to recordAudit page if item is clicked on desktop view ', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -440,7 +427,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -452,18 +439,17 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     })
     testComponent.update()
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/approvalTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })
 
 describe('Tablet tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   beforeAll(async () => {
-    getItem.mockReturnValue(validateScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
     resizeWindow(800, 1280)
   })
 
@@ -476,7 +462,7 @@ describe('Tablet tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -547,7 +533,7 @@ describe('Tablet tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -559,7 +545,7 @@ describe('Tablet tests', () => {
     })
     testComponent.update()
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/approvalTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })

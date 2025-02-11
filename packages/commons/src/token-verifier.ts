@@ -31,7 +31,7 @@ export const verifyToken = async (token: string, authUrl: string) => {
 }
 
 export const validateFunc = async (
-  payload: any,
+  payload: unknown,
   request: Hapi.Request,
   checkInvalidToken: boolean,
   authUrl: string

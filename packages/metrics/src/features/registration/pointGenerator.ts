@@ -46,7 +46,6 @@ import {
   getRecordInitiator,
   getPaymentReconciliation,
   getObservationValueByCode,
-  isNotification,
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
   getPractionerIdFromTask,
@@ -65,12 +64,11 @@ import {
   getAgeLabel,
   getdaysAfterEvent
 } from '@metrics/features/registration/utils'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  Events
-} from '@metrics/features/metrics/constants'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { fetchTaskHistory } from '@metrics/api'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
+import { getTokenPayload } from '@metrics/utils/authUtils'
+import { getUser } from '@metrics/features/audit/handler'
 
 export const generateInCompleteFieldPoints = async (
   payload: fhir.Bundle,
@@ -503,11 +501,14 @@ export async function generateTimeLoggedPoint(
 
 export async function generateDeclarationStartedPoint(
   payload: fhir.Bundle,
-  authHeader: IAuthHeader,
-  status: string
+  authHeader: IAuthHeader
 ): Promise<IDeclarationsStartedPoints> {
   const composition = getComposition(payload)
   const task = getTask(payload)
+  const tokenPayload = getTokenPayload(authHeader.Authorization)
+
+  const userId = tokenPayload.sub
+  const user = await getUser(userId, authHeader)
 
   if (!composition) {
     throw new Error('composition not found')
@@ -517,23 +518,7 @@ export async function generateDeclarationStartedPoint(
     throw new Error('Task not found')
   }
 
-  let role = ''
-
-  if (status === Events.INCOMPLETE) {
-    isNotification(composition)
-      ? (role = 'NOTIFICATION_API_USER')
-      : (role = 'FIELD_AGENT')
-  } else if (status === Events.VALIDATED) {
-    role = 'REGISTRATION_AGENT'
-  } else if (status === Events.WAITING_EXTERNAL_VALIDATION) {
-    role = 'REGISTRAR'
-  } else if (status === Events.READY_FOR_REVIEW) {
-    role = 'FIELD_AGENT'
-  }
-
-  if (role === '') {
-    throw new Error('Role not found')
-  }
+  const role = user.role
 
   const fields: IDeclarationsStartedFields = {
     role,

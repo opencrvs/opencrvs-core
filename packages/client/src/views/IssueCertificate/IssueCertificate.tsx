@@ -14,20 +14,20 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { Redirect, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { IPrintableDeclaration } from '@client/declarations'
-import { useDispatch } from 'react-redux'
 import { useDeclaration } from '@client/declarations/selectors'
 import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
-import { formatUrl, goToHomeTab } from '@client/navigation'
+import { formatUrl, generateGoToHomeTabUrl } from '@client/navigation'
 import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 export function IssueCertificate() {
+  const navigate = useNavigate()
   const intl = useIntl()
-  const dispatch = useDispatch()
+
   const { pageId, registrationId } = useParams<{
     registrationId: string
     pageId: string
@@ -39,7 +39,7 @@ export function IssueCertificate() {
 
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToIssue,
           selectorId: ''
@@ -58,7 +58,13 @@ export function IssueCertificate() {
             <Button
               size="medium"
               type="icon"
-              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
+              onClick={() =>
+                navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.readyToIssue
+                  })
+                )
+              }
             >
               <Icon name={'X'} weight={'bold'} />
             </Button>
@@ -69,7 +75,13 @@ export function IssueCertificate() {
             <Button
               size="medium"
               type="icon"
-              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
+              onClick={() =>
+                navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.readyToIssue
+                  })
+                )
+              }
             >
               <Icon name={'X'} weight={'bold'} />
             </Button>

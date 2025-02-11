@@ -915,6 +915,7 @@ enum SupportedFacilityFHIRProp {
   locationLevel3 = 'locationLevel3',
   locationLevel4 = 'locationLevel4',
   locationLevel5 = 'locationLevel5',
+  locationLevel6 = 'locationLevel6',
   district = 'district',
   state = 'state',
   country = 'country'

@@ -10,7 +10,31 @@
  */
 import { z } from 'zod'
 
-export const TranslationConfig = z.object({
+export type TranslationConfig = {
+  id: string
+  defaultMessage: string
+  description: string
+}
+
+export type MessageDescriptorZod = {
+  id: z.ZodString
+  defaultMessage: z.ZodString
+  description: z.ZodString
+}
+
+/*
+ * The only purpose of this explicit type definition is to reduce the size of
+ * packages/commons/build/dist/common/events/EventConfig.d.ts
+ * Doing this makes it go from 60705 to 40250
+ */
+type ExplicitTypeToReduceDeclarationSize = z.ZodObject<
+  MessageDescriptorZod,
+  'strip',
+  z.ZodTypeAny,
+  TranslationConfig
+>
+
+export const TranslationConfig: ExplicitTypeToReduceDeclarationSize = z.object({
   id: z
     .string()
     .describe(
