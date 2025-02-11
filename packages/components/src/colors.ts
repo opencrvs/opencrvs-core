@@ -61,8 +61,6 @@ export const colors = {
 
   // DEPRECTATED
   blue: '#4A8AD7',
-  blueDark: '#4079BD',
-  blueDarker: '#3668A3',
   blueLight: '#72A3E0',
   blueLighter: '#A0C3EB',
   secondary: '#4A8AD7',

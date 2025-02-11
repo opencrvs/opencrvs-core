@@ -38,7 +38,7 @@ export const StatusIcon = ({ type }: { type: BannerType }) => {
   } else if (type === 'verified') {
     return (
       <IconWrapper type={type}>
-        <Icon name="Check" size="small" weight="bold" color="blueDarker" />
+        <Icon name="Check" size="small" weight="bold" color="primaryDark" />
       </IconWrapper>
     )
   } else if (type === 'failed') {
