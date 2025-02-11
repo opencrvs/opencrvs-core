@@ -30,6 +30,8 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts/form'
+import { IFormSectionData } from '@client/forms'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
 const messages = defineMessages({
   reviewActionTitle: {
@@ -204,6 +206,17 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
       >
+        {formConfigs[0].review.fields && (
+          <FormFieldGenerator
+            fields={formConfigs[0].review.fields}
+            formData={{}}
+            id={'reviewMetadata'}
+            setAllFieldsDirty={false}
+            onChange={function (values: IFormSectionData): void {
+              console.log(values)
+            }}
+          />
+        )}
         <ReviewComponent.Actions
           messages={{
             title: messages.reviewActionTitle,

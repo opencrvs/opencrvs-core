@@ -46,6 +46,8 @@ import {
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
+  isSignatureFieldType,
+  isTextAreaFieldType,
   isTextFieldType
 } from '@opencrvs/commons/client'
 import {
@@ -80,6 +82,8 @@ import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
+import { TextArea } from '@client/v2-events/features/events/registered-fields/TextArea'
+import { SignatureUploader } from '@client/v2-events/features/events/registered-fields/SignatureUploader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -241,6 +245,29 @@ const GeneratedInputField = React.memo(
       )
     }
 
+    if (isTextAreaFieldType(field)) {
+      return (
+        <InputField
+          {...inputFieldProps}
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration?.prefix)
+          }
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration?.postfix)
+          }
+        >
+          <TextArea.Input
+            {...inputProps}
+            disabled={disabled}
+            maxLength={field.config.configuration?.maxLength}
+            value={field.value}
+          />
+        </InputField>
+      )
+    }
+
     if (isFileFieldType(field)) {
       const value = formData[fieldDefinition.id] as FileFieldValue
       return (
@@ -309,6 +336,22 @@ const GeneratedInputField = React.memo(
             {...field.config}
             value={field.value}
             setFieldValue={setFieldValue}
+          />
+        </InputField>
+      )
+    }
+
+    if (isSignatureFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <SignatureUploader.Input
+            name={fieldDefinition.id}
+            value={field.value as string}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+            modalTitle={intl.formatMessage({
+              id: 'v2.signature.upload.modal.title',
+              defaultMessage: 'Draw signature'
+            })}
           />
         </InputField>
       )
