@@ -11,6 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 
+import React from 'react'
 import superjson from 'superjson'
 import {
   tennisClueMembershipEventDocument,
@@ -21,12 +22,25 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 
 import { Review } from './Review'
-import React from 'react'
-import { within } from '@storybook/test'
-import {
-  eventConfig,
-  declarationForm
-} from '../registered-fields/Address.stories'
+import { fireEvent, within } from '@storybook/test'
+
+import { useModal } from '@client/v2-events/hooks/useModal'
+
+const mockFormData = {
+  'applicant.firstname': 'John',
+  'applicant.surname': 'Doe',
+  'applicant.dob': '1990-01-01',
+  'applicant.address': {
+    country: 'FAR',
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    street: '123 Tennis Club Avenue',
+    number: '123',
+    zipCode: 'Z12345',
+    urbanOrRural: 'RURAL',
+    town: 'Tennisville',
+    village: 'Tennisville'
+  }
+}
 
 const meta: Meta<typeof Review.Body> = {
   title: 'Review',
@@ -34,21 +48,7 @@ const meta: Meta<typeof Review.Body> = {
   args: {
     eventConfig: tennisClubMembershipEvent,
     formConfig: DEFAULT_FORM,
-    form: {
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
-      'applicant.dob': '1990-01-01',
-      'applicant.address': {
-        country: 'FAR',
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        street: '123 Tennis Club Avenue',
-        number: '123',
-        zipCode: 'Z12345',
-        urbanOrRural: 'RURAL',
-        town: 'Tennisville',
-        village: 'Tennisville'
-      }
-    },
+    form: mockFormData,
     onEdit: () => {},
     title: 'Member declaration for John Doe'
   },
@@ -87,5 +87,81 @@ export const ReviewWithoutChanges: Story = {
         ]
       }
     }
+  }
+}
+
+export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
+  name: 'Review Button Test',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    step('Open modal', async () => {
+      // Open modal
+      const [changeButton] = await canvas.findAllByRole('button', {
+        name: 'Change'
+      })
+
+      await fireEvent.click(changeButton)
+    })
+
+    step('Close modal', async () => {
+      // Close modal
+      const cancelButton = await canvas.findByRole('button', {
+        name: 'Cancel'
+      })
+
+      await fireEvent.click(cancelButton)
+    })
+  },
+  render: function Component() {
+    const [modal, openModal] = useModal()
+
+    async function handleDeclaration() {
+      await openModal<boolean | null>((close) => (
+        <Review.ActionModal action="Declare" close={close} />
+      ))
+    }
+
+    async function handleEdit() {
+      await openModal<boolean | null>((close) => (
+        <Review.EditModal close={close}></Review.EditModal>
+      ))
+
+      return
+    }
+
+    return (
+      <>
+        <Review.Body
+          eventConfig={tennisClubMembershipEvent}
+          form={mockFormData}
+          formConfig={DEFAULT_FORM}
+          title="My test action"
+          onEdit={handleEdit}
+        >
+          <Review.Actions
+            messages={{
+              title: {
+                id: 'v2.changeModal.title',
+                defaultMessage: 'This is a title',
+                description: 'The title for review action'
+              },
+              description: {
+                id: 'v2.changeModal.description',
+                defaultMessage: 'This is a description',
+                description: 'The title for review action'
+              },
+              onConfirm: {
+                id: 'ourOnConfirm',
+                defaultMessage: 'Confirm test',
+                description: 'The title for review action'
+              }
+            }}
+            onConfirm={handleDeclaration}
+          />
+        </Review.Body>
+        {modal}
+      </>
+    )
   }
 }
