@@ -15,11 +15,11 @@ import addFormats from 'ajv-formats'
 
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { FieldConfig } from '../FieldConfig'
-import { FieldValue } from '../FieldValue'
-import { ActionFormData } from '../ActionDocument'
-import { mapFieldTypeToZod } from '../FieldTypeMapping'
-import { TranslationConfig } from '../TranslationConfig'
+import { FieldConfig } from '../events/FieldConfig'
+import { FieldValue } from '../events/FieldValue'
+import { ActionFormData } from '../events/ActionDocument'
+import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import { TranslationConfig } from '../events/TranslationConfig'
 
 const ajv = new Ajv({
   $data: true
@@ -182,6 +182,7 @@ function validateFieldInput({
 }) {
   const error = mapFieldTypeToZod(field.type, field.required)
     .safeParse(value, {
+      // @ts-expect-error
       errorMap: zodToIntlErrorMap
     })
     .error?.format()

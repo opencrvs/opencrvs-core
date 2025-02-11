@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Clause, ClauseInput, ClauseOutput } from '../DeduplicationConfig'
+import { Clause, ClauseInput, ClauseOutput } from '@opencrvs/commons/events'
 
 export function and(clauses: ClauseInput[]): ClauseOutput {
   return {

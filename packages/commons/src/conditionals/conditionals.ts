@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventDocument } from '../EventDocument'
-import { ActionFormData } from '../ActionDocument'
-import { ITokenPayload } from '../../authentication'
-
+import { EventDocument } from '../events/EventDocument'
+import { ActionFormData } from '../events/ActionDocument'
+import { ITokenPayload } from '../authentication'
+import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
-import { ActionType } from '../ActionType'
 
 /** @knipignore */
 export type JSONSchema = {

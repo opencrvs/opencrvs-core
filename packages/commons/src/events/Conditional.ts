@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { JSONSchema } from './conditionals/conditionals'
+import { JSONSchema } from '../conditionals/conditionals'
 import { z } from 'zod'
 
 export function Conditional() {
