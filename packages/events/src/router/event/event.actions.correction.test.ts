@@ -46,7 +46,6 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const data = generator.event.actions.correction.request(event.id, {
     data: {
@@ -84,12 +83,11 @@ test(`${ActionType.APPROVE_CORRECTION} validation error message contains all th
   ).rejects.matchSnapshot()
 })
 
-test(`${ActionType.REQUEST_CORRECTION} Allows passing fields that are conditionally removed`, async () => {
+test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditional hidden fields are still skipped`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const data = generator.event.actions.correction.request(event.id, {
     data: {
@@ -110,7 +108,6 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const form = {
     'applicant.dob': '2024-02-01',
@@ -135,7 +132,6 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const form = {
     'applicant.dob': '2040-02-01',

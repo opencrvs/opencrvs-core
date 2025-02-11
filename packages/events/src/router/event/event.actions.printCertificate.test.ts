@@ -54,12 +54,11 @@ test('print certificate action can be added to a created event', async () => {
   ).toBe(ActionType.PRINT_CERTIFICATE)
 })
 
-test('Allows passing fields that are conditionally removed', async () => {
+test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const data = generator.event.actions.printCertificate(event.id, {
     data: {
@@ -80,7 +79,6 @@ test('Skips required field validation when they are conditionally hidden', async
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const form = {
     'applicant.dob': '2024-02-01',
@@ -105,7 +103,6 @@ test('Prevents adding birth date in future', async () => {
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const form = {
     'applicant.dob': '2040-02-01',
