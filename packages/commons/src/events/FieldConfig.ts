@@ -171,38 +171,40 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
-const AdminAreaOptions = z.object({
-  partOf: z
-    .object({
-      $data: z.string()
-    })
-    .optional()
-    .describe('Parent location'),
-  type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
-})
+const AdministrativeAreaOptions = z
+  .object({
+    partOf: z
+      .object({
+        $data: z.string()
+      })
+      .optional()
+      .describe('Parent location'),
+    type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
+  })
+  .describe('Administrative area options')
 
 const AdministrativeArea = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
-  configuration: AdminAreaOptions
-}).describe('Administrative area input field')
+  configuration: AdministrativeAreaOptions
+}).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 const Location = BaseField.extend({
   type: z.literal(FieldType.LOCATION)
-})
+}).describe('Input field for a location')
 
 export type Location = z.infer<typeof Location>
 
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY)
-})
+}).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE)
-})
+}).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
 
@@ -283,5 +285,7 @@ export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
-export type AdminAreaOptions = z.infer<typeof AdminAreaOptions>
+export type AdministrativeAreaOptions = z.infer<
+  typeof AdministrativeAreaOptions
+>
 export type FieldConditional = z.infer<typeof ActionConditional>
