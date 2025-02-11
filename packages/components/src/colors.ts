@@ -60,7 +60,6 @@ export const colors = {
   tealLighter: '#EBF7FA',
 
   // DEPRECTATED
-  blue: '#4A8AD7',
   secondary: '#4A8AD7',
   tertiary: '#CCCCCC',
   subheaderCopyBirth: '#007A5E',
