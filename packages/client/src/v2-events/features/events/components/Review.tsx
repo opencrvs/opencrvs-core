@@ -209,10 +209,10 @@ function ReviewComponent({
               >
                 <TitleContainer id={`header_title`}>
                   {intl.formatMessage(reviewMessages.govtName)} –{' '}
-                  {eventConfig.label.defaultMessage}
+                  {intl.formatMessage(eventConfig.label)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
-                  {title || intl.formatMessage(eventConfig.label)}
+                  {title}
                 </SubjectContainer>
               </Stack>
             </HeaderContent>
