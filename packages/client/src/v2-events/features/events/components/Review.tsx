@@ -208,7 +208,8 @@ function ReviewComponent({
                 gap={6}
               >
                 <TitleContainer id={`header_title`}>
-                  {intl.formatMessage(reviewMessages.govtName)}
+                  {intl.formatMessage(reviewMessages.govtName)} –{' '}
+                  {eventConfig.label.defaultMessage}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
                   {title || eventConfig.label.defaultMessage}
