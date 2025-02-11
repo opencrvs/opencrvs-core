@@ -81,6 +81,17 @@ const DEFAULT_FORM = {
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
           }
+        },
+        {
+          id: 'applicant.address',
+          type: 'ADDRESS',
+          required: true,
+          conditionals: [],
+          label: {
+            defaultMessage: "Applicant's address",
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.address.label'
+          }
         }
       ]
     },
@@ -1234,7 +1245,7 @@ export const tennisClueMembershipEventDocument: EventDocument = {
         'applicant.surname': 'Rouvila',
         'applicant.dob': '2025-01-23',
         'recommender.firstname': 'Euan',
-        'recommender.surname': 'Miller'
+        'recommender.surname': 'Millar'
       },
       type: 'DECLARE',
       createdBy: '6780dbf7a263c6515c7b97d2',
@@ -1249,7 +1260,7 @@ export const tennisClueMembershipEventDocument: EventDocument = {
         'applicant.surname': 'Rouvila',
         'applicant.dob': '2025-01-23',
         'recommender.firstname': 'Euan',
-        'recommender.surname': 'Miller'
+        'recommender.surname': 'Millar'
       },
       type: 'REGISTER',
       identifiers: {
