@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 export * from './ActionConfig'
 export * from './offline'
 export * from './EventConfig'
@@ -33,5 +34,7 @@ export * from './User'
 export * from './FieldType'
 export * from './ActionType'
 export * from './FieldTypeMapping'
+export * from './Conditional'
 // In order to infer types, we need to export the following types along with events
 export * from '../conditionals/conditionals'
+export * from '../conditionals/validate'

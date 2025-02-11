@@ -63,6 +63,7 @@ const Divider = BaseField.extend({
   type: z.literal(FieldType.DIVIDER)
 })
 export type Divider = z.infer<typeof Divider>
+
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   configuration: z
@@ -77,6 +78,12 @@ const TextField = BaseField.extend({
 }).describe('Text input')
 
 export type TextField = z.infer<typeof TextField>
+
+export const EmailField = BaseField.extend({
+  type: z.literal(FieldType.EMAIL)
+})
+
+export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
@@ -234,6 +241,7 @@ export type Inferred =
   | z.infer<typeof Country>
   | z.infer<typeof Location>
   | z.infer<typeof Divider>
+  | z.infer<typeof EmailField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,

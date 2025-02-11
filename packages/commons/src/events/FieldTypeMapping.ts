@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { z } from 'zod'
 import {
   AddressField,
   BulletList,
@@ -16,6 +17,7 @@ import {
   Country,
   DateField,
   Divider,
+  EmailField,
   FieldConfig,
   File,
   Location,
@@ -30,9 +32,11 @@ import {
   AddressFieldValue,
   CheckboxFieldValue,
   DateValue,
+  EmailValue,
   FieldValue,
   FieldValueSchema,
   FileFieldValue,
+  OptionalFieldValueSchema,
   TextValue
 } from './FieldValue'
 /**
@@ -51,10 +55,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
-
       break
-    case FieldType.DIVIDER:
+    case FieldType.EMAIL:
+      schema = EmailValue
+      break
     case FieldType.TEXT:
+    case FieldType.DIVIDER:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.LOCATION:
@@ -63,8 +69,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
     case FieldType.HIDDEN:
-      schema = TextValue
-
+      schema = required ? TextValue.min(1) : TextValue
       break
     case FieldType.CHECKBOX:
       schema = CheckboxFieldValue
@@ -83,6 +88,16 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
   return required ? schema : schema.optional()
 }
 
+export function createValidationSchema(config: FieldConfig[]) {
+  const shape: Record<string, FieldValueSchema | OptionalFieldValueSchema> = {}
+
+  for (const field of config) {
+    shape[field.id] = mapFieldTypeToZod(field.type, field.required)
+  }
+
+  return z.object(shape)
+}
+
 /**
  * Quick-and-dirty mock data generator for event actions.
  */
@@ -98,6 +113,8 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
       return `${field.id}-${field.type}-${i}`
+    case FieldType.EMAIL:
+      return 'test@opencrvs.org'
     case FieldType.ADDRESS:
       return {
         country: 'FAR',
@@ -146,6 +163,13 @@ export const isTextFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: TextField } => {
   return field.config.type === FieldType.TEXT
+}
+
+export const isEmailFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: EmailField } => {
+  return field.config.type === FieldType.EMAIL
 }
 
 export const isFileFieldType = (field: {
