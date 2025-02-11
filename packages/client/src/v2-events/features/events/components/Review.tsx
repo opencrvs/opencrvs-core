@@ -202,10 +202,10 @@ function ReviewComponent({
                 <CountryLogo size="small" src={countryLogoFile} />
               )}
               <Stack
-                direction="column"
                 alignItems="flex-start"
-                justify-content="flex-start"
+                direction="column"
                 gap={6}
+                justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
                   {intl.formatMessage(reviewMessages.govtName)} –{' '}
