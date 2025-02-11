@@ -52,7 +52,7 @@ const LegendItem = styled(LegendItemBase)<{ colour: string }>`
 const EstimateLegendItem = styled(LegendItemBase)`
   &::before {
     height: 8px;
-    border: 2px dotted ${({ theme }) => theme.colors.secondary};
+    border: 2px dotted ${({ theme }) => theme.colors.primary};
     background: transparent;
   }
 `
@@ -65,7 +65,7 @@ const DataLabel = styled.label`
 `
 const DataTitle = styled.h3<{ description?: string }>`
   ${({ theme }) => theme.fonts.reg18};
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.primary};
   margin: ${({ description }) => (description ? `0` : `0 0 23px 0`)};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -175,11 +175,7 @@ export const Legend = withTheme(
       sortedData = [...data].sort((a, b) => a.value - b.value)
     }
 
-    const colours = [
-      theme.colors.primary,
-      theme.colors.secondary,
-      theme.colors.tertiary
-    ]
+    const colours = [theme.colors.primary]
 
     return (
       <div>
