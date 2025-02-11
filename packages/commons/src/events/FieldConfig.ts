@@ -9,27 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import {
-  Conditional,
-  EnableConditional,
-  HideConditional,
-  ShowConditional
-} from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
+import { Conditional, ActionConditional } from './Conditional'
 
 const FieldId = z.string()
 
-const FieldConditional = z.discriminatedUnion('type', [
-  ShowConditional,
-  HideConditional,
-  EnableConditional
-])
-
 const BaseField = z.object({
   id: FieldId,
-  conditionals: z.array(FieldConditional).default([]).optional(),
+  conditionals: z.array(ActionConditional).default([]).optional(),
   initialValue: z
     .union([
       z.string(),
@@ -287,4 +276,4 @@ export type FieldConfig = Inferred
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
 export type AdminAreaOptions = z.infer<typeof AdminAreaOptions>
-export type FieldConditional = z.infer<typeof FieldConditional>
+export type FieldConditional = z.infer<typeof ActionConditional>
