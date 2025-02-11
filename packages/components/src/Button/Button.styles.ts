@@ -11,13 +11,7 @@
 
 import { css } from 'styled-components'
 
-export const base = ({
-  fullWidth,
-  iconPosition = 'left'
-}: {
-  fullWidth?: boolean
-  iconPosition?: 'left' | 'right'
-}) => css`
+export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold16};
   display: inline-flex;
   justify-content: center;
@@ -42,17 +36,26 @@ export const base = ({
   svg {
     vertical-align: top;
     pointer-events: none;
+  }
 
-    ${iconPosition === 'left' &&
-    css`
+  &:has(svg:first-child) {
+    svg {
       margin-left: -2px;
       margin-right: 8px;
-    `}
-    ${iconPosition === 'right' &&
-    css`
+    }
+  }
+
+  &:has(svg:last-child) {
+    svg {
       margin-left: 8px;
       margin-right: -2px;
-    `}
+    }
+  }
+
+  &:has(svg:only-child) {
+    svg {
+      margin: 0;
+    }
   }
 
   &:focus-visible {
