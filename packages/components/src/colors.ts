@@ -59,14 +59,6 @@ export const colors = {
   tealLight: '#AEDFEA',
   tealLighter: '#EBF7FA',
 
-  // DEPRECTATED
-  secondary: '#4A8AD7',
-  tertiary: '#CCCCCC',
-  subheaderCopyBirth: '#007A5E',
-  subheaderCopyDeath: '#4B5EAA',
-  subheaderCopyMarriage: '#E4BC0C',
-  backgroundPrimary: '#36304E',
-
   // Grey
   white: '#FFFFFF',
   grey50: '#F8F8F8',
