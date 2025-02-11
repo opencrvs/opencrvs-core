@@ -19,7 +19,6 @@ import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
   FIELD_SEPARATOR,
-  getConditionalActionsForField,
   getDependentFields,
   handleInitialValue,
   hasInitialValueDependencyInfo,
@@ -29,12 +28,11 @@ import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
   ActionFormData,
-  AddressFieldValue,
-  CheckboxFieldValue,
   FieldConfig,
   FieldType,
   FieldValue,
   FileFieldValue,
+  getConditionalActionsForField,
   isAddressFieldType,
   isAdministrativeAreaFieldType,
   isFacilityFieldType,
@@ -632,10 +630,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
-          makeFormikFieldIdsOpenCRVSCompatible(
-            makeDatesFormatted(props.fields, values)
-          ),
-          props.requiredErrorMessage
+          makeFormikFieldIdsOpenCRVSCompatible(values)
         )
       }
       onSubmit={() => {}}
