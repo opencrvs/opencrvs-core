@@ -27,6 +27,7 @@ export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   opacity: 1;
   margin: 0;
   background: transparent;
+  gap: 8px;
 
   ${fullWidth &&
   css`
@@ -36,26 +37,6 @@ export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   svg {
     vertical-align: top;
     pointer-events: none;
-  }
-
-  &:has(svg:first-child) {
-    svg {
-      margin-left: -2px;
-      margin-right: 8px;
-    }
-  }
-
-  &:has(svg:last-child) {
-    svg {
-      margin-left: 8px;
-      margin-right: -2px;
-    }
-  }
-
-  &:has(svg:only-child) {
-    svg {
-      margin: 0;
-    }
   }
 
   &:focus-visible {
