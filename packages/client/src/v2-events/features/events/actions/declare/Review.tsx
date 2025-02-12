@@ -118,7 +118,7 @@ export function Review() {
 
   const form = useEventFormData((state) => state.formValues)
   const { setMetadata, getMetadata } = useEventMetaData()
-  const metadata = getMetadata(eventId)
+  const metadata = getMetadata(eventId, {})
 
   async function handleEdit({
     pageId,
@@ -206,6 +206,7 @@ export function Review() {
           firstname: form['applicant.firstname'] as string,
           surname: form['applicant.surname'] as string
         })}
+        metadata={metadata}
         onMetadataChange={(values) => setMetadata(eventId, values)}
       >
         <ReviewComponent.Actions

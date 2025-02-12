@@ -167,6 +167,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  metadata,
   onEdit,
   children,
   title,
@@ -176,6 +177,7 @@ function ReviewComponent({
   eventConfig: EventConfig
   formConfig: FormConfig
   form: ActionFormData
+  metadata: ActionFormData
   previousFormValues?: EventIndex['data']
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
@@ -280,11 +282,11 @@ function ReviewComponent({
               })}
             </ReviewContainter>
             {formConfig.review.fields &&
-              formConfig.review.fields?.length > 0 && (
+              formConfig.review.fields.length > 0 && (
                 <ReviewContainter>
                   <FormFieldGenerator
                     fields={formConfig.review.fields || []}
-                    formData={{}}
+                    formData={metadata}
                     id={'review'}
                     setAllFieldsDirty={false}
                     onChange={onMetadataChange}
