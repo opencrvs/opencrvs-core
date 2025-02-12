@@ -33,7 +33,10 @@ export function createTestClient(user: CreatedUser, scopes?: Scope[]) {
   return caller
 }
 
-function createTestToken(userId: string, scopes?: Scope[]): TokenWithBearer {
+export function createTestToken(
+  userId: string,
+  scopes?: Scope[]
+): TokenWithBearer {
   const token = jwt.sign(
     { scope: scopes ?? SCOPES.RECORD_SUBMIT_FOR_APPROVAL, sub: userId },
     readFileSync(join(__dirname, './cert.key')),

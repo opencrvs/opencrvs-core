@@ -25,10 +25,12 @@ function setBearerForToken(token: string) {
 }
 
 /**
+ * Middleware which checks that one of the required scopes is present in the token.
+ *
  * @param scopes scopes that are allowed to access the resource
  * @returns TRPC compatible middleware function
  */
-function createScopeAuthMiddleware(scopes: Scope[]) {
+export function createScopeAuthMiddleware(scopes: Scope[]) {
   return async (opts: MiddlewareOptions) => {
     if (inScope({ Authorization: setBearerForToken(opts.ctx.token) }, scopes)) {
       return opts.next()
@@ -38,6 +40,23 @@ function createScopeAuthMiddleware(scopes: Scope[]) {
   }
 }
 
+/**
+ * Middleware which checks that all the required scopes are present in the token.
+ *
+ * @param scopes scopes that are required to access the resource
+ * @returns TRPC compatible middleware function
+ */
 export function requiresScopes(scopes: Scope[]) {
-  return createScopeAuthMiddleware(scopes)
+  return async (opts: MiddlewareOptions) => {
+    const token = setBearerForToken(opts.ctx.token)
+    const hasAllScopes = scopes.every((scope) =>
+      inScope({ Authorization: token }, [scope])
+    )
+
+    if (!hasAllScopes) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    return opts.next()
+  }
 }
