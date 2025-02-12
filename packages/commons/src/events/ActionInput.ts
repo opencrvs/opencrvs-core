@@ -17,7 +17,8 @@ const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
   draft: z.boolean().optional().default(false),
-  data: z.record(z.string(), FieldValue)
+  data: z.record(z.string(), FieldValue),
+  metadata: z.record(z.string(), FieldValue).optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -33,8 +34,7 @@ export const RegisterActionInput = BaseActionInput.merge(
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
-    }),
-    metadata: z.record(z.string(), FieldValue)
+    })
   })
 )
 
@@ -60,8 +60,7 @@ export type NotifyActionInput = z.infer<typeof NotifyActionInput>
 
 export const DeclareActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE),
-    metadata: z.record(z.string(), FieldValue).optional()
+    type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
   })
 )
 
@@ -91,8 +90,7 @@ export const RequestCorrectionActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.REQUEST_CORRECTION)
-      .default(ActionType.REQUEST_CORRECTION),
-    metadata: z.record(z.string(), FieldValue)
+      .default(ActionType.REQUEST_CORRECTION)
   })
 )
 

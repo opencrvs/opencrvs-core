@@ -26,6 +26,7 @@ import {
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from './Output'
 
 const Row = styled.div<{
@@ -168,7 +169,8 @@ function ReviewComponent({
   form,
   onEdit,
   children,
-  title
+  title,
+  onMetadataChange
 }: {
   children: React.ReactNode
   eventConfig: EventConfig
@@ -177,9 +179,9 @@ function ReviewComponent({
   previousFormValues?: EventIndex['data']
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
+  onMetadataChange: (values: ActionFormData) => void
 }) {
   const intl = useIntl()
-
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
@@ -277,6 +279,18 @@ function ReviewComponent({
                 )
               })}
             </ReviewContainter>
+            {formConfig.review.fields &&
+              formConfig.review.fields?.length > 0 && (
+                <ReviewContainter>
+                  <FormFieldGenerator
+                    fields={formConfig.review.fields || []}
+                    formData={{}}
+                    id={'review'}
+                    setAllFieldsDirty={false}
+                    onChange={onMetadataChange}
+                  />
+                </ReviewContainter>
+              )}
           </FormData>
         </Card>
         {children}

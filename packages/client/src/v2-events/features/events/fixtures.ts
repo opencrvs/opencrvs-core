@@ -842,7 +842,8 @@ const PRINT_CERTIFICATE_FORM = {
       id: 'v2.event.tennis-club-membership.action.certificate.form.review.title',
       defaultMessage: 'Member certificate collector for {firstname} {surname}',
       description: 'Title of the form to show in review page'
-    }
+    },
+    fields: []
   }
 } satisfies FormConfig
 

@@ -17,6 +17,7 @@ const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
+  metadata: z.record(z.string(), FieldValue).optional(),
   draft: z.boolean().optional().default(false),
   createdAtLocation: z.string()
 })
@@ -40,15 +41,13 @@ const RegisterAction = ActionBase.merge(
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
-    }),
-    metadata: z.record(z.string(), FieldValue)
+    })
   })
 )
 
 const DeclareAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE),
-    metadata: z.record(z.string(), FieldValue)
+    type: z.literal(ActionType.DECLARE)
   })
 )
 

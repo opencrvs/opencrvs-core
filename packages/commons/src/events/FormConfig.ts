@@ -39,7 +39,6 @@ export const FormConfig = z.object({
     fields: z
       .array(FieldConfig)
       .describe('Fields to be rendered on the review page for metadata')
-      .optional()
   })
 })
 
