@@ -43,6 +43,9 @@ export const SCOPES = {
   RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
 
+  // CIHAN TODO: add this to sheet
+  RECORD_DELETE: 'record.delete',
+
   // validate
   RECORD_SUBMIT_FOR_APPROVAL: 'record.declaration-submit-for-approval',
   RECORD_SUBMIT_FOR_UPDATES: 'record.declaration-submit-for-updates',

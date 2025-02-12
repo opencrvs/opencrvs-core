@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`prevents forbidden access if missing required scope 1`] = `[TRPCError: FORBIDDEN]`;
+
+exports[`should return 404 if event does not exist 1`] = `[TRPCError: Event not found with ID: some event]`;
+
+exports[`stored events can be deleted 1`] = `[TRPCError: Event not found with ID: 76081448-5415-4c22-891a-bf37e8da78c8]`;

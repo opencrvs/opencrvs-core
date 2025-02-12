@@ -110,6 +110,7 @@ export const eventRouter = router({
     return eventWithUserSpecificDrafts
   }),
   delete: publicProcedure
+    .use(requiresScopes([SCOPES.RECORD_DELETE]))
     .input(z.object({ eventId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
