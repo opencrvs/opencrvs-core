@@ -28,12 +28,6 @@ import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
-export const EventInputWithId = EventInput.extend({
-  id: z.string()
-})
-
-type EventInputWithId = z.infer<typeof EventInputWithId>
-
 async function getEventByTransactionId(transactionId: string) {
   const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
