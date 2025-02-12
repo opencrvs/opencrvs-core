@@ -153,6 +153,7 @@ export const eventRouter = router({
         })
       }),
     register: publicProcedure
+      .use(requiresScopes([SCOPES.RECORD_REGISTER]))
       // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
       .input(RegisterActionInput.omit({ identifiers: true }))
       // @ts-expect-error

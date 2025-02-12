@@ -38,7 +38,8 @@ test('Returns event with all actions', async () => {
   const client = createTestClient(user, [
     SCOPES.RECORD_DECLARATION_PRINT,
     SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-    SCOPES.RECORD_REGISTRATION_CORRECT
+    SCOPES.RECORD_REGISTRATION_CORRECT,
+    SCOPES.RECORD_REGISTER
   ])
 
   const event = await client.event.create(generator.event.create())

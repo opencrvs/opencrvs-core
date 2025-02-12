@@ -10,11 +10,11 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
 
   const event = await client.event.create(generator.event.create())
 

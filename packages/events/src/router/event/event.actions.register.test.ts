@@ -10,11 +10,22 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
+
+test('prevents forbidden access if missing required scope', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  await expect(
+    client.event.actions.register(
+      generator.event.actions.register('event-test-id-12345')
+    )
+  ).rejects.matchSnapshot()
+})
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
 
   const event = await client.event.create(generator.event.create())
 
@@ -29,7 +40,7 @@ test('Validation error message contains all the offending fields', async () => {
 
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
 
   const event = await client.event.create(generator.event.create())
 
@@ -47,7 +58,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
 
 test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
 
   const event = await client.event.create(generator.event.create())
 
@@ -71,7 +82,7 @@ test('Skips required field validation when they are conditionally hidden', async
 
 test('Prevents adding birth date in future', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
 
   const event = await client.event.create(generator.event.create())
 

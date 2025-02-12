@@ -64,7 +64,8 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
 test('a correction request can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+    SCOPES.RECORD_REGISTER
   ])
 
   const originalEvent = await client.event.create(generator.event.create())
@@ -207,7 +208,8 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
 test('a correction request can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+    SCOPES.RECORD_REGISTER
   ])
 
   const originalEvent = await client.event.create(generator.event.create())
@@ -236,7 +238,8 @@ describe('when a correction request exists', () => {
     const { user, generator } = await setupTestCase()
     client = createTestClient(user, [
       SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-      SCOPES.RECORD_REGISTRATION_CORRECT
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_REGISTER
     ])
 
     const originalEvent = await client.event.create(generator.event.create())
