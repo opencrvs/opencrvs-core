@@ -208,7 +208,7 @@ function ReviewComponent({
                 justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
-                  {intl.formatMessage(reviewMessages.govtName)} –{' '}
+                  {intl.formatMessage(reviewMessages.govtName)} {' – '}
                   {intl.formatMessage(eventConfig.label)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>

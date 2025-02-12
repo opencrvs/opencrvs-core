@@ -48,9 +48,7 @@ const meta: Meta<typeof Review.Body> = {
     eventConfig: tennisClubMembershipEvent,
     formConfig: DEFAULT_FORM,
     form: mockFormData,
-    onEdit: () => {
-      console.log('Click edit')
-    },
+    onEdit: () => undefined,
     title: 'Member declaration for John Doe'
   },
   beforeEach: () => {
