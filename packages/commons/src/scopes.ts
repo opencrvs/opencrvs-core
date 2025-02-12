@@ -34,7 +34,6 @@ export const SCOPES = {
   RECORDSEARCH: 'recordsearch',
 
   // record basic methods
-  RECORD_READ: 'record.read',
   RECORD_DELETE: 'record.delete',
   RECORD_READ_ALL: 'record.read:all',
 
