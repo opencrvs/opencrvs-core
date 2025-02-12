@@ -25,22 +25,6 @@ function setBearerForToken(token: string) {
 }
 
 /**
- * Middleware which checks that one of the required scopes is present in the token.
- *
- * @param scopes scopes that are allowed to access the resource
- * @returns TRPC compatible middleware function
- */
-export function createScopeAuthMiddleware(scopes: Scope[]) {
-  return async (opts: MiddlewareOptions) => {
-    if (inScope({ Authorization: setBearerForToken(opts.ctx.token) }, scopes)) {
-      return opts.next()
-    }
-
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-}
-
-/**
  * Middleware which checks that all the required scopes are present in the token.
  *
  * @param scopes scopes that are required to access the resource
