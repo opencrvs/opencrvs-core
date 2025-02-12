@@ -11,7 +11,7 @@ const params = {
 } satisfies ConditionalParameters
 
 describe('Validate conditionals', () => {
-  it('should validate and condition', () => {
+  it('validates "and" conditional', () => {
     expect(
       validate(
         and(
@@ -33,7 +33,7 @@ describe('Validate conditionals', () => {
     ).toBe(false)
   })
 
-  it('should validate or condition', () => {
+  it('validates "or" conditional', () => {
     expect(
       validate(
         or(
@@ -65,7 +65,7 @@ describe('Validate conditionals', () => {
     ).toBe(false)
   })
 
-  it('should validate not condition', () => {
+  it('validates "not" conditional', () => {
     expect(
       validate(not(field('applicant.name').isEqualTo('John Doe')), params)
     ).toBe(false)
@@ -75,7 +75,7 @@ describe('Validate conditionals', () => {
     ).toBe(true)
   })
 
-  it('should validate field isAfter condition', () => {
+  it('validates "field.isAfter" conditional', () => {
     expect(
       validate(field('applicant.dob').isAfter().date('1990-01-03'), params)
     ).toBe(false)
@@ -90,7 +90,7 @@ describe('Validate conditionals', () => {
     ).toBe(true)
   })
 
-  it('should validate field isBefore condition', () => {
+  it('validates "field.isBefore" conditional', () => {
     expect(
       validate(field('applicant.dob').isBefore().date('1990-01-03'), params)
     ).toBe(true)
@@ -105,7 +105,7 @@ describe('Validate conditionals', () => {
     ).toBe(false)
   })
 
-  it('should validate field isEqualTo condition', () => {
+  it('validates "field.isEqualTo" conditional', () => {
     expect(
       validate(field('applicant.name').isEqualTo('John Doe'), params)
     ).toBe(true)
@@ -114,14 +114,14 @@ describe('Validate conditionals', () => {
     ).toBe(false)
   })
 
-  it('should validate field isUndefined condition', () => {
+  it('validates "field.isUndefined" conditional', () => {
     expect(validate(field('applicant.name').isUndefined(), params)).toBe(false)
     expect(validate(field('applicant.name.foo').isUndefined(), params)).toBe(
       true
     )
   })
 
-  it('should validate field inArray condition', () => {
+  it('validates "field.inArray" conditional', () => {
     expect(
       validate(
         field('applicant.name').inArray(['Jack Doe', 'Jane Doe']),
