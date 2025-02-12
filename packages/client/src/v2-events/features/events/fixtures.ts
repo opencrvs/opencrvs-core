@@ -18,7 +18,7 @@ import {
 } from '@opencrvs/commons/client'
 
 /* eslint-disable max-lines */
-const DEFAULT_FORM = {
+export const DEFAULT_FORM = {
   label: {
     id: 'v2.event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',
