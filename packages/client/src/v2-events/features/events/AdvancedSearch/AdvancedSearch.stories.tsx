@@ -15,7 +15,6 @@ import superjson from 'superjson'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
 import { tennisClubMembershipEvent } from '@client/v2-events/features/events/fixtures'
-import { advancedSearchRouter } from './router'
 import AdvancedSearch from './AdvancedSearch'
 
 const meta: Meta<typeof AdvancedSearch> = {
@@ -45,7 +44,10 @@ type Story = StoryObj<typeof AdvancedSearch>
 export const AdvancedSearchStory: Story = {
   parameters: {
     reactRouter: {
-      router: advancedSearchRouter,
+      router: {
+        path: ROUTES.V2.ADVANCED_SEARCH.buildPath({}),
+        element: <AdvancedSearch />
+      },
       initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
     },
     msw: {
