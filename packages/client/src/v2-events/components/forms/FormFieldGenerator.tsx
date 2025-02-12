@@ -249,14 +249,13 @@ const GeneratedInputField = React.memo(
     }
 
     if (isFileFieldType(field)) {
-      const value = formData[fieldDefinition.id] as FileFieldValue
       return (
         <InputField {...inputFieldProps}>
           <File.Input
             {...inputProps}
-            value={value}
+            value={field.value}
             onChange={handleFileChange}
-            fullWidth={field.config.options?.fullWidth}
+            fullWidth={field.config.options?.style.fullWidth}
           />
         </InputField>
       )

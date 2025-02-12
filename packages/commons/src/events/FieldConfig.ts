@@ -127,11 +127,13 @@ const File = BaseField.extend({
   type: z.literal(FieldType.FILE),
   options: z
     .object({
-      fullWidth: z
-        .boolean()
-        .describe(
-          'Whether the file upload button should take the full width of the container or not'
-        )
+      style: z.object({
+        fullWidth: z
+          .boolean()
+          .describe(
+            'Whether the file upload button should take the full width of the container or not'
+          )
+      })
     })
     .optional()
 }).describe('File upload')
