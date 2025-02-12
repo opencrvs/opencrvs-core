@@ -17,6 +17,8 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
+export const EmailValue = z.string().email()
+
 export const FileFieldValue = z.object({
   filename: z.string(),
   originalFilename: z.string(),
