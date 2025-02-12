@@ -12,24 +12,20 @@
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { ActionType, SCOPES } from '@opencrvs/commons'
 
-test('Validation error message contains all the offending fields', async () => {
+test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
+  const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-
-  const data = generator.event.actions.register(event.id, {
-    data: {
-      'applicant.dob': '02-02'
-    }
-  })
-
-  await expect(client.event.actions.register(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.validate(
+      generator.event.actions.validate('registered-event-test-id-12345')
+    )
+  ).rejects.matchSnapshot()
 })
 
 test('Action without form definition should accept empty payload', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_VALIDATE])
 
   const event = await client.event.create(generator.event.create())
 

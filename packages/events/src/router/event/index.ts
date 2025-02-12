@@ -48,6 +48,7 @@ import { approveCorrection } from '@events/service/events/actions/approve-correc
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import * as middleware from '@events/router/middleware'
 import { requiresScopes } from '@events/router/middleware'
+
 function validateEventType({
   eventTypes,
   eventInputType
@@ -117,6 +118,7 @@ export const eventRouter = router({
     }),
   actions: router({
     notify: publicProcedure
+      .use(requiresScopes([SCOPES.RECORD_NOTIFY]))
       .input(NotifyActionInput)
       .use(middleware.validateAction(ActionType.NOTIFY))
       .mutation(async (options) => {
@@ -129,6 +131,7 @@ export const eventRouter = router({
         })
       }),
     declare: publicProcedure
+      .use(requiresScopes([SCOPES.RECORD_DECLARE]))
       .input(DeclareActionInput)
       .use(middleware.validateAction(ActionType.DECLARE))
       .mutation(async (options) => {
@@ -141,6 +144,7 @@ export const eventRouter = router({
         })
       }),
     validate: publicProcedure
+      .use(requiresScopes([SCOPES.RECORD_VALIDATE]))
       .input(ValidateActionInput)
       .use(middleware.validateAction(ActionType.VALIDATE))
       .mutation(async (options) => {

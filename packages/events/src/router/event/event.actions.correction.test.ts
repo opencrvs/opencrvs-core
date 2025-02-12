@@ -65,7 +65,8 @@ test('a correction request can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-    SCOPES.RECORD_REGISTER
+    SCOPES.RECORD_REGISTER,
+    SCOPES.RECORD_DECLARE
   ])
 
   const originalEvent = await client.event.create(generator.event.create())
@@ -209,7 +210,8 @@ test('a correction request can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-    SCOPES.RECORD_REGISTER
+    SCOPES.RECORD_REGISTER,
+    SCOPES.RECORD_DECLARE
   ])
 
   const originalEvent = await client.event.create(generator.event.create())
@@ -239,7 +241,8 @@ describe('when a correction request exists', () => {
     client = createTestClient(user, [
       SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
       SCOPES.RECORD_REGISTRATION_CORRECT,
-      SCOPES.RECORD_REGISTER
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_DECLARE
     ])
 
     const originalEvent = await client.event.create(generator.event.create())

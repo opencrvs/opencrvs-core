@@ -42,7 +42,10 @@ test('Validation error message contains all the offending fields', async () => {
 
 test('print certificate action can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+  const client = createTestClient(user, [
+    SCOPES.RECORD_DECLARATION_PRINT,
+    SCOPES.RECORD_DECLARE
+  ])
 
   const originalEvent = await client.event.create(generator.event.create())
 

@@ -39,7 +39,7 @@ test('stored events can be deleted', async () => {
   const event = await client.event.create(generator.event.create())
 
   // at this point event should exist
-  await expect(client.event.get(event.id)).toBeDefined()
+  expect(client.event.get(event.id)).toBeDefined()
 
   const removedEvent = await client.event.delete({ eventId: event.id })
   expect(removedEvent.id).toBe(event.id)

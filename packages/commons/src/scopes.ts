@@ -31,7 +31,11 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
 
+  // notify
+  RECORD_NOTIFY: 'record.notify',
+
   // declare
+  RECORD_DECLARE: 'record.declare',
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
   RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
   RECORD_DECLARE_DEATH: 'record.declare-death',
@@ -43,7 +47,10 @@ export const SCOPES = {
   RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
 
-  // CIHAN TODO: add this to sheet
+  // validate
+  RECORD_VALIDATE: 'record.validate',
+
+  // delete
   RECORD_DELETE: 'record.delete',
 
   // validate

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventStatus } from '@opencrvs/commons'
+import { EventStatus, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns empty list when no events', async () => {
@@ -36,7 +36,7 @@ test('Returns multiple events', async () => {
 
 test('Returns aggregated event with updated status and values', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 
   const initialData = {
     'applicant.firstname': 'John',
