@@ -13,6 +13,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 
 import React from 'react'
 import superjson from 'superjson'
+import { fireEvent, within } from '@storybook/test'
 import {
   tennisClueMembershipEventDocument,
   tennisClubMembershipEvent,
@@ -21,10 +22,8 @@ import {
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 
-import { Review } from './Review'
-import { fireEvent, within } from '@storybook/test'
-
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { Review } from './Review'
 
 const mockFormData = {
   'applicant.firstname': 'John',
@@ -49,7 +48,9 @@ const meta: Meta<typeof Review.Body> = {
     eventConfig: tennisClubMembershipEvent,
     formConfig: DEFAULT_FORM,
     form: mockFormData,
-    onEdit: () => {},
+    onEdit: () => {
+      console.log('Click edit')
+    },
     title: 'Member declaration for John Doe'
   },
   beforeEach: () => {
@@ -95,7 +96,7 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    step('Open modal', async () => {
+    await step('Open modal', async () => {
       const [changeButton] = await canvas.findAllByRole('button', {
         name: 'Change'
       })
@@ -103,7 +104,7 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
       await fireEvent.click(changeButton)
     })
 
-    step('Close modal', async () => {
+    await step('Close modal', async () => {
       const cancelButton = await canvas.findByRole('button', {
         name: 'Cancel'
       })
