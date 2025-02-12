@@ -27,6 +27,9 @@ import {
 import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { Output } from './Output'
+import { useSelector } from 'react-redux'
+import { getCountryLogoFile } from '@client/offline/selectors'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -154,6 +157,11 @@ const reviewMessages = defineMessages({
     id: 'v2.changeModal.description',
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
+  },
+  govtName: {
+    id: 'review.header.title.govtName',
+    defaultMessage: 'Government',
+    description: 'Header title that shows govt name'
   }
 })
 
@@ -179,6 +187,7 @@ function ReviewComponent({
   title: string
 }) {
   const intl = useIntl()
+  const countryLogoFile = useSelector(getCountryLogoFile)
 
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
@@ -189,6 +198,9 @@ function ReviewComponent({
         <Card>
           <HeaderContainer>
             <HeaderContent>
+              {countryLogoFile && (
+                <CountryLogo size="small" src={countryLogoFile} />
+              )}
               <Stack
                 alignItems="flex-start"
                 direction="column"
@@ -196,7 +208,8 @@ function ReviewComponent({
                 justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
-                  {eventConfig.label.defaultMessage}
+                  {intl.formatMessage(reviewMessages.govtName)} {' – '}
+                  {intl.formatMessage(eventConfig.label)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
                   {title}

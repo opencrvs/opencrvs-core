@@ -18,7 +18,6 @@ import {
 } from '@client/offline/reducer'
 import { System } from '@client/utils/gateway'
 import {
-  CertificateConfiguration,
   IApplicationConfig,
   IApplicationConfigAnonymous,
   IApplicationConfigResponse,

@@ -67,10 +67,9 @@ export async function getActionFormFields({
     `No configuration found for event type: ${eventType}`
   )
 
-  return getOrThrow(
-    findActiveActionFields(configuration, action),
-    `No fields found for action: ${action}`
-  )
+  // Action was defined in the configuration but form was not found.
+  // For now, we treat it as possible scenario (e.g. VALIDATE action).
+  return findActiveActionFields(configuration, action) ?? []
 }
 
 export async function notifyOnAction(
