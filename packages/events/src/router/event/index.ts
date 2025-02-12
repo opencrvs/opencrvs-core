@@ -66,9 +66,12 @@ function validateEventType({
 
 export const eventRouter = router({
   config: router({
-    get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
-      return getEventConfigurations(options.ctx.token)
-    })
+    get: publicProcedure
+      .use(requiresScopes([SCOPES.CONFIG_EVENT_READ]))
+      .output(z.array(EventConfig))
+      .query(async (options) => {
+        return getEventConfigurations(options.ctx.token)
+      })
   }),
   create: publicProcedure.input(EventInput).mutation(async (options) => {
     const config = await getEventConfigurations(options.ctx.token)

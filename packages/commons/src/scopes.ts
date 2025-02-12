@@ -25,6 +25,8 @@ export const SCOPES = {
   TEAMS: 'teams',
   CONFIG: 'config',
 
+  CONFIG_EVENT_READ: 'config.event.read',
+
   // systems / integrations
   WEBHOOK: 'webhook',
   NATIONALID: 'nationalId',
