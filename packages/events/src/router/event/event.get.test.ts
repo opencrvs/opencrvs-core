@@ -13,9 +13,16 @@ import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { SCOPES } from '@opencrvs/commons'
 
-test('Returns 404 when not found', async () => {
+test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
+
+  await expect(client.event.get('event-test-id-12345')).rejects.matchSnapshot()
+})
+
+test('Returns 404 when not found', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
 
   await expect(
     client.event.get('id-not-persisted')
@@ -24,7 +31,7 @@ test('Returns 404 when not found', async () => {
 
 test('Returns event', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
 
   const event = await client.event.create(generator.event.create())
 
@@ -41,7 +48,8 @@ test('Returns event with all actions', async () => {
     SCOPES.RECORD_REGISTRATION_CORRECT,
     SCOPES.RECORD_REGISTER,
     SCOPES.RECORD_VALIDATE,
-    SCOPES.RECORD_DECLARE
+    SCOPES.RECORD_DECLARE,
+    SCOPES.RECORD_READ
   ])
 
   const event = await client.event.create(generator.event.create())

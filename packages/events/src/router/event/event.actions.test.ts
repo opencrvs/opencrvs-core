@@ -30,7 +30,10 @@ test('actions can be added to created events', async () => {
 
 test('Action data can be retrieved', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+  const client = createTestClient(user, [
+    SCOPES.RECORD_DECLARE,
+    SCOPES.RECORD_READ
+  ])
 
   const originalEvent = await client.event.create(generator.event.create())
 

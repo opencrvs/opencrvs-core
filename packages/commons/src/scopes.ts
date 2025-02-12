@@ -33,6 +33,9 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
 
+  // record basic methods
+  RECORD_READ: 'record.read',
+
   // notify
   RECORD_NOTIFY: 'record.notify',
 

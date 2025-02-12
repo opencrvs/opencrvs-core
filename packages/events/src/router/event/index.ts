@@ -89,17 +89,20 @@ export const eventRouter = router({
       transactionId: options.input.transactionId
     })
   }),
-  get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-    const event = await getEventById(input)
+  get: publicProcedure
+    .use(requiresScopes([SCOPES.RECORD_READ]))
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      const event = await getEventById(input)
 
-    const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-    const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
-      eventWithSignedFiles,
-      ctx.user.id
-    )
+      const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
+      const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
+        eventWithSignedFiles,
+        ctx.user.id
+      )
 
-    return eventWithUserSpecificDrafts
-  }),
+      return eventWithUserSpecificDrafts
+    }),
   delete: publicProcedure
     .use(requiresScopes([SCOPES.RECORD_DELETE]))
     .input(z.object({ eventId: z.string() }))

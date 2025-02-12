@@ -10,10 +10,11 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { SCOPES } from '@opencrvs/commons'
 
 test('event can be created and fetched', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
   const event = await client.event.create(generator.event.create())
 
   const fetchedEvent = await client.event.get(event.id)

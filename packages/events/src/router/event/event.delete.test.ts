@@ -34,7 +34,10 @@ test('should return 404 if event does not exist', async () => {
 
 test('stored events can be deleted', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DELETE])
+  const client = createTestClient(user, [
+    SCOPES.RECORD_DELETE,
+    SCOPES.RECORD_READ
+  ])
 
   const event = await client.event.create(generator.event.create())
 
