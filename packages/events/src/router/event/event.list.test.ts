@@ -21,7 +21,7 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test('Returns empty list when no events', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_READ_ALL])
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
 
   const fetchedEvents = await client.event.list()
 
@@ -30,7 +30,7 @@ test('Returns empty list when no events', async () => {
 
 test('Returns multiple events', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_READ_ALL])
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
 
   for (let i = 0; i < 10; i++) {
     await client.event.create(generator.event.create())
@@ -45,7 +45,7 @@ test('Returns aggregated event with updated status and values', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     SCOPES.RECORD_DECLARE,
-    SCOPES.RECORD_READ_ALL
+    SCOPES.RECORD_READ
   ])
 
   const initialData = {

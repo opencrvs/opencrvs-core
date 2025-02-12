@@ -33,10 +33,6 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
 
-  // record basic methods
-  RECORD_DELETE: 'record.delete',
-  RECORD_READ_ALL: 'record.read:all',
-
   // notify
   RECORD_NOTIFY: 'record.notify',
 
@@ -63,6 +59,9 @@ export const SCOPES = {
   RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
   RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
   RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
+
+  // delete
+  RECORD_DELETE: 'record.delete',
 
   // register
   RECORD_REGISTER: 'record.register',

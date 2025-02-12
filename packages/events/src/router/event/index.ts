@@ -228,7 +228,7 @@ export const eventRouter = router({
     })
   }),
   list: publicProcedure
-    .use(requiresScopes([SCOPES.RECORD_READ_ALL]))
+    .use(requiresScopes([SCOPES.RECORD_READ]))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
   registration: router({
