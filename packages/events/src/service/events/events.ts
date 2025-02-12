@@ -32,7 +32,7 @@ export const EventInputWithId = EventInput.extend({
   id: z.string()
 })
 
-export type EventInputWithId = z.infer<typeof EventInputWithId>
+type EventInputWithId = z.infer<typeof EventInputWithId>
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await events.getClient()
