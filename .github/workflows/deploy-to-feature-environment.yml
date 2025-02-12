@@ -112,6 +112,7 @@ jobs:
 
   trigger-e2e:
     if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    # TODO: Identify reason why "Wait for E2E Workflow Completion" with 24.04
     runs-on: ubuntu-22.04
     needs: generate_stack_name_and_branch
     environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
@@ -217,6 +218,7 @@ jobs:
 
   listen-e2e:
     needs: [trigger-e2e, generate_stack_name_and_branch]
+    # TODO: Identify reason why "Wait for E2E Workflow Completion" with 24.04
     runs-on: ubuntu-22.04
     steps:
       - name: Wait for Environment Deployment (Deploy Job)
