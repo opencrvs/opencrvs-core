@@ -110,6 +110,11 @@ const SignatureField = BaseField.extend({
 }).describe('Signature input field')
 
 export type SignatureField = z.infer<typeof SignatureField>
+export const EmailField = BaseField.extend({
+  type: z.literal(FieldType.EMAIL)
+})
+
+export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
@@ -269,6 +274,7 @@ export type Inferred =
   | z.infer<typeof Location>
   | z.infer<typeof SignatureField>
   | z.infer<typeof Divider>
+  | z.infer<typeof EmailField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,

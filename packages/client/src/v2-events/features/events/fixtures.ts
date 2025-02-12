@@ -139,7 +139,7 @@ const DEFAULT_FORM = {
           id: 'recommender.firstname',
           conditionals: [
             {
-              type: 'HIDE',
+              type: 'SHOW',
               conditional: defineConditional({
                 type: 'object',
                 properties: {
@@ -147,7 +147,7 @@ const DEFAULT_FORM = {
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: 'true'
+                        const: true
                       }
                     },
                     required: ['recommender.none']
@@ -169,7 +169,7 @@ const DEFAULT_FORM = {
           id: 'recommender.surname',
           conditionals: [
             {
-              type: 'HIDE',
+              type: 'SHOW',
               conditional: defineConditional({
                 type: 'object',
                 properties: {
@@ -177,7 +177,7 @@ const DEFAULT_FORM = {
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: 'true'
+                        const: true
                       }
                     },
                     required: ['recommender.none']
@@ -199,7 +199,7 @@ const DEFAULT_FORM = {
           id: 'recommender.id',
           conditionals: [
             {
-              type: 'HIDE',
+              type: 'SHOW',
               conditional: defineConditional({
                 type: 'object',
                 properties: {
@@ -207,7 +207,7 @@ const DEFAULT_FORM = {
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: 'true'
+                        const: true
                       }
                     },
                     required: ['recommender.none']

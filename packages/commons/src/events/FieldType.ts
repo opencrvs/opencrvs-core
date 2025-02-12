@@ -13,6 +13,7 @@ export const FieldType = {
   ADDRESS: 'ADDRESS',
   TEXT: 'TEXT',
   TEXTAREA: 'TEXTAREA',
+  EMAIL: 'EMAIL',
   DATE: 'DATE',
   PARAGRAPH: 'PARAGRAPH',
   PAGE_HEADER: 'PAGE_HEADER',
