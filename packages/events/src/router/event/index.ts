@@ -45,7 +45,7 @@ import { router, publicProcedure } from '@events/router/trpc'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import * as middleware from '@events/router/middleware'
-import { requiresScopes } from '@events/router/middleware'
+import { requiresAnyScope } from '@events/router/middleware'
 
 function validateEventType({
   eventTypes,
@@ -66,12 +66,9 @@ function validateEventType({
 
 export const eventRouter = router({
   config: router({
-    get: publicProcedure
-      .use(requiresScopes([]))
-      .output(z.array(EventConfig))
-      .query(async (options) => {
-        return getEventConfigurations(options.ctx.token)
-      })
+    get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
+      return getEventConfigurations(options.ctx.token)
+    })
   }),
   create: publicProcedure.input(EventInput).mutation(async (options) => {
     const config = await getEventConfigurations(options.ctx.token)
@@ -90,7 +87,7 @@ export const eventRouter = router({
     })
   }),
   get: publicProcedure
-    .use(requiresScopes([SCOPES.RECORD_READ]))
+    .use(requiresAnyScope([SCOPES.RECORD_READ]))
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
@@ -104,14 +101,14 @@ export const eventRouter = router({
       return eventWithUserSpecificDrafts
     }),
   delete: publicProcedure
-    .use(requiresScopes([SCOPES.RECORD_DECLARE]))
+    .use(requiresAnyScope([SCOPES.RECORD_DECLARE]))
     .input(z.object({ eventId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   actions: router({
     notify: publicProcedure
-      .use(requiresScopes([SCOPES.RECORD_NOTIFY]))
+      .use(requiresAnyScope([SCOPES.RECORD_NOTIFY]))
       .input(NotifyActionInput)
       .use(middleware.validateAction(ActionType.NOTIFY))
       .mutation(async (options) => {
@@ -124,7 +121,7 @@ export const eventRouter = router({
         })
       }),
     declare: publicProcedure
-      .use(requiresScopes([SCOPES.RECORD_DECLARE]))
+      .use(requiresAnyScope([SCOPES.RECORD_DECLARE]))
       .input(DeclareActionInput)
       .use(middleware.validateAction(ActionType.DECLARE))
       .mutation(async (options) => {
@@ -137,7 +134,7 @@ export const eventRouter = router({
         })
       }),
     validate: publicProcedure
-      .use(requiresScopes([SCOPES.RECORD_SUBMIT_FOR_APPROVAL]))
+      .use(requiresAnyScope([SCOPES.RECORD_SUBMIT_FOR_APPROVAL]))
       .input(ValidateActionInput)
       .use(middleware.validateAction(ActionType.VALIDATE))
       .mutation(async (options) => {
@@ -150,7 +147,7 @@ export const eventRouter = router({
         })
       }),
     register: publicProcedure
-      .use(requiresScopes([SCOPES.RECORD_REGISTER]))
+      .use(requiresAnyScope([SCOPES.RECORD_REGISTER]))
       // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
       .input(RegisterActionInput.omit({ identifiers: true }))
       // @ts-expect-error
@@ -174,7 +171,7 @@ export const eventRouter = router({
         )
       }),
     printCertificate: publicProcedure
-      .use(requiresScopes([SCOPES.RECORD_DECLARATION_PRINT]))
+      .use(requiresAnyScope([SCOPES.RECORD_DECLARATION_PRINT]))
       .input(PrintCertificateActionInput)
       .use(middleware.validateAction(ActionType.PRINT_CERTIFICATE))
       .mutation(async (options) => {
@@ -188,7 +185,7 @@ export const eventRouter = router({
       }),
     correction: router({
       request: publicProcedure
-        .use(requiresScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION]))
+        .use(requiresAnyScope([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION]))
         .input(RequestCorrectionActionInput)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
         .mutation(async (options) => {
@@ -201,7 +198,7 @@ export const eventRouter = router({
           })
         }),
       approve: publicProcedure
-        .use(requiresScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
+        .use(requiresAnyScope([SCOPES.RECORD_REGISTRATION_CORRECT]))
         .input(ApproveCorrectionActionInput)
         .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
         .mutation(async (options) => {
@@ -214,7 +211,7 @@ export const eventRouter = router({
           })
         }),
       reject: publicProcedure
-        .use(requiresScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
+        .use(requiresAnyScope([SCOPES.RECORD_REGISTRATION_CORRECT]))
         .input(RejectCorrectionActionInput)
         .mutation(async (options) => {
           return rejectCorrection(options.input, {
@@ -228,7 +225,7 @@ export const eventRouter = router({
     })
   }),
   list: publicProcedure
-    .use(requiresScopes([SCOPES.RECORD_READ]))
+    .use(requiresAnyScope([SCOPES.RECORD_READ]))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
   registration: router({

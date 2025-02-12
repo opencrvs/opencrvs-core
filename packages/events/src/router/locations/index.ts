@@ -10,7 +10,7 @@
  */
 
 import { router, publicProcedure } from '@events/router/trpc'
-import { requiresScopes } from '@events/router/middleware'
+import { requiresAnyScope } from '@events/router/middleware'
 import {
   getLocations,
   Location,
@@ -21,7 +21,7 @@ import { SCOPES } from '@opencrvs/commons'
 
 export const locationRouter = router({
   set: publicProcedure
-    .use(requiresScopes([SCOPES.USER_DATA_SEEDING]))
+    .use(requiresAnyScope([SCOPES.USER_DATA_SEEDING]))
     .input(z.array(Location).min(1))
     .mutation(async (options) => {
       await setLocations(options.input)

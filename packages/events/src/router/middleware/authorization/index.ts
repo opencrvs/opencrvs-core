@@ -11,7 +11,6 @@
 
 import { inScope, Scope } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
-
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 
 /**
@@ -25,22 +24,17 @@ function setBearerForToken(token: string) {
 }
 
 /**
- * Middleware which checks that all the required scopes are present in the token.
+ * Middleware which checks that one of the required scopes are present in the token.
  *
  * @param scopes scopes that are required to access the resource
  * @returns TRPC compatible middleware function
  */
-export function requiresScopes(scopes: Scope[]) {
+export function requiresAnyScope(scopes: Scope[]) {
   return async (opts: MiddlewareOptions) => {
-    const token = setBearerForToken(opts.ctx.token)
-    const hasAllScopes = scopes.every((scope) =>
-      inScope({ Authorization: token }, [scope])
-    )
-
-    if (!hasAllScopes) {
-      throw new TRPCError({ code: 'FORBIDDEN' })
+    if (inScope({ Authorization: setBearerForToken(opts.ctx.token) }, scopes)) {
+      return opts.next()
     }
 
-    return opts.next()
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
 }

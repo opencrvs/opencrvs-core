@@ -10,13 +10,13 @@
  */
 
 import { SCOPES } from '@opencrvs/commons'
-import { requiresScopes } from '.'
+import { requiresAnyScope } from '.'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { createTestToken } from '@events/tests/utils'
 
 describe('requiresScopes()', () => {
-  test('should throw TRPCError with code "FORBIDDEN" if any of the required scopes are missing', async () => {
-    const middleware = requiresScopes([
+  test('should throw TRPCError with code "FORBIDDEN" if none of the required scopes are present on the token', async () => {
+    const middleware = requiresAnyScope([
       SCOPES.RECORD_REGISTER,
       SCOPES.RECORD_CONFIRM_REGISTRATION
     ])
@@ -24,7 +24,7 @@ describe('requiresScopes()', () => {
     // missing one of the required scopes
     const mockOpts = {
       ctx: {
-        token: createTestToken('test-user-id', [SCOPES.RECORD_REGISTER])
+        token: createTestToken('test-user-id', [SCOPES.RECORD_DECLARE])
       },
       next: vi.fn()
     } as unknown as MiddlewareOptions
@@ -36,17 +36,16 @@ describe('requiresScopes()', () => {
     expect(mockOpts.next).not.toHaveBeenCalled()
   })
 
-  test('should call next if all required scopes are present', async () => {
-    const middleware = requiresScopes([
+  test('should call next if any of the required scopes are present on the token', async () => {
+    const middleware = requiresAnyScope([
       SCOPES.RECORD_REGISTER,
       SCOPES.RECORD_CONFIRM_REGISTRATION
     ])
 
-    // has all the required scopes
+    // has one of the required scopes
     const mockOpts = {
       ctx: {
         token: createTestToken('test-user-id', [
-          SCOPES.RECORD_REGISTER,
           SCOPES.RECORD_CONFIRM_REGISTRATION
         ])
       },
