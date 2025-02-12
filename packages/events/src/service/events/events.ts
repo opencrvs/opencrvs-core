@@ -246,29 +246,3 @@ export async function addAction(
   await notifyOnAction(input, updatedEvent, token)
   return updatedEvent
 }
-
-export async function patchEvent(eventInput: EventInputWithId) {
-  const existingEvent = await getEventById(eventInput.id)
-
-  const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
-
-  const now = new Date().toISOString()
-
-  await collection.updateOne(
-    {
-      id: eventInput.id
-    },
-    {
-      $set: {
-        ...eventInput,
-        updatedAt: now
-      }
-    }
-  )
-
-  const event = await getEventById(existingEvent.id)
-  await indexEvent(event)
-
-  return event
-}

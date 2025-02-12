@@ -17,9 +17,7 @@ import {
   addAction,
   createEvent,
   deleteEvent,
-  EventInputWithId,
-  getEventById,
-  patchEvent
+  getEventById
 } from '@events/service/events/events'
 import { presignFilesInEvent } from '@events/service/files'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
@@ -87,17 +85,6 @@ export const eventRouter = router({
       createdAtLocation: options.ctx.user.primaryOfficeId,
       transactionId: options.input.transactionId
     })
-  }),
-  patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
-    const config = await getEventConfigurations(options.ctx.token)
-    const eventIds = config.map((c) => c.id)
-
-    validateEventType({
-      eventTypes: eventIds,
-      eventInputType: options.input.type
-    })
-
-    return patchEvent(options.input)
   }),
   get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
     const event = await getEventById(input)
