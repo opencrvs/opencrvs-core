@@ -41,6 +41,15 @@ export const handlers = {
       return [tennisClubMembershipEventIndex]
     })
   ],
+  files: [
+    http.post('/api/upload', async (req) => {
+      const formData = await req.request.formData()
+
+      return HttpResponse.text(
+        `event-attachments/${formData.get('transactionId')}.jpg`
+      )
+    })
+  ],
   registrationHome: [
     graphql.query('registrationHome', () => {
       return HttpResponse.json({
