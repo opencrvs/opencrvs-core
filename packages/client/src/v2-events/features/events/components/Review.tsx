@@ -306,6 +306,7 @@ function ReviewComponent({
                     fields={formConfig.review.fields}
                     formData={metadata}
                     id={'review'}
+                    initialValues={metadata}
                     setAllFieldsDirty={false}
                     onChange={onMetadataChange}
                   />

@@ -25,6 +25,8 @@ import {
   Paragraph,
   RadioGroup,
   SelectField,
+  SignatureField,
+  TextAreaField,
   TextField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -172,14 +174,14 @@ export const isTextFieldType = (field: {
 export const isTextAreaFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: TextField } => {
+}): field is { value: string; config: TextAreaField } => {
   return field.config.type === FieldType.TEXTAREA
 }
 
 export const isSignatureFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: TextField } => {
+}): field is { value: string; config: SignatureField } => {
   return field.config.type === FieldType.SIGNATURE
 }
 

@@ -45,6 +45,11 @@ const TENNIS_CLUB_FORM = defineForm({
         type: 'SIGNATURE',
         id: 'review.signature',
         required: false,
+        modalTitle: {
+          id: 'v2.signature.upload.modal.title',
+          defaultMessage: 'Draw signature',
+          description: 'Title for the modal to draw signature'
+        },
         label: {
           defaultMessage: 'Signature of informant',
           id: 'v2.event.birth.action.declare.form.review.signature.label',

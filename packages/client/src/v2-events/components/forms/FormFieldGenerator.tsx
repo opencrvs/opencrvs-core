@@ -346,10 +346,7 @@ const GeneratedInputField = React.memo(
             name={fieldDefinition.id}
             value={field.value as string}
             onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
-            modalTitle={intl.formatMessage({
-              id: 'v2.signature.upload.modal.title',
-              defaultMessage: 'Draw signature'
-            })}
+            modalTitle={intl.formatMessage(field.config.modalTitle)}
           />
         </InputField>
       )
