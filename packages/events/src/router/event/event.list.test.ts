@@ -12,9 +12,16 @@
 import { EventStatus, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
-test('Returns empty list when no events', async () => {
+test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
+
+  await expect(client.event.list()).rejects.matchSnapshot()
+})
+
+test('Returns empty list when no events', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_READ_ALL])
 
   const fetchedEvents = await client.event.list()
 
@@ -23,7 +30,7 @@ test('Returns empty list when no events', async () => {
 
 test('Returns multiple events', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_READ_ALL])
 
   for (let i = 0; i < 10; i++) {
     await client.event.create(generator.event.create())
@@ -36,7 +43,10 @@ test('Returns multiple events', async () => {
 
 test('Returns aggregated event with updated status and values', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+  const client = createTestClient(user, [
+    SCOPES.RECORD_DECLARE,
+    SCOPES.RECORD_READ_ALL
+  ])
 
   const initialData = {
     'applicant.firstname': 'John',

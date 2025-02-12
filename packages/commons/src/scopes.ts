@@ -35,6 +35,8 @@ export const SCOPES = {
 
   // record basic methods
   RECORD_READ: 'record.read',
+  RECORD_DELETE: 'record.delete',
+  RECORD_READ_ALL: 'record.read:all',
 
   // notify
   RECORD_NOTIFY: 'record.notify',
@@ -54,9 +56,6 @@ export const SCOPES = {
 
   // validate
   RECORD_VALIDATE: 'record.validate',
-
-  // delete
-  RECORD_DELETE: 'record.delete',
 
   // validate
   RECORD_SUBMIT_FOR_APPROVAL: 'record.declaration-submit-for-approval',
