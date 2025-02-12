@@ -11,7 +11,7 @@
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { SCOPES } from '@opencrvs/commons'
 
-test('prevents forbidden access from user if missing required scope', async () => {
+test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   // User missing required scope
   const registrarClient = createTestClient(user)

@@ -12,19 +12,13 @@
 import { ActionType, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
-test('prevents forbidden access from user if missing required scope', async () => {
+test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-
   await expect(
     client.event.actions.printCertificate(
-      generator.event.actions.printCertificate(event.id, {
-        data: {
-          'applicant.dob': '02-02'
-        }
-      })
+      generator.event.actions.printCertificate('event-test-id-12345')
     )
   ).rejects.matchSnapshot()
 })

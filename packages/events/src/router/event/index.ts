@@ -29,7 +29,8 @@ import {
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
-  logger
+  logger,
+  SCOPES
 } from '@opencrvs/commons'
 import {
   ActionType,
@@ -47,7 +48,6 @@ import { approveCorrection } from '@events/service/events/actions/approve-correc
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import * as middleware from '@events/router/middleware'
 import { requiresScopes } from '@events/router/middleware'
-import { SCOPES } from '@opencrvs/commons'
 function validateEventType({
   eventTypes,
   eventInputType
@@ -189,6 +189,7 @@ export const eventRouter = router({
       }),
     correction: router({
       request: publicProcedure
+        .use(requiresScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION]))
         .input(RequestCorrectionActionInput)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
         .mutation(async (options) => {
@@ -201,6 +202,7 @@ export const eventRouter = router({
           })
         }),
       approve: publicProcedure
+        .use(requiresScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
         .input(ApproveCorrectionActionInput)
         .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
         .mutation(async (options) => {
@@ -213,6 +215,7 @@ export const eventRouter = router({
           })
         }),
       reject: publicProcedure
+        .use(requiresScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
         .input(RejectCorrectionActionInput)
         .mutation(async (options) => {
           return rejectCorrection(options.input, {
