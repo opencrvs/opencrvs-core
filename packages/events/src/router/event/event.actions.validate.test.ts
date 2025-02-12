@@ -27,64 +27,19 @@ test('Validation error message contains all the offending fields', async () => {
   await expect(client.event.actions.register(data)).rejects.matchSnapshot()
 })
 
-test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
+test('Action without form definition should accept empty payload', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.validate(event.id, {
-    data: {
-      'applicant.dob': '02-1-2024',
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
-      'recommender.none': false
-    }
+    data: {}
   })
 
-  await expect(client.event.actions.validate(data)).rejects.matchSnapshot()
-})
+  const result = await client.event.actions.validate(data)
+  const lastAction = result.actions[result.actions.length - 1]
 
-test('Skips required field validation when they are conditionally hidden', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await client.event.create(generator.event.create())
-
-  const form = {
-    'applicant.dob': '2024-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
-    'recommender.none': false
-  }
-
-  const data = generator.event.actions.validate(event.id, {
-    data: form
-  })
-
-  const response = await client.event.actions.validate(data)
-  const savedAction = response.actions.find(
-    (action) => action.type === ActionType.VALIDATE
-  )
-  expect(savedAction?.data).toEqual(form)
-})
-
-test('Prevents adding birth date in future', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await client.event.create(generator.event.create())
-
-  const form = {
-    'applicant.dob': '2040-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
-    'recommender.none': false
-  }
-
-  const payload = generator.event.actions.validate(event.id, {
-    data: form
-  })
-
-  await expect(client.event.actions.validate(payload)).rejects.matchSnapshot()
+  expect(lastAction.type).toBe(ActionType.VALIDATE)
+  expect(lastAction.data).toEqual({})
 })
