@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { inScope, Scope, SCOPES } from '@opencrvs/commons'
+import { inScope, Scope } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 
 import { MiddlewareOptions } from '@events/router/middleware/utils'
@@ -34,10 +34,10 @@ function createScopeAuthMiddleware(scopes: Scope[]) {
       return opts.next()
     }
 
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
 }
 
-export const isDataSeedingUser = createScopeAuthMiddleware([
-  SCOPES.USER_DATA_SEEDING
-])
+export function requiresScopes(scopes: Scope[]) {
+  return createScopeAuthMiddleware(scopes)
+}

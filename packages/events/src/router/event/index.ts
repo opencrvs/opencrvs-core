@@ -46,7 +46,8 @@ import { router, publicProcedure } from '@events/router/trpc'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import * as middleware from '@events/router/middleware'
-
+import { requiresScopes } from '@events/router/middleware'
+import { SCOPES } from '@opencrvs/commons'
 function validateEventType({
   eventTypes,
   eventInputType
@@ -174,6 +175,7 @@ export const eventRouter = router({
         )
       }),
     printCertificate: publicProcedure
+      .use(requiresScopes([SCOPES.RECORD_DECLARATION_PRINT]))
       .input(PrintCertificateActionInput)
       .use(middleware.validateAction(ActionType.PRINT_CERTIFICATE))
       .mutation(async (options) => {

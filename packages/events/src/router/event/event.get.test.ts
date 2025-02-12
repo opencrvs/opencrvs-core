@@ -11,6 +11,7 @@
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { SCOPES } from '@opencrvs/commons'
 
 test('Returns 404 when not found', async () => {
   const { user } = await setupTestCase()
@@ -34,7 +35,7 @@ test('Returns event', async () => {
 
 test('Returns event with all actions', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
 
   const event = await client.event.create(generator.event.create())
 

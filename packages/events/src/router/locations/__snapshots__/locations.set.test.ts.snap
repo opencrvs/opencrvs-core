@@ -14,4 +14,6 @@ exports[`Prevents sending empty payload 1`] = `
 ]]
 `;
 
-exports[`prevents unauthorized access from registrar 1`] = `[TRPCError: UNAUTHORIZED]`;
+exports[`prevents forbidden access from user if missing required scope 1`] = `[TRPCError: FORBIDDEN]`;
+
+exports[`prevents unauthorized access from registrar 1`] = `[TRPCError: FORBIDDEN]`;
