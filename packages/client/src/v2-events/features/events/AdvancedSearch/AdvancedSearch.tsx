@@ -54,8 +54,11 @@ function AdvancedSearch() {
     setActiveTabId(tabId)
   }
 
-  const currentTabSections =
-    allEvents.find((e) => e.id === activeTabId)?.advancedSearch ?? []
+  const currentEvent = allEvents.find((e) => e.id === activeTabId)
+  if (!currentEvent) {
+    return null
+  }
+  const currentTabSections = currentEvent.advancedSearch
 
   return (
     <>
@@ -73,7 +76,7 @@ function AdvancedSearch() {
         titleColor={'copy'}
       >
         {currentTabSections.length > 0 && (
-          <TabSearch activeTabId={activeTabId} sections={currentTabSections} />
+          <TabSearch currentEvent={currentEvent} />
         )}
       </Content>
     </>

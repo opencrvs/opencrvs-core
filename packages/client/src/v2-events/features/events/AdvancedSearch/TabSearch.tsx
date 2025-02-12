@@ -12,11 +12,11 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useIntl, defineMessages } from 'react-intl'
 import { Accordion } from '@opencrvs/components'
-import { AdvancedSearchConfig, FieldValue } from '@opencrvs/commons/client'
+import { FieldValue } from '@opencrvs/commons/client'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
+import { EventConfig } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -42,36 +42,29 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
-export function TabSearch({
-  sections,
-  activeTabId
-}: {
-  sections: AdvancedSearchConfig[]
-  activeTabId: string
-}) {
+export function TabSearch({ currentEvent }: { currentEvent: EventConfig }) {
   const intl = useIntl()
-  const events = useEventConfigurations()
   const [formValues, setFormValues] = React.useState<
     Record<string, FieldValue>
   >({})
 
-  const currentEvent = events.filter((e) => e.id === activeTabId)
+  React.useEffect(() => {
+    setFormValues({})
+  }, [currentEvent])
 
   // Extract unique fields
   const allUniqueFields = [
     ...new Map(
-      currentEvent
-        .flatMap((event) =>
-          event.actions.flatMap((action) =>
-            action.forms.flatMap((form) =>
-              form.pages.flatMap((page) => page.fields)
-            )
+      currentEvent.actions.flatMap((action) =>
+        action.forms.flatMap((form) =>
+          form.pages.flatMap((page) =>
+            page.fields.map((field) => [field.id, field])
           )
         )
-        .map((field) => [field.id, field])
+      )
     ).values()
   ]
-
+  const sections = currentEvent.advancedSearch
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
     setFormValues((prev) => ({
       ...prev,
