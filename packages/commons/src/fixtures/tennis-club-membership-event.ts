@@ -347,7 +347,7 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.validate.label'
       },
-      forms: [TENNIS_CLUB_FORM]
+      forms: []
     },
     {
       type: 'REQUEST_CORRECTION',

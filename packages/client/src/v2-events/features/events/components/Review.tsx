@@ -12,6 +12,7 @@
 import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
+import { useSelector } from 'react-redux'
 import { ActionFormData, FormConfig } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -25,8 +26,10 @@ import {
 } from '@opencrvs/components'
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { getCountryLogoFile } from '@client/offline/selectors'
 import { Output } from './Output'
 
 const Row = styled.div<{
@@ -155,6 +158,11 @@ const reviewMessages = defineMessages({
     id: 'v2.changeModal.description',
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
+  },
+  govtName: {
+    id: 'review.header.title.govtName',
+    defaultMessage: 'Government',
+    description: 'Header title that shows govt name'
   }
 })
 
@@ -177,13 +185,14 @@ function ReviewComponent({
   eventConfig: EventConfig
   formConfig: FormConfig
   form: ActionFormData
-  metadata: ActionFormData
   previousFormValues?: EventIndex['data']
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
-  onMetadataChange: (values: ActionFormData) => void
+  metadata?: ActionFormData
+  onMetadataChange?: (values: ActionFormData) => void
 }) {
   const intl = useIntl()
+  const countryLogoFile = useSelector(getCountryLogoFile)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
@@ -193,6 +202,9 @@ function ReviewComponent({
         <Card>
           <HeaderContainer>
             <HeaderContent>
+              {countryLogoFile && (
+                <CountryLogo size="small" src={countryLogoFile} />
+              )}
               <Stack
                 alignItems="flex-start"
                 direction="column"
@@ -200,7 +212,8 @@ function ReviewComponent({
                 justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
-                  {eventConfig.label.defaultMessage}
+                  {intl.formatMessage(reviewMessages.govtName)} {' – '}
+                  {intl.formatMessage(eventConfig.label)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
                   {title}
@@ -281,19 +294,24 @@ function ReviewComponent({
                 )
               })}
             </ReviewContainter>
-            {formConfig.review.fields &&
-              formConfig.review.fields.length > 0 && (
+          </FormData>
+
+          {formConfig.review.fields &&
+            metadata &&
+            onMetadataChange &&
+            formConfig.review.fields.length > 0 && (
+              <FormData>
                 <ReviewContainter>
                   <FormFieldGenerator
-                    fields={formConfig.review.fields || []}
+                    fields={formConfig.review.fields}
                     formData={metadata}
                     id={'review'}
                     setAllFieldsDirty={false}
                     onChange={onMetadataChange}
                   />
                 </ReviewContainter>
-              )}
-          </FormData>
+              </FormData>
+            )}
         </Card>
         {children}
       </LeftColumn>
