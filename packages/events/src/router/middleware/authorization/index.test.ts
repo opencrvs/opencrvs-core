@@ -14,7 +14,7 @@ import { requiresScopes } from '.'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { createTestToken } from '@events/tests/utils'
 
-describe.only('requiresScopes()', () => {
+describe('requiresScopes()', () => {
   test('should throw TRPCError with code "FORBIDDEN" if any of the required scopes are missing', async () => {
     const middleware = requiresScopes([
       SCOPES.RECORD_REGISTER,
