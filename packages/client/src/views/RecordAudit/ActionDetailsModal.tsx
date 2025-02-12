@@ -633,7 +633,8 @@ const ActionDetailsModalListTable = ({
           />
         )}
       {!isEmpty(collectorData) &&
-        actionDetailsData.regStatus !== RegStatus.Issued && (
+        actionDetailsData.regStatus !== RegStatus.Issued &&
+        !['PRINT_IN_ADVANCE', 'OTHER'].includes(collectorData.relationship) && (
           <Table
             noResultText=" "
             columns={certificateCollectorVerified}
