@@ -15,6 +15,7 @@ import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
+import { findPageFields } from './utils'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -36,13 +37,8 @@ export const EventConfig = z
     advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
   })
   .superRefine((event, ctx) => {
-    const allFields = new Set(
-      event.actions.flatMap((action) =>
-        action.forms.flatMap((form) =>
-          form.pages.flatMap((page) => page.fields.flatMap((field) => field.id))
-        )
-      )
-    )
+    const allFields = findPageFields(event)
+    const fieldIds = allFields.map((field) => field.id)
 
     const advancedSearchFields = event.advancedSearch.flatMap((section) =>
       section.fields.flatMap((field) => field.fieldId)
@@ -59,7 +55,7 @@ export const EventConfig = z
     }
 
     const invalidFields = event.advancedSearch.flatMap((section) =>
-      section.fields.filter((field) => !allFields.has(field.fieldId))
+      section.fields.filter((field) => !fieldIds.includes(field.fieldId))
     )
 
     if (invalidFields.length > 0) {

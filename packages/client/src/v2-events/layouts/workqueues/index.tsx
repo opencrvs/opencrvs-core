@@ -13,7 +13,7 @@ import React from 'react'
 
 import { noop } from 'lodash'
 import { useNavigate } from 'react-router-dom'
-import { useIntl } from 'react-intl'
+import { useIntl, defineMessages } from 'react-intl'
 import {
   AppBar,
   Button,
@@ -31,6 +31,16 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
+
+const messagesToDefine = {
+  header: {
+    id: 'home.header.advancedSearch',
+    defaultMessage: 'Advanced Search',
+    description: 'Search menu advanced search type'
+  }
+}
+const messages = defineMessages(messagesToDefine)
+
 export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const intl = useIntl()
@@ -42,11 +52,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
 
   const advancedSearchNavigationList: INavigationType[] = [
     {
-      label: intl.formatMessage({
-        id: 'home.header.advancedSearch',
-        defaultMessage: 'Advanced Search',
-        description: 'Search menu advanced search type'
-      }),
+      label: intl.formatMessage(messages.header),
       id: 'advanced-search',
       onClick: () => {
         navigate(ROUTES.V2.ADVANCED_SEARCH.path)
