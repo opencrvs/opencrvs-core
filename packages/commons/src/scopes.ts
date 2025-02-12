@@ -25,8 +25,6 @@ export const SCOPES = {
   TEAMS: 'teams',
   CONFIG: 'config',
 
-  CONFIG_EVENT_READ: 'config.event.read',
-
   // systems / integrations
   WEBHOOK: 'webhook',
   NATIONALID: 'nationalId',
@@ -50,18 +48,12 @@ export const SCOPES = {
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
 
   // validate
-  RECORD_VALIDATE: 'record.validate',
-
-  // validate
   RECORD_SUBMIT_FOR_APPROVAL: 'record.declaration-submit-for-approval',
   RECORD_SUBMIT_FOR_UPDATES: 'record.declaration-submit-for-updates',
   RECORD_DECLARATION_EDIT: 'record.declaration-edit',
   RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
   RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
   RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
-
-  // delete
-  RECORD_DELETE: 'record.delete',
 
   // register
   RECORD_REGISTER: 'record.register',

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionType } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [])
 
   await expect(
     client.event.actions.printCertificate(
@@ -25,7 +25,7 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 
@@ -42,10 +42,7 @@ test('Validation error message contains all the offending fields', async () => {
 
 test('print certificate action can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_DECLARATION_PRINT,
-    SCOPES.RECORD_DECLARE
-  ])
+  const client = createTestClient(user)
 
   const originalEvent = await client.event.create(generator.event.create())
 
@@ -70,7 +67,7 @@ test('print certificate action can be added to a created event', async () => {
 
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 
@@ -90,7 +87,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
 
 test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 
@@ -114,7 +111,7 @@ test('Skips required field validation when they are conditionally hidden', async
 
 test('Prevents adding birth date in future', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 

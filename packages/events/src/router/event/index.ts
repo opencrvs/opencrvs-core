@@ -67,7 +67,7 @@ function validateEventType({
 export const eventRouter = router({
   config: router({
     get: publicProcedure
-      .use(requiresScopes([SCOPES.CONFIG_EVENT_READ]))
+      .use(requiresScopes([]))
       .output(z.array(EventConfig))
       .query(async (options) => {
         return getEventConfigurations(options.ctx.token)
@@ -104,7 +104,7 @@ export const eventRouter = router({
       return eventWithUserSpecificDrafts
     }),
   delete: publicProcedure
-    .use(requiresScopes([SCOPES.RECORD_DELETE]))
+    .use(requiresScopes([SCOPES.RECORD_DECLARE]))
     .input(z.object({ eventId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
@@ -137,7 +137,7 @@ export const eventRouter = router({
         })
       }),
     validate: publicProcedure
-      .use(requiresScopes([SCOPES.RECORD_VALIDATE]))
+      .use(requiresScopes([SCOPES.RECORD_SUBMIT_FOR_APPROVAL]))
       .input(ValidateActionInput)
       .use(middleware.validateAction(ActionType.VALIDATE))
       .mutation(async (options) => {

@@ -10,11 +10,11 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionType } from '@opencrvs/commons'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [])
 
   await expect(
     client.event.actions.validate(
@@ -25,7 +25,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
 
 test('Action without form definition should accept empty payload', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_VALIDATE])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 

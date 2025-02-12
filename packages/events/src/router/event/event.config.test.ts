@@ -10,18 +10,10 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { SCOPES } from '@opencrvs/commons'
-
-test('prevents forbidden access if missing required scope', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user)
-
-  await expect(client.event.config.get()).rejects.matchSnapshot()
-})
 
 test('event config can be fetched', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.CONFIG_EVENT_READ])
+  const client = createTestClient(user)
   const config = await client.event.config.get()
 
   expect(config[0].id).toEqual('TENNIS_CLUB_MEMBERSHIP')

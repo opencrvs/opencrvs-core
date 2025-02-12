@@ -10,11 +10,10 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { SCOPES } from '@opencrvs/commons'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [])
 
   await expect(
     client.event.delete({
@@ -25,7 +24,7 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test('should return 404 if event does not exist', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DELETE])
+  const client = createTestClient(user)
 
   await expect(
     client.event.delete({ eventId: 'some event' })
@@ -34,10 +33,7 @@ test('should return 404 if event does not exist', async () => {
 
 test('stored events can be deleted', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_DELETE,
-    SCOPES.RECORD_READ
-  ])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 
