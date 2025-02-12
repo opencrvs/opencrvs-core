@@ -19,7 +19,7 @@ echo
 echo "Waiting till contry config server is running before seeding data." && wait-on -l tcp:3040
 echo
 yarn seed:dev
-echo "
+echo -e "
 
 
 
