@@ -70,22 +70,22 @@ const DateDistanceMatcher = Matcher.extend({
   })
 })
 
-export interface AndInput {
+export type AndInput = {
   type: 'and'
   clauses: ClauseInput[]
 }
 
-export interface AndOutput {
+export type AndOutput = {
   type: 'and'
   clauses: ClauseOutput[]
 }
 
-export interface OrInput {
+export type OrInput = {
   type: 'or'
   clauses: ClauseInput[]
 }
 
-export interface OrOutput {
+export type OrOutput = {
   type: 'or'
   clauses: ClauseOutput[]
 }
