@@ -62,9 +62,13 @@ function validateEventType({
   }
 }
 
+// @TODO: We are using the birth declaration scope as a placeholder for all record declaration scopes.
+// This should be changed to use the custom event declaration scopes.
+const RECORD_DECLARE_SCOPE = SCOPES.RECORD_DECLARE_BIRTH
+
 const RECORD_READ_SCOPES = [
+  RECORD_DECLARE_SCOPE,
   SCOPES.RECORD_READ,
-  SCOPES.RECORD_DECLARE,
   SCOPES.RECORD_SUBMIT_INCOMPLETE,
   SCOPES.RECORD_SUBMIT_FOR_REVIEW,
   SCOPES.RECORD_REGISTER,
@@ -87,7 +91,7 @@ export const eventRouter = router({
       })
   }),
   create: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
+    .use(requiresAnyOfScopes([RECORD_DECLARE_SCOPE]))
     .input(EventInput)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
@@ -120,7 +124,7 @@ export const eventRouter = router({
       return eventWithUserSpecificDrafts
     }),
   delete: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
+    .use(requiresAnyOfScopes([RECORD_DECLARE_SCOPE]))
     .input(z.object({ eventId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
@@ -140,7 +144,7 @@ export const eventRouter = router({
         })
       }),
     declare: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
+      .use(requiresAnyOfScopes([RECORD_DECLARE_SCOPE]))
       .input(DeclareActionInput)
       .use(middleware.validateAction(ActionType.DECLARE))
       .mutation(async (options) => {

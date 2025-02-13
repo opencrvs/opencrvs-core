@@ -32,7 +32,6 @@ export const SCOPES = {
   RECORDSEARCH: 'recordsearch',
 
   // declare
-  RECORD_DECLARE: 'record.declare',
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
   RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
   RECORD_DECLARE_DEATH: 'record.declare-death',
