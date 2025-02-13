@@ -17,6 +17,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await expect(client.event.actions.notify({} as any)).rejects.toMatchObject(
     new TRPCError({ code: 'FORBIDDEN' })
   )
@@ -27,6 +28,7 @@ test(`allows access if required scope is present`, async () => {
   const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_INCOMPLETE])
 
   await expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     client.event.actions.notify({} as any)
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
