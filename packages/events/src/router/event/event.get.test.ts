@@ -32,6 +32,15 @@ test(`allows access with required scope`, async () => {
   )
 })
 
+test(`Returns 404 when not found`, async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+
+  await expect(
+    client.event.get('id-not-persisted')
+  ).rejects.toThrowErrorMatchingSnapshot()
+})
+
 test('Returns event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
