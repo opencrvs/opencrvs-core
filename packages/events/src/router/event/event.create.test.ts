@@ -11,6 +11,7 @@
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { SCOPES } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -18,7 +19,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
 
   await expect(
     client.event.create(generator.event.create())
-  ).rejects.matchSnapshot()
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
 test(`allows access with required scope`, async () => {
