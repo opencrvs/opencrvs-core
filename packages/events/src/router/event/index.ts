@@ -62,10 +62,25 @@ function validateEventType({
   }
 }
 
+const RECORD_READ_SCOPES = [
+  SCOPES.RECORD_READ,
+  SCOPES.RECORD_DECLARE,
+  SCOPES.RECORD_SUBMIT_INCOMPLETE,
+  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_EXPORT_RECORDS
+]
+
 export const eventRouter = router({
   config: router({
     get: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_READ, SCOPES.RECORD_DECLARE]))
+      .use(
+        requiresAnyOfScopes([
+          ...RECORD_READ_SCOPES,
+          SCOPES.CONFIG,
+          SCOPES.CONFIG_UPDATE_ALL
+        ])
+      )
       .output(z.array(EventConfig))
       .query(async (options) => {
         return getEventConfigurations(options.ctx.token)
@@ -91,7 +106,7 @@ export const eventRouter = router({
       })
     }),
   get: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_READ]))
+    .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
@@ -231,7 +246,7 @@ export const eventRouter = router({
     })
   }),
   list: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_READ]))
+    .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .output(z.array(EventIndex))
     .query(getIndexedEvents)
 })
