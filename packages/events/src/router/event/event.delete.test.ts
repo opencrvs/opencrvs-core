@@ -26,7 +26,7 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test(`allows access with required scope`, async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARE_BIRTH])
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 
   await expect(
     client.event.delete({ eventId: 'some event' })

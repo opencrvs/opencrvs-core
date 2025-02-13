@@ -27,7 +27,8 @@ import {
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
-  SCOPES
+  SCOPES,
+  logger
 } from '@opencrvs/commons'
 import {
   ActionType,
@@ -37,7 +38,8 @@ import {
   EventInput,
   NotifyActionInput,
   RegisterActionInput,
-  ValidateActionInput
+  ValidateActionInput,
+  FieldValue
 } from '@opencrvs/commons/events'
 import { router, publicProcedure } from '@events/router/trpc'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
@@ -62,12 +64,8 @@ function validateEventType({
   }
 }
 
-// @TODO: We are using the birth declaration scope as a placeholder for all record declaration scopes.
-// This should be changed to use the custom event declaration scopes.
-const RECORD_DECLARE_SCOPE = SCOPES.RECORD_DECLARE_BIRTH
-
 const RECORD_READ_SCOPES = [
-  RECORD_DECLARE_SCOPE,
+  SCOPES.RECORD_DECLARE,
   SCOPES.RECORD_READ,
   SCOPES.RECORD_SUBMIT_INCOMPLETE,
   SCOPES.RECORD_SUBMIT_FOR_REVIEW,
@@ -91,7 +89,7 @@ export const eventRouter = router({
       })
   }),
   create: publicProcedure
-    .use(requiresAnyOfScopes([RECORD_DECLARE_SCOPE]))
+    .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
     .input(EventInput)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
@@ -124,7 +122,7 @@ export const eventRouter = router({
       return eventWithUserSpecificDrafts
     }),
   delete: publicProcedure
-    .use(requiresAnyOfScopes([RECORD_DECLARE_SCOPE]))
+    .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
     .input(z.object({ eventId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
@@ -144,7 +142,7 @@ export const eventRouter = router({
         })
       }),
     declare: publicProcedure
-      .use(requiresAnyOfScopes([RECORD_DECLARE_SCOPE]))
+      .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
       .input(DeclareActionInput)
       .use(middleware.validateAction(ActionType.DECLARE))
       .mutation(async (options) => {
@@ -252,5 +250,19 @@ export const eventRouter = router({
   list: publicProcedure
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .output(z.array(EventIndex))
-    .query(getIndexedEvents)
+    .query(getIndexedEvents),
+  registration: router({
+    confirm: publicProcedure
+      .input(
+        z.object({
+          eventId: z.string(),
+          data: z.record(z.string(), FieldValue)
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        logger.info('Registration confirmed', { eventId: input.eventId })
+        logger.info(input.data)
+        return getEventById(input.eventId)
+      })
+  })
 })

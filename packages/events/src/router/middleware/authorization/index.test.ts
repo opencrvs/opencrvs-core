@@ -24,7 +24,7 @@ describe('requiresScopes()', () => {
     // missing one of the required scopes
     const mockOpts = {
       ctx: {
-        token: createTestToken('test-user-id', [SCOPES.RECORD_DECLARE_BIRTH])
+        token: createTestToken('test-user-id', [SCOPES.RECORD_DECLARE])
       },
       next: vi.fn()
     } as unknown as MiddlewareOptions

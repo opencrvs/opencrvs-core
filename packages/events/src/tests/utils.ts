@@ -23,7 +23,7 @@ import { seeder } from '@events/tests/generators'
 const { createCallerFactory } = t
 
 const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE,
   SCOPES.RECORD_DECLARATION_PRINT,
   SCOPES.RECORD_READ,
   SCOPES.RECORD_REGISTER,
