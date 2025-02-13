@@ -75,7 +75,7 @@ const TENNIS_CLUB_FORM = defineForm({
                 description: 'This is the error message for invalid date',
                 id: 'v2.event.birth.action.declare.form.section.child.field.dob.error'
               },
-              validator: field('applicant.dob').isBefore().now().apply()
+              validator: field('applicant.dob').isBefore().now()
             }
           ],
           label: {
@@ -326,7 +326,7 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.validate.label'
       },
-      forms: [TENNIS_CLUB_FORM]
+      forms: []
     },
     {
       type: 'REQUEST_CORRECTION',
