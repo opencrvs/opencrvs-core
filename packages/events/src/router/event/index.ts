@@ -27,7 +27,6 @@ import {
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
-  logger,
   SCOPES
 } from '@opencrvs/commons'
 import {
@@ -36,7 +35,6 @@ import {
   DeclareActionInput,
   EventIndex,
   EventInput,
-  FieldValue,
   NotifyActionInput,
   RegisterActionInput,
   ValidateActionInput
