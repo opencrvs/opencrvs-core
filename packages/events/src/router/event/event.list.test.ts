@@ -9,14 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventStatus } from '@opencrvs/commons'
+import { EventStatus, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { TRPCError } from '@trpc/server'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  await expect(client.event.list()).rejects.matchSnapshot()
+  await expect(client.event.list()).rejects.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
+})
+
+test(`allows access with required scope`, async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
+
+  await expect(client.event.list()).resolves.not.toThrow()
 })
 
 test('Returns empty list when no events', async () => {

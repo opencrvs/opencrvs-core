@@ -29,7 +29,7 @@ function setBearerForToken(token: string) {
  * @param scopes scopes that are required to access the resource
  * @returns TRPC compatible middleware function
  */
-export function requiresAnyScope(scopes: Scope[]) {
+export function requiresAnyOfScopes(scopes: Scope[]) {
   return async (opts: MiddlewareOptions) => {
     if (inScope({ Authorization: setBearerForToken(opts.ctx.token) }, scopes)) {
       return opts.next()

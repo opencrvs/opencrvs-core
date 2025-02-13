@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { TRPCError } from '@trpc/server'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -20,7 +21,18 @@ test('prevents forbidden access if missing required scope', async () => {
     client.event.actions.printCertificate(
       generator.event.actions.printCertificate('event-test-id-12345')
     )
-  ).rejects.matchSnapshot()
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+
+  await expect(
+    client.event.actions.printCertificate(
+      generator.event.actions.printCertificate('event-test-id-12345')
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
 test('Validation error message contains all the offending fields', async () => {

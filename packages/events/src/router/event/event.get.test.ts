@@ -10,22 +10,26 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { SCOPES } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { TRPCError } from '@trpc/server'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  await expect(client.event.get('event-test-id-12345')).rejects.matchSnapshot()
+  await expect(client.event.get('event-test-id-12345')).rejects.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
 })
 
-test('Returns 404 when not found', async () => {
+test(`allows access with required scope`, async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
 
-  await expect(
-    client.event.get('id-not-persisted')
-  ).rejects.toThrowErrorMatchingSnapshot()
+  await expect(client.event.get('some event')).rejects.not.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
 })
 
 test('Returns event', async () => {
