@@ -54,43 +54,7 @@ export const birthEvent = {
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      allowedWhen: {
-        type: 'object',
-        not: {
-          type: 'object',
-          properties: {
-            $event: {
-              type: 'object',
-              properties: {
-                actions: {
-                  type: 'array',
-                  contains: {
-                    type: 'object',
-                    properties: {
-                      type: {
-                        const: 'DECLARE'
-                      },
-                      draft: {
-                        type: 'boolean'
-                      }
-                    },
-                    required: ['type'],
-                    not: {
-                      properties: {
-                        draft: {
-                          const: true
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              required: ['actions']
-            }
-          },
-          required: ['$event']
-        }
-      },
+      conditionals: [],
       forms: [
         {
           label: {
@@ -126,7 +90,9 @@ export const birthEvent = {
                   },
                   type: 'FILE',
                   options: {
-                    fullWidth: true
+                    style: {
+                      fullWidth: true
+                    }
                   }
                 },
                 {

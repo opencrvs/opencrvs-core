@@ -80,7 +80,7 @@ import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
-import { DocumentUploaderWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
+import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -355,7 +355,7 @@ const GeneratedInputField = React.memo(
     if (isFileFieldWithOptionType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <DocumentUploaderWithOption
+          <FileWithOption.Input
             {...inputProps}
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}

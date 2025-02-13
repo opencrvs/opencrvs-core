@@ -79,7 +79,7 @@ export function getFullURL(filename: string) {
   throw new Error('MINIO_URL is not defined')
 }
 
-export async function getPresignedUrl(fileUri: string) {
+async function getPresignedUrl(fileUri: string) {
   const response = await fetch(
     '/api/presigned-url/event-attachments/' + fileUri,
     {

@@ -31,7 +31,7 @@ const UploadWrapper = styled.div`
   width: 100%;
 `
 
-const DorpdownContainer = styled.div`
+const DropdownContainer = styled.div`
   flex-grow: 1;
 `
 const Flex = styled.div`
@@ -179,7 +179,7 @@ export function DocumentUploaderWithOption({
       />
 
       <Flex>
-        <DorpdownContainer>
+        <DropdownContainer>
           <Select.Input
             id={props.name}
             options={remainingOptions}
@@ -190,7 +190,7 @@ export function DocumentUploaderWithOption({
               setErrorMessage('')
             }}
           />
-        </DorpdownContainer>
+        </DropdownContainer>
         <DocumentUploadButton
           {...props}
           allowedDocType={allowedDocType}
@@ -229,4 +229,9 @@ export function DocumentUploaderWithOption({
   )
 }
 
-export const FileOutput = null
+const DocumentWithOptionOutput = null
+
+export const FileWithOption = {
+  Input: DocumentUploaderWithOption,
+  Output: DocumentWithOptionOutput
+}
