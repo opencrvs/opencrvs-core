@@ -357,7 +357,8 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/setup-node@v4
+      - name: Use Node 18.X
+        uses: actions/setup-node@v4
         with:
           node-version: 18
       - name: Checkout base branch
