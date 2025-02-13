@@ -13,6 +13,8 @@
 import { InputField } from '@client/components/form/InputField'
 import { TEXT } from '@client/forms'
 import { Text as TextComponent } from '@opencrvs/components/lib/Text'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
 import * as React from 'react'
 
 import styled, { keyframes } from 'styled-components'
@@ -80,8 +82,6 @@ import { SubHeader } from '@opencrvs/components'
 import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
-import { TextArea } from '@client/v2-events/features/events/registered-fields/TextArea'
-import { SignatureUploader } from '@client/v2-events/features/events/registered-fields/SignatureUploader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -256,7 +256,7 @@ const GeneratedInputField = React.memo(
             intl.formatMessage(field.config.configuration?.postfix)
           }
         >
-          <TextArea.Input
+          <TextArea
             {...inputProps}
             disabled={disabled}
             maxLength={field.config.configuration?.maxLength}
@@ -342,11 +342,11 @@ const GeneratedInputField = React.memo(
     if (isSignatureFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <SignatureUploader.Input
+          <SignatureUploader
             name={fieldDefinition.id}
-            value={field.value as string}
+            value={field.value}
             onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
-            modalTitle={intl.formatMessage(field.config.modalTitle)}
+            modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
           />
         </InputField>
       )

@@ -97,7 +97,9 @@ export type TextAreaField = z.infer<typeof TextAreaField>
 
 const SignatureField = BaseField.extend({
   type: z.literal(FieldType.SIGNATURE),
-  modalTitle: TranslationConfig.describe('Title of the signature modal'),
+  signaturePromptLabel: TranslationConfig.describe(
+    'Title of the signature modal'
+  ),
   configuration: z
     .object({
       maxSizeMb: z.number().optional().describe('Maximum file size in MB'),

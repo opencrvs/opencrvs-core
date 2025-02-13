@@ -58,7 +58,7 @@ export const DEFAULT_FORM = {
           id: 'v2.event.birth.action.declare.form.review.signature.label',
           description: 'Label for the signature field in the review section'
         },
-        modalTitle: {
+        signaturePromptLabel: {
           id: 'v2.signature.upload.modal.title',
           defaultMessage: 'Draw signature',
           description: 'Title for the modal to draw signature'
@@ -950,6 +950,17 @@ export const tennisClubMembershipEvent = {
       forms: [DEFAULT_FORM]
     },
     {
+      type: 'REGISTER',
+      conditionals: [],
+      label: {
+        defaultMessage: 'Send an application',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'v2.event.tennis-club-membership.action.declare.label'
+      },
+      forms: [DEFAULT_FORM]
+    },
+    {
       type: 'REQUEST_CORRECTION',
       conditionals: [],
       label: {
@@ -1158,12 +1169,14 @@ export const tennisClubMembershipEvent = {
       forms: [DEFAULT_FORM]
     },
     {
+      type: 'PRINT_CERTIFICATE',
       label: {
         id: 'v2.event.tennis-club-membership.action.collect-certificate.label',
         defaultMessage: 'Print certificate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
+      forms: [PRINT_CERTIFICATE_FORM],
       conditionals: [
         {
           type: 'SHOW',
@@ -1202,9 +1215,7 @@ export const tennisClubMembershipEvent = {
             required: ['$event']
           })
         }
-      ],
-      type: 'PRINT_CERTIFICATE',
-      forms: [PRINT_CERTIFICATE_FORM]
+      ]
     }
   ],
   deduplication: [
@@ -1274,6 +1285,8 @@ export const tennisClueMembershipEventDocument: EventDocument = {
         'recommender.firstname': 'Euan',
         'recommender.surname': 'Millar'
       },
+      // Metadata is required to display a register action workflow in Storybook.
+      // It mimics the behavior of the declare action, with metadata added to this declaration.
       metadata: {
         'review.comment': 'asdasdasdasdasdasd',
         'review.signature':

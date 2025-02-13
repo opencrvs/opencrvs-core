@@ -9,12 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/**
+    This is an exact copy of `useEventFormData` except for `useSubscribeEventFormData`.  
+    Due to how `useSubscribeEventFormData` works, it’s not possible to use `useEventFormData` 
+    for adding additional metadata fields on review pages.
+ */
+
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { ActionFormData } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 
-interface EventFormData {
+interface EventMetadata {
   metadata: ActionFormData
   setMetadata: (eventId: string, data: ActionFormData) => void
   setMetadataIfEmpty: (eventId: string, data: ActionFormData) => void
@@ -46,7 +52,7 @@ function removeUndefinedKeys(data: ActionFormData) {
  * @property {string} eventId - The ID of the event.
  */
 
-export const useEventMetaData = create<EventFormData>()(
+export const useEventMetaData = create<EventMetadata>()(
   persist(
     (set, get) => ({
       metadata: {},

@@ -45,7 +45,7 @@ const TENNIS_CLUB_FORM = defineForm({
         type: 'SIGNATURE',
         id: 'review.signature',
         required: false,
-        modalTitle: {
+        signaturePromptLabel: {
           id: 'v2.signature.upload.modal.title',
           defaultMessage: 'Draw signature',
           description: 'Title for the modal to draw signature'
