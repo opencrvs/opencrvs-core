@@ -31,9 +31,6 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
 
-  // notify
-  RECORD_NOTIFY: 'record.notify',
-
   // declare
   RECORD_DECLARE: 'record.declare',
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
