@@ -356,9 +356,6 @@ jobs:
     name: Lint unused exports with Knip
     # TODO: Temporary kept 22.04
     # https://github.com/opencrvs/opencrvs-core/actions/runs/13286842344/job/37097427006
-    # yarn install --ignore-scripts
-    # yarn install v1.22.22
-    # [1/5] Validating package.json...
     # error @1.7.0: The engine "node" is incompatible with this module. Expected version "18.x.x". Got "20.18.2"
     runs-on: ubuntu-22.04
     if: github.event_name == 'pull_request'

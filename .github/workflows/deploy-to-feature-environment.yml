@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   generate_stack_name_and_branch:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       slugified_branch: ${{  steps.slugify_bname.outputs.stack  }}
       branch_name: ${{  steps.set_branch_and_pr_number.outputs.BRANCH_NAME  }}
@@ -112,8 +112,7 @@ jobs:
 
   trigger-e2e:
     if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
-    # TODO: Identify reason why "Wait for E2E Workflow Completion" with 24.04
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: generate_stack_name_and_branch
     environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
     outputs:
@@ -218,8 +217,7 @@ jobs:
 
   listen-e2e:
     needs: [trigger-e2e, generate_stack_name_and_branch]
-    # TODO: Identify reason why "Wait for E2E Workflow Completion" with 24.04
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v7
