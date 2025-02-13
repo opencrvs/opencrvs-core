@@ -25,8 +25,8 @@ import {
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
-  isTextFieldType,
-  isAddressFieldType
+  isAddressFieldType,
+  isTextFieldType
 } from '@opencrvs/commons/client'
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'

@@ -78,26 +78,6 @@ function FormClear() {
   return <Outlet />
 }
 
-export const ReviewWithoutChanges: Story = {
-  parameters: {
-    reactRouter: {
-      router,
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
-
 export const ReviewWithChanges: Story = {
   parameters: {
     reactRouter: {

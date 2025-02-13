@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig, defineForm } from '../events'
+import { defineConditional, defineConfig, defineForm, field } from '../events'
 
 const TENNIS_CLUB_FORM = defineForm({
   label: {
-    id: 'event.tennis-club-membership.action.declare.form.label',
+    id: 'v2.event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this form is referred as in the system'
   },
@@ -20,14 +20,14 @@ const TENNIS_CLUB_FORM = defineForm({
   version: {
     id: '1.0.0',
     label: {
-      id: 'event.tennis-club-membership.action.declare.form.version.1',
+      id: 'v2.event.tennis-club-membership.action.declare.form.version.1',
       defaultMessage: 'Version 1',
       description: 'This is the first version of the form'
     }
   },
   review: {
     title: {
-      id: 'event.tennis-club-membership.action.declare.form.review.title',
+      id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
       defaultMessage: 'Member declaration for {firstname} {surname}',
       description: 'Title of the form to show in review page'
     }
@@ -36,7 +36,7 @@ const TENNIS_CLUB_FORM = defineForm({
     {
       id: 'applicant',
       title: {
-        id: 'event.tennis-club-membership.action.declare.form.section.who.title',
+        id: 'v2.event.tennis-club-membership.action.declare.form.section.who.title',
         defaultMessage: 'Who is applying for the membership?',
         description: 'This is the title of the section'
       },
@@ -49,7 +49,7 @@ const TENNIS_CLUB_FORM = defineForm({
           label: {
             defaultMessage: "Applicant's first name",
             description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
           }
         },
         {
@@ -60,7 +60,7 @@ const TENNIS_CLUB_FORM = defineForm({
           label: {
             defaultMessage: "Applicant's surname",
             description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.who.field.surname.label'
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.surname.label'
           }
         },
         {
@@ -68,10 +68,20 @@ const TENNIS_CLUB_FORM = defineForm({
           type: 'DATE',
           required: true,
           conditionals: [],
+          validation: [
+            {
+              message: {
+                defaultMessage: 'Please enter a valid date',
+                description: 'This is the error message for invalid date',
+                id: 'v2.event.birth.action.declare.form.section.child.field.dob.error'
+              },
+              validator: field('applicant.dob').isBefore().now()
+            }
+          ],
           label: {
             defaultMessage: "Applicant's date of birth",
             description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
           }
         }
       ]
@@ -79,43 +89,111 @@ const TENNIS_CLUB_FORM = defineForm({
     {
       id: 'recommender',
       title: {
-        id: 'event.tennis-club-membership.action.declare.form.section.recommender.title',
+        id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.title',
         defaultMessage: 'Who is recommending the applicant?',
         description: 'This is the title of the section'
       },
       fields: [
         {
-          id: 'recommender.firstname',
-          type: 'TEXT',
-          required: true,
+          id: 'recommender.none',
           conditionals: [],
+          required: false,
           label: {
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.none.label',
+            defaultMessage: 'No recommender',
+            description: 'This is the label for the field'
+          },
+          type: 'CHECKBOX'
+        },
+        {
+          id: 'recommender.firstname',
+          conditionals: [
+            {
+              type: 'SHOW',
+              conditional: defineConditional({
+                type: 'object',
+                properties: {
+                  $form: {
+                    type: 'object',
+                    properties: {
+                      'recommender.none': {
+                        const: true
+                      }
+                    },
+                    required: ['recommender.none']
+                  }
+                },
+                required: ['$form']
+              })
+            }
+          ],
+          required: true,
+          label: {
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label',
             defaultMessage: "Recommender's first name",
-            description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
-          }
+            description: 'This is the label for the field'
+          },
+          type: 'TEXT'
         },
         {
           id: 'recommender.surname',
-          type: 'TEXT',
+          conditionals: [
+            {
+              type: 'SHOW',
+              conditional: defineConditional({
+                type: 'object',
+                properties: {
+                  $form: {
+                    type: 'object',
+                    properties: {
+                      'recommender.none': {
+                        const: true
+                      }
+                    },
+                    required: ['recommender.none']
+                  }
+                },
+                required: ['$form']
+              })
+            }
+          ],
           required: true,
-          conditionals: [],
           label: {
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label',
             defaultMessage: "Recommender's surname",
-            description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label'
-          }
+            description: 'This is the label for the field'
+          },
+          type: 'TEXT'
         },
         {
           id: 'recommender.id',
-          type: 'TEXT',
+          conditionals: [
+            {
+              type: 'SHOW',
+              conditional: defineConditional({
+                type: 'object',
+                properties: {
+                  $form: {
+                    type: 'object',
+                    properties: {
+                      'recommender.none': {
+                        const: true
+                      }
+                    },
+                    required: ['recommender.none']
+                  }
+                },
+                required: ['$form']
+              })
+            }
+          ],
           required: true,
-          conditionals: [],
           label: {
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.id.label',
             defaultMessage: "Recommender's membership ID",
-            description: 'This is the label for the field',
-            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
-          }
+            description: 'This is the label for the field'
+          },
+          type: 'TEXT'
         }
       ]
     }
@@ -248,7 +326,7 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.validate.label'
       },
-      forms: [TENNIS_CLUB_FORM]
+      forms: []
     },
     {
       type: 'REQUEST_CORRECTION',

@@ -10,13 +10,13 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { ActionType } from '@opencrvs/commons'
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const data = generator.event.actions.register(event.id, {
     data: {
@@ -25,4 +25,21 @@ test('Validation error message contains all the offending fields', async () => {
   })
 
   await expect(client.event.actions.register(data)).rejects.matchSnapshot()
+})
+
+test('Action without form definition should accept empty payload', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const data = generator.event.actions.validate(event.id, {
+    data: {}
+  })
+
+  const result = await client.event.actions.validate(data)
+  const lastAction = result.actions[result.actions.length - 1]
+
+  expect(lastAction.type).toBe(ActionType.VALIDATE)
+  expect(lastAction.data).toEqual({})
 })
