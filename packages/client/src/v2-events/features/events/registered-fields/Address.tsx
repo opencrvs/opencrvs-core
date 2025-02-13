@@ -188,9 +188,7 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: 'HIDE',
-        conditional: defineConditional(
-          createFieldCondition('country').isUndefined().apply()
-        )
+        conditional: createFieldCondition('country').isUndefined()
       }
     ],
     required: true,
@@ -209,9 +207,7 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: 'HIDE',
-        conditional: defineConditional(
-          createFieldCondition('province').isUndefined().apply()
-        )
+        conditional: createFieldCondition('province').isUndefined()
       }
     ],
     required: true,
@@ -233,9 +229,7 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: 'HIDE',
-        conditional: defineConditional(
-          createFieldCondition('district').isUndefined().apply()
-        )
+        conditional: createFieldCondition('district').isUndefined()
       }
     ],
     required: false,

@@ -18,7 +18,6 @@ import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
-  getConditionalActionsForField,
   getDependentFields,
   handleInitialValue,
   hasInitialValueDependencyInfo,
@@ -33,6 +32,7 @@ import {
   FieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
+  getConditionalActionsForField,
   isAddressFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
@@ -637,10 +637,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
-          makeFormikFieldIdsOpenCRVSCompatible(
-            makeDatesFormatted(props.fields, values)
-          ),
-          props.requiredErrorMessage
+          makeFormikFieldIdsOpenCRVSCompatible(values)
         )
       }
       onSubmit={() => {}}
