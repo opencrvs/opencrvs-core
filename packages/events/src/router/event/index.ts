@@ -235,19 +235,5 @@ export const eventRouter = router({
   list: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_READ]))
     .output(z.array(EventIndex))
-    .query(getIndexedEvents),
-  registration: router({
-    confirm: publicProcedure
-      .input(
-        z.object({
-          eventId: z.string(),
-          data: z.record(z.string(), FieldValue)
-        })
-      )
-      .mutation(async ({ input, ctx }) => {
-        logger.info('Registration confirmed', { eventId: input.eventId })
-        logger.info(input.data)
-        return getEventById(input.eventId)
-      })
-  })
+    .query(getIndexedEvents)
 })
