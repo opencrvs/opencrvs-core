@@ -21,7 +21,7 @@ describe('requiresScopes()', () => {
       SCOPES.RECORD_CONFIRM_REGISTRATION
     ])
 
-    // missing one of the required scopes
+    // missing all of the required scopes
     const mockOpts = {
       ctx: {
         token: createTestToken('test-user-id', [SCOPES.RECORD_DECLARE])
