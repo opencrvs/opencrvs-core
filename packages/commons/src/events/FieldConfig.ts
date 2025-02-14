@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+import { Conditional, ActionConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
-import { Conditional, ActionConditional } from './Conditional'
 
 const FieldId = z.string()
 
@@ -122,7 +122,7 @@ const DateField = BaseField.extend({
 
 export type DateField = z.infer<typeof DateField>
 
-const HTMLFontVariant = z.enum([
+const HtmlFontVariant = z.enum([
   'reg12',
   'reg14',
   'reg16',
@@ -139,7 +139,7 @@ const Paragraph = BaseField.extend({
     .object({
       styles: z
         .object({
-          fontVariant: HTMLFontVariant.optional()
+          fontVariant: HtmlFontVariant.optional()
         })
         .optional()
     })
@@ -184,7 +184,15 @@ export type RadioGroup = z.infer<typeof RadioGroup>
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
   items: z.array(TranslationConfig).describe('A list of items'),
-  font: HTMLFontVariant
+  configuration: z
+    .object({
+      styles: z
+        .object({
+          fontVariant: HtmlFontVariant.optional()
+        })
+        .optional()
+    })
+    .default({})
 }).describe('A list of bullet points')
 
 export type BulletList = z.infer<typeof BulletList>
@@ -328,7 +336,7 @@ export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
+
 export type AdministrativeAreaConfiguration = z.infer<
   typeof AdministrativeAreaConfiguration
 >
-export type FieldConditional = z.infer<typeof ActionConditional>

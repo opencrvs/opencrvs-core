@@ -9,11 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-
+import { EnableConditional, ShowConditional } from './Conditional'
 import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
-import { ActionConditional } from './Conditional'
+
+/**
+ * By default, when conditionals are not defined, action is visible and enabled to the user.
+ */
+const ActionConditional = z.discriminatedUnion('type', [
+  /** If conditional is defined, the action is shown to the user only if the condition is met */
+  ShowConditional,
+  /** If conditional is defined, the action is enabled only if the condition is met */
+  EnableConditional
+])
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
