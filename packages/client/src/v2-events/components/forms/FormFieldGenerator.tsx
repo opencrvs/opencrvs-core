@@ -36,6 +36,8 @@ import {
   FileFieldValue,
   getConditionalActionsForField,
   isAddressFieldType,
+  isAdministrativeAreaFieldType,
+  isFacilityFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
   isCountryFieldType,
@@ -43,6 +45,7 @@ import {
   isDividerFieldType,
   isFileFieldType,
   isLocationFieldType,
+  isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
@@ -72,11 +75,11 @@ import {
   Checkbox,
   Date as DateField,
   RadioGroup,
-  Location,
   LocationSearch,
   Select,
   SelectCountry,
-  Text
+  Text,
+  AdministrativeArea
 } from '@client/v2-events/features/events/registered-fields'
 
 import { SubHeader } from '@opencrvs/components'
@@ -352,33 +355,56 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    if (isLocationFieldType(field)) {
-      if (field.config.options.type === 'HEALTH_FACILITY')
-        return (
-          <InputField {...inputFieldProps}>
-            <LocationSearch.Input
-              {...field.config}
-              value={field.value}
-              setFieldValue={setFieldValue}
-            />
-          </InputField>
-        )
 
+    if (isAdministrativeAreaFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <Location.Input
+          <AdministrativeArea.Input
             {...field.config}
             value={field.value}
-            setFieldValue={setFieldValue}
             partOf={
-              (field.config.options?.partOf?.$data &&
+              (field.config.configuration?.partOf?.$data &&
                 (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                  field.config.options?.partOf.$data
+                  field.config.configuration?.partOf.$data
                 ] as string | undefined | null)) ??
               null
             }
+            setFieldValue={setFieldValue}
           />
         </InputField>
+      )
+    }
+
+    if (isLocationFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['locations']}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+
+    if (isOfficeFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['offices']}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+
+    if (isFacilityFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['facilities']}
+          setFieldValue={setFieldValue}
+        />
       )
     }
     if (isDividerFieldType(field)) {
