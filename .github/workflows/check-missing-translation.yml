@@ -47,7 +47,7 @@ jobs:
 
     - name: Set branch in core and check if any missing translation exists
       run: |
-        cd $HOME/core/opencrvs-core/
+        cd $HOME/core/
         if [ "$branch_exists" = "true" ]; then
           git checkout $branch_name
           echo "Check out to branch $branch_name"
