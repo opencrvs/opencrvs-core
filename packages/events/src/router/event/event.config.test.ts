@@ -8,17 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { inject, vi } from 'vitest'
 
-/** @knipignore */
-export const getEventIndexName = vi.fn()
-/** @knipignore */
-export const getEventAliasName = vi.fn()
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
-/** @knipignore */
-export function getOrCreateClient() {
-  return new elasticsearch.Client({
-    node: `http://${inject('ELASTICSEARCH_URI')}`
-  })
-}
+test('event config can be fetched', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+  const config = await client.event.config.get()
+
+  expect(config[0].id).toEqual('TENNIS_CLUB_MEMBERSHIP')
+  expect(config[1].id).toEqual('TENNIS_CLUB_MEMBERSHIP_PREMIUM')
+
+  expect(config.length).toEqual(2)
+})
