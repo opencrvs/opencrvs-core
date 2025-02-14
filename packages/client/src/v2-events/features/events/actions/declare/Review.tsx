@@ -31,15 +31,6 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts/form'
-import {
-  ActionFormData,
-  ActionType,
-  FieldConfig,
-  findActiveActionFields,
-  isFieldHiddenOrDisabled
-} from '@opencrvs/commons/client'
-import _ from 'lodash'
-import { formatISO } from 'date-fns'
 
 const messages = defineMessages({
   reviewActionTitle: {
@@ -108,21 +99,6 @@ interface RejectionState {
   isDuplicate: boolean
 }
 
-function stripForm(form: ActionFormData, fields: FieldConfig[]) {
-  return _.omitBy(form, (_, key) => {
-    const field = fields.find((f) => f.id === key)
-
-    if (!field) {
-      return true
-    }
-
-    return isFieldHiddenOrDisabled(field, {
-      $form: form,
-      $now: formatISO(new Date(), { representation: 'date' })
-    })
-  })
-}
-
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
@@ -143,11 +119,6 @@ export function Review() {
   const form = useEventFormData((state) => state.formValues)
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(eventId, {})
-
-  const strippedForm = stripForm(
-    form,
-    findActiveActionFields(config, ActionType.DECLARE) ?? []
-  )
 
   async function handleEdit({
     pageId,
