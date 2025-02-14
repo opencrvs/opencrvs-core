@@ -45,8 +45,21 @@ jobs:
       with: 
         node-version: 18
     
-    - name: Install typescript
-      run: npm install -g typescript
+    - name: Install dependencies
+      run: |
+        npm install -g typescript
+        npm install -g yarn
+    
+    - name: Clone the Core repository
+      run: |
+        cd $HOME/core
+        acting_branch=${{steps.set_branch.outputs.working_branch}}
+        export COUNTRY_CONFIG_PATH=${{steps.set_branch.outputs.countryconfig_path}}
+        git clone  https://github.com/opencrvs/opencrvs-core.git
+        cd ./opencrvs-core
+        git checkout $acting_branch
+        yarn install
+        yarn extract:translations
 
         
         
