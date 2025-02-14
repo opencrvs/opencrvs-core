@@ -8,8 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FieldConfig, getFieldValidationErrors } from '@opencrvs/commons/client'
-import { ActionFormData } from '@opencrvs/commons'
+import {
+  FieldConfig,
+  getFieldValidationErrors,
+  ActionFormData
+} from '@opencrvs/commons/client'
 import { IValidationResult } from '@client/utils/validate'
 
 interface IFieldErrors {

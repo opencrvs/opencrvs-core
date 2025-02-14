@@ -14,10 +14,12 @@ import {
   AddressField,
   AddressFieldValue,
   alwaysTrue,
+  ConditionalType,
   field as createFieldCondition,
   defineConditional,
   FieldConfig,
-  FieldProps
+  FieldProps,
+  not
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -34,8 +36,8 @@ function hide<T extends FieldConfig>(fieldConfig: T): T {
   return {
     ...fieldConfig,
     conditionals: (fieldConfig.conditionals || []).concat({
-      type: 'HIDE',
-      conditional: defineConditional(alwaysTrue())
+      type: ConditionalType.SHOW,
+      conditional: not(defineConditional(alwaysTrue()))
     })
   }
 }
@@ -187,8 +189,8 @@ const ADMIN_STRUCTURE = [
     id: 'province',
     conditionals: [
       {
-        type: 'HIDE',
-        conditional: createFieldCondition('country').isUndefined()
+        type: ConditionalType.SHOW,
+        conditional: not(createFieldCondition('country').isUndefined())
       }
     ],
     required: true,
@@ -205,8 +207,8 @@ const ADMIN_STRUCTURE = [
     type: 'ADMINISTRATIVE_AREA',
     conditionals: [
       {
-        type: 'HIDE',
-        conditional: createFieldCondition('province').isUndefined()
+        type: ConditionalType.SHOW,
+        conditional: not(createFieldCondition('province').isUndefined())
       }
     ],
     required: true,
@@ -218,7 +220,6 @@ const ADMIN_STRUCTURE = [
     configuration: {
       type: 'ADMIN_STRUCTURE',
       partOf: {
-        // @TODO: Fix
         $data: 'province'
       }
     }
@@ -227,8 +228,8 @@ const ADMIN_STRUCTURE = [
     id: 'urbanOrRural',
     conditionals: [
       {
-        type: 'HIDE',
-        conditional: createFieldCondition('district').isUndefined()
+        type: ConditionalType.SHOW,
+        conditional: not(createFieldCondition('district').isUndefined())
       }
     ],
     required: false,

@@ -34,7 +34,6 @@ import {
   FieldType,
   FieldValue,
   FileFieldValue,
-  getConditionalActionsForField,
   isAddressFieldType,
   isAdministrativeAreaFieldType,
   isFacilityFieldType,
@@ -43,6 +42,8 @@ import {
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
+  isFieldDisabled,
+  isFieldHidden,
   isFileFieldType,
   isLocationFieldType,
   isOfficeFieldType,
@@ -586,21 +587,18 @@ class FormSectionComponent extends React.Component<AllProps> {
             error = intl.formatMessage(firstError.message, firstError.props)
           }
 
-          const conditionalActions: string[] = getConditionalActionsForField(
-            field,
-            {
-              $form: makeFormikFieldIdsOpenCRVSCompatible(
-                valuesWithFormattedDate
-              ),
-              $now: formatISO(new Date(), { representation: 'date' })
-            }
-          )
+          const formParams = {
+            $form: makeFormikFieldIdsOpenCRVSCompatible(
+              valuesWithFormattedDate
+            ),
+            $now: formatISO(new Date(), { representation: 'date' })
+          }
 
-          if (conditionalActions.includes('HIDE')) {
+          if (isFieldHidden(field, formParams)) {
             return null
           }
 
-          const isFieldDisabled = conditionalActions.includes('disable')
+          const isDisabled = isFieldDisabled(field, formParams)
 
           return (
             <FormItem
@@ -618,8 +616,8 @@ class FormSectionComponent extends React.Component<AllProps> {
                       setFieldTouched={setFieldTouched}
                       setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
-                      disabled={isFieldDisabled}
-                      error={isFieldDisabled ? '' : error}
+                      disabled={isDisabled}
+                      error={isDisabled ? '' : error}
                       fields={fields}
                       formData={formData}
                       touched={touched[field.id] || false}
