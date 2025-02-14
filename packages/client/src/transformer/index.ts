@@ -166,6 +166,9 @@ const toCorrectionValue = (
   return changedValues
 }
 
+/**
+  * Meta type field suggests it has special functionality needed for the form. Cannot be hidden.
+  */
 function isMetaTypeField(field: IFormField): boolean {
   return (
     isFieldHttp(field) || isFieldLinkButton(field) || isFieldIDReader(field)
