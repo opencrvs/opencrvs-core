@@ -35,6 +35,7 @@ jobs:
             echo "branch_exists=true" >> $GITHUB_ENV
           else
             echo "branch_exists=false" >> $GITHUB_ENV
+          fi
 
       - name: Set branch in core and check if any missing translation exists
         run: |
@@ -45,5 +46,6 @@ jobs:
           else
             git checkout develop
             echo "Check out to develop branch"
+          fi
           sh packages/client/extract-translations.sh
       
