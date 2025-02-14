@@ -22,12 +22,12 @@ jobs:
     steps:
     - name: Create directory for core
       run: |
-        mkdir -m 777 -p /core
+        mkdir -m 777 -p $HOME/core
   
     - name: Checkout opencrvs-core repository
       uses: actions/checkout@v4
       with:
-        path: /core
+        path: $HOME/core
 
     - name: Get current branch name
       id: get_branch
@@ -35,8 +35,8 @@ jobs:
     
     - name: Clone countryconfig repository and check the branch if available in countryconfig or not
       run: |
-        mkdir -m 777 -p /countryconfig
-        cd /countryconfig
+        mkdir -m 777 -p $HOME/countryconfig
+        cd $HOME/countryconfig
         git clone https://github.com/opencrvs/opencrvs-countryconfig.git
         cd opencrvs-countryconfig
         if git show-ref --verify --quiet refs/heads/$branch_name; then
@@ -47,7 +47,7 @@ jobs:
 
     - name: Set branch in core and check if any missing translation exists
       run: |
-        cd /core/opencrvs-core/
+        cd $HOME/core/opencrvs-core/
         if [ "$branch_exists" = "true" ]; then
           git checkout $branch_name
           echo "Check out to branch $branch_name"
