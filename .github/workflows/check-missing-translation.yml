@@ -38,4 +38,9 @@ jobs:
           echo "Branch ${{ github.head_ref }} exists in countryconfig"
           echo "working_branch='${{ github.head_ref }}'" >> $GITHUB_OUTPUT
         fi
-        
+        echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
+    
+    - name: check output coming from previous step
+      run: |
+        echo "working_branch=${steps.set_branch.outputs.working_branch}"
+        echo "countryconfig_path=${steps.set_branch.outputs.countryconfig_path}"
