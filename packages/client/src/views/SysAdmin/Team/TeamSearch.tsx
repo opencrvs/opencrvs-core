@@ -28,6 +28,7 @@ import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useOnlineStatus } from '@client/utils'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const ConnectivityContainer = styled.div`
   justify-content: center;
@@ -55,6 +56,7 @@ export function TeamSearch() {
   const intl = useIntl()
   const offlineCountryConfiguration = useSelector(getOfflineData)
   const isOnline = useOnlineStatus()
+  const { canAccessOffice } = usePermissions()
 
   const searchHandler = (item: ISearchLocation) => {
     setSelectedLocation(item)
@@ -80,15 +82,15 @@ export function TeamSearch() {
           <LocationSearch
             selectedLocation={selectedLocation}
             buttonLabel={intl.formatMessage(buttonMessages.search)}
-            locationList={Object.values(
-              offlineCountryConfiguration.offices
-            ).map((location) => {
-              return {
-                id: location.id,
-                searchableText: location.name,
-                displayLabel: location.name
-              }
-            })}
+            locationList={Object.values(offlineCountryConfiguration.offices)
+              .filter(canAccessOffice)
+              .map((location) => {
+                return {
+                  id: location.id,
+                  searchableText: location.name,
+                  displayLabel: location.name
+                }
+              })}
             searchHandler={searchHandler}
             searchButtonHandler={searchButtonHandler}
             errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}
