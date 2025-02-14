@@ -8,13 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './Address'
-export * from './BulletList'
-export * from './Checkbox'
-export * from './Date'
-export * from './AdministrativeArea'
-export * from './LocationSearch'
-export * from './RadioGroup'
-export * from './Select'
-export * from './SelectCountry'
-export * from './Text'
+
+import { z } from 'zod'
+import {
+  ShowConditional,
+  HideConditional,
+  EnableConditional
+} from './Conditional'
+
+export const ActionConditional = z.discriminatedUnion('type', [
+  // Action can be shown / hidden
+  ShowConditional,
+  HideConditional,
+  // Action can be shown to the user in the list but as disabled
+  EnableConditional
+])

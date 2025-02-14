@@ -9,22 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import {
-  EnableConditional,
-  HideConditional,
-  ShowConditional
-} from './Conditional'
+
 import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
-
-const ActionConditional = z.discriminatedUnion('type', [
-  // Action can be shown / hidden
-  ShowConditional,
-  HideConditional,
-  // Action can be shown to the user in the list but as disabled
-  EnableConditional
-])
+import { ActionConditional } from './Conditional'
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
@@ -95,6 +84,38 @@ const CustomConfig = ActionConfigBase.merge(
   })
 )
 
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllActionConfigFields =
+  | typeof CreateConfig
+  | typeof DeclareConfig
+  | typeof ValidateConfig
+  | typeof RegisterConfig
+  | typeof DeleteConfig
+  | typeof PrintCertificateActionConfig
+  | typeof RequestCorrectionConfig
+  | typeof RejectCorrectionConfig
+  | typeof ApproveCorrectionConfig
+  | typeof CustomConfig
+
+/** @knipignore */
+export type InferredActionConfig =
+  | z.infer<typeof CreateConfig>
+  | z.infer<typeof DeclareConfig>
+  | z.infer<typeof ValidateConfig>
+  | z.infer<typeof RegisterConfig>
+  | z.infer<typeof DeleteConfig>
+  | z.infer<typeof PrintCertificateActionConfig>
+  | z.infer<typeof RequestCorrectionConfig>
+  | z.infer<typeof RejectCorrectionConfig>
+  | z.infer<typeof ApproveCorrectionConfig>
+  | z.infer<typeof CustomConfig>
+
 export const ActionConfig = z.discriminatedUnion('type', [
   CreateConfig,
   DeclareConfig,
@@ -106,6 +127,6 @@ export const ActionConfig = z.discriminatedUnion('type', [
   RejectCorrectionConfig,
   ApproveCorrectionConfig,
   CustomConfig
-])
+]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
 
-export type ActionConfig = z.infer<typeof ActionConfig>
+export type ActionConfig = InferredActionConfig

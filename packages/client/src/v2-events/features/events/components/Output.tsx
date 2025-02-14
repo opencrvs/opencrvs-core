@@ -20,7 +20,7 @@ import {
   isDateFieldType,
   isDividerFieldType,
   isFileFieldType,
-  isLocationFieldType,
+  isAdministrativeAreaFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
@@ -35,7 +35,7 @@ import {
   Checkbox,
   RadioGroup,
   Select,
-  Location,
+  AdministrativeArea,
   SelectCountry,
   Date as DateField
 } from '@client/v2-events/features/events/registered-fields'
@@ -102,8 +102,8 @@ function ValueOutput(field: FieldWithValue) {
     )
   }
 
-  if (isLocationFieldType(field)) {
-    return <Location.Output value={field.value} />
+  if (isAdministrativeAreaFieldType(field)) {
+    return <AdministrativeArea.Output value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
