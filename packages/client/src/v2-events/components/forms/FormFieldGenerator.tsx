@@ -531,13 +531,6 @@ class FormSectionComponent extends React.Component<AllProps> {
             return null
           }
 
-          console.log(
-            'isFieldHidden',
-            isFieldHidden(field, formParams),
-            field.id,
-            field.conditionals
-          )
-
           const isDisabled = isFieldDisabled(field, formParams)
 
           return (
