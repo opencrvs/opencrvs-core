@@ -40,15 +40,13 @@ jobs:
         fi
         echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
     
-    - name: Checkout the CORE repossitory
-      uses: actions/checkout@v4
-      with:
-        path: $HOME/core
-        ref: ${{ steps.set_branch.outputs.working_branch }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with: 
+        node-version: 18
     
-    - name: Navigate the directory
-      run: pwd && ls -la
-      
+    - name: Install typescript
+      run: npm install -g typescript
 
         
         
