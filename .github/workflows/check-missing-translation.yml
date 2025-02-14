@@ -1,0 +1,42 @@
+name: Check CountryConfig Branch
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  check-missing-translation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout opencrvs-core repository
+        uses: actions/checkout@v4
+
+      - name: Get current branch name
+        id: get_branch
+        run: echo "branch_name=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+
+      - name: Clone countryconfig repository
+        run: git clone https://github.com/opencrvs/opencrvs-countryconfig.git
+
+      - name: Check if branch exists in countryconfig
+        run: |
+          cd opencrvs-countryconfig
+          if git show-ref --verify --quiet refs/heads/$branch_name; then
+            echo "branch_exists=true" >> $GITHUB_ENV
+          else
+            echo "branch_exists=false" >> $GITHUB_ENV
+
+      - name: Set branch in core and check if any missing translation exists
+        run: |
+          cd countryconfig
+          if [ "$branch_exists" = "true" ]; then
+            git checkout $branch_name
+            echo "Check out to branch $branch_name"
+          else
+            git checkout develop
+            echo "Check out to develop branch"
+          sh packages/client/extract-translations.sh
+      
