@@ -10,12 +10,16 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
+import { FieldProps } from '@opencrvs/commons/client'
 // eslint-disable-next-line no-restricted-imports
-import { getAdminStructureLocations } from '@client/offline/selectors'
+import {
+  getAdminStructureLocations,
+  getLocations
+} from '@client/offline/selectors'
+import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { Select } from './Select'
 
-export interface ILocation {
+export interface LocationProps {
   id: string
   name: string
   status: string
@@ -39,32 +43,52 @@ function useAdminLocations(partOf: string) {
   return filteredLocations.map((location) => ({
     value: location.id,
     label: {
-      id: 'location.' + location.id,
+      id: 'v2.location.' + location.id,
       description: 'Label for location: ' + location.name,
       defaultMessage: location.name
     }
   }))
 }
 
-export function Location({
+function LocationInput({
   setFieldValue,
   value,
   partOf,
   ...props
 }: FieldProps<'LOCATION'> & {
-  setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
+  setFieldValue: (name: string, val: string | undefined) => void
   partOf: string | null
-  value?: LocationFieldValue
+  value?: string
 }) {
   const options = useAdminLocations(partOf ?? '0')
 
   return (
-    <Select
+    <Select.Input
       {...props}
+      data-testid={`location__${props.id}`}
       options={options}
       type="SELECT"
       value={value}
       onChange={(val: string) => setFieldValue(props.id, val)}
     />
   )
+}
+
+function LocationOutput({ value }: { value: Stringifiable }) {
+  const locations = useSelector(getLocations)
+
+  const location = value.toString() && locations[value.toString()]
+
+  return location ? location.name : ''
+}
+
+function useStringifier() {
+  const locations = useSelector(getLocations)
+  return (value: string) => locations[value].name
+}
+
+export const Location = {
+  Input: LocationInput,
+  Output: LocationOutput,
+  useStringifier: useStringifier
 }

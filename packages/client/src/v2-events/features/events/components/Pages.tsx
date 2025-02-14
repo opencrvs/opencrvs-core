@@ -11,37 +11,38 @@
 
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
+import { ActionFormData, FormPage } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
-import { FormPage } from '@opencrvs/commons'
-import { ActionFormData } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
  */
 export function Pages({
-  eventId,
+  form,
   pageId,
   showReviewButton,
   formPages,
-  form,
   onFormPageChange,
-  onSubmit
+  onSubmit,
+  submitButtonText,
+  setFormData,
+  children
 }: {
-  eventId: string
-  pageId: string
   form: ActionFormData
+  setFormData: (data: ActionFormData) => void
+  pageId: string
   showReviewButton?: boolean
   formPages: FormPage[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
+  submitButtonText?: string
+  children?: (page: FormPage) => React.ReactNode
 }) {
   const intl = useIntl()
 
-  const setFormValues = useEventFormData((state) => state.setFormValues)
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
 
   const {
@@ -65,21 +66,24 @@ export function Pages({
       currentPage={currentPage}
       pageTitle={intl.formatMessage(page.title)}
       showReviewButton={showReviewButton}
+      submitButtonText={submitButtonText}
       totalPages={total}
       onNextPage={next}
       onPreviousPage={previous}
       onSubmit={onSubmit}
     >
-      <FormFieldGenerator
-        fields={page.fields}
-        formData={form}
-        id="locationForm"
-        initialValues={form}
-        setAllFieldsDirty={false}
-        onChange={(values) => {
-          setFormValues(eventId, values)
-        }}
-      />
+      {children ? (
+        children(page)
+      ) : (
+        <FormFieldGenerator
+          fields={page.fields}
+          formData={form}
+          id="locationForm"
+          initialValues={form}
+          setAllFieldsDirty={false}
+          onChange={(values) => setFormData(values)}
+        />
+      )}
     </FormWizard>
   )
 }

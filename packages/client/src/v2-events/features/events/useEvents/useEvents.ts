@@ -118,7 +118,25 @@ export function useEvents() {
       register: useEventAction(
         utils.event.actions.register,
         api.event.actions.register
-      )
+      ),
+      printCertificate: useEventAction(
+        utils.event.actions.printCertificate,
+        api.event.actions.printCertificate
+      ),
+      correct: {
+        request: useEventAction(
+          utils.event.actions.correction.request,
+          api.event.actions.correction.request
+        ),
+        approve: useEventAction(
+          utils.event.actions.correction.approve,
+          api.event.actions.correction.approve
+        ),
+        reject: useEventAction(
+          utils.event.actions.correction.reject,
+          api.event.actions.correction.reject
+        )
+      }
     }
   }
 }

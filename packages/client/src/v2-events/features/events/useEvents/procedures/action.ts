@@ -18,6 +18,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
+import { createTemporaryId, isTemporaryId } from './create'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   utils.event.get.setData(updatedEvent.id, updatedEvent)
@@ -32,7 +33,7 @@ function waitUntilEventIsCreated<T extends { eventId: string }, R>(
 
     const localVersion = utils.event.get.getData(eventId)
 
-    if (!localVersion || localVersion.id === localVersion.transactionId) {
+    if (!localVersion || isTemporaryId(localVersion.id)) {
       // eslint-disable-next-line no-console
       console.error(
         'Event that has not been stored yet cannot be actioned upon'
@@ -51,12 +52,20 @@ type Mutation =
   | typeof api.event.actions.notify
   | typeof api.event.actions.register
   | typeof api.event.actions.validate
+  | typeof api.event.actions.printCertificate
+  | typeof api.event.actions.correction.request
+  | typeof api.event.actions.correction.approve
+  | typeof api.event.actions.correction.reject
 
 type Procedure =
   | typeof utils.event.actions.declare
   | typeof utils.event.actions.notify
   | typeof utils.event.actions.register
   | typeof utils.event.actions.validate
+  | typeof utils.event.actions.printCertificate
+  | typeof utils.event.actions.correction.request
+  | typeof utils.event.actions.correction.approve
+  | typeof utils.event.actions.correction.reject
 
 /*
  * This makes sure that if you are offline and do
@@ -117,6 +126,7 @@ function updateEventOptimistically<T extends ActionInput>(
       actions: [
         ...localEvent.actions,
         {
+          id: createTemporaryId(),
           type: actionType,
           data: variables.data,
           draft: false,
@@ -163,6 +173,42 @@ utils.event.actions.validate.setMutationDefaults(({ canonicalMutationFn }) => ({
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent
 }))
+
+utils.event.actions.printCertificate.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
+
+utils.event.actions.correction.request.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
+
+utils.event.actions.correction.approve.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
+
+utils.event.actions.correction.reject.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
 
 export function useEventAction<P extends Procedure, M extends Mutation>(
   procedure: P,

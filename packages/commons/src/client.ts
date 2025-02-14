@@ -11,10 +11,11 @@
 export * from './search'
 export * from './events'
 export * from './scopes'
-export * from './conditionals/conditionals'
-export * from './conditionals/validate'
 export * from './documents'
+export * from './workqueues'
 export * from './uuid'
+export * from './utils'
+export * from './conditionals/validate'
 export { DEFAULT_ROLES_DEFINITION } from './authentication'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

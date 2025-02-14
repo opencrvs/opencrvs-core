@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -52,7 +52,7 @@ jobs:
   test:
     name: Test
     needs: setup
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -163,7 +163,7 @@ jobs:
 
   prepare-client-tests:
     name: Prepare client tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v4
@@ -236,7 +236,7 @@ jobs:
   lint-client:
     name: Lint client
     needs: prepare-client-tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Download filesystem artifact
@@ -269,10 +269,56 @@ jobs:
       - name: Run linting
         run: cd packages/client && yarn lint
 
+  run-visual-tests:
+    name: Run visual tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      # Without this, the fetch command will fail with
+      # fatal: could not read Username for 'https://github.com': No such device or address
+      - name: Remove extraheader config
+        run: git config --unset http.https://github.com/.extraheader
+
+      - name: Fetch full Git history
+        run: git fetch --prune --unshallow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          workingDir: packages/client
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
   test-client:
     name: Test client
     needs: prepare-client-tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -308,9 +354,13 @@ jobs:
 
   lint-knip:
     name: Lint unused exports with Knip
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
+      - name: Use Node 18.X
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
@@ -364,7 +414,7 @@ jobs:
 
   build-toolkit:
     name: Build toolkit
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code

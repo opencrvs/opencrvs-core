@@ -9,17 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { get, mapKeys, orderBy } from 'lodash'
 import React, { useState } from 'react'
-import { useIntl } from 'react-intl'
+import { mapKeys, orderBy } from 'lodash'
+import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
 import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
-import { WorkqueueConfig } from '@opencrvs/commons'
-import { EventIndex } from '@opencrvs/commons/client'
+import {
+  defaultColumns,
+  EventConfig,
+  EventIndex,
+  getAllFields,
+  getOrThrow,
+  RootWorkqueueConfig,
+  workqueues
+} from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
   ColumnContentAlignment,
@@ -29,9 +36,20 @@ import {
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { messages } from '@client/v2-events/messages'
+
+import { formattedDuration } from '@client/utils/date-formatting'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from './components/ContentWrapper'
+import { useIntlFormatMessageWithFlattenedParams } from './utils'
+
+const messages = defineMessages({
+  empty: {
+    defaultMessage: 'Empty message',
+    description: 'Label for workqueue tooltip',
+    id: 'v2.regHome.issued'
+  }
+})
 
 /**
  * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.
@@ -44,6 +62,7 @@ const ToolTipContainer = styled.span`
 
 const NondecoratedLink = styled(Link)`
   text-decoration: none;
+  color: 'primary';
 `
 
 function changeSortedColumn(
@@ -69,70 +88,87 @@ function changeSortedColumn(
   }
 }
 
-export function WorkqueueIndex() {
-  const { getEvents, getOutbox } = useEvents()
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
+export function WorkqueueIndex({ workqueueId }: { workqueueId: string }) {
+  const { getEvents } = useEvents()
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
-  const [config] = useEventConfigurations()
+  const events = (getEvents.useQuery().data ?? []) satisfies EventIndex[]
+  const eventConfigs = useEventConfigurations()
 
   const workqueueConfig =
-    config.workqueues.find((workqueue) => workqueue.id === searchParams.id) ??
-    config.workqueues[0]
+    workqueueId in workqueues
+      ? workqueues[workqueueId as keyof typeof workqueues]
+      : null
 
-  // eslint-disable-next-line
   if (!workqueueConfig) {
     return null
   }
 
-  const events = getEvents.useQuery()
-  const outbox = getOutbox()
-
-  const eventsWithoutOutbox =
-    events.data?.filter(
-      (event) => !outbox.find((outboxEvent) => outboxEvent.id === event.id)
-    ) || []
-
   return (
     <Workqueue
-      config={workqueueConfig}
-      events={eventsWithoutOutbox.concat(outbox)}
+      events={events}
+      workqueueConfig={workqueueConfig}
       {...searchParams}
+      eventConfigs={eventConfigs}
     />
   )
 }
 
+interface Column {
+  label?: string
+  width: number
+  key: string
+  sortFunction?: (columnName: string) => void
+  isActionColumn?: boolean
+  isSorted?: boolean
+  alignment?: ColumnContentAlignment
+}
 /**
  * A Workqueue that displays a table of events based on search criteria.
  */
 function Workqueue({
   events,
-  config,
+  workqueueConfig,
   limit,
-  offset
+  offset,
+  eventConfigs
 }: {
   events: EventIndex[]
-  config: WorkqueueConfig
+  workqueueConfig: RootWorkqueueConfig
   limit: number
   offset: number
+  eventConfigs: EventConfig[]
 }) {
   const intl = useIntl()
+  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
   const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
   const drafts = getDrafts()
-  const statuses = config.filters.flatMap((filter) => filter.status)
 
-  const workqueue = events
-    .filter((event) => statuses.length === 0 || statuses.includes(event.status))
-    .map((event) =>
-      mapKeys(event, (_, key) => (key === 'data' ? key : `${key}`))
-    )
+  const validEvents = events.filter((event) =>
+    eventConfigs.some((e) => e.id === event.type)
+  )
+
+  if (validEvents.length !== events.length) {
+    // eslint-disable-next-line
+    console.log('Fields without proper configuration found. Ignoring them')
+  }
+
+  const workqueue = validEvents
     .map((event) => {
       const { data, ...rest } = event
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return { ...rest, ...mapKeys(data as any, (_, key) => `${key}`) }
+      return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
     })
-    .map((event) => {
+    .filter((event) => eventConfigs.some((e) => e.id === event.type))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((event: Omit<EventIndex, 'data'> & { [key: string]: any }) => {
+      /** We already filtered invalid events, this should never happen. */
+      const eventConfig = getOrThrow(
+        eventConfigs.find((e) => e.id === event.type),
+        `Could not find event config for ${event.id}`
+      )
+
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
@@ -148,12 +184,35 @@ function Workqueue({
         return event.status
       }
 
+      const allPropertiesWithEmptyValues = setEmptyValuesForFields(
+        getAllFields(eventConfig)
+      )
+
+      const eventWorkqueue = getOrThrow(
+        eventConfig.workqueues.find((wq) => wq.id === workqueueConfig.id),
+        `Could not find workqueue config for ${workqueueConfig.id}`
+      )
+
+      const fieldsWithPopulatedValues: Record<string, string> =
+        eventWorkqueue.fields.reduce(
+          (acc, field) => ({
+            ...acc,
+            [field.column]: flattenedIntl.formatMessage(field.label, {
+              ...allPropertiesWithEmptyValues,
+              ...event
+            })
+          }),
+          {}
+        )
+
+      const titleColumnId = workqueueConfig.columns[0].id
+
       return {
+        ...fieldsWithPopulatedValues,
         ...event,
-        // eslint-disable-next-line
-        createdAt: intl.formatDate(new Date(event.createdAt)),
-        // eslint-disable-next-line
-        modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
+        event: intl.formatMessage(eventConfig.label),
+        createdAt: formattedDuration(new Date(event.createdAt)),
+        modifiedAt: formattedDuration(new Date(event.modifiedAt)),
 
         status: intl.formatMessage(
           {
@@ -165,10 +224,9 @@ function Workqueue({
             status: getEventStatus()
           }
         ),
-
-        [config.fields[0].id]: isInOutbox ? (
+        [titleColumnId]: isInOutbox ? (
           <IconWithName
-            name={get(event, config.fields[0].id) ?? 'N/A'}
+            name={fieldsWithPopulatedValues[titleColumnId]}
             status={'OUTBOX'}
           />
         ) : (
@@ -178,7 +236,7 @@ function Workqueue({
             })}
           >
             <IconWithName
-              name={get(event, config.fields[0].id) ?? 'N/A'}
+              name={fieldsWithPopulatedValues[titleColumnId]}
               status={event.status}
             />
           </NondecoratedLink>
@@ -200,76 +258,41 @@ function Workqueue({
     setSortOrder(newSortOrder)
   }
 
-  function getDefaultColumns(): Array<{
-    label?: string
-    width: number
-    key: string
-    sortFunction?: (columnName: string) => void
-    isActionColumn?: boolean
-    isSorted?: boolean
-    alignment?: ColumnContentAlignment
-  }> {
-    return [
-      {
-        label: intl.formatMessage({
-          id: 'events.workqueues.status',
-          defaultMessage: 'Status'
-        }),
+  function getDefaultColumns(): Array<Column> {
+    return workqueueConfig.defaultColumns.map(
+      (column): Column => ({
+        label:
+          column in defaultColumns
+            ? intl.formatMessage(
+                defaultColumns[column as keyof typeof defaultColumns].label
+              )
+            : '',
         width: 25,
-        key: 'status',
+        key: column,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === 'status'
-      },
-      {
-        label: intl.formatMessage({
-          id: 'events.workqueues.createdAt',
-          defaultMessage: 'Created'
-        }),
-        width: 25,
-        key: 'createdAt',
-        sortFunction: onColumnClick,
-        isSorted: sortedCol === 'createdAt'
-      },
-      {
-        label: intl.formatMessage({
-          id: 'events.workqueues.modifiedAt',
-          defaultMessage: 'Modified'
-        }),
-        width: 25,
-        key: 'modifiedAt',
-        sortFunction: onColumnClick,
-        isSorted: sortedCol === 'modifiedAt'
-      }
-    ]
+        isSorted: sortedCol === column
+      })
+    )
   }
+
   // @TODO: separate types for action button vs other columns
-  function getColumns(): Array<{
-    label?: string
-    width: number
-    key: string
-    sortFunction?: (columnName: string) => void
-    isActionColumn?: boolean
-    isSorted?: boolean
-    alignment?: ColumnContentAlignment
-  }> {
+  function getColumns(): Array<Column> {
     if (width > theme.grid.breakpoints.lg) {
-      return config.fields.map((field, i) => ({
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        label: intl.formatMessage(field.label!),
+      return workqueueConfig.columns.map((column) => ({
+        label: intl.formatMessage(column.label),
         width: 35,
-        key: field.id,
+        key: column.id,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === field.id
+        isSorted: sortedCol === column.id
       }))
     } else {
-      return config.fields
-        .map((field, i) => ({
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          label: intl.formatMessage(field.label!),
+      return workqueueConfig.columns
+        .map((column) => ({
+          label: intl.formatMessage(column.label),
           width: 35,
-          key: field.id,
+          key: column.id,
           sortFunction: onColumnClick,
-          isSorted: sortedCol === field.id
+          isSorted: sortedCol === column.id
         }))
         .slice(0, 2)
     }
@@ -287,7 +310,8 @@ function Workqueue({
       noContent={workqueue.length === 0}
       noResultText={'No results'}
       paginationId={Math.round(offset / limit)}
-      title={intl.formatMessage(config.title)}
+      // eslint-disable-next-line
+      title={intl.formatMessage(workqueueConfig.title)}
       totalPages={totalPages}
     >
       <ReactTooltip id="validateTooltip">

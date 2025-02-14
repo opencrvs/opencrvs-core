@@ -12,13 +12,15 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { Debug } from '@client/v2-events/features/debug/debug'
+import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import * as Register from '@client/v2-events/features/events/actions/register'
+import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
-import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
+import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from './routes'
@@ -28,6 +30,7 @@ import { ROUTES } from './routes'
  *
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
+
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
@@ -37,22 +40,7 @@ export const routesConfig = {
     </TRPCProvider>
   ),
   children: [
-    {
-      path: ROUTES.V2.path,
-      // Alternative would be to create a navigation component that would be used here.
-      element: (
-        <WorkqueueLayout>
-          <WorkqueueIndex />
-        </WorkqueueLayout>
-      ),
-      children: [
-        {
-          index: true,
-          path: ROUTES.V2.WORKQUEUE.path,
-          element: <WorkqueueIndex />
-        }
-      ]
-    },
+    workqueueRouter,
     {
       path: ROUTES.V2.EVENTS.OVERVIEW.path,
       element: (
@@ -91,6 +79,7 @@ export const routesConfig = {
         }
       ]
     },
+    correctionRouter,
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
       element: <Outlet />,
@@ -106,6 +95,24 @@ export const routesConfig = {
         {
           path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
           element: <Register.Review />
+        }
+      ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,
+      element: <Outlet />,
+      children: [
+        {
+          index: true,
+          element: <PrintCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.path,
+          element: <PrintCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.path,
+          element: <PrintCertificate.Review />
         }
       ]
     }

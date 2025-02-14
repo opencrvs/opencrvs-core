@@ -92,10 +92,10 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        eventId={eventId}
         form={form}
         formPages={formPages}
         pageId={currentPageId}
+        setFormData={(data) => setFormValues(eventId, data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(

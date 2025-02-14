@@ -22,7 +22,20 @@ import { seeder } from '@events/tests/generators'
 
 const { createCallerFactory } = t
 
-export function createTestClient(user: CreatedUser, scopes?: Scope[]) {
+const TEST_USER_DEFAULT_SCOPES = [
+  SCOPES.RECORD_DECLARE,
+  SCOPES.RECORD_DECLARATION_PRINT,
+  SCOPES.RECORD_READ,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_REGISTRATION_CORRECT,
+  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+  SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+]
+
+export function createTestClient(
+  user: CreatedUser,
+  scopes: Scope[] = TEST_USER_DEFAULT_SCOPES
+) {
   const createCaller = createCallerFactory(appRouter)
   const token = createTestToken(user.id, scopes)
 
@@ -33,9 +46,12 @@ export function createTestClient(user: CreatedUser, scopes?: Scope[]) {
   return caller
 }
 
-function createTestToken(userId: string, scopes?: Scope[]): TokenWithBearer {
+export function createTestToken(
+  userId: string,
+  scopes: Scope[]
+): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes ?? SCOPES.RECORD_SUBMIT_FOR_APPROVAL, sub: userId },
+    { scope: scopes, sub: userId },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',

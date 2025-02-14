@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod'
-import { ActionType } from './ActionConfig'
+import { ActionType } from './ActionType'
 import { FieldValue } from './FieldValue'
 
 const BaseActionInput = z.object({
@@ -37,6 +37,8 @@ export const RegisterActionInput = BaseActionInput.merge(
   })
 )
 
+export type RegisterActionInput = z.infer<typeof RegisterActionInput>
+
 export const ValidateActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE),
@@ -61,6 +63,14 @@ export const DeclareActionInput = BaseActionInput.merge(
   })
 )
 
+export const PrintCertificateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.PRINT_CERTIFICATE)
+      .default(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
 export type DeclareActionInput = z.infer<typeof DeclareActionInput>
 
 const AssignActionInput = BaseActionInput.merge(
@@ -74,6 +84,45 @@ const UnassignActionInput = BaseActionInput.merge(
     type: z.literal(ActionType.UNASSIGN).default(ActionType.UNASSIGN)
   })
 )
+
+export const RequestCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.REQUEST_CORRECTION)
+      .default(ActionType.REQUEST_CORRECTION),
+    metadata: z.record(z.string(), FieldValue)
+  })
+)
+
+export type RequestCorrectionActionInput = z.infer<
+  typeof RequestCorrectionActionInput
+>
+
+export const RejectCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    requestId: z.string(),
+    type: z
+      .literal(ActionType.REJECT_CORRECTION)
+      .default(ActionType.REJECT_CORRECTION)
+  })
+)
+
+export type RejectCorrectionActionInput = z.infer<
+  typeof RejectCorrectionActionInput
+>
+
+export const ApproveCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    requestId: z.string(),
+    type: z
+      .literal(ActionType.APPROVE_CORRECTION)
+      .default(ActionType.APPROVE_CORRECTION)
+  })
+)
+
+export type ApproveCorrectionActionInput = z.infer<
+  typeof ApproveCorrectionActionInput
+>
 
 /**
  * ActionInput types are used to validate the input data for the action.
@@ -90,7 +139,11 @@ export const ActionInput = z.discriminatedUnion('type', [
   NotifyActionInput,
   DeclareActionInput,
   AssignActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  PrintCertificateActionInput,
+  RequestCorrectionActionInput,
+  RejectCorrectionActionInput,
+  ApproveCorrectionActionInput
 ])
 
 export type ActionInput = z.input<typeof ActionInput>

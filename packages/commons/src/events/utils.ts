@@ -11,15 +11,20 @@
 
 import { TranslationConfig } from './TranslationConfig'
 
+import { flattenDeep, isEqual } from 'lodash'
+import { workqueues } from '../workqueues'
+import { ActionType } from './ActionType'
+import { EventConfig } from './EventConfig'
+import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
-import { flattenDeep } from 'lodash'
-import { EventConfig, EventConfigInput } from './EventConfig'
-import { WorkqueueConfigInput } from './WorkqueueConfig'
 import { FieldConfig } from './FieldConfig'
+import { WorkqueueConfig } from './WorkqueueConfig'
 
-const isMetadataField = <T extends string>(
+function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
-): field is EventMetadataKeys => field in eventMetadataLabelMap
+): field is EventMetadataKeys {
+  return field in eventMetadataLabelMap
+}
 
 /**
  * @returns All the fields in the event configuration input.
@@ -43,9 +48,17 @@ export const findInputPageFields = (
  */
 export const findPageFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep(
-    config.actions.map(({ forms }) =>
-      forms.map(({ pages }) => pages.map(({ fields }) => fields))
-    )
+    config.actions.map((action) => {
+      if (action.type === ActionType.REQUEST_CORRECTION) {
+        return [
+          ...action.forms.map(({ pages }) => pages.map(({ fields }) => fields)),
+          ...action.onboardingForm.flatMap(({ fields }) => fields),
+          ...action.additionalDetailsForm.flatMap(({ fields }) => fields)
+        ]
+      }
+
+      return action.forms.map(({ pages }) => pages.map(({ fields }) => fields))
+    })
   )
 }
 
@@ -91,24 +104,62 @@ export const resolveLabelsFromKnownFields = ({
   })
 }
 
-export const resolveFieldLabels = ({
-  config,
-  pageFields
-}: {
-  config: WorkqueueConfigInput
-  pageFields: { id: string; label: TranslationConfig }[]
-}) => {
-  return {
-    ...config,
-    fields: resolveLabelsFromKnownFields({
-      pageFields,
-      refFields: config.fields
-    })
-  }
-}
-
 export function getAllFields(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
     .flatMap((form) => form.pages.flatMap((page) => page.fields))
+}
+
+export function getAllPages(configuration: EventConfig) {
+  return configuration.actions
+    .flatMap((action) => action.forms.filter((form) => form.active))
+    .flatMap((form) => form.pages)
+}
+
+export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
+  workqueueConfigs.map((workqueue) => {
+    const rootWorkqueue = Object.values(workqueues).find(
+      (wq) => wq.id === workqueue.id
+    )
+    if (!rootWorkqueue) {
+      throw new Error(
+        `Invalid workqueue configuration: workqueue not found with id:  ${workqueue.id}`
+      )
+    }
+
+    const rootWorkqueueFields = rootWorkqueue.columns.map(({ id }) => id).sort()
+
+    const workqueueConfigFields = workqueue.fields
+      .map(({ column }) => column)
+      .sort()
+
+    if (!isEqual(rootWorkqueueFields, workqueueConfigFields)) {
+      throw new Error(
+        `Invalid workqueue configuration: [${rootWorkqueueFields.join(
+          ','
+        )}] does not match [${workqueueConfigFields.join(',')}]`
+      )
+    }
+  })
+}
+
+export const findActiveActionForm = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  const actionConfig = configuration.actions.find((a) => a.type === action)
+  const form = actionConfig?.forms.find((f) => f.active)
+
+  /** Let caller decide whether to throw or default to empty array */
+  return form
+}
+
+export const findActiveActionFields = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  const form = findActiveActionForm(configuration, action)
+
+  /** Let caller decide whether to throw or default to empty array */
+  return form?.pages.flatMap((p) => p.fields)
 }

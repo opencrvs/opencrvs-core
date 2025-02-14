@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 import { FieldValue } from './FieldValue'
+import { ActionType } from './ActionType'
 
 const ActionBase = z.object({
+  id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
@@ -67,6 +68,32 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+const PrintCertificateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
+const RequestedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REQUEST_CORRECTION)
+  })
+)
+
+const ApprovedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.APPROVE_CORRECTION),
+    requestId: z.string()
+  })
+)
+
+const RejectedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT_CORRECTION),
+    requestId: z.string()
+  })
+)
+
 const CustomAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM)
@@ -80,7 +107,11 @@ export const ActionDocument = z.discriminatedUnion('type', [
   RegisterAction,
   DeclareAction,
   AssignedAction,
+  RequestedCorrectionAction,
+  ApprovedCorrectionAction,
+  RejectedCorrectionAction,
   UnassignedAction,
+  PrintCertificateAction,
   CustomAction
 ])
 
@@ -88,7 +119,7 @@ export type ActionDocument = z.infer<typeof ActionDocument>
 
 export const ResolvedUser = z.object({
   id: z.string(),
-  systemRole: z.string(),
+  role: z.string(),
   name: z.array(
     z.object({
       use: z.string(),

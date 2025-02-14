@@ -37,7 +37,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   )
 
   function isActionVisible(action: ActionConfig) {
-    if (!action.allowedWhen) {
+    if (action.conditionals.length === 0) {
       return true
     }
     const params = {
@@ -45,8 +45,15 @@ export function ActionMenu({ eventId }: { eventId: string }) {
       $user: authentication,
       $now: formatISO(new Date(), { representation: 'date' })
     }
-
-    return validate(action.allowedWhen, params)
+    return action.conditionals.reduce((acc, conditional) => {
+      if (conditional.type === 'SHOW') {
+        return acc && validate(conditional.conditional, params)
+      }
+      if (conditional.type === 'HIDE') {
+        return acc && !validate(conditional.conditional, params)
+      }
+      return acc
+    }, true)
   }
 
   return (
@@ -65,6 +72,8 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                 onClick={() => {
                   if (
                     action.type === ActionType.CREATE ||
+                    action.type === ActionType.APPROVE_CORRECTION ||
+                    action.type === ActionType.REJECT_CORRECTION ||
                     action.type === ActionType.CUSTOM
                   ) {
                     alert(`Action ${action.type} is not implemented yet.`)

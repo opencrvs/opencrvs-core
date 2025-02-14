@@ -11,10 +11,10 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
+import { FieldProps } from '@opencrvs/commons/client'
 // eslint-disable-next-line no-restricted-imports
 import { getFacilityLocations } from '@client/offline/selectors'
-import { ILocation } from './Location'
+import { LocationProps } from './Location'
 
 interface SearchLocation {
   id: string
@@ -22,7 +22,7 @@ interface SearchLocation {
   displayLabel: string
 }
 
-interface Facility extends ILocation {
+interface Facility extends LocationProps {
   type: 'HEALTH_FACILITY'
   physicalType: 'Building'
 }
@@ -35,38 +35,41 @@ function toSearchOption(facility: Facility) {
   }
 }
 
-function useAdminLocations(value?: LocationFieldValue) {
+function useFacilityLocations(value?: string) {
   const locationMap = useSelector(getFacilityLocations)
 
   const locations = Object.values(locationMap)
-  const initialLocation =
-    // @TODO: Should disappear when restarting. Otherwise ignore and let markus fix the thing
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    value && locationMap[value] ? toSearchOption(locationMap[value]) : undefined
+
+  const location = value && locationMap[value]
+  const initialLocation = location ? toSearchOption(location) : undefined
   const options = locations.map(toSearchOption)
   return { options, initialLocation }
 }
 
-export function LocationSearch({
+function LocationSearchInput({
   setFieldValue,
   value,
   ...props
 }: FieldProps<'LOCATION'> & {
-  setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
-  value?: LocationFieldValue
+  setFieldValue: (name: string, val: string | undefined) => void
+  value?: string
 }) {
-  const { options, initialLocation } = useAdminLocations()
+  const { options, initialLocation } = useFacilityLocations()
 
   return (
     <LocationSearchComponent
       buttonLabel="Health facility"
       locationList={options}
       searchHandler={(location: SearchLocation) =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         setFieldValue(props.id, location.id)
       }
       selectedLocation={initialLocation}
       {...props}
     />
   )
+}
+
+export const LocationSearch = {
+  Input: LocationSearchInput,
+  Output: null
 }

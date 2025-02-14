@@ -14,10 +14,31 @@ import {
   EventInput,
   getUUID,
   ActionType,
-  ValidateActionInput
+  ValidateActionInput,
+  RegisterActionInput,
+  RequestCorrectionActionInput,
+  findActiveActionFields,
+  EventConfig,
+  mapFieldTypeToMockValue
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+
+export function generateActionInput(
+  configuration: EventConfig,
+  action: ActionType
+) {
+  const fields = findActiveActionFields(configuration, action) ?? []
+
+  return fields.reduce(
+    (acc, field, i) => ({
+      ...acc,
+      [field.id]: mapFieldTypeToMockValue(field, i)
+    }),
+    {}
+  )
+}
 
 interface Name {
   use: string
@@ -28,15 +49,16 @@ interface Name {
 export interface CreatedUser {
   id: string
   primaryOfficeId: string
-  systemRole: string
+  role: string
   name: Array<Name>
 }
 
 interface CreateUser {
   primaryOfficeId: string
-  systemRole?: string
+  role?: string
   name?: Array<Name>
 }
+
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
@@ -58,7 +80,9 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.DECLARE,
         transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
+        data:
+          input.data ??
+          generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
         eventId
       }),
       validate: (
@@ -67,16 +91,98 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.VALIDATE,
         transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
+        data:
+          input.data ??
+          generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
         duplicates: [],
         eventId
-      })
+      }),
+      register: (
+        eventId: string,
+        input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.REGISTER,
+        transactionId: input.transactionId ?? getUUID(),
+        data:
+          input.data ??
+          generateActionInput(tennisClubMembershipEvent, ActionType.REGISTER),
+        eventId
+      }),
+      printCertificate: (
+        eventId: string,
+        input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.PRINT_CERTIFICATE,
+        transactionId: input.transactionId ?? getUUID(),
+        data:
+          input.data ??
+          generateActionInput(
+            tennisClubMembershipEvent,
+            ActionType.PRINT_CERTIFICATE
+          ),
+        eventId
+      }),
+      correction: {
+        request: (
+          eventId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.REQUEST_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.REQUEST_CORRECTION
+            ),
+          metadata: {},
+          eventId
+        }),
+        approve: (
+          eventId: string,
+          requestId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.APPROVE_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.APPROVE_CORRECTION
+            ),
+          eventId,
+          requestId
+        }),
+        reject: (
+          eventId: string,
+          requestId: string,
+          input: Partial<
+            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          > = {}
+        ) => ({
+          type: ActionType.REJECT_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.REJECT_CORRECTION
+            ),
+          eventId,
+          requestId
+        })
+      }
     }
   }
 
   const user = {
     create: (input: CreateUser) => ({
-      systemRole: input.systemRole ?? 'REGISTRATION_AGENT',
+      role: input.role ?? 'REGISTRATION_AGENT',
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId
     })
@@ -117,7 +223,7 @@ export function seeder() {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
-      systemRole: user.systemRole,
+      role: user.role,
       id: createdUser.insertedId.toString()
     }
   }

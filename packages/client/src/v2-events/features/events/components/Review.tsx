@@ -12,13 +12,7 @@
 import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
-
-import { formatISO } from 'date-fns'
-import {
-  ActionFormData,
-  FieldConfig,
-  FormConfig
-} from '@opencrvs/commons/client'
+import { ActionFormData, FormConfig } from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
@@ -30,10 +24,12 @@ import {
   Text
 } from '@opencrvs/components'
 
-import { EventConfig } from '@opencrvs/commons'
-import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
-import { getConditionalActionsForField } from '@client/v2-events/components/forms/utils'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
+import { EventConfig, EventIndex } from '@opencrvs/commons'
+import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import { Output } from './Output'
+import { useSelector } from 'react-redux'
+import { getCountryLogoFile } from '@client/offline/selectors'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -116,70 +112,58 @@ const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
   changeButton: {
-    id: 'buttons.change',
+    id: 'v2.buttons.change',
     defaultMessage: 'Change',
     description: 'The label for the change button'
   },
   actionModalCancel: {
-    id: 'actionModal.cancel',
+    id: 'v2.actionModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of action modal'
   },
   actionModalPrimaryAction: {
-    id: 'actionModal.PrimaryAction',
+    id: 'v2.actionModal.PrimaryAction',
     defaultMessage: '{action, select, declare{Declare} other{{action}}}',
     description: 'The label for primary action button of action modal'
   },
   actionModalTitle: {
-    id: 'actionModal.title',
+    id: 'v2.actionModal.title',
     defaultMessage:
       '{action, select, declare{Declare} other{{action}}} the member?',
     description: 'The title for action modal'
   },
   actionModalDescription: {
-    id: 'actionModal.description',
+    id: 'v2.actionModal.description',
     defaultMessage:
       'The declarant will be notified of this action and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
   changeModalCancel: {
-    id: 'changeModal.cancel',
+    id: 'v2.changeModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of change modal'
   },
   changeModalContinue: {
-    id: 'changeModal.continue',
+    id: 'v2.changeModal.continue',
     defaultMessage: 'Continue',
     description: 'The label for continue button of change modal'
   },
   changeModalTitle: {
-    id: 'changeModal.title',
+    id: 'v2.changeModal.title',
     defaultMessage: 'Edit declaration?',
     description: 'The title for change modal'
   },
   changeModalDescription: {
-    id: 'changeModal.description',
+    id: 'v2.changeModal.description',
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
+  },
+  govtName: {
+    id: 'review.header.title.govtName',
+    defaultMessage: 'Government',
+    description: 'Header title that shows govt name'
   }
 })
-
-interface Stringifiable {
-  toString(): string
-}
-
-const FIELD_TYPE_FORMATTERS: Partial<
-  Record<
-    FieldConfig['type'],
-    null | ((props: { value: Stringifiable }) => JSX.Element)
-  >
-> = {
-  FILE: FileOutput
-}
-
-function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
-  return <>{value.toString() || ''}</>
-}
 
 /**
  * Review component, used to display the "read" version of the form.
@@ -188,6 +172,7 @@ function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
 function ReviewComponent({
   eventConfig,
   formConfig,
+  previousFormValues,
   form,
   onEdit,
   children,
@@ -197,14 +182,15 @@ function ReviewComponent({
   eventConfig: EventConfig
   formConfig: FormConfig
   form: ActionFormData
+  previousFormValues?: EventIndex['data']
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
 }) {
   const intl = useIntl()
+  const countryLogoFile = useSelector(getCountryLogoFile)
 
-  const { toString } = useTransformer(eventConfig.id)
-
-  const stringifiedForm = toString(form)
+  const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
+  const previousForm = previousFormValues ?? {}
 
   return (
     <Row>
@@ -212,6 +198,9 @@ function ReviewComponent({
         <Card>
           <HeaderContainer>
             <HeaderContent>
+              {countryLogoFile && (
+                <CountryLogo size="small" src={countryLogoFile} />
+              )}
               <Stack
                 alignItems="flex-start"
                 direction="column"
@@ -219,7 +208,8 @@ function ReviewComponent({
                 justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
-                  {eventConfig.label.defaultMessage}
+                  {intl.formatMessage(reviewMessages.govtName)} {' – '}
+                  {intl.formatMessage(eventConfig.label)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
                   {title}
@@ -253,35 +243,20 @@ function ReviewComponent({
                     >
                       <ListReview id={'Section_' + page.id}>
                         {page.fields
-                          .filter(
-                            (field) =>
-                              // Formatters can explicitly define themselves to be null
-                              // this means a value display row in not rendered at all
-                              FIELD_TYPE_FORMATTERS[field.type] !== null
-                          )
-                          .filter(
-                            (field) =>
-                              // Omit hidden fields
-                              !getConditionalActionsForField(field, {
-                                $form: form,
-                                $now: formatISO(new Date(), {
-                                  representation: 'date'
-                                })
-                              }).includes('HIDE')
-                          )
+                          .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
-                            const Output =
-                              FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
+                            const value = form[field.id]
+                            const previousValue = previousForm[field.id]
 
-                            const value = stringifiedForm[field.id]
-                            const hasValue =
-                              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                              value !== null && value !== undefined
-
-                            const valueDisplay = hasValue ? (
-                              <Output value={value} />
-                            ) : (
-                              ''
+                            const valueDisplay = (
+                              <Output
+                                field={field}
+                                previousValue={previousValue}
+                                showPreviouslyMissingValuesAsChanged={
+                                  showPreviouslyMissingValuesAsChanged
+                                }
+                                value={value}
+                              />
                             )
 
                             return (
@@ -415,7 +390,18 @@ function PreviewActionComponent({
   )
 }
 
-function EditModal({ close }: { close: (result: boolean | null) => void }) {
+function EditModal({
+  copy,
+  close
+}: {
+  copy?: {
+    cancel?: MessageDescriptor
+    continue?: MessageDescriptor
+    title?: MessageDescriptor
+    description?: MessageDescriptor
+  }
+  close: (result: boolean | null) => void
+}) {
   const intl = useIntl()
   return (
     <ResponsiveModal
@@ -429,7 +415,7 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
             close(null)
           }}
         >
-          {intl.formatMessage(reviewMessages.changeModalCancel)}
+          {intl.formatMessage(copy?.cancel || reviewMessages.changeModalCancel)}
         </Button>,
         <Button
           key="confirm_edit"
@@ -439,17 +425,21 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
             close(true)
           }}
         >
-          {intl.formatMessage(reviewMessages.changeModalContinue)}
+          {intl.formatMessage(
+            copy?.continue || reviewMessages.changeModalContinue
+          )}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(reviewMessages.changeModalTitle)}
+      title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(reviewMessages.changeModalDescription)}
+          {intl.formatMessage(
+            copy?.description || reviewMessages.changeModalDescription
+          )}
         </Text>
       </Stack>
     </ResponsiveModal>
@@ -457,9 +447,16 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
 }
 
 function ActionModal({
+  copy,
   close,
   action
 }: {
+  copy?: {
+    cancel?: MessageDescriptor
+    primaryAction?: MessageDescriptor
+    title?: MessageDescriptor
+    description?: MessageDescriptor
+  }
   close: (result: boolean | null) => void
   action: string
 }) {
@@ -476,7 +473,7 @@ function ActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(reviewMessages.actionModalCancel)}
+          {intl.formatMessage(copy?.cancel || reviewMessages.actionModalCancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -486,19 +483,27 @@ function ActionModal({
             close(true)
           }}
         >
-          {intl.formatMessage(reviewMessages.actionModalPrimaryAction, {
-            action
-          })}
+          {intl.formatMessage(
+            copy?.primaryAction || reviewMessages.actionModalPrimaryAction,
+            {
+              action
+            }
+          )}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(reviewMessages.actionModalTitle, { action })}
+      title={intl.formatMessage(
+        copy?.title || reviewMessages.actionModalTitle,
+        { action }
+      )}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(reviewMessages.actionModalDescription)}
+          {intl.formatMessage(
+            copy?.description || reviewMessages.actionModalDescription
+          )}
         </Text>
       </Stack>
     </ResponsiveModal>
