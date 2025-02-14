@@ -26,6 +26,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   isFieldButton,
   isFieldHttp,
+  isFieldIDReader,
   isFieldLinkButton,
   isRadioGroupWithNestedField,
   serializeFieldValue
@@ -166,7 +167,9 @@ const toCorrectionValue = (
 }
 
 function isMetaTypeField(field: IFormField): boolean {
-  return isFieldHttp(field) || isFieldLinkButton(field)
+  return (
+    isFieldHttp(field) || isFieldLinkButton(field) || isFieldIDReader(field)
+  )
 }
 export function getChangedValues(
   formDefinition: IForm,
