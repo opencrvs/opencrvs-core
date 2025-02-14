@@ -10,7 +10,30 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+
+test(`prevents forbidden access if missing required scope`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.declare(
+      generator.event.actions.declare('event-test-id-12345', {})
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+
+  await expect(
+    client.event.actions.declare(
+      generator.event.actions.declare('event-test-id-12345', {})
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()

@@ -1632,7 +1632,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         items: items.filter((item) => item),
         action:
           this.includesVerificationStatus(section) &&
-          Boolean(declaration.data[section.id].verified) ? (
+          Boolean(declaration.data[section.id]?.verified) ? (
             <VerificationPill
               type={declaration.data[section.id].verified as string}
             />
