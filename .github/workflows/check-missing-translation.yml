@@ -43,7 +43,8 @@ jobs:
     - name: Set branch in core and check if any missing translation exists
       run: |
         cd $HOME/core/
-        working
+        working_branch= ${{ env.working_branch }}
+        
 
         # if [ "$branch_exists" = "true" ]; then
         #   git checkout $branch_name
