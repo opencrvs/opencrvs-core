@@ -20,32 +20,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout opencrvs-core repository
-        uses: actions/checkout@v4
+    - name: Create directory for core
+      run: mkdir -p /core
+  
+    - name: Checkout opencrvs-core repository
+      uses: actions/checkout@v4
+      with:
+        path: /core
 
-      - name: Get current branch name
-        id: get_branch
-        run: echo "branch_name=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+    - name: Get current branch name
+      id: get_branch
+      run: echo "branch_name=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+    
+    - name: Clone countryconfig repository and check the branch if available in countryconfig or not
+      run: |
+        mkdir -p /countryconfig
+        cd /countryconfig
+        git clone https://github.com/opencrvs/opencrvs-countryconfig.git
+        cd opencrvs-countryconfig
+        if git show-ref --verify --quiet refs/heads/$branch_name; then
+          echo "branch_exists=true" >> $GITHUB_ENV
+        else
+          echo "branch_exists=false" >> $GITHUB_ENV
+        fi
 
-      - name: Clone countryconfig repository and check the branch if available in countryconfig or not
-        run: |
-          git clone https://github.com/opencrvs/opencrvs-countryconfig.git
-          cd opencrvs-countryconfig
-          if git show-ref --verify --quiet refs/heads/$branch_name; then
-            echo "branch_exists=true" >> $GITHUB_ENV
-          else
-            echo "branch_exists=false" >> $GITHUB_ENV
-          fi
-
-      - name: Set branch in core and check if any missing translation exists
-        run: |
-          cd opencrvs-core
-          if [ "$branch_exists" = "true" ]; then
-            git checkout $branch_name
-            echo "Check out to branch $branch_name"
-          else
-            git checkout develop
-            echo "Check out to develop branch"
-          fi
-          sh packages/client/extract-translations.sh
-      
+    - name: Set branch in core and check if any missing translation exists
+      run: |
+        cd /core/opencrvs-core/
+        if [ "$branch_exists" = "true" ]; then
+          git checkout $branch_name
+          echo "Check out to branch $branch_name"
+        else
+          git checkout develop
+          echo "Check out to develop branch"
+        fi
+        sh packages/client/extract-translations.sh
+    
