@@ -165,9 +165,9 @@ const toCorrectionValue = (
   }
   return changedValues
 }
-
 /**
- * Meta type field suggests it has special functionality needed for the form. Cannot be hidden.
+ * This check ensures these fields are ignored when submitting, as they only generate
+ * other field values and shouldn't be sent to the backend.
  */
 function isMetaTypeField(field: IFormField): boolean {
   return (
