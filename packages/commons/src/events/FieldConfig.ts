@@ -79,6 +79,41 @@ const TextField = BaseField.extend({
 
 export type TextField = z.infer<typeof TextField>
 
+const TextAreaField = BaseField.extend({
+  type: z.literal(FieldType.TEXTAREA),
+  configuration: z
+    .object({
+      maxLength: z.number().optional().describe('Maximum length of the text'),
+      rows: z.number().optional().describe('Number of visible text lines'),
+      cols: z.number().optional().describe('Number of visible columns'),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
+    })
+    .default({ rows: 4 })
+    .optional()
+}).describe('Multiline text input')
+
+export type TextAreaField = z.infer<typeof TextAreaField>
+
+const SignatureField = BaseField.extend({
+  type: z.literal(FieldType.SIGNATURE),
+  signaturePromptLabel: TranslationConfig.describe(
+    'Title of the signature modal'
+  ),
+  configuration: z
+    .object({
+      maxSizeMb: z.number().optional().describe('Maximum file size in MB'),
+      allowedFileFormats: z
+        .array(z.string())
+        .optional()
+        .describe('List of allowed file formats for the signature')
+    })
+    .default({})
+    .optional()
+}).describe('Signature input field')
+
+export type SignatureField = z.infer<typeof SignatureField>
+
 export const EmailField = BaseField.extend({
   type: z.literal(FieldType.EMAIL)
 })
@@ -249,6 +284,7 @@ export type AllFields =
 export type Inferred =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
+  | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof Paragraph>
   | z.infer<typeof RadioGroup>
@@ -260,12 +296,14 @@ export type Inferred =
   | z.infer<typeof FileUploadWithOptions>
   | z.infer<typeof Country>
   | z.infer<typeof Location>
+  | z.infer<typeof SignatureField>
   | z.infer<typeof Divider>
   | z.infer<typeof EmailField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
   TextField,
+  TextAreaField,
   DateField,
   Paragraph,
   RadioGroup,
@@ -276,6 +314,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   File,
   Country,
   Location,
+  SignatureField,
   Divider,
   FileUploadWithOptions
 ]) as unknown as z.ZodType<Inferred, any, Inferred>

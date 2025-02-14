@@ -26,6 +26,8 @@ import {
   Paragraph,
   RadioGroup,
   SelectField,
+  SignatureField,
+  TextAreaField,
   TextField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -62,6 +64,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = EmailValue
       break
     case FieldType.TEXT:
+    case FieldType.TEXTAREA:
     case FieldType.DIVIDER:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
@@ -70,6 +73,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.SIGNATURE:
     case FieldType.HIDDEN:
       schema = required ? TextValue.min(1) : TextValue
       break
@@ -111,12 +115,14 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
   switch (field.type) {
     case FieldType.DIVIDER:
     case FieldType.TEXT:
+    case FieldType.TEXTAREA:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.LOCATION:
     case FieldType.SELECT:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
+    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
       return `${field.id}-${field.type}-${i}`
     case FieldType.EMAIL:
@@ -170,6 +176,20 @@ export const isTextFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: TextField } => {
   return field.config.type === FieldType.TEXT
+}
+
+export const isTextAreaFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: TextAreaField } => {
+  return field.config.type === FieldType.TEXTAREA
+}
+
+export const isSignatureFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: SignatureField } => {
+  return field.config.type === FieldType.SIGNATURE
 }
 
 export const isEmailFieldType = (field: {
