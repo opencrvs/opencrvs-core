@@ -58,7 +58,7 @@ export interface IProps {
 function usePersistentCountryBackground() {
   const theme = useTheme()
   const [countryBackground, setCountryBackground] = React.useState({
-    backgroundColor: `${(theme as ITheme).colors.backgroundPrimary}`,
+    backgroundColor: `${(theme as ITheme).colors.purpleDarker}`,
     backgroundImage: '',
     imageFit: ''
   })
