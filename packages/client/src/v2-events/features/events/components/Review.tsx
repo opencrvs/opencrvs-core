@@ -28,6 +28,7 @@ import {
 import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { Output } from './Output'
 
@@ -174,9 +175,11 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  metadata,
   onEdit,
   children,
-  title
+  title,
+  onMetadataChange
 }: {
   children: React.ReactNode
   eventConfig: EventConfig
@@ -185,10 +188,11 @@ function ReviewComponent({
   previousFormValues?: EventIndex['data']
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
+  metadata?: ActionFormData
+  onMetadataChange?: (values: ActionFormData) => void
 }) {
   const intl = useIntl()
   const countryLogoFile = useSelector(getCountryLogoFile)
-
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
@@ -291,6 +295,23 @@ function ReviewComponent({
               })}
             </ReviewContainter>
           </FormData>
+
+          {metadata &&
+            onMetadataChange &&
+            formConfig.review.fields.length > 0 && (
+              <FormData>
+                <ReviewContainter>
+                  <FormFieldGenerator
+                    fields={formConfig.review.fields}
+                    formData={metadata}
+                    id={'review'}
+                    initialValues={metadata}
+                    setAllFieldsDirty={false}
+                    onChange={onMetadataChange}
+                  />
+                </ReviewContainter>
+              </FormData>
+            )}
         </Card>
         {children}
       </LeftColumn>

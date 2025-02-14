@@ -13,11 +13,14 @@
 import { InputField } from '@client/components/form/InputField'
 import { TEXT } from '@client/forms'
 import { Text as TextComponent } from '@opencrvs/components/lib/Text'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
 import * as React from 'react'
 
 import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
+  FIELD_SEPARATOR,
   getDependentFields,
   handleInitialValue,
   hasInitialValueDependencyInfo,
@@ -32,6 +35,8 @@ import {
   FieldValue,
   FileFieldValue,
   isAddressFieldType,
+  isAdministrativeAreaFieldType,
+  isFacilityFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
   isCountryFieldType,
@@ -41,10 +46,13 @@ import {
   isFieldHidden,
   isFileFieldType,
   isLocationFieldType,
+  isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
+  isSignatureFieldType,
+  isTextAreaFieldType,
   isTextFieldType
 } from '@opencrvs/commons/client'
 import {
@@ -68,11 +76,11 @@ import {
   Checkbox,
   Date as DateField,
   RadioGroup,
-  Location,
   LocationSearch,
   Select,
   SelectCountry,
-  Text
+  Text,
+  AdministrativeArea
 } from '@client/v2-events/features/events/registered-fields'
 
 import { SubHeader } from '@opencrvs/components'
@@ -240,6 +248,29 @@ const GeneratedInputField = React.memo(
       )
     }
 
+    if (isTextAreaFieldType(field)) {
+      return (
+        <InputField
+          {...inputFieldProps}
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration?.prefix)
+          }
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration?.postfix)
+          }
+        >
+          <TextArea
+            {...inputProps}
+            disabled={disabled}
+            maxLength={field.config.configuration?.maxLength}
+            value={field.value}
+          />
+        </InputField>
+      )
+    }
+
     if (isFileFieldType(field)) {
       const value = formData[fieldDefinition.id] as FileFieldValue
       return (
@@ -312,24 +343,26 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    if (isLocationFieldType(field)) {
-      if (field.config.configuration.type === 'HEALTH_FACILITY')
-        return (
-          <InputField {...inputFieldProps}>
-            <LocationSearch.Input
-              {...field.config}
-              value={field.value}
-              setFieldValue={setFieldValue}
-            />
-          </InputField>
-        )
 
+    if (isSignatureFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <Location.Input
+          <SignatureUploader
+            name={fieldDefinition.id}
+            value={field.value}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+            modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isAdministrativeAreaFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <AdministrativeArea.Input
             {...field.config}
             value={field.value}
-            setFieldValue={setFieldValue}
             partOf={
               (field.config.configuration?.partOf?.$data &&
                 (makeFormikFieldIdsOpenCRVSCompatible(formData)[
@@ -337,8 +370,42 @@ const GeneratedInputField = React.memo(
                 ] as string | undefined | null)) ??
               null
             }
+            setFieldValue={setFieldValue}
           />
         </InputField>
+      )
+    }
+
+    if (isLocationFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['locations']}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+
+    if (isOfficeFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['offices']}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+
+    if (isFacilityFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['facilities']}
+          setFieldValue={setFieldValue}
+        />
       )
     }
     if (isDividerFieldType(field)) {
@@ -575,7 +642,6 @@ class FormSectionComponent extends React.Component<AllProps> {
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-export const FIELD_SEPARATOR = '____'
 function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [

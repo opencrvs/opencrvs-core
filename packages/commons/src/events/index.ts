@@ -35,6 +35,7 @@ export * from './FieldType'
 export * from './ActionType'
 export * from './FieldTypeMapping'
 export * from './Conditional'
+export * from './AdvancedSearchConfig'
 // In order to infer types, we need to export the following types along with events
 export * from '../conditionals/conditionals'
 export * from '../conditionals/validate'
