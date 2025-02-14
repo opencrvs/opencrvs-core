@@ -42,5 +42,5 @@ jobs:
     
     - name: check output coming from previous step
       run: |
-        echo "working_branch=${steps.set_branch.outputs.working_branch}"
-        echo "countryconfig_path=${steps.set_branch.outputs.countryconfig_path}"
+        echo "working_branch=${{steps.set_branch.outputs.working_branch}}"
+        echo "countryconfig_path=${{steps.set_branch.outputs.countryconfig_path}}"
