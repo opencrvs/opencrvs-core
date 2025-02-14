@@ -197,13 +197,12 @@ const ADMIN_STRUCTURE = [
       defaultMessage: 'Province',
       description: 'This is the label for the field'
     },
-    type: 'LOCATION',
-    options: {
-      type: 'ADMIN_STRUCTURE'
-    }
+    type: 'ADMINISTRATIVE_AREA',
+    configuration: { type: 'ADMIN_STRUCTURE' }
   },
   {
     id: 'district',
+    type: 'ADMINISTRATIVE_AREA',
     conditionals: [
       {
         type: 'HIDE',
@@ -216,12 +215,12 @@ const ADMIN_STRUCTURE = [
       defaultMessage: 'District',
       description: 'This is the label for the field'
     },
-    type: 'LOCATION',
-    options: {
+    configuration: {
+      type: 'ADMIN_STRUCTURE',
       partOf: {
+        // @TODO: Fix
         $data: 'province'
-      },
-      type: 'ADMIN_STRUCTURE'
+      }
     }
   },
   {
