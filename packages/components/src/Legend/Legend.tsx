@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import styled, { withTheme } from 'styled-components'
+import styled from 'styled-components'
 import { IDataPoint, ICategoryDataPoint } from '../chart-datapoint-types'
 import { ITheme } from '../theme'
 
@@ -43,9 +43,9 @@ const LegendItemBase = styled.div`
     content: ':';
   }
 `
-const LegendItem = styled(LegendItemBase)<{ colour: string }>`
+const LegendItem = styled(LegendItemBase)`
   &::before {
-    background: ${({ colour }) => colour};
+    background: ${({ theme }) => theme.colors.primary};
   }
 `
 
@@ -100,18 +100,12 @@ const FooterIcon = styled.div`
   margin: 0 8px;
 `
 
-function LegendHeader({
-  dataPoint,
-  colour
-}: {
-  dataPoint: ILegendDataPoint
-  colour: string
-}) {
+function LegendHeader({ dataPoint }: { dataPoint: ILegendDataPoint }) {
   if (dataPoint.estimate) {
     return <EstimateLegendItem>{dataPoint.label}</EstimateLegendItem>
   }
 
-  return <LegendItem colour={colour}>{dataPoint.label}</LegendItem>
+  return <LegendItem>{dataPoint.label}</LegendItem>
 }
 
 function LegendBody({ dataPoint }: { dataPoint: ILegendDataPoint }) {
@@ -164,41 +158,34 @@ function LegendFooter({
   )
 }
 
-export const Legend = withTheme(
-  ({ data, theme, smallestToLargest }: ILegendProps & { theme: ITheme }) => {
-    const dataPointsWithoutEstimates = data.filter(
-      (dataPoint) => !dataPoint.estimate
-    )
-
-    let sortedData = data
-    if (smallestToLargest) {
-      sortedData = [...data].sort((a, b) => a.value - b.value)
-    }
-
-    const colours = [theme.colors.primary]
-
-    return (
-      <div>
-        <Row>
-          {sortedData.map((dataPoint, i) => {
-            const colour =
-              colours[dataPointsWithoutEstimates.indexOf(dataPoint)]
-            return (
-              <Column key={i}>
-                <LegendHeader dataPoint={dataPoint} colour={colour} />
-                <LegendBody dataPoint={dataPoint} />
-                {dataPoint.categoricalData && (
-                  <LegendFooter
-                    dataPoints={dataPoint.categoricalData}
-                    total={dataPoint.value}
-                    isTotal={dataPoint.total}
-                  />
-                )}
-              </Column>
-            )
-          })}
-        </Row>
-      </div>
-    )
+export const Legend = ({
+  data,
+  smallestToLargest
+}: ILegendProps & { theme: ITheme }) => {
+  let sortedData = data
+  if (smallestToLargest) {
+    sortedData = [...data].sort((a, b) => a.value - b.value)
   }
-)
+
+  return (
+    <div>
+      <Row>
+        {sortedData.map((dataPoint, i) => {
+          return (
+            <Column key={i}>
+              <LegendHeader dataPoint={dataPoint} />
+              <LegendBody dataPoint={dataPoint} />
+              {dataPoint.categoricalData && (
+                <LegendFooter
+                  dataPoints={dataPoint.categoricalData}
+                  total={dataPoint.value}
+                  isTotal={dataPoint.total}
+                />
+              )}
+            </Column>
+          )
+        })}
+      </Row>
+    </div>
+  )
+}
