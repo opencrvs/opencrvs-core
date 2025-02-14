@@ -15,7 +15,6 @@ import {
   isQuestionnaireResponse,
   QuestionnaireResponse
 } from '@opencrvs/commons/types'
-import { unionBy } from 'lodash'
 
 interface FieldInput {
   fieldId: string
@@ -23,17 +22,16 @@ interface FieldInput {
   valueBoolean?: boolean
 }
 
-const upsertAnswer = (
+export const upsertAnswer = (
   responses: NonNullable<QuestionnaireResponse['item']>,
   { fieldId, valueString, valueBoolean }: FieldInput
-) => {
-  const updatedEntry = {
+) => [
+  ...responses.filter(({ text }) => text !== fieldId),
+  {
     text: fieldId,
     answer: [{ valueString, valueBoolean }]
   }
-
-  return unionBy([...responses, updatedEntry], 'text')
-}
+]
 
 /**
  * Upserts (updates or adds) a field to the record QuestionnaireResponse
