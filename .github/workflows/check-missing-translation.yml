@@ -10,7 +10,6 @@
 name: Check Missing Translation
 
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - '*'
@@ -26,33 +25,17 @@ jobs:
         mkdir -m 777 -p $HOME/core
         mkdir -m 777 -p $HOME/countryconfig
   
-    - name: Clone countryconfig repository and check the branch if available in countryconfig or not
+    - name: Clone countryconfig and check if there any branch exists with the same name like current branch
       id: set_branch
       run: |
         cd $HOME/countryconfig
         git clone https://github.com/opencrvs/opencrvs-countryconfig.git
         cd opencrvs-countryconfig
-
-        if git show-ref --verify --quiet refs/heads/$(echo ${GITHUB_REF#refs/heads/}); then
-          echo "working_branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+        if [ -z "$(git branch -a | grep ${{ github.head_ref }})" ]; then
+          echo "Branch ${{ github.head_ref }} does not exist in countryconfig, we will use the develop branch"
+          echo "working_branch='develop'" >> $GITHUB_OUTPUT
         else
-          echo "working_branch=develop" >> $GITHUB_ENV
+          echo "Branch ${{ github.head_ref }} exists in countryconfig"
+          echo "working_branch='${{ github.head_ref }}'" >> $GITHUB_OUTPUT
         fi
-        echo "We will be working on the branch $working_branch"
-
-    - name: Set branch in core and check if any missing translation exists
-      run: |
-        cd $HOME/core/
-        echo "working_branch=$working_branch" >> $GITHUB_ENV
-        echo "we will be checking out to branch $working_branch"
-
-
-        # if [ "$branch_exists" = "true" ]; then
-        #   git checkout $branch_name
-        #   echo "Check out to branch $branch_name"
-        # else
-        #   git checkout develop
-        #   echo "Check out to develop branch"
-        # fi
-        # sh packages/client/extract-translations.sh
-    
+        
