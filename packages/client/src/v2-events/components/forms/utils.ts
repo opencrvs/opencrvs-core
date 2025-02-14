@@ -17,7 +17,8 @@ import {
   FieldValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
-import { FIELD_SEPARATOR } from './FormFieldGenerator'
+
+export const FIELD_SEPARATOR = '____'
 
 export function handleInitialValue(
   field: FieldConfig,
