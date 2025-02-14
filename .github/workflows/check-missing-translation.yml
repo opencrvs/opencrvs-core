@@ -59,7 +59,7 @@ jobs:
         cd ./opencrvs-core
         git checkout $acting_branch
         yarn install
-        yarn extract:translations
+        sh ./packages/client/src/extract-translations.ts
 
         
         
