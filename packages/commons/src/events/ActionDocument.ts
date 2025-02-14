@@ -17,6 +17,7 @@ const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
+  metadata: z.record(z.string(), FieldValue).optional(),
   draft: z.boolean().optional().default(false),
   createdAtLocation: z.string()
 })
