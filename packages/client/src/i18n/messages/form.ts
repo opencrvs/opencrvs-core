@@ -434,6 +434,11 @@ export const formMessageDescriptors = {
     defaultMessage: 'Create new user',
     description: 'The title of user form',
     id: 'form.section.user.title'
+  },
+  empty: {
+    defaultMessage: '',
+    description: 'Empty string',
+    id: 'form.field.label.empty'
   }
 }
 
