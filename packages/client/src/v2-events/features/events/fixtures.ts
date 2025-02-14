@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
-import { ConditionalType, EventDocument } from '@opencrvs/commons/client'
 import {
+  ConditionalType,
+  EventDocument,
   defineConditional,
   EventConfig,
   EventIndex,
