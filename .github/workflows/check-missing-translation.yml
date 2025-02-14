@@ -48,12 +48,13 @@ jobs:
     - name: Set branch in core and check if any missing translation exists
       run: |
         cd $HOME/core/
-        if [ "$branch_exists" = "true" ]; then
-          git checkout $branch_name
-          echo "Check out to branch $branch_name"
-        else
-          git checkout develop
-          echo "Check out to develop branch"
-        fi
-        sh packages/client/extract-translations.sh
+        ls -l
+        # if [ "$branch_exists" = "true" ]; then
+        #   git checkout $branch_name
+        #   echo "Check out to branch $branch_name"
+        # else
+        #   git checkout develop
+        #   echo "Check out to develop branch"
+        # fi
+        # sh packages/client/extract-translations.sh
     
