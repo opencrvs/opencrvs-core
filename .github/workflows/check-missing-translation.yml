@@ -1,4 +1,13 @@
-name: Check CountryConfig Branch
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+name: Check Missing Translation
 
 on:
   workflow_dispatch:
@@ -18,11 +27,9 @@ jobs:
         id: get_branch
         run: echo "branch_name=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
-      - name: Clone countryconfig repository
-        run: git clone https://github.com/opencrvs/opencrvs-countryconfig.git
-
-      - name: Check if branch exists in countryconfig
+      - name: Clone countryconfig repository and check the branch if available in countryconfig or not
         run: |
+          git clone https://github.com/opencrvs/opencrvs-countryconfig.git
           cd opencrvs-countryconfig
           if git show-ref --verify --quiet refs/heads/$branch_name; then
             echo "branch_exists=true" >> $GITHUB_ENV
@@ -31,7 +38,7 @@ jobs:
 
       - name: Set branch in core and check if any missing translation exists
         run: |
-          cd countryconfig
+          cd opencrvs-core
           if [ "$branch_exists" = "true" ]; then
             git checkout $branch_name
             echo "Check out to branch $branch_name"
