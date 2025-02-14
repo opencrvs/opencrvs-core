@@ -24,7 +24,7 @@ interface SearchLocation {
   displayLabel: string
 }
 
-function useAdministrativeArears(
+function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const offlineCountryConfig = useSelector(getOfflineData)
@@ -52,7 +52,7 @@ function LocationSearchInput({
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string
 }) {
-  const locationList = useAdministrativeArears(searchableResource)
+  const locationList = useAdministrativeAreas(searchableResource)
   const selectedLocation = locationList.find(
     (location) => location.id === value
   )

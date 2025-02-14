@@ -171,7 +171,7 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
-const AdministrativeAreaOptions = z
+const AdministrativeAreaConfiguration = z
   .object({
     partOf: z
       .object({
@@ -185,7 +185,7 @@ const AdministrativeAreaOptions = z
 
 const AdministrativeArea = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
-  configuration: AdministrativeAreaOptions
+  configuration: AdministrativeAreaConfiguration
 }).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
@@ -285,7 +285,7 @@ export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
-export type AdministrativeAreaOptions = z.infer<
-  typeof AdministrativeAreaOptions
+export type AdministrativeAreaConfiguration = z.infer<
+  typeof AdministrativeAreaConfiguration
 >
 export type FieldConditional = z.infer<typeof ActionConditional>

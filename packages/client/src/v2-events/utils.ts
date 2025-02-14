@@ -10,7 +10,11 @@
  */
 
 import { uniq, isString, get } from 'lodash'
-import { ResolvedUser, ActionDocument } from '@opencrvs/commons/client'
+import {
+  ResolvedUser,
+  ActionDocument,
+  EventConfig
+} from '@opencrvs/commons/client'
 
 /**
  *
@@ -53,4 +57,18 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   )
 
   return uniq(userIds)
+}
+
+export const getAllUniqueFields = (currentEvent: EventConfig) => {
+  return [
+    ...new Map(
+      currentEvent.actions.flatMap((action) =>
+        action.forms.flatMap((form) =>
+          form.pages.flatMap((page) =>
+            page.fields.map((field) => [field.id, field])
+          )
+        )
+      )
+    ).values()
+  ]
 }

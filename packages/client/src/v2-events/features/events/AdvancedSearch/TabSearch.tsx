@@ -10,13 +10,14 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { useIntl, defineMessages } from 'react-intl'
+import { useIntl, defineMessages, IntlShape } from 'react-intl'
 import { Accordion } from '@opencrvs/components'
 import { FieldValue } from '@opencrvs/commons/client'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
 import { EventConfig } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { getAllUniqueFields } from '@client/v2-events/utils'
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -42,37 +43,15 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
-export function TabSearch({ currentEvent }: { currentEvent: EventConfig }) {
-  const intl = useIntl()
-  const [formValues, setFormValues] = React.useState<
-    Record<string, FieldValue>
-  >({})
-
-  React.useEffect(() => {
-    setFormValues({})
-  }, [currentEvent])
-
-  // Extract unique fields
-  const allUniqueFields = [
-    ...new Map(
-      currentEvent.actions.flatMap((action) =>
-        action.forms.flatMap((form) =>
-          form.pages.flatMap((page) =>
-            page.fields.map((field) => [field.id, field])
-          )
-        )
-      )
-    ).values()
-  ]
-  const sections = currentEvent.advancedSearch
-  const handleFieldChange = (fieldId: string, value: FieldValue) => {
-    setFormValues((prev) => ({
-      ...prev,
-      [fieldId]: value
-    }))
-  }
-
-  const SectionFields = sections.map((section) => {
+function getSectionFields(
+  event: EventConfig,
+  formValues: Record<string, FieldValue>,
+  handleFieldChange: (fieldId: string, value: FieldValue) => void,
+  intl: IntlShape
+) {
+  const advancedSearchSections = event.advancedSearch
+  const allUniqueFields = getAllUniqueFields(event)
+  return advancedSearchSections.map((section) => {
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
@@ -80,12 +59,10 @@ export function TabSearch({ currentEvent }: { currentEvent: EventConfig }) {
       advancedSearchFieldId.includes(field.id)
     )
 
-    const modifiedFields = fields.map((f) => {
-      return {
-        ...f,
-        required: false // advanced search fields need not be required
-      }
-    })
+    const modifiedFields = fields.map((f) => ({
+      ...f,
+      required: false // advanced search fields need not be required
+    }))
 
     return (
       <Accordion
@@ -110,6 +87,31 @@ export function TabSearch({ currentEvent }: { currentEvent: EventConfig }) {
       </Accordion>
     )
   })
+}
+
+export function TabSearch({ currentEvent }: { currentEvent: EventConfig }) {
+  const intl = useIntl()
+  const [formValues, setFormValues] = React.useState<
+    Record<string, FieldValue>
+  >({})
+
+  React.useEffect(() => {
+    setFormValues({})
+  }, [currentEvent])
+
+  const handleFieldChange = (fieldId: string, value: FieldValue) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [fieldId]: value
+    }))
+  }
+
+  const SectionFields = getSectionFields(
+    currentEvent,
+    formValues,
+    handleFieldChange,
+    intl
+  )
 
   const hasEnoughParams = Object.entries(formValues).length > 0
   const Search = (
