@@ -24,7 +24,7 @@ import {
 } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventMetaData } from '@client/v2-events/features/events/useEventMetadata'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMetadata'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -117,7 +117,7 @@ export function Review() {
   )[0]
 
   const form = useEventFormData((state) => state.formValues)
-  const { setMetadata, getMetadata } = useEventMetaData()
+  const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(eventId, {})
 
   async function handleEdit({

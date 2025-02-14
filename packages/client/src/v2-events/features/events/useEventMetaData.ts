@@ -52,7 +52,7 @@ function removeUndefinedKeys(data: ActionFormData) {
  * @property {string} eventId - The ID of the event.
  */
 
-export const useEventMetaData = create<EventMetadata>()(
+export const useEventMetadata = create<EventMetadata>()(
   persist(
     (set, get) => ({
       metadata: {},
