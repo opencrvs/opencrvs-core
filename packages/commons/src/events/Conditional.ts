@@ -41,3 +41,31 @@ export const EnableConditional = z.object({
   type: z.literal(ConditionalTypes.ENABLE),
   conditional: Conditional()
 })
+
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllActionConditionalFields =
+  | typeof ShowConditional
+  | typeof HideConditional
+  | typeof EnableConditional
+
+/** @knipignore */
+export type InferredActionConditional =
+  | z.infer<typeof ShowConditional>
+  | z.infer<typeof HideConditional>
+  | z.infer<typeof EnableConditional>
+
+export const ActionConditional = z.discriminatedUnion('type', [
+  // Action can be shown / hidden
+  ShowConditional,
+  HideConditional,
+  // Action can be shown to the user in the list but as disabled
+  EnableConditional
+]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConditionalFields[]>
+
+export type ActionConditional = InferredActionConditional

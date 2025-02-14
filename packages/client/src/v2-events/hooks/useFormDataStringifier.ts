@@ -19,12 +19,12 @@ import {
 } from '@opencrvs/commons/client'
 import {
   Address,
-  Location,
+  AdministrativeArea,
   RadioGroup
 } from '@client/v2-events/features/events/registered-fields'
 
 function useFieldStringifier() {
-  const stringifyLocation = Location.useStringifier()
+  const stringifyLocation = AdministrativeArea.useStringifier()
   const stringifyAddress = Address.useStringifier()
   const stringifyRadioGroup = RadioGroup.useStringifier()
 
