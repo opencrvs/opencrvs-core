@@ -20,11 +20,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Get the current branch name
-      id: get_branch
-      run: |
-        echo "branch_name=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
-        echo "We are currently on the branch $branch_name"
 
     - name: Create directory for core and countryconfig
       run: |
@@ -38,8 +33,8 @@ jobs:
         git clone https://github.com/opencrvs/opencrvs-countryconfig.git
         cd opencrvs-countryconfig
 
-        if git show-ref --verify --quiet refs/heads/${steps.get_branch.outputs.branch_name}; then
-          echo "working_branch=${steps.get_branch.outputs.branch_name}" >> $GITHUB_OUTPUT
+        if git show-ref --verify --quiet refs/heads/$(echo ${GITHUB_REF#refs/heads/}); then
+          echo "working_branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
         else
           echo "working_branch=develop" >> $GITHUB_OUTPUT
         fi
@@ -48,7 +43,7 @@ jobs:
     - name: Set branch in core and check if any missing translation exists
       run: |
         cd $HOME/core/
-        
+        working
 
         # if [ "$branch_exists" = "true" ]; then
         #   git checkout $branch_name
