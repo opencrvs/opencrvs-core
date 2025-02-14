@@ -12,6 +12,7 @@
 import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
+import { useSelector } from 'react-redux'
 import { ActionFormData, FormConfig } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -25,11 +26,10 @@ import {
 } from '@opencrvs/components'
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
-import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
-import { Output } from './Output'
-import { useSelector } from 'react-redux'
-import { getCountryLogoFile } from '@client/offline/selectors'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import { getCountryLogoFile } from '@client/offline/selectors'
+import { Output } from './Output'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
