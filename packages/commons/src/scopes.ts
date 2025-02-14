@@ -31,6 +31,11 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
 
+  /**
+   * @TODO This is a temporary scope to be used for V2 Events custom events declaration
+   */
+  RECORD_DECLARE: 'record.declare-birth',
+
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
   RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
