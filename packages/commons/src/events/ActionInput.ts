@@ -17,7 +17,8 @@ const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
   draft: z.boolean().optional().default(false),
-  data: z.record(z.string(), FieldValue)
+  data: z.record(z.string(), FieldValue),
+  metadata: z.record(z.string(), FieldValue).optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -89,8 +90,7 @@ export const RequestCorrectionActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.REQUEST_CORRECTION)
-      .default(ActionType.REQUEST_CORRECTION),
-    metadata: z.record(z.string(), FieldValue)
+      .default(ActionType.REQUEST_CORRECTION)
   })
 )
 

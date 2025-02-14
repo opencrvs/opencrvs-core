@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './search'
+// eslint-disable-next-line import/export
 export * from './events'
 export * from './scopes'
 export * from './documents'
 export * from './workqueues'
 export * from './uuid'
 export * from './utils'
+// eslint-disable-next-line import/export
+export * from './conditionals/validate'
 export { DEFAULT_ROLES_DEFINITION } from './authentication'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

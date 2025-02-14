@@ -128,6 +128,8 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       // When we have proper validation of custom fields.
       return { type: 'text' }
     case FieldType.TEXT:
+    case FieldType.TEXTAREA:
+    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:

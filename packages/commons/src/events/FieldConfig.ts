@@ -68,6 +68,41 @@ const TextField = BaseField.extend({
 
 export type TextField = z.infer<typeof TextField>
 
+const TextAreaField = BaseField.extend({
+  type: z.literal(FieldType.TEXTAREA),
+  configuration: z
+    .object({
+      maxLength: z.number().optional().describe('Maximum length of the text'),
+      rows: z.number().optional().describe('Number of visible text lines'),
+      cols: z.number().optional().describe('Number of visible columns'),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
+    })
+    .default({ rows: 4 })
+    .optional()
+}).describe('Multiline text input')
+
+export type TextAreaField = z.infer<typeof TextAreaField>
+
+const SignatureField = BaseField.extend({
+  type: z.literal(FieldType.SIGNATURE),
+  signaturePromptLabel: TranslationConfig.describe(
+    'Title of the signature modal'
+  ),
+  configuration: z
+    .object({
+      maxSizeMb: z.number().optional().describe('Maximum file size in MB'),
+      allowedFileFormats: z
+        .array(z.string())
+        .optional()
+        .describe('List of allowed file formats for the signature')
+    })
+    .default({})
+    .optional()
+}).describe('Signature input field')
+
+export type SignatureField = z.infer<typeof SignatureField>
+
 export const EmailField = BaseField.extend({
   type: z.literal(FieldType.EMAIL)
 })
@@ -223,6 +258,7 @@ const Address = BaseField.extend({
 export type AllFields =
   | typeof Address
   | typeof TextField
+  | typeof TextAreaField
   | typeof DateField
   | typeof Paragraph
   | typeof RadioGroup
@@ -237,11 +273,14 @@ export type AllFields =
   | typeof Location
   | typeof Facility
   | typeof Office
+  | typeof SignatureField
+  | typeof EmailField
 
 /** @knipignore */
 export type Inferred =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
+  | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof Paragraph>
   | z.infer<typeof RadioGroup>
@@ -251,16 +290,18 @@ export type Inferred =
   | z.infer<typeof Checkbox>
   | z.infer<typeof File>
   | z.infer<typeof Country>
-  | z.infer<typeof Location>
-  | z.infer<typeof Divider>
   | z.infer<typeof AdministrativeArea>
+  | z.infer<typeof Divider>
+  | z.infer<typeof Location>
   | z.infer<typeof Facility>
   | z.infer<typeof Office>
+  | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
   TextField,
+  TextAreaField,
   DateField,
   Paragraph,
   RadioGroup,
@@ -274,8 +315,10 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Divider,
   Location,
   Facility,
-  Office
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllFields[]>
+  Office,
+  SignatureField,
+  EmailField
+]) as unknown as z.ZodType<Inferred, any, Inferred>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
