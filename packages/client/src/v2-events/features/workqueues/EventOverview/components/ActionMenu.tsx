@@ -49,9 +49,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
       if (conditional.type === 'SHOW') {
         return acc && validate(conditional.conditional, params)
       }
-      if (conditional.type === 'HIDE') {
-        return acc && !validate(conditional.conditional, params)
-      }
+
       return acc
     }, true)
   }
