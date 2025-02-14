@@ -34,11 +34,11 @@ jobs:
         cd opencrvs-countryconfig
 
         if git show-ref --verify --quiet refs/heads/$(echo ${GITHUB_REF#refs/heads/}); then
-          echo "working_branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+          echo "working_branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
         else
-          echo "working_branch=develop" >> $GITHUB_OUTPUT
+          echo "working_branch=develop" >> $GITHUB_ENV
         fi
-        echo "We will be working on the branch $working_branch"
+        echo "We will be working on the branch ${{ env.working_branch }}"
 
     - name: Set branch in core and check if any missing translation exists
       run: |
