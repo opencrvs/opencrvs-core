@@ -29,7 +29,9 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function recursiveTransform(obj: any) {
     if (typeof obj !== 'object' || obj === null) {
       return obj

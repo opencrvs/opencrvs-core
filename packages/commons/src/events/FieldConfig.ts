@@ -113,6 +113,7 @@ const SignatureField = BaseField.extend({
 }).describe('Signature input field')
 
 export type SignatureField = z.infer<typeof SignatureField>
+
 export const EmailField = BaseField.extend({
   type: z.literal(FieldType.EMAIL)
 })

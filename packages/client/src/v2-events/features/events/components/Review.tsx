@@ -296,8 +296,7 @@ function ReviewComponent({
             </ReviewContainter>
           </FormData>
 
-          {formConfig.review.fields &&
-            metadata &&
+          {metadata &&
             onMetadataChange &&
             formConfig.review.fields.length > 0 && (
               <FormData>

@@ -20,6 +20,7 @@ import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
+  FIELD_SEPARATOR,
   getDependentFields,
   handleInitialValue,
   hasInitialValueDependencyInfo,
@@ -617,7 +618,6 @@ class FormSectionComponent extends React.Component<AllProps> {
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-export const FIELD_SEPARATOR = '____'
 function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
