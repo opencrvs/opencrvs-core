@@ -60,7 +60,7 @@ const DocumentTypeRequiredError = {
   description: 'Show error message if the document type is not selected'
 }
 
-export function DocumentUploaderWithOption({
+function DocumentUploaderWithOption({
   ...props
 }: Omit<
   ComponentProps<typeof SimpleDocumentUploader>,

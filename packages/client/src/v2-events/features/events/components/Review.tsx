@@ -38,10 +38,11 @@ import {
 import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
-import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
+import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
 import { Output } from './Output'
 
 const Row = styled.div<{
@@ -221,10 +222,12 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  metadata,
   onEdit,
   children,
   title,
-  isUploadButtonVisible
+  isUploadButtonVisible,
+  onMetadataChange
 }: {
   children: React.ReactNode
   eventConfig: EventConfig
@@ -242,11 +245,12 @@ function ReviewComponent({
   }) => void
   title: string
   isUploadButtonVisible?: boolean
+  metadata?: ActionFormData
+  onMetadataChange?: (values: ActionFormData) => void
 }) {
   const scopes = useSelector(getScope)
   const intl = useIntl()
   const countryLogoFile = useSelector(getCountryLogoFile)
-
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
@@ -447,6 +451,23 @@ function ReviewComponent({
               })}
             </ReviewContainter>
           </FormData>
+
+          {metadata &&
+            onMetadataChange &&
+            formConfig.review.fields.length > 0 && (
+              <FormData>
+                <ReviewContainter>
+                  <FormFieldGenerator
+                    fields={formConfig.review.fields}
+                    formData={metadata}
+                    id={'review'}
+                    initialValues={metadata}
+                    setAllFieldsDirty={false}
+                    onChange={onMetadataChange}
+                  />
+                </ReviewContainter>
+              </FormData>
+            )}
         </Card>
         {children}
       </LeftColumn>

@@ -19,6 +19,7 @@ import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
 import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'
+
 import { getUser, logger } from '@opencrvs/commons'
 import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'

@@ -177,7 +177,8 @@ export const birthEvent = {
               id: 'event.birth.action.declare.form.review.title',
               defaultMessage: 'Birth declaration for {firstname} {surname}',
               description: 'Title of the form to show in review page'
-            }
+            },
+            fields: []
           }
         }
       ],

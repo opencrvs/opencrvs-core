@@ -13,11 +13,14 @@
 import { InputField } from '@client/components/form/InputField'
 import { TEXT } from '@client/forms'
 import { Text as TextComponent } from '@opencrvs/components/lib/Text'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
 import * as React from 'react'
 
 import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
+  FIELD_SEPARATOR,
   getDependentFields,
   handleInitialValue,
   hasInitialValueDependencyInfo,
@@ -46,6 +49,8 @@ import {
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
+  isSignatureFieldType,
+  isTextAreaFieldType,
   isTextFieldType
 } from '@opencrvs/commons/client'
 import {
@@ -248,6 +253,29 @@ const GeneratedInputField = React.memo(
       )
     }
 
+    if (isTextAreaFieldType(field)) {
+      return (
+        <InputField
+          {...inputFieldProps}
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration?.prefix)
+          }
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration?.postfix)
+          }
+        >
+          <TextArea
+            {...inputProps}
+            disabled={disabled}
+            maxLength={field.config.configuration?.maxLength}
+            value={field.value}
+          />
+        </InputField>
+      )
+    }
+
     if (isFileFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
@@ -316,6 +344,19 @@ const GeneratedInputField = React.memo(
             {...field.config}
             value={field.value}
             setFieldValue={setFieldValue}
+          />
+        </InputField>
+      )
+    }
+
+    if (isSignatureFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <SignatureUploader
+            name={fieldDefinition.id}
+            value={field.value}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+            modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
           />
         </InputField>
       )
@@ -598,7 +639,6 @@ class FormSectionComponent extends React.Component<AllProps> {
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-export const FIELD_SEPARATOR = '____'
 function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [

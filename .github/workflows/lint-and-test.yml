@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -52,7 +52,7 @@ jobs:
   test:
     name: Test
     needs: setup
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -163,7 +163,7 @@ jobs:
 
   prepare-client-tests:
     name: Prepare client tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v4
@@ -236,7 +236,7 @@ jobs:
   lint-client:
     name: Lint client
     needs: prepare-client-tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Download filesystem artifact
@@ -272,7 +272,7 @@ jobs:
   run-visual-tests:
     name: Run visual tests
     needs: prepare-client-tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Download filesystem artifact
@@ -318,7 +318,7 @@ jobs:
   test-client:
     name: Test client
     needs: prepare-client-tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -354,9 +354,13 @@ jobs:
 
   lint-knip:
     name: Lint unused exports with Knip
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
+      - name: Use Node 18.X
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
@@ -410,7 +414,7 @@ jobs:
 
   build-toolkit:
     name: Build toolkit
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code
