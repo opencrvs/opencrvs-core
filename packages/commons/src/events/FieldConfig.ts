@@ -9,12 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import {
-  Conditional,
-  EnableConditional,
-  HideConditional,
-  ShowConditional
-} from './Conditional'
+import { Conditional, EnableConditional, ShowConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
@@ -23,7 +18,6 @@ const FieldId = z.string()
 
 const FieldConditional = z.discriminatedUnion('type', [
   ShowConditional,
-  HideConditional,
   EnableConditional
 ])
 
@@ -182,7 +176,7 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
-const LocationOptions = z.object({
+const LocationConfiguration = z.object({
   partOf: z
     .object({
       $data: z.string()
@@ -194,7 +188,7 @@ const LocationOptions = z.object({
 
 const Location = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
-  options: LocationOptions
+  configuration: LocationConfiguration
 }).describe('Location input field')
 
 export type Location = z.infer<typeof Location>
@@ -266,5 +260,5 @@ export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
-export type LocationOptions = z.infer<typeof LocationOptions>
+export type LocationOptions = z.infer<typeof LocationConfiguration>
 export type FieldConditional = z.infer<typeof FieldConditional>

@@ -31,13 +31,14 @@ import {
   FieldType,
   FieldValue,
   FileFieldValue,
-  getConditionalActionsForField,
   isAddressFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
+  isFieldDisabled,
+  isFieldHidden,
   isFileFieldType,
   isLocationFieldType,
   isPageHeaderFieldType,
@@ -312,7 +313,7 @@ const GeneratedInputField = React.memo(
       )
     }
     if (isLocationFieldType(field)) {
-      if (field.config.options.type === 'HEALTH_FACILITY')
+      if (field.config.configuration.type === 'HEALTH_FACILITY')
         return (
           <InputField {...inputFieldProps}>
             <LocationSearch.Input
@@ -330,9 +331,9 @@ const GeneratedInputField = React.memo(
             value={field.value}
             setFieldValue={setFieldValue}
             partOf={
-              (field.config.options?.partOf?.$data &&
+              (field.config.configuration?.partOf?.$data &&
                 (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                  field.config.options?.partOf.$data
+                  field.config.configuration?.partOf.$data
                 ] as string | undefined | null)) ??
               null
             }
@@ -519,21 +520,25 @@ class FormSectionComponent extends React.Component<AllProps> {
             error = intl.formatMessage(firstError.message, firstError.props)
           }
 
-          const conditionalActions: string[] = getConditionalActionsForField(
-            field,
-            {
-              $form: makeFormikFieldIdsOpenCRVSCompatible(
-                valuesWithFormattedDate
-              ),
-              $now: formatISO(new Date(), { representation: 'date' })
-            }
-          )
+          const formParams = {
+            $form: makeFormikFieldIdsOpenCRVSCompatible(
+              valuesWithFormattedDate
+            ),
+            $now: formatISO(new Date(), { representation: 'date' })
+          }
 
-          if (conditionalActions.includes('HIDE')) {
+          if (isFieldHidden(field, formParams)) {
             return null
           }
 
-          const isFieldDisabled = conditionalActions.includes('disable')
+          console.log(
+            'isFieldHidden',
+            isFieldHidden(field, formParams),
+            field.id,
+            field.conditionals
+          )
+
+          const isDisabled = isFieldDisabled(field, formParams)
 
           return (
             <FormItem
@@ -551,8 +556,8 @@ class FormSectionComponent extends React.Component<AllProps> {
                       setFieldTouched={setFieldTouched}
                       setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
-                      disabled={isFieldDisabled}
-                      error={isFieldDisabled ? '' : error}
+                      disabled={isDisabled}
+                      error={isDisabled ? '' : error}
                       fields={fields}
                       formData={formData}
                       touched={touched[field.id] || false}

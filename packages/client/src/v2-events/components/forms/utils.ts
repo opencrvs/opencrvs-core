@@ -13,8 +13,8 @@ import {
   ActionFormData,
   FieldConfig,
   Inferred,
-  getConditionalActionsForField,
-  FieldValue
+  FieldValue,
+  isFieldHidden
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 import { FIELD_SEPARATOR } from './FormFieldGenerator'
@@ -35,12 +35,12 @@ export function handleInitialValue(
 }
 
 export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return getConditionalActionsForField(field, {
+  return !isFieldHidden(field, {
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
     })
-  }).every((fieldAction) => fieldAction !== 'HIDE')
+  })
 }
 
 export function evalExpressionInFieldDefinition(
