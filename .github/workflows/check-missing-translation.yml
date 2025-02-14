@@ -40,7 +40,14 @@ jobs:
         fi
         echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
     
-    - name: check output coming from previous step
+    - name: Clone the core repository and check the missing translations
       run: |
         echo "working_branch=${{steps.set_branch.outputs.working_branch}}"
         echo "countryconfig_path=${{steps.set_branch.outputs.countryconfig_path}}"
+        cd $HOME/core
+        git clone https://github.com/opencrvs/opencrvs-core.git
+        cd opencrvs-core
+        git checkout $working_branch
+        export COUNTRYCONFIG_PATH=$countryconfig_path
+        
+        
