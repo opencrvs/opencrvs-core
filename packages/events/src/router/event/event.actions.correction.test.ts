@@ -13,11 +13,97 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
-  getUUID
+  getUUID,
+  SCOPES
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { generateActionInput } from '@events/tests/generators'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { TRPCError } from '@trpc/server'
+
+test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.correction.request(
+      generator.event.actions.correction.request(
+        'registered-event-test-id-12345'
+      )
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.REQUEST_CORRECTION} allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+  ])
+
+  await expect(
+    client.event.actions.correction.request(
+      generator.event.actions.correction.request(
+        'registered-event-test-id-12345'
+      )
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing required scope`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.correction.approve(
+      generator.event.actions.correction.approve(
+        'registered-event-test-id-12345',
+        'request-test-id-12345'
+      )
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.APPROVE_CORRECTION} allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
+
+  await expect(
+    client.event.actions.correction.approve(
+      generator.event.actions.correction.approve(
+        'registered-event-test-id-12345',
+        'request-test-id-12345'
+      )
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing required scope`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.correction.reject(
+      generator.event.actions.correction.reject(
+        'registered-event-test-id-12345',
+        'request-test-id-12345'
+      )
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
+
+  await expect(
+    client.event.actions.correction.reject(
+      generator.event.actions.correction.reject(
+        'registered-event-test-id-12345',
+        'request-test-id-12345'
+      )
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
 
 test('a correction request can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
@@ -58,7 +144,7 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   ).rejects.matchSnapshot()
 })
 
-test(`${ActionType.APPROVE_CORRECTION} validation error message contains all the offending fields`, async () => {
+test(`${ActionType.APPROVE_CORRECTION} validation error message contains all the offending fields`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
