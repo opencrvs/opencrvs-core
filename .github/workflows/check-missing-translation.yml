@@ -38,13 +38,14 @@ jobs:
         else
           echo "working_branch=develop" >> $GITHUB_ENV
         fi
-        echo "We will be working on the branch ${{ env.working_branch }}"
+        echo "We will be working on the branch $working_branch"
 
     - name: Set branch in core and check if any missing translation exists
       run: |
         cd $HOME/core/
-        working_branch= ${{ env.working_branch }}
-        
+        echo "working_branch=$working_branch" >> $GITHUB_ENV
+        echo "we will be checking out to branch $working_branch"
+
 
         # if [ "$branch_exists" = "true" ]; then
         #   git checkout $branch_name
