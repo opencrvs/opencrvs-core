@@ -49,6 +49,7 @@ jobs:
       run: |
         npm install -g typescript
         npm install -g yarn
+        npm install -g ts-node
     
     - name: Clone the Core repository
       run: |
@@ -59,7 +60,7 @@ jobs:
         cd ./opencrvs-core
         git checkout $acting_branch
         yarn install
-        sh ./packages/client/src/extract-translations.ts
+        sh ./packages/client/src/extract-translations.sh
 
         
         
