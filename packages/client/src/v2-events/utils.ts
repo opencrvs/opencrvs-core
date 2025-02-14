@@ -36,6 +36,7 @@ export function getUsersFullName(
 }
 
 /** Utility to get all keys from union */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**

@@ -11,7 +11,7 @@
 
 import { EventDocument } from '../events/EventDocument'
 import { ActionFormData } from '../events/ActionDocument'
-import { ITokenPayload } from '../authentication'
+import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 
@@ -24,19 +24,14 @@ export function defineConditional(schema: any) {
   return schema as JSONSchema
 }
 
-export type ConditionalParameters = { $now: string } & (
-  | {
-      $event: EventDocument
-    }
-  | {
-      $event: EventDocument
-      $form: ActionFormData
-      $user: ITokenPayload
-    }
-  | {
-      $form: ActionFormData
-    }
-)
+export type UserConditionalParameters = { $now: string; $user: TokenPayload }
+export type EventConditionalParameters = { $now: string; $event: EventDocument }
+export type FormConditionalParameters = { $now: string; $form: ActionFormData }
+
+export type ConditionalParameters =
+  | UserConditionalParameters
+  | EventConditionalParameters
+  | FormConditionalParameters
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   k: infer I
@@ -57,6 +52,11 @@ export function alwaysTrue(): AjvJSONSchema {
   return {}
 }
 
+/**
+ * Universal boolean connector to be used with any type of conditional. (user, event, field)
+ *
+ * @example and(field('foo').isEqualTo('bar'), field('baz').isUndefined())
+ */
 export function and(...conditions: AjvJSONSchema[]): JSONSchema {
   return defineConditional({
     type: 'object',
@@ -65,6 +65,11 @@ export function and(...conditions: AjvJSONSchema[]): JSONSchema {
   })
 }
 
+/**
+ * Universal boolean connector to be used with any type of conditional. (user, event, field)
+ *
+ * @example or(field('foo').isEqualTo('bar'), field('baz').isUndefined())
+ */
 export function or(...conditions: AjvJSONSchema[]): JSONSchema {
   return defineConditional({
     type: 'object',
@@ -73,6 +78,11 @@ export function or(...conditions: AjvJSONSchema[]): JSONSchema {
   })
 }
 
+/**
+ * Universal boolean connector to be used with any type of conditional. (user, event, field)
+ *
+ * @example not(field('foo').isEqualTo('bar'))
+ */
 export function not(condition: AjvJSONSchema): JSONSchema {
   return defineConditional({
     type: 'object',
@@ -81,69 +91,82 @@ export function not(condition: AjvJSONSchema): JSONSchema {
   })
 }
 
-export function userHasScope(scope: string): AjvJSONSchema {
-  return {
-    type: 'object',
-    properties: {
-      $user: {
-        type: 'object',
-        required: ['scope'],
-        properties: {
-          scope: {
-            contains: {
-              type: 'string',
-              const: scope
+/**
+ *
+ * Generate conditional rules for user.
+ */
+export const user = {
+  hasScope: (scope: Scope) =>
+    defineConditional({
+      type: 'object',
+      properties: {
+        $user: {
+          type: 'object',
+          required: ['scope'],
+          properties: {
+            scope: {
+              type: 'array',
+              contains: {
+                type: 'string',
+                const: scope
+              }
             }
           }
         }
-      }
-    },
-    required: ['$user']
-  }
+      },
+      required: ['$user']
+    })
 }
 
-export function eventHasAction(type: ActionType): AjvJSONSchema {
-  return {
-    type: 'object',
-    properties: {
-      $event: {
-        type: 'object',
-        properties: {
-          actions: {
-            type: 'array',
-            contains: {
-              type: 'object',
-              properties: {
-                type: {
-                  const: type
-                },
-                draft: {
-                  type: 'boolean'
-                }
-              },
-              required: ['type'],
-              not: {
+/**
+ *
+ * Generate conditional rules for event.
+ */
+export const event = {
+  hasAction: (action: ActionType) =>
+    defineConditional({
+      type: 'object',
+      properties: {
+        $event: {
+          type: 'object',
+          properties: {
+            actions: {
+              type: 'array',
+              contains: {
+                type: 'object',
                 properties: {
+                  type: {
+                    const: action
+                  },
                   draft: {
-                    const: true
+                    type: 'boolean'
+                  }
+                },
+                required: ['type'],
+                not: {
+                  properties: {
+                    draft: {
+                      const: true
+                    }
                   }
                 }
               }
             }
-          }
-        },
-        required: ['actions']
-      }
-    },
-    required: ['$event']
-  }
+          },
+          required: ['actions']
+        }
+      },
+      required: ['$event']
+    })
 }
 
 /**
- * Generate conditional rules for a field.
- * @param fieldId - The field ID conditions are being applied to
+ * Generate conditional rules for a form field.
  *
- * @returns @see FieldAPI
+ * @param fieldId - The field ID condition is applied to.
+ * @example to combine multiple conditions, utilise connectors like `and`, `or`, `not`:
+ *  and(field('foo').isEqualTo('bar'), field('baz').isUndefined())
+ *
  */
 export function field(fieldId: string) {
   const getDateFromNow = (days: number) =>
@@ -171,30 +194,6 @@ export function field(fieldId: string) {
     },
     required: ['$form']
   })
-
-  const getNegativeDateRange = (
-    date: string,
-    clause: 'formatMinimum' | 'formatMaximum'
-  ) =>
-    defineConditional({
-      type: 'object',
-      properties: {
-        $form: {
-          type: 'object',
-          properties: {
-            [fieldId]: {
-              type: 'string',
-              not: {
-                format: 'date',
-                [clause]: date
-              }
-            }
-          },
-          required: [fieldId]
-        }
-      },
-      required: ['$form']
-    })
 
   return {
     isAfter: () => ({
@@ -284,85 +283,6 @@ export function field(fieldId: string) {
           }
         },
         required: ['$form']
-      }),
-    not: {
-      isAfter: () => ({
-        days: (days: number) => ({
-          inPast: () =>
-            defineConditional(
-              getNegativeDateRange(getDateFromNow(days), 'formatMinimum')
-            ),
-          inFuture: () =>
-            defineConditional(
-              getNegativeDateRange(getDateFromNow(-days), 'formatMinimum')
-            )
-        }),
-        date: (date: string) =>
-          defineConditional(getNegativeDateRange(date, 'formatMinimum')),
-        now: () =>
-          defineConditional(
-            getNegativeDateRange(getDateFromNow(0), 'formatMinimum')
-          )
-      }),
-      isBefore: () => ({
-        days: (days: number) => ({
-          inPast: () =>
-            defineConditional(
-              getNegativeDateRange(getDateFromNow(days), 'formatMaximum')
-            ),
-          inFuture: () =>
-            defineConditional(
-              getNegativeDateRange(getDateFromNow(-days), 'formatMaximum')
-            )
-        }),
-        date: (date: string) =>
-          defineConditional(getNegativeDateRange(date, 'formatMaximum')),
-        now: () =>
-          defineConditional(
-            getNegativeDateRange(getDateFromNow(0), 'formatMaximum')
-          )
-      }),
-      inArray: (values: string[]) =>
-        defineConditional({
-          type: 'object',
-          properties: {
-            $form: {
-              type: 'object',
-              properties: {
-                [fieldId]: {
-                  type: 'string',
-                  not: {
-                    enum: values
-                  }
-                }
-              },
-              required: [fieldId]
-            }
-          },
-          required: ['$form']
-        }),
-      isEqualTo: (value: string | boolean) =>
-        defineConditional({
-          type: 'object',
-          properties: {
-            $form: {
-              type: 'object',
-              properties: {
-                [fieldId]: {
-                  oneOf: [
-                    { type: 'string', const: value },
-                    { type: 'boolean', const: value }
-                  ],
-                  not: {
-                    const: value
-                  }
-                }
-              },
-              required: [fieldId]
-            }
-          },
-          required: ['$form']
-        })
-    }
+      })
   }
 }

@@ -26,6 +26,7 @@ function convertDotToTripleUnderscore(obj: ActionFormData, parentKey = '') {
       (parentKey ? parentKey + INTERNAL_SEPARATOR : '') +
       key.replace(/\./g, INTERNAL_SEPARATOR)
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (typeof value === 'object' && value !== null) {
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {

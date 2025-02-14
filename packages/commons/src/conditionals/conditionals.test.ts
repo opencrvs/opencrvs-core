@@ -10,10 +10,22 @@
  */
 
 import { validate } from './validate'
-import { and, or, field, not, ConditionalParameters } from './conditionals'
+import {
+  user,
+  and,
+  or,
+  field,
+  not,
+  ConditionalParameters,
+  UserConditionalParameters,
+  EventConditionalParameters,
+  event
+} from './conditionals'
 import { formatISO } from 'date-fns'
+import { SCOPES } from '../scopes'
+import { ActionType } from '../events'
 
-const params = {
+const fieldParams = {
   $form: {
     'applicant.name': 'John Doe',
     'applicant.dob': '1990-01-02'
@@ -22,128 +34,212 @@ const params = {
 } satisfies ConditionalParameters
 
 describe('Validate conditionals', () => {
-  it('validates "and" conditional', () => {
-    expect(
-      validate(
-        and(
-          field('applicant.name').isEqualTo('John Doe'),
-          field('applicant.dob').isAfter().date('1989-01-01')
-        ),
-        params
-      )
-    ).toBe(true)
+  describe('"universal" conditionals', () => {
+    it('validates "and" conditional', () => {
+      expect(
+        validate(
+          and(
+            field('applicant.name').isEqualTo('John Doe'),
+            field('applicant.dob').isAfter().date('1989-01-01')
+          ),
+          fieldParams
+        )
+      ).toBe(true)
 
-    expect(
-      validate(
-        and(
-          field('applicant.name').isEqualTo('John Doe'),
-          field('applicant.dob').isAfter().date('1991-01-01')
-        ),
-        params
-      )
-    ).toBe(false)
+      expect(
+        validate(
+          and(
+            field('applicant.name').isEqualTo('John Doe'),
+            field('applicant.dob').isAfter().date('1991-01-01')
+          ),
+          fieldParams
+        )
+      ).toBe(false)
+    })
+
+    it('validates "or" conditional', () => {
+      expect(
+        validate(
+          or(
+            field('applicant.name').isEqualTo('John Doe'),
+            field('applicant.dob').isAfter().date('1989-01-01')
+          ),
+          fieldParams
+        )
+      ).toBe(true)
+
+      expect(
+        validate(
+          or(
+            field('applicant.name').isEqualTo('John Doe'),
+            field('applicant.dob').isAfter().date('1991-01-01')
+          ),
+          fieldParams
+        )
+      ).toBe(true)
+
+      expect(
+        validate(
+          or(
+            field('applicant.name').isEqualTo('Jack Doe'),
+            field('applicant.dob').isAfter().date('1991-01-01')
+          ),
+          fieldParams
+        )
+      ).toBe(false)
+    })
+
+    it('validates "not" conditional', () => {
+      expect(
+        validate(
+          not(field('applicant.name').isEqualTo('John Doe')),
+          fieldParams
+        )
+      ).toBe(false)
+
+      expect(
+        validate(
+          not(field('applicant.name').isEqualTo('Jack Doe')),
+          fieldParams
+        )
+      ).toBe(true)
+    })
   })
 
-  it('validates "or" conditional', () => {
-    expect(
-      validate(
-        or(
-          field('applicant.name').isEqualTo('John Doe'),
-          field('applicant.dob').isAfter().date('1989-01-01')
-        ),
-        params
+  describe('"field" conditionals', () => {
+    it('validates "field.isAfter" conditional', () => {
+      expect(
+        validate(
+          field('applicant.dob').isAfter().date('1990-01-03'),
+          fieldParams
+        )
+      ).toBe(false)
+
+      // seems to be inclusive
+      expect(
+        validate(
+          field('applicant.dob').isAfter().date('1990-01-02'),
+          fieldParams
+        )
+      ).toBe(true)
+
+      expect(
+        validate(
+          field('applicant.dob').isAfter().date('1990-01-01'),
+          fieldParams
+        )
+      ).toBe(true)
+    })
+
+    it('validates "field.isBefore" conditional', () => {
+      expect(
+        validate(
+          field('applicant.dob').isBefore().date('1990-01-03'),
+          fieldParams
+        )
+      ).toBe(true)
+
+      // seems to be exclusive
+      expect(
+        validate(
+          field('applicant.dob').isBefore().date('1990-01-02'),
+          fieldParams
+        )
+      ).toBe(true)
+
+      expect(
+        validate(
+          field('applicant.dob').isBefore().date('1990-01-01'),
+          fieldParams
+        )
+      ).toBe(false)
+    })
+
+    it('validates "field.isEqualTo" conditional', () => {
+      expect(
+        validate(field('applicant.name').isEqualTo('John Doe'), fieldParams)
+      ).toBe(true)
+      expect(
+        validate(field('applicant.name').isEqualTo('Jane Doe'), fieldParams)
+      ).toBe(false)
+    })
+
+    it('validates "field.isUndefined" conditional', () => {
+      expect(validate(field('applicant.name').isUndefined(), fieldParams)).toBe(
+        false
       )
-    ).toBe(true)
+      expect(
+        validate(field('applicant.name.foo').isUndefined(), fieldParams)
+      ).toBe(true)
+    })
 
-    expect(
-      validate(
-        or(
-          field('applicant.name').isEqualTo('John Doe'),
-          field('applicant.dob').isAfter().date('1991-01-01')
-        ),
-        params
+    it('validates "field.inArray" conditional', () => {
+      expect(
+        validate(
+          field('applicant.name').inArray(['Jack Doe', 'Jane Doe']),
+          fieldParams
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          field('applicant.name').inArray(['John Doe', 'Jane Doe']),
+          fieldParams
+        )
+      ).toBe(true)
+    })
+  })
+
+  describe('"user" conditionals', () => {
+    const userParams = {
+      $user: {
+        scope: ['record.register', 'record.registration-correct'],
+        exp: '1739881718',
+        algorithm: 'RS256',
+        sub: '677b33fea7efb08730f3abfa33'
+      },
+      $now: formatISO(new Date(), { representation: 'date' })
+    } satisfies UserConditionalParameters
+
+    it('validates "user.hasScope" conditional', () => {
+      expect(validate(user.hasScope(SCOPES.VALIDATE), userParams)).toBe(false)
+
+      expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
+        true
       )
-    ).toBe(true)
+    })
+  })
 
-    expect(
-      validate(
-        or(
-          field('applicant.name').isEqualTo('Jack Doe'),
-          field('applicant.dob').isAfter().date('1991-01-01')
-        ),
-        params
+  describe('"event" conditionals', () => {
+    it('validates "event.hasAction" conditional', () => {
+      const now = formatISO(new Date(), { representation: 'date' })
+      const eventParams = {
+        $now: now,
+        $event: {
+          id: '123',
+          type: 'birth',
+          createdAt: now,
+          updatedAt: now,
+          actions: [
+            {
+              id: '1234',
+              type: ActionType.DECLARE,
+              createdAt: now,
+              createdBy: '12345',
+              data: {},
+              createdAtLocation: '123456',
+              draft: false
+            }
+          ]
+        }
+      } satisfies EventConditionalParameters
+
+      expect(validate(event.hasAction(ActionType.DECLARE), eventParams)).toBe(
+        true
       )
-    ).toBe(false)
-  })
 
-  it('validates "not" conditional', () => {
-    expect(
-      validate(not(field('applicant.name').isEqualTo('John Doe')), params)
-    ).toBe(false)
-
-    expect(
-      validate(not(field('applicant.name').isEqualTo('Jack Doe')), params)
-    ).toBe(true)
-  })
-
-  it('validates "field.isAfter" conditional', () => {
-    expect(
-      validate(field('applicant.dob').isAfter().date('1990-01-03'), params)
-    ).toBe(false)
-
-    // seems to be inclusive
-    expect(
-      validate(field('applicant.dob').isAfter().date('1990-01-02'), params)
-    ).toBe(true)
-
-    expect(
-      validate(field('applicant.dob').isAfter().date('1990-01-01'), params)
-    ).toBe(true)
-  })
-
-  it('validates "field.isBefore" conditional', () => {
-    expect(
-      validate(field('applicant.dob').isBefore().date('1990-01-03'), params)
-    ).toBe(true)
-
-    // seems to be exclusive
-    expect(
-      validate(field('applicant.dob').isBefore().date('1990-01-02'), params)
-    ).toBe(true)
-
-    expect(
-      validate(field('applicant.dob').isBefore().date('1990-01-01'), params)
-    ).toBe(false)
-  })
-
-  it('validates "field.isEqualTo" conditional', () => {
-    expect(
-      validate(field('applicant.name').isEqualTo('John Doe'), params)
-    ).toBe(true)
-    expect(
-      validate(field('applicant.name').isEqualTo('Jane Doe'), params)
-    ).toBe(false)
-  })
-
-  it('validates "field.isUndefined" conditional', () => {
-    expect(validate(field('applicant.name').isUndefined(), params)).toBe(false)
-    expect(validate(field('applicant.name.foo').isUndefined(), params)).toBe(
-      true
-    )
-  })
-
-  it('validates "field.inArray" conditional', () => {
-    expect(
-      validate(
-        field('applicant.name').inArray(['Jack Doe', 'Jane Doe']),
-        params
+      expect(validate(event.hasAction(ActionType.REGISTER), eventParams)).toBe(
+        false
       )
-    ).toBe(false)
-    expect(
-      validate(
-        field('applicant.name').inArray(['John Doe', 'Jane Doe']),
-        params
-      )
-    ).toBe(true)
+    })
   })
 })

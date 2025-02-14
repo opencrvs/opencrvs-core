@@ -49,6 +49,10 @@ export const primary = ({ loading }: { loading?: boolean }) => css`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
 
+  svg {
+    color: ${({ theme }) => theme.colors.white};
+  }
+
   &:hover {
     background: ${({ theme }) => theme.colors.primaryDark};
   }
@@ -63,52 +67,62 @@ export const primary = ({ loading }: { loading?: boolean }) => css`
 `
 
 export const secondary = css`
-  border: 2px solid ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primary};
+  border: 1.5px solid ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.copy};
+
+  svg {
+    color: ${({ theme }) => theme.colors.primary};
+  }
 
   &:hover {
+    border: 1.5px solid ${({ theme }) => theme.colors.primaryDark};
     background: ${({ theme }) => theme.colors.grey100};
-    border: 2px solid ${({ theme }) => theme.colors.primaryDark};
-    color: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
     background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.primaryDarker};
   }
+
   &:focus-visible {
-    border: 2px solid ${({ theme }) => theme.colors.grey600};
+    border: 1.5px solid ${({ theme }) => theme.colors.grey600};
     background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.grey600};
   }
 `
-
 export const secondaryNegative = css`
-  border: 2px solid ${({ theme }) => theme.colors.negative};
-  color: ${({ theme }) => theme.colors.negative};
+  border: 1.5px solid ${({ theme }) => theme.colors.negative};
+  color: ${({ theme }) => theme.colors.copy};
+
+  svg {
+    color: ${({ theme }) => theme.colors.negative};
+  }
 
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
-    border: 2px solid ${({ theme }) => theme.colors.negativeDark};
-    color: ${({ theme }) => theme.colors.negativeDark};
+    border: 1.5px solid ${({ theme }) => theme.colors.negativeDark};
   }
+
   &:active {
     background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.negativeDarker};
   }
+
   &:focus-visible {
-    border: 2px solid ${({ theme }) => theme.colors.negativeDarker};
+    border: 1.5px solid ${({ theme }) => theme.colors.negativeDarker};
     background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.negativeDarker};
   }
 `
 
 export const tertiary = css`
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.copy};
+
+  svg {
+    color: ${({ theme }) => theme.colors.primary};
+  }
 
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
-    color: ${({ theme }) => theme.colors.primaryDark};
   }
+
   &:active {
     background: ${({ theme }) => theme.colors.grey200};
   }
@@ -117,6 +131,10 @@ export const tertiary = css`
 export const positive = css`
   background: ${({ theme }) => theme.colors.positive};
   color: ${({ theme }) => theme.colors.white};
+
+  svg {
+    color: ${({ theme }) => theme.colors.positive};
+  }
 
   &:hover {
     background: ${({ theme }) => theme.colors.positiveDark};
@@ -129,6 +147,10 @@ export const positive = css`
 export const negative = css`
   background: ${({ theme }) => theme.colors.negative};
   color: ${({ theme }) => theme.colors.white};
+
+  svg {
+    color: ${({ theme }) => theme.colors.white};
+  }
 
   &:hover {
     background: ${({ theme }) => theme.colors.negativeDark};
@@ -143,7 +165,7 @@ export const icon = css`
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 
-  &:hover:not(:focus-visible) {
+  &:hover {
     background: ${({ theme }) => theme.colors.grey100};
   }
   &:active {
@@ -161,7 +183,7 @@ export const iconPrimary = css`
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 
-  &:hover:not(:focus-visible) {
+  &:hover {
     background: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
@@ -194,7 +216,7 @@ export const medium = css`
 `
 
 export const large = css`
-  ${({ theme }) => theme.fonts.bold18};
+  ${({ theme }) => theme.fonts.reg18};
   height: 54px;
   padding: 0 16px;
 `
