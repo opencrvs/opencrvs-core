@@ -12,6 +12,7 @@
 export const FieldType = {
   ADDRESS: 'ADDRESS',
   TEXT: 'TEXT',
+  TEXTAREA: 'TEXTAREA',
   EMAIL: 'EMAIL',
   DATE: 'DATE',
   PARAGRAPH: 'PARAGRAPH',
@@ -24,7 +25,8 @@ export const FieldType = {
   SELECT: 'SELECT',
   COUNTRY: 'COUNTRY',
   LOCATION: 'LOCATION',
-  DIVIDER: 'DIVIDER'
+  DIVIDER: 'DIVIDER',
+  SIGNATURE: 'SIGNATURE'
 } as const
 
 export const fieldTypes = Object.values(FieldType)

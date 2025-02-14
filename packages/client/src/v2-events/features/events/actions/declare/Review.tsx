@@ -24,6 +24,7 @@ import {
 } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -128,7 +129,6 @@ export function Review() {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
-
   const { goToHome } = useEventFormNavigation()
   const declareMutation = events.actions.declare
 
@@ -141,6 +141,8 @@ export function Review() {
   )[0]
 
   const form = useEventFormData((state) => state.formValues)
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata(eventId, {})
 
   const strippedForm = stripForm(
     form,
@@ -181,9 +183,9 @@ export function Review() {
       declareMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: uuid()
+        transactionId: uuid(),
+        metadata
       })
-
       goToHome()
     }
   }
@@ -216,6 +218,7 @@ export function Review() {
           eventId: event.id,
           data: form,
           transactionId: uuid(),
+          metadata,
           draft: true
         })
         goToHome()
@@ -232,6 +235,8 @@ export function Review() {
           firstname: form['applicant.firstname'] as string,
           surname: form['applicant.surname'] as string
         })}
+        metadata={metadata}
+        onMetadataChange={(values) => setMetadata(eventId, values)}
       >
         <ReviewComponent.Actions
           messages={{

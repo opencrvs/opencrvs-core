@@ -25,7 +25,7 @@ const StyledButton = styled(Button)`
   transition: background 0.4s ease;
   border-radius: 4px;
   background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
+  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   ${({ theme }) => theme.fonts.bold16};
 
   &:hover:enabled {
