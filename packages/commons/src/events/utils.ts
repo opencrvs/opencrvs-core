@@ -163,3 +163,14 @@ export const findActiveActionFields = (
   /** Let caller decide whether to throw or default to empty array */
   return form?.pages.flatMap((p) => p.fields)
 }
+
+export function getEventConfiguration(
+  eventConfigurations: EventConfig[],
+  type: string
+): EventConfig {
+  const config = eventConfigurations.find((config) => config.id === type)
+  if (!config) {
+    throw new Error(`Event configuration not found for type: ${type}`)
+  }
+  return config
+}
