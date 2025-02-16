@@ -23,7 +23,7 @@ import {
 } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from './create'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurations } from '../../useEventConfiguration'
 import _ from 'lodash'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
@@ -270,6 +270,7 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
   procedure: P,
   mutation: M
 ) {
+  const eventConfigurations = useEventConfigurations()
   const mutationDefaults = procedure.getMutationDefaults()
 
   if (!mutationDefaults?.mutationFn) {
@@ -287,7 +288,13 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
 
   const mutationFn = waitUntilEventIsCreated<any, any>(
     async ({ eventType, ...params }) => {
-      const { eventConfiguration } = useEventConfiguration(eventType)
+      const eventConfiguration = eventConfigurations.find(
+        (event) => event.id === eventType
+      )
+
+      if (!eventConfiguration) {
+        throw new Error('Event configuration not found')
+      }
 
       return defaultMutationFn({
         ...params,
