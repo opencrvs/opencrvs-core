@@ -15,6 +15,7 @@ import { getMutationKey } from '@trpc/react-query'
 import {
   ActionInput,
   ActionType,
+  EventConfig,
   EventDocument,
   findActiveActionFields,
   getCurrentEventState,
@@ -48,7 +49,11 @@ function waitUntilEventIsCreated<T extends { eventId: string }, R>(
       )
     }
 
-    return canonicalMutationFn({ ...params, eventId: localVersion.id })
+    return canonicalMutationFn({
+      ...params,
+      eventId: localVersion.id,
+      eventType: localVersion.type
+    })
   }
 }
 
@@ -247,13 +252,24 @@ utils.event.actions.correction.reject.setMutationDefaults(
   })
 )
 
+function stripUnusedFields(
+  actionType: ActionType,
+  eventConfiguration: EventConfig,
+  data: any
+) {
+  const activeFields =
+    findActiveActionFields(eventConfiguration, actionType) ?? []
+
+  return _.omitBy(data, (_, fieldId) => {
+    const field = activeFields.find((f) => f.id === fieldId)
+    return !field || isFieldHiddenOrDisabled(field, data)
+  })
+}
+
 export function useEventAction<P extends Procedure, M extends Mutation>(
   procedure: P,
   mutation: M
 ) {
-  // TODO CIHAN tää kaivetaa jostai?
-  const { eventConfiguration } = useEventConfiguration('tennis-club-membership')
-
   const mutationDefaults = procedure.getMutationDefaults()
 
   if (!mutationDefaults?.mutationFn) {
@@ -262,43 +278,34 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
     )
   }
 
-  const mutationFn = waitUntilEventIsCreated<any, any>(
-    mutationDefaults.mutationFn
-  )
+  const defaultMutationFn = mutationDefaults.mutationFn
+  const actionType = mutationDefaults?.meta?.actionType as ActionType
 
-  // Strip unused (hidden/disabled) fields from the data
-  async function stripData(params: any) {
-    // TODO CIHAN saako tän muualta ku tuolta metasta?
-    const actionType = mutationDefaults?.meta?.actionType as ActionType
-
-    if (!actionType) {
-      throw new Error('No event action type found. This should never happen')
-    }
-
-    // TODO CIHAN kaiva action type jostai?
-    const fields = findActiveActionFields(eventConfiguration, actionType) ?? []
-
-    const strippedData = _.omitBy(params.data, (_, key) => {
-      const field = fields.find((f) => f.id === key)
-
-      if (!field) {
-        return true
-      }
-
-      return isFieldHiddenOrDisabled(field, params.data)
-    })
-
-    return mutationFn({
-      ...params,
-      data: strippedData
-    })
+  if (!actionType) {
+    throw new Error('No event action type found. This should never happen')
   }
+
+  const mutationFn = waitUntilEventIsCreated<any, any>(
+    async ({ eventType, ...params }) => {
+      const { eventConfiguration } = useEventConfiguration(eventType)
+
+      return defaultMutationFn({
+        ...params,
+        // replace data with a version where unused fields are stripped
+        data: await stripUnusedFields(
+          actionType,
+          eventConfiguration,
+          params.data
+        )
+      })
+    }
+  )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return useMutation<any, any, any, any>({
     ...mutationDefaults,
     mutationKey: getMutationKey(mutation),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutationFn: stripData
+    mutationFn
   }) as ReturnType<M['useMutation']>
 }
