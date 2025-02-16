@@ -150,33 +150,53 @@ function updateEventOptimistically<T extends ActionInput>(
   }
 }
 
+// interface EventActionMutationDefaults {
+//   retry: true
+//   retryDelay: 10000
+//   mutationFn: (params: any) => Promise<any>
+//   onSuccess: (data: any) => void
+//   meta: { actionType: ActionType }
+// }
+
 utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent,
-  onMutate: (params) => updateEventOptimistically('DECLARE')(params)
+  onMutate: (params) => updateEventOptimistically('DECLARE')(params),
+  meta: {
+    actionType: ActionType.DECLARE
+  }
 }))
 
 utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.REGISTER
+  }
 }))
 
 utils.event.actions.notify.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.NOTIFY
+  }
 }))
 
 utils.event.actions.validate.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.VALIDATE
+  }
 }))
 
 utils.event.actions.printCertificate.setMutationDefaults(
@@ -184,7 +204,10 @@ utils.event.actions.printCertificate.setMutationDefaults(
     retry: true,
     retryDelay: 10000,
     mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent
+    onSuccess: updateLocalEvent,
+    meta: {
+      actionType: ActionType.PRINT_CERTIFICATE
+    }
   })
 )
 
@@ -193,7 +216,10 @@ utils.event.actions.correction.request.setMutationDefaults(
     retry: true,
     retryDelay: 10000,
     mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent
+    onSuccess: updateLocalEvent,
+    meta: {
+      actionType: ActionType.REQUEST_CORRECTION
+    }
   })
 )
 
@@ -202,7 +228,10 @@ utils.event.actions.correction.approve.setMutationDefaults(
     retry: true,
     retryDelay: 10000,
     mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent
+    onSuccess: updateLocalEvent,
+    meta: {
+      actionType: ActionType.APPROVE_CORRECTION
+    }
   })
 )
 
@@ -211,7 +240,10 @@ utils.event.actions.correction.reject.setMutationDefaults(
     retry: true,
     retryDelay: 10000,
     mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent
+    onSuccess: updateLocalEvent,
+    meta: {
+      actionType: ActionType.REJECT_CORRECTION
+    }
   })
 )
 
@@ -234,15 +266,17 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
     mutationDefaults.mutationFn
   )
 
-  function stripForm(params: any) {
-    console.log('strip form here?')
+  // Strip unused (hidden/disabled) fields from the data
+  async function stripData(params: any) {
+    // TODO CIHAN saako tän muualta ku tuolta metasta?
+    const actionType = mutationDefaults?.meta?.actionType as ActionType
+
+    if (!actionType) {
+      throw new Error('No event action type found. This should never happen')
+    }
 
     // TODO CIHAN kaiva action type jostai?
-    const fields =
-      findActiveActionFields(eventConfiguration, ActionType.DECLARE) ?? []
-
-    console.log(fields)
-    console.log(params.data)
+    const fields = findActiveActionFields(eventConfiguration, actionType) ?? []
 
     const strippedData = _.omitBy(params.data, (_, key) => {
       const field = fields.find((f) => f.id === key)
@@ -254,11 +288,9 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
       return isFieldHiddenOrDisabled(field, params.data)
     })
 
-    console.log(strippedData)
-
     return mutationFn({
       ...params,
-      data: { ...params.data, form: strippedData }
+      data: strippedData
     })
   }
 
@@ -267,6 +299,6 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
     ...mutationDefaults,
     mutationKey: getMutationKey(mutation),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutationFn: stripForm
+    mutationFn: stripData
   }) as ReturnType<M['useMutation']>
 }
