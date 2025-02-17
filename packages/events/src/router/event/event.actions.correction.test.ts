@@ -17,8 +17,7 @@ import {
   SCOPES
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { generateActionInput } from '@events/tests/generators'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { DEFAULT_ACTION_DATA } from '@events/tests/generators'
 import { TRPCError } from '@trpc/server'
 
 test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
@@ -135,7 +134,8 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
 
   const data = generator.event.actions.correction.request(event.id, {
     data: {
-      'applicant.dob': '02-02'
+      'applicant.dob': '02-02',
+      'recommender.none': true
     }
   })
 
@@ -159,7 +159,8 @@ test(`${ActionType.APPROVE_CORRECTION} validation error message contains all the
     withCorrectionRequest.id,
     {
       data: {
-        'applicant.dob': '02-02'
+        'applicant.dob': '02-02',
+        'recommender.none': true
       }
     }
   )
@@ -180,7 +181,7 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
-      'recommender.none': false
+      'recommender.none': true
     }
   })
 
@@ -199,7 +200,7 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
     'applicant.dob': '2024-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': false
+    'recommender.none': true
   }
 
   const data = generator.event.actions.correction.request(event.id, {
@@ -223,7 +224,7 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
     'applicant.dob': '2040-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': false
+    'recommender.none': true
   }
 
   const payload = generator.event.actions.correction.request(event.id, {
@@ -278,10 +279,7 @@ describe('when a correction request exists', () => {
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(registeredEvent.id, {
         data: {
-          ...generateActionInput(
-            tennisClubMembershipEvent,
-            ActionType.REQUEST_CORRECTION
-          ),
+          ...DEFAULT_ACTION_DATA,
           'applicant.firstName': 'Johnny'
         }
       })

@@ -58,7 +58,8 @@ test('Returns aggregated event with updated status and values', async () => {
   const initialData = {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'applicant.dob': '2000-01-01'
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true
   }
 
   const event = await client.event.create(generator.event.create())

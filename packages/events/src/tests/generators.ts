@@ -17,28 +17,13 @@ import {
   ValidateActionInput,
   RegisterActionInput,
   RequestCorrectionActionInput,
-  findActiveActionFields,
   EventConfig,
+  findActiveActionFields,
   mapFieldTypeToMockValue
 } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-
-export function generateActionInput(
-  configuration: EventConfig,
-  action: ActionType
-) {
-  const fields = findActiveActionFields(configuration, action) ?? []
-
-  return fields.reduce(
-    (acc, field, i) => ({
-      ...acc,
-      [field.id]: mapFieldTypeToMockValue(field, i)
-    }),
-    {}
-  )
-}
 
 interface Name {
   use: string
@@ -57,6 +42,13 @@ interface CreateUser {
   primaryOfficeId: string
   role?: string
   name?: Array<Name>
+}
+
+export const DEFAULT_ACTION_DATA = {
+  'applicant.firstname': 'John',
+  'applicant.surname': 'Doe',
+  'applicant.dob': '2000-01-01',
+  'recommender.none': true
 }
 
 /**
@@ -80,9 +72,7 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.DECLARE,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
-          generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
+        data: input.data ?? DEFAULT_ACTION_DATA,
         eventId
       }),
       validate: (
@@ -91,9 +81,7 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.VALIDATE,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
-          generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
+        data: input.data ?? {},
         duplicates: [],
         eventId
       }),
@@ -103,9 +91,7 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.REGISTER,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
-          generateActionInput(tennisClubMembershipEvent, ActionType.REGISTER),
+        data: input.data ?? DEFAULT_ACTION_DATA,
         eventId
       }),
       printCertificate: (
@@ -114,12 +100,7 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.PRINT_CERTIFICATE,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
-          generateActionInput(
-            tennisClubMembershipEvent,
-            ActionType.PRINT_CERTIFICATE
-          ),
+        data: input.data ?? DEFAULT_ACTION_DATA,
         eventId
       }),
       correction: {
@@ -131,12 +112,7 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.REQUEST_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data:
-            input.data ??
-            generateActionInput(
-              tennisClubMembershipEvent,
-              ActionType.REQUEST_CORRECTION
-            ),
+          data: input.data ?? DEFAULT_ACTION_DATA,
           metadata: {},
           eventId
         }),
@@ -149,12 +125,7 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.APPROVE_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data:
-            input.data ??
-            generateActionInput(
-              tennisClubMembershipEvent,
-              ActionType.APPROVE_CORRECTION
-            ),
+          data: input.data ?? DEFAULT_ACTION_DATA,
           eventId,
           requestId
         }),
@@ -167,12 +138,7 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.REJECT_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data:
-            input.data ??
-            generateActionInput(
-              tennisClubMembershipEvent,
-              ActionType.REJECT_CORRECTION
-            ),
+          data: input.data ?? DEFAULT_ACTION_DATA,
           eventId,
           requestId
         })
