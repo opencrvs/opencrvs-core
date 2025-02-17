@@ -53,6 +53,7 @@ jobs:
           echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
 
       - name: Check for "🚀 Ready to deploy" label
+        if: contains(steps.check-labels.outputs.labels, '🚀 Ready to deploy')
         run: |
           labels=$(gh pr view $PR_NUMBER --json labels --jq '.labels[].name')
           if [[ "$labels" != *"🚀 Ready to deploy"* ]]; then
