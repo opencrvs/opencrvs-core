@@ -4,7 +4,6 @@ on: pull_request
 jobs:
   chromatic:
     name: Run chromatic visual tests
-    needs: prepare-client-tests
     runs-on: ubuntu-24.04
 
     steps:
