@@ -23,7 +23,7 @@ import {
 } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from './create'
-import { useEventConfigurations } from '../../useEventConfiguration'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import _ from 'lodash'
 import { formatISO } from 'date-fns'
 
@@ -309,11 +309,7 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
       return defaultMutationFn({
         ...params,
         // replace data with a version where unused fields are stripped
-        data: await stripUnusedFields(
-          actionType,
-          eventConfiguration,
-          params.data
-        )
+        data: stripUnusedFields(actionType, eventConfiguration, params.data)
       })
     }
   )
