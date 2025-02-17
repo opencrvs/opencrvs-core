@@ -38,6 +38,6 @@ jobs:
       - name: Run Chromatic
         uses: chromaui/action@latest
         with:
-          workingDir: packages/client
+          workingDir: ../packages/client
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           exitOnceUploaded: false # Keeps CI in 'pending' state until changes are reviewed
