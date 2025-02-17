@@ -13,6 +13,7 @@ import { Mutation as TanstackMutation } from '@tanstack/query-core'
 import { useMutation } from '@tanstack/react-query'
 import { getMutationKey } from '@trpc/react-query'
 import {
+  ActionFormData,
   ActionInput,
   ActionType,
   EventConfig,
@@ -156,14 +157,6 @@ function updateEventOptimistically<T extends ActionInput>(
   }
 }
 
-// interface EventActionMutationDefaults {
-//   retry: true
-//   retryDelay: 10000
-//   mutationFn: (params: any) => Promise<any>
-//   onSuccess: (data: any) => void
-//   meta: { actionType: ActionType }
-// }
-
 utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
@@ -256,7 +249,7 @@ utils.event.actions.correction.reject.setMutationDefaults(
 function stripUnusedFields(
   actionType: ActionType,
   eventConfiguration: EventConfig,
-  data: any
+  data: ActionFormData
 ) {
   const activeFields =
     findActiveActionFields(eventConfiguration, actionType) ?? []
@@ -318,7 +311,6 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
   return useMutation<any, any, any, any>({
     ...mutationDefaults,
     mutationKey: getMutationKey(mutation),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mutationFn
   }) as ReturnType<M['useMutation']>
 }
