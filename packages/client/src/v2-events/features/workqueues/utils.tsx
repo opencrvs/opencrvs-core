@@ -58,7 +58,10 @@ function convertDotInCurlyBraces(str: string): string {
 export function useIntlFormatMessageWithFlattenedParams() {
   const intl = useIntl()
 
-  function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
+  function formatMessage<T extends {}>(
+    message: MessageDescriptor,
+    params?: T
+  ): string {
     const variables = convertDotToTripleUnderscore(params ?? {})
 
     const originalMessage =
@@ -80,7 +83,11 @@ export function useIntlFormatMessageWithFlattenedParams() {
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
       variables
     )
-    return formatted?.toString().trim()
+    if (!formatted || typeof formatted !== 'string') {
+      return ''
+    }
+
+    return formatted.trim()
   }
 
   return {
