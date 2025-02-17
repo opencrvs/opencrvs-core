@@ -26,8 +26,6 @@ import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
-import _ from 'lodash'
-
 export function generateActionInput(
   configuration: EventConfig,
   action: ActionType
