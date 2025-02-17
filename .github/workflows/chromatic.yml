@@ -9,6 +9,7 @@
 
 name: 'Chromatic'
 on:
+  push:
   pull_request:
     branches:
       - develop
@@ -124,6 +125,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Run chromatic badges
+        run: yarn run chromatic
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
       - name: Run Chromatic
         uses: chromaui/action@latest
         with:
