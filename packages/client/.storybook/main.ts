@@ -31,18 +31,6 @@ const config: StorybookConfig = {
   framework: {
     name: getAbsolutePath('@storybook/react-vite'),
     options: {}
-  },
-  viteFinal: (config) => {
-    config.plugins = config.plugins?.filter((plugins) => {
-      const list = Array.isArray(plugins) ? plugins : [plugins]
-      return !list
-        .filter(
-          (plugin): plugin is Plugin =>
-            typeof plugin === 'object' && plugin !== null && 'name' in plugin
-        )
-        .some((plugin) => plugin.name.startsWith('vite-plugin-pwa'))
-    })
-    return config
   }
 }
 export default config

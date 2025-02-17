@@ -13,11 +13,16 @@ import {
   ActionFormData,
   FieldConfig,
   Inferred,
-  getConditionalActionsForField,
-  FieldValue
+  FieldValue,
+  isFieldHidden
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik. This function unflattens
+ */
 export const FIELD_SEPARATOR = '____'
 
 export function handleInitialValue(
@@ -36,12 +41,12 @@ export function handleInitialValue(
 }
 
 export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return getConditionalActionsForField(field, {
+  return !isFieldHidden(field, {
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
     })
-  }).every((fieldAction) => fieldAction !== 'HIDE')
+  })
 }
 
 export function evalExpressionInFieldDefinition(
