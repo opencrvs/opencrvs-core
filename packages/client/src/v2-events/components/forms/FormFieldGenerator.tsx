@@ -34,15 +34,19 @@ import {
   FieldType,
   FieldValue,
   FileFieldValue,
-  getConditionalActionsForField,
   isAddressFieldType,
+  isAdministrativeAreaFieldType,
+  isFacilityFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
+  isFieldDisabled,
+  isFieldHidden,
   isFileFieldType,
   isLocationFieldType,
+  isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
@@ -72,11 +76,11 @@ import {
   Checkbox,
   Date as DateField,
   RadioGroup,
-  Location,
   LocationSearch,
   Select,
   SelectCountry,
-  Text
+  Text,
+  AdministrativeArea
 } from '@client/v2-events/features/events/registered-fields'
 
 import { SubHeader } from '@opencrvs/components'
@@ -352,33 +356,56 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    if (isLocationFieldType(field)) {
-      if (field.config.options.type === 'HEALTH_FACILITY')
-        return (
-          <InputField {...inputFieldProps}>
-            <LocationSearch.Input
-              {...field.config}
-              value={field.value}
-              setFieldValue={setFieldValue}
-            />
-          </InputField>
-        )
 
+    if (isAdministrativeAreaFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <Location.Input
+          <AdministrativeArea.Input
             {...field.config}
             value={field.value}
-            setFieldValue={setFieldValue}
             partOf={
-              (field.config.options?.partOf?.$data &&
+              (field.config.configuration?.partOf?.$data &&
                 (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                  field.config.options?.partOf.$data
+                  field.config.configuration?.partOf.$data
                 ] as string | undefined | null)) ??
               null
             }
+            setFieldValue={setFieldValue}
           />
         </InputField>
+      )
+    }
+
+    if (isLocationFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['locations']}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+
+    if (isOfficeFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['offices']}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+
+    if (isFacilityFieldType(field)) {
+      return (
+        <LocationSearch.Input
+          {...field.config}
+          value={field.value}
+          searchableResource={['facilities']}
+          setFieldValue={setFieldValue}
+        />
       )
     }
     if (isDividerFieldType(field)) {
@@ -560,21 +587,18 @@ class FormSectionComponent extends React.Component<AllProps> {
             error = intl.formatMessage(firstError.message, firstError.props)
           }
 
-          const conditionalActions: string[] = getConditionalActionsForField(
-            field,
-            {
-              $form: makeFormikFieldIdsOpenCRVSCompatible(
-                valuesWithFormattedDate
-              ),
-              $now: formatISO(new Date(), { representation: 'date' })
-            }
-          )
+          const formParams = {
+            $form: makeFormikFieldIdsOpenCRVSCompatible(
+              valuesWithFormattedDate
+            ),
+            $now: formatISO(new Date(), { representation: 'date' })
+          }
 
-          if (conditionalActions.includes('HIDE')) {
+          if (isFieldHidden(field, formParams)) {
             return null
           }
 
-          const isFieldDisabled = conditionalActions.includes('disable')
+          const isDisabled = isFieldDisabled(field, formParams)
 
           return (
             <FormItem
@@ -592,8 +616,8 @@ class FormSectionComponent extends React.Component<AllProps> {
                       setFieldTouched={setFieldTouched}
                       setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
-                      disabled={isFieldDisabled}
-                      error={isFieldDisabled ? '' : error}
+                      disabled={isDisabled}
+                      error={isDisabled ? '' : error}
                       fields={fields}
                       formData={formData}
                       touched={touched[field.id] || false}

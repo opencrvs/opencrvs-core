@@ -12,15 +12,18 @@
 import { z } from 'zod'
 import {
   AddressField,
+  AdministrativeArea,
   BulletList,
   Checkbox,
   Country,
   DateField,
   Divider,
+  Facility,
   EmailField,
   FieldConfig,
   File,
   Location,
+  Office,
   PageHeader,
   Paragraph,
   RadioGroup,
@@ -71,6 +74,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
     case FieldType.SIGNATURE:
     case FieldType.HIDDEN:
       schema = required ? TextValue.min(1) : TextValue
@@ -118,6 +124,9 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
     case FieldType.RADIO_GROUP:
     case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
       return `${field.id}-${field.type}-${i}`
     case FieldType.EMAIL:
       return 'test@opencrvs.org'
@@ -254,4 +263,25 @@ export const isDividerFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: Divider } => {
   return field.config.type === FieldType.DIVIDER
+}
+
+export const isAdministrativeAreaFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: AdministrativeArea } => {
+  return field.config.type === FieldType.ADMINISTRATIVE_AREA
+}
+
+export const isFacilityFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: Facility } => {
+  return field.config.type === FieldType.FACILITY
+}
+
+export const isOfficeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: Office } => {
+  return field.config.type === FieldType.OFFICE
 }
