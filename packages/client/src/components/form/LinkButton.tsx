@@ -100,18 +100,18 @@ export const LinkButtonField = ({
       disabled={isDisabled}
       onClick={() => {
         if (declaration) {
-          dispatch(writeDeclaration(declaration))
-        }
-        // to make the redireciton happen after the saving is done
-        setTimeout(() => {
-          window.location.href = evalExpressionInFieldDefinition(
-            '`' + decodeURIComponent(to) + '`',
-            form,
-            config,
-            draft,
-            user
+          dispatch(
+            writeDeclaration(declaration, () => {
+              window.location.href = evalExpressionInFieldDefinition(
+                '`' + decodeURIComponent(to) + '`',
+                form,
+                config,
+                draft,
+                user
+              )
+            })
           )
-        })
+        }
       }}
     >
       {fieldDefinition.icon &&
