@@ -22,7 +22,8 @@
     "build:clean": "rm -rf build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook"
+    "test-storybook": "test-storybook",
+    "chromatic": "chromatic"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
