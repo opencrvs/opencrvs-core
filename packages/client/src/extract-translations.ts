@@ -188,11 +188,13 @@ async function extractMessages() {
 
   if (missingKeys.length > 0) {
     // eslint-disable-line no-console
-    console.log(chalk.red.bold('Missing translations'))
-    console.log(`You are missing the following content keys from your country configuration package:\n
-${chalk.white(missingKeys.join('\n'))}\n
-Translate the keys and add them to this file:
-${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
+    if (!process.env.CI) {
+      console.log(chalk.red.bold('Missing translations'))
+      console.log(`You are missing the following content keys from your country configuration package:\n
+  ${chalk.white(missingKeys.join('\n'))}\n
+  Translate the keys and add them to this file:
+  ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
+    }
 
     if (write) {
       console.log(
