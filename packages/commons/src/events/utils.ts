@@ -21,7 +21,7 @@ import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionFormData } from './ActionDocument'
 import { formatISO } from 'date-fns'
-import { isFieldHiddenOrDisabled } from '../client'
+import { isFieldHiddenOrDisabled } from '../conditionals/validate'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
