@@ -269,6 +269,42 @@ jobs:
       - name: Run linting
         run: cd packages/client && yarn lint
 
+  run-storybook-tests:
+    name: Lint client
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+      - name: Build Storybook
+        run: yarn build-storybook --quiet
+      - name: Serve Storybook and run tests
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "npx http-server storybook-static --port 6006 --silent" \
+            "npx wait-on tcp:6006 && yarn test-storybook"
+
   run-visual-tests:
     name: Run visual tests
     needs: prepare-client-tests
@@ -314,6 +350,8 @@ jobs:
         with:
           workingDir: packages/client
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          exitZeroOnChanges: false # Fail workflow if changes are found. Expect manual acceptance
+          onlyChanged: true # Only test components that have changed since the last build
 
   test-client:
     name: Test client
