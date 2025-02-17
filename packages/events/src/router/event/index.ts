@@ -112,14 +112,12 @@ export const eventRouter = router({
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
-
       const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-      const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
+
+      return getEventWithOnlyUserSpecificDrafts(
         eventWithSignedFiles,
         ctx.user.id
       )
-
-      return eventWithUserSpecificDrafts
     }),
   delete: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))

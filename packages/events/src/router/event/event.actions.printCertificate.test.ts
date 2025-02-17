@@ -45,7 +45,8 @@ test('Validation error message contains all the offending fields', async () => {
     client.event.actions.printCertificate(
       generator.event.actions.printCertificate(event.id, {
         data: {
-          'applicant.dob': '02-02'
+          'applicant.dob': '02-02',
+          'recommender.none': true
         }
       })
     )
@@ -61,6 +62,7 @@ test('print certificate action can be added to a created event', async () => {
   await client.event.actions.declare(
     generator.event.actions.declare(originalEvent.id)
   )
+
   const registeredEvent = await client.event.actions.printCertificate(
     generator.event.actions.printCertificate(originalEvent.id)
   )
@@ -88,7 +90,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
-      'recommender.none': false
+      'recommender.none': true
     }
   })
 
@@ -107,7 +109,7 @@ test('Skips required field validation when they are conditionally hidden', async
     'applicant.dob': '2024-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': false
+    'recommender.none': true
   }
 
   const data = generator.event.actions.printCertificate(event.id, {
@@ -131,7 +133,7 @@ test('Prevents adding birth date in future', async () => {
     'applicant.dob': '2040-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': false
+    'recommender.none': true
   }
 
   const payload = generator.event.actions.printCertificate(event.id, {

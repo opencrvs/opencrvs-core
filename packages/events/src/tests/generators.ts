@@ -17,9 +17,10 @@ import {
   ValidateActionInput,
   RegisterActionInput,
   RequestCorrectionActionInput,
-  findActiveActionFields,
+  mapFieldTypeToMockValue,
   EventConfig,
-  mapFieldTypeToMockValue
+  findActiveActionFields,
+  stripHiddenOrDisabledFields
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
@@ -31,13 +32,15 @@ export function generateActionInput(
 ) {
   const fields = findActiveActionFields(configuration, action) ?? []
 
-  return fields.reduce(
+  const data = fields.reduce(
     (acc, field, i) => ({
       ...acc,
       [field.id]: mapFieldTypeToMockValue(field, i)
     }),
     {}
   )
+
+  return stripHiddenOrDisabledFields(action, configuration, data)
 }
 
 interface Name {
@@ -91,9 +94,7 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.VALIDATE,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
-          generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
+        data: input.data ?? {},
         duplicates: [],
         eventId
       }),
