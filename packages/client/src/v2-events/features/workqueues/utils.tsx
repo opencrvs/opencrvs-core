@@ -10,7 +10,7 @@
  */
 
 import { MessageDescriptor, useIntl } from 'react-intl'
-import { PrimitiveType } from 'intl-messageformat'
+import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
 import { ActionFormData } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
@@ -61,22 +61,30 @@ export function useIntlFormatMessageWithFlattenedParams() {
   function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
     const variables = convertDotToTripleUnderscore(params ?? {})
 
-    return (
-      intl
-        .formatMessage(
-          {
-            id: message.id,
-            description: message.description,
-            defaultMessage: convertDotInCurlyBraces(
-              message.defaultMessage as string
-            )
-          },
-          variables
-        )
-        // When multiple variables are provided, we trim to ensure empty content in case both are missing.
-        // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
-        .trim()
+    const variablesWithoutNull = Object.fromEntries(
+      Object.entries(variables).filter(([_key, value]) => value !== null)
     )
+
+    const originalMessage =
+      intl.messages[message.id as keyof typeof intl.messages] ||
+      message.defaultMessage
+
+    if (typeof originalMessage !== 'string') {
+      // eslint-disable-next-line no-console
+      console.error(
+        'Message must be a string. Encountered',
+        originalMessage,
+        'when searching with',
+        message.id
+      )
+      throw new Error('Message must be a string')
+    }
+
+    const defaultMessage = convertDotInCurlyBraces(originalMessage)
+    const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
+      variablesWithoutNull
+    )
+    return formatted?.toString().trim()
   }
 
   return {
