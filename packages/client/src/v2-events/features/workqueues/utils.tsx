@@ -61,10 +61,6 @@ export function useIntlFormatMessageWithFlattenedParams() {
   function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
     const variables = convertDotToTripleUnderscore(params ?? {})
 
-    const variablesWithoutNull = Object.fromEntries(
-      Object.entries(variables).filter(([_key, value]) => value !== null)
-    )
-
     const originalMessage =
       intl.messages[message.id as keyof typeof intl.messages] ||
       message.defaultMessage
@@ -82,7 +78,7 @@ export function useIntlFormatMessageWithFlattenedParams() {
 
     const defaultMessage = convertDotInCurlyBraces(originalMessage)
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
-      variablesWithoutNull
+      variables
     )
     return formatted?.toString().trim()
   }
