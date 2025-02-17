@@ -16,12 +16,8 @@ import {
   ActionType,
   ValidateActionInput,
   RegisterActionInput,
-  RequestCorrectionActionInput,
-  EventConfig,
-  findActiveActionFields,
-  mapFieldTypeToMockValue
+  RequestCorrectionActionInput
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
 
