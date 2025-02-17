@@ -21,24 +21,23 @@ export function Conditional() {
   return z.custom<JSONSchema>((val) => typeof val === 'object' && val !== null)
 }
 
-const ConditionalTypes = {
+/**
+ * By default, when conditionals are undefined, action is visible and enabled to everyone.
+ */
+export const ConditionalType = {
+  /** When 'SHOW' conditional is defined, the action is shown to the user only if the condition is met */
   SHOW: 'SHOW',
-  HIDE: 'HIDE',
+  /** If 'ENABLE' conditional is defined, the action is enabled only if the condition is met */
   ENABLE: 'ENABLE'
 } as const
 
 export const ShowConditional = z.object({
-  type: z.literal(ConditionalTypes.SHOW),
-  conditional: Conditional()
-})
-
-export const HideConditional = z.object({
-  type: z.literal(ConditionalTypes.HIDE),
+  type: z.literal(ConditionalType.SHOW),
   conditional: Conditional()
 })
 
 export const EnableConditional = z.object({
-  type: z.literal(ConditionalTypes.ENABLE),
+  type: z.literal(ConditionalType.ENABLE),
   conditional: Conditional()
 })
 
@@ -51,19 +50,16 @@ export const EnableConditional = z.object({
 /** @knipignore */
 export type AllActionConditionalFields =
   | typeof ShowConditional
-  | typeof HideConditional
   | typeof EnableConditional
 
 /** @knipignore */
 export type InferredActionConditional =
   | z.infer<typeof ShowConditional>
-  | z.infer<typeof HideConditional>
   | z.infer<typeof EnableConditional>
 
 export const ActionConditional = z.discriminatedUnion('type', [
   // Action can be shown / hidden
   ShowConditional,
-  HideConditional,
   // Action can be shown to the user in the list but as disabled
   EnableConditional
 ]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConditionalFields[]>
