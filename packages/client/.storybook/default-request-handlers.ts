@@ -63,16 +63,16 @@ export const handlers = {
         `event-attachments/${formData.get('transactionId')}.jpg`
       )
     }),
+    http.delete('/api/files/:filename', async (request) => {
+      return HttpResponse.text('OK')
+    }),
     http.get('http://localhost:3535/ocrvs/:id', async (request) => {
       const cache = await caches.open(FAKE_CACHE_NAME)
 
-      const keys = await cache.keys()
-      for (const request of keys) {
-        const response = await cache.match(request)
+      const response = await cache.match(request.request)
 
-        if (response) {
-          return response
-        }
+      if (response) {
+        return response
       }
 
       const svgImage = `
