@@ -270,7 +270,7 @@ jobs:
         run: cd packages/client && yarn lint
 
   run-storybook-tests:
-    name: Lint client
+    name: Run storybook tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
     steps:
@@ -298,15 +298,19 @@ jobs:
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
       - name: Build Storybook
+        with:
+          working-directory: packages/client
         run: yarn build-storybook --quiet
       - name: Serve Storybook and run tests
+        with:
+          working-directory: packages/client
         run: |
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "npx http-server storybook-static --port 6006 --silent" \
             "npx wait-on tcp:6006 && yarn test-storybook"
 
   run-visual-tests:
-    name: Run visual tests
+    name: Run chromatic visual tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
 
