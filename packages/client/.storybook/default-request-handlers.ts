@@ -23,6 +23,20 @@ import {
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
 
+async function ensureCacheExists(cacheName: string) {
+  const cacheNames = await caches.keys()
+  if (!cacheNames.includes(cacheName)) {
+    await caches.open(cacheName)
+    // eslint-disable-next-line no-console
+    console.log(`Cache "${cacheName}" created.`)
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(`Cache "${cacheName}" already exists.`)
+  }
+}
+const FAKE_CACHE_NAME = 'workbox-runtime'
+ensureCacheExists(FAKE_CACHE_NAME)
+
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -49,8 +63,17 @@ export const handlers = {
         `event-attachments/${formData.get('transactionId')}.jpg`
       )
     }),
-    http.get('http://localhost:3535/ocrvs/:id', async ({ params }) => {
-      const { id } = params
+    http.get('http://localhost:3535/ocrvs/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+
+      const keys = await cache.keys()
+      for (const request of keys) {
+        const response = await cache.match(request)
+
+        if (response) {
+          return response
+        }
+      }
 
       const svgImage = `
         <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
