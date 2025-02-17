@@ -62,6 +62,7 @@ test('print certificate action can be added to a created event', async () => {
   await client.event.actions.declare(
     generator.event.actions.declare(originalEvent.id)
   )
+
   const registeredEvent = await client.event.actions.printCertificate(
     generator.event.actions.printCertificate(originalEvent.id)
   )

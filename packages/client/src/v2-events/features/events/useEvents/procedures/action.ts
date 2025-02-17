@@ -13,20 +13,16 @@ import { Mutation as TanstackMutation } from '@tanstack/query-core'
 import { useMutation } from '@tanstack/react-query'
 import { getMutationKey } from '@trpc/react-query'
 import {
-  ActionFormData,
   ActionInput,
   ActionType,
-  EventConfig,
   EventDocument,
-  findActiveActionFields,
   getCurrentEventState,
-  isFieldHiddenOrDisabled
+  stripHiddenOrDisabledFields
 } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from './create'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import _ from 'lodash'
-import { formatISO } from 'date-fns'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   utils.event.get.setData(updatedEvent.id, updatedEvent)
@@ -245,29 +241,6 @@ utils.event.actions.correction.reject.setMutationDefaults(
     }
   })
 )
-
-function stripHiddenOrDisabledFields(
-  actionType: ActionType,
-  eventConfiguration: EventConfig,
-  data: ActionFormData
-) {
-  const activeFields =
-    findActiveActionFields(eventConfiguration, actionType) ?? []
-
-  const now = formatISO(new Date(), { representation: 'date' })
-
-  return _.omitBy(data, (_, fieldId) => {
-    const field = activeFields.find((f) => f.id === fieldId)
-
-    return (
-      !field ||
-      isFieldHiddenOrDisabled(field, {
-        $form: data,
-        $now: now
-      })
-    )
-  })
-}
 
 export function useEventAction<P extends Procedure, M extends Mutation>(
   procedure: P,

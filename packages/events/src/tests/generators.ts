@@ -16,10 +16,34 @@ import {
   ActionType,
   ValidateActionInput,
   RegisterActionInput,
-  RequestCorrectionActionInput
+  RequestCorrectionActionInput,
+  mapFieldTypeToMockValue,
+  EventConfig,
+  findActiveActionFields,
+  stripHiddenOrDisabledFields
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+
+import _ from 'lodash'
+
+export function generateActionInput(
+  configuration: EventConfig,
+  action: ActionType
+) {
+  const fields = findActiveActionFields(configuration, action) ?? []
+
+  const data = fields.reduce(
+    (acc, field, i) => ({
+      ...acc,
+      [field.id]: mapFieldTypeToMockValue(field, i)
+    }),
+    {}
+  )
+
+  return stripHiddenOrDisabledFields(action, configuration, data)
+}
 
 interface Name {
   use: string
@@ -38,13 +62,6 @@ interface CreateUser {
   primaryOfficeId: string
   role?: string
   name?: Array<Name>
-}
-
-export const DEFAULT_ACTION_DATA = {
-  'applicant.firstname': 'John',
-  'applicant.surname': 'Doe',
-  'applicant.dob': '2000-01-01',
-  'recommender.none': true
 }
 
 /**
@@ -68,7 +85,9 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.DECLARE,
         transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? DEFAULT_ACTION_DATA,
+        data:
+          input.data ??
+          generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
         eventId
       }),
       validate: (
@@ -87,7 +106,9 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.REGISTER,
         transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? DEFAULT_ACTION_DATA,
+        data:
+          input.data ??
+          generateActionInput(tennisClubMembershipEvent, ActionType.REGISTER),
         eventId
       }),
       printCertificate: (
@@ -96,7 +117,12 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.PRINT_CERTIFICATE,
         transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? DEFAULT_ACTION_DATA,
+        data:
+          input.data ??
+          generateActionInput(
+            tennisClubMembershipEvent,
+            ActionType.PRINT_CERTIFICATE
+          ),
         eventId
       }),
       correction: {
@@ -108,7 +134,12 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.REQUEST_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? DEFAULT_ACTION_DATA,
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.REQUEST_CORRECTION
+            ),
           metadata: {},
           eventId
         }),
@@ -121,7 +152,12 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.APPROVE_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? DEFAULT_ACTION_DATA,
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.APPROVE_CORRECTION
+            ),
           eventId,
           requestId
         }),
@@ -134,7 +170,12 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.REJECT_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? DEFAULT_ACTION_DATA,
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.REJECT_CORRECTION
+            ),
           eventId,
           requestId
         })

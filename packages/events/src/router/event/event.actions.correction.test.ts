@@ -17,8 +17,9 @@ import {
   SCOPES
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { DEFAULT_ACTION_DATA } from '@events/tests/generators'
 import { TRPCError } from '@trpc/server'
+import { generateActionInput } from '@events/tests/generators'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -279,7 +280,7 @@ describe('when a correction request exists', () => {
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(registeredEvent.id, {
         data: {
-          ...DEFAULT_ACTION_DATA,
+          ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
           'applicant.firstName': 'Johnny'
         }
       })

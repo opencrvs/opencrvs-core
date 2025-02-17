@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DEFAULT_ACTION_DATA } from '@events/tests/generators'
+import { generateActionInput } from '@events/tests/generators'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { ActionType, SCOPES } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -122,7 +123,7 @@ test('validation prevents including hidden fields', async () => {
 
   const data = generator.event.actions.declare(event.id, {
     data: {
-      ...DEFAULT_ACTION_DATA,
+      ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
       'recommender.firstname': 'this should not be here'
     }
   })
