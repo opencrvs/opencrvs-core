@@ -139,16 +139,24 @@ export function getFieldValidationErrors({
     isFieldHidden(field, conditionalParameters) ||
     isFieldDisabled(field, conditionalParameters)
   ) {
-    return {
-      errors: [
-        {
-          message: {
-            id: 'v2.error.hidden',
-            defaultMessage: 'Field is hidden or disabled',
-            description: 'Error message when field is hidden or disabled'
+    if (values[field.id]) {
+      return {
+        errors: [
+          {
+            message: {
+              id: 'v2.error.hidden',
+              defaultMessage:
+                'Hidden or disabled field should not receive a value',
+              description:
+                'Error message when field is hidden or disabled, but a value was received'
+            }
           }
-        }
-      ]
+        ]
+      }
+    }
+
+    return {
+      errors: []
     }
   }
 
