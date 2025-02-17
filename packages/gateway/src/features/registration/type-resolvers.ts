@@ -245,8 +245,14 @@ export const typeResolvers: GQLResolver = {
   },
   Person: {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
+    name: (person: Patient) => {
+      if (!person.active) {
+        return null
+      }
+      return person.name
+    },
     dateOfMarriage: (person: Patient) => {
-      if (!person.extension) {
+      if (!person.extension || !person.active) {
         return null
       }
 
@@ -257,7 +263,7 @@ export const typeResolvers: GQLResolver = {
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
     age: (person: Patient) => {
-      if (!person.extension) {
+      if (!person.extension || !person.active) {
         return null
       }
 
@@ -274,10 +280,12 @@ export const typeResolvers: GQLResolver = {
       return marriageExtension.valueString
     },
     maritalStatus: (person: Patient) => {
-      return person && person.maritalStatus && person.maritalStatus.text
+      return !person.active
+        ? null
+        : person && person.maritalStatus && person.maritalStatus.text
     },
     occupation: (person: Patient) => {
-      if (!person.extension) {
+      if (!person.extension || !person.active) {
         return null
       }
 
@@ -288,7 +296,7 @@ export const typeResolvers: GQLResolver = {
       return (occupationExtension && occupationExtension.valueString) || null
     },
     reasonNotApplying: (person: Patient) => {
-      if (!person.extension) {
+      if (!person.extension || person.active) {
         return null
       }
 
@@ -303,7 +311,7 @@ export const typeResolvers: GQLResolver = {
       )
     },
     ageOfIndividualInYears: (person: Patient) => {
-      if (!person.extension) {
+      if (!person.extension || !person.active) {
         return null
       }
 
@@ -318,7 +326,7 @@ export const typeResolvers: GQLResolver = {
       )
     },
     exactDateOfBirthUnknown: (person: Patient) => {
-      if (!person.extension) {
+      if (!person.extension || !person.active) {
         return null
       }
 
@@ -336,13 +344,19 @@ export const typeResolvers: GQLResolver = {
       return person.active
     },
     multipleBirth: (person: Patient) => {
+      if (!person.active) {
+        return null
+      }
       return person.multipleBirthInteger
     },
     deceased: (person: Patient) => {
+      if (!person.active) {
+        return null
+      }
       return person
     },
     nationality: (person: Patient) => {
-      if (!person.extension) {
+      if (!person.extension || !person.active) {
         return null
       }
 
@@ -373,7 +387,7 @@ export const typeResolvers: GQLResolver = {
       return nationality
     },
     educationalAttainment: (person: Patient) => {
-      if (!person.extension) {
+      if (!person.extension || !person.active) {
         return null
       }
 
@@ -421,7 +435,12 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
-      return (person && person.name) || null
+
+      if (!person.active) {
+        return null
+      }
+
+      return person.name
     },
     dateOfMarriage: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
       if (!relatedPerson.patient) {
@@ -431,6 +450,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
         person?.extension || []
@@ -445,6 +469,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
         person?.extension || []
@@ -465,7 +494,12 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
-      return (person && person.birthDate) || null
+
+      if (!person.active) {
+        return null
+      }
+
+      return person.birthDate
     },
     identifier: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
       if (!relatedPerson.patient) {
@@ -475,7 +509,12 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
-      return (person && person.identifier) || null
+
+      if (!person.active) {
+        return null
+      }
+
+      return person.identifier
     },
     maritalStatus: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
       if (!relatedPerson.patient) {
@@ -485,6 +524,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       return person && person.maritalStatus && person.maritalStatus.text
     },
     occupation: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
@@ -495,6 +539,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       const occupationExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
         person?.extension || []
@@ -517,6 +566,11 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
         person?.extension || []
       )
+
+      if (!person.active) {
+        return null
+      }
+
       return (
         (reasonNotApplyingExtension &&
           reasonNotApplyingExtension.valueString) ||
@@ -535,6 +589,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       const ageOfIndividualInYearsExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
         person?.extension || []
@@ -557,6 +616,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       const exactDateOfBirthUnknownExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
         person?.extension || []
@@ -575,6 +639,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       return person?.active
     },
     multipleBirth: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
@@ -585,6 +654,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       return person?.multipleBirthInteger
     },
     deceased: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
@@ -595,6 +669,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       return person
     },
     nationality: async (relatedPerson: Saved<RelatedPerson>, _, context) => {
@@ -605,6 +684,10 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
 
       const nationalityExtension = findExtension(
         `${FHIR_SPECIFICATION_URL}patient-nationality`,
@@ -644,6 +727,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       const educationalAttainmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
         person?.extension || []
@@ -662,6 +750,11 @@ export const typeResolvers: GQLResolver = {
         context.record!,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
+
+      if (!person.active) {
+        return null
+      }
+
       return person?.address
     }
   },
