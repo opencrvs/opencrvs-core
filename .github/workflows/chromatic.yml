@@ -7,12 +7,6 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
-        with:
-          name: client
-          path: .
-
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
