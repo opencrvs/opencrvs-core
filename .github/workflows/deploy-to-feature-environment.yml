@@ -53,7 +53,6 @@ jobs:
           echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
 
       - name: Check for "🚀 Ready to deploy" label
-        if: contains(steps.check-labels.outputs.labels, '🚀 Ready to deploy')
         run: |
           labels=$(gh pr view $PR_NUMBER --json labels --jq '.labels[].name')
           if [[ "$labels" != *"🚀 Ready to deploy"* ]]; then
@@ -112,7 +111,7 @@ jobs:
     secrets: inherit
 
   trigger-e2e:
-    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false && contains(steps.check-labels.outputs.labels, '🚀 Ready to deploy')) }}
     runs-on: ubuntu-24.04
     needs: generate_stack_name_and_branch
     environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
