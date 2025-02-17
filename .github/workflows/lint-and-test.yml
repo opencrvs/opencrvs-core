@@ -297,17 +297,17 @@ jobs:
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
       - name: Build Storybook
-        with:
-          working-directory: packages/client
         run: yarn build-storybook --quiet
+        working-directory: packages/client
+
       - name: Serve Storybook and run tests
-        with:
-          working-directory: packages/client
         run: |
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "npx http-server storybook-static --port 6006 --silent" \
             "npx wait-on tcp:6006 && yarn test-storybook"
+        working-directory: packages/client
 
   run-visual-tests:
     name: Run chromatic visual tests
