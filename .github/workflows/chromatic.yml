@@ -9,7 +9,6 @@
 
 name: 'Chromatic'
 on:
-  push:
   pull_request:
     branches:
       - develop
@@ -127,6 +126,7 @@ jobs:
 
       - name: Run chromatic badges
         run: yarn run chromatic
+        working-directory: packages/client
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
       - name: Run Chromatic
