@@ -9,12 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
-import { EventDocument } from '@opencrvs/commons'
 import {
+  ConditionalType,
+  EventDocument,
   defineConditional,
   EventConfig,
   EventIndex,
-  FormConfig
+  FormConfig,
+  not
 } from '@opencrvs/commons/client'
 
 /* eslint-disable max-lines */
@@ -300,41 +302,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.OTHER.idType',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.requesterId']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.requesterId': {
+                              not: {
+                                enum: ['OTHER']
+                              }
+                            }
+                          },
                           required: ['collector.requesterId']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.requesterId': {
-                            not: {
-                              enum: ['OTHER']
-                            }
-                          }
-                        },
-                        required: ['collector.requesterId']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -401,41 +405,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.PASSPORT.details',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.OTHER.idType']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.OTHER.idType': {
+                              not: {
+                                enum: ['PASSPORT']
+                              }
+                            }
+                          },
                           required: ['collector.OTHER.idType']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.OTHER.idType': {
-                            not: {
-                              enum: ['PASSPORT']
-                            }
-                          }
-                        },
-                        required: ['collector.OTHER.idType']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -450,41 +456,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.DRIVING_LICENSE.details',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.OTHER.idType']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.OTHER.idType': {
+                              not: {
+                                enum: ['DRIVING_LICENSE']
+                              }
+                            }
+                          },
                           required: ['collector.OTHER.idType']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.OTHER.idType': {
-                            not: {
-                              enum: ['DRIVING_LICENSE']
-                            }
-                          }
-                        },
-                        required: ['collector.OTHER.idType']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -499,41 +507,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.REFUGEE_NUMBER.details',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.OTHER.idType']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.OTHER.idType': {
+                              not: {
+                                enum: ['REFUGEE_NUMBER']
+                              }
+                            }
+                          },
                           required: ['collector.OTHER.idType']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.OTHER.idType': {
-                            not: {
-                              enum: ['REFUGEE_NUMBER']
-                            }
-                          }
-                        },
-                        required: ['collector.OTHER.idType']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -548,41 +558,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.ALIEN_NUMBER.details',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.OTHER.idType']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.OTHER.idType': {
+                              not: {
+                                enum: ['ALIEN_NUMBER']
+                              }
+                            }
+                          },
                           required: ['collector.OTHER.idType']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.OTHER.idType': {
-                            not: {
-                              enum: ['ALIEN_NUMBER']
-                            }
-                          }
-                        },
-                        required: ['collector.OTHER.idType']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -597,41 +609,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.OTHER.idTypeOther',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.OTHER.idType']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.OTHER.idType': {
+                              not: {
+                                enum: ['OTHER']
+                              }
+                            }
+                          },
                           required: ['collector.OTHER.idType']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.OTHER.idType': {
-                            not: {
-                              enum: ['OTHER']
-                            }
-                          }
-                        },
-                        required: ['collector.OTHER.idType']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -646,41 +660,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.OTHER.firstName',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.requesterId']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.requesterId': {
+                              not: {
+                                enum: ['OTHER']
+                              }
+                            }
+                          },
                           required: ['collector.requesterId']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.requesterId': {
-                            not: {
-                              enum: ['OTHER']
-                            }
-                          }
-                        },
-                        required: ['collector.requesterId']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -695,41 +711,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.OTHER.lastName',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.requesterId']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.requesterId': {
+                              not: {
+                                enum: ['OTHER']
+                              }
+                            }
+                          },
                           required: ['collector.requesterId']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.requesterId': {
-                            not: {
-                              enum: ['OTHER']
-                            }
-                          }
-                        },
-                        required: ['collector.requesterId']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -744,41 +762,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.OTHER.relationshipToMember',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.requesterId']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.requesterId': {
+                              not: {
+                                enum: ['OTHER']
+                              }
+                            }
+                          },
                           required: ['collector.requesterId']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.requesterId': {
-                            not: {
-                              enum: ['OTHER']
-                            }
-                          }
-                        },
-                        required: ['collector.requesterId']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: true,
@@ -794,41 +814,43 @@ const PRINT_CERTIFICATE_FORM = {
           id: 'collector.OTHER.signedAffidavit',
           conditionals: [
             {
-              type: 'HIDE',
-              conditional: defineConditional({
-                anyOf: [
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        not: {
+              type: ConditionalType.SHOW,
+              conditional: not(
+                defineConditional({
+                  anyOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
                           type: 'object',
+                          not: {
+                            type: 'object',
+                            required: ['collector.requesterId']
+                          }
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'collector.requesterId': {
+                              not: {
+                                enum: ['OTHER']
+                              }
+                            }
+                          },
                           required: ['collector.requesterId']
                         }
-                      }
-                    },
-                    required: ['$form']
-                  },
-                  {
-                    type: 'object',
-                    properties: {
-                      $form: {
-                        type: 'object',
-                        properties: {
-                          'collector.requesterId': {
-                            not: {
-                              enum: ['OTHER']
-                            }
-                          }
-                        },
-                        required: ['collector.requesterId']
-                      }
-                    },
-                    required: ['$form']
-                  }
-                ]
-              })
+                      },
+                      required: ['$form']
+                    }
+                  ]
+                })
+              )
             }
           ],
           required: false,
@@ -1239,6 +1261,21 @@ export const tennisClubMembershipEvent = {
           }
         ]
       }
+    }
+  ],
+  advancedSearch: [
+    {
+      id: 'RANDOM',
+      title: {
+        defaultMessage: 'Tennis club registration search',
+        description: 'This is what this event is referred as in the system',
+        id: 'v2.event.tennis-club-membership.search'
+      },
+      fields: [
+        {
+          fieldId: 'applicant.dob'
+        }
+      ]
     }
   ]
 } satisfies EventConfig

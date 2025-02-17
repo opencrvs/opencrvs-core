@@ -13,10 +13,20 @@ import { MessageDescriptor, useIntl } from 'react-intl'
 import { BulletList as BulletListComponent } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
 
-export function BulletList({ id, items, font }: FieldProps<'BULLET_LIST'>) {
+export function BulletList({
+  id,
+  items,
+  configuration
+}: FieldProps<'BULLET_LIST'>) {
   const intl = useIntl()
   const formattedItmes = items.map((item: MessageDescriptor) =>
     intl.formatMessage(item)
   )
-  return <BulletListComponent font={font} id={id} items={formattedItmes} />
+  return (
+    <BulletListComponent
+      font={configuration.styles?.fontVariant ?? 'reg16'}
+      id={id}
+      items={formattedItmes}
+    />
+  )
 }
