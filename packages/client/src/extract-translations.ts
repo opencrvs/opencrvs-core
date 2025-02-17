@@ -186,9 +186,9 @@ async function extractMessages() {
     console.log(extraKeys.join('\n'))
   }
 
+  console.log(chalk.blue(`CI environment variable is set to: ${process.env.CI}`))
   if (missingKeys.length > 0) {
     // eslint-disable-line no-console
-    console.log(chalk.blue(`CI environment variable is set to: ${process.env.CI}`))
     if (!process.env.CI) {
       console.log(chalk.red.bold('Missing translations'))
       console.log(`You are missing the following content keys from your country configuration package:\n
