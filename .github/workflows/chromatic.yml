@@ -25,15 +25,15 @@ jobs:
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
 
-      # Without this, the fetch command will fail with
-      # fatal: could not read Username for 'https://github.com': No such device or address
-      - name: Remove extraheader config
-        run: git config --unset http.https://github.com/.extraheader
+      # # Without this, the fetch command will fail with
+      # # fatal: could not read Username for 'https://github.com': No such device or address
+      # - name: Remove extraheader config
+      #   run: git config --unset http.https://github.com/.extraheader
 
-      - name: Fetch full Git history
-        run: git fetch --prune --unshallow
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Fetch full Git history
+      #   run: git fetch --prune --unshallow
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Chromatic
         uses: chromaui/action@latest
