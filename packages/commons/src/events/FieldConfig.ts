@@ -9,27 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import {
-  Conditional,
-  EnableConditional,
-  HideConditional,
-  ShowConditional
-} from './Conditional'
+import { Conditional, ActionConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
 
 const FieldId = z.string()
 
-const FieldConditional = z.discriminatedUnion('type', [
-  ShowConditional,
-  HideConditional,
-  EnableConditional
-])
-
 const BaseField = z.object({
   id: FieldId,
-  conditionals: z.array(FieldConditional).default([]).optional(),
+  conditionals: z.array(ActionConditional).default([]).optional(),
   initialValue: z
     .union([
       z.string(),
@@ -133,7 +122,7 @@ const DateField = BaseField.extend({
 
 export type DateField = z.infer<typeof DateField>
 
-const HTMLFontVariant = z.enum([
+const HtmlFontVariant = z.enum([
   'reg12',
   'reg14',
   'reg16',
@@ -150,7 +139,7 @@ const Paragraph = BaseField.extend({
     .object({
       styles: z
         .object({
-          fontVariant: HTMLFontVariant.optional()
+          fontVariant: HtmlFontVariant.optional()
         })
         .optional()
     })
@@ -195,7 +184,15 @@ export type RadioGroup = z.infer<typeof RadioGroup>
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
   items: z.array(TranslationConfig).describe('A list of items'),
-  font: HTMLFontVariant
+  configuration: z
+    .object({
+      styles: z
+        .object({
+          fontVariant: HtmlFontVariant.optional()
+        })
+        .optional()
+    })
+    .default({})
 }).describe('A list of bullet points')
 
 export type BulletList = z.infer<typeof BulletList>
@@ -217,22 +214,42 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
-const LocationOptions = z.object({
-  partOf: z
-    .object({
-      $data: z.string()
-    })
-    .optional()
-    .describe('Parent location'),
-  type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
-})
+const AdministrativeAreaConfiguration = z
+  .object({
+    partOf: z
+      .object({
+        $data: z.string()
+      })
+      .optional()
+      .describe('Parent location'),
+    type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
+  })
+  .describe('Administrative area options')
+
+const AdministrativeArea = BaseField.extend({
+  type: z.literal(FieldType.ADMINISTRATIVE_AREA),
+  configuration: AdministrativeAreaConfiguration
+}).describe('Administrative area input field e.g. facility, office')
+
+export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 const Location = BaseField.extend({
-  type: z.literal(FieldType.LOCATION),
-  options: LocationOptions
-}).describe('Location input field')
+  type: z.literal(FieldType.LOCATION)
+}).describe('Input field for a location')
 
 export type Location = z.infer<typeof Location>
+
+const Facility = BaseField.extend({
+  type: z.literal(FieldType.FACILITY)
+}).describe('Input field for a facility')
+
+export type Facility = z.infer<typeof Facility>
+
+const Office = BaseField.extend({
+  type: z.literal(FieldType.OFFICE)
+}).describe('Input field for an office')
+
+export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
@@ -249,6 +266,7 @@ const Address = BaseField.extend({
 export type AllFields =
   | typeof Address
   | typeof TextField
+  | typeof TextAreaField
   | typeof DateField
   | typeof Paragraph
   | typeof RadioGroup
@@ -258,8 +276,13 @@ export type AllFields =
   | typeof Checkbox
   | typeof File
   | typeof Country
-  | typeof Location
+  | typeof AdministrativeArea
   | typeof Divider
+  | typeof Location
+  | typeof Facility
+  | typeof Office
+  | typeof SignatureField
+  | typeof EmailField
 
 /** @knipignore */
 export type Inferred =
@@ -275,9 +298,12 @@ export type Inferred =
   | z.infer<typeof Checkbox>
   | z.infer<typeof File>
   | z.infer<typeof Country>
-  | z.infer<typeof Location>
-  | z.infer<typeof SignatureField>
+  | z.infer<typeof AdministrativeArea>
   | z.infer<typeof Divider>
+  | z.infer<typeof Location>
+  | z.infer<typeof Facility>
+  | z.infer<typeof Office>
+  | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
@@ -293,17 +319,24 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Checkbox,
   File,
   Country,
+  AdministrativeArea,
+  Divider,
   Location,
+  Facility,
+  Office,
   SignatureField,
-  Divider
+  EmailField
 ]) as unknown as z.ZodType<Inferred, any, Inferred>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
+export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
-export type LocationOptions = z.infer<typeof LocationOptions>
-export type FieldConditional = z.infer<typeof FieldConditional>
+
+export type AdministrativeAreaConfiguration = z.infer<
+  typeof AdministrativeAreaConfiguration
+>

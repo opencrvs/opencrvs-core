@@ -31,7 +31,7 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return ajv.validate(schema, data)
 }
 
-export function getConditionalActionsForField(
+function getConditionalActionsForField(
   field: FieldConfig,
   values: ConditionalParameters
 ) {
@@ -43,7 +43,10 @@ export function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
-function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
+export function isFieldHidden(
+  field: FieldConfig,
+  params: ConditionalParameters
+) {
   const hasShowRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'SHOW'
   )
@@ -54,7 +57,10 @@ function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
   return !isVisible
 }
 
-function isFieldDisabled(field: FieldConfig, params: ConditionalParameters) {
+export function isFieldDisabled(
+  field: FieldConfig,
+  params: ConditionalParameters
+) {
   const hasEnableRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'ENABLE'
   )
