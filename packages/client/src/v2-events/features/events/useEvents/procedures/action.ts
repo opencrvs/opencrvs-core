@@ -289,6 +289,7 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
     throw new Error('No event action type found. This should never happen')
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mutationFn = waitUntilEventIsCreated<any, any>(
     async ({ eventType, ...params }) => {
       const eventConfiguration = eventConfigurations.find(
