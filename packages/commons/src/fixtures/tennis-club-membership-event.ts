@@ -143,10 +143,32 @@ const TENNIS_CLUB_FORM = defineForm({
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: true
+                        anyOf: [
+                          {
+                            const: 'undefined'
+                          },
+                          {
+                            const: false
+                          },
+                          {
+                            const: null
+                          },
+                          {
+                            const: ''
+                          }
+                        ]
                       }
                     },
-                    required: ['recommender.none']
+                    anyOf: [
+                      {
+                        required: ['recommender.none']
+                      },
+                      {
+                        not: {
+                          required: ['recommender.none']
+                        }
+                      }
+                    ]
                   }
                 },
                 required: ['$form']
@@ -173,10 +195,32 @@ const TENNIS_CLUB_FORM = defineForm({
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: true
+                        anyOf: [
+                          {
+                            const: 'undefined'
+                          },
+                          {
+                            const: false
+                          },
+                          {
+                            const: null
+                          },
+                          {
+                            const: ''
+                          }
+                        ]
                       }
                     },
-                    required: ['recommender.none']
+                    anyOf: [
+                      {
+                        required: ['recommender.none']
+                      },
+                      {
+                        not: {
+                          required: ['recommender.none']
+                        }
+                      }
+                    ]
                   }
                 },
                 required: ['$form']
@@ -203,10 +247,32 @@ const TENNIS_CLUB_FORM = defineForm({
                     type: 'object',
                     properties: {
                       'recommender.none': {
-                        const: true
+                        anyOf: [
+                          {
+                            const: 'undefined'
+                          },
+                          {
+                            const: false
+                          },
+                          {
+                            const: null
+                          },
+                          {
+                            const: ''
+                          }
+                        ]
                       }
                     },
-                    required: ['recommender.none']
+                    anyOf: [
+                      {
+                        required: ['recommender.none']
+                      },
+                      {
+                        not: {
+                          required: ['recommender.none']
+                        }
+                      }
+                    ]
                   }
                 },
                 required: ['$form']

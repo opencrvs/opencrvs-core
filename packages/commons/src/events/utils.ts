@@ -11,7 +11,7 @@
 
 import { TranslationConfig } from './TranslationConfig'
 
-import { flattenDeep, isEqual } from 'lodash'
+import { flattenDeep, isEqual, omitBy } from 'lodash'
 import { workqueues } from '../workqueues'
 import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
@@ -19,6 +19,9 @@ import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
+import { ActionFormData } from './ActionDocument'
+import { formatISO } from 'date-fns'
+import { isFieldHiddenOrDisabled } from '../conditionals/validate'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -162,4 +165,27 @@ export const findActiveActionFields = (
 
   /** Let caller decide whether to throw or default to empty array */
   return form?.pages.flatMap((p) => p.fields)
+}
+
+export function stripHiddenOrDisabledFields(
+  actionType: ActionType,
+  eventConfiguration: EventConfig,
+  data: ActionFormData
+) {
+  const activeFields =
+    findActiveActionFields(eventConfiguration, actionType) ?? []
+
+  const now = formatISO(new Date(), { representation: 'date' })
+
+  return omitBy(data, (_, fieldId) => {
+    const field = activeFields.find((f) => f.id === fieldId)
+
+    return (
+      !field ||
+      isFieldHiddenOrDisabled(field, {
+        $form: data,
+        $now: now
+      })
+    )
+  })
 }
