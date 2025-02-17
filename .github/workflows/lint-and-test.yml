@@ -354,8 +354,7 @@ jobs:
         with:
           workingDir: packages/client
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          exitZeroOnChanges: false # Fail workflow if changes are found. Expect manual acceptance
-          onlyChanged: true # Only test components that have changed since the last build
+          exitOnceUploaded: false # Keeps CI in 'pending' state until changes are reviewed
 
   test-client:
     name: Test client
