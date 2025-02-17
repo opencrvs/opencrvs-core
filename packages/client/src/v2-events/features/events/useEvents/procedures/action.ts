@@ -246,7 +246,7 @@ utils.event.actions.correction.reject.setMutationDefaults(
   })
 )
 
-function stripUnusedFields(
+function stripHiddenOrDisabledFields(
   actionType: ActionType,
   eventConfiguration: EventConfig,
   data: ActionFormData
@@ -302,8 +302,12 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
 
       return defaultMutationFn({
         ...params,
-        // replace data with a version where unused fields are stripped
-        data: stripUnusedFields(actionType, eventConfiguration, params.data)
+
+        data: stripHiddenOrDisabledFields(
+          actionType,
+          eventConfiguration,
+          params.data
+        )
       })
     }
   )
