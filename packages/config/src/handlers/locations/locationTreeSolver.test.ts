@@ -41,7 +41,9 @@ const lateLoadModule = async () => {
 
 describe('resolveChildren', () => {
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create()
+    mongoServer = await MongoMemoryServer.create({
+      binary: { checkMD5: false }
+    })
     const uri = mongoServer.getUri()
     OLD_ENV = process.env
     process.env.HEARTH_MONGO_URL = mongoServer.getUri()
@@ -51,7 +53,7 @@ describe('resolveChildren', () => {
 
     const db = connectedClient.db()
     collection = db.collection<Location>('Location_view_with_plain_ids')
-  })
+  }, 60000 /* Timeout to allow mongo binary download*/)
 
   afterAll(async () => {
     process.env = OLD_ENV
@@ -64,11 +66,11 @@ describe('resolveChildren', () => {
   })
 
   beforeEach(async () => {
-    collection.deleteMany({})
+    await collection.deleteMany({})
   })
 
   describe('given a location with no children', () => {
-    test.only('should return empty array', async () => {
+    test('should return empty array', async () => {
       // late import to allow env vars to be set before the module is loaded
       const resolveLocationChildren = await lateLoadModule()
 
@@ -83,7 +85,7 @@ describe('resolveChildren', () => {
   })
 
   describe('given a location with children', () => {
-    test.only('should return all descendants', async () => {
+    test('should return all descendants', async () => {
       // late import to allow env vars to be set before the module is loaded
       const resolveLocationChildren = await lateLoadModule()
 
