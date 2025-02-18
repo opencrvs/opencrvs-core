@@ -10,9 +10,9 @@
  */
 import { UUID } from '@opencrvs/commons'
 import { ServerRoute } from '@hapi/hapi'
-import { resolveLocationChildren } from './locationTreeSolver'
-import { fetchFromHearth, fetchLocations } from '@config/services/hearth'
+import { fetchFromHearth } from '@config/services/hearth'
 import { SavedLocation } from '@opencrvs/commons/types'
+import { resolveLocationChildren } from './locationTreeSolver'
 
 export const resolveChildren: ServerRoute['handler'] = async (req) => {
   const { locationId } = req.params as { locationId: UUID }
@@ -24,11 +24,11 @@ export const resolveChildren: ServerRoute['handler'] = async (req) => {
     return [location]
   }
 
-  const locations = await fetchLocations()
+  const children = await resolveLocationChildren(locationId)
 
-  return [location, ...resolveLocationChildren(location, locations)]
+  return [location, ...children]
 }
 
 function isTypeOf(location: SavedLocation, type: string) {
-  return location.type?.coding?.some((x) => x.code === type)
+  return location?.type?.coding?.some((x) => x.code === type)
 }

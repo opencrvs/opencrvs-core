@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { UUID } from '@opencrvs/commons'
-import { resolveLocationChildren } from './locationTreeSolver'
 import * as fixtures from '@opencrvs/commons/fixtures'
 import { resolveChildren } from './children'
 import { fetchFromHearth, fetchLocations } from '@config/services/hearth'
@@ -43,58 +42,5 @@ describe('resolveChildren', () => {
       expect(fetchLocations).not.toHaveBeenCalled()
       expect(res).toEqual([office])
     })
-  })
-})
-
-describe('resolveLocationChildren', () => {
-  test('empty locations', () => {
-    const uuid1 = fixtures.savedLocation({
-      id: 'uuid1' as UUID,
-      partOf: undefined
-    })
-    const result = resolveLocationChildren(uuid1, [])
-    expect(result).toEqual([])
-  })
-
-  test('parent with no children', () => {
-    const uuid1 = fixtures.savedLocation({
-      id: 'uuid1' as UUID,
-      partOf: undefined
-    })
-    const result = resolveLocationChildren(uuid1, [uuid1])
-    expect(result).toEqual([])
-  })
-
-  test('single level hierarchy', () => {
-    const uuid1 = fixtures.savedLocation({
-      id: 'uuid1' as UUID,
-      partOf: undefined
-    })
-    const uuid2 = fixtures.savedLocation({
-      id: 'uuid2' as UUID,
-      partOf: { reference: `Location/${uuid1.id}` }
-    })
-    const result = resolveLocationChildren(uuid1, [uuid1, uuid2])
-
-    expect(result).toContainEqual(uuid2)
-    expect(result).toHaveLength(1)
-  })
-
-  test('multi-level hierarchy', () => {
-    const uuid1 = fixtures.savedLocation({
-      id: 'uuid1' as UUID,
-      partOf: undefined
-    })
-    const uuid2 = fixtures.savedLocation({
-      id: 'uuid2' as UUID,
-      partOf: { reference: `Location/${uuid1.id}` }
-    })
-    const uuid3 = fixtures.savedLocation({
-      id: 'uuid3' as UUID,
-      partOf: { reference: `Location/${uuid2.id}` }
-    })
-
-    const result = resolveLocationChildren(uuid1, [uuid1, uuid2, uuid3])
-    expect(result).toEqual([uuid2, uuid3])
   })
 })
