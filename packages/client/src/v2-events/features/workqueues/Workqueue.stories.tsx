@@ -27,7 +27,6 @@ const meta: Meta<typeof WorkqueueIndex> = {
 }
 
 export default meta
-
 type Story = StoryObj<typeof WorkqueueIndex>
 
 export const Workqueue: Story = {}
