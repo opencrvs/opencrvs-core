@@ -89,7 +89,7 @@ function changeSortedColumn(
   }
 }
 
-export function WorkqueueContainer() {
+function WorkqueueContainer() {
   // @TODO: We need to revisit on how the workqueue id is passed.
   // We'll follow up during 'workqueue' feature.
   const workqueueId = 'all'
