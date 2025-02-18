@@ -143,6 +143,10 @@ function findPatient(
       Patient | RelatedPerson
     >(record, resourceIdentifierToUUID(patientSection.entry![0].reference))
 
+    if (!patientOrRelatedPerson.active) {
+      return null
+    }
+
     if (isPatient(patientOrRelatedPerson)) {
       return patientOrRelatedPerson
     }
