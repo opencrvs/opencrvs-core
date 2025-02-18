@@ -107,7 +107,7 @@ const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
   }
 `
 
-export const ZeroDocument = styled.div`
+const ZeroDocument = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   height: 700px;
   padding: 24px;
