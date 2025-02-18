@@ -44,8 +44,10 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue,
   OptionalFieldValueSchema,
+  RequiredTextValue,
   TextValue
 } from './FieldValue'
+
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
  * File is separated from FieldType and FieldConfig to avoid circular dependencies.
@@ -81,7 +83,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.OFFICE:
     case FieldType.SIGNATURE:
     case FieldType.HIDDEN:
-      schema = required ? TextValue.min(1) : TextValue
+      schema = required ? RequiredTextValue : TextValue
       break
     case FieldType.CHECKBOX:
       schema = CheckboxFieldValue

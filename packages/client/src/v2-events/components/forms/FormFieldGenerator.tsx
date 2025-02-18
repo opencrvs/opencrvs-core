@@ -628,21 +628,19 @@ class FormSectionComponent extends React.Component<AllProps> {
             >
               <Field name={field.id}>
                 {(formikFieldProps: FieldProps<any>) => {
+                  const initialValue =
+                    'initialValue' in field && field.initialValue
+
                   // If given, use default value for fresh input
                   useEffect(() => {
-                    const initialValue = field.initialValue
-
                     const shouldUseInitialValue =
-                      initialValue &&
-                      formikFieldProps.field.value === undefined && // if value is undefined, it hasn't been changed yet
-                      // TODO CIHAN: tästä eroon?
-                      typeof initialValue === 'string' // default values only support strings current
+                      initialValue && formikFieldProps.field.value === undefined
 
                     if (shouldUseInitialValue) {
                       formikFieldProps.field.value = initialValue
                       this.setFieldValuesWithDependency(field.id, initialValue)
                     }
-                  }, [field.initialValue, field.id, formikFieldProps.field])
+                  }, [initialValue, field.id, formikFieldProps.field])
 
                   return (
                     <GeneratedInputField

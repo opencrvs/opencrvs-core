@@ -13,21 +13,18 @@ import { Conditional, ActionConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
+import {
+  CheckboxFieldValue,
+  DateValue,
+  RequiredTextValue,
+  TextValue
+} from './FieldValue'
 
 const FieldId = z.string()
 
 const BaseField = z.object({
   id: FieldId,
   conditionals: z.array(ActionConditional).default([]).optional(),
-  initialValue: z
-    .union([
-      z.string(),
-      z.object({
-        dependsOn: z.array(FieldId).default([]),
-        expression: z.string()
-      })
-    ])
-    .optional(),
   required: z.boolean().default(false).optional(),
   disabled: z.boolean().default(false).optional(),
   hidden: z.boolean().default(false).optional(),
@@ -55,6 +52,8 @@ export type Divider = z.infer<typeof Divider>
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
+  // TODO CIHAN: pystyskö näis käyttää mapFieldTypeToZod?
+  initialValue: RequiredTextValue.optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -70,6 +69,7 @@ export type TextField = z.infer<typeof TextField>
 
 const TextAreaField = BaseField.extend({
   type: z.literal(FieldType.TEXTAREA),
+  initialValue: RequiredTextValue.optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -86,6 +86,7 @@ export type TextAreaField = z.infer<typeof TextAreaField>
 
 const SignatureField = BaseField.extend({
   type: z.literal(FieldType.SIGNATURE),
+  initialValue: RequiredTextValue.optional(),
   signaturePromptLabel: TranslationConfig.describe(
     'Title of the signature modal'
   ),
@@ -104,13 +105,15 @@ const SignatureField = BaseField.extend({
 export type SignatureField = z.infer<typeof SignatureField>
 
 export const EmailField = BaseField.extend({
-  type: z.literal(FieldType.EMAIL)
+  type: z.literal(FieldType.EMAIL),
+  initialValue: RequiredTextValue.optional()
 })
 
 export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
+  initialValue: DateValue.optional(),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -135,6 +138,7 @@ const HtmlFontVariant = z.enum([
 
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
+  initialValue: RequiredTextValue.optional(),
   configuration: z
     .object({
       styles: z
@@ -178,6 +182,7 @@ const SelectOption = z.object({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
+  initialValue: TextValue.optional(),
   options: z.array(SelectOption).describe('A list of options'),
   configuration: z
     .object({
@@ -194,6 +199,7 @@ export type RadioGroup = z.infer<typeof RadioGroup>
 
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
+  initialValue: RequiredTextValue.optional(),
   items: z.array(TranslationConfig).describe('A list of items'),
   configuration: z
     .object({
@@ -210,17 +216,20 @@ export type BulletList = z.infer<typeof BulletList>
 
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
+  initialValue: RequiredTextValue.optional(),
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
 const Checkbox = BaseField.extend({
-  type: z.literal(FieldType.CHECKBOX)
+  type: z.literal(FieldType.CHECKBOX),
+  initialValue: CheckboxFieldValue.optional()
 }).describe('Boolean checkbox field')
 
 export type Checkbox = z.infer<typeof Checkbox>
 
 const Country = BaseField.extend({
-  type: z.literal(FieldType.COUNTRY)
+  type: z.literal(FieldType.COUNTRY),
+  initialValue: RequiredTextValue.optional()
 }).describe('Country select field')
 
 export type Country = z.infer<typeof Country>
@@ -239,13 +248,15 @@ const AdministrativeAreaConfiguration = z
 
 const AdministrativeArea = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
-  configuration: AdministrativeAreaConfiguration
+  configuration: AdministrativeAreaConfiguration,
+  initialValue: RequiredTextValue.optional()
 }).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 const Location = BaseField.extend({
-  type: z.literal(FieldType.LOCATION)
+  type: z.literal(FieldType.LOCATION),
+  initialValue: RequiredTextValue.optional()
 }).describe('Input field for a location')
 
 export type Location = z.infer<typeof Location>
@@ -258,20 +269,21 @@ const FileUploadWithOptions = BaseField.extend({
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 const Facility = BaseField.extend({
-  type: z.literal(FieldType.FACILITY)
+  type: z.literal(FieldType.FACILITY),
+  initialValue: RequiredTextValue.optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
-  type: z.literal(FieldType.OFFICE)
+  type: z.literal(FieldType.OFFICE),
+  initialValue: RequiredTextValue.optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
-  type: z.literal(FieldType.ADDRESS),
-  initialValue: z.object({}).passthrough().optional()
+  type: z.literal(FieldType.ADDRESS)
 }).describe('Address input field – a combination of location and text fields')
 
 /*
