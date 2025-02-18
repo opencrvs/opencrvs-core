@@ -16,7 +16,7 @@ import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
 describe('useIntlFormatMessageWithFlattenedParams', () => {
   const messages = {
-    'test.message': 'Hello, {name}!',
+    'test.message': 'Hello, {name} :)',
     'test.nested': 'Your order {order.id} is confirmed.',
     'test.missing': 'This should not be missing.'
   }
@@ -37,7 +37,7 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
       { id: 'test.message', defaultMessage: 'Hello, {name}!' },
       { name: 'John' }
     )
-    expect(formattedMessage).toBe('Hello, John!')
+    expect(formattedMessage).toBe('Hello, John :)')
   })
 
   it('formats a message with flattened parameters', () => {
