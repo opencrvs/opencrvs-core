@@ -33,6 +33,11 @@ const config: StorybookConfig = {
     options: {}
   },
   viteFinal: (config) => {
+    /*
+     * Remove Vite PWA plugin from the Storybook build.
+     * If we wouldn't do this, MSW and the PWA plugin would have to compete
+     * for the service worker file as there can only be one service worker.
+     */
     config.plugins = config.plugins?.filter((plugins) => {
       const list = Array.isArray(plugins) ? plugins : [plugins]
       return !list

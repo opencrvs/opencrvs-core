@@ -167,6 +167,17 @@ export const findActiveActionFields = (
   return form?.pages.flatMap((p) => p.fields)
 }
 
+export function getEventConfiguration(
+  eventConfigurations: EventConfig[],
+  type: string
+): EventConfig {
+  const config = eventConfigurations.find((config) => config.id === type)
+  if (!config) {
+    throw new Error(`Event configuration not found for type: ${type}`)
+  }
+  return config
+}
+
 export function stripHiddenOrDisabledFields(
   actionType: ActionType,
   eventConfiguration: EventConfig,
