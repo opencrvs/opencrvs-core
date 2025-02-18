@@ -11,6 +11,10 @@ get_abs_filename() {
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
+echo "The value of CI is: ${CI:-not set}"
+
+exit 1
+
 write=false
 outdated=false
 
@@ -33,7 +37,6 @@ for i in "$@"; do
   esac
 done
 
-echo "The value of CI is: $CI"
 
 if [ -z "$COUNTRY_CONFIG_PATH" ] ; then
   echo 'The Environment variable COUNTRY_CONFIG_PATH must be set in your Terminal, '
