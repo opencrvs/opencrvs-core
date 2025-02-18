@@ -22,6 +22,7 @@ import {
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
+import { random } from 'lodash'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -83,7 +84,34 @@ export const handlers = {
         </svg>
       `
 
-      return new HttpResponse(svgImage, {
+      const tree = `
+        <svg width="150" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="65" y="100" width="20" height="60" fill="#8B4513" />
+        <circle cx="75" cy="80" r="40" fill="green" />
+        <circle cx="55" cy="90" r="30" fill="darkgreen" />
+        <circle cx="95" cy="90" r="30" fill="darkgreen" />
+        <circle cx="75" cy="60" r="30" fill="darkgreen" />
+        </svg>`
+
+      const fish = `
+        <svg width="150" height="100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="75" cy="50" rx="50" ry="30" fill="#1E90FF" />
+        <polygon points="115,50 135,35 135,65" fill="#4682B4" />
+        <circle cx="55" cy="40" r="5" fill="white" />
+        <path d="M55,50 Q65,40 75,50 Q65,60 55,50" fill="lightblue" />
+        </svg>`
+
+      const mountain = `
+          <svg width="200" height="150" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="80" y="70" fill="#98FB98" />
+          <polygon points="50,70 100,20 150,70" fill="#A9A9A9" />
+          <polygon points="70,70 120,30 170,70" fill="#808080" />
+          <circle cx="30" cy="30" r="20" fill="#FFD700" />
+          </svg>`
+
+      const mockImages = [svgImage, tree, fish, mountain]
+
+      return new HttpResponse(mockImages[random(0, mockImages.length)], {
         headers: {
           'Content-Type': 'image/svg+xml',
           'Cache-Control': 'no-cache'

@@ -59,14 +59,18 @@ export function Review() {
 
   async function handleEdit({
     pageId,
-    fieldId
+    fieldId,
+    confirmation
   }: {
     pageId: string
     fieldId?: string
+    confirmation?: boolean
   }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close} />
-    ))
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close} />
+      )))
 
     if (confirmedEdit) {
       navigate(
@@ -104,6 +108,7 @@ export function Review() {
         eventConfig={config}
         form={form}
         formConfig={formConfig}
+        isUploadButtonVisible={true}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(actionConfig.label, {
           ...initialValues,
