@@ -20,7 +20,7 @@ async function uploadFile({
 }: {
   file: File
   transactionId: string
-  optionKey: string
+  id: string
 }): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
@@ -155,7 +155,7 @@ interface Options {
     originalFilename: string
     type: string
     filename: string
-    option: string
+    id: string
   }) => void
 }
 
@@ -163,7 +163,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   const upload = useMutation({
     mutationFn: uploadFile,
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, transactionId, optionKey }) => {
+    onMutate: async ({ file, transactionId, id }) => {
       const extension = file.name.split('.').pop()
       const temporaryUrl = `${transactionId}.${extension}`
 
@@ -174,7 +174,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
         originalFilename: file.name,
         type: file.type,
         filename: temporaryUrl,
-        option: optionKey
+        id
       })
     }
   })
@@ -192,11 +192,20 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     deleteFile: (filename: string) => {
       return del.mutate({ filename })
     },
-    uploadFiles: (file: File, optionKey?: string) => {
+    /**
+     * Uploads a file with an optional identifier.
+     *
+     * @param {File} file - The file to be uploaded.
+     * @param {string} [id='default'] - An optional identifier for the file.
+     * This allows the caller to track the file when its upload completes.
+     *
+     * @returns {Promise} A promise representing the upload operation.
+     */
+    uploadFile: (file: File, id = 'default') => {
       return upload.mutate({
         file,
         transactionId: uuid(),
-        optionKey: optionKey ?? 'default'
+        id
       })
     }
   }

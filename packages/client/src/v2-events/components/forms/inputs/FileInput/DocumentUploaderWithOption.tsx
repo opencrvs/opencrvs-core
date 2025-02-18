@@ -94,19 +94,19 @@ function DocumentUploaderWithOption({
     return label && intl.formatMessage(label)
   }
 
-  const { uploadFiles, deleteFile: deleteFileFromBackend } = useFileUpload(
+  const { uploadFile, deleteFile: deleteFileFromBackend } = useFileUpload(
     name,
     {
-      onSuccess: ({ type, originalFilename, filename, option }) => {
+      onSuccess: ({ type, originalFilename, filename, id }) => {
         const newFile = {
           filename,
           originalFilename: originalFilename,
           type: type,
-          option: option
+          option: id
         }
 
         setFilesBeingProcessed((prev) =>
-          prev.filter(({ label }) => label !== option)
+          prev.filter(({ label }) => label !== id)
         )
 
         setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
@@ -206,7 +206,7 @@ function DocumentUploaderWithOption({
                   { label: selectedOption }
                 ])
 
-                uploadFiles(newFile, selectedOption)
+                uploadFile(newFile, selectedOption)
               } else {
                 setErrorMessage(documentTypeRequiredErrorMessage)
               }
