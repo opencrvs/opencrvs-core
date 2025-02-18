@@ -50,7 +50,7 @@ function convertDotToTripleUnderscore(obj: ActionFormData, parentKey = '') {
  * Replace dots with triple underscores within the curly braces.
  * This is needed to support dot notation in the message variables.
  */
-function convertDotInCurlyBraces(str: string): string {
+export function convertDotInCurlyBraces(str: string): string {
   return str.replace(/{([^}]+)}/g, (match, content) => {
     // Replace dots with triple underscores within the curly braces
     const transformedContent = content.replace(/\./g, INTERNAL_SEPARATOR)

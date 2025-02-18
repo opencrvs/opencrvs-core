@@ -14,6 +14,17 @@ import { IntlProvider } from 'react-intl'
 import { getLanguage, getMessages } from '@client/i18n/selectors'
 import { IStoreState } from '@client/store'
 import { IntlMessages } from '@client/i18n/reducer'
+import { convertDotInCurlyBraces } from '@client/v2-events/features/workqueues/utils'
+
+const convertDotsInMessages = (messages: IntlMessages) => {
+  const updatedMessages: IntlMessages = {}
+  for (const key in messages) {
+    if (messages.hasOwnProperty(key)) {
+      updatedMessages[key] = convertDotInCurlyBraces(messages[key])
+    }
+  }
+  return updatedMessages
+}
 
 type StateProps = {
   locale: string
@@ -24,7 +35,7 @@ const mapStateToProps = (state: IStoreState): StateProps => {
   const locale = getLanguage(state)
   return {
     locale,
-    messages: getMessages(state)
+    messages: convertDotsInMessages(getMessages(state))
   }
 }
 
