@@ -96,12 +96,40 @@ const zodToIntlErrorMap = (
     }
   }
 
+  if (issue.code === 'invalid_string' && issue.validation === 'email') {
+    return {
+      message: {
+        message: {
+          defaultMessage: 'Invalid email address',
+          description: 'This is the error message for invalid email fields',
+          id: 'v2.error.invalidEmail'
+        }
+      }
+    }
+  }
+
+  if (
+    issue.code === 'invalid_type' &&
+    issue.expected !== issue.received &&
+    issue.received === 'undefined'
+  ) {
+    return {
+      message: {
+        message: {
+          defaultMessage: 'Required for registration',
+          description: 'This is the error message for required fields',
+          id: 'v2.error.required'
+        }
+      }
+    }
+  }
+
   return {
     message: {
       message: {
-        defaultMessage: 'Required for registration',
-        description: 'This is the error message for required fields',
-        id: 'v2.error.required'
+        defaultMessage: 'Invalid input',
+        description: 'This is the error message for invalid field value',
+        id: 'v2.error.invalid'
       }
     }
   }

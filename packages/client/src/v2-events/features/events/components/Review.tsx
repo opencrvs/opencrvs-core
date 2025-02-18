@@ -255,6 +255,7 @@ function ReviewComponent({
                             const valueDisplay = (
                               <Output
                                 field={field}
+                                form={form}
                                 previousValue={previousValue}
                                 showPreviouslyMissingValuesAsChanged={
                                   showPreviouslyMissingValuesAsChanged

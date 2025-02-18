@@ -53,7 +53,8 @@ import {
   isSelectFieldType,
   isSignatureFieldType,
   isTextAreaFieldType,
-  isTextFieldType
+  isTextFieldType,
+  isEmailFieldType
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -239,6 +240,20 @@ const GeneratedInputField = React.memo(
         >
           <Text.Input
             type={field.config.configuration?.type ?? 'text'}
+            {...inputProps}
+            isDisabled={disabled}
+            maxLength={field.config.configuration?.maxLength}
+            value={field.value}
+          />
+        </InputField>
+      )
+    }
+
+    if (isEmailFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Text.Input
+            type="email"
             {...inputProps}
             isDisabled={disabled}
             maxLength={field.config.configuration?.maxLength}

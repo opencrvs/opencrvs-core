@@ -11,6 +11,7 @@
 
 import React from 'react'
 import styled from 'styled-components'
+import { useIntl } from 'react-intl'
 import {
   FieldConfig,
   FieldValue,
@@ -24,9 +25,12 @@ import {
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
+  isEmailFieldType,
   isSelectFieldType,
   isAddressFieldType,
-  isTextFieldType
+  isTextFieldType,
+  getFieldValidationErrors,
+  ActionFormData
 } from '@opencrvs/commons/client'
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -42,6 +46,15 @@ import {
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
+`
+const ValidationError = styled.span`
+  color: ${({ theme }) => theme.colors.negative};
+  display: inline-block;
+  text-transform: lowercase;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
 `
 
 interface FieldWithValue {
@@ -92,6 +105,10 @@ function ValueOutput(field: FieldWithValue) {
     return <Checkbox.Output value={field.value} />
   }
 
+  if (isEmailFieldType(field)) {
+    return <DefaultOutput value={field.value} />
+  }
+
   if (isAddressFieldType(field)) {
     return <Address.Output value={field.value} />
   }
@@ -124,16 +141,27 @@ function getEmptyValueForFieldType(field: FieldWithValue) {
 }
 
 export function Output({
+  form,
   field,
   value,
   previousValue,
   showPreviouslyMissingValuesAsChanged = true
 }: {
+  form: ActionFormData
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
+  const intl = useIntl()
+  const error = getFieldValidationErrors({ field, values: form })
+  if (error.errors.length > 0) {
+    return (
+      <ValidationError>
+        {intl.formatMessage(error.errors[0].message)}
+      </ValidationError>
+    )
+  }
   if (!value) {
     if (previousValue) {
       return <ValueOutput config={field} value={previousValue} />
