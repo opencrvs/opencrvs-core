@@ -32,6 +32,7 @@ const config: StorybookConfig = {
     name: getAbsolutePath('@storybook/react-vite'),
     options: {}
   },
+  staticDirs: ['../public'],
   viteFinal: (config) => {
     config.plugins = config.plugins?.filter((plugins) => {
       const list = Array.isArray(plugins) ? plugins : [plugins]
