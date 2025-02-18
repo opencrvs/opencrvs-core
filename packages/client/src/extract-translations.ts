@@ -186,16 +186,14 @@ async function extractMessages() {
     console.log(extraKeys.join('\n'))
   }
 
-  console.log(chalk.blue(`CI environment variable is set to: ${process.env.CI}`))
   if (missingKeys.length > 0) {
     // eslint-disable-line no-console
-    if (!process.env.CI) {
-      console.log(chalk.red.bold('Missing translations'))
-      console.log(`You are missing the following content keys from your country configuration package:\n
-  ${chalk.white(missingKeys.join('\n'))}\n
-  Translate the keys and add them to this file:
-  ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
-    }
+    console.log(chalk.red.bold('Missing translations'))
+    console.log(chalk.red.bold(`The value of CI is: ${process.env.CI}`))
+    console.log(`You are missing the following content keys from your country configuration package:\n
+${chalk.white(missingKeys.join('\n'))}\n
+Translate the keys and add them to this file:
+${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
 
     if (write) {
       console.log(

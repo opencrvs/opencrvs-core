@@ -55,9 +55,8 @@ jobs:
         git checkout $acting_branch
         yarn install
         cd ./packages/client
-        yarn extract:translations
-      env:
-        CI: true
+        CI="true" yarn extract:translations
+     
 
         
         
