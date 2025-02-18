@@ -32,6 +32,7 @@ const config: StorybookConfig = {
     name: getAbsolutePath('@storybook/react-vite'),
     options: {}
   },
+  staticDirs: ['../public'],
   viteFinal: (config) => {
     /*
      * Remove Vite PWA plugin from the Storybook build.
