@@ -201,5 +201,6 @@ export const birthEvent = {
       filters: []
     }
   ],
-  deduplication: []
+  deduplication: [],
+  advancedSearch: []
 } satisfies EventConfig
