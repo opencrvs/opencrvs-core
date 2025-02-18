@@ -838,6 +838,19 @@ function createInformantType(
     fhirBundle
   )
 
+  const currentInformantRelationship =
+    relatedPersonResource.relationship?.coding?.find(
+      ({ system }) =>
+        system === 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype'
+    )?.code
+
+  if (
+    currentInformantRelationship &&
+    currentInformantRelationship !== fieldValue
+  ) {
+    relatedPersonResource.patient = undefined
+  }
+
   if (fieldValue !== 'OTHER') {
     relatedPersonResource.relationship = {
       coding: [
