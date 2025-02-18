@@ -237,11 +237,11 @@ function ReviewComponent({
   onEdit: ({
     pageId,
     fieldId,
-    skipConfirmation
+    confirmation
   }: {
     pageId: string
     fieldId?: string
-    skipConfirmation?: boolean
+    confirmation?: boolean
   }) => void
   title: string
   isUploadButtonVisible?: boolean
@@ -491,7 +491,7 @@ function ReviewComponent({
                         e.stopPropagation()
                         onEdit({
                           pageId: pagesWithFile[0],
-                          skipConfirmation: true
+                          confirmation: true
                         })
                       }}
                     >

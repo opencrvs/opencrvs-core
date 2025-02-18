@@ -82,14 +82,14 @@ export function Review() {
   async function handleEdit({
     pageId,
     fieldId,
-    skipConfirmation
+    confirmation
   }: {
     pageId: string
     fieldId?: string
-    skipConfirmation?: boolean
+    confirmation?: boolean
   }) {
     const confirmedEdit =
-      skipConfirmation ||
+      confirmation ||
       (await openModal<boolean | null>((close) => (
         <ReviewComponent.EditModal close={close} />
       )))
