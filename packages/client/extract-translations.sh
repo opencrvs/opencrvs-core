@@ -33,6 +33,8 @@ for i in "$@"; do
   esac
 done
 
+echo "The value of CI is: $CI"
+
 if [ -z "$COUNTRY_CONFIG_PATH" ] ; then
   echo 'The Environment variable COUNTRY_CONFIG_PATH must be set in your Terminal, '
   echo 'so we can check that your country configuration has all necessary translations.'
