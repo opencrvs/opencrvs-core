@@ -143,10 +143,6 @@ function findPatient(
       Patient | RelatedPerson
     >(record, resourceIdentifierToUUID(patientSection.entry![0].reference))
 
-    if (!patientOrRelatedPerson.active) {
-      return null
-    }
-
     if (isPatient(patientOrRelatedPerson)) {
       return patientOrRelatedPerson
     }
@@ -282,6 +278,24 @@ export const typeResolvers: GQLResolver = {
         return marriageExtension.valueInteger
       }
       return marriageExtension.valueString
+    },
+    birthDate: (person: Patient) => {
+      if (!person.active) {
+        return null
+      }
+      return person.birthDate
+    },
+    identifier: (person: Patient) => {
+      if (!person.active) {
+        return null
+      }
+      return person.identifier
+    },
+    address: (person: Patient) => {
+      if (!person.active) {
+        return null
+      }
+      return person.address
     },
     maritalStatus: (person: Patient) => {
       return !person.active
