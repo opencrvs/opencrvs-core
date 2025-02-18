@@ -19,6 +19,9 @@ import { ROUTES } from '@client/v2-events/routes'
 const meta: Meta<typeof WorkqueueIndex> = {
   title: 'Workqueue',
   component: WorkqueueIndex,
+  args: {
+    workqueueId: 'all'
+  },
   decorators: [
     (Story) => (
       <TRPCProvider>
