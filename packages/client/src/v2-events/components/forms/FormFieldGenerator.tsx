@@ -15,7 +15,7 @@ import { TEXT } from '@client/forms'
 import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
-import * as React from 'react'
+import React, { useEffect, useCallback } from 'react'
 
 import styled, { keyframes } from 'styled-components'
 import {
@@ -175,13 +175,13 @@ const GeneratedInputField = React.memo(
         intl.formatMessage(fieldDefinition.placeholder)
     }
 
-    const handleFileChange = React.useCallback(
+    const handleFileChange = useCallback(
       (value: FileFieldValue | undefined) =>
         setFieldValue(fieldDefinition.id, value),
       [fieldDefinition.id, setFieldValue]
     )
 
-    const handleFileWithOptionChange = React.useCallback(
+    const handleFileWithOptionChange = useCallback(
       (value: FileFieldWithOptionValue | undefined) =>
         setFieldValue(fieldDefinition.id, value),
       [fieldDefinition.id, setFieldValue]
@@ -194,7 +194,7 @@ const GeneratedInputField = React.memo(
     const field = {
       inputFieldProps,
       config: fieldDefinition,
-      value
+      value: value
     }
 
     if (isDateFieldType(field)) {
@@ -628,6 +628,27 @@ class FormSectionComponent extends React.Component<AllProps> {
             >
               <Field name={field.id}>
                 {(formikFieldProps: FieldProps<any>) => {
+                  const isTouched = touched[field.id] || false
+                  const initialValue = field.initialValue as string | undefined
+
+                  const shouldUseInitialValue =
+                    formikFieldProps.field.value === undefined && // if value is undefined, it hasn't been changed yet
+                    !isTouched &&
+                    initialValue &&
+                    typeof initialValue === 'string' // default values only support strings current
+
+                  useEffect(() => {
+                    if (shouldUseInitialValue) {
+                      formikFieldProps.field.value = initialValue
+                      this.setFieldValuesWithDependency(field.id, initialValue)
+                    }
+                  }, [
+                    shouldUseInitialValue,
+                    initialValue,
+                    field.id,
+                    formikFieldProps.field
+                  ])
+
                   return (
                     <GeneratedInputField
                       fieldDefinition={field}
