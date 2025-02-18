@@ -86,7 +86,8 @@ export function useIntlFormatMessageWithFlattenedParams() {
     if (!formatted || typeof formatted !== 'string') {
       return ''
     }
-
+    // When multiple variables are provided, we trim to ensure empty content in case both are missing.
+    // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
     return formatted.trim()
   }
 
