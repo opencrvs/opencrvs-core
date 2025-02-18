@@ -630,14 +630,12 @@ class FormSectionComponent extends React.Component<AllProps> {
                 {(formikFieldProps: FieldProps<any>) => {
                   // If given, use default value for fresh input
                   useEffect(() => {
-                    // TODO this type sucks
-                    const initialValue = field.initialValue as
-                      | string
-                      | undefined
+                    const initialValue = field.initialValue
 
                     const shouldUseInitialValue =
                       initialValue &&
                       formikFieldProps.field.value === undefined && // if value is undefined, it hasn't been changed yet
+                      // TODO CIHAN: tästä eroon?
                       typeof initialValue === 'string' // default values only support strings current
 
                     if (shouldUseInitialValue) {
