@@ -11,14 +11,22 @@
 import { UUID } from '@opencrvs/commons'
 import * as fixtures from '@opencrvs/commons/fixtures'
 import { resolveChildren } from './children'
-import { fetchFromHearth, fetchLocations } from '@config/services/hearth'
+import { fetchFromHearth } from '@config/services/hearth'
+import { resolveLocationChildren } from './locationTreeSolver'
 
 jest.mock('@config/services/hearth', () => ({
-  fetchFromHearth: jest.fn(),
-  fetchLocations: jest.fn()
+  fetchFromHearth: jest.fn()
+}))
+
+jest.mock('./locationTreeSolver', () => ({
+  resolveLocationChildren: jest.fn()
 }))
 
 const fetchFromHearthMock = fetchFromHearth as jest.Mock
+const resolveLocationChildrenMock = resolveLocationChildren as jest.Mock
+
+// Cast handler to make it callable
+const handler = resolveChildren as unknown as (req: Request) => Promise<any>
 
 describe('resolveChildren', () => {
   describe('given a location of type office', () => {
@@ -32,15 +40,32 @@ describe('resolveChildren', () => {
 
       const req = { params: { locationId: office.id } } as any
 
-      // Cast handler to make it callable
-      const handler = resolveChildren as unknown as (
-        req: Request
-      ) => Promise<any>
+      const res = await handler(req)
+
+      expect(resolveLocationChildrenMock).not.toHaveBeenCalled()
+      expect(res).toEqual([office])
+    })
+  })
+
+  describe('given a location with children', () => {
+    test('should return location and children', async () => {
+      const parent = fixtures.savedLocation({
+        id: 'uuid1' as UUID,
+        type: { coding: [{ code: 'ADMIN_STRUCTURE' }] }
+      })
+
+      fetchFromHearthMock.mockResolvedValue(parent)
+
+      const child1 = fixtures.savedLocation({ id: 'uuid2' as UUID })
+      const child2 = fixtures.savedLocation({ id: 'uuid3' as UUID })
+
+      resolveLocationChildrenMock.mockResolvedValue([child1, child2])
+
+      const req = { params: { locationId: parent.id } } as any
 
       const res = await handler(req)
 
-      expect(fetchLocations).not.toHaveBeenCalled()
-      expect(res).toEqual([office])
+      expect(res).toEqual([parent, child1, child2])
     })
   })
 })
