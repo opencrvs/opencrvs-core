@@ -30,6 +30,7 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
+import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { Output } from './Output'
 
 const Row = styled.div<{
@@ -185,10 +186,10 @@ function ReviewComponent({
   eventConfig: EventConfig
   formConfig: FormConfig
   form: ActionFormData
+  metadata?: ActionFormData
   previousFormValues?: EventIndex['data']
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
-  metadata?: ActionFormData
   onMetadataChange?: (values: ActionFormData) => void
 }) {
   const intl = useIntl()
@@ -374,14 +375,26 @@ const ActionContainer = styled.div`
     margin-bottom: 8px;
   }
 `
+const incompleteFormWarning: MessageDescriptor = {
+  id: 'v2.reviewAction.incompleteForm',
+  defaultMessage:
+    'Please add mandatory information correctly before registering.',
+  description: 'The label for warning of incomplete form'
+}
 
 function PreviewActionComponent({
   onConfirm,
+  formConfig,
+  form,
+  metadata,
   onReject,
   messages
 }: {
   onConfirm: () => void
   onReject?: () => void
+  formConfig: FormConfig
+  form: ActionFormData
+  metadata?: ActionFormData
   messages: {
     title: MessageDescriptor
     description: MessageDescriptor
@@ -389,14 +402,29 @@ function PreviewActionComponent({
   }
 }) {
   const intl = useIntl()
+  const hasValidationErrors = formConfig.pages.some((page) => {
+    const fieldErrors = getValidationErrorsForForm(page.fields, form)
+    return Object.values(fieldErrors).some((field) => field.errors.length > 0)
+  })
+  const hasMetadataValidationErrors = Object.values(
+    getValidationErrorsForForm(formConfig.review.fields, metadata ?? {})
+  ).some((field) => field.errors.length > 0)
+
+  const errorExist = hasValidationErrors || hasMetadataValidationErrors
+  const background = errorExist ? 'error' : 'success'
+  const descriptionMessage = errorExist
+    ? incompleteFormWarning
+    : messages.description
+
   return (
     <Container>
-      <UnderLayBackground background="success">
+      <UnderLayBackground background={background}>
         <Content>
           <Title>{intl.formatMessage(messages.title)}</Title>
-          <Description>{intl.formatMessage(messages.description)}</Description>
+          <Description>{intl.formatMessage(descriptionMessage)}</Description>
           <ActionContainer>
             <Button
+              disabled={errorExist}
               id="validateDeclarationBtn"
               size="large"
               type="positive"

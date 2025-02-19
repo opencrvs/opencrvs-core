@@ -35,7 +35,7 @@ import { FormLayout } from '@client/v2-events/layouts/form'
 const messages = defineMessages({
   reviewActionTitle: {
     id: 'v2.reviewAction.title',
-    defaultMessage: 'Declare member',
+    defaultMessage: 'Declare event',
     description: 'The title for review action'
   },
   reviewActionDescription: {
@@ -210,11 +210,14 @@ export function Review() {
         onMetadataChange={(values) => setMetadata(eventId, values)}
       >
         <ReviewComponent.Actions
+          form={form}
+          formConfig={formConfigs[0]}
           messages={{
             title: messages.reviewActionTitle,
             description: messages.reviewActionDescription,
             onConfirm: messages.reviewActionDeclare
           }}
+          metadata={metadata}
           onConfirm={handleDeclaration}
           onReject={handleReject}
         />
