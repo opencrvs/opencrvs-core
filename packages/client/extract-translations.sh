@@ -11,8 +11,6 @@ get_abs_filename() {
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
-echo "The value of CI is: ${CI}"
-
 write=false
 outdated=false
 
