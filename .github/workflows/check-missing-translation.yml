@@ -31,6 +31,7 @@ jobs:
         cd $HOME/countryconfig
         git clone https://github.com/opencrvs/opencrvs-countryconfig.git
         cd opencrvs-countryconfig
+        working_branch='develop'
         if [ -z "$(git branch -a | grep ${{ github.head_ref }})" ]; then
           echo "Branch ${{ github.head_ref }} does not exist in countryconfig, we will use the develop branch"
           echo "working_branch='develop'" >> $GITHUB_OUTPUT
@@ -39,6 +40,7 @@ jobs:
           echo "working_branch='${{ github.head_ref }}'" >> $GITHUB_OUTPUT
         fi
         echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
+        echo "the value of working branch is $working_branch"
         git checkout $working_branch
         cc_branch=$(git branch --show-current)
         echo "Current branch in CC after checkout is: $cc_branch"
