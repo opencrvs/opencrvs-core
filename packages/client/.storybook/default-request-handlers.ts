@@ -352,7 +352,7 @@ export const handlers = {
         return response
       }
 
-      const svgImage = `
+      const defaultFile = `
         <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3 6C3 4.34315 4.34315 3 6 3H14C15.6569 3 17 4.34315 17 6V14C17 15.6569 15.6569 17 14 17H6C4.34315 17 3 15.6569 3 14V6Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M21 7V18C21 19.6569 19.6569 21 18 21H7" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -385,9 +385,25 @@ export const handlers = {
           <circle cx="30" cy="30" r="20" fill="#FFD700" />
           </svg>`
 
-      const mockImages = [svgImage, tree, fish, mountain]
+      const url = new URL(request.request.url)
+      const basename = url.pathname.split('/').pop()
 
-      return new HttpResponse(mockImages[random(0, mockImages.length)], {
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = tree
+          break
+        case 'fish.svg':
+          file = fish
+          break
+        case 'mountain.svg':
+          file = mountain
+          break
+        default:
+          file = defaultFile
+      }
+
+      return new HttpResponse(file, {
         headers: {
           'Content-Type': 'image/svg+xml',
           'Cache-Control': 'no-cache'
