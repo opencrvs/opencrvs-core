@@ -11,7 +11,6 @@
 import { z } from 'zod'
 
 export const TextValue = z.string()
-export const RequiredTextValue = TextValue.min(1)
 
 export const DateValue = z
   .string()
