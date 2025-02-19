@@ -41,17 +41,7 @@ jobs:
           echo "working_branch='${{ github.head_ref }}'" >> $GITHUB_OUTPUT
         fi
         echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
-        echo "the value of working branch is $working_branch"
         git checkout $working_branch
-        cc_branch=$(git branch --show-current)
-        echo "Current branch in CC after checkout is: $cc_branch"
-    
-    - name: Debugging the cc branch
-      run: |
-        cc_path=${{steps.set_branch.outputs.countryconfig_path}}
-        cd $cc_path
-        current_branch=$(git branch --show-current)
-        echo "Current branch is: $current_branch"
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -68,7 +58,7 @@ jobs:
         git checkout $acting_branch
         yarn install
         cd ./packages/client
-        CI="true" yarn extract:translations
+        CI=true yarn extract:translations
      
 
         

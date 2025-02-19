@@ -51,6 +51,7 @@ type CSVRow = { id: string; description: string } & Record<string, string>
 
 const write = process.argv.includes('--write')
 const outdated = process.argv.includes('--outdated')
+const CI = process.argv.includes('--CI')
 
 const COUNTRY_CONFIG_PATH = process.argv[2]
 
@@ -173,6 +174,13 @@ async function extractMessages() {
     (key) => !translations.find(({ id }) => id === key)
   )
 
+  const missingKeysDesc = missingKeys.map((key) => ({
+    id: key,
+    description: reactIntlDescriptions[key]
+  }))
+
+
+
   if (outdated) {
     const extraKeys = translations
       .map(({ id }) => id)
@@ -186,15 +194,24 @@ async function extractMessages() {
     console.log(extraKeys.join('\n'))
   }
 
-  console.log(chalk.red.bold(process.env.CI || 'undefined'))
-  
+
+
   if (missingKeys.length > 0) {
     // eslint-disable-line no-console
     console.log(chalk.red.bold('Missing translations '))
-    console.log(`You are missing the following content keys from your country configuration package:\n
-${chalk.white(missingKeys.join('\n'))}\n
+    if(CI) {
+      console.log(`You are missing the following content keys from your country configuration package:\n
+${chalk.white(missingKeysDesc.join('\n'))}\n
 Translate the keys and add them to this file:
 ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
+    }
+    
+    if(!CI) {
+      console.log(`You are missing the following content keys from your country configuration package:\n
+  ${chalk.white(missingKeys.join('\n'))}\n
+  Translate the keys and add them to this file:
+  ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
+    }
 
     if (write) {
       console.log(
