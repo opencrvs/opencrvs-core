@@ -44,7 +44,6 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue,
   OptionalFieldValueSchema,
-  RequiredTextValue,
   TextValue
 } from './FieldValue'
 
@@ -83,7 +82,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.OFFICE:
     case FieldType.SIGNATURE:
     case FieldType.HIDDEN:
-      schema = required ? RequiredTextValue : TextValue
+      schema = required ? TextValue.min(1) : TextValue
       break
     case FieldType.CHECKBOX:
       schema = CheckboxFieldValue
