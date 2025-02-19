@@ -22,6 +22,7 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
+import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -112,9 +113,10 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const { forms: formConfigs } = config.actions.filter(
-    (action) => action.type === 'DECLARE'
-  )[0]
+  const formConfig = findActiveActionForm(config, ActionType.DECLARE)
+  if (!formConfig) {
+    throw new Error('No active form configuration found for declare action')
+  }
 
   const form = useEventFormData((state) => state.formValues)
   const { setMetadata, getMetadata } = useEventMetadata()
@@ -201,13 +203,13 @@ export function Review() {
     >
       <ReviewComponent.Body
         eventConfig={config}
-        formConfig={formConfigs[0]}
+        formConfig={formConfig}
         // eslint-disable-next-line
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         isUploadButtonVisible={true}
         // @todo: Update to use dynamic title
-        title={intl.formatMessage(formConfigs[0].review.title, {
+        title={intl.formatMessage(formConfig.review.title, {
           firstname: form['applicant.firstname'] as string,
           surname: form['applicant.surname'] as string
         })}
@@ -216,7 +218,7 @@ export function Review() {
       >
         <ReviewComponent.Actions
           form={form}
-          formConfig={formConfigs[0]}
+          formConfig={formConfig}
           messages={{
             title: messages.reviewActionTitle,
             description: messages.reviewActionDescription,

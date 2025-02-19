@@ -11,7 +11,8 @@
 import {
   FieldConfig,
   getFieldValidationErrors,
-  ActionFormData
+  ActionFormData,
+  FormConfig
 } from '@opencrvs/commons/client'
 import { IValidationResult } from '@client/utils/validate'
 
@@ -46,4 +47,20 @@ export function getValidationErrorsForForm(
           },
     {}
   )
+}
+
+export function validationErrorsInActionFormExist(
+  formConfig: FormConfig,
+  form: ActionFormData,
+  metadata?: ActionFormData
+): boolean {
+  const hasValidationErrors = formConfig.pages.some((page) => {
+    const fieldErrors = getValidationErrorsForForm(page.fields, form)
+    return Object.values(fieldErrors).some((field) => field.errors.length > 0)
+  })
+  const hasMetadataValidationErrors = Object.values(
+    getValidationErrorsForForm(formConfig.review.fields, metadata ?? {})
+  ).some((field) => field.errors.length > 0)
+
+  return hasValidationErrors || hasMetadataValidationErrors
 }

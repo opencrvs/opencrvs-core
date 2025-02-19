@@ -40,7 +40,7 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
-import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
@@ -591,15 +591,11 @@ function PreviewActionComponent({
   }
 }) {
   const intl = useIntl()
-  const hasValidationErrors = formConfig.pages.some((page) => {
-    const fieldErrors = getValidationErrorsForForm(page.fields, form)
-    return Object.values(fieldErrors).some((field) => field.errors.length > 0)
-  })
-  const hasMetadataValidationErrors = Object.values(
-    getValidationErrorsForForm(formConfig.review.fields, metadata ?? {})
-  ).some((field) => field.errors.length > 0)
-
-  const errorExist = hasValidationErrors || hasMetadataValidationErrors
+  const errorExist = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
   const background = errorExist ? 'error' : 'success'
   const descriptionMessage = errorExist
     ? incompleteFormWarning
