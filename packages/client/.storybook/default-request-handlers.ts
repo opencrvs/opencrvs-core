@@ -56,6 +56,282 @@ export const handlers = {
       return [tennisClubMembershipEventIndex]
     })
   ],
+  getUserRoles: [
+    graphql.query('getUserRoles', () => {
+      return HttpResponse.json({
+        data: {
+          getUserRoles: [
+            {
+              id: 'FIELD_AGENT',
+              label: {
+                id: 'userRole.fieldAgent',
+                defaultMessage: 'Field Agent',
+                description: 'Name for user role Field Agent',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'POLICE_OFFICER',
+              label: {
+                id: 'userRole.policeOfficer',
+                defaultMessage: 'Police Officer',
+                description: 'Name for user role Police Officer',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'SOCIAL_WORKER',
+              label: {
+                id: 'userRole.socialWorker',
+                defaultMessage: 'Social Worker',
+                description: 'Name for user role Social Worker',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'HEALTHCARE_WORKER',
+              label: {
+                id: 'userRole.healthcareWorker',
+                defaultMessage: 'Healthcare Worker',
+                description: 'Name for user role Healthcare Worker',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_LEADER',
+              label: {
+                id: 'userRole.localLeader',
+                defaultMessage: 'Local Leader',
+                description: 'Name for user role Local Leader',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'REGISTRATION_AGENT',
+              label: {
+                id: 'userRole.registrationAgent',
+                defaultMessage: 'Registration Agent',
+                description: 'Name for user role Registration Agent',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-approval',
+                'record.declaration-submit-for-updates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.registration-request-correction',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.registration-print&issue-certified-copies',
+                'performance.read',
+                'performance.read-dashboards',
+                'organisation.read-locations:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_REGISTRAR',
+              label: {
+                id: 'userRole.localRegistrar',
+                defaultMessage: 'Local Registrar',
+                description: 'Name for user role Local Registrar',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-updates',
+                'record.review-duplicates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.register',
+                'record.registration-correct',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.unassign-others',
+                'record.registration-print&issue-certified-copies',
+                'record.confirm-registration',
+                'record.reject-registration',
+                'performance.read',
+                'performance.read-dashboards',
+                'profile.electronic-signature',
+                'organisation.read-locations:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_SYSTEM_ADMIN',
+              label: {
+                id: 'userRole.localSystemAdmin',
+                defaultMessage: 'Local System Admin',
+                description: 'Name for user role Local System Admin',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'user.read:my-office',
+                'user.create:my-jurisdiction',
+                'organisation.read-locations:my-jurisdiction',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'NATIONAL_SYSTEM_ADMIN',
+              label: {
+                id: 'userRole.nationalSystemAdmin',
+                defaultMessage: 'National System Admin',
+                description: 'Name for user role National System Admin',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'user.create:all',
+                'user.read:all',
+                'user.update:all',
+                'organisation.read-locations:all',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'config.update:all',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'PERFORMANCE_MANAGER',
+              label: {
+                id: 'userRole.performanceManager',
+                defaultMessage: 'Performance Manager',
+                description: 'Name for user role Performance Manager',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'NATIONAL_REGISTRAR',
+              label: {
+                id: 'userRole.nationalRegistrar',
+                defaultMessage: 'National Registrar',
+                description: 'Name for user role National Registrar',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-updates',
+                'record.review-duplicates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.register',
+                'record.registration-correct',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.unassign-others',
+                'record.registration-print&issue-certified-copies',
+                'record.confirm-registration',
+                'record.reject-registration',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'profile.electronic-signature',
+                'organisation.read-locations:my-office',
+                'user.read:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            }
+          ]
+        }
+      })
+    })
+  ],
   files: [
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
@@ -76,7 +352,7 @@ export const handlers = {
         return response
       }
 
-      const svgImage = `
+      const defaultFile = `
         <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3 6C3 4.34315 4.34315 3 6 3H14C15.6569 3 17 4.34315 17 6V14C17 15.6569 15.6569 17 14 17H6C4.34315 17 3 15.6569 3 14V6Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M21 7V18C21 19.6569 19.6569 21 18 21H7" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -109,9 +385,25 @@ export const handlers = {
           <circle cx="30" cy="30" r="20" fill="#FFD700" />
           </svg>`
 
-      const mockImages = [svgImage, tree, fish, mountain]
+      const url = new URL(request.request.url)
+      const basename = url.pathname.split('/').pop()
 
-      return new HttpResponse(mockImages[random(0, mockImages.length)], {
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = tree
+          break
+        case 'fish.svg':
+          file = fish
+          break
+        case 'mountain.svg':
+          file = mountain
+          break
+        default:
+          file = defaultFile
+      }
+
+      return new HttpResponse(file, {
         headers: {
           'Content-Type': 'image/svg+xml',
           'Cache-Control': 'no-cache'
