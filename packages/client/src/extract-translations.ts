@@ -207,11 +207,11 @@ async function extractMessages() {
         (key): CSVRow => ({
           id: key,
           description: reactIntlDescriptions[key],
-          ...emptyLanguages,
           en:
             messagesParsedFromApp
               .find(({ id }) => id === key)
-              ?.defaultMessage?.toString() || ''
+              ?.defaultMessage?.toString() || '',
+          ...emptyLanguages
         })
       )
       const message = defaultsToBeAdded.map((row) => Object.values(row).join(',')).join('\n')
