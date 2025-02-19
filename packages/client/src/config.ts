@@ -11,6 +11,20 @@
 
 type Config = typeof window.config
 
+/*
+ * The following logic is temporary logic so that Events v2 can be tested as the "primary"
+ * events. This will be removed once Events v2 is published.
+ *
+ * Country configuration, as part of its config can define a flag FEATURES.V2_EVENTS = true
+ * that enables the same mode. The following logic overrides that config and makes it configurable
+ * in the client.
+ * The overrides are primarily read from local storage. The values in local storage can be controlled by
+ * setting up the URL parameters. For example, to enable V2_EVENTS, the URL can be:
+ *
+ * http://localhost:3000/?V2_EVENTS=true
+ * http://localhost:3000/?V2_EVENTS=false
+ */
+
 const localFeaturesOverrides = JSON.parse(
   localStorage.getItem('config') || '{}'
 ) as Partial<Config['FEATURES']>
