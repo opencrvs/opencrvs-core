@@ -63,7 +63,9 @@ window.addEventListener('online', userReconnectedToast)
 const container = document.getElementById('root')
 const root = createRoot(container!)
 
-const router = createBrowserRouter(routesConfig)
+const router = createBrowserRouter(routesConfig, {
+  future: { v7_relativeSplatPath: true }
+})
 
 root.render(<App router={router} store={store} />)
 
