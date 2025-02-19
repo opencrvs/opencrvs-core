@@ -53,7 +53,8 @@ module.exports = {
           '!@client/forms',
           '!@client/i18n',
           '!@client/search',
-          '!@client/offline'
+          '!@client/offline',
+          '!@client/config'
         ]
       }
     ]
