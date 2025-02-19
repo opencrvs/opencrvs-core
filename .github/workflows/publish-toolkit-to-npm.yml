@@ -74,16 +74,3 @@ jobs:
         working-directory: packages/toolkit
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Push updated version to opencrvs-countryconfig
-        if: steps.check-version.outputs.version-exists == 'false'
-        run: |
-          git clone https://github.com/opencrvs/opencrvs-countryconfig.git
-          cd opencrvs-countryconfig
-          git checkout develop
-          jq --arg version "$TOOLKIT_VERSION" '.dependencies["@opencrvs/toolkit"] = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json
-          git commit -m "chore: update @opencrvs/toolkit to $TOOLKIT_VERSION"
-          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/opencrvs/opencrvs-countryconfig.git develop
