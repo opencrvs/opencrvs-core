@@ -518,7 +518,10 @@ export function App({ client, store, router }: IAppProps) {
           <I18nContainer>
             <ThemeProvider theme={getTheme()}>
               <StyledErrorBoundary>
-                <RouterProvider router={router} />
+                <RouterProvider
+                  router={router}
+                  future={{ v7_startTransition: true }}
+                />
               </StyledErrorBoundary>
             </ThemeProvider>
           </I18nContainer>
