@@ -90,7 +90,7 @@ const TextField = BaseField.extend({
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
-      type: z.enum(['text', 'email', 'password', 'number']).optional(),
+      type: z.enum(['text', 'email', 'password']).optional(),
       prefix: TranslationConfig.optional(),
       postfix: TranslationConfig.optional()
     })
@@ -99,6 +99,18 @@ const TextField = BaseField.extend({
 }).describe('Text input')
 
 export type TextField = z.infer<typeof TextField>
+
+const NumberField = BaseField.extend({
+  ...getDefaultFieldValues(FieldType.NUMBER),
+  configuration: z
+    .object({
+      min: z.number().optional().describe('Minimum value'),
+      max: z.number().optional().describe('Maximum value'),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
+    })
+    .optional()
+}).describe('Number input')
 
 const TextAreaField = BaseField.extend({
   ...getDefaultFieldValues(FieldType.TEXTAREA),
@@ -316,6 +328,7 @@ const Address = BaseField.extend({
 export type AllFields =
   | typeof Address
   | typeof TextField
+  | typeof NumberField
   | typeof TextAreaField
   | typeof DateField
   | typeof Paragraph
@@ -339,6 +352,7 @@ export type AllFields =
 export type Inferred =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
+  | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof Paragraph>
@@ -361,6 +375,7 @@ export type Inferred =
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
   TextField,
+  NumberField,
   TextAreaField,
   DateField,
   Paragraph,
@@ -385,6 +400,7 @@ export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
+export type NumberField = z.infer<typeof NumberField>
 export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>

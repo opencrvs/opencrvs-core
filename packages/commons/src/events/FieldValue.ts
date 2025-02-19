@@ -58,6 +58,8 @@ export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
 
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
+export const NumberFieldValue = z.number()
+export type NumberFieldValue = z.infer<typeof NumberFieldValue>
 
 export const FieldValue = z.union([
   TextValue,
@@ -65,7 +67,8 @@ export const FieldValue = z.union([
   FileFieldValue,
   FileFieldWithOptionValue,
   CheckboxFieldValue,
-  AddressFieldValue
+  AddressFieldValue,
+  NumberFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
@@ -78,6 +81,7 @@ export type FieldValueSchema =
   | typeof FileFieldWithOptionValue
   | typeof CheckboxFieldValue
   | typeof AddressFieldValue
+  | typeof NumberFieldValue
   | z.ZodString
   | z.ZodBoolean
 

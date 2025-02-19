@@ -55,7 +55,8 @@ import {
   isSelectFieldType,
   isSignatureFieldType,
   isTextAreaFieldType,
-  isTextFieldType
+  isTextFieldType,
+  isNumberFieldType
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -82,6 +83,7 @@ import {
   Select,
   SelectCountry,
   Text,
+  Number,
   AdministrativeArea
 } from '@client/v2-events/features/events/registered-fields'
 
@@ -252,6 +254,30 @@ const GeneratedInputField = React.memo(
             isDisabled={disabled}
             maxLength={field.config.configuration?.maxLength}
             value={field.value}
+          />
+        </InputField>
+      )
+    }
+
+    if (isNumberFieldType(field)) {
+      return (
+        <InputField
+          {...inputFieldProps}
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration?.prefix)
+          }
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration?.postfix)
+          }
+        >
+          <Number.Input
+            {...inputProps}
+            disabled={disabled}
+            value={field.value}
+            min={field.config.configuration?.min}
+            max={field.config.configuration?.max}
           />
         </InputField>
       )
@@ -630,7 +656,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                 {(formikFieldProps: FieldProps<any>) => {
                   const defaultValue =
                     'defaultValue' in field &&
-                    typeof field.defaultValue != 'object' && // currently the default values do not support the 'complex' types
+                    typeof field.defaultValue != 'object' && // currently the default values do not support the 'complex' types, only strings, numbers and boolean
                     field.defaultValue
 
                   // Logic for using default value if defined
