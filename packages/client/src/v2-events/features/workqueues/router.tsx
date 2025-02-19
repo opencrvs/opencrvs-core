@@ -18,14 +18,14 @@ export const router = {
   path: ROUTES.V2.WORKQUEUES.path,
   element: (
     <WorkqueueLayout>
-      <WorkqueueIndex workqueueId={'all'} />
+      <WorkqueueIndex />
     </WorkqueueLayout>
   ),
   children: [
     {
       index: true,
       path: ROUTES.V2.WORKQUEUES.WORKQUEUE.path,
-      element: <WorkqueueIndex workqueueId={'all'} />
+      element: <WorkqueueIndex />
     }
   ]
 }
