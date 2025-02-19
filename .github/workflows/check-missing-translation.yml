@@ -39,6 +39,7 @@ jobs:
           echo "working_branch='${{ github.head_ref }}'" >> $GITHUB_OUTPUT
         fi
         echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
+        git checkout $working_branch
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
