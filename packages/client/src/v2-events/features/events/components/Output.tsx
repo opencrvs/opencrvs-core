@@ -139,6 +139,7 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
+  // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
   const hasValue = value !== null && value !== undefined
 
   if (!hasValue) {
