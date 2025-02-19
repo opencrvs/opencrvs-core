@@ -161,7 +161,18 @@ const PageHeader = BaseField.extend({
 export type PageHeader = z.infer<typeof PageHeader>
 
 const File = BaseField.extend({
-  type: z.literal(FieldType.FILE)
+  type: z.literal(FieldType.FILE),
+  options: z
+    .object({
+      style: z.object({
+        fullWidth: z
+          .boolean()
+          .describe(
+            'Whether the file upload button should take the full width of the container or not'
+          )
+      })
+    })
+    .optional()
 }).describe('File upload')
 
 export type File = z.infer<typeof File>
@@ -245,6 +256,13 @@ const Location = BaseField.extend({
 
 export type Location = z.infer<typeof Location>
 
+const FileUploadWithOptions = BaseField.extend({
+  type: z.literal(FieldType.FILE_WITH_OPTIONS),
+  options: z.array(SelectOption).describe('A list of options')
+}).describe('Select input')
+
+export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
+
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY)
 }).describe('Input field for a facility')
@@ -289,6 +307,7 @@ export type AllFields =
   | typeof Office
   | typeof SignatureField
   | typeof EmailField
+  | typeof FileUploadWithOptions
 
 /** @knipignore */
 export type Inferred =
@@ -303,6 +322,7 @@ export type Inferred =
   | z.infer<typeof Select>
   | z.infer<typeof Checkbox>
   | z.infer<typeof File>
+  | z.infer<typeof FileUploadWithOptions>
   | z.infer<typeof Country>
   | z.infer<typeof AdministrativeArea>
   | z.infer<typeof Divider>
@@ -331,7 +351,8 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Facility,
   Office,
   SignatureField,
-  EmailField
+  EmailField,
+  FileUploadWithOptions
 ]) as unknown as z.ZodType<Inferred, any, Inferred>
 
 export type SelectField = z.infer<typeof Select>

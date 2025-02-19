@@ -268,9 +268,8 @@ jobs:
 
       - name: Run linting
         run: cd packages/client && yarn lint
-
-  run-visual-tests:
-    name: Run visual tests
+  chromatic:
+    name: Run chromatic visual tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
 
@@ -310,10 +309,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Chromatic
-        uses: chromaui/action@latest
-        with:
-          workingDir: packages/client
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        run: yarn run chromatic
+        working-directory: packages/client
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test-client:
     name: Test client
