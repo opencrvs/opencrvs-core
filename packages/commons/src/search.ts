@@ -85,6 +85,7 @@ export interface IAssignment {
   firstName: string
   lastName: string
   officeName: string
+  createdAt: string
 }
 
 export interface IOperationHistory {
