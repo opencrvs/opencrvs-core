@@ -67,7 +67,7 @@ export const SearchResult = () => {
   const allFields = getAllUniqueFields(eventConfiguration)
 
   validateEventSearchParams(allFields, searchParams)
-  search(searchParams)
+  const res = search({ ...searchParams, type: eventType })
 
   return (
     <div>

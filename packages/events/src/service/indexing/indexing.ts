@@ -29,6 +29,7 @@ import {
 import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
+import { DEFAULT_SIZE, generateQuery } from './utils'
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
 }
@@ -296,13 +297,24 @@ export async function getIndexedEvents() {
   return events
 }
 
-export async function getIndex(event: EventSearchIndex) {
+export async function getIndex(eventParams: EventSearchIndex) {
   const esClient = getOrCreateClient()
+  const { type, ...rest } = eventParams
+  const query = generateQuery(rest)
 
-  const response = await esClient.get<EncodedEventIndex>({
-    index: getEventIndexName(event.type),
-    id: event.id
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventIndexName(type),
+    size: DEFAULT_SIZE,
+    request_cache: false,
+    query
   })
 
-  return response
+  const events = z.array(EventIndex).parse(
+    response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
+  )
+
+  return events
 }
