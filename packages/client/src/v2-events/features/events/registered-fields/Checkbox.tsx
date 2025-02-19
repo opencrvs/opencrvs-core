@@ -40,7 +40,7 @@ function CheckboxInput({
 }
 
 function CheckboxOutput({ value }: { value?: Stringifiable }) {
-  return value === 'true' ? 'Yes' : 'No'
+  return value?.toString() === 'true' ? 'Yes' : 'No'
 }
 
 export const Checkbox = {
