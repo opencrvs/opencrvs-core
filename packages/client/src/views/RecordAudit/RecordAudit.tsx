@@ -549,7 +549,6 @@ const BodyContent = ({
               in that case use the one from the short declaration info query */
               declaration.assignment ??= draft?.assignmentStatus
             }
-
             return (
               <RecordAuditBody
                 key={`record-audit-${declarationId}`}
@@ -598,6 +597,14 @@ const BodyContent = ({
       status: wqStatus || draftStatus
     }
 
+    if (
+      draft?.assignmentStatus?.createdAt &&
+      workqueueDeclaration?.registration?.assignment?.createdAt &&
+      workqueueDeclaration?.registration?.assignment?.createdAt >
+        draft?.assignmentStatus?.createdAt
+    ) {
+      declaration.assignment = workqueueDeclaration.registration.assignment
+    }
     return (
       <RecordAuditBody
         key={`record-audit-${declarationId}`}
