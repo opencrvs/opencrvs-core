@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { UUID } from '@opencrvs/commons'
+
 import { ServerRoute } from '@hapi/hapi'
 import { fetchFromHearth } from '@config/services/hearth'
-import { SavedLocation } from '@opencrvs/commons/types'
+import { SavedLocation, isOffice } from '@opencrvs/commons/types'
 import { resolveLocationChildren } from './locationTreeSolver'
 
 export const resolveChildren: ServerRoute['handler'] = async (req) => {
@@ -20,15 +21,11 @@ export const resolveChildren: ServerRoute['handler'] = async (req) => {
   const location = await fetchFromHearth<SavedLocation>(
     `Location/${locationId}`
   )
-  if (isTypeOf(location, 'CRVS_OFFICE')) {
+  if (isOffice(location)) {
     return [location]
   }
 
   const children = await resolveLocationChildren(locationId)
 
   return [location, ...children]
-}
-
-function isTypeOf(location: SavedLocation, type: string) {
-  return location?.type?.coding?.some((x) => x.code === type)
 }
