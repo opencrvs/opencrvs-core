@@ -27,9 +27,9 @@ export const getOrCreateClient = () => {
 }
 
 export function getEventAliasName() {
-  return `events`
+  return env.ES_INDEX_PREFIX
 }
 
 export function getEventIndexName(eventType: string) {
-  return `events_${eventType}`.toLowerCase()
+  return `${env.ES_INDEX_PREFIX}_${eventType}`.toLowerCase()
 }

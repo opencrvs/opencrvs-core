@@ -167,40 +167,40 @@ export const FileReview: StoryObj<typeof Review> = {
           eventConfig={birthEvent}
           form={{
             'documents.proofOfBirth': {
-              filename: '2d2c06e7-cadb-47b7-9779-419e6125b681.jpg',
-              originalFilename: '8073450b-c9e5-486b-bef4-52db3dc39f2e.jpg',
-              type: 'image/jpeg'
+              filename: 'tree.svg',
+              originalFilename: 'tree.svg',
+              type: 'image/svg+xml'
             },
             'documents.proofOfMother': [
               {
-                filename: '30555050-01b9-4b90-9172-da7eaa97bdf1.jpeg',
-                originalFilename: 'abcd.jpeg',
-                type: 'image/jpeg',
+                filename: 'fish.svg',
+                originalFilename: 'fish.svg',
+                type: 'image/svg+xml',
                 option: 'NATIONAL_ID'
               },
               {
-                filename: 'b7bf34d7-4a93-4f18-8fb7-e04a5801c0bd.jpg',
-                originalFilename: 'abcd.jpg',
-                type: 'image/jpeg',
+                filename: 'mountain.svg',
+                originalFilename: 'mountain.svg',
+                type: 'image/svg+xml',
                 option: 'PASSPORT'
               },
               {
-                filename: '019dc6d3-1e09-4fbc-854f-4b1b10d9d42e.jpg',
-                originalFilename: 'abcd.jpg',
-                type: 'image/jpeg',
+                filename: 'tree.svg',
+                originalFilename: 'tree.svg',
+                type: 'image/svg+xml',
                 option: 'BIRTH_REGISTRATION_NUMBER'
               },
               {
-                filename: '01cbaef6-bada-458b-8ce6-69f456df25e4.png',
-                originalFilename: 'abcd.png',
-                type: 'image/png',
+                filename: 'fish.svg',
+                originalFilename: 'fish.svg',
+                type: 'image/svg+xml',
                 option: 'NONE'
               }
             ],
             'documents.proofOther': {
-              filename: '9b797687-c294-42d6-b504-2a20a72fb9bb.png',
-              originalFilename: 'abcd.png',
-              type: 'image/png'
+              filename: 'tree.svg',
+              originalFilename: 'tree.svg',
+              type: 'image/svg+xml'
             }
           }}
           formConfig={birthEvent.actions[0].forms[0]}
