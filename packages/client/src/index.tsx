@@ -64,7 +64,11 @@ const container = document.getElementById('root')
 const root = createRoot(container!)
 
 const router = createBrowserRouter(routesConfig, {
-  future: { v7_relativeSplatPath: true, v7_fetcherPersist: true }
+  future: {
+    v7_relativeSplatPath: true,
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true
+  }
 })
 
 root.render(<App router={router} store={store} />)
