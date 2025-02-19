@@ -18,7 +18,6 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { birthEvent } from './fixtures'
 
-
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/File',
   args: { onChange: fn() },

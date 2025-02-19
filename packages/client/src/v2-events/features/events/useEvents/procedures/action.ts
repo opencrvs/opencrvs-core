@@ -20,9 +20,8 @@ import {
   stripHiddenOrDisabledFields
 } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
-import { createTemporaryId, isTemporaryId } from './create'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import _ from 'lodash'
+import { createTemporaryId, isTemporaryId } from './create'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   utils.event.get.setData(updatedEvent.id, updatedEvent)
@@ -256,7 +255,7 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
   }
 
   const defaultMutationFn = mutationDefaults.mutationFn
-  const actionType = mutationDefaults?.meta?.actionType as ActionType
+  const actionType = mutationDefaults.meta?.actionType as ActionType | undefined
 
   if (!actionType) {
     throw new Error('No event action type found. This should never happen')

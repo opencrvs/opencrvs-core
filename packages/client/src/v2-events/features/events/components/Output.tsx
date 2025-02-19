@@ -139,7 +139,7 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
-  const hasValue = value !== undefined && value !== null
+  const hasValue = value !== null && value !== undefined
 
   if (!hasValue) {
     if (previousValue) {

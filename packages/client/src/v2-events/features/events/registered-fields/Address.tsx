@@ -50,7 +50,7 @@ function hide<T extends FieldConfig>(fieldConfig: T): T {
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue = {}, value = {}, ...otherProps } = props
+  const { onChange, value = {}, ...otherProps } = props
 
   let fields = [
     ...ADMIN_STRUCTURE,
