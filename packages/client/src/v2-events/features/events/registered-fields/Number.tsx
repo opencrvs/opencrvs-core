@@ -20,7 +20,7 @@ interface NumberInputProps extends Omit<TextInputProps, 'type' | 'maxLength'> {
 }
 
 function NumberInput({ value, disabled, ...props }: NumberInputProps) {
-  const inputValue = value.toString() ?? ''
+  const inputValue = isNaN(value) ? '' : value.toString()
 
   return (
     <TextInputComponent
