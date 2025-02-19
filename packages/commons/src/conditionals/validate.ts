@@ -168,6 +168,7 @@ export function getFieldValidationErrors({
     isFieldDisabled(field, conditionalParameters)
   ) {
     if (values[field.id]) {
+      console.trace('who')
       return {
         errors: [
           {

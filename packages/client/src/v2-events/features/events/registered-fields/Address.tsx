@@ -265,7 +265,11 @@ const ADMIN_STRUCTURE = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-const ALL_FIELDS = [...ADMIN_STRUCTURE, ...URBAN_FIELDS, ...RURAL_FIELDS]
+export const ALL_ADDRESS_FIELDS = [
+  ...ADMIN_STRUCTURE,
+  ...URBAN_FIELDS,
+  ...RURAL_FIELDS
+]
 
 type RequiredKeysFromFieldValue = keyof AddressFieldValue
 type EnsureSameUnion<A, B> = [A] extends [B]
@@ -275,7 +279,7 @@ type EnsureSameUnion<A, B> = [A] extends [B]
   : false
 type Expect<T extends true> = T
 
-type AllFields = (typeof ALL_FIELDS)[number]['id']
+type AllFields = (typeof ALL_ADDRESS_FIELDS)[number]['id']
 
 /*
  * This type ensures that all fields needed in AddressFieldValue type
@@ -297,7 +301,7 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
 
   return (
     <>
-      {ALL_FIELDS.map((field) => ({ field, value: value[field.id] }))
+      {ALL_ADDRESS_FIELDS.map((field) => ({ field, value: value[field.id] }))
         .filter((field) => field.value)
         .map((field) => (
           <>
@@ -321,7 +325,7 @@ function useStringifier() {
      * form data stringifier so location and other form fields can handle stringifying their own data
      */
     const stringifier = useFormDataStringifier()
-    return stringifier(ALL_FIELDS, value as ActionFormData)
+    return stringifier(ALL_ADDRESS_FIELDS, value as ActionFormData)
   }
 }
 
