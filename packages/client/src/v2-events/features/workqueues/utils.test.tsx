@@ -61,10 +61,16 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
     expect(formattedMessage).toBe('Fallback message for test.')
   })
 
-  it('throws an error if message is not a string', () => {
+  it('throws an error if message string has variables that are were provided', () => {
     const { result } = renderUseIntlHook()
     expect(() =>
-      result.current.formatMessage({ id: 'test.missing' }, { value: 'test' })
-    ).not.toThrow()
+      result.current.formatMessage({ id: 'test.message' }, {})
+    ).toThrow()
+  })
+  it('does not throw if a variable is null', () => {
+    const { result } = renderUseIntlHook()
+    expect(
+      result.current.formatMessage({ id: 'test.message' }, { name: null })
+    ).toBe('Hello,  :)')
   })
 })
