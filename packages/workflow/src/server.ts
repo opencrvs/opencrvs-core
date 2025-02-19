@@ -19,6 +19,8 @@ import {
 import getPlugins from '@workflow/config/plugins'
 import { getRoutes } from '@workflow/config/routes'
 import { readFileSync } from 'fs'
+import { logger } from '@opencrvs/commons'
+import { Boom } from '@hapi/boom'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -57,6 +59,13 @@ export async function createServer() {
       request.sentryScope?.setExtra('payload', request.payload)
       return h.continue
     }
+  })
+
+  server.ext('onPreResponse', (request, h) => {
+    if (request.response instanceof Boom) {
+      logger.error(request.response)
+    }
+    return h.continue
   })
 
   async function start() {
