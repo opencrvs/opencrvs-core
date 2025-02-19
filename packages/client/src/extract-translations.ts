@@ -201,7 +201,8 @@ async function extractMessages() {
     console.log(chalk.red.bold('Missing translations '))
     if(CI) {
       const emptyLanguages = Object.fromEntries(
-        knownLanguages.map((lang) => [lang, ''])
+        // knownLanguages.map((lang) => [lang, ''])
+        knownLanguages.filter((lang)=> lang!='en').map((lang) => [lang, ''])
       )
       const defaultsToBeAdded = missingKeys.map(
         (key): CSVRow => ({
@@ -211,7 +212,7 @@ async function extractMessages() {
             messagesParsedFromApp
               .find(({ id }) => id === key)
               ?.defaultMessage?.toString() || '',
-          ...emptyLanguages
+          ...emptyLanguages,
         })
       )
       const message = defaultsToBeAdded.map((row) => Object.values(row).join(',')).join('\n')
@@ -219,6 +220,7 @@ async function extractMessages() {
 ${chalk.white(message)}\n
  Add them to this file and run again:
 ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
+      process.exit(1)  
     }
     
     if(!CI) {
