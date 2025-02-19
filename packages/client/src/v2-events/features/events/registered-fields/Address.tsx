@@ -42,7 +42,7 @@ function hide<T extends FieldConfig>(fieldConfig: T): T {
   }
 }
 
-function addInitialValue(defaultValues: AddressField['defaultValue']) {
+function addDefaultValue(defaultValues: AddressField['defaultValue']) {
   if (!defaultValues) {
     return (fieldConfig: FieldConfigWithoutAddress) => fieldConfig
   }
@@ -91,7 +91,7 @@ function AddressInput(props: Props) {
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={fields.map(addInitialValue(defaultValue))}
+      fields={fields.map(addDefaultValue(defaultValue))}
       formData={value}
       setAllFieldsDirty={false}
       onChange={onChange}
