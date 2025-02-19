@@ -48,7 +48,7 @@ jobs:
       with: 
         node-version: 18
     
-    - name: Clone the Core repository
+    - name: Clone the Core repository and Check for missing translation
       run: |
         cd $HOME/core
         acting_branch=${{steps.set_branch.outputs.working_branch}}
