@@ -40,6 +40,8 @@ jobs:
         fi
         echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
         git checkout $working_branch
+        cc_branch=$(git branch --show-current)
+        echo "Current branch in CC after checkout is: $cc_branch"
     
     - name: Debugging the cc branch
       run: |
