@@ -37,6 +37,7 @@ jobs:
           echo "working_branch='develop'" >> $GITHUB_OUTPUT
         else
           echo "Branch ${{ github.head_ref }} exists in countryconfig"
+          working_branch='${{ github.head_ref }}'
           echo "working_branch='${{ github.head_ref }}'" >> $GITHUB_OUTPUT
         fi
         echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
