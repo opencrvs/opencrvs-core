@@ -42,21 +42,19 @@ function hide<T extends FieldConfig>(fieldConfig: T): T {
   }
 }
 
-function addInitialValue(initialValues: AddressField['defaultValue']) {
-  if (!initialValues) {
+function addInitialValue(defaultValues: AddressField['defaultValue']) {
+  if (!defaultValues) {
     return (fieldConfig: FieldConfigWithoutAddress) => fieldConfig
   }
 
   return (fieldConfig: FieldConfigWithoutAddress) => {
-    if (!initialValues[fieldConfig.id]) {
+    if (!defaultValues[fieldConfig.id]) {
       return fieldConfig
     }
 
     return {
       ...fieldConfig,
-      initialValue: initialValues[
-        fieldConfig.id
-      ] as FieldConfigWithoutAddress['defaultValue']
+      defaultValue: defaultValues[fieldConfig.id]
     }
   }
 }

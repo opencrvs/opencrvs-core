@@ -316,7 +316,7 @@ export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
-  defaultValue: z.object({}).passthrough().optional()
+  defaultValue: z.record(z.string()).optional()
 }).describe('Address input field – a combination of location and text fields')
 
 /*
