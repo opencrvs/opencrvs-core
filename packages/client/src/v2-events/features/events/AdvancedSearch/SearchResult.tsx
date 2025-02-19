@@ -19,6 +19,7 @@ import {
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { getAllUniqueFields } from '@client/v2-events/utils'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 function validateEventSearchParams(
   fields: FieldConfig[],
@@ -58,14 +59,15 @@ function validateEventSearchParams(
 }
 
 export const SearchResult = () => {
+  const { search } = useEvents()
   const searchParams = parse(window.location.search)
-
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
 
   const { eventConfiguration } = useEventConfiguration(eventType)
   const allFields = getAllUniqueFields(eventConfiguration)
 
   validateEventSearchParams(allFields, searchParams)
+  search(searchParams)
 
   return (
     <div>

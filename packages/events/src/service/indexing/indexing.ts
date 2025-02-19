@@ -14,6 +14,7 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
+  EventSearchIndex,
   FieldConfig,
   FieldType,
   getCurrentEventState
@@ -293,4 +294,15 @@ export async function getIndexedEvents() {
   )
 
   return events
+}
+
+export async function getIndex(event: EventSearchIndex) {
+  const esClient = getOrCreateClient()
+
+  const response = await esClient.get<EncodedEventIndex>({
+    index: getEventIndexName(event.type),
+    id: event.id
+  })
+
+  return response
 }
