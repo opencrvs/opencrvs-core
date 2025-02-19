@@ -150,11 +150,14 @@ export function Review() {
         onMetadataChange={(values) => setMetadata(eventId, values)}
       >
         <ReviewComponent.Actions
+          form={form}
+          formConfig={formConfigs[0]}
           messages={{
             title: messages.registerActionTitle,
             description: messages.registerActionDescription,
             onConfirm: messages.registerActionDeclare
           }}
+          metadata={metadata}
           onConfirm={handleRegistration}
         />
         {modal}

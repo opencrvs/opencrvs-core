@@ -137,6 +137,8 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
           onEdit={handleEdit}
         >
           <Review.Actions
+            form={mockFormData}
+            formConfig={DEFAULT_FORM}
             messages={{
               title: {
                 id: 'v2.changeModal.title',
