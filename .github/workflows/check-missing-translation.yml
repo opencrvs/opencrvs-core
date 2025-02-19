@@ -41,6 +41,13 @@ jobs:
         echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
         git checkout $working_branch
     
+    - name: Debugging the cc branch
+      run: |
+        cc_path=${{steps.set_branch.outputs.countryconfig_path}}
+        cd cc_path
+        current_branch=git branch --show-current
+        echo "Current branch is: $current_branch"
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with: 
