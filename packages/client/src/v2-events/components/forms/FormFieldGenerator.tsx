@@ -22,8 +22,8 @@ import {
   evalExpressionInFieldDefinition,
   FIELD_SEPARATOR,
   getDependentFields,
-  handleInitialValue,
-  hasInitialValueDependencyInfo,
+  handleDefaultValue,
+  hasDefaultValueDependencyInfo,
   makeDatesFormatted
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
@@ -443,7 +443,7 @@ type FormData = Record<string, FieldValue>
 
 const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
   fields.reduce((memo, field) => {
-    const fieldInitialValue = handleInitialValue(field, formData)
+    const fieldInitialValue = handleDefaultValue(field, formData)
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
 
@@ -544,14 +544,14 @@ class FormSectionComponent extends React.Component<AllProps> {
       const dependentFields = getDependentFields(this.props.fields, fieldName)
       for (const field of dependentFields) {
         if (
-          !field.initialValue ||
-          !hasInitialValueDependencyInfo(field.initialValue)
+          !field.defaultValue ||
+          !hasDefaultValueDependencyInfo(field.defaultValue)
         ) {
           continue
         }
 
         updatedValues[field.id] = evalExpressionInFieldDefinition(
-          field.initialValue.expression,
+          field.defaultValue.expression,
           { $form: updatedValues }
         )
         updateDependentFields(field.id)
@@ -629,7 +629,9 @@ class FormSectionComponent extends React.Component<AllProps> {
               <Field name={field.id}>
                 {(formikFieldProps: FieldProps<any>) => {
                   const defaultValue =
-                    'defaultValue' in field && field.defaultValue
+                    'defaultValue' in field &&
+                    typeof field.defaultValue != 'object' && // currently the default values do not support the 'complex' types
+                    field.defaultValue
 
                   // Logic for using default value if defined
                   useEffect(() => {

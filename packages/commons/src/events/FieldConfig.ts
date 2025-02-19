@@ -24,6 +24,15 @@ const FieldId = z.string()
 
 const BaseField = z.object({
   id: FieldId,
+  defaultValue: z
+    .union([
+      z.string(),
+      z.object({
+        dependsOn: z.array(FieldId).default([]),
+        expression: z.string()
+      })
+    ])
+    .optional(),
   conditionals: z.array(ActionConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
   disabled: z.boolean().default(false).optional(),
@@ -52,7 +61,6 @@ export type Divider = z.infer<typeof Divider>
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
-  // TODO CIHAN: pystyskö näis käyttää mapFieldTypeToZod?
   defaultValue: RequiredTextValue.optional(),
   configuration: z
     .object({

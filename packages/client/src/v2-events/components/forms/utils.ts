@@ -25,19 +25,19 @@ import { DependencyInfo } from '@client/forms'
  */
 export const FIELD_SEPARATOR = '____'
 
-export function handleInitialValue(
+export function handleDefaultValue(
   field: FieldConfig,
   formData: ActionFormData
 ) {
-  const initialValue = field.initialValue
+  const defaultValue = field.defaultValue
 
-  if (hasInitialValueDependencyInfo(initialValue)) {
-    return evalExpressionInFieldDefinition(initialValue.expression, {
+  if (hasDefaultValueDependencyInfo(defaultValue)) {
+    return evalExpressionInFieldDefinition(defaultValue.expression, {
       $form: formData
     })
   }
 
-  return initialValue
+  return defaultValue
 }
 
 export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
@@ -60,8 +60,8 @@ export function evalExpressionInFieldDefinition(
   return eval(expression) as FieldValue
 }
 
-export function hasInitialValueDependencyInfo(
-  value: Inferred['initialValue']
+export function hasDefaultValueDependencyInfo(
+  value: Inferred['defaultValue']
 ): value is DependencyInfo {
   return typeof value === 'object' && 'dependsOn' in value
 }
@@ -71,13 +71,13 @@ export function getDependentFields(
   fieldName: string
 ): FieldConfig[] {
   return fields.filter((field) => {
-    if (!field.initialValue) {
+    if (!field.defaultValue) {
       return false
     }
-    if (!hasInitialValueDependencyInfo(field.initialValue)) {
+    if (!hasDefaultValueDependencyInfo(field.defaultValue)) {
       return false
     }
-    return field.initialValue.dependsOn.includes(fieldName)
+    return field.defaultValue.dependsOn.includes(fieldName)
   })
 }
 
