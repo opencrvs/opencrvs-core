@@ -63,7 +63,7 @@ export function evalExpressionInFieldDefinition(
 export function hasDefaultValueDependencyInfo(
   value: Inferred['defaultValue']
 ): value is DependencyInfo {
-  return typeof value === 'object' && 'dependsOn' in value
+  return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
 }
 
 export function getDependentFields(

@@ -11,7 +11,6 @@
 import React from 'react'
 import {
   ActionFormData,
-  AddressField,
   AddressFieldValue,
   alwaysTrue,
   ConditionalType,
@@ -42,25 +41,6 @@ function hide<T extends FieldConfig>(fieldConfig: T): T {
   }
 }
 
-function addInitialValue(initialValues: AddressField['initialValue']) {
-  if (!initialValues) {
-    return (fieldConfig: FieldConfigWithoutAddress) => fieldConfig
-  }
-
-  return (fieldConfig: FieldConfigWithoutAddress) => {
-    if (!initialValues[fieldConfig.id]) {
-      return fieldConfig
-    }
-
-    return {
-      ...fieldConfig,
-      initialValue: initialValues[
-        fieldConfig.id
-      ] as FieldConfigWithoutAddress['initialValue']
-    }
-  }
-}
-
 /**
  * AddressInput is a form component for capturing address details based on administrative structure.
  *
@@ -70,7 +50,7 @@ function addInitialValue(initialValues: AddressField['initialValue']) {
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  */
 function AddressInput(props: Props) {
-  const { onChange, initialValue = {}, value = {}, ...otherProps } = props
+  const { onChange, defaultValue = {}, value = {}, ...otherProps } = props
 
   let fields = [
     ...ADMIN_STRUCTURE,
@@ -93,7 +73,7 @@ function AddressInput(props: Props) {
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={fields.map(addInitialValue(initialValue))}
+      fields={fields}
       formData={value}
       setAllFieldsDirty={false}
       onChange={onChange}
@@ -240,7 +220,7 @@ const ADMIN_STRUCTURE = [
     },
     hideLabel: true,
     type: 'RADIO_GROUP',
-    initialValue: 'URBAN',
+    defaultValue: 'URBAN',
     options: [
       {
         value: 'URBAN',

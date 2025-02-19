@@ -196,7 +196,7 @@ const GeneratedInputField = React.memo(
     const field = {
       inputFieldProps,
       config: fieldDefinition,
-      value: value
+      value
     }
 
     if (isDateFieldType(field)) {

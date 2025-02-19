@@ -129,9 +129,6 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
               id: 'storybook.address.label',
               defaultMessage: 'Address',
               description: 'The title for the address input'
-            },
-            initialValue: {
-              country: 'FAR'
             }
           }
         ]}
