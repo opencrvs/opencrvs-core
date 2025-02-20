@@ -33,6 +33,8 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
+import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
+import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -64,6 +66,15 @@ const ToolTipContainer = styled.span`
 const NondecoratedLink = styled(Link)`
   text-decoration: none;
   color: 'primary';
+`
+
+const FABContainer = styled.div`
+  position: fixed;
+  right: 40px;
+  bottom: 55px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 
 function changeSortedColumn(
@@ -330,6 +341,14 @@ function Workqueue({
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
       />
+      <FABContainer>
+        <Link to={ROUTES.V2.EVENTS.CREATE.path}>
+          <FloatingActionButton
+            icon={() => <PlusTransparentWhite />}
+            id="new_event_declaration"
+          />
+        </Link>
+      </FABContainer>
     </WQContentWrapper>
   )
 }
