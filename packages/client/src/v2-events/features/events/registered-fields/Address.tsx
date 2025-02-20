@@ -25,6 +25,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
+// ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<FieldConfig, { type: 'ADDRESS' }>
 
 type Props = FieldProps<'ADDRESS'> & {
@@ -42,19 +43,23 @@ function hide<T extends FieldConfig>(fieldConfig: T): T {
   }
 }
 
-function addDefaultValue(defaultValues: AddressField['defaultValue']) {
+function addDefaultValue<T extends FieldConfigWithoutAddress>(
+  defaultValues: AddressFieldValue
+): (fieldConfig: T) => T {
   if (!defaultValues) {
-    return (fieldConfig: FieldConfigWithoutAddress) => fieldConfig
+    return (fieldConfig) => fieldConfig
   }
 
-  return (fieldConfig: FieldConfigWithoutAddress) => {
-    if (!defaultValues[fieldConfig.id]) {
+  return (fieldConfig) => {
+    const key = fieldConfig.id as keyof typeof defaultValues
+
+    if (!defaultValues[key]) {
       return fieldConfig
     }
 
     return {
       ...fieldConfig,
-      defaultValue: defaultValues[fieldConfig.id]
+      defaultValue: defaultValues[key]
     }
   }
 }

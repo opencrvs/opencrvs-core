@@ -38,7 +38,11 @@ function CheckboxInput({
   )
 }
 
+function CheckboxOutput({ value }: { value?: boolean }) {
+  return value ? 'Yes' : 'No'
+}
+
 export const Checkbox = {
   Input: CheckboxInput,
-  Output: (value: boolean) => (value ? 'Yes' : 'No')
+  Output: CheckboxOutput
 }
