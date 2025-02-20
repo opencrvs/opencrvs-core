@@ -57,7 +57,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger>
+        <DropdownMenu.Trigger asChild>
           <PrimaryButton icon={() => <CaretDown />}>
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
