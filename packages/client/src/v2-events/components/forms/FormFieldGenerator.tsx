@@ -654,22 +654,6 @@ class FormSectionComponent extends React.Component<AllProps> {
             >
               <Field name={field.id}>
                 {(formikFieldProps: FieldProps<any>) => {
-                  const defaultValue =
-                    'defaultValue' in field &&
-                    typeof field.defaultValue != 'object' && // currently the default values do not support the 'complex' types, only strings, numbers and boolean
-                    field.defaultValue
-
-                  // Logic for using default value if defined
-                  useEffect(() => {
-                    const shouldUseDefaultValue =
-                      defaultValue && formikFieldProps.field.value === undefined
-
-                    if (shouldUseDefaultValue) {
-                      formikFieldProps.field.value = defaultValue
-                      this.setFieldValuesWithDependency(field.id, defaultValue)
-                    }
-                  }, [defaultValue, field.id, formikFieldProps.field])
-
                   return (
                     <GeneratedInputField
                       fieldDefinition={field}
