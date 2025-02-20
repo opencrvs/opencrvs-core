@@ -15,15 +15,15 @@ import { TEXT } from '@client/forms'
 import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
-import * as React from 'react'
+import React, { useEffect, useCallback } from 'react'
 
 import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
   FIELD_SEPARATOR,
   getDependentFields,
-  handleInitialValue,
-  hasInitialValueDependencyInfo,
+  handleDefaultValue,
+  hasDefaultValueDependencyInfo,
   makeDatesFormatted
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
@@ -55,7 +55,8 @@ import {
   isSelectFieldType,
   isSignatureFieldType,
   isTextAreaFieldType,
-  isTextFieldType
+  isTextFieldType,
+  isNumberFieldType
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -82,6 +83,7 @@ import {
   Select,
   SelectCountry,
   Text,
+  Number,
   AdministrativeArea
 } from '@client/v2-events/features/events/registered-fields'
 
@@ -175,13 +177,13 @@ const GeneratedInputField = React.memo(
         intl.formatMessage(fieldDefinition.placeholder)
     }
 
-    const handleFileChange = React.useCallback(
+    const handleFileChange = useCallback(
       (value: FileFieldValue | undefined) =>
         setFieldValue(fieldDefinition.id, value),
       [fieldDefinition.id, setFieldValue]
     )
 
-    const handleFileWithOptionChange = React.useCallback(
+    const handleFileWithOptionChange = useCallback(
       (value: FileFieldWithOptionValue | undefined) =>
         setFieldValue(fieldDefinition.id, value),
       [fieldDefinition.id, setFieldValue]
@@ -252,6 +254,30 @@ const GeneratedInputField = React.memo(
             isDisabled={disabled}
             maxLength={field.config.configuration?.maxLength}
             value={field.value}
+          />
+        </InputField>
+      )
+    }
+
+    if (isNumberFieldType(field)) {
+      return (
+        <InputField
+          {...inputFieldProps}
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration?.prefix)
+          }
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration?.postfix)
+          }
+        >
+          <Number.Input
+            {...inputProps}
+            disabled={disabled}
+            value={field.value}
+            min={field.config.configuration?.min}
+            max={field.config.configuration?.max}
           />
         </InputField>
       )
@@ -443,7 +469,7 @@ type FormData = Record<string, FieldValue>
 
 const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
   fields.reduce((memo, field) => {
-    const fieldInitialValue = handleInitialValue(field, formData)
+    const fieldInitialValue = handleDefaultValue(field, formData)
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
 
@@ -544,14 +570,14 @@ class FormSectionComponent extends React.Component<AllProps> {
       const dependentFields = getDependentFields(this.props.fields, fieldName)
       for (const field of dependentFields) {
         if (
-          !field.initialValue ||
-          !hasInitialValueDependencyInfo(field.initialValue)
+          !field.defaultValue ||
+          !hasDefaultValueDependencyInfo(field.defaultValue)
         ) {
           continue
         }
 
         updatedValues[field.id] = evalExpressionInFieldDefinition(
-          field.initialValue.expression,
+          field.defaultValue.expression,
           { $form: updatedValues }
         )
         updateDependentFields(field.id)
@@ -690,14 +716,18 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
-  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>(
-    props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
-  )
+  const initialValues =
+    props.initialValues && Object.keys(props.initialValues).length > 0
+      ? props.initialValues
+      : mapFieldsToValues(props.fields, nestedFormData)
+
+  const formikCompatibleInitialValues =
+    makeFormFieldIdsFormikCompatible<FieldValue>(initialValues)
 
   return (
     <Formik<ActionFormData>
       enableReinitialize={true}
-      initialValues={initialValues}
+      initialValues={formikCompatibleInitialValues}
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,

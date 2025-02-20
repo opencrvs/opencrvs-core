@@ -1019,7 +1019,7 @@ export const tennisClubMembershipEvent = {
                 defaultMessage: 'Who is requesting a change to this record?',
                 description: 'The title for the corrector form'
               },
-              initialValue: '',
+              defaultValue: '',
               options: [
                 {
                   value: 'INFORMANT',
@@ -1087,7 +1087,7 @@ export const tennisClubMembershipEvent = {
                 defaultMessage: '@todo',
                 description: 'The title for the corrector form'
               },
-              initialValue: '',
+              defaultValue: '',
               required: true,
               options: [
                 {
@@ -1140,7 +1140,7 @@ export const tennisClubMembershipEvent = {
                 defaultMessage: 'Who is requesting a change to this record?',
                 description: 'The title for the corrector form'
               },
-              initialValue: '',
+              defaultValue: '',
               configuration: {
                 styles: {
                   size: 'NORMAL'
