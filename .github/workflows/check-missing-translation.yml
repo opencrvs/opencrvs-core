@@ -59,7 +59,9 @@ jobs:
         yarn install
         cd ./packages/client
         CI=true yarn extract:translations 2>&1 | tee output.txt
-        echo "### Summary Of Missing Translation" >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        cat output.txt >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        awk '/Missing translations/ {flag=1} flag' output.txt > missing_translations.txt
+        if [ -s missing_translations.txt ]; then 
+          echo "### Summary Of Missing Translation" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          cat missing_translations >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
