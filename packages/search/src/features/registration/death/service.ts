@@ -119,7 +119,12 @@ function createIndexBody(
 
   const assignment = findAssignment(bundle)
   body.assignment =
-    assignment && composeAssignment(assignment.office, assignment.practitioner)
+    assignment &&
+    composeAssignment(
+      assignment.office,
+      assignment.practitioner,
+      assignment.createdAt
+    )
 }
 
 function createDeceasedIndex(
