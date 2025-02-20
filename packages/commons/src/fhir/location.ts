@@ -121,7 +121,7 @@ export function isHealthFacility(
   return location.type?.coding?.[0].code === 'HEALTH_FACILITY'
 }
 
-export function isOffice(location: Location): location is HealthFacility {
+export function isOffice(location: Location): location is Office {
   return location.type?.coding?.[0].code === 'CRVS_OFFICE'
 }
 
