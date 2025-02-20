@@ -76,6 +76,30 @@ describe('Validate record endpoint', () => {
       })
     )
 
+    // Token exchange mock call
+    mswServer.use(
+      // The actual more verbose query below, but for simplicity we can keep simpler one unless this causes issues:
+
+      // ?grant_type=urn:opencrvs:oauth:grant-type:token-exchange&subject_token=${token}&subject_token_type=urn:ietf:params:oauth:token-type:access_token
+      // &requested_token_type=urn:opencrvs:oauth:token-type:single_record_token&record_id=${recordId}
+
+      rest.post(`http://localhost:4040/token`, (_, res, ctx) => {
+        return res(
+          ctx.json({
+            access_token: 'some-token'
+          })
+        )
+      })
+    )
+
+    // mock country config event action hook returning a basic 200
+    mswServer.use(
+      rest.post(
+        'http://localhost:3040/events/BIRTH/actions/sent-for-approval',
+        (_, res, ctx) => res(ctx.status(200))
+      )
+    )
+
     const response = await server.server.inject({
       method: 'POST',
       url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/validate',
