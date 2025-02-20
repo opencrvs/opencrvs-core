@@ -8,16 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { DateFieldValue } from '@opencrvs/commons/client'
 
-export const INITIAL_DATE_VALUE = null
-
-export const dateToString = (date: DateFieldValue) => {
-  if (!date) {
-    return ''
-  }
-  if (typeof date === 'string') {
-    return date
-  }
-  return (date as Date).toISOString().split('T')[0]
+export type User = {
+  id: string
+  name: { use: string; given: string[]; family: string }[]
+  role: string
 }

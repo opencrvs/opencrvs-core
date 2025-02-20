@@ -15,14 +15,15 @@
     "test:watch": "vitest",
     "lint": "yarn lint:css && yarn lint:ts",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
-    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}' --max-warnings=314",
+    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}' --max-warnings=288",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "bash extract-translations.sh",
     "generate-gateway-types": "NODE_OPTIONS=--dns-result-order=ipv4first graphql-codegen --config codegen.ts && prettier --write src/utils/gateway.ts",
     "build:clean": "rm -rf build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook"
+    "test-storybook": "test-storybook",
+    "chromatic": "chromatic"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -135,6 +136,7 @@
     "@storybook/react-vite": "^8.4.7",
     "@storybook/test": "^8.4.7",
     "@storybook/test-runner": "^0.21.0",
+    "@storybook/testing-library": "^0.2.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.1.0",
     "@types/browser-image-compression": "^1.0.13",
@@ -163,6 +165,7 @@
     "@vitest/coverage-c8": "^0.25.5",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "chalk": "^2.4.1",
+    "chromatic": "^11.25.2",
     "crypto-js": "^4.2.0",
     "csv-stringify": "^6.4.6",
     "csv2json": "^2.0.2",
@@ -185,6 +188,7 @@
     "opener": "^1.5.1",
     "prettier": "2.8.8",
     "qrcode": "^1.5.1",
+    "react-select-event": "^5.5.1",
     "serve": "^14.2.0",
     "storybook": "^8.4.7",
     "stylelint": "^14.11.0",
@@ -208,6 +212,11 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }

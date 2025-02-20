@@ -9,29 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { inScope, Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
-import { TRPCError, AnyTRPCMiddlewareFunction } from '@trpc/server'
-
-import { z } from 'zod'
-
-const ContextSchema = z.object({
-  user: z.object({
-    id: z.string(),
-    primaryOfficeId: z.string()
-  }),
-  token: z.string() as z.ZodType<TokenWithBearer>
-})
-
-export type Context = z.infer<typeof ContextSchema>
-
-/**
- * TRPC Middleware options with correct context.
- * Actual middleware type definition is only for internal use within TRPC.
- */
-type MiddlewareOptions = Omit<
-  Parameters<AnyTRPCMiddlewareFunction>[0],
-  'ctx'
-> & { ctx: Context }
+import { inScope, Scope } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import { MiddlewareOptions } from '@events/router/middleware/utils'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -42,22 +22,19 @@ function setBearerForToken(token: string) {
 
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
+
 /**
- * @param scopes scopes that are allowed to access the resource
+ * Middleware which checks that one of the required scopes are present in the token.
+ *
+ * @param scopes scopes that are required to access the resource
  * @returns TRPC compatible middleware function
  */
-function createScopeAuthMiddleware(scopes: Scope[]) {
+export function requiresAnyOfScopes(scopes: Scope[]) {
   return async (opts: MiddlewareOptions) => {
     if (inScope({ Authorization: setBearerForToken(opts.ctx.token) }, scopes)) {
       return opts.next()
     }
 
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
-}
-
-const isDataSeedingUser = createScopeAuthMiddleware([SCOPES.USER_DATA_SEEDING])
-
-export const middleware = {
-  isDataSeedingUser
 }

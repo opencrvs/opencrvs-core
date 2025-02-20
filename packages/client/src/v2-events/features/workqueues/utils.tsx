@@ -9,23 +9,41 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Dictionary, mapKeys } from 'lodash'
 import { MessageDescriptor, useIntl } from 'react-intl'
-
+import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
+import { ActionFormData } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
 /**
  * Replaces dots with triple underscores in the object keys.
  * This is needed to support dot notation in the message variables.
  */
-function convertDotToTripleUnderscore<T extends {}>(
-  obj: T
-): Dictionary<T[keyof T]> {
-  const keysWithUnderscores = mapKeys(obj, (_, key) => {
-    return key.replace(/\./g, INTERNAL_SEPARATOR)
-  })
+function convertDotToTripleUnderscore(obj: ActionFormData, parentKey = '') {
+  const result: Record<string, PrimitiveType> = {}
 
-  return keysWithUnderscores
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey =
+      (parentKey ? parentKey + INTERNAL_SEPARATOR : '') +
+      key.replace(/\./g, INTERNAL_SEPARATOR)
+    if (Array.isArray(value)) {
+      value.forEach((val, id) =>
+        Object.assign(
+          result,
+          convertDotToTripleUnderscore(
+            val,
+            (newKey ? newKey + INTERNAL_SEPARATOR : '') + id
+          )
+        )
+      )
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    } else if (typeof value === 'object' && value !== null) {
+      Object.assign(result, convertDotToTripleUnderscore(value, newKey))
+    } else {
+      result[newKey] = value
+    }
+  }
+
+  return result
 }
 
 /**
@@ -49,25 +67,37 @@ function convertDotInCurlyBraces(str: string): string {
 export function useIntlFormatMessageWithFlattenedParams() {
   const intl = useIntl()
 
-  function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
+  function formatMessage<T extends {}>(
+    message: MessageDescriptor,
+    params?: T
+  ): string {
     const variables = convertDotToTripleUnderscore(params ?? {})
 
-    return (
-      intl
-        .formatMessage(
-          {
-            id: message.id,
-            description: message.description,
-            defaultMessage: convertDotInCurlyBraces(
-              message.defaultMessage as string
-            )
-          },
-          variables
-        )
-        // When multiple variables are provided, we trim to ensure empty content in case both are missing.
-        // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
-        .trim()
+    const originalMessage =
+      intl.messages[message.id as keyof typeof intl.messages] ||
+      message.defaultMessage
+
+    if (typeof originalMessage !== 'string') {
+      // eslint-disable-next-line no-console
+      console.error(
+        'Message must be a string. Encountered',
+        originalMessage,
+        'when searching with',
+        message.id
+      )
+      throw new Error('Message must be a string')
+    }
+
+    const defaultMessage = convertDotInCurlyBraces(originalMessage)
+    const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
+      variables
     )
+    if (!formatted || typeof formatted !== 'string') {
+      return ''
+    }
+    // When multiple variables are provided, we trim to ensure empty content in case both are missing.
+    // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
+    return formatted.trim()
   }
 
   return {

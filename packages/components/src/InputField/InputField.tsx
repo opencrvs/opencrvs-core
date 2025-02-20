@@ -17,9 +17,7 @@ const InputHeader = styled.div`
   display: flex;
   justify-content: space-between;
 `
-const ComponentWrapper = styled.span`
-  display: flex;
-`
+const ComponentWrapper = styled.span``
 const InputDescription = styled.p`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};

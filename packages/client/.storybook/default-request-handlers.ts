@@ -8,18 +8,35 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { http } from 'msw'
 
-import { graphql, HttpResponse } from 'msw'
+/* eslint-disable import/no-relative-parent-imports */
+import { http, graphql, HttpResponse } from 'msw'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
 import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
-import superjson from 'superjson'
 import { AppRouter } from '../src/v2-events/trpc'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventIndex
 } from '../src/v2-events/features/events/fixtures'
+import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
+import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
+import { random } from 'lodash'
+
+async function ensureCacheExists(cacheName: string) {
+  const cacheNames = await caches.keys()
+  if (!cacheNames.includes(cacheName)) {
+    await caches.open(cacheName)
+    // eslint-disable-next-line no-console
+    console.log(`Cache "${cacheName}" created.`)
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(`Cache "${cacheName}" already exists.`)
+  }
+}
+const FAKE_CACHE_NAME = 'workbox-runtime'
+ensureCacheExists(FAKE_CACHE_NAME)
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
@@ -33,13 +50,365 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 export const handlers = {
   events: [
     tRPCMsw.event.config.get.query(() => {
-      return [tennisClubMembershipEvent]
-    }),
-    tRPCMsw.events.get.query(() => {
-      return [tennisClubMembershipEventIndex]
+      return [tennisClubMembershipEvent, birthEvent]
     }),
     tRPCMsw.event.list.query(() => {
-      return []
+      return [tennisClubMembershipEventIndex]
+    })
+  ],
+  getUserRoles: [
+    graphql.query('getUserRoles', () => {
+      return HttpResponse.json({
+        data: {
+          getUserRoles: [
+            {
+              id: 'FIELD_AGENT',
+              label: {
+                id: 'userRole.fieldAgent',
+                defaultMessage: 'Field Agent',
+                description: 'Name for user role Field Agent',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'POLICE_OFFICER',
+              label: {
+                id: 'userRole.policeOfficer',
+                defaultMessage: 'Police Officer',
+                description: 'Name for user role Police Officer',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'SOCIAL_WORKER',
+              label: {
+                id: 'userRole.socialWorker',
+                defaultMessage: 'Social Worker',
+                description: 'Name for user role Social Worker',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'HEALTHCARE_WORKER',
+              label: {
+                id: 'userRole.healthcareWorker',
+                defaultMessage: 'Healthcare Worker',
+                description: 'Name for user role Healthcare Worker',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_LEADER',
+              label: {
+                id: 'userRole.localLeader',
+                defaultMessage: 'Local Leader',
+                description: 'Name for user role Local Leader',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'REGISTRATION_AGENT',
+              label: {
+                id: 'userRole.registrationAgent',
+                defaultMessage: 'Registration Agent',
+                description: 'Name for user role Registration Agent',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-approval',
+                'record.declaration-submit-for-updates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.registration-request-correction',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.registration-print&issue-certified-copies',
+                'performance.read',
+                'performance.read-dashboards',
+                'organisation.read-locations:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_REGISTRAR',
+              label: {
+                id: 'userRole.localRegistrar',
+                defaultMessage: 'Local Registrar',
+                description: 'Name for user role Local Registrar',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-updates',
+                'record.review-duplicates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.register',
+                'record.registration-correct',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.unassign-others',
+                'record.registration-print&issue-certified-copies',
+                'record.confirm-registration',
+                'record.reject-registration',
+                'performance.read',
+                'performance.read-dashboards',
+                'profile.electronic-signature',
+                'organisation.read-locations:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_SYSTEM_ADMIN',
+              label: {
+                id: 'userRole.localSystemAdmin',
+                defaultMessage: 'Local System Admin',
+                description: 'Name for user role Local System Admin',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'user.read:my-office',
+                'user.create:my-jurisdiction',
+                'organisation.read-locations:my-jurisdiction',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'NATIONAL_SYSTEM_ADMIN',
+              label: {
+                id: 'userRole.nationalSystemAdmin',
+                defaultMessage: 'National System Admin',
+                description: 'Name for user role National System Admin',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'user.create:all',
+                'user.read:all',
+                'user.update:all',
+                'organisation.read-locations:all',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'config.update:all',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'PERFORMANCE_MANAGER',
+              label: {
+                id: 'userRole.performanceManager',
+                defaultMessage: 'Performance Manager',
+                description: 'Name for user role Performance Manager',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'NATIONAL_REGISTRAR',
+              label: {
+                id: 'userRole.nationalRegistrar',
+                defaultMessage: 'National Registrar',
+                description: 'Name for user role National Registrar',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-updates',
+                'record.review-duplicates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.register',
+                'record.registration-correct',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.unassign-others',
+                'record.registration-print&issue-certified-copies',
+                'record.confirm-registration',
+                'record.reject-registration',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'profile.electronic-signature',
+                'organisation.read-locations:my-office',
+                'user.read:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            }
+          ]
+        }
+      })
+    })
+  ],
+  files: [
+    http.post('/api/upload', async (req) => {
+      const formData = await req.request.formData()
+
+      return HttpResponse.text(
+        `event-attachments/${formData.get('transactionId')}.jpg`
+      )
+    }),
+    http.delete('/api/files/:filename', async (request) => {
+      return HttpResponse.text('OK')
+    }),
+    http.get('http://localhost:3535/ocrvs/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+
+      const response = await cache.match(request.request)
+
+      if (response) {
+        return response
+      }
+
+      const defaultFile = `
+        <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 6C3 4.34315 4.34315 3 6 3H14C15.6569 3 17 4.34315 17 6V14C17 15.6569 15.6569 17 14 17H6C4.34315 17 3 15.6569 3 14V6Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M21 7V18C21 19.6569 19.6569 21 18 21H7" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 12.375L6.66789 8.70711C7.05842 8.31658 7.69158 8.31658 8.08211 8.70711L10.875 11.5M10.875 11.5L13.2304 9.1446C13.6209 8.75408 14.2541 8.75408 14.6446 9.14461L17 11.5M10.875 11.5L12.8438 13.4688" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `
+
+      const tree = `
+        <svg width="150" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="65" y="100" width="20" height="60" fill="#8B4513" />
+        <circle cx="75" cy="80" r="40" fill="green" />
+        <circle cx="55" cy="90" r="30" fill="darkgreen" />
+        <circle cx="95" cy="90" r="30" fill="darkgreen" />
+        <circle cx="75" cy="60" r="30" fill="darkgreen" />
+        </svg>`
+
+      const fish = `
+        <svg width="150" height="100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="75" cy="50" rx="50" ry="30" fill="#1E90FF" />
+        <polygon points="115,50 135,35 135,65" fill="#4682B4" />
+        <circle cx="55" cy="40" r="5" fill="white" />
+        <path d="M55,50 Q65,40 75,50 Q65,60 55,50" fill="lightblue" />
+        </svg>`
+
+      const mountain = `
+          <svg width="200" height="150" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="80" y="70" fill="#98FB98" />
+          <polygon points="50,70 100,20 150,70" fill="#A9A9A9" />
+          <polygon points="70,70 120,30 170,70" fill="#808080" />
+          <circle cx="30" cy="30" r="20" fill="#FFD700" />
+          </svg>`
+
+      const url = new URL(request.request.url)
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = tree
+          break
+        case 'fish.svg':
+          file = fish
+          break
+        case 'mountain.svg':
+          file = mountain
+          break
+        default:
+          file = defaultFile
+      }
+
+      return new HttpResponse(file, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
     })
   ],
   registrationHome: [
@@ -115,6 +484,283 @@ export const handlers = {
             results: [],
             __typename: 'TotalMetrics'
           }
+        }
+      })
+    })
+  ],
+  roles: [
+    graphql.query('getUserRoles', () => {
+      return HttpResponse.json({
+        data: {
+          getUserRoles: [
+            {
+              id: 'FIELD_AGENT',
+              label: {
+                id: 'userRole.fieldAgent',
+                defaultMessage: 'Field Agent',
+                description: 'Name for user role Field Agent',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'POLICE_OFFICER',
+              label: {
+                id: 'userRole.policeOfficer',
+                defaultMessage: 'Police Officer',
+                description: 'Name for user role Police Officer',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'SOCIAL_WORKER',
+              label: {
+                id: 'userRole.socialWorker',
+                defaultMessage: 'Social Worker',
+                description: 'Name for user role Social Worker',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'HEALTHCARE_WORKER',
+              label: {
+                id: 'userRole.healthcareWorker',
+                defaultMessage: 'Healthcare Worker',
+                description: 'Name for user role Healthcare Worker',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_LEADER',
+              label: {
+                id: 'userRole.localLeader',
+                defaultMessage: 'Local Leader',
+                description: 'Name for user role Local Leader',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-submit-incomplete',
+                'record.declaration-submit-for-review',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'REGISTRATION_AGENT',
+              label: {
+                id: 'userRole.registrationAgent',
+                defaultMessage: 'Registration Agent',
+                description: 'Name for user role Registration Agent',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-approval',
+                'record.declaration-submit-for-updates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.registration-request-correction',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.registration-print&issue-certified-copies',
+                'performance.read',
+                'performance.read-dashboards',
+                'organisation.read-locations:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_REGISTRAR',
+              label: {
+                id: 'userRole.localRegistrar',
+                defaultMessage: 'Local Registrar',
+                description: 'Name for user role Local Registrar',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-updates',
+                'record.review-duplicates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.register',
+                'record.registration-correct',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.unassign-others',
+                'record.registration-print&issue-certified-copies',
+                'record.confirm-registration',
+                'record.reject-registration',
+                'performance.read',
+                'performance.read-dashboards',
+                'profile.electronic-signature',
+                'organisation.read-locations:my-office',
+                'user.read:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'LOCAL_SYSTEM_ADMIN',
+              label: {
+                id: 'userRole.localSystemAdmin',
+                defaultMessage: 'Local System Admin',
+                description: 'Name for user role Local System Admin',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'user.read:my-office',
+                'user.create:my-jurisdiction',
+                'organisation.read-locations:my-jurisdiction',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'NATIONAL_SYSTEM_ADMIN',
+              label: {
+                id: 'userRole.nationalSystemAdmin',
+                defaultMessage: 'National System Admin',
+                description: 'Name for user role National System Admin',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'user.create:all',
+                'user.read:all',
+                'user.update:all',
+                'organisation.read-locations:all',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'config.update:all',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'PERFORMANCE_MANAGER',
+              label: {
+                id: 'userRole.performanceManager',
+                defaultMessage: 'Performance Manager',
+                description: 'Name for user role Performance Manager',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            },
+            {
+              id: 'NATIONAL_REGISTRAR',
+              label: {
+                id: 'userRole.nationalRegistrar',
+                defaultMessage: 'National Registrar',
+                description: 'Name for user role National Registrar',
+                __typename: 'I18nMessage'
+              },
+              scopes: [
+                'record.declare-birth',
+                'record.declare-death',
+                'record.declare-marriage',
+                'record.declaration-edit',
+                'record.declaration-submit-for-updates',
+                'record.review-duplicates',
+                'record.declaration-archive',
+                'record.declaration-reinstate',
+                'record.register',
+                'record.registration-correct',
+                'record.declaration-print-supporting-documents',
+                'record.export-records',
+                'record.unassign-others',
+                'record.registration-print&issue-certified-copies',
+                'record.confirm-registration',
+                'record.reject-registration',
+                'performance.read',
+                'performance.read-dashboards',
+                'performance.vital-statistics-export',
+                'profile.electronic-signature',
+                'organisation.read-locations:my-office',
+                'user.read:my-office',
+                'search.birth',
+                'search.death',
+                'search.marriage',
+                'demo'
+              ],
+              __typename: 'UserRole'
+            }
+          ]
         }
       })
     })
@@ -452,6 +1098,152 @@ export const handlers = {
         entry: [
           {
             fullUrl:
+              'http://localhost:2021/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/115c7e08-cefe-4640-8818-15d904211e77',
+            resource: {
+              resourceType: 'Location',
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/statistical-code',
+                  value: 'ADMIN_STRUCTURE_AWn3s2RqgAN'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+                  value: 'STATE'
+                }
+              ],
+              name: 'Central',
+              alias: ['Central'],
+              description: 'AWn3s2RqgAN',
+              status: 'active',
+              mode: 'instance',
+              partOf: { reference: 'Location/0' },
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/location-type',
+                    code: 'ADMIN_STRUCTURE'
+                  }
+                ]
+              },
+              physicalType: {
+                coding: [{ code: 'jdn', display: 'Jurisdiction' }]
+              },
+              extension: [
+                {
+                  url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+                  valueAttachment: {
+                    contentType: 'application/geo+json',
+                    data: '<base64>'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+                  valueString:
+                    '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+                  valueString:
+                    '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+                  valueString:
+                    '[{"2007":40000},{"2008":40000},{"2009":40000},{"2010":40000},{"2011":40000},{"2012":40000},{"2013":40000},{"2014":40000},{"2015":40000},{"2016":40000},{"2017":40000},{"2018":40000},{"2019":40000},{"2020":40000},{"2021":40000},{"2022":60000},{"2023":80000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+                  valueString:
+                    '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
+                }
+              ],
+              meta: {
+                lastUpdated: '2025-02-05T07:52:42.266+00:00',
+                versionId: '115c7e08-cefe-4640-8818-15d904211e77'
+              },
+              id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+            },
+            request: {
+              method: 'PUT',
+              url: 'Location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+            }
+          },
+          {
+            fullUrl:
+              'http://localhost:2021/location/5ef450bc-712d-48ad-93f3-8da0fa453baa/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
+            resource: {
+              resourceType: 'Location',
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/statistical-code',
+                  value: 'ADMIN_STRUCTURE_oEBf29y8JP8'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+                  value: 'DISTRICT'
+                }
+              ],
+              name: 'Ibombo',
+              alias: ['Ibombo'],
+              description: 'oEBf29y8JP8',
+              status: 'active',
+              mode: 'instance',
+              partOf: {
+                reference: 'Location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+              },
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/location-type',
+                    code: 'ADMIN_STRUCTURE'
+                  }
+                ]
+              },
+              physicalType: {
+                coding: [{ code: 'jdn', display: 'Jurisdiction' }]
+              },
+              extension: [
+                {
+                  url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+                  valueAttachment: {
+                    contentType: 'application/geo+json',
+                    data: '<base64>'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+                  valueString:
+                    '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+                  valueString:
+                    '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+                  valueString:
+                    '[{"2007":10000},{"2008":10000},{"2009":10000},{"2010":10000},{"2011":10000},{"2012":10000},{"2013":10000},{"2014":10000},{"2015":10000},{"2016":10000},{"2017":10000},{"2018":10000},{"2019":10000},{"2020":10000},{"2021":10000},{"2022":15000},{"2023":20000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+                  valueString:
+                    '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
+                }
+              ],
+              meta: {
+                lastUpdated: '2025-02-05T07:52:42.267+00:00',
+                versionId: '8ae119de-682a-40fa-be03-9de10fc07d53'
+              },
+              id: '5ef450bc-712d-48ad-93f3-8da0fa453baa'
+            },
+            request: {
+              method: 'PUT',
+              url: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+            }
+          },
+          {
+            fullUrl:
               'http://config:2021/location/92ab695b-9362-4682-a861-ddce87a3a905/_history/f11c3af0-b945-4082-8902-c66e4f9b43da',
             resource: {
               resourceType: 'Location',
@@ -466,7 +1258,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/890bda15-bb14-4575-93c2-e23cad0233e2'
+                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
               },
               type: {
                 coding: [
@@ -805,7 +1597,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/890bda15-bb14-4575-93c2-e23cad0233e2'
+                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
               },
               type: {
                 coding: [
@@ -1106,11 +1898,91 @@ export const handlers = {
     })
   ],
   config: [
+    http.get(
+      'http://localhost:6006/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
+      () => {
+        return HttpResponse.text(
+          tennisClubMembershipCertifiedCertificateTemplate
+        )
+      }
+    ),
+    http.get(
+      'http://localhost:6006/api/countryconfig/certificates/tennis-club-membership-certified-certificate.svg',
+      () => {
+        return HttpResponse.text(
+          tennisClubMembershipCertifiedCertificateTemplate
+        )
+      }
+    ),
+
+    http.get(
+      'http://localhost:6006/api/countryconfig/fonts/NotoSans-Regular.ttf',
+      async () => {
+        const fontResponse = await fetch(
+          'http://localhost:3040/fonts/NotoSans-Regular.ttf'
+        )
+        const fontArrayBuffer = await fontResponse.arrayBuffer()
+        return HttpResponse.arrayBuffer(fontArrayBuffer)
+      }
+    ),
+
     http.get('http://localhost:2021/config', () => {
       return HttpResponse.json({
         systems: [],
         config: mockOfflineData.config,
-        certificates: []
+        certificates: [
+          {
+            id: 'tennis-club-membership-certificate',
+            event: 'TENNIS_CLUB_MEMBERSHIP',
+            label: {
+              id: 'certificates.tennis-club-membership.certificate.copy',
+              defaultMessage: 'Tennis Club Membership Certificate copy',
+              description: 'The label for a tennis-club-membership certificate'
+            },
+            isDefault: false,
+            fee: {
+              onTime: 7,
+              late: 10.6,
+              delayed: 18
+            },
+            svgUrl:
+              '/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
+            fonts: {
+              'Noto Sans': {
+                normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+                italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+              }
+            }
+          },
+          {
+            id: 'tennis-club-membership-certified-certificate',
+            event: 'TENNIS_CLUB_MEMBERSHIP',
+            label: {
+              id: 'certificates.tennis-club-membership.certificate.certified-copy',
+              defaultMessage:
+                'Tennis Club Membership Certificate certified copy',
+              description: 'The label for a tennis-club-membership certificate'
+            },
+            isDefault: false,
+            fee: {
+              onTime: 7,
+              late: 10.6,
+              delayed: 18
+            },
+            svgUrl:
+              '/api/countryconfig/certificates/tennis-club-membership-certified-certificate.svg',
+            fonts: {
+              'Noto Sans': {
+                normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+                italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+              }
+            }
+          }
+        ]
       })
     })
   ],
@@ -1120,7 +1992,9 @@ export const handlers = {
         languages: [
           {
             lang: 'en',
-            messages: {}
+            messages: {
+              'review.header.title.govtName': 'Republic of Farajaland'
+            }
           },
           {
             lang: 'fr',

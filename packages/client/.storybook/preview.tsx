@@ -12,7 +12,7 @@
 import { getTheme } from '@opencrvs/components/lib/theme'
 import type { Preview } from '@storybook/react'
 import { initialize, mswLoader } from 'msw-storybook-addon'
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import { Provider } from 'react-redux'
 import {
   createMemoryRouter,
@@ -21,12 +21,12 @@ import {
   RouterProvider
 } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
-import { Page } from '../src/components/Page'
-import { I18nContainer } from '../src/i18n/components/I18nContainer'
-import { createStore } from '../src/store'
-import { useApolloClient } from '../src/utils/apolloClient'
-import { ApolloProvider } from '../src/utils/ApolloProvider'
-import { TRPCProvider } from '../src/v2-events/trpc'
+import { Page } from '@client/components/Page'
+import { I18nContainer } from '@client/i18n/components/I18nContainer'
+import { createStore } from '@client/store'
+import { useApolloClient } from '@client/utils/apolloClient'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { TRPCProvider } from '@client/v2-events/trpc'
 import { handlers } from './default-request-handlers'
 import WebFont from 'webfontloader'
 WebFont.load({
@@ -53,13 +53,13 @@ initialize({
 
 const { store } = createStore()
 
-interface WrapperProps {
+type WrapperProps = PropsWithChildren<{
   store: ReturnType<typeof createStore>['store']
   initialPath: string
-  router: RouteObject
-}
+  router?: RouteObject
+}>
 
-function Wrapper({ store, router, initialPath }: WrapperProps) {
+function Wrapper({ store, router, initialPath, children }: WrapperProps) {
   const { client } = useApolloClient(store)
 
   return (
@@ -78,7 +78,12 @@ function Wrapper({ store, router, initialPath }: WrapperProps) {
                           <Outlet />
                         </Page>
                       ),
-                      children: [router]
+                      children: [
+                        router || {
+                          path: initialPath,
+                          element: children
+                        }
+                      ]
                     }
                   ],
                   {
@@ -110,13 +115,15 @@ const preview: Preview = {
     )
   },
   decorators: [
-    (_Story, context) => {
+    (Story, context) => {
       return (
         <Wrapper
           store={store}
           router={context.parameters?.reactRouter?.router}
           initialPath={context.parameters?.reactRouter?.initialPath || '/'}
-        ></Wrapper>
+        >
+          <Story />
+        </Wrapper>
       )
     }
   ]

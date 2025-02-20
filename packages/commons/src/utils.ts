@@ -8,4 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './Legend'
+
+export function getOrThrow<T>(x: T, message: string) {
+  if (x === undefined || x === null) {
+    throw new Error(message)
+  }
+
+  return x
+}

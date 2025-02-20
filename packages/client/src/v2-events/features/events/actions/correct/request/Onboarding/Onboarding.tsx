@@ -24,16 +24,17 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 const messages = defineMessages({
   title: {
     defaultMessage: 'Correct Record',
     description: 'Label for correct record button in dropdown menu',
-    id: 'action.correct'
+    id: 'v2.action.correct'
   }
 })
 
-export function Onboarding() {
+function Onboarding() {
   const resetMetadata = useCorrectionRequestData((state) => state.clear)
   const resetFormData = useEventFormData((state) => state.clear)
   React.useEffect(() => {
@@ -101,7 +102,6 @@ export function Onboarding() {
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
-        eventId={event.id}
         // @TODO: Use subscription if needed
         form={correctionRequestData.getFormValues()}
         formPages={formPages}
@@ -128,3 +128,5 @@ export function Onboarding() {
     </ActionPageLight>
   )
 }
+
+export const OnboardingIndex = withSuspense(Onboarding)

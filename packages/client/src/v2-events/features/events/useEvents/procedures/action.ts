@@ -14,11 +14,15 @@ import { useMutation } from '@tanstack/react-query'
 import { getMutationKey } from '@trpc/react-query'
 import {
   ActionInput,
+  ActionType,
   EventDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  stripHiddenOrDisabledFields
 } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from './create'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import _ from 'lodash'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   utils.event.get.setData(updatedEvent.id, updatedEvent)
@@ -43,7 +47,11 @@ function waitUntilEventIsCreated<T extends { eventId: string }, R>(
       )
     }
 
-    return canonicalMutationFn({ ...params, eventId: localVersion.id })
+    return canonicalMutationFn({
+      ...params,
+      eventId: localVersion.id,
+      eventType: localVersion.type
+    })
   }
 }
 
@@ -52,18 +60,20 @@ type Mutation =
   | typeof api.event.actions.notify
   | typeof api.event.actions.register
   | typeof api.event.actions.validate
-  | typeof api.event.actions.correct.request
-  | typeof api.event.actions.correct.approve
-  | typeof api.event.actions.correct.reject
+  | typeof api.event.actions.printCertificate
+  | typeof api.event.actions.correction.request
+  | typeof api.event.actions.correction.approve
+  | typeof api.event.actions.correction.reject
 
 type Procedure =
   | typeof utils.event.actions.declare
   | typeof utils.event.actions.notify
   | typeof utils.event.actions.register
   | typeof utils.event.actions.validate
-  | typeof utils.event.actions.correct.request
-  | typeof utils.event.actions.correct.approve
-  | typeof utils.event.actions.correct.reject
+  | typeof utils.event.actions.printCertificate
+  | typeof utils.event.actions.correction.request
+  | typeof utils.event.actions.correction.approve
+  | typeof utils.event.actions.correction.reject
 
 /*
  * This makes sure that if you are offline and do
@@ -148,54 +158,87 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent,
-  onMutate: (params) => updateEventOptimistically('DECLARE')(params)
+  onMutate: (params) => updateEventOptimistically('DECLARE')(params),
+  meta: {
+    actionType: ActionType.DECLARE
+  }
 }))
 
 utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.REGISTER
+  }
 }))
 
 utils.event.actions.notify.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.NOTIFY
+  }
 }))
 
 utils.event.actions.validate.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.VALIDATE
+  }
 }))
 
-utils.event.actions.correct.request.setMutationDefaults(
+utils.event.actions.printCertificate.setMutationDefaults(
   ({ canonicalMutationFn }) => ({
     retry: true,
     retryDelay: 10000,
     mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent
+    onSuccess: updateLocalEvent,
+    meta: {
+      actionType: ActionType.PRINT_CERTIFICATE
+    }
   })
 )
 
-utils.event.actions.correct.approve.setMutationDefaults(
+utils.event.actions.correction.request.setMutationDefaults(
   ({ canonicalMutationFn }) => ({
     retry: true,
     retryDelay: 10000,
     mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent
+    onSuccess: updateLocalEvent,
+    meta: {
+      actionType: ActionType.REQUEST_CORRECTION
+    }
   })
 )
 
-utils.event.actions.correct.reject.setMutationDefaults(
+utils.event.actions.correction.approve.setMutationDefaults(
   ({ canonicalMutationFn }) => ({
     retry: true,
     retryDelay: 10000,
     mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent
+    onSuccess: updateLocalEvent,
+    meta: {
+      actionType: ActionType.APPROVE_CORRECTION
+    }
+  })
+)
+
+utils.event.actions.correction.reject.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent,
+    meta: {
+      actionType: ActionType.REJECT_CORRECTION
+    }
   })
 )
 
@@ -203,6 +246,7 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
   procedure: P,
   mutation: M
 ) {
+  const eventConfigurations = useEventConfigurations()
   const mutationDefaults = procedure.getMutationDefaults()
 
   if (!mutationDefaults?.mutationFn) {
@@ -211,11 +255,40 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
     )
   }
 
+  const defaultMutationFn = mutationDefaults.mutationFn
+  const actionType = mutationDefaults?.meta?.actionType as ActionType
+
+  if (!actionType) {
+    throw new Error('No event action type found. This should never happen')
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mutationFn = waitUntilEventIsCreated<any, any>(
+    async ({ eventType, ...params }) => {
+      const eventConfiguration = eventConfigurations.find(
+        (event) => event.id === eventType
+      )
+
+      if (!eventConfiguration) {
+        throw new Error('Event configuration not found')
+      }
+
+      return defaultMutationFn({
+        ...params,
+
+        data: stripHiddenOrDisabledFields(
+          actionType,
+          eventConfiguration,
+          params.data
+        )
+      })
+    }
+  )
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return useMutation<any, any, any, any>({
     ...mutationDefaults,
     mutationKey: getMutationKey(mutation),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutationFn: waitUntilEventIsCreated<any, any>(mutationDefaults.mutationFn)
+    mutationFn
   }) as ReturnType<M['useMutation']>
 }

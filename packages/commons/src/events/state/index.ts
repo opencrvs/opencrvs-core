@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from '../ActionConfig'
+import { ActionType } from '../ActionType'
 import { ActionDocument } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
@@ -51,10 +51,26 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
 }
 
 function getData(actions: Array<ActionDocument>) {
+  /** Types that are not taken into the aggregate values (e.g. while printing certificate)
+   * stop auto filling collector form with previous priint action data)
+   */
+  const excludedActions = [
+    ActionType.REQUEST_CORRECTION,
+    ActionType.PRINT_CERTIFICATE
+  ]
+
   return actions.reduce((status, action) => {
-    if (action.type === ActionType.REQUEST_CORRECTION) {
+    if (
+      excludedActions.some((excludedAction) => excludedAction === action.type)
+    ) {
       return status
     }
+
+    /*
+     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+     * details in the correction. To do this, we find the original request that this
+     * approval is for and merge its details with the current data of the record.
+     */
 
     if (action.type === ActionType.APPROVE_CORRECTION) {
       const requestAction = actions.find(({ id }) => id === action.requestId)

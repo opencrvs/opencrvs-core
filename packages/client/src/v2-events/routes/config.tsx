@@ -10,18 +10,20 @@
  */
 
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, RouteObject } from 'react-router-dom'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import * as Register from '@client/v2-events/features/events/actions/register'
+import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
 import { ROUTES } from './routes'
 
 /**
@@ -29,6 +31,7 @@ import { ROUTES } from './routes'
  *
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
+
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
@@ -95,6 +98,28 @@ export const routesConfig = {
           element: <Register.Review />
         }
       ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,
+      element: <Outlet />,
+      children: [
+        {
+          index: true,
+          element: <PrintCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.path,
+          element: <PrintCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.path,
+          element: <PrintCertificate.Review />
+        }
+      ]
+    },
+    {
+      path: ROUTES.V2.ADVANCED_SEARCH.path,
+      element: <AdvancedSearch />
     }
   ]
-}
+} satisfies RouteObject

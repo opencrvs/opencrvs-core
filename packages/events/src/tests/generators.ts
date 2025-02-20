@@ -16,10 +16,34 @@ import {
   ActionType,
   ValidateActionInput,
   RegisterActionInput,
-  RequestCorrectionActionInput
+  RequestCorrectionActionInput,
+  mapFieldTypeToMockValue,
+  EventConfig,
+  findActiveActionFields,
+  stripHiddenOrDisabledFields
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+
+export function generateActionInput(
+  configuration: EventConfig,
+  action: ActionType
+) {
+  const fields = findActiveActionFields(configuration, action) ?? []
+
+  const data = fields.reduce(
+    (acc, field, i) => ({
+      ...acc,
+      [field.id]: mapFieldTypeToMockValue(field, i)
+    }),
+    {}
+  )
+
+  // Strip away hidden or disabled fields from mock action data
+  // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
+  return stripHiddenOrDisabledFields(action, configuration, data)
+}
 
 interface Name {
   use: string
@@ -39,6 +63,7 @@ interface CreateUser {
   role?: string
   name?: Array<Name>
 }
+
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
@@ -60,7 +85,9 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.DECLARE,
         transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
+        data:
+          input.data ??
+          generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
         eventId
       }),
       validate: (
@@ -79,10 +106,26 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.REGISTER,
         transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
+        data:
+          input.data ??
+          generateActionInput(tennisClubMembershipEvent, ActionType.REGISTER),
         eventId
       }),
-      correct: {
+      printCertificate: (
+        eventId: string,
+        input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.PRINT_CERTIFICATE,
+        transactionId: input.transactionId ?? getUUID(),
+        data:
+          input.data ??
+          generateActionInput(
+            tennisClubMembershipEvent,
+            ActionType.PRINT_CERTIFICATE
+          ),
+        eventId
+      }),
+      correction: {
         request: (
           eventId: string,
           input: Partial<
@@ -91,7 +134,12 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.REQUEST_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? {},
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.REQUEST_CORRECTION
+            ),
           metadata: {},
           eventId
         }),
@@ -104,7 +152,12 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.APPROVE_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? {},
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.APPROVE_CORRECTION
+            ),
           eventId,
           requestId
         }),
@@ -117,7 +170,12 @@ export function payloadGenerator() {
         ) => ({
           type: ActionType.REJECT_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? {},
+          data:
+            input.data ??
+            generateActionInput(
+              tennisClubMembershipEvent,
+              ActionType.REJECT_CORRECTION
+            ),
           eventId,
           requestId
         })

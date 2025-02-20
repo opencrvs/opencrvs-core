@@ -9,35 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Conditional } from '../conditionals/conditionals'
+import { EnableConditional, ShowConditional } from './Conditional'
 import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { ActionType } from './ActionType'
+
+/**
+ * By default, when conditionals are not defined, action is visible and enabled to the user.
+ */
+const ActionConditional = z.discriminatedUnion('type', [
+  /** If conditional is defined, the action is shown to the user only if the condition is met */
+  ShowConditional,
+  /** If conditional is defined, the action is enabled only if the condition is met */
+  EnableConditional
+])
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
-  allowedWhen: Conditional().optional(),
+  conditionals: z.array(ActionConditional).optional().default([]),
   draft: z.boolean().optional(),
   forms: z.array(FormConfig)
 })
-
-/**
- * Actions recognized by the system
- */
-export const ActionType = {
-  CREATE: 'CREATE',
-  ASSIGN: 'ASSIGN',
-  UNASSIGN: 'UNASSIGN',
-  REGISTER: 'REGISTER',
-  VALIDATE: 'VALIDATE',
-  REQUEST_CORRECTION: 'REQUEST_CORRECTION',
-  REJECT_CORRECTION: 'REJECT_CORRECTION',
-  APPROVE_CORRECTION: 'APPROVE_CORRECTION',
-  DETECT_DUPLICATE: 'DETECT_DUPLICATE',
-  NOTIFY: 'NOTIFY',
-  DECLARE: 'DECLARE',
-  DELETE: 'DELETE',
-  CUSTOM: 'CUSTOM'
-} as const
 
 const CreateConfig = ActionConfigBase.merge(
   z.object({
@@ -69,6 +61,12 @@ const DeleteConfig = ActionConfigBase.merge(
   })
 )
 
+const PrintCertificateActionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
 const RequestCorrectionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
@@ -95,16 +93,49 @@ const CustomConfig = ActionConfigBase.merge(
   })
 )
 
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllActionConfigFields =
+  | typeof CreateConfig
+  | typeof DeclareConfig
+  | typeof ValidateConfig
+  | typeof RegisterConfig
+  | typeof DeleteConfig
+  | typeof PrintCertificateActionConfig
+  | typeof RequestCorrectionConfig
+  | typeof RejectCorrectionConfig
+  | typeof ApproveCorrectionConfig
+  | typeof CustomConfig
+
+/** @knipignore */
+export type InferredActionConfig =
+  | z.infer<typeof CreateConfig>
+  | z.infer<typeof DeclareConfig>
+  | z.infer<typeof ValidateConfig>
+  | z.infer<typeof RegisterConfig>
+  | z.infer<typeof DeleteConfig>
+  | z.infer<typeof PrintCertificateActionConfig>
+  | z.infer<typeof RequestCorrectionConfig>
+  | z.infer<typeof RejectCorrectionConfig>
+  | z.infer<typeof ApproveCorrectionConfig>
+  | z.infer<typeof CustomConfig>
+
 export const ActionConfig = z.discriminatedUnion('type', [
   CreateConfig,
   DeclareConfig,
   ValidateConfig,
   RegisterConfig,
   DeleteConfig,
+  PrintCertificateActionConfig,
   RequestCorrectionConfig,
   RejectCorrectionConfig,
   ApproveCorrectionConfig,
   CustomConfig
-])
+]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
 
-export type ActionConfig = z.infer<typeof ActionConfig>
+export type ActionConfig = InferredActionConfig

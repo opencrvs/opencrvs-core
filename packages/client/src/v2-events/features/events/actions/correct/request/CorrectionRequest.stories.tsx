@@ -40,26 +40,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-export const Onboarding: Story = {
-  parameters: {
-    reactRouter: {
-      router: router,
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
-        pageId: 'corrector'
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
 function FormClear() {
   const form = useEventFormData()
   const requestDetails = useCorrectionRequestData()
@@ -76,26 +56,6 @@ function FormClear() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return <Outlet />
-}
-
-export const ReviewWithoutChanges: Story = {
-  parameters: {
-    reactRouter: {
-      router,
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
 }
 
 export const ReviewWithChanges: Story = {

@@ -9,79 +9,76 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { FieldType } from './FieldConfig'
 
-const TextFieldValue = z.string()
-export type TextFieldValue = z.infer<typeof TextFieldValue>
+export const TextValue = z.string()
 
-const DateFieldValue = z.string().nullable()
-export type DateFieldValue = z.infer<typeof DateFieldValue>
+export const DateValue = z
+  .string()
+  .date()
+  .describe('Date in the format YYYY-MM-DD')
 
-const ParagraphFieldValue = z.string()
-export type ParagraphFieldValue = z.infer<typeof ParagraphFieldValue>
+export const EmailValue = z.string().email()
 
-const PageHeaderFieldValue = z.string()
-export type PageHeaderFieldValue = z.infer<typeof PageHeaderFieldValue>
-
-const BulletListFieldValue = z.string()
-export type BulletListFieldValue = z.infer<typeof BulletListFieldValue>
-
-export const FileFieldValue = z
-  .object({
-    filename: z.string(),
-    originalFilename: z.string(),
-    type: z.string()
-  })
-  .nullable()
+export const FileFieldValue = z.object({
+  filename: z.string(),
+  originalFilename: z.string(),
+  type: z.string()
+})
 
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 
-const RadioGroupFieldValue = z.string()
-export type RadioGroupFieldValue = z.infer<typeof RadioGroupFieldValue>
+export const AddressFieldValue = z
+  .object({
+    country: z.string(),
+    province: z.string(),
+    district: z.string(),
+    urbanOrRural: z.string(),
+    town: z.string(),
+    residentialArea: z.string(),
+    street: z.string(),
+    number: z.string(),
+    zipCode: z.string(),
+    village: z.string()
+  })
+  .partial()
 
-const CheckboxFieldValue = z.enum(['true', 'false'])
+export type AddressFieldValue = z.infer<typeof AddressFieldValue>
+export const FileFieldValueWithOption = z.object({
+  filename: z.string(),
+  originalFilename: z.string(),
+  type: z.string(),
+  option: z.string()
+})
+
+export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
+
+export const FileFieldWithOptionValue = z.array(FileFieldValueWithOption)
+
+export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
+
+export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 
-const LocationFieldValue = z.string()
-export type LocationFieldValue = z.infer<typeof LocationFieldValue>
-
-const SelectFieldValue = z.string()
-export type SelectFieldValue = z.infer<typeof SelectFieldValue>
-
-const CountryFieldValue = z.string()
-export type CountryFieldValue = z.infer<typeof CountryFieldValue>
-
-export type FieldTypeToFieldValue<T extends FieldType> = T extends 'TEXT'
-  ? TextFieldValue
-  : T extends 'PARAGRAPH'
-  ? ParagraphFieldValue
-  : T extends 'BULLET_LIST'
-  ? BulletListFieldValue
-  : T extends 'DATE'
-  ? DateFieldValue
-  : T extends 'FILE'
-  ? FileFieldValue
-  : T extends 'RADIO_GROUP'
-  ? RadioGroupFieldValue
-  : T extends 'CHECKBOX'
-  ? CheckboxFieldValue
-  : T extends 'LOCATION'
-  ? LocationFieldValue
-  : T extends 'COUNTRY'
-  ? CountryFieldValue
-  : T extends 'SELECT'
-  ? SelectFieldValue
-  : never
-
 export const FieldValue = z.union([
-  TextFieldValue,
-  DateFieldValue,
-  ParagraphFieldValue,
+  TextValue,
+  DateValue,
   FileFieldValue,
-  RadioGroupFieldValue,
+  FileFieldWithOptionValue,
   CheckboxFieldValue,
-  LocationFieldValue,
-  SelectFieldValue
+  AddressFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
+
+/**
+ * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
+ * */
+export type FieldValueSchema =
+  | typeof FileFieldValue
+  | typeof FileFieldWithOptionValue
+  | typeof CheckboxFieldValue
+  | typeof AddressFieldValue
+  | z.ZodString
+  | z.ZodBoolean
+
+export type OptionalFieldValueSchema = z.ZodOptional<FieldValueSchema>

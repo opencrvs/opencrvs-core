@@ -10,14 +10,15 @@
  */
 
 import { z } from 'zod'
-import { ActionType } from './ActionConfig'
+import { ActionType } from './ActionType'
 import { FieldValue } from './FieldValue'
 
 const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
   draft: z.boolean().optional().default(false),
-  data: z.record(z.string(), FieldValue)
+  data: z.record(z.string(), FieldValue),
+  metadata: z.record(z.string(), FieldValue).optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -63,6 +64,14 @@ export const DeclareActionInput = BaseActionInput.merge(
   })
 )
 
+export const PrintCertificateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.PRINT_CERTIFICATE)
+      .default(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
 export type DeclareActionInput = z.infer<typeof DeclareActionInput>
 
 const AssignActionInput = BaseActionInput.merge(
@@ -81,8 +90,7 @@ export const RequestCorrectionActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.REQUEST_CORRECTION)
-      .default(ActionType.REQUEST_CORRECTION),
-    metadata: z.record(z.string(), FieldValue)
+      .default(ActionType.REQUEST_CORRECTION)
   })
 )
 
@@ -132,6 +140,7 @@ export const ActionInput = z.discriminatedUnion('type', [
   DeclareActionInput,
   AssignActionInput,
   UnassignActionInput,
+  PrintCertificateActionInput,
   RequestCorrectionActionInput,
   RejectCorrectionActionInput,
   ApproveCorrectionActionInput

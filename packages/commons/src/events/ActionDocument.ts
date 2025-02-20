@@ -8,15 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 import { FieldValue } from './FieldValue'
+import { ActionType } from './ActionType'
 
 const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
+  metadata: z.record(z.string(), FieldValue).optional(),
   draft: z.boolean().optional().default(false),
   createdAtLocation: z.string()
 })
@@ -68,6 +69,12 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+const PrintCertificateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
 const RequestedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION)
@@ -105,6 +112,7 @@ export const ActionDocument = z.discriminatedUnion('type', [
   ApprovedCorrectionAction,
   RejectedCorrectionAction,
   UnassignedAction,
+  PrintCertificateAction,
   CustomAction
 ])
 

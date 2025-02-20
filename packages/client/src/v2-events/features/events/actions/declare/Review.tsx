@@ -24,6 +24,7 @@ import {
 } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -33,54 +34,54 @@ import { FormLayout } from '@client/v2-events/layouts/form'
 
 const messages = defineMessages({
   reviewActionTitle: {
-    id: 'reviewAction.title',
+    id: 'v2.reviewAction.title',
     defaultMessage: 'Declare member',
     description: 'The title for review action'
   },
   reviewActionDescription: {
-    id: 'reviewAction.description',
+    id: 'v2.reviewAction.description',
     defaultMessage:
       'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
     description: 'The description for review action'
   },
   reviewActionDeclare: {
-    id: 'reviewAction.Declare',
+    id: 'v2.reviewAction.Declare',
     defaultMessage: 'Declare',
     description: 'The label for declare button of review action'
   },
   reviewActionReject: {
-    id: 'reviewAction.reject',
+    id: 'v2.reviewAction.reject',
     defaultMessage: 'Reject',
     description: 'The label for reject button of review action'
   },
   rejectModalCancel: {
-    id: 'rejectModal.cancel',
+    id: 'v2.rejectModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of reject modal'
   },
   rejectModalArchive: {
-    id: 'rejectModal.archive',
+    id: 'v2.rejectModal.archive',
     defaultMessage: 'Archive',
     description: 'The label for archive button of reject modal'
   },
   rejectModalSendForUpdate: {
-    id: 'rejectModal.sendForUpdate',
+    id: 'v2.rejectModal.sendForUpdate',
     defaultMessage: 'Send For Update',
     description: 'The label for send For Update button of reject modal'
   },
   rejectModalTitle: {
-    id: 'rejectModal.title',
+    id: 'v2.rejectModal.title',
     defaultMessage: 'Reason for rejection?',
     description: 'The title for reject modal'
   },
   rejectModalDescription: {
-    id: 'rejectModal.description',
+    id: 'v2.rejectModal.description',
     defaultMessage:
       'Please describe the updates required to this record for follow up action.',
     description: 'The description for reject modal'
   },
   rejectModalMarkAsDuplicate: {
-    id: 'rejectModal.markAsDuplicate',
+    id: 'v2.rejectModal.markAsDuplicate',
     defaultMessage: 'Mark as a duplicate',
     description: 'The label for mark as duplicate checkbox of reject modal'
   }
@@ -104,7 +105,6 @@ export function Review() {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
-
   const { goToHome } = useEventFormNavigation()
   const declareMutation = events.actions.declare
 
@@ -117,17 +117,23 @@ export function Review() {
   )[0]
 
   const form = useEventFormData((state) => state.formValues)
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata(eventId, {})
 
   async function handleEdit({
     pageId,
-    fieldId
+    fieldId,
+    confirmation
   }: {
     pageId: string
     fieldId?: string
+    confirmation?: boolean
   }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
-    ))
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
+      )))
 
     if (confirmedEdit) {
       navigate(
@@ -152,9 +158,9 @@ export function Review() {
       declareMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: uuid()
+        transactionId: uuid(),
+        metadata
       })
-
       goToHome()
     }
   }
@@ -187,6 +193,7 @@ export function Review() {
           eventId: event.id,
           data: form,
           transactionId: uuid(),
+          metadata,
           draft: true
         })
         goToHome()
@@ -198,11 +205,14 @@ export function Review() {
         // eslint-disable-next-line
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
+        isUploadButtonVisible={true}
         // @todo: Update to use dynamic title
         title={intl.formatMessage(formConfigs[0].review.title, {
           firstname: form['applicant.firstname'] as string,
           surname: form['applicant.surname'] as string
         })}
+        metadata={metadata}
+        onMetadataChange={(values) => setMetadata(eventId, values)}
       >
         <ReviewComponent.Actions
           messages={{

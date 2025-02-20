@@ -21,7 +21,7 @@ on:
 jobs:
   build:
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -52,7 +52,7 @@ jobs:
 
   comment-check:
     if: github.event_name == 'issue_comment' && github.event.comment.body == '/uikit'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository

@@ -29,6 +29,10 @@ Client for managing custom events.
 
 We will be iterating over the structure during the project. Treat it as a starting point. Many times the important thing is to have any structure.
 
+## Route structure
+
+By default, Events V2 is accessible via the /v2 route, allowing the application’s normal operations to continue alongside its development. When Events V2 needs to be deployed to a live environment as the primary event type, the environment variable V2_EVENTS=true can be set in the country config package. This hides the old event views completely and replaces them with Events V2. Once Events V2 is officially released, it will become the default event view.
+
 ## Development practices
 
 - Do not import components outside v2-events. If you need a component, copy it in and refactor it.

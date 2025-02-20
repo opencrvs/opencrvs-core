@@ -28,12 +28,6 @@ import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
-export const EventInputWithId = EventInput.extend({
-  id: z.string()
-})
-
-export type EventInputWithId = z.infer<typeof EventInputWithId>
-
 async function getEventByTransactionId(transactionId: string) {
   const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
@@ -62,6 +56,12 @@ export async function getEventById(id: string) {
   }
 
   return event
+}
+
+export async function getEventTypeId(id: string) {
+  const event = await getEventById(id)
+
+  return event.type
 }
 
 export async function deleteEvent(
@@ -111,7 +111,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 
       const fileValue = FileFieldValue.safeParse(value)
 
-      if (!isFile || !fileValue.success || !fileValue.data) {
+      if (!isFile || !fileValue.success) {
         continue
       }
 
@@ -208,7 +208,7 @@ export async function addAction(
       continue
     }
 
-    if (fileValue.data && !(await fileExists(fileValue.data.filename, token))) {
+    if (!(await fileExists(fileValue.data.filename, token))) {
       throw new Error(`File not found: ${fileValue.data.filename}`)
     }
   }
@@ -239,30 +239,4 @@ export async function addAction(
   await indexEvent(updatedEvent)
   await notifyOnAction(input, updatedEvent, token)
   return updatedEvent
-}
-
-export async function patchEvent(eventInput: EventInputWithId) {
-  const existingEvent = await getEventById(eventInput.id)
-
-  const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
-
-  const now = new Date().toISOString()
-
-  await collection.updateOne(
-    {
-      id: eventInput.id
-    },
-    {
-      $set: {
-        ...eventInput,
-        updatedAt: now
-      }
-    }
-  )
-
-  const event = await getEventById(existingEvent.id)
-  await indexEvent(event)
-
-  return event
 }
