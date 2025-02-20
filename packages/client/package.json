@@ -35,6 +35,7 @@
     "src/**/*.json": "prettier --write"
   },
   "dependencies": {
+    "@actions/core": "^1.11.1",
     "@apollo/client": "^3.7.0",
     "@craco/craco": "^6.4.3",
     "@opencrvs/commons": "^1.7.0",
