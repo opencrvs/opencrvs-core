@@ -25,6 +25,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
+// ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<FieldConfig, { type: 'ADDRESS' }>
 
 type Props = FieldProps<'ADDRESS'> & {
@@ -42,21 +43,23 @@ function hide<T extends FieldConfig>(fieldConfig: T): T {
   }
 }
 
-function addInitialValue(initialValues: AddressField['initialValue']) {
-  if (!initialValues) {
-    return (fieldConfig: FieldConfigWithoutAddress) => fieldConfig
+function addDefaultValue<T extends FieldConfigWithoutAddress>(
+  defaultValues: AddressFieldValue
+): (fieldConfig: T) => T {
+  if (!defaultValues) {
+    return (fieldConfig) => fieldConfig
   }
 
-  return (fieldConfig: FieldConfigWithoutAddress) => {
-    if (!initialValues[fieldConfig.id]) {
+  return (fieldConfig) => {
+    const key = fieldConfig.id as keyof typeof defaultValues
+
+    if (!defaultValues[key]) {
       return fieldConfig
     }
 
     return {
       ...fieldConfig,
-      initialValue: initialValues[
-        fieldConfig.id
-      ] as FieldConfigWithoutAddress['initialValue']
+      defaultValue: defaultValues[key]
     }
   }
 }
@@ -70,7 +73,7 @@ function addInitialValue(initialValues: AddressField['initialValue']) {
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  */
 function AddressInput(props: Props) {
-  const { onChange, initialValue = {}, value = {}, ...otherProps } = props
+  const { onChange, defaultValue = {}, value = {}, ...otherProps } = props
 
   let fields = [
     ...ADMIN_STRUCTURE,
@@ -93,7 +96,7 @@ function AddressInput(props: Props) {
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={fields.map(addInitialValue(initialValue))}
+      fields={fields.map(addDefaultValue(defaultValue))}
       formData={value}
       setAllFieldsDirty={false}
       onChange={onChange}
@@ -240,7 +243,7 @@ const ADMIN_STRUCTURE = [
     },
     hideLabel: true,
     type: 'RADIO_GROUP',
-    initialValue: 'URBAN',
+    defaultValue: 'URBAN',
     options: [
       {
         value: 'URBAN',

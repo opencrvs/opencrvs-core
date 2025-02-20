@@ -457,7 +457,7 @@ export const tennisClubMembershipEvent = defineConfig({
                 defaultMessage: 'Who is requesting a change to this record?',
                 description: 'The title for the corrector form'
               },
-              initialValue: '',
+              defaultValue: '',
               options: [
                 {
                   value: 'INFORMANT',
@@ -525,7 +525,7 @@ export const tennisClubMembershipEvent = defineConfig({
                 defaultMessage: 'Identity verified',
                 description: 'The title for the corrector form'
               },
-              initialValue: '',
+              defaultValue: '',
               required: true,
               options: [
                 {
@@ -578,7 +578,7 @@ export const tennisClubMembershipEvent = defineConfig({
                 defaultMessage: 'Who is requesting a change to this record?',
                 description: 'The title for the corrector form'
               },
-              initialValue: '',
+              defaultValue: '',
               configuration: {
                 styles: {
                   size: 'NORMAL'
