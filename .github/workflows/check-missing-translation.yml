@@ -59,11 +59,16 @@ jobs:
         yarn install
         cd ./packages/client
         CI=true yarn extract:translations 2>&1 | tee output.txt
-        awk '/Missing translations/ {flag=1} flag' output.txt > missing_translations.txt
-        if [ -s missing_translations.txt ]; then 
-          echo "### Summary Of Missing Translation" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          cat missing_translations.txt >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          exit 1
+        if grep -q "Missing translations" output.txt; then
+           awk '/You are missing the following content keys from your country configuration package:/ {flag=1; next} /Add them to this file and run again:/ {flag=0} flag' output.txt > missing_translations.txt
+           sed -i '/^$/d' missing_translations.txt
+           echo "### Summary Of Missing Translation" >> $GITHUB_STEP_SUMMARY
+           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+           cat missing_translations.txt >> $GITHUB_STEP_SUMMARY
+           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+           echo "Add them to this file and and run again:" >> $GITHUB_STEP_SUMMARY
+           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+           echo "/opencrvs-countryconfig/src/translations/client.csv" >> $GITHUB_STEP_SUMMARY
+           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+           exit 1
         fi
