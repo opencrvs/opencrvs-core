@@ -58,8 +58,8 @@ jobs:
         git checkout $acting_branch
         yarn install
         cd ./packages/client
-        output=$(CI=true yarn extract:translations 2>&1)
-        echo "### Translation Extraction Output" >> $GITHUB_STEP_SUMMARY
+        CI=true yarn extract:translations 2>&1 | tee output.txt
+        echo "### Summary Of Missing Translation" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        echo "$output" >> $GITHUB_STEP_SUMMARY
+        cat output.txt >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
