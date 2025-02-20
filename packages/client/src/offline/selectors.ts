@@ -61,14 +61,14 @@ export const getLocations = createSelector(getOfflineData, (data) => ({
   ...data.offices
 }))
 
+export const getCountryLogoFile = createSelector(
+  getOfflineData,
+  (data) => data.config.COUNTRY_LOGO.file
+)
+
 export const getAdminStructureLocations = createSelector(
   getOfflineData,
   (data) => data.locations
-)
-
-export const getFacilityLocations = createSelector(
-  getOfflineData,
-  (data) => data.facilities
 )
 
 export const selectCountryBackground = (store: IStoreState) => {

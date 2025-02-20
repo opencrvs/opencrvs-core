@@ -1,3 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"code":"invalid_type","expected":"string","received":"undefined","path":["applicant.firstname"],"message":"Required"},{"code":"invalid_type","expected":"string","received":"undefined","path":["applicant.surname"],"message":"Required"},{"code":"invalid_string","validation":"date","message":"Invalid date","path":["applicant.dob"]},{"code":"invalid_type","expected":"string","received":"undefined","path":["recommender.firstname"],"message":"Required"},{"code":"invalid_type","expected":"string","received":"undefined","path":["recommender.surname"],"message":"Required"},{"code":"invalid_type","expected":"string","received":"undefined","path":["recommender.id"],"message":"Required"}]]`;
+exports[`Prevents adding birth date in future 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2040-02-01"}]]`;
+
+exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required for registration","id":"applicant.firstname"},{"message":"Required for registration","id":"applicant.surname"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Invalid date. Please use the format YYYY-MM-DD","id":"applicant.dob","value":"02-02"}]]`;
+
+exports[`validation prevents including hidden fields 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.firstname","value":"this should not be here"}]]`;
+
+exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"},{"message":"Invalid date. Please use the format YYYY-MM-DD","id":"applicant.dob","value":"02-1-2024"}]]`;

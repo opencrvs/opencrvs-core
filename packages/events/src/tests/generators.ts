@@ -17,37 +17,14 @@ import {
   ValidateActionInput,
   RegisterActionInput,
   RequestCorrectionActionInput,
-  findActiveActionFields,
+  mapFieldTypeToMockValue,
   EventConfig,
-  FieldConfig
+  findActiveActionFields,
+  stripHiddenOrDisabledFields
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-
-/**
- * Quick-and-dirty mock data generator for event actions.
- */
-function mapTypeToMockValue(field: FieldConfig, i: number) {
-  switch (field.type) {
-    case 'DIVIDER':
-    case 'TEXT':
-    case 'BULLET_LIST':
-    case 'PAGE_HEADER':
-    case 'LOCATION':
-    case 'SELECT':
-    case 'COUNTRY':
-    case 'RADIO_GROUP':
-    case 'PARAGRAPH':
-      return `${field.id}-${field.type}-${i}`
-    case 'DATE':
-      return '2021-01-01'
-    case 'CHECKBOX':
-      return true
-    case 'FILE':
-      return null
-  }
-}
 
 export function generateActionInput(
   configuration: EventConfig,
@@ -55,13 +32,17 @@ export function generateActionInput(
 ) {
   const fields = findActiveActionFields(configuration, action) ?? []
 
-  return fields.reduce(
+  const data = fields.reduce(
     (acc, field, i) => ({
       ...acc,
-      [field.id]: mapTypeToMockValue(field, i)
+      [field.id]: mapFieldTypeToMockValue(field, i)
     }),
     {}
   )
+
+  // Strip away hidden or disabled fields from mock action data
+  // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
+  return stripHiddenOrDisabledFields(action, configuration, data)
 }
 
 interface Name {
@@ -115,9 +96,7 @@ export function payloadGenerator() {
       ) => ({
         type: ActionType.VALIDATE,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
-          generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
+        data: input.data ?? {},
         duplicates: [],
         eventId
       }),

@@ -15,7 +15,8 @@ import {
   EventIndex,
   ActionDocument,
   getAllFields,
-  SummaryConfig
+  SummaryConfig,
+  FieldValue
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -25,7 +26,7 @@ import {
   useEventConfiguration,
   useEventConfigurations
 } from '@client/v2-events/features/events/useEventConfiguration'
-import { getInitialValues } from '@client/v2-events/components/forms/utils'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -33,6 +34,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
+import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -91,13 +93,20 @@ function EventOverview({
   history: ActionDocument[]
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const allFields = getAllFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const initialValues = getInitialValues(getAllFields(eventConfiguration))
 
-  const title = intl.formatMessage(summary.title.label, {
-    ...initialValues,
-    ...event.data
-  })
+  const stringifyFormData = useFormDataStringifier()
+
+  const eventWithDefaults = stringifyFormData(allFields, event.data)
+
+  const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
+
+  const flattenedEventIndex: Record<string, FieldValue | null> = {
+    ...emptyEvent,
+    ...eventWithDefaults
+  }
+  const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
 
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
@@ -110,11 +119,7 @@ function EventOverview({
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
-      <EventSummary
-        defaultValues={initialValues}
-        event={event}
-        summary={summary}
-      />
+      <EventSummary event={flattenedEventIndex} summary={summary} />
       <EventHistory history={history} />
     </Content>
   )

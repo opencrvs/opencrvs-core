@@ -9,10 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { hashKey } from '@tanstack/react-query'
+import { hashKey, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
-import { EventDocument, EventIndex } from '@opencrvs/commons/client'
-import { api, queryClient, utils } from '@client/v2-events/trpc'
+import { InferQueryLikeData } from '@trpc/react-query/shared'
+import {
+  EventConfig,
+  EventDocument,
+  EventIndex,
+  getEventConfiguration
+} from '@opencrvs/commons/client'
+import { api, queryClient, trpcClient, utils } from '@client/v2-events/trpc'
+import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useEventAction } from './procedures/action'
 import { createEvent } from './procedures/create'
 import { useDeleteEventMutation } from './procedures/delete'
@@ -52,6 +59,66 @@ function filterOutboxEventsWithMutation<
     >
     return events.filter((event) => filter(event, variables))
   })
+}
+
+/*
+ * This logic overrides the default behaviour of "api.event.get"
+ * by making it so all "FILE" or "FILE_WITH_OPTIONS" type data points
+ * are parsed from the received event document and prefetched as part of fetching the record
+ *
+ * This ensures the full record can be browsed even when the user goes offline
+ */
+const getEventById = getQueryKey(api.event.get, undefined)
+queryClient.setQueryDefaults<InferQueryLikeData<typeof api.event.get>>(
+  getEventById,
+  {
+    queryFn: async ({ queryKey, meta }) => {
+      const [queryPath, queryKeyOptions] = queryKey as typeof getEventById
+      if (!meta) {
+        throw new Error(
+          'api.event.get was called without passing mandatory event configuration'
+        )
+      }
+      /*
+       * This is a query directly to the tRPC server
+       */
+      const response = await trpcClient.query(
+        queryPath.join('.'), // 'event.get'
+        queryKeyOptions?.input // UUID
+      )
+
+      const eventDocument = EventDocument.parse(response)
+
+      const eventConfig = getEventConfiguration(
+        meta.eventConfig as EventConfig[],
+        eventDocument.type
+      )
+
+      await cacheFiles(eventDocument, eventConfig)
+      return eventDocument
+    }
+  }
+)
+
+const getEvent = {
+  useQuery: (id: string) => {
+    const eventConfig = api.event.config.get.useQuery().data
+
+    return useQuery<EventDocument>({
+      queryKey: getQueryKey(api.event.get, id, 'query'),
+      meta: { eventConfig }
+    })
+  },
+  useSuspenseQuery: (id: string) => {
+    const [eventConfig] = api.event.config.get.useSuspenseQuery()
+
+    return [
+      useSuspenseQuery<EventDocument>({
+        queryKey: getQueryKey(api.event.get, id, 'query'),
+        meta: { eventConfig }
+      }).data
+    ]
+  }
 }
 
 export function useEvents() {
@@ -97,7 +164,7 @@ export function useEvents() {
 
   return {
     createEvent,
-    getEvent: api.event.get,
+    getEvent,
     getEvents: api.event.list,
     deleteEvent: useDeleteEventMutation(),
     getOutbox,
@@ -123,7 +190,7 @@ export function useEvents() {
         utils.event.actions.printCertificate,
         api.event.actions.printCertificate
       ),
-      correct: {
+      correction: {
         request: useEventAction(
           utils.event.actions.correction.request,
           api.event.actions.correction.request

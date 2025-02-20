@@ -13,11 +13,97 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
-  getUUID
+  getUUID,
+  SCOPES
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { TRPCError } from '@trpc/server'
 import { generateActionInput } from '@events/tests/generators'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+
+test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.correction.request(
+      generator.event.actions.correction.request(
+        'registered-event-test-id-12345'
+      )
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.REQUEST_CORRECTION} allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+  ])
+
+  await expect(
+    client.event.actions.correction.request(
+      generator.event.actions.correction.request(
+        'registered-event-test-id-12345'
+      )
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing required scope`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.correction.approve(
+      generator.event.actions.correction.approve(
+        'registered-event-test-id-12345',
+        'request-test-id-12345'
+      )
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.APPROVE_CORRECTION} allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
+
+  await expect(
+    client.event.actions.correction.approve(
+      generator.event.actions.correction.approve(
+        'registered-event-test-id-12345',
+        'request-test-id-12345'
+      )
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing required scope`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.correction.reject(
+      generator.event.actions.correction.reject(
+        'registered-event-test-id-12345',
+        'request-test-id-12345'
+      )
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
+
+  await expect(
+    client.event.actions.correction.reject(
+      generator.event.actions.correction.reject(
+        'registered-event-test-id-12345',
+        'request-test-id-12345'
+      )
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
 
 test('a correction request can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
@@ -46,11 +132,11 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  event.id
 
   const data = generator.event.actions.correction.request(event.id, {
     data: {
-      'applicant.dob': '02-02'
+      'applicant.dob': '02-02',
+      'recommender.none': true
     }
   })
 
@@ -59,7 +145,7 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   ).rejects.matchSnapshot()
 })
 
-test(`${ActionType.APPROVE_CORRECTION} validation error message contains all the offending fields`, async () => {
+test(`${ActionType.APPROVE_CORRECTION} validation error message contains all the offending fields`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -74,13 +160,80 @@ test(`${ActionType.APPROVE_CORRECTION} validation error message contains all th
     withCorrectionRequest.id,
     {
       data: {
-        'applicant.dob': '02-02'
+        'applicant.dob': '02-02',
+        'recommender.none': true
       }
     }
   )
 
   await expect(
     client.event.actions.correction.approve(data)
+  ).rejects.matchSnapshot()
+})
+
+test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditional hidden fields are still skipped`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const data = generator.event.actions.correction.request(event.id, {
+    data: {
+      'applicant.dob': '02-1-2024',
+      'applicant.firstname': 'John',
+      'applicant.surname': 'Doe',
+      'recommender.none': true
+    }
+  })
+
+  await expect(
+    client.event.actions.correction.request(data)
+  ).rejects.matchSnapshot()
+})
+
+test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they are conditionally hidden`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const form = {
+    'applicant.dob': '2024-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true
+  }
+
+  const data = generator.event.actions.correction.request(event.id, {
+    data: form
+  })
+
+  const response = await client.event.actions.correction.request(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.REQUEST_CORRECTION
+  )
+  expect(savedAction?.data).toEqual(form)
+})
+
+test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const form = {
+    'applicant.dob': '2040-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true
+  }
+
+  const payload = generator.event.actions.correction.request(event.id, {
+    data: form
+  })
+
+  await expect(
+    client.event.actions.correction.request(payload)
   ).rejects.matchSnapshot()
 })
 
@@ -127,10 +280,7 @@ describe('when a correction request exists', () => {
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(registeredEvent.id, {
         data: {
-          ...generateActionInput(
-            tennisClubMembershipEvent,
-            ActionType.REQUEST_CORRECTION
-          ),
+          ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
           'applicant.firstName': 'Johnny'
         }
       })

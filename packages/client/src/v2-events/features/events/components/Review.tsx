@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,17 +13,21 @@
 import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
-
-import { formatISO } from 'date-fns'
+import { useSelector } from 'react-redux'
 import {
   ActionFormData,
   FieldConfig,
-  FormConfig
+  FormConfig,
+  isFileFieldType,
+  isFileFieldWithOptionType,
+  SCOPES
 } from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
+  DocumentViewer,
   Icon,
+  IDocumentViewerOptions,
   Link,
   ListReview,
   ResponsiveModal,
@@ -31,16 +36,14 @@ import {
 } from '@opencrvs/components'
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
-import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
-import {
-  getConditionalActionsForField,
-  isFormFieldVisible
-} from '@client/v2-events/components/forms/utils'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
-
-const Deleted = styled.del`
-  color: ${({ theme }) => theme.colors.negative};
-`
+import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { getCountryLogoFile } from '@client/offline/selectors'
+// eslint-disable-next-line no-restricted-imports
+import { getScope } from '@client/profile/profileSelectors'
+import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
+import { Output } from './Output'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -83,11 +86,35 @@ const SubjectContainer = styled.div`
   ${({ theme }) => theme.fonts.h2}
   overflow-wrap: anywhere;
 `
-
+const RightColumn = styled.div`
+  width: 40%;
+  border-radius: 4px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
 const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
   overflow: hidden;
+`
+const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
+  position: fixed;
+  width: calc(40% - 24px);
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
+    margin-bottom: 11px;
+  }
+`
+
+const ZeroDocument = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
+  height: 700px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `
 
 const Card = styled.div`
@@ -168,72 +195,23 @@ const reviewMessages = defineMessages({
     id: 'v2.changeModal.description',
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
+  },
+  govtName: {
+    id: 'review.header.title.govtName',
+    defaultMessage: 'Government',
+    description: 'Header title that shows govt name'
+  },
+  zeroDocumentsTextForAnySection: {
+    defaultMessage: 'No supporting documents',
+    description: 'Zero documents text',
+    id: 'review.documents.zeroDocumentsTextForAnySection'
+  },
+  editDocuments: {
+    defaultMessage: 'Add attachement',
+    description: 'Edit documents text',
+    id: 'review.documents.editDocuments'
   }
 })
-
-interface Stringifiable {
-  toString(): string
-}
-
-const FIELD_TYPE_FORMATTERS: Partial<
-  Record<
-    FieldConfig['type'],
-    null | ((props: { value: Stringifiable }) => JSX.Element)
-  >
-> = {
-  FILE: FileOutput
-}
-
-function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
-  return <>{value.toString() || ''}</>
-}
-
-function Output({
-  field,
-  value,
-  previousValue,
-  showPreviouslyMissingValuesAsChanged = true
-}: {
-  field: FieldConfig
-  value: string
-  previousValue?: string
-  showPreviouslyMissingValuesAsChanged: boolean
-}) {
-  const ValueOutput = FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
-
-  if (!value) {
-    if (previousValue) {
-      return <ValueOutput value={previousValue} />
-    }
-
-    return ''
-  }
-
-  if (previousValue && previousValue !== value) {
-    return (
-      <>
-        <Deleted>
-          <ValueOutput value={previousValue} />
-        </Deleted>
-        <br />
-        <ValueOutput value={value} />
-      </>
-    )
-  }
-  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
-    return (
-      <>
-        <Deleted>
-          <ValueOutput value={'-'} />
-        </Deleted>
-        <br />
-        <ValueOutput value={value} />
-      </>
-    )
-  }
-
-  return <ValueOutput value={value} />
-}
 
 /**
  * Review component, used to display the "read" version of the form.
@@ -244,28 +222,135 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  metadata,
   onEdit,
   children,
-  title
+  title,
+  isUploadButtonVisible,
+  onMetadataChange
 }: {
   children: React.ReactNode
   eventConfig: EventConfig
   formConfig: FormConfig
   form: ActionFormData
   previousFormValues?: EventIndex['data']
-  onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
+  onEdit: ({
+    pageId,
+    fieldId,
+    confirmation
+  }: {
+    pageId: string
+    fieldId?: string
+    confirmation?: boolean
+  }) => void
   title: string
+  isUploadButtonVisible?: boolean
+  metadata?: ActionFormData
+  onMetadataChange?: (values: ActionFormData) => void
 }) {
+  const scopes = useSelector(getScope)
   const intl = useIntl()
-
-  const { toString } = useTransformer(eventConfig.id)
-
-  const stringifiedForm = toString(form)
-
+  const countryLogoFile = useSelector(getCountryLogoFile)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
-  const stringifiedPreviousForm = previousFormValues
-    ? toString(previousFormValues)
-    : {}
+  const previousForm = previousFormValues ?? {}
+
+  const pagesWithFile = formConfig.pages
+    .filter(({ fields }) =>
+      fields.some(({ type }) => type === 'FILE' || type === 'FILE_WITH_OPTIONS')
+    )
+    .map(({ id }) => id)
+
+  function getOptions(fieldConfig: FieldConfig): IDocumentViewerOptions {
+    const value = form[fieldConfig.id]
+    if (!value) {
+      return {
+        selectOptions: [],
+        documentOptions: []
+      }
+    }
+
+    const fieldObj = {
+      config: fieldConfig,
+      value
+    }
+    if (isFileFieldType(fieldObj)) {
+      return {
+        selectOptions: [
+          {
+            value: fieldObj.config.id,
+            label: intl.formatMessage(fieldObj.config.label)
+          }
+        ],
+        documentOptions: [
+          {
+            value: getFullURL(fieldObj.value.filename),
+            label: fieldObj.config.id
+          }
+        ]
+      }
+    }
+
+    if (isFileFieldWithOptionType(fieldObj)) {
+      const labelPrefix = intl.formatMessage(fieldObj.config.label)
+
+      return fieldObj.config.options.reduce<IDocumentViewerOptions>(
+        (acc, { value: val, label }) => {
+          const specificValue = fieldObj.value.find(
+            ({ option }) => val === option
+          )
+          if (specificValue) {
+            return {
+              documentOptions: [
+                ...acc.documentOptions,
+                { value: getFullURL(specificValue.filename), label: val }
+              ],
+              selectOptions: [
+                ...acc.selectOptions,
+                {
+                  value: val,
+                  label: `${labelPrefix} (${intl.formatMessage(label)})`
+                }
+              ]
+            }
+          }
+          return acc
+        },
+        {
+          selectOptions: [],
+          documentOptions: []
+        }
+      )
+    }
+
+    return {
+      selectOptions: [],
+      documentOptions: []
+    }
+  }
+
+  function reduceFields(fieldConfigs: FieldConfig[]): IDocumentViewerOptions {
+    return fieldConfigs.reduce<IDocumentViewerOptions>(
+      (acc, fieldConfig) => {
+        const { selectOptions, documentOptions } = getOptions(fieldConfig)
+        return {
+          documentOptions: [...acc.documentOptions, ...documentOptions],
+          selectOptions: [...acc.selectOptions, ...selectOptions]
+        }
+      },
+      { selectOptions: [], documentOptions: [] }
+    )
+  }
+
+  const fileOptions = formConfig.pages.reduce<IDocumentViewerOptions>(
+    (acc, page) => {
+      const { selectOptions, documentOptions } = reduceFields(page.fields)
+      return {
+        documentOptions: [...acc.documentOptions, ...documentOptions],
+        selectOptions: [...acc.selectOptions, ...selectOptions]
+      }
+    },
+    { selectOptions: [], documentOptions: [] }
+  )
 
   return (
     <Row>
@@ -273,6 +358,9 @@ function ReviewComponent({
         <Card>
           <HeaderContainer>
             <HeaderContent>
+              {countryLogoFile && (
+                <CountryLogo size="small" src={countryLogoFile} />
+              )}
               <Stack
                 alignItems="flex-start"
                 direction="column"
@@ -280,7 +368,8 @@ function ReviewComponent({
                 justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
-                  {eventConfig.label.defaultMessage}
+                  {intl.formatMessage(reviewMessages.govtName)} {' – '}
+                  {intl.formatMessage(eventConfig.label)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
                   {title}
@@ -314,18 +403,10 @@ function ReviewComponent({
                     >
                       <ListReview id={'Section_' + page.id}>
                         {page.fields
-                          .filter(
-                            (field) =>
-                              // Formatters can explicitly define themselves to be null
-                              // this means a value display row in not rendered at all
-                              // An example of this is FileInput, of which files we do not want to render in the value lists
-                              FIELD_TYPE_FORMATTERS[field.type] !== null
-                          )
                           .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
-                            const value = stringifiedForm[field.id]
-                            const previousValue =
-                              stringifiedPreviousForm[field.id]
+                            const value = form[field.id]
+                            const previousValue = previousForm[field.id]
 
                             const valueDisplay = (
                               <Output
@@ -370,9 +451,59 @@ function ReviewComponent({
               })}
             </ReviewContainter>
           </FormData>
+
+          {metadata &&
+            onMetadataChange &&
+            formConfig.review.fields.length > 0 && (
+              <FormData>
+                <ReviewContainter>
+                  <FormFieldGenerator
+                    fields={formConfig.review.fields}
+                    formData={metadata}
+                    id={'review'}
+                    initialValues={metadata}
+                    setAllFieldsDirty={false}
+                    onChange={onMetadataChange}
+                  />
+                </ReviewContainter>
+              </FormData>
+            )}
         </Card>
         {children}
       </LeftColumn>
+      {pagesWithFile.length > 0 && (
+        <RightColumn>
+          <ResponsiveDocumentViewer
+            isRegisterScope={
+              scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT) ?? false
+            }
+          >
+            <DocumentViewer id="document_section" options={fileOptions}>
+              {fileOptions.documentOptions.length === 0 && (
+                <ZeroDocument id={`zero_document`}>
+                  {intl.formatMessage(
+                    reviewMessages.zeroDocumentsTextForAnySection
+                  )}
+                  {isUploadButtonVisible && (
+                    <Link
+                      id="edit-document"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEdit({
+                          pageId: pagesWithFile[0],
+                          confirmation: true
+                        })
+                      }}
+                    >
+                      {intl.formatMessage(reviewMessages.editDocuments)}
+                    </Link>
+                  )}
+                </ZeroDocument>
+              )}
+            </DocumentViewer>
+          </ResponsiveDocumentViewer>
+        </RightColumn>
+      )}
     </Row>
   )
 }

@@ -22,9 +22,9 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
-import { ActionType } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -105,7 +105,6 @@ export function Review() {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
-
   const { goToHome } = useEventFormNavigation()
   const declareMutation = events.actions.declare
 
@@ -118,17 +117,23 @@ export function Review() {
   )[0]
 
   const form = useEventFormData((state) => state.formValues)
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata(eventId, {})
 
   async function handleEdit({
     pageId,
-    fieldId
+    fieldId,
+    confirmation
   }: {
     pageId: string
     fieldId?: string
+    confirmation?: boolean
   }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
-    ))
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
+      )))
 
     if (confirmedEdit) {
       navigate(
@@ -153,9 +158,9 @@ export function Review() {
       declareMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: uuid()
+        transactionId: uuid(),
+        metadata
       })
-
       goToHome()
     }
   }
@@ -188,6 +193,7 @@ export function Review() {
           eventId: event.id,
           data: form,
           transactionId: uuid(),
+          metadata,
           draft: true
         })
         goToHome()
@@ -199,11 +205,14 @@ export function Review() {
         // eslint-disable-next-line
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
+        isUploadButtonVisible={true}
         // @todo: Update to use dynamic title
         title={intl.formatMessage(formConfigs[0].review.title, {
           firstname: form['applicant.firstname'] as string,
           surname: form['applicant.surname'] as string
         })}
+        metadata={metadata}
+        onMetadataChange={(values) => setMetadata(eventId, values)}
       >
         <ReviewComponent.Actions
           messages={{

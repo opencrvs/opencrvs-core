@@ -11,7 +11,7 @@
 
 import { Pages } from './Pages'
 import { Review } from './Review'
-import { Onboarding } from './Onboarding/Onboarding'
+import { OnboardingIndex as Onboarding } from './Onboarding/Onboarding'
 import { Summary } from './Summary/Summary'
 import { AdditionalDetails } from './AdditionalDetails/AdditionalDetails'
 export { Pages, Review, Onboarding, Summary, AdditionalDetails }

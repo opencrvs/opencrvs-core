@@ -13,59 +13,17 @@ import {
   ActionInputWithType,
   ActionType,
   FieldConfig,
-  FileFieldValue
+  FieldValue,
+  getFieldValidationErrors
 } from '@opencrvs/commons'
 
-import { z } from 'zod'
+import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getActionFormFields } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
-import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { TRPCError } from '@trpc/server'
 
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
-}
-
-function mapTypeToZod(type: FieldConfig['type'], required?: boolean) {
-  let schema
-  switch (type) {
-    case 'DIVIDER':
-    case 'TEXT':
-    case 'BULLET_LIST':
-    case 'PAGE_HEADER':
-    case 'LOCATION':
-    case 'SELECT':
-    case 'COUNTRY':
-    case 'RADIO_GROUP':
-    case 'PARAGRAPH':
-      schema = z.string()
-      break
-    case 'DATE':
-      // YYYY-MM-DD
-      schema = z.string().date()
-      break
-    case 'CHECKBOX':
-      schema = z.boolean()
-      break
-    case 'FILE':
-      schema = FileFieldValue
-      break
-  }
-
-  return required ? schema : schema.optional()
-}
-
-type InputField = typeof FileFieldValue | z.ZodString | z.ZodBoolean
-
-type OptionalInputField = z.ZodOptional<InputField>
-function createValidationSchema(config: FieldConfig[]) {
-  const shape: Record<string, InputField | OptionalInputField> = {}
-
-  for (const field of config) {
-    shape[field.id] = mapTypeToZod(field.type, field.required)
-  }
-
-  return z.object(shape)
 }
 
 export function validateAction(actionType: ActionType) {
@@ -78,12 +36,36 @@ export function validateAction(actionType: ActionType) {
       eventType
     })
 
-    const result = createValidationSchema(formFields).safeParse(opts.input.data)
+    const errors = formFields.reduce(
+      (
+        errorResults: { message: string; id: string; value: FieldValue }[],
+        field: FieldConfig
+      ) => {
+        const fieldErrors = getFieldValidationErrors({
+          field,
+          values: opts.input.data
+        }).errors
 
-    if (result.error) {
+        if (fieldErrors.length === 0) {
+          return errorResults
+        }
+
+        // For backend, use the default message without translations.
+        const errormessageWithId = fieldErrors.map((error) => ({
+          message: error.message.defaultMessage,
+          id: field.id,
+          value: opts.input.data[field.id]
+        }))
+
+        return [...errorResults, ...errormessageWithId]
+      },
+      []
+    )
+
+    if (errors.length > 0) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: JSON.stringify(result.error.errors)
+        message: JSON.stringify(errors)
       })
     }
 

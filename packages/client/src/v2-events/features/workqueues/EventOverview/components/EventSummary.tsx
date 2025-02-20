@@ -12,8 +12,7 @@
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
-import { EventIndex, FieldValue } from '@opencrvs/commons/client'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
+import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 
 /**
@@ -22,16 +21,12 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/featu
 
 export function EventSummary({
   event,
-  summary,
-  defaultValues
+  summary
 }: {
-  event: EventIndex
+  event: Record<string, FieldValue | null>
   summary: SummaryConfig
-  defaultValues: Record<string, FieldValue>
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const { toString } = useTransformer(event.type)
-  const data = toString(event.data)
 
   return (
     <>
@@ -46,10 +41,7 @@ export function EventSummary({
                 field.emptyValueMessage &&
                 intl.formatMessage(field.emptyValueMessage)
               }
-              value={intl.formatMessage(field.value, {
-                ...defaultValues,
-                ...data
-              })}
+              value={intl.formatMessage(field.value, event)}
             />
           )
         })}

@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "0.0.34-rr",
+  "version": "0.0.47-jr",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
@@ -17,6 +17,7 @@
   "dependencies": {
     "uuid": "^9.0.0",
     "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "superjson": "1.9.0-0",
     "@trpc/client": "^11.0.0-rc.648",
     "@trpc/server": "^11.0.0-rc.532"

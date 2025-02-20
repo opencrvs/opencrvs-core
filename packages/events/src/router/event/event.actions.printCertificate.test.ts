@@ -9,8 +9,31 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { TRPCError } from '@trpc/server'
+
+test('prevents forbidden access if missing required scope', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.printCertificate(
+      generator.event.actions.printCertificate('event-test-id-12345')
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+
+  await expect(
+    client.event.actions.printCertificate(
+      generator.event.actions.printCertificate('event-test-id-12345')
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
@@ -22,7 +45,8 @@ test('Validation error message contains all the offending fields', async () => {
     client.event.actions.printCertificate(
       generator.event.actions.printCertificate(event.id, {
         data: {
-          'applicant.dob': '02-02'
+          'applicant.dob': '02-02',
+          'recommender.none': true
         }
       })
     )
@@ -38,8 +62,9 @@ test('print certificate action can be added to a created event', async () => {
   await client.event.actions.declare(
     generator.event.actions.declare(originalEvent.id)
   )
-  const registeredEvent = await client.event.actions.register(
-    generator.event.actions.register(originalEvent.id)
+
+  const registeredEvent = await client.event.actions.printCertificate(
+    generator.event.actions.printCertificate(originalEvent.id)
   )
 
   const printCertificate = await client.event.actions.printCertificate(
@@ -52,4 +77,70 @@ test('print certificate action can be added to a created event', async () => {
   expect(
     printCertificate.actions[printCertificate.actions.length - 1].type
   ).toBe(ActionType.PRINT_CERTIFICATE)
+})
+
+test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const data = generator.event.actions.printCertificate(event.id, {
+    data: {
+      'applicant.dob': '02-1-2024',
+      'applicant.firstname': 'John',
+      'applicant.surname': 'Doe',
+      'recommender.none': true
+    }
+  })
+
+  await expect(
+    client.event.actions.printCertificate(data)
+  ).rejects.matchSnapshot()
+})
+
+test('Skips required field validation when they are conditionally hidden', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const form = {
+    'applicant.dob': '2024-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true
+  }
+
+  const data = generator.event.actions.printCertificate(event.id, {
+    data: form
+  })
+
+  const response = await client.event.actions.printCertificate(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.PRINT_CERTIFICATE
+  )
+  expect(savedAction?.data).toEqual(form)
+})
+
+test('Prevents adding birth date in future', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const form = {
+    'applicant.dob': '2040-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true
+  }
+
+  const payload = generator.event.actions.printCertificate(event.id, {
+    data: form
+  })
+
+  await expect(
+    client.event.actions.printCertificate(payload)
+  ).rejects.matchSnapshot()
 })

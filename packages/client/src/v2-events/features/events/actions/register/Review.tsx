@@ -22,6 +22,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { FormLayout } from '@client/v2-events/layouts/form'
 
 const messages = defineMessages({
@@ -57,6 +58,11 @@ export function Review() {
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata(
+    eventId,
+    event.actions.find((a) => a.type === 'DECLARE')?.metadata
+  )
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
   const { forms: formConfigs } = config.actions.filter(
@@ -75,14 +81,18 @@ export function Review() {
 
   async function handleEdit({
     pageId,
-    fieldId
+    fieldId,
+    confirmation
   }: {
     pageId: string
     fieldId?: string
+    confirmation?: boolean
   }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close} />
-    ))
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close} />
+      )))
 
     if (confirmedEdit) {
       navigate(
@@ -106,7 +116,8 @@ export function Review() {
       registerMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: uuid()
+        transactionId: uuid(),
+        metadata
       })
 
       goToHome()
@@ -121,7 +132,8 @@ export function Review() {
           eventId: event.id,
           data: form,
           transactionId: uuid(),
-          draft: true
+          draft: true,
+          metadata
         })
         goToHome()
       }}
@@ -130,9 +142,12 @@ export function Review() {
         eventConfig={config}
         form={form}
         formConfig={formConfigs[0]}
+        isUploadButtonVisible={true}
+        metadata={metadata}
         previousFormValues={previousFormValues}
         title=""
         onEdit={handleEdit}
+        onMetadataChange={(values) => setMetadata(eventId, values)}
       >
         <ReviewComponent.Actions
           messages={{
