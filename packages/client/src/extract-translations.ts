@@ -221,7 +221,7 @@ async function extractMessages() {
 ${chalk.white(message)}\n
  Add them to this file and run again:
 ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
-      core.setFailed('Action failed Found missing Keys') 
+      core.setFailed('Action failed, Found some missing Keys') 
     }
     
     if(!CI) {
