@@ -74,6 +74,7 @@ import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
+import { config } from './config'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -99,7 +100,7 @@ function createRedirect(from: string, to: string) {
   }
 }
 
-export const routesConfig = window.config.FEATURES.V2_EVENTS
+export const routesConfig = config.FEATURES.V2_EVENTS
   ? [
       {
         path: '/',
