@@ -123,6 +123,8 @@ function decodeFieldId(fieldId: string) {
 
 function mapFieldTypeToElasticsearch(field: FieldConfig) {
   switch (field.type) {
+    case FieldType.NUMBER:
+      return { type: 'double' }
     case FieldType.DATE:
       // @TODO: This should be changed back to 'date'
       // When we have proper validation of custom fields.
@@ -134,7 +136,6 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
-    case FieldType.NUMBER:
       return { type: 'text' }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:

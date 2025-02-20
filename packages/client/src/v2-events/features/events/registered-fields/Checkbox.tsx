@@ -12,7 +12,6 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { Checkbox as CheckboxComponent } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons/client'
-import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
 function CheckboxInput({
   setFieldValue,
@@ -39,11 +38,7 @@ function CheckboxInput({
   )
 }
 
-function CheckboxOutput({ value }: { value?: Stringifiable }) {
-  return value?.toString() === 'true' ? 'Yes' : 'No'
-}
-
 export const Checkbox = {
   Input: CheckboxInput,
-  Output: CheckboxOutput
+  Output: (value: boolean) => (value ? 'Yes' : 'No')
 }
