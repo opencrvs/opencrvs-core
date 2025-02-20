@@ -18,7 +18,6 @@ import { promisify } from 'util'
 import { sortBy } from 'lodash'
 import ts from 'typescript'
 import { MessageDescriptor } from 'react-intl'
-import * as core from '@actions/core'
 
 export async function writeJSONToCSV(
   filename: string,
@@ -52,7 +51,7 @@ type CSVRow = { id: string; description: string } & Record<string, string>
 
 const write = process.argv.includes('--write')
 const outdated = process.argv.includes('--outdated')
-const CI = process.argv.includes('--CI')
+const ci = process.argv.includes('--ci')
 
 const COUNTRY_CONFIG_PATH = process.argv[2]
 
@@ -175,13 +174,6 @@ async function extractMessages() {
     (key) => !translations.find(({ id }) => id === key)
   )
 
-  const missingKeysDesc = missingKeys.map((key) => ({
-    id: key,
-    description: reactIntlDescriptions[key]
-  }))
-
-
-
   if (outdated) {
     const extraKeys = translations
       .map(({ id }) => id)
@@ -200,9 +192,8 @@ async function extractMessages() {
   if (missingKeys.length > 0) {
     // eslint-disable-line no-console
     console.log(chalk.red.bold('Missing translations '))
-    if(CI) {
+    if(ci) {
       const emptyLanguages = Object.fromEntries(
-        // knownLanguages.map((lang) => [lang, ''])
         knownLanguages.filter((lang)=> lang!='en').map((lang) => [lang, ''])
       )
       const defaultsToBeAdded = missingKeys.map(
@@ -221,10 +212,9 @@ async function extractMessages() {
 ${chalk.white(message)}\n
  Add them to this file and run again:
 ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
-      core.setFailed('Action failed, Found some missing Keys') 
     }
     
-    if(!CI) {
+    if(!ci) {
       console.log(`You are missing the following content keys from your country configuration package:\n
   ${chalk.white(missingKeys.join('\n'))}\n
   Translate the keys and add them to this file:

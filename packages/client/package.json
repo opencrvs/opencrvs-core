@@ -121,7 +121,6 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@actions/core": "^1.11.1",
     "@chromatic-com/storybook": "^3.2.3",
     "@graphql-codegen/add": "^5.0.0",
     "@graphql-codegen/cli": "^5.0.0",

@@ -7,6 +7,8 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
+set -e
+
 get_abs_filename() {
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
@@ -57,7 +59,7 @@ if $write; then
 fi
 
 if [ $CI = true ]; then
-  yarn run ts-node -- --compiler-options='{"module": "commonjs", "moduleResolution": "node"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --CI
+  yarn run ts-node -- --compiler-options='{"module": "commonjs", "moduleResolution": "node"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --ci
   exit 0
 fi
 yarn run ts-node -- --compiler-options='{"module": "commonjs", "moduleResolution": "node"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH
