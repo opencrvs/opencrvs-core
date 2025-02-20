@@ -40,6 +40,7 @@ interface IAssignment {
   firstName: string
   lastName: string
   practitionerId: string
+  createdAt: string
 }
 
 const getTimeLoggedDataByStatus = (
