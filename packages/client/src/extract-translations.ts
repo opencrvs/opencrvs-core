@@ -18,6 +18,7 @@ import { promisify } from 'util'
 import { sortBy } from 'lodash'
 import ts from 'typescript'
 import { MessageDescriptor } from 'react-intl'
+import * as core from '@actions/core'
 
 export async function writeJSONToCSV(
   filename: string,
@@ -220,7 +221,7 @@ async function extractMessages() {
 ${chalk.white(message)}\n
  Add them to this file and run again:
 ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
-      process.exit(1)  
+      core.setFailed('Action failed Found missing Keys') 
     }
     
     if(!CI) {
