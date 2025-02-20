@@ -597,6 +597,12 @@ const BodyContent = ({
       status: wqStatus || draftStatus
     }
 
+    /*
+     * A previously assigned record might have been reassigned to another user
+     * causing the previously downloaded assignment to become stale. So we are
+     * prioritizing the assignment from the workqueue declaration over the draft
+     * if it is a more recent one.
+     */
     if (
       draft?.assignmentStatus?.createdAt &&
       workqueueDeclaration?.registration?.assignment?.createdAt &&
