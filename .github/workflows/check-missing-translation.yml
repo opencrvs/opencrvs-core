@@ -63,6 +63,7 @@ jobs:
         if [ -s missing_translations.txt ]; then 
           echo "### Summary Of Missing Translation" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          cat missing_translations >> $GITHUB_STEP_SUMMARY
+          cat missing_translations.txt >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          exit 1
         fi
