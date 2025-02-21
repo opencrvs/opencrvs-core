@@ -40,36 +40,6 @@ export function getValidationErrorsForForm(
       return errorsForAllFields
     }
 
-    // if (field.type === FieldType.ADDRESS && values[field.id]) {
-    //   const addressFieldErrors: Errors = ALL_ADDRESS_FIELDS.reduce(
-    //     (errorsForAddressFields, addressField) => {
-    //       const error = getFieldValidationErrors({
-    //         field: {
-    //           ...addressField,
-    //           required: addressField.required && !checkValidationErrorsOnly
-    //         },
-    //         //@ts-ignore
-    //         values: values[field.id]
-    //       })
-
-    //       return {
-    //         ...errorsForAddressFields,
-    //         [addressField.id]: error
-    //       }
-    //     },
-    //     {}
-    //   )
-
-    //   return {
-    //     ...errorsForAllFields,
-    //     [field.id]: {
-    //       errors: Object.values(addressFieldErrors).flatMap(
-    //         (key: IFieldErrors) => key.errors
-    //       )
-    //     }
-    //   }
-    // }
-
     return {
       ...errorsForAllFields,
       [field.id]: getFieldValidationErrors({
