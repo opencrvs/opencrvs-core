@@ -18,6 +18,7 @@ import {
   ActionFormData,
   FieldConfig,
   FormConfig,
+  getFieldValidationErrors,
   isFileFieldType,
   isFileFieldWithOptionType,
   SCOPES
@@ -45,6 +46,16 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
 import { Output } from './Output'
+
+export const ValidationError = styled.span`
+  color: ${({ theme }) => theme.colors.negative};
+  display: inline-block;
+  text-transform: lowercase;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+`
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -421,6 +432,20 @@ function ReviewComponent({
                               />
                             )
 
+                            console.log('value', value)
+
+                            const error = getFieldValidationErrors({
+                              field,
+                              values: form
+                            })
+
+                            const errorDisplay =
+                              error.errors.length > 0 ? (
+                                <ValidationError key={field.id}>
+                                  {intl.formatMessage(error.errors[0].message)}
+                                </ValidationError>
+                              ) : null
+
                             return (
                               <ListReview.Row
                                 key={field.id}
@@ -442,7 +467,11 @@ function ReviewComponent({
                                 }
                                 id={field.id}
                                 label={intl.formatMessage(field.label)}
-                                value={valueDisplay}
+                                value={
+                                  error.errors.length > 0
+                                    ? errorDisplay
+                                    : valueDisplay
+                                }
                               />
                             )
                           })}

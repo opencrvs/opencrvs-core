@@ -15,6 +15,7 @@ import {
   AddressFieldValue,
   alwaysTrue,
   field as createFieldCondition,
+  and,
   defineConditional,
   FieldConfig,
   FieldProps,
@@ -37,6 +38,11 @@ type Props = FieldProps<'ADDRESS'> & {
   onChange: (newValue: ActionFormData) => void
   value?: AddressFieldValue
 }
+
+const AddressType = {
+  URBAN: 'URBAN',
+  RURAL: 'RURAL'
+} as const
 
 function hide<T extends FieldConfig>(fieldConfig: T): T {
   return {
@@ -80,23 +86,11 @@ function addDefaultValue<T extends FieldConfigWithoutAddress>(
 function AddressInput(props: Props) {
   const { onChange, defaultValue = {}, value = {}, ...otherProps } = props
 
-  let fields = [
+  const fields = [
     ...ADMIN_STRUCTURE,
     ...URBAN_FIELDS,
-    ...RURAL_FIELDS.map(hide)
+    ...RURAL_FIELDS
   ] satisfies Array<FieldConfigWithoutAddress>
-
-  if (!value.district) {
-    fields = [
-      ...ADMIN_STRUCTURE,
-      ...URBAN_FIELDS.map(hide),
-      ...RURAL_FIELDS.map(hide)
-    ]
-  }
-
-  if (value.urbanOrRural === 'RURAL') {
-    fields = [...ADMIN_STRUCTURE, ...URBAN_FIELDS.map(hide), ...RURAL_FIELDS]
-  }
 
   return (
     <FormFieldGenerator
@@ -109,10 +103,20 @@ function AddressInput(props: Props) {
   )
 }
 
+const displayWhenDistrictUrbanSelected = [
+  {
+    type: ConditionalType.SHOW,
+    conditional: and(
+      createFieldCondition('urbanOrRural').isEqualTo(AddressType.URBAN),
+      not(createFieldCondition('district').isUndefined())
+    )
+  }
+]
+
 const URBAN_FIELDS = [
   {
     id: 'town',
-    conditionals: [],
+    conditionals: displayWhenDistrictUrbanSelected,
     required: false,
     label: {
       id: 'v2.field.address.town.label',
@@ -123,7 +127,7 @@ const URBAN_FIELDS = [
   },
   {
     id: 'residentialArea',
-    conditionals: [],
+    conditionals: displayWhenDistrictUrbanSelected,
     required: false,
     label: {
       id: 'v2.field.address.residentialArea.label',
@@ -134,7 +138,7 @@ const URBAN_FIELDS = [
   },
   {
     id: 'street',
-    conditionals: [],
+    conditionals: displayWhenDistrictUrbanSelected,
     required: false,
     label: {
       id: 'v2.field.address.street.label',
@@ -145,7 +149,7 @@ const URBAN_FIELDS = [
   },
   {
     id: 'number',
-    conditionals: [],
+    conditionals: displayWhenDistrictUrbanSelected,
     required: false,
     label: {
       id: 'v2.field.address.number.label',
@@ -156,7 +160,7 @@ const URBAN_FIELDS = [
   },
   {
     id: 'zipCode',
-    conditionals: [],
+    conditionals: displayWhenDistrictUrbanSelected,
     required: false,
     label: {
       id: 'v2.field.address.zipCode.label',
@@ -170,7 +174,15 @@ const URBAN_FIELDS = [
 const RURAL_FIELDS = [
   {
     id: 'village',
-    conditionals: [],
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: and(
+          createFieldCondition('urbanOrRural').isEqualTo(AddressType.RURAL),
+          not(createFieldCondition('district').isUndefined())
+        )
+      }
+    ],
     required: false,
     label: {
       id: 'v2.field.address.village.label',
@@ -266,6 +278,7 @@ const ADMIN_STRUCTURE = [
         }
       }
     ],
+    defaultValue: 'URBAN',
     configuration: {
       styles: { size: 'NORMAL' }
     }
@@ -302,25 +315,8 @@ type _ExpectTrue = Expect<
 >
 
 function AddressOutput({ value }: { value?: AddressFieldValue }) {
-  const intl = useIntl()
   if (!value) {
     return ''
-  }
-  const addressValidationResults = getValidationErrorsForForm(
-    ALL_ADDRESS_FIELDS,
-    value
-  )
-
-  const allAddressErrors: IValidationResult[] = Object.values(
-    addressValidationResults
-  ).flatMap((fieldErrors) => fieldErrors.errors)
-
-  if (allAddressErrors.length > 0) {
-    return (
-      <ValidationError>
-        {intl.formatMessage(allAddressErrors[0].message)}
-      </ValidationError>
-    )
   }
 
   return (

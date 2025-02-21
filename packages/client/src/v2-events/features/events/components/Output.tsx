@@ -164,16 +164,6 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
-  const intl = useIntl()
-  const error = getFieldValidationErrors({ field, values: form })
-  if (error.errors.length > 0) {
-    return (
-      <ValidationError>
-        {intl.formatMessage(error.errors[0].message)}
-      </ValidationError>
-    )
-  }
-
   // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
   const hasValue = value !== null && value !== undefined
 
