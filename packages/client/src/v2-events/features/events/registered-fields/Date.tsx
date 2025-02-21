@@ -24,7 +24,13 @@ function DateInput({
   onChange: (newValue: string) => void
   value?: string
 }) {
-  return <DateField {...props} value={value} onChange={onChange} />
+  return (
+    <DateField
+      {...props}
+      value={value ? value.toString() : ''}
+      onChange={onChange}
+    />
+  )
 }
 
 function DateOutput({ value }: { value?: string }) {
