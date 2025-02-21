@@ -31,7 +31,8 @@ import {
   isTextFieldType,
   getFieldValidationErrors,
   ActionFormData,
-  isFacilityFieldType
+  isFacilityFieldType,
+  isNumberFieldType
 } from '@opencrvs/commons/client'
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -84,6 +85,10 @@ function ValueOutput(field: FieldWithValue) {
   }
 
   if (isTextFieldType(field)) {
+    return <DefaultOutput value={field.value} />
+  }
+
+  if (isNumberFieldType(field)) {
     return <DefaultOutput value={field.value} />
   }
 
@@ -168,7 +173,11 @@ export function Output({
       </ValidationError>
     )
   }
-  if (!value) {
+
+  // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
+  const hasValue = value !== null && value !== undefined
+
+  if (!hasValue) {
     if (previousValue) {
       return <ValueOutput config={field} value={previousValue} />
     }
@@ -187,7 +196,7 @@ export function Output({
       </>
     )
   }
-  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
+  if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
         <Deleted>

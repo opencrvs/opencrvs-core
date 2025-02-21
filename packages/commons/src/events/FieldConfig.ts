@@ -13,21 +13,38 @@ import { Conditional, ActionConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
+import {
+  AddressFieldValue,
+  CheckboxFieldValue,
+  DateValue,
+  NumberFieldValue,
+  RequiredTextValue,
+  TextValue
+} from './FieldValue'
 
 const FieldId = z.string()
 
+const DependencyExpression = z.object({
+  dependsOn: z.array(FieldId).default([]),
+  expression: z.string()
+})
+
 const BaseField = z.object({
   id: FieldId,
-  conditionals: z.array(ActionConditional).default([]).optional(),
-  initialValue: z
+  defaultValue: z
     .union([
-      z.string(),
-      z.object({
-        dependsOn: z.array(FieldId).default([]),
-        expression: z.string()
-      })
+      // These are the currently supported default values types
+      z.union([
+        TextValue,
+        RequiredTextValue,
+        DateValue,
+        NumberFieldValue,
+        CheckboxFieldValue
+      ]),
+      DependencyExpression
     ])
     .optional(),
+  conditionals: z.array(ActionConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
   disabled: z.boolean().default(false).optional(),
   hidden: z.boolean().default(false).optional(),
@@ -55,10 +72,11 @@ export type Divider = z.infer<typeof Divider>
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
-      type: z.enum(['text', 'password', 'number']).optional(),
+      type: z.enum(['text', 'password']).optional(),
       prefix: TranslationConfig.optional(),
       postfix: TranslationConfig.optional()
     })
@@ -68,8 +86,22 @@ const TextField = BaseField.extend({
 
 export type TextField = z.infer<typeof TextField>
 
+const NumberField = BaseField.extend({
+  type: z.literal(FieldType.NUMBER),
+  defaultValue: z.union([NumberFieldValue, DependencyExpression]).optional(),
+  configuration: z
+    .object({
+      min: z.number().optional().describe('Minimum value'),
+      max: z.number().optional().describe('Maximum value'),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
+    })
+    .optional()
+}).describe('Number input')
+
 const TextAreaField = BaseField.extend({
   type: z.literal(FieldType.TEXTAREA),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -110,13 +142,15 @@ export const EmailField = BaseField.extend({
       maxLength: z.number().optional().describe('Maximum length of the text')
     })
     .default({ maxLength: 10 })
-    .optional()
+    .optional(),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 })
 
 export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
+  defaultValue: z.union([DateValue, DependencyExpression]).optional(),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -141,6 +175,7 @@ const HtmlFontVariant = z.enum([
 
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
   configuration: z
     .object({
       styles: z
@@ -155,7 +190,8 @@ const Paragraph = BaseField.extend({
 export type Paragraph = z.infer<typeof Paragraph>
 
 const PageHeader = BaseField.extend({
-  type: z.literal(FieldType.PAGE_HEADER)
+  type: z.literal(FieldType.PAGE_HEADER),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('A read-only header component for form pages')
 
 export type PageHeader = z.infer<typeof PageHeader>
@@ -184,6 +220,7 @@ const SelectOption = z.object({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
+  defaultValue: z.union([TextValue, DependencyExpression]).optional(),
   options: z.array(SelectOption).describe('A list of options'),
   configuration: z
     .object({
@@ -200,6 +237,7 @@ export type RadioGroup = z.infer<typeof RadioGroup>
 
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
+  defaultValue: z.string().optional(),
   items: z.array(TranslationConfig).describe('A list of items'),
   configuration: z
     .object({
@@ -216,17 +254,20 @@ export type BulletList = z.infer<typeof BulletList>
 
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
+  defaultValue: z.union([TextValue, DependencyExpression]).optional(),
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
 const Checkbox = BaseField.extend({
-  type: z.literal(FieldType.CHECKBOX)
+  type: z.literal(FieldType.CHECKBOX),
+  defaultValue: z.union([CheckboxFieldValue, DependencyExpression]).optional()
 }).describe('Boolean checkbox field')
 
 export type Checkbox = z.infer<typeof Checkbox>
 
 const Country = BaseField.extend({
-  type: z.literal(FieldType.COUNTRY)
+  type: z.literal(FieldType.COUNTRY),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('Country select field')
 
 export type Country = z.infer<typeof Country>
@@ -245,13 +286,15 @@ const AdministrativeAreaConfiguration = z
 
 const AdministrativeArea = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
   configuration: AdministrativeAreaConfiguration
 }).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 const Location = BaseField.extend({
-  type: z.literal(FieldType.LOCATION)
+  type: z.literal(FieldType.LOCATION),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('Input field for a location')
 
 export type Location = z.infer<typeof Location>
@@ -264,20 +307,22 @@ const FileUploadWithOptions = BaseField.extend({
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 const Facility = BaseField.extend({
-  type: z.literal(FieldType.FACILITY)
+  type: z.literal(FieldType.FACILITY),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
-  type: z.literal(FieldType.OFFICE)
+  type: z.literal(FieldType.OFFICE),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
-  initialValue: z.object({}).passthrough().optional()
+  defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
 /*
@@ -290,6 +335,7 @@ const Address = BaseField.extend({
 export type AllFields =
   | typeof Address
   | typeof TextField
+  | typeof NumberField
   | typeof TextAreaField
   | typeof DateField
   | typeof Paragraph
@@ -313,6 +359,7 @@ export type AllFields =
 export type Inferred =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
+  | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof Paragraph>
@@ -335,6 +382,7 @@ export type Inferred =
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
   TextField,
+  NumberField,
   TextAreaField,
   DateField,
   Paragraph,
@@ -359,6 +407,7 @@ export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
+export type NumberField = z.infer<typeof NumberField>
 export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>

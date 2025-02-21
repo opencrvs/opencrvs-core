@@ -130,7 +130,7 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
               defaultMessage: 'Address',
               description: 'The title for the address input'
             },
-            initialValue: {
+            defaultValue: {
               country: 'FAR'
             }
           }
