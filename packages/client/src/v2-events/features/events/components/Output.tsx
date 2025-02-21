@@ -30,7 +30,8 @@ import {
   isAddressFieldType,
   isTextFieldType,
   getFieldValidationErrors,
-  ActionFormData
+  ActionFormData,
+  isFacilityFieldType
 } from '@opencrvs/commons/client'
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -41,13 +42,14 @@ import {
   Select,
   AdministrativeArea,
   SelectCountry,
-  Date as DateField
+  Date as DateField,
+  LocationSearch
 } from '@client/v2-events/features/events/registered-fields'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
-const ValidationError = styled.span`
+export const ValidationError = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;
@@ -125,6 +127,10 @@ function ValueOutput(field: FieldWithValue) {
 
   if (isDividerFieldType(field)) {
     return <DefaultOutput value={field.value} />
+  }
+
+  if (isFacilityFieldType(field)) {
+    return <LocationSearch.Output value={field.value} />
   }
 }
 
