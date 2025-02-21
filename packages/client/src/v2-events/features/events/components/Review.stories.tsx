@@ -14,6 +14,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
 import { fireEvent, within } from '@storybook/test'
+import { AddressFieldValue } from '@opencrvs/commons/client'
 import {
   tennisClueMembershipEventDocument,
   tennisClubMembershipEvent,
@@ -36,8 +37,9 @@ const mockFormData = {
     street: '123 Tennis Club Avenue',
     number: '123',
     zipCode: 'Z12345',
-    urbanOrRural: 'URBAN',
-    town: 'Tennisville'
+    urbanOrRural: 'URBAN' as const,
+    town: 'Tennisville',
+    residentialArea: 'Example Residential Area'
   }
 }
 
@@ -188,13 +190,9 @@ export const ReviewWithValidationErrors: Story = {
       'applicant.address': {
         country: 'FAR',
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        street: '123 Tennis Club Avenue',
-        number: '123',
-        zipCode: 'Z12345',
         urbanOrRural: 'RURAL',
-        town: 'Tennisville',
         village: 'Tennisville'
-      }
+      } as AddressFieldValue
     }
   },
   render: function Component() {

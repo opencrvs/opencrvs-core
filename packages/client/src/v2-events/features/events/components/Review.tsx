@@ -432,8 +432,6 @@ function ReviewComponent({
                               />
                             )
 
-                            console.log('value', value)
-
                             const error = getFieldValidationErrors({
                               field,
                               values: form

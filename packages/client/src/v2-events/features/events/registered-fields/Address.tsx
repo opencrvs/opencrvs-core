@@ -9,33 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
 import {
   ActionFormData,
   AddressFieldValue,
-  alwaysTrue,
-  field as createFieldCondition,
   and,
-  defineConditional,
+  ConditionalType,
+  field as createFieldCondition,
   FieldConfig,
   FieldProps,
-  not,
-  ConditionalType
+  not
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import {
-  Output,
-  ValidationError
-} from '@client/v2-events/features/events/components/Output'
+import { Output } from '@client/v2-events/features/events/components/Output'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
-import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
-import { IValidationResult } from '@client/utils/validate'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<FieldConfig, { type: 'ADDRESS' }>
 
 type Props = FieldProps<'ADDRESS'> & {
-  onChange: (newValue: ActionFormData) => void
+  onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
 }
 
@@ -43,16 +35,6 @@ const AddressType = {
   URBAN: 'URBAN',
   RURAL: 'RURAL'
 } as const
-
-function hide<T extends FieldConfig>(fieldConfig: T): T {
-  return {
-    ...fieldConfig,
-    conditionals: (fieldConfig.conditionals || []).concat({
-      type: ConditionalType.SHOW,
-      conditional: not(defineConditional(alwaysTrue()))
-    })
-  }
-}
 
 function addDefaultValue<T extends FieldConfigWithoutAddress>(
   defaultValues: AddressFieldValue
@@ -84,7 +66,7 @@ function addDefaultValue<T extends FieldConfigWithoutAddress>(
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue = {}, value = {}, ...otherProps } = props
+  const { onChange, defaultValue, value = {}, ...otherProps } = props
 
   const fields = [
     ...ADMIN_STRUCTURE,
@@ -95,10 +77,11 @@ function AddressInput(props: Props) {
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={fields.map(addDefaultValue(defaultValue))}
+      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
       formData={value}
+      initialValues={value}
       setAllFieldsDirty={false}
-      onChange={onChange}
+      onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />
   )
 }
@@ -291,7 +274,8 @@ export const ALL_ADDRESS_FIELDS = [
   ...RURAL_FIELDS
 ]
 
-type RequiredKeysFromFieldValue = keyof AddressFieldValue
+type AllKeys<T> = T extends unknown ? keyof T : never
+type RequiredKeysFromFieldValue = AllKeys<AddressFieldValue>
 type EnsureSameUnion<A, B> = [A] extends [B]
   ? [B] extends [A]
     ? true
@@ -318,15 +302,15 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
   if (!value) {
     return ''
   }
-
   return (
     <>
-      {ALL_ADDRESS_FIELDS.map((field) => ({ field, value: value[field.id] }))
-        .filter(
-          (field) => field.value || (!field.value && field.field.required)
-        )
+      {ALL_ADDRESS_FIELDS.map((field) => ({
+        field,
+        value: value[field.id as keyof typeof value]
+      }))
+        .filter((field) => field.value)
         .map((field) => (
-          <>
+          <React.Fragment key={field.field.id}>
             <Output
               field={field.field}
               form={value}
@@ -334,7 +318,7 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
               value={field.value}
             />
             <br />
-          </>
+          </React.Fragment>
         ))}
     </>
   )

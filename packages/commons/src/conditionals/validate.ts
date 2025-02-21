@@ -10,15 +10,15 @@
  */
 
 import Ajv from 'ajv'
-import { ConditionalParameters, JSONSchema } from './conditionals'
 import addFormats from 'ajv-formats'
+import { ConditionalParameters, JSONSchema } from './conditionals'
 
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { FieldConfig } from '../events/FieldConfig'
-import { FieldValue } from '../events/FieldValue'
 import { ActionFormData } from '../events/ActionDocument'
+import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import { FieldValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 
 const ajv = new Ajv({
@@ -237,17 +237,17 @@ function validateFieldInput({
   field: FieldConfig
   value: FieldValue
 }) {
-  const error = mapFieldTypeToZod(field.type, field.required)
-    .safeParse(value, {
+  const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
+    value,
+    {
       // @ts-expect-error
       errorMap: zodToIntlErrorMap
-    })
-    .error?.format()
-
-  if (!error) {
-    return []
-  }
+    }
+  )
 
   // We have overridden the standard error messages
-  return error._errors as unknown as { message: TranslationConfig }[]
+  return (rawError.error?.issues.map((issue) => issue.message) ??
+    []) as unknown as {
+    message: TranslationConfig
+  }[]
 }

@@ -681,7 +681,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                       error={isDisabled ? '' : error}
                       fields={fields}
                       formData={formData}
-                      touched={touched[field.id] || false}
+                      touched={touched[field.id] ? true : false}
                       values={values}
                       onUploadingStateChanged={
                         this.props.onUploadingStateChanged

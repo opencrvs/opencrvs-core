@@ -11,40 +11,38 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
 import {
+  ActionFormData,
   FieldConfig,
   FieldValue,
+  isAddressFieldType,
+  isAdministrativeAreaFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
+  isEmailFieldType,
+  isFacilityFieldType,
   isFileFieldType,
-  isAdministrativeAreaFieldType,
+  isNumberFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
-  isEmailFieldType,
   isSelectFieldType,
-  isAddressFieldType,
-  isTextFieldType,
-  getFieldValidationErrors,
-  ActionFormData,
-  isFacilityFieldType,
-  isNumberFieldType
+  isTextFieldType
 } from '@opencrvs/commons/client'
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
   Address,
+  AdministrativeArea,
   Checkbox,
+  Date as DateField,
+  LocationSearch,
   RadioGroup,
   Select,
-  AdministrativeArea,
-  SelectCountry,
-  Date as DateField,
-  LocationSearch
+  SelectCountry
 } from '@client/v2-events/features/events/registered-fields'
 
 const Deleted = styled.del`
@@ -144,10 +142,6 @@ function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
 }
 
 function getEmptyValueForFieldType(field: FieldWithValue) {
-  if (isAddressFieldType(field)) {
-    return {}
-  }
-
   return '-'
 }
 
