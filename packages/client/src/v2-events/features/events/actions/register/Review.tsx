@@ -69,7 +69,7 @@ export function Review() {
   )
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const formConfig = findActiveActionForm(config, ActionType.DECLARE)
+  const formConfig = findActiveActionForm(config, ActionType.REGISTER)
   if (!formConfig) {
     throw new Error('No active form configuration found for declare action')
   }
