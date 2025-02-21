@@ -12,9 +12,11 @@ import {
   FieldConfig,
   getFieldValidationErrors,
   ActionFormData,
-  FormConfig
+  FormConfig,
+  FieldType
 } from '@opencrvs/commons/client'
 import { IValidationResult } from '@client/utils/validate'
+import { ALL_ADDRESS_FIELDS } from '@client/v2-events/features/events/registered-fields'
 
 interface IFieldErrors {
   errors: IValidationResult[]
@@ -29,24 +31,56 @@ export function getValidationErrorsForForm(
   values: ActionFormData,
   checkValidationErrorsOnly?: boolean
 ) {
-  return fields.reduce(
-    (errorsForAllFields: Errors, field) =>
+  return fields.reduce((errorsForAllFields: Errors, field) => {
+    if (
       // eslint-disable-next-line
       errorsForAllFields[field.id] &&
       errorsForAllFields[field.id].errors.length > 0
-        ? errorsForAllFields
-        : {
-            ...errorsForAllFields,
-            [field.id]: getFieldValidationErrors({
-              field: {
-                ...field,
-                required: field.required && !checkValidationErrorsOnly
-              },
-              values
-            })
-          },
-    {}
-  )
+    ) {
+      return errorsForAllFields
+    }
+
+    if (field.type === FieldType.ADDRESS && values[field.id]) {
+      const addressFieldErrors: Errors = ALL_ADDRESS_FIELDS.reduce(
+        (errorsForAddressFields, addressField) => {
+          const error = getFieldValidationErrors({
+            field: {
+              ...addressField,
+              required: addressField.required && !checkValidationErrorsOnly
+            },
+            //@ts-ignore
+            values: values[field.id]
+          })
+
+          return {
+            ...errorsForAddressFields,
+            [addressField.id]: error
+          }
+        },
+        {}
+      )
+
+      return {
+        ...errorsForAllFields,
+        [field.id]: {
+          errors: Object.values(addressFieldErrors).flatMap(
+            (key: IFieldErrors) => key.errors
+          )
+        }
+      }
+    }
+
+    return {
+      ...errorsForAllFields,
+      [field.id]: getFieldValidationErrors({
+        field: {
+          ...field,
+          required: field.required && !checkValidationErrorsOnly
+        },
+        values
+      })
+    }
+  }, {})
 }
 
 export function validationErrorsInActionFormExist(

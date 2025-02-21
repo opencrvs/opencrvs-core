@@ -9,22 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { useIntl } from 'react-intl'
 import {
   ActionFormData,
-  AddressField,
   AddressFieldValue,
   alwaysTrue,
-  ConditionalType,
   field as createFieldCondition,
   defineConditional,
   FieldConfig,
   FieldProps,
-  not
+  not,
+  ConditionalType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { Output } from '@client/v2-events/features/events/components/Output'
+import {
+  Output,
+  ValidationError
+} from '@client/v2-events/features/events/components/Output'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
+import { IValidationResult } from '@client/utils/validate'
 
+// ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<FieldConfig, { type: 'ADDRESS' }>
 
 type Props = FieldProps<'ADDRESS'> & {
@@ -42,21 +48,23 @@ function hide<T extends FieldConfig>(fieldConfig: T): T {
   }
 }
 
-function addInitialValue(initialValues: AddressField['initialValue']) {
-  if (!initialValues) {
-    return (fieldConfig: FieldConfigWithoutAddress) => fieldConfig
+function addDefaultValue<T extends FieldConfigWithoutAddress>(
+  defaultValues: AddressFieldValue
+): (fieldConfig: T) => T {
+  if (!defaultValues) {
+    return (fieldConfig) => fieldConfig
   }
 
-  return (fieldConfig: FieldConfigWithoutAddress) => {
-    if (!initialValues[fieldConfig.id]) {
+  return (fieldConfig) => {
+    const key = fieldConfig.id as keyof typeof defaultValues
+
+    if (!defaultValues[key]) {
       return fieldConfig
     }
 
     return {
       ...fieldConfig,
-      initialValue: initialValues[
-        fieldConfig.id
-      ] as FieldConfigWithoutAddress['initialValue']
+      defaultValue: defaultValues[key]
     }
   }
 }
@@ -70,7 +78,7 @@ function addInitialValue(initialValues: AddressField['initialValue']) {
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  */
 function AddressInput(props: Props) {
-  const { onChange, initialValue = {}, value = {}, ...otherProps } = props
+  const { onChange, defaultValue = {}, value = {}, ...otherProps } = props
 
   let fields = [
     ...ADMIN_STRUCTURE,
@@ -93,7 +101,7 @@ function AddressInput(props: Props) {
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={fields.map(addInitialValue(initialValue))}
+      fields={fields.map(addDefaultValue(defaultValue))}
       formData={value}
       setAllFieldsDirty={false}
       onChange={onChange}
@@ -240,7 +248,6 @@ const ADMIN_STRUCTURE = [
     },
     hideLabel: true,
     type: 'RADIO_GROUP',
-    initialValue: 'URBAN',
     options: [
       {
         value: 'URBAN',
@@ -265,7 +272,11 @@ const ADMIN_STRUCTURE = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-const ALL_FIELDS = [...ADMIN_STRUCTURE, ...URBAN_FIELDS, ...RURAL_FIELDS]
+export const ALL_ADDRESS_FIELDS = [
+  ...ADMIN_STRUCTURE,
+  ...URBAN_FIELDS,
+  ...RURAL_FIELDS
+]
 
 type RequiredKeysFromFieldValue = keyof AddressFieldValue
 type EnsureSameUnion<A, B> = [A] extends [B]
@@ -275,7 +286,7 @@ type EnsureSameUnion<A, B> = [A] extends [B]
   : false
 type Expect<T extends true> = T
 
-type AllFields = (typeof ALL_FIELDS)[number]['id']
+type AllFields = (typeof ALL_ADDRESS_FIELDS)[number]['id']
 
 /*
  * This type ensures that all fields needed in AddressFieldValue type
@@ -291,14 +302,33 @@ type _ExpectTrue = Expect<
 >
 
 function AddressOutput({ value }: { value?: AddressFieldValue }) {
+  const intl = useIntl()
   if (!value) {
     return ''
+  }
+  const addressValidationResults = getValidationErrorsForForm(
+    ALL_ADDRESS_FIELDS,
+    value
+  )
+
+  const allAddressErrors: IValidationResult[] = Object.values(
+    addressValidationResults
+  ).flatMap((fieldErrors) => fieldErrors.errors)
+
+  if (allAddressErrors.length > 0) {
+    return (
+      <ValidationError>
+        {intl.formatMessage(allAddressErrors[0].message)}
+      </ValidationError>
+    )
   }
 
   return (
     <>
-      {ALL_FIELDS.map((field) => ({ field, value: value[field.id] }))
-        .filter((field) => field.value)
+      {ALL_ADDRESS_FIELDS.map((field) => ({ field, value: value[field.id] }))
+        .filter(
+          (field) => field.value || (!field.value && field.field.required)
+        )
         .map((field) => (
           <>
             <Output
@@ -321,7 +351,7 @@ function useStringifier() {
      * form data stringifier so location and other form fields can handle stringifying their own data
      */
     const stringifier = useFormDataStringifier()
-    return stringifier(ALL_FIELDS, value as ActionFormData)
+    return stringifier(ALL_ADDRESS_FIELDS, value as ActionFormData)
   }
 }
 

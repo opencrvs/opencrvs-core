@@ -30,7 +30,9 @@ import {
   isAddressFieldType,
   isTextFieldType,
   getFieldValidationErrors,
-  ActionFormData
+  ActionFormData,
+  isFacilityFieldType,
+  isNumberFieldType
 } from '@opencrvs/commons/client'
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -41,13 +43,14 @@ import {
   Select,
   AdministrativeArea,
   SelectCountry,
-  Date as DateField
+  Date as DateField,
+  LocationSearch
 } from '@client/v2-events/features/events/registered-fields'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
-const ValidationError = styled.span`
+export const ValidationError = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;
@@ -82,6 +85,10 @@ function ValueOutput(field: FieldWithValue) {
   }
 
   if (isTextFieldType(field)) {
+    return <DefaultOutput value={field.value} />
+  }
+
+  if (isNumberFieldType(field)) {
     return <DefaultOutput value={field.value} />
   }
 
@@ -126,6 +133,10 @@ function ValueOutput(field: FieldWithValue) {
   if (isDividerFieldType(field)) {
     return <DefaultOutput value={field.value} />
   }
+
+  if (isFacilityFieldType(field)) {
+    return <LocationSearch.Output value={field.value} />
+  }
 }
 
 function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
@@ -162,7 +173,11 @@ export function Output({
       </ValidationError>
     )
   }
-  if (!value) {
+
+  // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
+  const hasValue = value !== null && value !== undefined
+
+  if (!hasValue) {
     if (previousValue) {
       return <ValueOutput config={field} value={previousValue} />
     }
@@ -181,7 +196,7 @@ export function Output({
       </>
     )
   }
-  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
+  if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
         <Deleted>
