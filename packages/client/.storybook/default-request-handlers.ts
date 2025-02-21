@@ -22,7 +22,6 @@ import {
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
-import { random } from 'lodash'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()

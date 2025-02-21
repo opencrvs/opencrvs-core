@@ -406,7 +406,10 @@ function ReviewComponent({
                         {page.fields
                           .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
-                            const value = form[field.id]
+                            console.log('form', form.data)
+                            console.log('value', form.data[field.id])
+                            console.log('field', field)
+                            const value = form!.data[field.id]
                             const previousValue = previousForm[field.id]
 
                             const valueDisplay = (
@@ -571,7 +574,7 @@ const incompleteFormWarning: MessageDescriptor = {
   description: 'The label for warning of incomplete form'
 }
 
-function PreviewActionComponent({
+function ReviewActionComponent({
   onConfirm,
   formConfig,
   form,
@@ -747,7 +750,7 @@ function ActionModal({
 
 export const Review = {
   Body: ReviewComponent,
-  Actions: PreviewActionComponent,
+  Actions: ReviewActionComponent,
   EditModal: EditModal,
   ActionModal: ActionModal
 }

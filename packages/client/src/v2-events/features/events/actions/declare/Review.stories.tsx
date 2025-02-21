@@ -11,22 +11,29 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { http, graphql, HttpResponse } from 'msw'
+import { getUUID } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
-import * as Declare from './index'
+import { payloadGenerator } from '../../../../../../.storybook/test-data-generators'
+import { ReviewIndex } from './Review'
 
-const meta: Meta<typeof Declare.Pages> = {
+const generator = payloadGenerator()
+
+const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare',
   beforeEach: () => {
-    useEventFormData.getState().clear()
+    useEventFormData.setState({
+      formValues: generator.event.actions.declare(getUUID())
+    })
   }
 }
 
 export default meta
 
-type Story = StoryObj<typeof Declare.Pages>
+type Story = StoryObj<typeof ReviewIndex>
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -36,13 +43,17 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-export const Page: Story = {
+export const ReviewForLocalRegistrar: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
-        pageId: 'applicant'
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: '123-456-789'
+      })
+    },
+    beforeEach: () => {
+      useEventFormData.setState({
+        formValues: generator.event.actions.declare('123-456-789')
       })
     },
     msw: {
@@ -51,24 +62,14 @@ export const Page: Story = {
           tRPCMsw.event.get.query(() => {
             return tennisClueMembershipEventDocument
           })
-        ]
-      }
-    }
-  }
-}
-export const Review: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.localRegistrar()
+              }
+            })
           })
         ]
       }

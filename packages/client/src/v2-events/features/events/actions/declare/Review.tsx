@@ -14,6 +14,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useSelector } from 'react-redux'
 import {
   Button,
   Checkbox,
@@ -22,7 +23,15 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionFormData,
+  ActionType,
+  findActiveActionForm,
+  FormConfig,
+  Scope,
+  SCOPES,
+  TranslationConfig
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -33,10 +42,23 @@ import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts/form'
 
+// eslint-disable-next-line no-restricted-imports
+import { getScope } from '@client/profile/profileSelectors'
+import {
+  getValidationErrorsForForm,
+  validationErrorsInActionFormExist
+} from '../../../../components/forms/validation'
+import { withSuspense } from '../../../../components/withSuspense'
+
 const messages = defineMessages({
   reviewActionTitle: {
     id: 'v2.reviewAction.title',
-    defaultMessage: 'Declare event',
+    defaultMessage: 'Declaration incomplete',
+    description: 'The title for review action'
+  },
+  reviewIncompleteActionTitle: {
+    id: 'v2.reviewAction.incomplete.title',
+    defaultMessage: 'Declaration incomplete',
     description: 'The title for review action'
   },
   reviewActionDescription: {
@@ -45,10 +67,22 @@ const messages = defineMessages({
       'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
     description: 'The description for review action'
   },
+  sendForReviewDescription: {
+    id: 'v2.reviewAction.sendForReview.description',
+    defaultMessage:
+      'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
+    description: 'The description for review action'
+  },
   reviewActionDeclare: {
     id: 'v2.reviewAction.Declare',
     defaultMessage: 'Declare',
     description: 'The label for declare button of review action'
+  },
+  sendForReviewOnConfirm: {
+    id: 'v2.reviewAction.Declare.sendForReview',
+    defaultMessage: 'Send for review',
+    description:
+      'The button label for sending incomplete declaration for review'
   },
   reviewActionReject: {
     id: 'v2.reviewAction.reject',
@@ -88,6 +122,79 @@ const messages = defineMessages({
   }
 })
 
+const messages2 = {
+  complete: {
+    register: {},
+    validate: {},
+    declare: {},
+    sendForReview: {}
+  },
+  incomplete: {
+    register: {},
+    validate: {},
+    declare: {},
+    sendForReview: {}
+  }
+}
+
+const completeDeclarationMessages = {
+  title: messages.reviewActionTitle,
+  description: messages.reviewActionDescription,
+  onConfirm: messages.reviewActionDeclare
+}
+
+const incompleteDeclarationMessages = {
+  onConfirm: messages.sendForReviewOnConfirm,
+  title: messages.reviewIncompleteActionTitle,
+  description: messages.sendForReviewDescription // @TODO: Check that this is the case
+}
+
+function getCompletedFormConfig(formCofig: FormConfig, scopes?: Scope[]) {
+  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
+    return {
+      onConfirmDeclaration: () => {},
+      messages: {
+        title: messages.reviewActionTitle,
+        onConfirm: messages.reviewActionDeclare,
+        description: messages.reviewActionDescription
+      }
+    }
+  }
+}
+
+function getReviewActionConfig({
+  formConfig,
+  form,
+  metadata,
+  scopes
+}: {
+  formConfig: FormConfig
+  form: ActionFormData
+  metadata?: ActionFormData
+  scopes?: Scope[]
+}) {
+  // : {
+  //   onConfirmDeclaration: () => void
+  //   messages: {
+  //     title: TranslationConfig,
+  //     onConfirm: TranslationConfig,
+  //     description: TranslationConfig
+  //   }
+  // }
+  const isComplete = !validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
+  console.log('isComplete', scopes)
+  if (isComplete) {
+    // return getCompletedFormConfig(formConfig, scopes)
+  }
+
+  // return getIncompletedFormConfig(formConfig, scopes)
+}
+
 // eslint-disable-next-line no-shadow
 enum REJECT_ACTIONS {
   ARCHIVE,
@@ -119,8 +226,24 @@ export function Review() {
   }
 
   const form = useEventFormData((state) => state.formValues)
+  console.log('form', form)
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(eventId, {})
+
+  const hasErrors = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
+  const scopes = useSelector(getScope) ?? undefined
+
+  // const reviewActionConfiguration = getReviewActionConfig({
+  //   formConfig,
+  //   form,
+  //   metadata,
+  //   scopes
+  // })
 
   async function handleEdit({
     pageId,
@@ -219,12 +342,13 @@ export function Review() {
         <ReviewComponent.Actions
           form={form}
           formConfig={formConfig}
-          messages={{
-            title: messages.reviewActionTitle,
-            description: messages.reviewActionDescription,
-            onConfirm: messages.reviewActionDeclare
-          }}
+          messages={
+            hasErrors
+              ? incompleteDeclarationMessages
+              : completeDeclarationMessages
+          }
           metadata={metadata}
+          // theme={hasErrors ? 'negative' : 'positive'}
           onConfirm={handleDeclaration}
           onReject={handleReject}
         />
@@ -317,3 +441,5 @@ function RejectModal({
     </ResponsiveModal>
   )
 }
+
+export const ReviewIndex = withSuspense(Review)
