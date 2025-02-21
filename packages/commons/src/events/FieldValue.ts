@@ -78,8 +78,9 @@ export const FieldValue = z.union([
   FileFieldValue,
   FileFieldWithOptionValue,
   CheckboxFieldValue,
-  z.union([AddressFieldValue.options.map((type) => type.partial())] as any),
-  NumberFieldValue
+  NumberFieldValue,
+  UrbanAddress,
+  RuralAddress
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>

@@ -17,6 +17,7 @@ import {
   field as createFieldCondition,
   FieldConfig,
   FieldProps,
+  FieldType,
   not
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -24,9 +25,12 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 // ADDRESS field may not contain another ADDRESS field
-type FieldConfigWithoutAddress = Exclude<FieldConfig, { type: 'ADDRESS' }>
+type FieldConfigWithoutAddress = Exclude<
+  FieldConfig,
+  { type: typeof FieldType.ADDRESS }
+>
 
-type Props = FieldProps<'ADDRESS'> & {
+type Props = FieldProps<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
 }
@@ -37,7 +41,7 @@ const AddressType = {
 } as const
 
 function addDefaultValue<T extends FieldConfigWithoutAddress>(
-  defaultValues: AddressFieldValue
+  defaultValues?: AddressFieldValue
 ): (fieldConfig: T) => T {
   if (!defaultValues) {
     return (fieldConfig) => fieldConfig
@@ -106,7 +110,7 @@ const URBAN_FIELDS = [
       defaultMessage: 'Town',
       description: 'This is the label for the field'
     },
-    type: 'TEXT'
+    type: FieldType.TEXT
   },
   {
     id: 'residentialArea',
@@ -117,7 +121,7 @@ const URBAN_FIELDS = [
       defaultMessage: 'Residential Area',
       description: 'This is the label for the field'
     },
-    type: 'TEXT'
+    type: FieldType.TEXT
   },
   {
     id: 'street',
@@ -128,7 +132,7 @@ const URBAN_FIELDS = [
       defaultMessage: 'Street',
       description: 'This is the label for the field'
     },
-    type: 'TEXT'
+    type: FieldType.TEXT
   },
   {
     id: 'number',
@@ -139,7 +143,7 @@ const URBAN_FIELDS = [
       defaultMessage: 'Number',
       description: 'This is the label for the field'
     },
-    type: 'TEXT'
+    type: FieldType.TEXT
   },
   {
     id: 'zipCode',
@@ -150,7 +154,7 @@ const URBAN_FIELDS = [
       defaultMessage: 'Postcode / Zip',
       description: 'This is the label for the field'
     },
-    type: 'TEXT'
+    type: FieldType.TEXT
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
@@ -172,7 +176,7 @@ const RURAL_FIELDS = [
       defaultMessage: 'Village',
       description: 'This is the label for the field'
     },
-    type: 'TEXT'
+    type: FieldType.TEXT
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
@@ -186,7 +190,7 @@ const ADMIN_STRUCTURE = [
       defaultMessage: 'Country',
       description: 'This is the label for the field'
     },
-    type: 'COUNTRY'
+    type: FieldType.COUNTRY
   },
   {
     id: 'province',
