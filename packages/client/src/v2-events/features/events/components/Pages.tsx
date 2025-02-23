@@ -9,12 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { ActionFormData, FormPage } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  mapFieldsToValues
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
+import { flatten } from 'lodash'
 
 /**
  *
@@ -42,6 +46,7 @@ export function Pages({
   children?: (page: FormPage) => React.ReactNode
 }) {
   const intl = useIntl()
+  const [initialForm, setInitialForm] = useState(form)
 
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
 
@@ -61,6 +66,19 @@ export function Pages({
     }
   }, [pageId, currentPage, formPages, onFormPageChange])
 
+  // TODO CIHAN: can I make this neater?
+  useEffect(() => {
+    const allFields = flatten(formPages.map((page) => page.fields))
+    const fieldsWithDefaults = allFields.filter(
+      (field) =>
+        field.defaultValue &&
+        field.defaultValue !== null &&
+        field.defaultValue !== undefined
+    )
+
+    setInitialForm(mapFieldsToValues(fieldsWithDefaults, form))
+  }, [])
+
   return (
     <FormWizard
       currentPage={currentPage}
@@ -79,7 +97,7 @@ export function Pages({
           fields={page.fields}
           formData={form}
           id="locationForm"
-          initialValues={form}
+          initialValues={initialForm}
           setAllFieldsDirty={false}
           onChange={(values) => setFormData(values)}
         />

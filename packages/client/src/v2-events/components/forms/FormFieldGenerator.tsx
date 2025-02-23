@@ -467,7 +467,7 @@ GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
 type FormData = Record<string, FieldValue>
 
-const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
+export const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
   fields.reduce((memo, field) => {
     const fieldInitialValue = handleDefaultValue(field, formData)
     return { ...memo, [field.id]: fieldInitialValue }
@@ -709,25 +709,22 @@ function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
 
 export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
   const intl = useIntl()
-
   const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
 
   const onChange = (values: ActionFormData) => {
     props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
-  const initialValues =
-    props.initialValues && Object.keys(props.initialValues).length > 0
-      ? props.initialValues
-      : mapFieldsToValues(props.fields, nestedFormData)
-
-  const formikCompatibleInitialValues =
-    makeFormFieldIdsFormikCompatible<FieldValue>(initialValues)
+  // TODO CIHAN: is this needed?
+  // possibly for nested forms?
+  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>(
+    props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
+  )
 
   return (
     <Formik<ActionFormData>
       enableReinitialize={true}
-      initialValues={formikCompatibleInitialValues}
+      initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
