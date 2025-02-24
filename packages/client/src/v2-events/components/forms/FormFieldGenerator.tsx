@@ -15,7 +15,7 @@ import { TEXT } from '@client/forms'
 import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
-import React, { useEffect, useCallback } from 'react'
+import React, { useCallback } from 'react'
 
 import styled, { keyframes } from 'styled-components'
 import {
@@ -716,18 +716,15 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
-  const initialValues =
-    props.initialValues && Object.keys(props.initialValues).length > 0
-      ? props.initialValues
-      : mapFieldsToValues(props.fields, nestedFormData)
-
-  const formikCompatibleInitialValues =
-    makeFormFieldIdsFormikCompatible<FieldValue>(initialValues)
+  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
+    ...mapFieldsToValues(props.fields, nestedFormData),
+    ...props.initialValues
+  })
 
   return (
     <Formik<ActionFormData>
       enableReinitialize={true}
-      initialValues={formikCompatibleInitialValues}
+      initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
