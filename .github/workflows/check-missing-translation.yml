@@ -66,9 +66,6 @@ jobs:
            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
            cat missing_translations.txt >> $GITHUB_STEP_SUMMARY
            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-           echo "Add them to this file and and run again:" >> $GITHUB_STEP_SUMMARY
-           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-           echo "/opencrvs-countryconfig/src/translations/client.csv" >> $GITHUB_STEP_SUMMARY
-           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+           echo "Create a pull request to the `opencrvs/countryconfig` repository with a branch name $acting_branch and add the translations to `src/translations/client.csv`. After pushing the changes, you can run this pipeline again." >> $GITHUB_STEP_SUMMARY
            exit 1
         fi
