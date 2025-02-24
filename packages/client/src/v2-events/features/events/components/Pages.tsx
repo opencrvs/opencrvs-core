@@ -11,14 +11,25 @@
 
 import React, { useEffect, useMemo } from 'react'
 import { useIntl } from 'react-intl'
-import { ActionFormData, FormPage } from '@opencrvs/commons/client'
-import { FormWizard } from '@opencrvs/components'
 import {
-  FormFieldGenerator,
-  mapFieldsToValues
-} from '@client/v2-events/components/forms/FormFieldGenerator'
+  ActionFormData,
+  FieldConfig,
+  FieldValue,
+  FormPage
+} from '@opencrvs/commons/client'
+import { FormWizard } from '@opencrvs/components'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 import { flatten } from 'lodash'
+
+import { handleDefaultValue } from '@client/v2-events/components/forms/utils'
+type FormData = Record<string, FieldValue>
+
+const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
+  fields.reduce((memo, field) => {
+    const fieldInitialValue = handleDefaultValue(field, formData)
+    return { ...memo, [field.id]: fieldInitialValue }
+  }, {})
 
 /**
  *

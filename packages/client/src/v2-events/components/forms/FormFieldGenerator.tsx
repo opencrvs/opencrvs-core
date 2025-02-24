@@ -15,14 +15,13 @@ import { TEXT } from '@client/forms'
 import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
-import React, { useEffect, useCallback } from 'react'
+import React, { useCallback } from 'react'
 
 import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
   FIELD_SEPARATOR,
   getDependentFields,
-  handleDefaultValue,
   hasDefaultValueDependencyInfo,
   makeDatesFormatted
 } from './utils'
@@ -464,14 +463,6 @@ const GeneratedInputField = React.memo(
 )
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
-
-type FormData = Record<string, FieldValue>
-
-export const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
-  fields.reduce((memo, field) => {
-    const fieldInitialValue = handleDefaultValue(field, formData)
-    return { ...memo, [field.id]: fieldInitialValue }
-  }, {})
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 
