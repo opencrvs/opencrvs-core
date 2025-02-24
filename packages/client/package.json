@@ -23,6 +23,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test-storybook": "test-storybook",
+    "test-storybook:watch": "test-storybook --watch",
     "chromatic": "chromatic"
   },
   "lint-staged": {
