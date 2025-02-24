@@ -14,6 +14,7 @@ import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { RecursiveStringRecord } from '@client/v2-events/hooks/useFormDataStringifier'
 
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
@@ -23,7 +24,7 @@ export function EventSummary({
   event,
   summary
 }: {
-  event: Record<string, FieldValue | null>
+  event: Record<string, FieldValue | null | RecursiveStringRecord>
   summary: SummaryConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
