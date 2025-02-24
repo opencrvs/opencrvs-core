@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { ActionFormData, FormPage } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
@@ -46,7 +46,20 @@ export function Pages({
   children?: (page: FormPage) => React.ReactNode
 }) {
   const intl = useIntl()
-  const [initialForm, setInitialForm] = useState(form)
+
+  // can I make this neater?
+  const initialForm = useMemo(() => {
+    console.log('all fields')
+    const allFields = flatten(formPages.map((page) => page.fields))
+    const fieldsWithDefaults = allFields.filter(
+      (field) =>
+        field.defaultValue &&
+        field.defaultValue !== null &&
+        field.defaultValue !== undefined
+    )
+
+    return mapFieldsToValues(fieldsWithDefaults, form)
+  }, [])
 
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
 
@@ -65,19 +78,6 @@ export function Pages({
       onFormPageChange(formPages[currentPage].id)
     }
   }, [pageId, currentPage, formPages, onFormPageChange])
-
-  // TODO CIHAN: can I make this neater?
-  useEffect(() => {
-    const allFields = flatten(formPages.map((page) => page.fields))
-    const fieldsWithDefaults = allFields.filter(
-      (field) =>
-        field.defaultValue &&
-        field.defaultValue !== null &&
-        field.defaultValue !== undefined
-    )
-
-    setInitialForm(mapFieldsToValues(fieldsWithDefaults, form))
-  }, [])
 
   return (
     <FormWizard
