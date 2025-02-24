@@ -53,7 +53,7 @@ function useFieldStringifier() {
   }
 }
 
-interface RecursiveStringRecord {
+export interface RecursiveStringRecord {
   [key: string]: string | RecursiveStringRecord
 }
 

@@ -146,13 +146,11 @@ function getEmptyValueForFieldType(field: FieldWithValue) {
 }
 
 export function Output({
-  form,
   field,
   value,
   previousValue,
   showPreviouslyMissingValuesAsChanged = true
 }: {
-  form: ActionFormData
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
