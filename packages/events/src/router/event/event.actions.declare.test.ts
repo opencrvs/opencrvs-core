@@ -9,8 +9,33 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { generateActionInput } from '@events/tests/generators'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { TRPCError } from '@trpc/server'
+
+test(`prevents forbidden access if missing required scope`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(
+    client.event.actions.declare(
+      generator.event.actions.declare('event-test-id-12345', {})
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+
+  await expect(
+    client.event.actions.declare(
+      generator.event.actions.declare('event-test-id-12345', {})
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
@@ -20,7 +45,8 @@ test('Validation error message contains all the offending fields', async () => {
 
   const data = generator.event.actions.declare(event.id, {
     data: {
-      'applicant.dob': '02-02'
+      'applicant.dob': '02-02',
+      'recommender.none': true
     }
   })
 
@@ -38,7 +64,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
-      'recommender.none': false
+      'recommender.none': true
     }
   })
 
@@ -55,7 +81,7 @@ test('Skips required field validation when they are conditionally hidden', async
     'applicant.dob': '2024-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': false
+    'recommender.none': true
   }
 
   const data = generator.event.actions.declare(event.id, {
@@ -79,7 +105,7 @@ test('Prevents adding birth date in future', async () => {
     'applicant.dob': '2040-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': false
+    'recommender.none': true
   }
 
   const payload = generator.event.actions.declare(event.id, {
@@ -87,4 +113,20 @@ test('Prevents adding birth date in future', async () => {
   })
 
   await expect(client.event.actions.declare(payload)).rejects.matchSnapshot()
+})
+
+test('validation prevents including hidden fields', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const data = generator.event.actions.declare(event.id, {
+    data: {
+      ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
+      'recommender.firstname': 'this should not be here'
+    }
+  })
+
+  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
 })

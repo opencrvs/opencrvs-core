@@ -1,3 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required for registration","id":"applicant.firstname"},{"message":"Required for registration","id":"applicant.surname"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Invalid date. Please use the format YYYY-MM-DD","id":"applicant.dob","value":"02-02"}]]`;

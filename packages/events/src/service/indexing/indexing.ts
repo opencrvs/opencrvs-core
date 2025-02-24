@@ -123,11 +123,15 @@ function decodeFieldId(fieldId: string) {
 
 function mapFieldTypeToElasticsearch(field: FieldConfig) {
   switch (field.type) {
+    case FieldType.NUMBER:
+      return { type: 'double' }
     case FieldType.DATE:
       // @TODO: This should be changed back to 'date'
       // When we have proper validation of custom fields.
       return { type: 'text' }
     case FieldType.TEXT:
+    case FieldType.TEXTAREA:
+    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
@@ -139,6 +143,9 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.CHECKBOX:
     case FieldType.LOCATION:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
@@ -168,6 +175,16 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           filename: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
+        }
+      }
+    case FieldType.FILE_WITH_OPTIONS:
+      return {
+        type: 'nested',
+        properties: {
+          filename: { type: 'keyword' },
+          originalFilename: { type: 'keyword' },
+          type: { type: 'keyword' },
+          option: { type: 'keyword' }
         }
       }
     default:

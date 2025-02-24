@@ -13,34 +13,40 @@ import {
   ActionFormData,
   FieldConfig,
   Inferred,
-  getConditionalActionsForField,
-  FieldValue
+  FieldValue,
+  isFieldHidden
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
-import { FIELD_SEPARATOR } from './FormFieldGenerator'
 
-export function handleInitialValue(
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik. This function unflattens
+ */
+export const FIELD_SEPARATOR = '____'
+
+export function handleDefaultValue(
   field: FieldConfig,
   formData: ActionFormData
 ) {
-  const initialValue = field.initialValue
+  const defaultValue = field.defaultValue
 
-  if (hasInitialValueDependencyInfo(initialValue)) {
-    return evalExpressionInFieldDefinition(initialValue.expression, {
+  if (hasDefaultValueDependencyInfo(defaultValue)) {
+    return evalExpressionInFieldDefinition(defaultValue.expression, {
       $form: formData
     })
   }
 
-  return initialValue
+  return defaultValue
 }
 
 export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return getConditionalActionsForField(field, {
+  return !isFieldHidden(field, {
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
     })
-  }).every((fieldAction) => fieldAction !== 'HIDE')
+  })
 }
 
 export function evalExpressionInFieldDefinition(
@@ -54,10 +60,10 @@ export function evalExpressionInFieldDefinition(
   return eval(expression) as FieldValue
 }
 
-export function hasInitialValueDependencyInfo(
-  value: Inferred['initialValue']
+export function hasDefaultValueDependencyInfo(
+  value: Inferred['defaultValue']
 ): value is DependencyInfo {
-  return typeof value === 'object' && 'dependsOn' in value
+  return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
 }
 
 export function getDependentFields(
@@ -65,13 +71,13 @@ export function getDependentFields(
   fieldName: string
 ): FieldConfig[] {
   return fields.filter((field) => {
-    if (!field.initialValue) {
+    if (!field.defaultValue) {
       return false
     }
-    if (!hasInitialValueDependencyInfo(field.initialValue)) {
+    if (!hasDefaultValueDependencyInfo(field.defaultValue)) {
       return false
     }
-    return field.initialValue.dependsOn.includes(fieldName)
+    return field.defaultValue.dependsOn.includes(fieldName)
   })
 }
 

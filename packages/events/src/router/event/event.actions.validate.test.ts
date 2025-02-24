@@ -10,21 +10,29 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
 
-test('Validation error message contains all the offending fields', async () => {
+test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [])
 
-  const event = await client.event.create(generator.event.create())
+  await expect(
+    client.event.actions.validate(
+      generator.event.actions.validate('registered-event-test-id-12345')
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
 
-  const data = generator.event.actions.register(event.id, {
-    data: {
-      'applicant.dob': '02-02'
-    }
-  })
+test(`allows access if required scope is present`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_FOR_APPROVAL])
 
-  await expect(client.event.actions.register(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.validate(
+      generator.event.actions.validate('registered-event-test-id-12345')
+    )
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
 test('Action without form definition should accept empty payload', async () => {

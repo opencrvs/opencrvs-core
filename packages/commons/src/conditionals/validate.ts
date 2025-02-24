@@ -31,7 +31,7 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return ajv.validate(schema, data)
 }
 
-export function getConditionalActionsForField(
+function getConditionalActionsForField(
   field: FieldConfig,
   values: ConditionalParameters
 ) {
@@ -43,7 +43,10 @@ export function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
-function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
+export function isFieldHidden(
+  field: FieldConfig,
+  params: ConditionalParameters
+) {
   const hasShowRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'SHOW'
   )
@@ -54,13 +57,23 @@ function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
   return !isVisible
 }
 
-function isFieldDisabled(field: FieldConfig, params: ConditionalParameters) {
+export function isFieldDisabled(
+  field: FieldConfig,
+  params: ConditionalParameters
+) {
   const hasEnableRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'ENABLE'
   )
   const validConditionals = getConditionalActionsForField(field, params)
   const isEnabled = !hasEnableRule || validConditionals.includes('ENABLE')
   return !isEnabled
+}
+
+export function isFieldHiddenOrDisabled(
+  field: FieldConfig,
+  params: ConditionalParameters
+) {
+  return isFieldHidden(field, params) || isFieldDisabled(field, params)
 }
 
 /**
@@ -126,6 +139,22 @@ export function getFieldValidationErrors({
     isFieldHidden(field, conditionalParameters) ||
     isFieldDisabled(field, conditionalParameters)
   ) {
+    if (values[field.id]) {
+      return {
+        errors: [
+          {
+            message: {
+              id: 'v2.error.hidden',
+              defaultMessage:
+                'Hidden or disabled field should not receive a value',
+              description:
+                'Error message when field is hidden or disabled, but a value was received'
+            }
+          }
+        ]
+      }
+    }
+
     return {
       errors: []
     }

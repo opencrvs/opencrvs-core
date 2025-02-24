@@ -20,13 +20,14 @@ import {
   isDateFieldType,
   isDividerFieldType,
   isFileFieldType,
-  isLocationFieldType,
+  isAdministrativeAreaFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
   isAddressFieldType,
-  isTextFieldType
+  isTextFieldType,
+  isNumberFieldType
 } from '@opencrvs/commons/client'
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -35,7 +36,7 @@ import {
   Checkbox,
   RadioGroup,
   Select,
-  Location,
+  AdministrativeArea,
   SelectCountry,
   Date as DateField
 } from '@client/v2-events/features/events/registered-fields'
@@ -72,6 +73,10 @@ function ValueOutput(field: FieldWithValue) {
     return <DefaultOutput value={field.value} />
   }
 
+  if (isNumberFieldType(field)) {
+    return <DefaultOutput value={field.value} />
+  }
+
   if (isFileFieldType(field)) {
     return null
   }
@@ -102,8 +107,8 @@ function ValueOutput(field: FieldWithValue) {
     )
   }
 
-  if (isLocationFieldType(field)) {
-    return <Location.Output value={field.value} />
+  if (isAdministrativeAreaFieldType(field)) {
+    return <AdministrativeArea.Output value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
@@ -134,7 +139,10 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
-  if (!value) {
+  // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
+  const hasValue = value !== null && value !== undefined
+
+  if (!hasValue) {
     if (previousValue) {
       return <ValueOutput config={field} value={previousValue} />
     }
@@ -153,7 +161,7 @@ export function Output({
       </>
     )
   }
-  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
+  if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
         <Deleted>

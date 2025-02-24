@@ -49,9 +49,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
       if (conditional.type === 'SHOW') {
         return acc && validate(conditional.conditional, params)
       }
-      if (conditional.type === 'HIDE') {
-        return acc && !validate(conditional.conditional, params)
-      }
+
       return acc
     }, true)
   }
@@ -59,7 +57,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger>
+        <DropdownMenu.Trigger asChild>
           <PrimaryButton icon={() => <CaretDown />}>
             {intl.formatMessage(messages.action)}
           </PrimaryButton>

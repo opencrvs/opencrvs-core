@@ -22,7 +22,8 @@
     "build:clean": "rm -rf build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook"
+    "test-storybook": "test-storybook",
+    "chromatic": "chromatic"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -164,6 +165,7 @@
     "@vitest/coverage-c8": "^0.25.5",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "chalk": "^2.4.1",
+    "chromatic": "^11.25.2",
     "crypto-js": "^4.2.0",
     "csv-stringify": "^6.4.6",
     "csv2json": "^2.0.2",
@@ -210,6 +212,11 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }

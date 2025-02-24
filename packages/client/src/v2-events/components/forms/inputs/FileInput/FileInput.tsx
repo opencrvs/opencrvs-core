@@ -22,13 +22,14 @@ function FileInput(
     value: FileFieldValue | undefined
     onChange: (value?: FileFieldValue) => void
     error?: boolean
+    label?: string
   }
 ) {
   const { value, onChange, name, description, allowedDocType } = props
 
   const [file, setFile] = React.useState(value)
 
-  const { uploadFiles, deleteFile } = useFileUpload(name, {
+  const { uploadFile, deleteFile } = useFileUpload(name, {
     onSuccess: ({ type, originalFilename, filename }) => {
       setFile({
         filename,
@@ -50,7 +51,7 @@ function FileInput(
       description={description}
       error={''}
       file={file}
-      label={file?.originalFilename}
+      label={props.label ?? file?.originalFilename}
       name={name}
       onComplete={(newFile) => {
         if (newFile) {
@@ -59,7 +60,7 @@ function FileInput(
             originalFilename: newFile.name,
             type: newFile.type
           })
-          uploadFiles(newFile)
+          uploadFile(newFile)
         }
         if (!newFile && file) {
           deleteFile(file.filename)

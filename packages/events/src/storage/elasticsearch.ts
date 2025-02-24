@@ -13,6 +13,7 @@ import { env } from '@events/environment'
 
 let client: elasticsearch.Client | undefined
 
+/** @knipignore */
 export const getOrCreateClient = () => {
   if (!client) {
     client = new elasticsearch.Client({
@@ -26,9 +27,9 @@ export const getOrCreateClient = () => {
 }
 
 export function getEventAliasName() {
-  return `events`
+  return env.ES_INDEX_PREFIX
 }
 
 export function getEventIndexName(eventType: string) {
-  return `events_${eventType}`.toLowerCase()
+  return `${env.ES_INDEX_PREFIX}_${eventType}`.toLowerCase()
 }

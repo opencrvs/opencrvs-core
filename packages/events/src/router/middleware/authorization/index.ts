@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { inScope, Scope, SCOPES } from '@opencrvs/commons'
+import { inScope, Scope } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
-
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 
 /**
@@ -25,19 +24,17 @@ function setBearerForToken(token: string) {
 }
 
 /**
- * @param scopes scopes that are allowed to access the resource
+ * Middleware which checks that one of the required scopes are present in the token.
+ *
+ * @param scopes scopes that are required to access the resource
  * @returns TRPC compatible middleware function
  */
-function createScopeAuthMiddleware(scopes: Scope[]) {
+export function requiresAnyOfScopes(scopes: Scope[]) {
   return async (opts: MiddlewareOptions) => {
     if (inScope({ Authorization: setBearerForToken(opts.ctx.token) }, scopes)) {
       return opts.next()
     }
 
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
 }
-
-export const isDataSeedingUser = createScopeAuthMiddleware([
-  SCOPES.USER_DATA_SEEDING
-])
