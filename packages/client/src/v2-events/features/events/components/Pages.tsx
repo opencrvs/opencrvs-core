@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useIntl } from 'react-intl'
 import { ActionFormData, FormPage } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
@@ -47,9 +47,14 @@ export function Pages({
 }) {
   const intl = useIntl()
 
-  // can I make this neater?
   const initialForm = useMemo(() => {
-    console.log('all fields')
+    // If the form already has any values, it means that the form has been initialized previously
+    // So we don't want to reinitialize it
+    if (Object.keys(form).length > 0) {
+      return form
+    }
+
+    // Initialize form with default values
     const allFields = flatten(formPages.map((page) => page.fields))
     const fieldsWithDefaults = allFields.filter(
       (field) =>
