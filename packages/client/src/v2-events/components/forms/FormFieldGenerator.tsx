@@ -715,10 +715,8 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
-  // TODO CIHAN: is this needed?
-  // possibly for nested forms?
   const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>(
-    props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
+    props.initialValues ?? {}
   )
 
   return (
