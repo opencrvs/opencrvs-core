@@ -272,7 +272,7 @@ const ADMIN_STRUCTURE = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-export const ALL_ADDRESS_FIELDS = [
+const ALL_ADDRESS_FIELDS = [
   ...ADMIN_STRUCTURE,
   ...URBAN_FIELDS,
   ...RURAL_FIELDS

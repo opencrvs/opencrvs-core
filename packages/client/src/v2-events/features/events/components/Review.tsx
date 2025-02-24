@@ -47,7 +47,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
 import { Output } from './Output'
 
-export const ValidationError = styled.span`
+const ValidationError = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;

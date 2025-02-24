@@ -29,8 +29,7 @@ import {
   findActiveActionForm,
   FormConfig,
   Scope,
-  SCOPES,
-  TranslationConfig
+  SCOPES
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -53,7 +52,7 @@ import { withSuspense } from '../../../../components/withSuspense'
 const messages = defineMessages({
   reviewActionTitle: {
     id: 'v2.reviewAction.title',
-    defaultMessage: 'Declaration incomplete',
+    defaultMessage: 'Declare event',
     description: 'The title for review action'
   },
   reviewIncompleteActionTitle: {
@@ -342,13 +341,19 @@ export function Review() {
         <ReviewComponent.Actions
           form={form}
           formConfig={formConfig}
-          messages={
-            hasErrors
-              ? incompleteDeclarationMessages
-              : completeDeclarationMessages
-          }
-          metadata={metadata}
+          // messages={
+          //   hasErrors
+          //     ? incompleteDeclarationMessages
+          //     : completeDeclarationMessages
+          // }
+          // metadata={metadata}
           // theme={hasErrors ? 'negative' : 'positive'}
+          messages={{
+            title: messages.reviewActionTitle,
+            description: messages.reviewActionDescription,
+            onConfirm: messages.reviewActionDeclare
+          }}
+          metadata={metadata}
           onConfirm={handleDeclaration}
           onReject={handleReject}
         />

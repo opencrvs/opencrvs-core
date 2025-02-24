@@ -12,7 +12,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import {
-  ActionFormData,
   FieldConfig,
   FieldValue,
   isAddressFieldType,
@@ -47,15 +46,6 @@ import {
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
-`
-export const ValidationError = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
-  display: inline-block;
-  text-transform: lowercase;
-
-  &::first-letter {
-    text-transform: uppercase;
-  }
 `
 
 interface FieldWithValue {
