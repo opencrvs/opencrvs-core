@@ -11,22 +11,25 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { http, graphql, HttpResponse } from 'msw'
-import { getUUID } from '@opencrvs/commons/client'
+import { graphql, HttpResponse } from 'msw'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
-import { payloadGenerator } from '../../../../../../.storybook/test-data-generators'
+// eslint-disable-next-line
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ReviewIndex } from './Review'
 
-const generator = payloadGenerator()
+const generator = testDataGenerator()
+
+const eventId = '123-456-789'
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare',
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: generator.event.actions.declare(getUUID())
+      eventId,
+      formValues: generator.event.actions.declare(eventId).data
     })
   }
 }
@@ -43,24 +46,40 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-export const ReviewForLocalRegistrar: Story = {
+const eventDocument = {
+  type: 'TENNIS_CLUB_MEMBERSHIP',
+  id: eventId,
+  createdAt: '2025-01-23T05:30:02.615Z',
+  updatedAt: '2025-01-23T05:35:27.689Z',
+  actions: [
+    {
+      id: 'ae9618d8-319d-48a7-adfe-7ad6cfbc56b7',
+      type: 'CREATE' as const,
+      createdAt: '2025-01-23T05:30:02.615Z',
+      createdBy: '6780dbf7a263c6515c7b97d2',
+      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
+      draft: false,
+      data: {}
+    }
+  ]
+}
+
+export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: '123-456-789'
-      })
-    },
-    beforeEach: () => {
-      useEventFormData.setState({
-        formValues: generator.event.actions.declare('123-456-789')
+        eventId
       })
     },
     msw: {
       handlers: {
-        event: [
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return eventDocument
           })
         ],
         user: [
@@ -68,6 +87,209 @@ export const ReviewForLocalRegistrar: Story = {
             return HttpResponse.json({
               data: {
                 getUser: generator.user.localRegistrar()
+              }
+            })
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const ReviewForLocalRegistrarIncomplete: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      eventId,
+      formValues: {}
+    })
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          })
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.localRegistrar()
+              }
+            })
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const ReviewForRegistrationAgentComplete: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      eventId,
+      formValues: generator.event.actions.declare(eventId).data
+    })
+
+    window.localStorage.setItem(
+      'opencrvs',
+      generator.user.token.registrationAgent
+    )
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          })
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.registrationAgent()
+              }
+            })
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const ReviewForRegistrationAgentIncomplete: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      eventId,
+      formValues: {}
+    })
+
+    window.localStorage.setItem(
+      'opencrvs',
+      generator.user.token.registrationAgent
+    )
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          })
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.registrationAgent()
+              }
+            })
+          })
+        ]
+      }
+    }
+  }
+}
+export const ReviewForFieldAgentComplete: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      eventId,
+      formValues: generator.event.actions.declare(eventId).data
+    })
+
+    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          })
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.fieldAgent()
+              }
+            })
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const ReviewForFieldAgentIncomplete: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      eventId,
+      formValues: {}
+    })
+
+    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          })
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.fieldAgent()
               }
             })
           })

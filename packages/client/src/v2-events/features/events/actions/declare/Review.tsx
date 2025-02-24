@@ -43,11 +43,8 @@ import { FormLayout } from '@client/v2-events/layouts/form'
 
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
-import {
-  getValidationErrorsForForm,
-  validationErrorsInActionFormExist
-} from '../../../../components/forms/validation'
-import { withSuspense } from '../../../../components/withSuspense'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 const messages = defineMessages({
   reviewActionTitle: {
@@ -121,46 +118,117 @@ const messages = defineMessages({
   }
 })
 
-const messages2 = {
-  complete: {
-    register: {},
-    validate: {},
-    declare: {},
-    sendForReview: {}
+const registerMessages = {
+  title: {
+    id: 'v2.review.register.title',
+    defaultMessage: 'Register event',
+    description: 'The title shown when reviewing a record to register'
   },
-  incomplete: {
-    register: {},
-    validate: {},
-    declare: {},
-    sendForReview: {}
+  onConfirm: {
+    id: 'v2.review.register.confirm',
+    defaultMessage: 'Register',
+    description: 'The label for register button of review action'
   }
 }
 
-const completeDeclarationMessages = {
-  title: messages.reviewActionTitle,
-  description: messages.reviewActionDescription,
-  onConfirm: messages.reviewActionDeclare
+const validateMessages = {
+  title: {
+    id: 'v2.review.validate.title',
+    defaultMessage: 'Send for approval',
+    description: 'The title shown when reviewing a record to validate'
+  },
+  onConfirm: {
+    id: 'v2.review.validate.confirm',
+    defaultMessage: 'Send for approval',
+    description: 'The label for review action button when validating'
+  }
 }
 
-const incompleteDeclarationMessages = {
-  onConfirm: messages.sendForReviewOnConfirm,
-  title: messages.reviewIncompleteActionTitle,
-  description: messages.sendForReviewDescription // @TODO: Check that this is the case
+const declareMessages = {
+  onConfirm: {
+    id: 'v2.review.declare.confirm',
+    defaultMessage: 'Send for review',
+    description: 'The label for review action button when declaring'
+  }
 }
 
-function getCompletedFormConfig(formCofig: FormConfig, scopes?: Scope[]) {
-  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
-    return {
-      onConfirmDeclaration: () => {},
-      messages: {
-        title: messages.reviewActionTitle,
-        onConfirm: messages.reviewActionDeclare,
-        description: messages.reviewActionDescription
-      }
+const messages2 = {
+  complete: {
+    register: {
+      title: registerMessages.title,
+      description: {
+        id: 'v2.review.register.description.complete',
+        defaultMessage:
+          'By clicking register, you confirm that the information entered is correct and the event can be registered.',
+        description:
+          'The description for registration action when form is complete'
+      },
+      onConfirm: registerMessages.onConfirm
+    },
+    validate: {
+      title: validateMessages.title,
+      description: {
+        id: 'v2.review.validate.description.complete',
+        defaultMessage:
+          'The informant will receive an email with a registration number that they can use to collect the certificate',
+        description: 'The description for validate action when form is complete'
+      },
+      onConfirm: validateMessages.onConfirm
+    },
+    declare: {
+      title: {
+        id: 'v2.review.declare.title.complete',
+        defaultMessage: 'Declaration complete',
+        description:
+          'The title shown when reviewing an incomplete record to declare'
+      },
+      description: {
+        id: 'v2.review.declare.description.complete',
+        defaultMessage:
+          'The informant will receive an email with a registration number that they can use to collect the certificate',
+        description: 'The description for declare action when form is complete'
+      },
+      onConfirm: declareMessages.onConfirm
+    }
+  },
+  incomplete: {
+    register: {
+      title: registerMessages.title,
+      description: {
+        id: 'v2.reviewAction.register.description.incomplete',
+        defaultMessage: 'Please add mandatory information before registering',
+        description:
+          'The description for registration action when form is incomplete'
+      },
+      onConfirm: registerMessages.onConfirm
+    },
+    validate: {
+      title: validateMessages.title,
+      description: {
+        id: 'v2.review.validate.description.incomplete',
+        defaultMessage:
+          'Please add mandatory information before sending for approval',
+        description: 'The description for validate action when form is complete'
+      },
+      onConfirm: validateMessages.onConfirm
+    },
+    declare: {
+      title: {
+        id: 'v2.review.declare.title.incomplete',
+        defaultMessage: 'Declaration incomplete',
+        description:
+          'The title shown when reviewing an incomplete record to declare'
+      },
+      description: {
+        id: 'v2.review.declare.description.complete',
+        defaultMessage:
+          'The informant will receive an email with a tracking ID that they can use to provide the additional mandatory information required for registration',
+        description: 'The description for declare action when form is complete'
+      },
+      onConfirm: declareMessages.onConfirm
     }
   }
 }
-
 function getReviewActionConfig({
   formConfig,
   form,
@@ -172,26 +240,50 @@ function getReviewActionConfig({
   metadata?: ActionFormData
   scopes?: Scope[]
 }) {
-  // : {
-  //   onConfirmDeclaration: () => void
-  //   messages: {
-  //     title: TranslationConfig,
-  //     onConfirm: TranslationConfig,
-  //     description: TranslationConfig
-  //   }
-  // }
-  const isComplete = !validationErrorsInActionFormExist(
+  const incomplete = validationErrorsInActionFormExist(
     formConfig,
     form,
     metadata
   )
 
-  console.log('isComplete', scopes)
-  if (isComplete) {
-    // return getCompletedFormConfig(formConfig, scopes)
+  const isDisabled = incomplete
+    ? !!scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
+    : false
+
+  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
+    return {
+      onConfirm: () => {},
+      incomplete,
+      isDisabled,
+      messages: incomplete
+        ? messages2.incomplete.register
+        : messages2.complete.register
+    }
   }
 
-  // return getIncompletedFormConfig(formConfig, scopes)
+  if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+    return {
+      onConfirm: () => {},
+      incomplete,
+      isDisabled,
+      messages: incomplete
+        ? messages2.incomplete.validate
+        : messages2.complete.validate
+    }
+  }
+
+  if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
+    return {
+      onConfirm: () => {},
+      incomplete,
+      isDisabled,
+      messages: incomplete
+        ? messages2.incomplete.declare
+        : messages2.complete.declare
+    }
+  }
+
+  throw new Error('No valid scope found for the action')
 }
 
 // eslint-disable-next-line no-shadow
@@ -225,24 +317,18 @@ export function Review() {
   }
 
   const form = useEventFormData((state) => state.formValues)
-  console.log('form', form)
+
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(eventId, {})
 
-  const hasErrors = validationErrorsInActionFormExist(
-    formConfig,
-    form,
-    metadata
-  )
-
   const scopes = useSelector(getScope) ?? undefined
 
-  // const reviewActionConfiguration = getReviewActionConfig({
-  //   formConfig,
-  //   form,
-  //   metadata,
-  //   scopes
-  // })
+  const reviewActionConfiguration = getReviewActionConfig({
+    formConfig,
+    form,
+    metadata,
+    scopes
+  })
 
   async function handleEdit({
     pageId,
@@ -347,12 +433,7 @@ export function Review() {
           //     : completeDeclarationMessages
           // }
           // metadata={metadata}
-          // theme={hasErrors ? 'negative' : 'positive'}
-          messages={{
-            title: messages.reviewActionTitle,
-            description: messages.reviewActionDescription,
-            onConfirm: messages.reviewActionDeclare
-          }}
+          messages={reviewActionConfiguration.messages}
           metadata={metadata}
           onConfirm={handleDeclaration}
           onReject={handleReject}

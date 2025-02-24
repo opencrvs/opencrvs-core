@@ -417,10 +417,7 @@ function ReviewComponent({
                         {page.fields
                           .filter((field) => isFormFieldVisible(field, form))
                           .map((field) => {
-                            console.log('form', form.data)
-                            console.log('value', form.data[field.id])
-                            console.log('field', field)
-                            const value = form!.data[field.id]
+                            const value = form[field.id]
                             const previousValue = previousForm[field.id]
 
                             const valueDisplay = (

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConditional, defineConfig, defineForm, field } from '../events'
+import { ConditionalType, defineConfig, defineForm, field } from '../events'
 
 const TENNIS_CLUB_FORM = defineForm({
   label: {
@@ -44,16 +44,15 @@ const TENNIS_CLUB_FORM = defineForm({
       {
         type: 'SIGNATURE',
         id: 'review.signature',
-        required: false,
-        signaturePromptLabel: {
-          id: 'v2.signature.upload.modal.title',
-          defaultMessage: 'Draw signature',
-          description: 'Title for the modal to draw signature'
-        },
         label: {
           defaultMessage: 'Signature of informant',
           id: 'v2.event.birth.action.declare.form.review.signature.label',
           description: 'Label for the signature field in the review section'
+        },
+        signaturePromptLabel: {
+          id: 'v2.signature.upload.modal.title',
+          defaultMessage: 'Draw signature',
+          description: 'Title for the modal to draw signature'
         }
       }
     ]
@@ -99,7 +98,7 @@ const TENNIS_CLUB_FORM = defineForm({
               message: {
                 defaultMessage: 'Please enter a valid date',
                 description: 'This is the error message for invalid date',
-                id: 'v2.event.birth.action.declare.form.section.child.field.dob.error'
+                id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.error'
               },
               validator: field('applicant.dob').isBefore().now()
             }
@@ -122,170 +121,62 @@ const TENNIS_CLUB_FORM = defineForm({
       fields: [
         {
           id: 'recommender.none',
-          conditionals: [],
+          type: 'CHECKBOX',
           required: false,
+          conditionals: [],
           label: {
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.none.label',
             defaultMessage: 'No recommender',
-            description: 'This is the label for the field'
-          },
-          type: 'CHECKBOX'
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.none.label'
+          }
         },
         {
           id: 'recommender.firstname',
+          type: 'TEXT',
+          required: true,
           conditionals: [
             {
-              type: 'SHOW',
-              conditional: defineConditional({
-                type: 'object',
-                properties: {
-                  $form: {
-                    type: 'object',
-                    properties: {
-                      'recommender.none': {
-                        anyOf: [
-                          {
-                            const: 'undefined'
-                          },
-                          {
-                            const: false
-                          },
-                          {
-                            const: null
-                          },
-                          {
-                            const: ''
-                          }
-                        ]
-                      }
-                    },
-                    anyOf: [
-                      {
-                        required: ['recommender.none']
-                      },
-                      {
-                        not: {
-                          required: ['recommender.none']
-                        }
-                      }
-                    ]
-                  }
-                },
-                required: ['$form']
-              })
+              type: ConditionalType.SHOW,
+              conditional: field('recommender.none').isFalsy()
             }
           ],
-          required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label',
             defaultMessage: "Recommender's first name",
-            description: 'This is the label for the field'
-          },
-          type: 'TEXT'
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
+          }
         },
         {
           id: 'recommender.surname',
+          type: 'TEXT',
+          required: true,
           conditionals: [
             {
-              type: 'SHOW',
-              conditional: defineConditional({
-                type: 'object',
-                properties: {
-                  $form: {
-                    type: 'object',
-                    properties: {
-                      'recommender.none': {
-                        anyOf: [
-                          {
-                            const: 'undefined'
-                          },
-                          {
-                            const: false
-                          },
-                          {
-                            const: null
-                          },
-                          {
-                            const: ''
-                          }
-                        ]
-                      }
-                    },
-                    anyOf: [
-                      {
-                        required: ['recommender.none']
-                      },
-                      {
-                        not: {
-                          required: ['recommender.none']
-                        }
-                      }
-                    ]
-                  }
-                },
-                required: ['$form']
-              })
+              type: ConditionalType.SHOW,
+              conditional: field('recommender.none').isFalsy()
             }
           ],
-          required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label',
             defaultMessage: "Recommender's surname",
-            description: 'This is the label for the field'
-          },
-          type: 'TEXT'
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label'
+          }
         },
         {
           id: 'recommender.id',
+          type: 'TEXT',
+          required: true,
           conditionals: [
             {
-              type: 'SHOW',
-              conditional: defineConditional({
-                type: 'object',
-                properties: {
-                  $form: {
-                    type: 'object',
-                    properties: {
-                      'recommender.none': {
-                        anyOf: [
-                          {
-                            const: 'undefined'
-                          },
-                          {
-                            const: false
-                          },
-                          {
-                            const: null
-                          },
-                          {
-                            const: ''
-                          }
-                        ]
-                      }
-                    },
-                    anyOf: [
-                      {
-                        required: ['recommender.none']
-                      },
-                      {
-                        not: {
-                          required: ['recommender.none']
-                        }
-                      }
-                    ]
-                  }
-                },
-                required: ['$form']
-              })
+              type: ConditionalType.SHOW,
+              conditional: field('recommender.none').isFalsy()
             }
           ],
-          required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.id.label',
             defaultMessage: "Recommender's membership ID",
-            description: 'This is the label for the field'
-          },
-          type: 'TEXT'
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
+          }
         }
       ]
     }
