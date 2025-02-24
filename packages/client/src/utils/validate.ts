@@ -760,7 +760,16 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
   }
 }
 
+/**
+ * @deprecated This validator is deprecated and will be removed in future releases. Use `isDateBetween` instead
+ */
 export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'This validator is deprecated and will be removed in future releases. Use `isDateBetween` instead'
+    )
+  }
   if (value) {
     if (
       minAgeGapExist(
