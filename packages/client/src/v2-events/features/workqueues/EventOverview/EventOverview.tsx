@@ -34,7 +34,10 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import {
+  RecursiveStringRecord,
+  useFormDataStringifier
+} from '@client/v2-events/hooks/useFormDataStringifier'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -102,7 +105,10 @@ function EventOverview({
 
   const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
 
-  const flattenedEventIndex: Record<string, FieldValue | null> = {
+  const flattenedEventIndex: Record<
+    string,
+    FieldValue | null | RecursiveStringRecord
+  > = {
     ...emptyEvent,
     ...eventWithDefaults
   }

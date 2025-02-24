@@ -34,18 +34,18 @@ import {
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 
-export interface FontFamilyTypes {
+interface FontFamilyTypes {
   normal: string
   bold: string
   italics: string
   bolditalics: string
 }
 
-export type CertificateConfiguration = Partial<{
+type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
 
-export const certificateBaseTemplate = {
+const certificateBaseTemplate = {
   definition: {
     pageMargins: [0, 0, 0, 0] as [number, number, number, number],
     defaultStyle: {
@@ -240,25 +240,9 @@ export function svgToPdfTemplate(
   return pdfTemplate
 }
 
-export function downloadFile(
-  contentType: string,
-  data: string,
-  fileName: string
-) {
-  const linkSource = `data:${contentType};base64,${window.btoa(data)}`
-  const downloadLink = document.createElement('a')
-  downloadLink.setAttribute('href', linkSource)
-  downloadLink.setAttribute('download', fileName)
-  downloadLink.click()
-}
-
-export interface PdfTemplate {
+interface PdfTemplate {
   definition: TDocumentDefinitions
   fonts: Record<string, TFontFamilyTypes>
-}
-
-export interface SvgTemplate {
-  definition: string
 }
 
 export function printAndDownloadPdf(
