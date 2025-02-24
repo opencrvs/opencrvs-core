@@ -732,18 +732,15 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
-  const initialValues =
-    props.initialValues && Object.keys(props.initialValues).length > 0
-      ? props.initialValues
-      : mapFieldsToValues(props.fields, nestedFormData)
-
-  const formikCompatibleInitialValues =
-    makeFormFieldIdsFormikCompatible<FieldValue>(initialValues)
+  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
+    ...mapFieldsToValues(props.fields, nestedFormData),
+    ...props.initialValues
+  })
 
   return (
     <Formik<ActionFormData>
       enableReinitialize={true}
-      initialValues={formikCompatibleInitialValues}
+      initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,

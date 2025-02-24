@@ -11,13 +11,15 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { userEvent, within } from '@storybook/test'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
-import * as Request from './index'
+import { Pages } from './index'
+import { expect } from '@storybook/test'
 
-const meta: Meta<typeof Request.Pages> = {
+const meta: Meta<typeof Pages> = {
   title: 'Declare',
   beforeEach: () => {
     useEventFormData.getState().clear()
@@ -26,7 +28,7 @@ const meta: Meta<typeof Request.Pages> = {
 
 export default meta
 
-type Story = StoryObj<typeof Request.Pages>
+type Story = StoryObj<typeof Pages>
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -56,12 +58,68 @@ export const Page: Story = {
     }
   }
 }
+
 export const Review: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId: tennisClueMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClueMembershipEventDocument
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const FilledPagesVisibleInReview: Story = {
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText(/Who is applying for the membership?/)
+
+    await step('Fill the applicant details', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____firstname'),
+        'John'
+      )
+
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____surname'),
+        'Doe'
+      )
+
+      const continueButton = await canvas.findByText('Continue')
+      await userEvent.click(continueButton)
+      await userEvent.click(continueButton)
+    })
+
+    await step('Verify that filled pages are visible in review', async () => {
+      const applicantFirstNameRow = await canvas.findByText(
+        "Applicant's first name"
+      )
+      await expect(applicantFirstNameRow).toBeInTheDocument()
+      const applicantFirstNameCell = applicantFirstNameRow.nextElementSibling
+      await expect(applicantFirstNameCell).toHaveTextContent('John')
+
+      const applicantSurnameRow = await canvas.findByText("Applicant's surname")
+      const applicantSurnameCell = applicantSurnameRow.nextElementSibling
+      await expect(applicantSurnameCell).toHaveTextContent('Doe')
+    })
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: tennisClueMembershipEventDocument.id,
+        pageId: 'applicant'
       })
     },
     msw: {
