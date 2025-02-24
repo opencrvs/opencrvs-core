@@ -12,7 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import React from 'react'
 import { FieldType } from '@opencrvs/commons/client'
-import { Box } from '@opencrvs/components/lib/box'
+import { Box } from '@opencrvs/components'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Output } from './Output'
