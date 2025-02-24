@@ -22,13 +22,10 @@ import { Pages as PagesComponent } from '@client/v2-events/features/events/compo
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  useEventFormData,
-  useSubscribeEventFormData
-} from '@client/v2-events/features/events/useEventFormData'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
-import { withSuspense } from '../../../../components/withSuspense'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -39,9 +36,13 @@ export function Pages() {
   const { modal, goToHome } = useEventFormNavigation()
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const { eventId: formEventId, formValues } = useSubscribeEventFormData()
+  const {
+    getFormValues,
+    eventId: formEventId,
+    setFormValues
+  } = useEventFormData()
 
-  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const formValues = getFormValues(eventId)
 
   useEffect(() => {
     if (formEventId !== event.id) {
