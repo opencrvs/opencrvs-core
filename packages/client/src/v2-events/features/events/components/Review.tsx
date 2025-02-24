@@ -45,17 +45,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
-import { Output } from './Output'
-
-export const ValidationError = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
-  display: inline-block;
-  text-transform: lowercase;
-
-  &::first-letter {
-    text-transform: uppercase;
-  }
-`
+import { Output, ValidationError } from './Output'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
