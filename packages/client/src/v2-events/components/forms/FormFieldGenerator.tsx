@@ -716,9 +716,8 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
-  const defaultValues = mapFieldsToValues(props.fields, nestedFormData)
   const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
-    ...defaultValues,
+    ...mapFieldsToValues(props.fields, nestedFormData),
     ...props.initialValues
   })
 
