@@ -717,12 +717,15 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
   }
 
   const defaultValues = mapFieldsToValues(props.fields, nestedFormData)
-  const vals = { ...defaultValues, ...props.initialValues }
+  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
+    ...defaultValues,
+    ...props.initialValues
+  })
 
   return (
     <Formik<ActionFormData>
       enableReinitialize={true}
-      initialValues={makeFormFieldIdsFormikCompatible<FieldValue>(vals)}
+      initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
