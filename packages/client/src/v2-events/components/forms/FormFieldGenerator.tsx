@@ -344,6 +344,8 @@ const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <Address.Input
             value={field.value}
+            //@TODO: We need to come up with a general solution for complex types.
+            // @ts-ignore
             onChange={(val) => setFieldValue(fieldDefinition.id, val)}
             {...field.config}
           />
@@ -645,7 +647,7 @@ class FormSectionComponent extends React.Component<AllProps> {
 
           if (fieldErrors && fieldErrors.length > 0) {
             const [firstError] = fieldErrors
-            error = intl.formatMessage(firstError.message, firstError.props)
+            error = intl.formatMessage(firstError.message)
           }
 
           const formParams = {
@@ -681,7 +683,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                       error={isDisabled ? '' : error}
                       fields={fields}
                       formData={formData}
-                      touched={touched[field.id] || false}
+                      touched={touched[field.id] ?? false}
                       values={values}
                       onUploadingStateChanged={
                         this.props.onUploadingStateChanged

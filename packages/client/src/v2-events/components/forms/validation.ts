@@ -8,22 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
   getFieldValidationErrors,
   ActionFormData,
-  FormConfig,
-  FieldType
+  FormConfig
 } from '@opencrvs/commons/client'
-import { IValidationResult } from '@client/utils/validate'
-import { ALL_ADDRESS_FIELDS } from '@client/v2-events/features/events/registered-fields'
 
-interface IFieldErrors {
-  errors: IValidationResult[]
+interface FieldErrors {
+  errors: {
+    message: MessageDescriptor
+  }[]
 }
 
 export interface Errors {
-  [fieldName: string]: IFieldErrors
+  [fieldName: string]: FieldErrors
 }
 
 export function getValidationErrorsForForm(
@@ -38,36 +38,6 @@ export function getValidationErrorsForForm(
       errorsForAllFields[field.id].errors.length > 0
     ) {
       return errorsForAllFields
-    }
-
-    if (field.type === FieldType.ADDRESS && values[field.id]) {
-      const addressFieldErrors: Errors = ALL_ADDRESS_FIELDS.reduce(
-        (errorsForAddressFields, addressField) => {
-          const error = getFieldValidationErrors({
-            field: {
-              ...addressField,
-              required: addressField.required && !checkValidationErrorsOnly
-            },
-            //@ts-ignore
-            values: values[field.id]
-          })
-
-          return {
-            ...errorsForAddressFields,
-            [addressField.id]: error
-          }
-        },
-        {}
-      )
-
-      return {
-        ...errorsForAllFields,
-        [field.id]: {
-          errors: Object.values(addressFieldErrors).flatMap(
-            (key: IFieldErrors) => key.errors
-          )
-        }
-      }
     }
 
     return {
