@@ -46,15 +46,6 @@ export const Page: Story = {
         eventId: tennisClueMembershipEventDocument.id,
         pageId: 'applicant'
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
     }
   }
 }
@@ -66,15 +57,6 @@ export const Review: Story = {
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId: tennisClueMembershipEventDocument.id
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
     }
   }
 }
@@ -121,15 +103,6 @@ export const FilledPagesVisibleInReview: Story = {
         eventId: tennisClueMembershipEventDocument.id,
         pageId: 'applicant'
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
     }
   }
 }
