@@ -39,17 +39,19 @@ const TableDiv = styled.div`
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
+export const eventHistoryStatusMessage = {
+  id: `v2.events.history.status`,
+  defaultMessage:
+    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
+}
+
 const messages = defineMessages({
   'event.history.timeFormat': {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
     id: 'v2.event.history.timeFormat',
     description: 'Time format for timestamps in event history'
   },
-  'events.history.status': {
-    id: `v2.events.history.status`,
-    defaultMessage:
-      '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
-  },
+
   'event.history.role': {
     id: 'v2.event.history.role',
     defaultMessage:
@@ -90,7 +92,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
             onHistoryRowClick(item, user)
           }}
         >
-          {intl.formatMessage(messages['events.history.status'], {
+          {intl.formatMessage(eventHistoryStatusMessage, {
             status: item.type
           })}
         </Link>

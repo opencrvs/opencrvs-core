@@ -16,6 +16,7 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { ActionDocument } from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
+import { eventHistoryStatusMessage } from './EventHistory'
 
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
@@ -41,7 +42,11 @@ export function EventHistoryModal({
 }) {
   const intl = useIntl()
 
-  const name = getUsersFullName(user.name, intl.locale)
+  const userName = getUsersFullName(user.name, intl.locale)
+  const title = intl.formatMessage(eventHistoryStatusMessage, {
+    status: history.type
+  })
+
   return (
     <ResponsiveModal
       autoHeight
@@ -49,14 +54,14 @@ export function EventHistoryModal({
       handleClose={close}
       responsive={true}
       show={true}
-      title={history.type}
+      title={title}
       width={1024}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg19">
           {joinValues(
             [
-              name,
+              userName,
               format(
                 new Date(history.createdAt),
                 intl.formatMessage(messages['event.history.modal.timeFormat'])
