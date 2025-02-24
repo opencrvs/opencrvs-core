@@ -28,6 +28,7 @@
 - Auth now allows exchanging user's token for a new record-specific token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
 - A new GraphQL mutation `upsertRegistrationIdentifier` is added to allow updating the patient identifiers of a registration record such as NID [#8034](https://github.com/opencrvs/opencrvs-core/pull/8034)
 - Updated GraphQL mutation `confirmRegistration` to allow adding a `comment` for record audit [#8197](https://github.com/opencrvs/opencrvs-core/pull/8197)
+- Add isDateBetween() validator to enable validation that will constraint a date to be only valid if it falls within a specified date range [#7636](https://github.com/opencrvs/opencrvs-core/issues/7636)
 
 ### Improvements
 
@@ -360,4 +361,3 @@ In the next OpenCRVS release v1.5.0, there will be two significant changes both 
 - **Metabase from v0.45.2.1 to v0.46.6.1**
 
 See [Releases](https://github.com/opencrvs/opencrvs-core/releases) for release notes of older releases.
-
