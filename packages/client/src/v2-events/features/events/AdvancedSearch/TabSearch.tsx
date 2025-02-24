@@ -113,7 +113,9 @@ export function TabSearch({ currentEvent }: { currentEvent: EventConfig }) {
     const searchParams = new URLSearchParams()
 
     Object.entries(formValues).forEach(([key, value]) => {
-      searchParams.append(key, String(value)) // Convert all values to strings
+      if (value) {
+        searchParams.append(key, String(value))
+      } // Convert all values to strings
     })
 
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({

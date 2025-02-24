@@ -30,6 +30,7 @@ import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
 import { DEFAULT_SIZE, generateQuery } from './utils'
+
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
 }

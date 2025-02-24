@@ -13,21 +13,22 @@ import {
   QueryDslQueryContainer,
   SearchRequest
 } from '@elastic/elasticsearch/lib/api/types'
+
 const FIELD_SEPARATOR = '____'
 export const DEFAULT_SIZE = 10
 
 export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
-  const must: QueryDslQueryContainer[] = Object.entries(event).map(
+  const should: QueryDslQueryContainer[] = Object.entries(event).map(
     ([key, value]) => ({
-      term: {
-        [key.replaceAll('.', FIELD_SEPARATOR)]: value
+      match: {
+        [`data.${key.replaceAll('.', FIELD_SEPARATOR)}`]: value
       }
     })
   )
 
   return {
     bool: {
-      must
+      should
     }
   } as SearchRequest['query']
 }
