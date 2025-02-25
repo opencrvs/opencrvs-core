@@ -40,7 +40,8 @@ const mockFormData = {
     urbanOrRural: 'URBAN' as const,
     town: 'Tennisville',
     residentialArea: 'Example Residential Area'
-  }
+  },
+  'recommender.none': true
 }
 
 const meta: Meta<typeof Review.Body> = {
