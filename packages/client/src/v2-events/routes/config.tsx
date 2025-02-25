@@ -24,6 +24,7 @@ import { router as workqueueRouter } from '@client/v2-events/features/workqueues
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
+import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
 import { ROUTES } from './routes'
 
 /**
@@ -35,10 +36,12 @@ import { ROUTES } from './routes'
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
-    <TRPCProvider>
-      <Outlet />
-      <Debug />
-    </TRPCProvider>
+    <StyledErrorBoundary>
+      <TRPCProvider>
+        <Outlet />
+        <Debug />
+      </TRPCProvider>
+    </StyledErrorBoundary>
   ),
   children: [
     workqueueRouter,
