@@ -152,7 +152,7 @@ jobs:
       - name: Gather Trivy output from base branch image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
           trivy-config: trivy.yaml
           format: 'sarif'
           output: './trivy-results-base.sarif'
@@ -161,7 +161,7 @@ jobs:
       - name: Gather Trivy output from newly build image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
           format: 'sarif'
           output: './trivy-results-branch.sarif'
@@ -194,5 +194,5 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
