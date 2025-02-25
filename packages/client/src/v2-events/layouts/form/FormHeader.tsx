@@ -100,6 +100,7 @@ export function FormHeader({
                   menuItems={menuItems}
                   toggleButton={
                     <Icon
+                      data-testid="event-menu-toggle-button-image"
                       color="primary"
                       name="DotsThreeVertical"
                       size="large"
