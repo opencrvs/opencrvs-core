@@ -145,6 +145,14 @@ export function useEvents() {
       }
     )
 
+    const eventFromValidateActions = filterOutboxEventsWithMutation(
+      eventsList,
+      trpc.event.actions.validate.mutationOptions(undefined),
+      (event, parameters) => {
+        return event.id === parameters.eventId && !parameters.draft
+      }
+    )
+
     const eventFromRegisterActions = filterOutboxEventsWithMutation(
       eventsList,
       api.event.actions.register,
@@ -155,6 +163,7 @@ export function useEvents() {
 
     return eventFromDeclareActions
       .concat(eventFromDeclareActions)
+      .concat(eventFromValidateActions)
       .concat(eventFromRegisterActions)
       .filter(
         /* uniqueById */
