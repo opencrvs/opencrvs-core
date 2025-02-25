@@ -8,8 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Review } from './Review'
 import { Pages } from './Pages'
 
-export { Review, Pages }
+const PagesIndex = withSuspense(Pages)
+const ReviewIndex = withSuspense(Review)
+export { PagesIndex as Pages, ReviewIndex as Review }

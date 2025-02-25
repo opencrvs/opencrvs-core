@@ -15,11 +15,14 @@ import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
 import * as selectEvent from 'react-select-event'
 import styled from 'styled-components'
-import { ActionType, EventConfig } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventConfig,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { AddressFieldValue } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
-import { tennisClubMembershipEvent } from '@client/v2-events/features/events/fixtures'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { TRPCProvider } from '@client/v2-events/trpc'
