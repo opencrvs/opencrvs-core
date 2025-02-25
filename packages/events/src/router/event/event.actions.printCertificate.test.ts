@@ -26,7 +26,9 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+  const client = createTestClient(user, [
+    SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+  ])
 
   await expect(
     client.event.actions.printCertificate(

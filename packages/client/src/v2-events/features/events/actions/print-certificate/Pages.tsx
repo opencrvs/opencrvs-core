@@ -131,10 +131,10 @@ export function Pages() {
               <InputField
                 id={certTemplateFieldConfig.id}
                 label={intl.formatMessage(certTemplateFieldConfig.label)}
+                required={true}
                 touched={false}
               >
                 <Select.Input
-                  required
                   id={certTemplateFieldConfig.id}
                   label={certTemplateFieldConfig.label}
                   options={certTemplateFieldConfig.options}
