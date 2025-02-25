@@ -13,12 +13,18 @@ import React, { PropsWithChildren } from 'react'
 
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
-import { serialize } from 'superjson'
+import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
 import { TRPCError } from '@trpc/server'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { EventDocument, EventInput } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
-import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
+import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
+import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
+import {
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventIndex
+} from '../fixtures'
 import { useEvents } from './useEvents'
 
 const serverSpy = vi.fn()
@@ -80,11 +86,27 @@ function errorHandler() {
     }
   )
 }
+
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
 const server = setupServer(
   http.post<never, EventInput, EventDocument>(
     '/api/events/event.create',
     createHandler
-  )
+  ),
+
+  tRPCMsw.event.config.get.query(() => {
+    return [tennisClubMembershipEvent, birthEvent]
+  }),
+  tRPCMsw.event.list.query(() => {
+    return [tennisClubMembershipEventIndex]
+  })
 )
 
 beforeAll(() => server.listen())
@@ -114,10 +136,10 @@ beforeEach<TestContext>(async (testContext) => {
   await storage.removeItem('reactQuery')
 
   const eventsHook = renderHook(() => useEvents(), { wrapper })
+
   await waitFor(() => expect(eventsHook.result.current).not.toBeNull(), {
     timeout: 3000
   })
-
   const createHook = renderHook(() => eventsHook.result.current.createEvent(), {
     wrapper
   })
@@ -139,6 +161,7 @@ describe('events that have unsynced actions', () => {
     createEventHook
   }) => {
     server.use(http.post('/api/events/event.create', errorHandler))
+
     createEventHook.result.current.mutate({
       type: 'TENNIS_CLUB_MEMBERSHIP',
       transactionId: '_TEST_TRANSACTION_'

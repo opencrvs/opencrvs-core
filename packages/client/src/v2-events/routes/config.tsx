@@ -24,6 +24,7 @@ import { router as workqueueRouter } from '@client/v2-events/features/workqueues
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
+import { ErrorBoundary } from '@client/components/ErrorBoundary'
 import { ROUTES } from './routes'
 
 /**
@@ -65,6 +66,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
       element: <Outlet />,
+      errorElement: <h1>error</h1>,
       children: [
         {
           index: true,

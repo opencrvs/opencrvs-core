@@ -11,7 +11,11 @@
 
 import { Mutation as TanstackMutation } from '@tanstack/query-core'
 import { useMutation } from '@tanstack/react-query'
-import { getMutationKey } from '@trpc/react-query'
+import {
+  DecorateMutationProcedure,
+  inferInput,
+  inferOutput
+} from '@trpc/tanstack-react-query'
 import {
   ActionInput,
   ActionType,
@@ -19,60 +23,20 @@ import {
   getCurrentEventState,
   stripHiddenOrDisabledFields
 } from '@opencrvs/commons/client'
-import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { createTemporaryId, isTemporaryId } from './create'
+import {
+  invalidateEventsList,
+  setEventData,
+  setEventListData,
+  setMutationDefaults
+} from '@client/v2-events/features/events/useEvents/api'
+import { queryClient, utils } from '@client/v2-events/trpc'
+import { createTemporaryId, waitUntilEventIsCreated } from './create'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
-  utils.event.get.setData(updatedEvent.id, updatedEvent)
-  return utils.event.list.invalidate()
+  setEventData(updatedEvent.id, updatedEvent)
+  return invalidateEventsList()
 }
-
-function waitUntilEventIsCreated<T extends { eventId: string }, R>(
-  canonicalMutationFn: (params: T) => Promise<R>
-): (params: T) => Promise<R> {
-  return async (params) => {
-    const { eventId } = params
-
-    const localVersion = utils.event.get.getData(eventId)
-
-    if (!localVersion || isTemporaryId(localVersion.id)) {
-      // eslint-disable-next-line no-console
-      console.error(
-        'Event that has not been stored yet cannot be actioned upon'
-      )
-      throw new Error(
-        'Event that has not been stored yet cannot be actioned upon'
-      )
-    }
-
-    return canonicalMutationFn({
-      ...params,
-      eventId: localVersion.id,
-      eventType: localVersion.type
-    })
-  }
-}
-
-type Mutation =
-  | typeof api.event.actions.declare
-  | typeof api.event.actions.notify
-  | typeof api.event.actions.register
-  | typeof api.event.actions.validate
-  | typeof api.event.actions.printCertificate
-  | typeof api.event.actions.correction.request
-  | typeof api.event.actions.correction.approve
-  | typeof api.event.actions.correction.reject
-
-type Procedure =
-  | typeof utils.event.actions.declare
-  | typeof utils.event.actions.notify
-  | typeof utils.event.actions.register
-  | typeof utils.event.actions.validate
-  | typeof utils.event.actions.printCertificate
-  | typeof utils.event.actions.correction.request
-  | typeof utils.event.actions.correction.approve
-  | typeof utils.event.actions.correction.reject
 
 /*
  * This makes sure that if you are offline and do
@@ -81,7 +45,7 @@ type Procedure =
  * 3. Declare the record
  * 4. Connect to the internet
  * The draft stage in the middle will be cancelled. This is to prevent race conditions
- * between when the backend receives the draft when it receives the declare action.
+ * between when the backend receives the draft and when it receives the declare action.
  */
 function cancelOngoingDraftRequests({ eventId, draft }: ActionInput) {
   const mutationCache = queryClient.getMutationCache()
@@ -124,7 +88,9 @@ function updateEventOptimistically<T extends ActionInput>(
   return (variables: T) => {
     cancelOngoingDraftRequests(variables)
 
-    const localEvent = utils.event.get.getData(variables.eventId)
+    const localEvent = queryClient.getQueryData(
+      utils.event.get.queryKey(variables.eventId)
+    )
     if (!localEvent) {
       return
     }
@@ -144,7 +110,7 @@ function updateEventOptimistically<T extends ActionInput>(
       ]
     }
 
-    utils.event.list.setData(undefined, (eventIndices) =>
+    setEventListData((eventIndices) =>
       eventIndices
         ?.filter((ei) => ei.id !== optimisticEvent.id)
         .concat(getCurrentEventState(optimisticEvent))
@@ -152,117 +118,107 @@ function updateEventOptimistically<T extends ActionInput>(
   }
 }
 
-utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
+setMutationDefaults(utils.event.actions.declare, {
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent,
-  onMutate: (params) => updateEventOptimistically('DECLARE')(params),
+  onMutate: updateEventOptimistically('DECLARE'),
   meta: {
     actionType: ActionType.DECLARE
   }
-}))
+})
 
-utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
+setMutationDefaults(utils.event.actions.register, {
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.REGISTER
   }
-}))
+})
 
-utils.event.actions.notify.setMutationDefaults(({ canonicalMutationFn }) => ({
+setMutationDefaults(utils.event.actions.notify, {
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.NOTIFY
   }
-}))
+})
 
-utils.event.actions.validate.setMutationDefaults(({ canonicalMutationFn }) => ({
+setMutationDefaults(utils.event.actions.validate, {
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.VALIDATE
   }
-}))
+})
 
-utils.event.actions.printCertificate.setMutationDefaults(
-  ({ canonicalMutationFn }) => ({
-    retry: true,
-    retryDelay: 10000,
-    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent,
-    meta: {
-      actionType: ActionType.PRINT_CERTIFICATE
-    }
-  })
-)
+setMutationDefaults(utils.event.actions.printCertificate, {
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.PRINT_CERTIFICATE
+  }
+})
 
-utils.event.actions.correction.request.setMutationDefaults(
-  ({ canonicalMutationFn }) => ({
-    retry: true,
-    retryDelay: 10000,
-    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent,
-    meta: {
-      actionType: ActionType.REQUEST_CORRECTION
-    }
-  })
-)
+setMutationDefaults(utils.event.actions.correction.request, {
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.REQUEST_CORRECTION
+  }
+})
 
-utils.event.actions.correction.approve.setMutationDefaults(
-  ({ canonicalMutationFn }) => ({
-    retry: true,
-    retryDelay: 10000,
-    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent,
-    meta: {
-      actionType: ActionType.APPROVE_CORRECTION
-    }
-  })
-)
+setMutationDefaults(utils.event.actions.correction.approve, {
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.APPROVE_CORRECTION
+  }
+})
 
-utils.event.actions.correction.reject.setMutationDefaults(
-  ({ canonicalMutationFn }) => ({
-    retry: true,
-    retryDelay: 10000,
-    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-    onSuccess: updateLocalEvent,
-    meta: {
-      actionType: ActionType.REJECT_CORRECTION
-    }
-  })
-)
+setMutationDefaults(utils.event.actions.correction.reject, {
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.REJECT_CORRECTION
+  }
+})
 
-export function useEventAction<P extends Procedure, M extends Mutation>(
-  procedure: P,
-  mutation: M
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useEventAction<P extends DecorateMutationProcedure<any>>(
+  procedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
-  const mutationDefaults = procedure.getMutationDefaults()
 
-  if (!mutationDefaults?.mutationFn) {
+  /*
+   * Merge default tRPC mutationOptions with the ones provided above
+   */
+  const mutationOptions = {
+    ...procedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(procedure.mutationKey())
+  }
+
+  if (!mutationOptions.mutationFn) {
     throw new Error(
       'No mutation fn found for operation. This should never happen'
     )
   }
 
-  const defaultMutationFn = mutationDefaults.mutationFn
-  const actionType = mutationDefaults.meta?.actionType as ActionType | undefined
+  const defaultMutationFn = mutationOptions.mutationFn
+  const actionType = mutationOptions.meta?.actionType as ActionType | undefined
 
   if (!actionType) {
     throw new Error('No event action type found. This should never happen')
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mutationFn = waitUntilEventIsCreated<any, any>(
+  const mutationFn = waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
     async ({ eventType, ...params }) => {
       const eventConfiguration = eventConfigurations.find(
         (event) => event.id === eventType
@@ -274,7 +230,6 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
 
       return defaultMutationFn({
         ...params,
-
         data: stripHiddenOrDisabledFields(
           actionType,
           eventConfiguration,
@@ -284,10 +239,8 @@ export function useEventAction<P extends Procedure, M extends Mutation>(
     }
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return useMutation<any, any, any, any>({
-    ...mutationDefaults,
-    mutationKey: getMutationKey(mutation),
+  return useMutation({
+    ...mutationOptions,
     mutationFn
-  }) as ReturnType<M['useMutation']>
+  })
 }
