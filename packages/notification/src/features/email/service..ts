@@ -33,7 +33,10 @@ export async function sendAllUserEmails(request: Hapi.Request) {
   const recipientEmail = userDetails?.emailForNotification
   const payload = request.payload as AllUsersEmailPayloadSchema
   await preProcessRequest(request)
-  await NotificationQueue.create({ ...payload, recipientEmail })
+  await NotificationQueue.create({
+    ...payload,
+    ...(recipientEmail && { recipientEmail })
+  })
   if (!isLoopInprogress) {
     loopNotificationQueue(request.server)
   }
@@ -94,7 +97,7 @@ async function findOldestNotificationQueueRecord() {
 }
 
 async function dispatch(
-  recipientEmail: string,
+  recipientEmail: string | null,
   record: NotificationQueueRecord
 ) {
   const filteredRecord = record.bcc.filter((item) => item !== recipientEmail)
@@ -104,7 +107,7 @@ async function dispatch(
       email: 'allUserNotification',
       sms: 'allUserNotification'
     },
-    { email: recipientEmail, bcc: filteredRecord },
+    { email: recipientEmail || undefined, bcc: filteredRecord },
     'user',
     {
       subject: record.subject,
@@ -153,7 +156,7 @@ export async function loopNotificationQueue(server: Hapi.Server) {
       `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
     )
 
-    const res = await dispatch(record.recipientEmail, record)
+    const res = await dispatch(record.recipientEmail || '', record)
 
     if (!res.ok) {
       const error = await res.json()
