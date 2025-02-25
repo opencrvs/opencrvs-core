@@ -57,7 +57,7 @@ export const ACCUMULATED_FILE_SIZE = 20480000
 
 export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 /**
- * @deprecated This validator is deprecated and will be removed in future releases. Use the `isDateBetween` validator for date and age fields instead
+ * @deprecated This validator is deprecated and will be removed in future releases. Use the `isAgeInYearsBetween` validator for date and age fields instead
  */
 export const INFORMANT_MINIMUM_AGE = 16
 

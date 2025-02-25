@@ -278,21 +278,23 @@ export const minAgeGapExist = (
   return diff >= minAgeGap
 }
 
-export const dateIsBetween =
-  (dateOneAsString: string, dateTwoAsString: string): Validation =>
+export const isAgeInYearsBetween =
+  (min: number, max?: number): Validation =>
   (value: IFormFieldValue) => {
     const dateFormat = /^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01])$/
     if (dateFormat.test(value.toString())) {
-      const dateOne = new Date(dateOneAsString).setHours(0, 0, 0, 0)
-      const dateTwo = new Date(dateTwoAsString).setHours(0, 0, 0, 0)
-      const actualDate = new Date(value.toString()).setHours(0, 0, 0, 0)
+      max = max || 120 // defaulting to 120 years as max if max is not provided
+      const today = new Date()
+      const dateOfBirth = new Date(value.toString())
+      const ageFromDateOfBirth = today.getFullYear() - dateOfBirth.getFullYear()
 
-      const dateIsWithinRange = actualDate >= dateOne && actualDate <= dateTwo
+      const ageIsWithinRange =
+        ageFromDateOfBirth >= min && ageFromDateOfBirth <= max
+      if (ageIsWithinRange) return undefined
 
-      if (dateIsWithinRange) return undefined
       return {
-        message: messages.dateIsBetween,
-        props: { dateOne: dateOneAsString, dateTwo: dateTwoAsString }
+        message: messages.isAgeInYearsBetween,
+        props: { min, max }
       }
     }
     return undefined
@@ -761,13 +763,13 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
 }
 
 /**
- * @deprecated This validator is deprecated and will be removed in future releases. Use `isDateBetween` instead
+ * @deprecated This validator is deprecated and will be removed in future releases. Use `isAgeInYearsBetween` instead
  */
 export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
   if (process.env.NODE_ENV !== 'production') {
     // eslint-disable-next-line no-console
     console.warn(
-      'This validator is deprecated and will be removed in future releases. Use `isDateBetween` instead'
+      'This validator is deprecated and will be removed in future releases. Use `isAgeInYearsBetween` instead'
     )
   }
   if (value) {
