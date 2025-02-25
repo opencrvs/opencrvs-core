@@ -51,7 +51,7 @@ interface IValidationMessages
   validDrivingLicenseNumber: MessageDescriptor
   nonDecimalPointNumber: MessageDescriptor
   invalidDate: MessageDescriptor
-  dateIsBetween: MessageDescriptor
+  isAgeInYearsBetween: MessageDescriptor
 }
 
 const messagesToDefine: IValidationMessages = {
@@ -289,11 +289,11 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Invalid date field',
     description: 'The error message that appears when a date field is invalid'
   },
-  dateIsBetween: {
-    id: 'validations.dateIsBetween',
-    defaultMessage: 'Date must be between {dateOne} and {dateTwo}',
+  isAgeInYearsBetween: {
+    id: 'validations.isAgeInYearsBetween',
+    defaultMessage: 'Age must be between {min} and {max} years',
     description:
-      'The error message that appears when a date is outside the valid date range'
+      'The error message that appears when a date is outside the valid age range'
   }
 }
 
