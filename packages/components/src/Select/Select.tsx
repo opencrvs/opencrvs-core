@@ -131,7 +131,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__single-value--is-disabled {
-    color: ${({ theme }) => theme.colors.copy};
+    color: ${({ theme }) => theme.colors.grey500};
   }
 
   .react-select__menu {
