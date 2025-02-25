@@ -8,7 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ConditionalType, defineConfig, defineForm, field } from '../events'
+import { field } from '../conditionals/conditionals'
+import { defineConfig } from '../events/defineConfig'
+import { defineForm } from '../events/EventConfigInput'
+import { ConditionalType } from '../events/Conditional'
 
 export const TENNIS_CLUB_FORM = defineForm({
   label: {
