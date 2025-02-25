@@ -70,7 +70,7 @@ export async function createServer() {
   async function start() {
     await server.start()
     await database.start()
-    loopNotificationQueue('user@gmail.com', server)
+    loopNotificationQueue(server)
     server.log('info', `Notification server started on ${HOST}:${PORT}`)
   }
 
