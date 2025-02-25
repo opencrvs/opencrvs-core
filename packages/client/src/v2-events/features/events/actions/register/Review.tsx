@@ -75,15 +75,13 @@ export function Review() {
     throw new Error('No active form configuration found for declare action')
   }
 
-  const setFormValuesIfEmpty = useEventFormData(
-    (state) => state.setFormValuesIfEmpty
-  )
+  const setFormValues = useEventFormData((state) => state.setFormValues)
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data
 
   useEffect(() => {
-    setFormValuesIfEmpty(eventId, previousFormValues)
-  }, [event, eventId, setFormValuesIfEmpty, previousFormValues])
+    setFormValues(eventId, previousFormValues)
+  }, [event, eventId, setFormValues, previousFormValues])
 
   const form = getFormValues(eventId)
 
