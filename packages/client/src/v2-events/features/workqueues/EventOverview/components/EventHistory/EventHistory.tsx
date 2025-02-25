@@ -26,7 +26,10 @@ import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
-import { EventHistoryModal } from './EventHistoryModal'
+import {
+  EventHistoryModal,
+  eventHistoryStatusMessage
+} from './EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
 
 /**
@@ -38,12 +41,6 @@ const TableDiv = styled.div`
 `
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
-
-export const eventHistoryStatusMessage = {
-  id: `v2.events.history.status`,
-  defaultMessage:
-    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
-}
 
 const messages = defineMessages({
   'event.history.timeFormat': {

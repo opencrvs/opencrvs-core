@@ -16,7 +16,12 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { ActionDocument } from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
-import { eventHistoryStatusMessage } from './EventHistory'
+
+export const eventHistoryStatusMessage = {
+  id: `v2.events.history.status`,
+  defaultMessage:
+    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
+}
 
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
