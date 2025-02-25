@@ -71,7 +71,7 @@ export const FormWizard = ({
               </Button>
             )}
             {showReviewButton && (
-              <Button type="secondary" onClick={onSubmit}>
+              <Button size="large" type="secondary" onClick={onSubmit}>
                 Back to review
               </Button>
             )}
