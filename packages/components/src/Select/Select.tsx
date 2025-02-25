@@ -101,6 +101,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.yellow};
   }
 
+  .react-select__control--is-disabled {
+    background-color: ${({ theme }) => theme.colors.white};
+  }
+
   .react-select__value-container {
     padding: 4px 16px;
   }
