@@ -18,6 +18,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 // eslint-disable-next-line
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -80,6 +81,9 @@ export const ReviewForLocalRegistrarComplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -118,6 +122,9 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -161,6 +168,9 @@ export const ReviewForRegistrationAgentComplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -204,6 +214,9 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -243,6 +256,9 @@ export const ReviewForFieldAgentComplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -283,6 +299,9 @@ export const ReviewForFieldAgentIncomplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
