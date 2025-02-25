@@ -24,7 +24,7 @@ import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/
 import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventIndex
-} from '../fixtures'
+} from '@client/v2-events/features/events/fixtures'
 import { useEvents } from './useEvents'
 
 const serverSpy = vi.fn()

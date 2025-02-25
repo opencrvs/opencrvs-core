@@ -57,7 +57,4 @@ export function setMutationDefaults<
   })
 }
 
-export type TRPCError = TRPCClientError<AppRouter>
-export function isTRPCClientError(cause: unknown): cause is TRPCError {
-  return cause instanceof TRPCClientError
-}
+type TRPCError = TRPCClientError<AppRouter>
