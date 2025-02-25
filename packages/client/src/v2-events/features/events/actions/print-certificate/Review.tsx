@@ -18,7 +18,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, SCOPES } from '@opencrvs/commons/client'
 import {
   Box,
   Button,
@@ -40,6 +40,7 @@ import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
+import ProtectedComponent from '@client/components/ProtectedComponent'
 
 const CertificateContainer = styled.div`
   svg {
@@ -142,7 +143,7 @@ export function Review() {
   )
 
   const handleCorrection = () =>
-    navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
 
   const handlePrint = async () => {
     const confirmed = await openModal<boolean>((close) => (
@@ -209,16 +210,20 @@ export function Review() {
           </Box>
           <Content
             bottomActionButtons={[
-              <Button
+              <ProtectedComponent
                 key="edit-record"
-                fullWidth
-                size="large"
-                type="negative"
-                onClick={handleCorrection}
+                scopes={[SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION]}
               >
-                <Icon name="X" size="medium" />
-                {intl.formatMessage(messages.makeCorrection)}
-              </Button>,
+                <Button
+                  fullWidth
+                  size="large"
+                  type="negative"
+                  onClick={handleCorrection}
+                >
+                  <Icon name="X" size="medium" />
+                  {intl.formatMessage(messages.makeCorrection)}
+                </Button>
+              </ProtectedComponent>,
               <Button
                 key="confirm-and-print"
                 fullWidth
