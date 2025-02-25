@@ -603,7 +603,8 @@ function ReviewActionComponent({
   form,
   metadata,
   onReject,
-  messages
+  messages,
+  primaryButtonType
 }: {
   onConfirm: () => void
   onReject?: () => void
@@ -615,6 +616,7 @@ function ReviewActionComponent({
     description: MessageDescriptor
     onConfirm: MessageDescriptor
   }
+  primaryButtonType?: 'positive' | 'primary'
 }) {
   const intl = useIntl()
   const errorExist = validationErrorsInActionFormExist(
@@ -638,7 +640,7 @@ function ReviewActionComponent({
               disabled={errorExist}
               id="validateDeclarationBtn"
               size="large"
-              type="positive"
+              type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
               <Icon name="Check" />
@@ -713,8 +715,8 @@ function ActionModal({
   action
 }: {
   copy?: {
-    cancel?: MessageDescriptor
-    primaryAction?: MessageDescriptor
+    onCancel?: MessageDescriptor
+    onConfirm?: MessageDescriptor
     title?: MessageDescriptor
     description?: MessageDescriptor
   }
@@ -734,7 +736,9 @@ function ActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(copy?.cancel || reviewMessages.actionModalCancel)}
+          {intl.formatMessage(
+            copy?.onCancel || reviewMessages.actionModalCancel
+          )}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -745,7 +749,7 @@ function ActionModal({
           }}
         >
           {intl.formatMessage(
-            copy?.primaryAction || reviewMessages.actionModalPrimaryAction,
+            copy?.onConfirm || reviewMessages.actionModalPrimaryAction,
             {
               action
             }
