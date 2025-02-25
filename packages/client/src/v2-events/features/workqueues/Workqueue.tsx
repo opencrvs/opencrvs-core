@@ -35,7 +35,10 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/v2-events/components/IconWithName'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
@@ -160,6 +163,7 @@ function Workqueue({
   const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
   const drafts = getDrafts()
+  const { width } = useWindowSize()
 
   const validEvents = events.filter((event) =>
     eventConfigs.some((e) => e.id === event.type)
@@ -222,6 +226,20 @@ function Workqueue({
 
       const titleColumnId = workqueueConfig.columns[0].id
 
+      const TitleColumn =
+        width > theme.grid.breakpoints.lg ? (
+          <IconWithName
+            name={fieldsWithPopulatedValues[titleColumnId]}
+            status={'OUTBOX'}
+          />
+        ) : (
+          <IconWithNameEvent
+            event={intl.formatMessage(eventConfig.label)}
+            name={fieldsWithPopulatedValues[titleColumnId]}
+            status={'OUTBOX'}
+          />
+        )
+
       return {
         ...fieldsWithPopulatedValues,
         ...event,
@@ -240,26 +258,19 @@ function Workqueue({
           }
         ),
         [titleColumnId]: isInOutbox ? (
-          <IconWithName
-            name={fieldsWithPopulatedValues[titleColumnId]}
-            status={'OUTBOX'}
-          />
+          TitleColumn
         ) : (
           <NondecoratedLink
             to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
               eventId: event.id
             })}
           >
-            <IconWithName
-              name={fieldsWithPopulatedValues[titleColumnId]}
-              status={event.status}
-            />
+            {TitleColumn}
           </NondecoratedLink>
         )
       }
     })
 
-  const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
@@ -292,24 +303,21 @@ function Workqueue({
 
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
-    if (width > theme.grid.breakpoints.lg) {
-      return workqueueConfig.columns.map((column) => ({
+    const configuredColumns: Array<Column> = workqueueConfig.columns.map(
+      (column) => ({
         label: intl.formatMessage(column.label),
         width: 35,
         key: column.id,
         sortFunction: onColumnClick,
         isSorted: sortedCol === column.id
-      }))
+      })
+    )
+    const allColumns = configuredColumns.concat(getDefaultColumns())
+
+    if (width > theme.grid.breakpoints.lg) {
+      return allColumns
     } else {
-      return workqueueConfig.columns
-        .map((column) => ({
-          label: intl.formatMessage(column.label),
-          width: 35,
-          key: column.id,
-          sortFunction: onColumnClick,
-          isSorted: sortedCol === column.id
-        }))
-        .slice(0, 2)
+      return allColumns.slice(0, 1)
     }
   }
 
@@ -335,7 +343,7 @@ function Workqueue({
         </ToolTipContainer>
       </ReactTooltip>
       <WorkqueueComponent
-        columns={getColumns().concat(getDefaultColumns())}
+        columns={getColumns()}
         content={orderBy(workqueue, sortedCol, sortOrder)}
         hideLastBorder={!isShowPagination}
         loading={false} // @TODO: Handle these on top level
