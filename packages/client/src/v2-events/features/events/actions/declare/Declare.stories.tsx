@@ -58,26 +58,6 @@ export const Page: Story = {
   }
 }
 
-export const Review: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
-
 export const FilledPagesVisibleInReview: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)

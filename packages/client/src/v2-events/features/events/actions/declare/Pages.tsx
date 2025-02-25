@@ -23,9 +23,8 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -133,5 +132,3 @@ export function Pages() {
     </FormLayout>
   )
 }
-
-export const PagesIndex = withSuspense(Pages)
