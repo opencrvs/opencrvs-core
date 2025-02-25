@@ -38,12 +38,20 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+// Use an undeclared draft event for tests
+const undeclaredDraftEvent = {
+  ...tennisClueMembershipEventDocument,
+  actions: tennisClueMembershipEventDocument.actions.filter(
+    ({ type }) => type === 'CREATE'
+  )
+}
+
 export const Page: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
+        eventId: undeclaredDraftEvent.id,
         pageId: 'applicant'
       })
     },
@@ -51,7 +59,7 @@ export const Page: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return undeclaredDraftEvent
           })
         ]
       }
@@ -64,14 +72,14 @@ export const Review: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
+        eventId: undeclaredDraftEvent.id
       })
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return undeclaredDraftEvent
           })
         ]
       }
@@ -84,6 +92,10 @@ export const FilledPagesVisibleInReview: Story = {
     const canvas = within(canvasElement)
 
     await canvas.findByText(/Who is applying for the membership?/)
+
+    await expect(
+      await canvas.findByTestId('event-menu-toggle-button-image')
+    ).toBeInTheDocument()
 
     await step('Fill the applicant details', async () => {
       await userEvent.type(
@@ -118,7 +130,7 @@ export const FilledPagesVisibleInReview: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
+        eventId: undeclaredDraftEvent.id,
         pageId: 'applicant'
       })
     },
@@ -126,7 +138,7 @@ export const FilledPagesVisibleInReview: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return undeclaredDraftEvent
           })
         ]
       }
