@@ -26,7 +26,10 @@ import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
-import { EventHistoryModal } from './EventHistoryModal'
+import {
+  EventHistoryModal,
+  eventHistoryStatusMessage
+} from './EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
 
 /**
@@ -45,11 +48,7 @@ const messages = defineMessages({
     id: 'v2.event.history.timeFormat',
     description: 'Time format for timestamps in event history'
   },
-  'events.history.status': {
-    id: `v2.events.history.status`,
-    defaultMessage:
-      '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
-  },
+
   'event.history.role': {
     id: 'v2.event.history.role',
     defaultMessage:
@@ -90,7 +89,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
             onHistoryRowClick(item, user)
           }}
         >
-          {intl.formatMessage(messages['events.history.status'], {
+          {intl.formatMessage(eventHistoryStatusMessage, {
             status: item.type
           })}
         </Link>

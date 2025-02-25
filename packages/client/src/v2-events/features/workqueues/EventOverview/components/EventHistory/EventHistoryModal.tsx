@@ -17,6 +17,12 @@ import { ActionDocument } from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
 
+export const eventHistoryStatusMessage = {
+  id: `v2.events.history.status`,
+  defaultMessage:
+    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
+}
+
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
@@ -41,7 +47,11 @@ export function EventHistoryModal({
 }) {
   const intl = useIntl()
 
-  const name = getUsersFullName(user.name, intl.locale)
+  const userName = getUsersFullName(user.name, intl.locale)
+  const title = intl.formatMessage(eventHistoryStatusMessage, {
+    status: history.type
+  })
+
   return (
     <ResponsiveModal
       autoHeight
@@ -49,14 +59,14 @@ export function EventHistoryModal({
       handleClose={close}
       responsive={true}
       show={true}
-      title={history.type}
+      title={title}
       width={1024}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg19">
           {joinValues(
             [
-              name,
+              userName,
               format(
                 new Date(history.createdAt),
                 intl.formatMessage(messages['event.history.modal.timeFormat'])
