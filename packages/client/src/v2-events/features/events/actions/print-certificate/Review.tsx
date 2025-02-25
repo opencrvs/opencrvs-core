@@ -212,7 +212,10 @@ export function Review() {
             bottomActionButtons={[
               <ProtectedComponent
                 key="edit-record"
-                scopes={[SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION]}
+                scopes={[
+                  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+                  SCOPES.RECORD_REGISTRATION_CORRECT
+                ]}
               >
                 <Button
                   fullWidth
