@@ -2,7 +2,7 @@
 name: 'Feature'
 about: Used to suggest something that you wish OpenCRVS could do
 title: ''
-labels: 'Feature'
+type: 'Epic: Feature'
 assignees: ''
 ---
 
