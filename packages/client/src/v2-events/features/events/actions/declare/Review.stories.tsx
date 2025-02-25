@@ -12,6 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { graphql, HttpResponse } from 'msw'
+import { userEvent, within } from '@storybook/test'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -97,6 +98,22 @@ export const ReviewForLocalRegistrarComplete: Story = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    await step('Modal has scope based content', async () => {
+      const canvas = within(canvasElement)
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Register' })
+      )
+
+      const modal = within(await canvas.findByRole('modal'))
+
+      await modal.findByText('Register?')
+      await modal.findByRole('button', { name: 'Register' })
+      await userEvent.click(
+        await modal.findByRole('button', { name: 'Cancel' })
+      )
+    })
   }
 }
 
@@ -184,6 +201,22 @@ export const ReviewForRegistrationAgentComplete: Story = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    await step('Modal has scope based content', async () => {
+      const canvas = within(canvasElement)
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Send for approval' })
+      )
+
+      const modal = within(await canvas.findByRole('modal'))
+
+      await modal.findByText('Send for approval?')
+      await modal.findByRole('button', { name: 'Confirm' })
+      await userEvent.click(
+        await modal.findByRole('button', { name: 'Cancel' })
+      )
+    })
   }
 }
 
@@ -272,6 +305,22 @@ export const ReviewForFieldAgentComplete: Story = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    await step('Modal has scope based content', async () => {
+      const canvas = within(canvasElement)
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Send for review' })
+      )
+
+      const modal = within(await canvas.findByRole('modal'))
+
+      await modal.findByText('Send for review?')
+      await modal.findByRole('button', { name: 'Confirm' })
+      await userEvent.click(
+        await modal.findByRole('button', { name: 'Cancel' })
+      )
+    })
   }
 }
 
