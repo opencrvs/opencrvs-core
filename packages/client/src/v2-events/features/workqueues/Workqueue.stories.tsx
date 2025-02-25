@@ -49,7 +49,7 @@ export const Workqueue: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildSearch({ id: 'all' })
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({})
     },
     msw: {
       handlers: {
