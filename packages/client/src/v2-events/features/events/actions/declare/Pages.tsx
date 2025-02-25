@@ -23,7 +23,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
 
 export function Pages() {

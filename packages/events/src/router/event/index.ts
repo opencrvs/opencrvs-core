@@ -140,7 +140,13 @@ export const eventRouter = router({
         })
       }),
     declare: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
+      .use(
+        requiresAnyOfScopes([
+          SCOPES.RECORD_DECLARE,
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+          SCOPES.RECORD_REGISTER
+        ])
+      )
       .input(DeclareActionInput)
       .use(middleware.validateAction(ActionType.DECLARE))
       .mutation(async (options) => {
@@ -153,7 +159,12 @@ export const eventRouter = router({
         })
       }),
     validate: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_FOR_APPROVAL]))
+      .use(
+        requiresAnyOfScopes([
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+          SCOPES.RECORD_REGISTER
+        ])
+      )
       .input(ValidateActionInput)
       .use(middleware.validateAction(ActionType.VALIDATE))
       .mutation(async (options) => {

@@ -11,13 +11,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { userEvent, within } from '@storybook/test'
+import { userEvent, within, expect } from '@storybook/test'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
 import { Pages } from './index'
-import { expect } from '@storybook/test'
 
 const meta: Meta<typeof Pages> = {
   title: 'Declare',
@@ -53,26 +52,6 @@ export const Page: Story = {
       initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
         eventId: undeclaredDraftEvent.id,
         pageId: 'applicant'
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return undeclaredDraftEvent
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const Review: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: undeclaredDraftEvent.id
       })
     },
     msw: {
