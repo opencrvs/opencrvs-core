@@ -62,6 +62,16 @@ export function FormHeader({
     await deleteDeclaration(eventId)
   }, [eventId, deleteDeclaration])
 
+  const menuItems = isUndeclaredDraft(event)
+    ? [
+        {
+          label: 'Delete declaration',
+          icon: <Icon name="Trash" />,
+          handler: onDelete
+        }
+      ]
+    : []
+
   return (
     <AppBar
       desktopLeft={appbarIcon}
@@ -84,23 +94,19 @@ export function FormHeader({
                 <Icon name="X" />
                 {intl.formatMessage(messages.exitButton)}
               </Button>
-              <ToggleMenu
-                id={'event-menu'}
-                menuItems={
-                  isUndeclaredDraft(event)
-                    ? [
-                        {
-                          label: 'Delete declaration',
-                          icon: <Icon name="Trash" />,
-                          handler: onDelete
-                        }
-                      ]
-                    : []
-                }
-                toggleButton={
-                  <Icon color="primary" name="DotsThreeVertical" size="large" />
-                }
-              />
+              {menuItems.length > 0 && (
+                <ToggleMenu
+                  id={'event-menu'}
+                  menuItems={menuItems}
+                  toggleButton={
+                    <Icon
+                      color="primary"
+                      name="DotsThreeVertical"
+                      size="large"
+                    />
+                  }
+                />
+              )}
             </>
           ) : (
             <Button size="small" type="icon" onClick={goToHome}>
