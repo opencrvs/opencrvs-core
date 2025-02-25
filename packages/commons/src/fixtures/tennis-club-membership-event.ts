@@ -10,7 +10,7 @@
  */
 import { ConditionalType, defineConfig, defineForm, field } from '../events'
 
-const TENNIS_CLUB_FORM = defineForm({
+export const TENNIS_CLUB_FORM = defineForm({
   label: {
     id: 'v2.event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',

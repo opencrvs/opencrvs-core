@@ -14,12 +14,12 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
 import { fireEvent, within } from '@storybook/test'
-import { AddressFieldValue } from '@opencrvs/commons/client'
 import {
-  tennisClueMembershipEventDocument,
+  AddressFieldValue,
   tennisClubMembershipEvent,
-  DEFAULT_FORM
-} from '@client/v2-events/features/events/fixtures'
+  TENNIS_CLUB_FORM
+} from '@opencrvs/commons/client'
+import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 
@@ -48,7 +48,7 @@ const meta: Meta<typeof Review.Body> = {
   component: Review.Body,
   args: {
     eventConfig: tennisClubMembershipEvent,
-    formConfig: DEFAULT_FORM,
+    formConfig: TENNIS_CLUB_FORM,
     form: mockFormData,
     onEdit: () => undefined,
     title: 'Member declaration for John Doe'
@@ -134,13 +134,13 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
         <Review.Body
           eventConfig={tennisClubMembershipEvent}
           form={mockFormData}
-          formConfig={DEFAULT_FORM}
+          formConfig={TENNIS_CLUB_FORM}
           title="My test action"
           onEdit={handleEdit}
         >
           <Review.Actions
             form={mockFormData}
-            formConfig={DEFAULT_FORM}
+            formConfig={TENNIS_CLUB_FORM}
             messages={{
               title: {
                 id: 'v2.changeModal.title',
@@ -200,13 +200,13 @@ export const ReviewWithValidationErrors: Story = {
       <Review.Body
         eventConfig={tennisClubMembershipEvent}
         form={this.args?.form || {}}
-        formConfig={DEFAULT_FORM}
+        formConfig={TENNIS_CLUB_FORM}
         title="My test action"
         onEdit={() => undefined}
       >
         <Review.Actions
           form={this.args?.form || {}}
-          formConfig={DEFAULT_FORM}
+          formConfig={TENNIS_CLUB_FORM}
           messages={{
             title: {
               id: 'v2.changeModal.title',

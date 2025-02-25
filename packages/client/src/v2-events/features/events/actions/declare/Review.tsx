@@ -214,7 +214,6 @@ function getReviewActionConfig({
 
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
     return {
-      onConfirm: () => {},
       incomplete,
       isDisabled,
       messages: incomplete
@@ -225,7 +224,6 @@ function getReviewActionConfig({
 
   if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
     return {
-      onConfirm: () => {},
       incomplete,
       isDisabled,
       messages: incomplete
@@ -236,7 +234,6 @@ function getReviewActionConfig({
 
   if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
     return {
-      onConfirm: () => {},
       incomplete,
       isDisabled,
       messages: incomplete
