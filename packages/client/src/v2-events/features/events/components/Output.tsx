@@ -131,6 +131,7 @@ function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
   return value?.toString() || ''
 }
 
+// @TODO: This only works for text fields, each components output function should handle the case for undefined value
 function getEmptyValueForFieldType(field: FieldWithValue) {
   return '-'
 }
@@ -168,6 +169,7 @@ export function Output({
       </>
     )
   }
+
   if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
