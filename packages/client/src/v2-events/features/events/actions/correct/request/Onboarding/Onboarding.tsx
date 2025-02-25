@@ -34,7 +34,7 @@ const messages = defineMessages({
   }
 })
 
-function Onboarding() {
+export function Onboarding() {
   const resetMetadata = useCorrectionRequestData((state) => state.clear)
   const resetFormData = useEventFormData((state) => state.clear)
   React.useEffect(() => {
@@ -128,5 +128,3 @@ function Onboarding() {
     </ActionPageLight>
   )
 }
-
-export const OnboardingIndex = withSuspense(Onboarding)

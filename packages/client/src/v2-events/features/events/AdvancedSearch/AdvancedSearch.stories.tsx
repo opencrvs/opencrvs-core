@@ -12,9 +12,9 @@ import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
-import { tennisClubMembershipEvent } from '@client/v2-events/features/events/fixtures'
 import AdvancedSearch from './AdvancedSearch'
 
 const meta: Meta<typeof AdvancedSearch> = {
