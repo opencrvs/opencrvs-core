@@ -46,45 +46,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
-const messages = defineMessages({
-  reviewActionTitle: {
-    id: 'v2.reviewAction.title',
-    defaultMessage: 'Declare event',
-    description: 'The title for review action'
-  },
-  reviewIncompleteActionTitle: {
-    id: 'v2.reviewAction.incomplete.title',
-    defaultMessage: 'Declaration incomplete',
-    description: 'The title for review action'
-  },
-  reviewActionDescription: {
-    id: 'v2.reviewAction.description',
-    defaultMessage:
-      'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
-    description: 'The description for review action'
-  },
-  sendForReviewDescription: {
-    id: 'v2.reviewAction.sendForReview.description',
-    defaultMessage:
-      'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
-    description: 'The description for review action'
-  },
-  reviewActionDeclare: {
-    id: 'v2.reviewAction.Declare',
-    defaultMessage: 'Declare',
-    description: 'The label for declare button of review action'
-  },
-  sendForReviewOnConfirm: {
-    id: 'v2.reviewAction.Declare.sendForReview',
-    defaultMessage: 'Send for review',
-    description:
-      'The button label for sending incomplete declaration for review'
-  },
-  reviewActionReject: {
-    id: 'v2.reviewAction.reject',
-    defaultMessage: 'Reject',
-    description: 'The label for reject button of review action'
-  },
+const modalMessages = defineMessages({
   rejectModalCancel: {
     id: 'v2.rejectModal.cancel',
     defaultMessage: 'Cancel',
@@ -152,7 +114,7 @@ const declareMessages = {
   }
 }
 
-const messages2 = {
+const reviewMessages = {
   complete: {
     register: {
       title: registerMessages.title,
@@ -256,8 +218,8 @@ function getReviewActionConfig({
       incomplete,
       isDisabled,
       messages: incomplete
-        ? messages2.incomplete.register
-        : messages2.complete.register
+        ? reviewMessages.incomplete.register
+        : reviewMessages.complete.register
     }
   }
 
@@ -267,8 +229,8 @@ function getReviewActionConfig({
       incomplete,
       isDisabled,
       messages: incomplete
-        ? messages2.incomplete.validate
-        : messages2.complete.validate
+        ? reviewMessages.incomplete.validate
+        : reviewMessages.complete.validate
     }
   }
 
@@ -278,8 +240,8 @@ function getReviewActionConfig({
       incomplete,
       isDisabled,
       messages: incomplete
-        ? messages2.incomplete.declare
-        : messages2.complete.declare
+        ? reviewMessages.incomplete.declare
+        : reviewMessages.complete.declare
     }
   }
 
@@ -427,12 +389,6 @@ export function Review() {
         <ReviewComponent.Actions
           form={form}
           formConfig={formConfig}
-          // messages={
-          //   hasErrors
-          //     ? incompleteDeclarationMessages
-          //     : completeDeclarationMessages
-          // }
-          // metadata={metadata}
           messages={reviewActionConfiguration.messages}
           metadata={metadata}
           onConfirm={handleDeclaration}
@@ -469,7 +425,7 @@ function RejectModal({
             close(null)
           }}
         >
-          {intl.formatMessage(messages.rejectModalCancel)}
+          {intl.formatMessage(modalMessages.rejectModalCancel)}
         </Button>,
         <Button
           key="confirm_reject_with_archive"
@@ -482,7 +438,7 @@ function RejectModal({
             })
           }}
         >
-          {intl.formatMessage(messages.rejectModalArchive)}
+          {intl.formatMessage(modalMessages.rejectModalArchive)}
         </Button>,
         <Button
           key="confirm_reject_with_update"
@@ -495,17 +451,17 @@ function RejectModal({
             })
           }}
         >
-          {intl.formatMessage(messages.rejectModalSendForUpdate)}
+          {intl.formatMessage(modalMessages.rejectModalSendForUpdate)}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(messages.rejectModalTitle)}
+      title={intl.formatMessage(modalMessages.rejectModalTitle)}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(messages.rejectModalDescription)}
+          {intl.formatMessage(modalMessages.rejectModalDescription)}
         </Text>
         <TextInput
           required={true}
@@ -515,7 +471,7 @@ function RejectModal({
           }
         />
         <Checkbox
-          label={intl.formatMessage(messages.rejectModalMarkAsDuplicate)}
+          label={intl.formatMessage(modalMessages.rejectModalMarkAsDuplicate)}
           name={'markDUplicate'}
           selected={state.isDuplicate}
           value={''}

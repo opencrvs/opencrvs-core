@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { generateActionInput } from '@events/tests/generators'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionType, generateActionInput, SCOPES } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
 

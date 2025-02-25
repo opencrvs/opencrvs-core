@@ -13,12 +13,13 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
+  generateActionInput,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { TRPCError } from '@trpc/server'
-import { generateActionInput } from '@events/tests/generators'
+
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
