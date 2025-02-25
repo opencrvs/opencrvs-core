@@ -18,7 +18,6 @@ import { validationMessages as messages } from '@client/i18n/messages'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
-  INFORMANT_MINIMUM_AGE,
   NATIONAL_ID
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
@@ -757,33 +756,6 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
     ) {
       return {
         message: messages.isMoVisitBeforeBirth
-      }
-    }
-  }
-}
-
-/**
- * @deprecated This validator is deprecated and will be removed in future releases. Use `isAgeInYearsBetween` instead
- */
-export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
-  if (process.env.NODE_ENV !== 'production') {
-    // eslint-disable-next-line no-console
-    console.warn(
-      'This validator is deprecated and will be removed in future releases. Use `isAgeInYearsBetween` instead'
-    )
-  }
-  if (value) {
-    if (
-      minAgeGapExist(
-        format(new Date(Date.now()), 'yyyy-MM-dd'),
-        value.toString(),
-        INFORMANT_MINIMUM_AGE
-      )
-    ) {
-      return undefined
-    } else {
-      return {
-        message: messages.isInformantOfLegalAge
       }
     }
   }
