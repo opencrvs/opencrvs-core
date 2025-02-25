@@ -209,7 +209,7 @@ function getReviewActionConfig({
   )
 
   const isDisabled = incomplete
-    ? !!scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
+    ? !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
     : false
 
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
