@@ -111,6 +111,17 @@ export const TENNIS_CLUB_FORM = defineForm({
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
           }
+        },
+        {
+          id: 'applicant.address',
+          type: 'ADDRESS',
+          required: true,
+          conditionals: [],
+          label: {
+            defaultMessage: "Applicant's address",
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.address.label'
+          }
         }
       ]
     },
