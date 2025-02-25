@@ -190,7 +190,7 @@ export const eventRouter = router({
         )
       }),
     printCertificate: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARATION_PRINT]))
+      .use(requiresAnyOfScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]))
       .input(PrintCertificateActionInput)
       .use(middleware.validateAction(ActionType.PRINT_CERTIFICATE))
       .mutation(async (options) => {
