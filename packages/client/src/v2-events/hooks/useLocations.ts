@@ -9,10 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { api } from '@client/v2-events/trpc'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { useTRPC } from '@client/v2-events/trpc'
 
 export function useLocations() {
+  const trpc = useTRPC()
   return {
-    getLocations: api.locations.get
+    getLocations: {
+      useSuspenseQuery: () => {
+        return [useSuspenseQuery(trpc.locations.get.queryOptions()).data]
+      }
+    }
   }
 }
