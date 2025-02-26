@@ -65,7 +65,11 @@ export function Review() {
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(
     eventId,
-    event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
+    /**
+     * Instead of using DECLARE action to get metadata,
+     * we should be using the latest action metadata
+     */
+    event.actions.find((a) => a.type === ActionType.DECLARE)?.metadata
   )
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
