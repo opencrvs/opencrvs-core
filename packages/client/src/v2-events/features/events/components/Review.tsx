@@ -45,7 +45,17 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
-import { Output, ValidationError } from './Output'
+import { Output } from './Output'
+
+const ValidationError = styled.span`
+  color: ${({ theme }) => theme.colors.negative};
+  display: inline-block;
+  text-transform: lowercase;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+`
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -587,13 +597,14 @@ const incompleteFormWarning: MessageDescriptor = {
   description: 'The label for warning of incomplete form'
 }
 
-function PreviewActionComponent({
+function ReviewActionComponent({
   onConfirm,
   formConfig,
   form,
   metadata,
   onReject,
-  messages
+  messages,
+  primaryButtonType
 }: {
   onConfirm: () => void
   onReject?: () => void
@@ -605,6 +616,7 @@ function PreviewActionComponent({
     description: MessageDescriptor
     onConfirm: MessageDescriptor
   }
+  primaryButtonType?: 'positive' | 'primary'
 }) {
   const intl = useIntl()
   const errorExist = validationErrorsInActionFormExist(
@@ -628,7 +640,7 @@ function PreviewActionComponent({
               disabled={errorExist}
               id="validateDeclarationBtn"
               size="large"
-              type="positive"
+              type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
               <Icon name="Check" />
@@ -703,8 +715,8 @@ function ActionModal({
   action
 }: {
   copy?: {
-    cancel?: MessageDescriptor
-    primaryAction?: MessageDescriptor
+    onCancel?: MessageDescriptor
+    onConfirm?: MessageDescriptor
     title?: MessageDescriptor
     description?: MessageDescriptor
   }
@@ -724,7 +736,9 @@ function ActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(copy?.cancel || reviewMessages.actionModalCancel)}
+          {intl.formatMessage(
+            copy?.onCancel || reviewMessages.actionModalCancel
+          )}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -735,7 +749,7 @@ function ActionModal({
           }}
         >
           {intl.formatMessage(
-            copy?.primaryAction || reviewMessages.actionModalPrimaryAction,
+            copy?.onConfirm || reviewMessages.actionModalPrimaryAction,
             {
               action
             }
@@ -763,7 +777,7 @@ function ActionModal({
 
 export const Review = {
   Body: ReviewComponent,
-  Actions: PreviewActionComponent,
+  Actions: ReviewActionComponent,
   EditModal: EditModal,
   ActionModal: ActionModal
 }

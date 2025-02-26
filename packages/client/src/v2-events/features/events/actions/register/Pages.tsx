@@ -26,7 +26,7 @@ import {
   useEventFormData,
   useSubscribeEventFormData
 } from '@client/v2-events/features/events/useEventFormData'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)

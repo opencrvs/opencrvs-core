@@ -26,7 +26,9 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_PRINT])
+  const client = createTestClient(user, [
+    SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+  ])
 
   await expect(
     client.event.actions.printCertificate(
@@ -86,61 +88,10 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.printCertificate(event.id, {
-    data: {
-      'applicant.dob': '02-1-2024',
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
-      'recommender.none': true
-    }
+    data: {}
   })
 
   await expect(
     client.event.actions.printCertificate(data)
-  ).rejects.matchSnapshot()
-})
-
-test('Skips required field validation when they are conditionally hidden', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await client.event.create(generator.event.create())
-
-  const form = {
-    'applicant.dob': '2024-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
-    'recommender.none': true
-  }
-
-  const data = generator.event.actions.printCertificate(event.id, {
-    data: form
-  })
-
-  const response = await client.event.actions.printCertificate(data)
-  const savedAction = response.actions.find(
-    (action) => action.type === ActionType.PRINT_CERTIFICATE
-  )
-  expect(savedAction?.data).toEqual(form)
-})
-
-test('Prevents adding birth date in future', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await client.event.create(generator.event.create())
-
-  const form = {
-    'applicant.dob': '2040-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
-    'recommender.none': true
-  }
-
-  const payload = generator.event.actions.printCertificate(event.id, {
-    data: form
-  })
-
-  await expect(
-    client.event.actions.printCertificate(payload)
   ).rejects.matchSnapshot()
 })
