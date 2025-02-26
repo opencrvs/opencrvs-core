@@ -47,7 +47,8 @@ function FormClear() {
     form.setFormValues(tennisClueMembershipEventDocument.id, {
       'applicant.firstname': 'Max',
       'applicant.surname': 'McLaren',
-      'applicant.dob': '2020-01-02'
+      'applicant.dob': '2020-01-02',
+      'recommender.none': true
     })
     requestDetails.setFormValues({
       'correction.requester.relationship': 'ANOTHER_AGENT',

@@ -99,7 +99,7 @@
     "react-intl": "5.25.1",
     "react-page-visibility": "^3.2.1",
     "react-redux": "^7.1.1",
-    "react-router-dom": "^6.28.0",
+    "react-router-dom": "^6.28.1",
     "react-router-typesafe-routes": "1.2.2",
     "react-stickynode": "^2.0.1",
     "react-tooltip": "^4.2.21",

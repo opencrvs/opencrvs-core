@@ -8,24 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { WorkqueueContainer } from './Workqueue'
 
-import React from 'react'
-import { WorkqueueLayout } from '@client/v2-events/layouts'
-import { ROUTES } from '@client/v2-events/routes'
-import { WorkqueueIndex } from './index'
-
-export const router = {
-  path: ROUTES.V2.WORKQUEUES.path,
-  element: (
-    <WorkqueueLayout>
-      <WorkqueueIndex />
-    </WorkqueueLayout>
-  ),
-  children: [
-    {
-      index: true,
-      path: ROUTES.V2.WORKQUEUES.WORKQUEUE.path,
-      element: <WorkqueueIndex />
-    }
-  ]
-}
+export const WorkqueueIndex = withSuspense(WorkqueueContainer)

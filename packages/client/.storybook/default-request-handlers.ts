@@ -16,13 +16,10 @@ import superjson from 'superjson'
 import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
-import {
-  tennisClubMembershipEvent,
-  tennisClubMembershipEventIndex
-} from '../src/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventIndex } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
-import { random } from 'lodash'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()

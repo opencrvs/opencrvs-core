@@ -17,14 +17,15 @@ import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
 import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { EventDocument, EventInput } from '@opencrvs/commons/client'
+import {
+  EventDocument,
+  EventInput,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
-import {
-  tennisClubMembershipEvent,
-  tennisClubMembershipEventIndex
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { useEvents } from './useEvents'
 
 const serverSpy = vi.fn()

@@ -40,7 +40,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { formattedDuration } from '@client/utils/date-formatting'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
@@ -89,7 +88,7 @@ function changeSortedColumn(
   }
 }
 
-function WorkqueueContainer() {
+export function WorkqueueContainer() {
   // @TODO: We need to revisit on how the workqueue id is passed.
   // We'll follow up during 'workqueue' feature.
   const workqueueId = 'all'
@@ -333,5 +332,3 @@ function Workqueue({
     </WQContentWrapper>
   )
 }
-
-export const WorkqueueIndex = withSuspense(WorkqueueContainer)

@@ -16,9 +16,9 @@ import { tennisClueMembershipEventDocument } from '@client/v2-events/features/ev
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
 import { router } from '@client/v2-events/features/events/actions/correct/request/router'
-import { OnboardingIndex } from './Onboarding'
+import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 
-const meta: Meta<typeof OnboardingIndex> = {
+const meta: Meta<typeof Onboarding> = {
   title: 'CorrectionRequest',
   beforeEach: () => {
     useEventFormData.getState().clear()

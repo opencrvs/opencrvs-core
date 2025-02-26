@@ -16,7 +16,12 @@ import {
   useSuspenseQuery
 } from '@tanstack/react-query'
 
-import { TRPCMutationOptions } from '@trpc/tanstack-react-query'
+import {
+  DecorateMutationProcedure,
+  inferInput,
+  inferOutput,
+  TRPCMutationOptions
+} from '@trpc/tanstack-react-query'
 import {
   EventConfig,
   EventDocument,
@@ -32,14 +37,15 @@ import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getPendingMutations<T extends ReturnType<TRPCMutationOptions<any>>>(
-  queryOptions: T
+function getPendingMutations<T extends DecorateMutationProcedure<any>>(
+  mutation: T
 ) {
-  type MutationFn = Exclude<T['mutationFn'], undefined>
-  type Data = ReturnType<MutationFn>
-  type Variables = Parameters<MutationFn>[0]
-  type Context = Parameters<MutationFn>[1]
-  const key = queryOptions.mutationKey
+  // type MutationFn = Exclude<T['mutationFn'], undefined>
+  type Data = inferOutput<T>
+  type Variables = inferInput<T>
+
+  const mutationOptions = mutation.mutationOptions()
+  const key = mutationOptions.mutationKey
 
   return queryClient
     .getMutationCache()
@@ -49,21 +55,18 @@ function getPendingMutations<T extends ReturnType<TRPCMutationOptions<any>>>(
       (mutation) =>
         mutation.options.mutationKey &&
         hashKey(mutation.options.mutationKey) === hashKey(key)
-    ) as Mutation<Data, Error, Variables, Context>[]
+    ) as Mutation<Data, Error, Variables>[]
 }
 
 function filterOutboxEventsWithMutation<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends ReturnType<TRPCMutationOptions<any>>
+  T extends DecorateMutationProcedure<any>
 >(
   events: EventIndex[],
-  mutationOptions: T,
-  filter: (
-    event: EventIndex,
-    parameters: Parameters<Exclude<T['mutationFn'], undefined>>[0]
-  ) => boolean
+  mutation: T,
+  filter: (event: EventIndex, parameters: inferInput<T>) => boolean
 ) {
-  return getPendingMutations(mutationOptions).flatMap((m) => {
+  return getPendingMutations(mutation).flatMap((m) => {
     const variables = m.state.variables
     return events.filter((event) => filter(event, variables))
   })
@@ -135,7 +138,15 @@ export function useEvents() {
   function getOutbox() {
     const eventFromDeclareActions = filterOutboxEventsWithMutation(
       eventsList,
-      trpc.event.actions.declare.mutationOptions(undefined),
+      trpc.event.actions.declare,
+      (event, parameters) => {
+        return event.id === parameters.eventId && !parameters.draft
+      }
+    )
+
+    const eventFromValidateActions = filterOutboxEventsWithMutation(
+      eventsList,
+      trpc.event.actions.validate,
       (event, parameters) => {
         return event.id === parameters.eventId && !parameters.draft
       }
@@ -143,7 +154,7 @@ export function useEvents() {
 
     const eventFromRegisterActions = filterOutboxEventsWithMutation(
       eventsList,
-      trpc.event.actions.declare.mutationOptions(undefined),
+      trpc.event.actions.register,
       (event, parameters) => {
         return event.id === parameters.eventId && !parameters.draft
       }
@@ -151,6 +162,7 @@ export function useEvents() {
 
     return eventFromDeclareActions
       .concat(eventFromDeclareActions)
+      .concat(eventFromValidateActions)
       .concat(eventFromRegisterActions)
       .filter(
         /* uniqueById */
