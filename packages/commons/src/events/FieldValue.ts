@@ -36,16 +36,16 @@ const AdminStructure = z.object({
 
 const UrbanAddress = AdminStructure.extend({
   urbanOrRural: z.literal('URBAN'),
-  town: z.string().optional().nullable(),
-  residentialArea: z.string().optional().nullable(),
-  street: z.string().optional().nullable(),
-  number: z.string().optional().nullable(),
-  zipCode: z.string().optional().nullable()
+  town: z.string().optional(),
+  residentialArea: z.string().optional(),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  zipCode: z.string().optional()
 })
 
 const RuralAddress = AdminStructure.extend({
   urbanOrRural: z.literal('RURAL'),
-  village: z.string().optional().nullable()
+  village: z.string().optional()
 })
 
 export const AddressFieldValue = z.discriminatedUnion('urbanOrRural', [

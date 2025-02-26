@@ -39,4 +39,3 @@ By default, Events V2 is accessible via the /v2 route, allowing the applicationâ
 - When building new features, aim to have a separate component that handles interaction with router and data fetching when it makes sense. Features should be route independent, and necessary information (ids and such) should be passed in as props or similar. See (`features/events/actions/register` or `features/events/actions/declare`)
 - Use constants through object pattern. e.g.`ActionType.CREATE` over `'CREATE'`. In most situations, it does not matter. However, changing the names will get much easier.
 - When building new features, prefer to import them through `index.ts`. Managing imports will be cleaner and easier that way. See (`/layouts`)
-
