@@ -24,6 +24,7 @@ import {
   Stack
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
+import { workqueues } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -105,6 +106,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               <Icon color="primary" name="MagnifyingGlass" size="medium" />
             </Button>
           }
+          mobileTitle={intl.formatMessage(workqueues.all.title)}
         />
       }
       skipToContentText="skip"
