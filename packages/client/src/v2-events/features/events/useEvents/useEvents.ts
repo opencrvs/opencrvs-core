@@ -9,109 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  hashKey,
-  Mutation,
-  useQuery,
-  useSuspenseQuery
-} from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import {
-  DecorateMutationProcedure,
-  inferInput,
-  inferOutput
-} from '@trpc/tanstack-react-query'
-import {
-  EventConfig,
-  EventDocument,
-  EventIndex,
-  getEventConfiguration
-} from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { cacheFiles } from '@client/v2-events/features/files/cache'
-import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
-import { setQueryDefaults } from './api'
+import { EventDocument } from '@opencrvs/commons/client'
+import { queryClient, useTRPC } from '@client/v2-events/trpc'
+import { useOutbox } from './outbox'
 import { useEventAction } from './procedures/action'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getPendingMutations<T extends DecorateMutationProcedure<any>>(
-  procedure: T
-) {
-  // type MutationFn = Exclude<T['mutationFn'], undefined>
-  type Data = inferOutput<T>
-  type Variables = inferInput<T>
-
-  const mutationOptions = procedure.mutationOptions()
-  const key = mutationOptions.mutationKey
-
-  return queryClient
-    .getMutationCache()
-    .getAll()
-    .filter((mutation) => mutation.state.status !== 'success')
-    .filter(
-      (mutation) =>
-        mutation.options.mutationKey &&
-        hashKey(mutation.options.mutationKey) === hashKey(key)
-    ) as Mutation<Data, Error, Variables>[]
-}
-
-function filterOutboxEventsWithMutation<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends DecorateMutationProcedure<any>
->(
-  events: EventIndex[],
-  mutation: T,
-  filter: (event: EventIndex, parameters: inferInput<T>) => boolean
-) {
-  return getPendingMutations(mutation).flatMap((m) => {
-    const variables = m.state.variables
-    return events.filter((event) => filter(event, variables))
-  })
-}
-
-/*
- * This logic overrides the default behaviour of "api.event.get"
- * by making it so all "FILE" or "FILE_WITH_OPTIONS" type data points
- * are parsed from the received event document and prefetched as part of fetching the record
- *
- * This ensures the full record can be browsed even when the user goes offline
- */
-
-setQueryDefaults(utils.event.get, {
-  queryFn: async (...params) => {
-    const {
-      meta,
-      queryKey: [, input]
-    } = params[0]
-    if (!meta) {
-      throw new Error(
-        'api.event.get was called without passing mandatory event configuration'
-      )
-    }
-
-    const queryOptions = utils.event.get.queryOptions(input.input)
-
-    if (typeof queryOptions.queryFn !== 'function') {
-      throw new Error('queryFn is not a function')
-    }
-    /*
-     * This is a query directly to the tRPC server
-     */
-    const response = await queryOptions.queryFn(...params)
-
-    const eventDocument = EventDocument.parse(response)
-
-    const eventConfig = getEventConfiguration(
-      meta.eventConfig as EventConfig[],
-      eventDocument.type
-    )
-
-    await cacheFiles(eventDocument, eventConfig)
-    return eventDocument
-  }
-})
+import { useGetEvent } from './procedures/get'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -119,8 +25,6 @@ export function useEvents() {
     ...trpc.event.list.queryOptions(),
     queryKey: trpc.event.list.queryKey()
   })
-
-  const eventsList = eventListQuery.data ?? []
 
   function getDrafts(): EventDocument[] {
     const queries = queryClient.getQueriesData<EventDocument>({
@@ -134,73 +38,9 @@ export function useEvents() {
       )
   }
 
-  function getOutbox() {
-    const eventFromDeclareActions = filterOutboxEventsWithMutation(
-      eventsList,
-      trpc.event.actions.declare,
-      (event, parameters) => {
-        return event.id === parameters.eventId && !parameters.draft
-      }
-    )
-
-    const eventFromValidateActions = filterOutboxEventsWithMutation(
-      eventsList,
-      trpc.event.actions.validate,
-      (event, parameters) => {
-        return event.id === parameters.eventId && !parameters.draft
-      }
-    )
-
-    const eventFromRegisterActions = filterOutboxEventsWithMutation(
-      eventsList,
-      trpc.event.actions.register,
-      (event, parameters) => {
-        return event.id === parameters.eventId && !parameters.draft
-      }
-    )
-
-    return eventFromDeclareActions
-      .concat(eventFromDeclareActions)
-      .concat(eventFromValidateActions)
-      .concat(eventFromRegisterActions)
-      .filter(
-        /* uniqueById */
-        (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
-      )
-  }
-
   return {
     createEvent: useCreateEvent,
-    getEvent: {
-      useQuery: (id: string) => {
-        const eventConfig = useEventConfigurations()
-        // Skip the queryFn defined by tRPC and use our own default defined above
-        const { queryFn, ...options } = trpc.event.get.queryOptions(id)
-
-        return useQuery({
-          ...options,
-          queryKey: trpc.event.get.queryKey(id),
-          meta: {
-            eventConfig
-          }
-        })
-      },
-      useSuspenseQuery: (id: string) => {
-        const eventConfig = useEventConfigurations()
-        // Skip the queryFn defined by tRPC and use our own default defined above
-        const { queryFn, ...options } = trpc.event.get.queryOptions(id)
-
-        return [
-          useSuspenseQuery({
-            ...options,
-            queryKey: trpc.event.get.queryKey(id),
-            meta: {
-              eventConfig
-            }
-          }).data
-        ]
-      }
-    },
+    getEvent: useGetEvent(),
     getEvents: {
       useQuery: () => eventListQuery,
       useSuspenseQuery: () => [
@@ -213,7 +53,7 @@ export function useEvents() {
     deleteEvent: {
       useMutation: useDeleteEvent
     },
-    getOutbox,
+    getOutbox: useOutbox,
     getDrafts,
     actions: {
       validate: useEventAction(trpc.event.actions.validate),

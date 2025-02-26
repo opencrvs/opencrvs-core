@@ -58,15 +58,17 @@ type TRPCQueryKey<T> = [readonly string[], { input: T }]
  *
  * @template P - The type of the mutation procedure e.g. trpc.events.get.
  * @template Context - The type of the context, defaults to `any`.
- * @param {P} mutation - The mutation procedure to set defaults for.
+ * @param {OmitKeyof<MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>, Context>, 'mutationKey'>} options - The options to set as defaults, excluding the `mutationKey`.
  */
 export function setMutationDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  P extends DecorateMutationProcedure<any>
+  P extends DecorateMutationProcedure<any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Context = any
 >(
   mutation: P,
   options: OmitKeyof<
-    MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>>,
+    MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>, Context>,
     'mutationKey'
   >
 ) {
