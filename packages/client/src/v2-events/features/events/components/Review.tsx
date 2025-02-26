@@ -45,7 +45,17 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
-import { Output, ValidationError } from './Output'
+import { Output } from './Output'
+
+const ValidationError = styled.span`
+  color: ${({ theme }) => theme.colors.negative};
+  display: inline-block;
+  text-transform: lowercase;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+`
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -587,7 +597,7 @@ const incompleteFormWarning: MessageDescriptor = {
   description: 'The label for warning of incomplete form'
 }
 
-function PreviewActionComponent({
+function ReviewActionComponent({
   onConfirm,
   formConfig,
   form,
@@ -763,7 +773,7 @@ function ActionModal({
 
 export const Review = {
   Body: ReviewComponent,
-  Actions: PreviewActionComponent,
+  Actions: ReviewActionComponent,
   EditModal: EditModal,
   ActionModal: ActionModal
 }
