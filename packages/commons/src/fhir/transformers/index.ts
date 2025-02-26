@@ -93,7 +93,10 @@ import {
   getComposition,
   markSaved,
   CompositionSectionTitleByCode,
-  EVENT_TYPE
+  EVENT_TYPE,
+  isComposition,
+  Composition,
+  findCompositionSection
 } from '..'
 import { getUUID, UUID } from '../..'
 import { replaceFromBundle } from '../../record'
@@ -2741,7 +2744,7 @@ const builders: IFieldBuilders = {
           docRef.content = [
             {
               attachment: {
-                contentType: fieldValue
+                data: fieldValue
               }
             }
           ]
@@ -2774,7 +2777,7 @@ const builders: IFieldBuilders = {
           docRef.content = [
             {
               attachment: {
-                contentType: fieldValue
+                data: fieldValue
               }
             }
           ]
@@ -3123,6 +3126,22 @@ export function updateFHIRBundle<T extends Bundle>(
   const context = {
     event: eventType,
     _index: {}
+  }
+
+  // Remove any existing supporting documents to rebuild them from
+  // scratch allowing deletion of any removed documents
+  const composition = existingBundle.entry
+    .map((e) => e.resource)
+    .find((resource) => isComposition(resource)) as Composition | undefined
+
+  if (composition) {
+    const documentSection = findCompositionSection(
+      'supporting-documents',
+      composition
+    )
+    if (documentSection) {
+      documentSection.entry = []
+    }
   }
 
   return transformObj(
