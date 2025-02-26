@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Outlet, RouteObject } from 'react-router-dom'
+import { Navigate, Outlet, RouteObject } from 'react-router-dom'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
@@ -120,6 +120,10 @@ export const routesConfig = {
     {
       path: ROUTES.V2.ADVANCED_SEARCH.path,
       element: <AdvancedSearch />
+    },
+    {
+      path: ROUTES.V2.SEARCH.path,
+      element: <Navigate replace to="/search" />
     }
   ]
 } satisfies RouteObject

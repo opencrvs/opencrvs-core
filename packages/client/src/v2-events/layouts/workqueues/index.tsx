@@ -97,6 +97,14 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           }
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<Hamburger />}
+          mobileRight={
+            <Button
+              type={'icon'}
+              onClick={() => navigate(ROUTES.V2.SEARCH.path)}
+            >
+              <Icon color="primary" name="MagnifyingGlass" size="medium" />
+            </Button>
+          }
         />
       }
       skipToContentText="skip"
