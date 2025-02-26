@@ -2,7 +2,7 @@
 name: 'Bug'
 about: Used to submit bugs and things that appear broken.
 title: ''
-labels: 'Bug'
+type: 'Bug'
 assignees: ''
 ---
 
