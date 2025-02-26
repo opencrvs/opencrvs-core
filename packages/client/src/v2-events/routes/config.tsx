@@ -11,6 +11,7 @@
 
 import React from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
+
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
@@ -25,7 +26,7 @@ import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
 import { ROUTES } from './routes'
-import { StyledErrorBoundary } from './StyledErrorBoundary'
+import { TRPCErrorBoundary } from './StyledErrorBoundary'
 
 /**
  * Configuration for the routes of the v2-events feature.
@@ -36,12 +37,13 @@ import { StyledErrorBoundary } from './StyledErrorBoundary'
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
-    <TRPCProvider>
-      <Outlet />
-      <Debug />
-    </TRPCProvider>
+    <TRPCErrorBoundary>
+      <TRPCProvider>
+        <Outlet />
+        <Debug />
+      </TRPCProvider>
+    </TRPCErrorBoundary>
   ),
-  errorElement: <StyledErrorBoundary />,
   children: [
     workqueueRouter,
     {

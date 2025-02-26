@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
-// eslint-disable-next-line no-restricted-imports
+import React, { Component } from 'react'
 import * as Sentry from '@sentry/react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
+import { TRPCClientError } from '@trpc/client'
 import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Box } from '@opencrvs/components/lib/Box'
@@ -41,40 +40,88 @@ const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
 
-export const StyledErrorBoundary = () => {
-  const intl = useIntl()
-  const [authError, setAuthError] = useState(false)
+interface Props {
+  children: React.ReactNode
+}
+interface State {
+  error: Error | null
+}
 
-  const onError = (error: Error) => {
-    if (import.meta.env.MODE === 'test') {
-      // eslint-disable-next-line no-console
-      console.log(error)
-    }
-    setAuthError(error.message === '401')
+interface Props {
+  children: ReactNode
+}
+interface State {
+  error: Error | null
+}
+
+export class TRPCErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = { error: null }
   }
 
-  return (
-    <Sentry.ErrorBoundary showDialog={!development} onError={onError}>
-      <PageWrapper>
-        <ErrorContainer>
-          <ErrorTitle>
-            {authError &&
-              intl.formatMessage(errorMessages.errorCodeUnauthorized)}
-            {authError
-              ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
-              : intl.formatMessage(errorMessages.errorTitle)}
-          </ErrorTitle>
-          <ErrorMessage>
-            {intl.formatMessage(errorMessages.unknownErrorDescription)}
-          </ErrorMessage>
-          <TertiaryButton
-            id="GoToHomepage"
-            onClick={() => (window.location.href = '/')}
-          >
-            {intl.formatMessage(buttonMessages.goToHomepage)}
-          </TertiaryButton>
-        </ErrorContainer>
-      </PageWrapper>
-    </Sentry.ErrorBoundary>
-  )
+  static getDerivedStateFromError(error: Error) {
+    return { error }
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('TRPC Error Caught:', error)
+  }
+
+  render() {
+    const intl = { formatMessage: (message: any) => message.defaultMessage }
+    if (this.state.error) {
+      const error = this.state.error
+      let httpCode = 500
+      let message = 'Something went wrong.'
+
+      console.log(error, 'error')
+      if (error instanceof TRPCClientError) {
+        console.log('error.data', error.data)
+        httpCode = error.data?.httpStatus ?? 500
+        message = error.message
+      }
+
+      return (
+        <Sentry.ErrorBoundary
+          showDialog={!development}
+          onError={(error) => {
+            console.log(error)
+          }}
+        >
+          <PageWrapper>
+            <ErrorContainer>
+              {httpCode === 401 ? (
+                <>
+                  <ErrorTitle>
+                    {intl.formatMessage(errorMessages.errorTitleUnauthorized)}
+                  </ErrorTitle>
+                  <ErrorMessage>
+                    {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
+                  </ErrorMessage>
+                </>
+              ) : (
+                <>
+                  <ErrorTitle>
+                    {intl.formatMessage(errorMessages.errorTitle)}
+                  </ErrorTitle>
+                  <ErrorMessage>
+                    {intl.formatMessage(errorMessages.unknownErrorDescription)}
+                  </ErrorMessage>
+                </>
+              )}
+              <TertiaryButton
+                id="GoToHomepage"
+                onClick={() => (window.location.href = '/')}
+              >
+                {intl.formatMessage(buttonMessages.goToHomepage)}
+              </TertiaryButton>
+            </ErrorContainer>
+          </PageWrapper>
+        </Sentry.ErrorBoundary>
+      )
+    }
+
+    return this.props.children
+  }
 }
