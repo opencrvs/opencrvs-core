@@ -130,7 +130,7 @@ const confirmModalMessages = {
     register: {
       title: {
         id: 'v2.review.register.confirmModal.title',
-        defaultMessage: 'Register the birth?',
+        defaultMessage: 'Register?',
         description: 'The title for review action modal when registering'
       },
       description: {
