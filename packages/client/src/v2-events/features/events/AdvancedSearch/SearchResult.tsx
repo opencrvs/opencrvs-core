@@ -13,19 +13,23 @@ import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
+import { ErrorText } from '@opencrvs/components/lib'
 import {
+  EventSearchIndex,
   FieldConfig,
   FieldValue,
   validateFieldInput
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
-import { Workqueue } from '@opencrvs/components/lib/Workqueue'
+import { Workqueue, IColumn } from '@opencrvs/components/lib/Workqueue'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
+import { LoadingIndicator } from '@client/v2-events/components/LoadingIndicator'
+import { IconWithName } from '@client/v2-events/components/IconWithName'
 
 const SORT_ORDER = {
   ASCENDING: 'asc',
@@ -193,7 +197,12 @@ const messagesToDefine = {
     defaultMessage: 'No result',
     description:
       'Text to display if the search return no results for the current filters',
-    id: 'constants.noResults'
+    id: 'v2.constants.noResults'
+  },
+  queryError: {
+    defaultMessage: 'An error occurred while searching',
+    description: 'The error message shown when a search query fails',
+    id: 'v2.error.search'
   }
 }
 
@@ -223,10 +232,46 @@ export const SearchResult = (props: IProps) => {
   const allFields = getAllUniqueFields(eventConfiguration)
 
   validateEventSearchParams(allFields, searchParams)
-  const data = search({ ...searchParams, type: eventType })
-  const total = 20
-  const loading = false
+
+  const {
+    data: queryData,
+    isLoading,
+    error
+  } = search({
+    ...searchParams,
+    type: eventType
+  })
+
+  const total = queryData?.length || 0
   const searchText = 'searchText'
+
+  const onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      sortedCol,
+      sortOrder
+    )
+    setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
+  }
+
+  const transformData = (data: EventSearchIndex[]) => {
+    return data.map((doc) => {
+      // @todo get the name from the event data
+      const Name =
+        doc.data?.['applicant.firstname'] +
+        ' ' +
+        doc.data?.['applicant.surname']
+      const event = intl.formatMessage(eventConfiguration.label)
+      const dateOfEvent = new Date(doc.createdAt).toLocaleDateString()
+
+      return {
+        iconWithName: <IconWithName name={Name} />,
+        event,
+        dateOfEvent
+      }
+    })
+  }
 
   const getContentTableColumns = () => {
     if (windowWidth > theme.grid.breakpoints.lg) {
@@ -256,7 +301,7 @@ export const SearchResult = (props: IProps) => {
           key: COLUMNS.ACTIONS,
           isActionColumn: true
         }
-      ]
+      ] as IColumn[]
     } else {
       return [
         {
@@ -270,42 +315,46 @@ export const SearchResult = (props: IProps) => {
           key: COLUMNS.ACTIONS,
           isActionColumn: true
         }
-      ]
+      ] as IColumn[]
     }
   }
 
-  const onColumnClick = (columnName: string) => {
-    const { newSortedCol, newSortOrder } = changeSortedColumn(
-      columnName,
-      sortedCol,
-      sortOrder
+  let content
+  if (isLoading) {
+    content = (
+      <div id="advanced-search_loader">
+        <LoadingIndicator loading={true} />
+      </div>
     )
-    setSortedCol(newSortedCol)
-    setSortOrder(newSortOrder)
+  } else if (error) {
+    content = (
+      <ErrorText id="advanced-search-result-error-text">
+        {intl.formatMessage(messages.queryError)}
+      </ErrorText>
+    )
+  } else if (queryData && total > 0) {
+    content = (
+      <Workqueue
+        columns={getContentTableColumns()}
+        content={transformData(queryData)}
+        hideLastBorder={true}
+        noResultText={intl.formatMessage(messages.noResults)}
+      />
+    )
   }
-
   return (
     <div>
       <WQContentWrapper
         isMobileSize={false}
-        noContent={total < 1 && !loading}
+        noContent={total < 1 && !isLoading}
         noResultText={intl.formatMessage(messages.noResultFor, {
           param: searchText
         })}
         title={`${intl.formatMessage(messages.searchResult)} ${
-          loading ? '' : ' (' + total + ')'
+          isLoading ? '' : ' (' + total + ')'
         }`}
       >
-        {data.data && total > 0 && (
-          <>
-            <Workqueue
-              columns={getContentTableColumns()}
-              content={[{ name: 'ashik' }, { name: 'avi' }]}
-              hideLastBorder={true}
-              noResultText={intl.formatMessage(messages.noResults)}
-            />
-          </>
-        )}
+        {content}
       </WQContentWrapper>
     </div>
   )
