@@ -14,31 +14,34 @@ import styled from 'styled-components'
 import {
   FieldConfig,
   FieldValue,
+  isAddressFieldType,
+  isAdministrativeAreaFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
+  isEmailFieldType,
+  isFacilityFieldType,
   isFileFieldType,
-  isAdministrativeAreaFieldType,
+  isNumberFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
-  isAddressFieldType,
-  isTextFieldType,
-  isNumberFieldType
+  isTextFieldType
 } from '@opencrvs/commons/client'
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
   Address,
+  AdministrativeArea,
   Checkbox,
+  Date as DateField,
+  LocationSearch,
   RadioGroup,
   Select,
-  AdministrativeArea,
-  SelectCountry,
-  Date as DateField
+  SelectCountry
 } from '@client/v2-events/features/events/registered-fields'
 
 const Deleted = styled.del`
@@ -97,6 +100,10 @@ function ValueOutput(field: FieldWithValue) {
     return <Checkbox.Output value={field.value} />
   }
 
+  if (isEmailFieldType(field)) {
+    return <DefaultOutput value={field.value} />
+  }
+
   if (isAddressFieldType(field)) {
     return <Address.Output value={field.value} />
   }
@@ -114,17 +121,18 @@ function ValueOutput(field: FieldWithValue) {
   if (isDividerFieldType(field)) {
     return <DefaultOutput value={field.value} />
   }
+
+  if (isFacilityFieldType(field)) {
+    return <LocationSearch.Output value={field.value} />
+  }
 }
 
 function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
   return value?.toString() || ''
 }
 
+// @TODO: This only works for text fields, each components output function should handle the case for undefined value
 function getEmptyValueForFieldType(field: FieldWithValue) {
-  if (isAddressFieldType(field)) {
-    return {}
-  }
-
   return '-'
 }
 
@@ -161,6 +169,7 @@ export function Output({
       </>
     )
   }
+
   if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>

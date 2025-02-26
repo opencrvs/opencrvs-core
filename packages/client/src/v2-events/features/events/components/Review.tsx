@@ -18,6 +18,7 @@ import {
   ActionFormData,
   FieldConfig,
   FormConfig,
+  getFieldValidationErrors,
   isFileFieldType,
   isFileFieldWithOptionType,
   SCOPES
@@ -40,10 +41,21 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
 import { Output } from './Output'
+
+const ValidationError = styled.span`
+  color: ${({ theme }) => theme.colors.negative};
+  display: inline-block;
+  text-transform: lowercase;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+`
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -233,6 +245,7 @@ function ReviewComponent({
   eventConfig: EventConfig
   formConfig: FormConfig
   form: ActionFormData
+  metadata?: ActionFormData
   previousFormValues?: EventIndex['data']
   onEdit: ({
     pageId,
@@ -245,7 +258,6 @@ function ReviewComponent({
   }) => void
   title: string
   isUploadButtonVisible?: boolean
-  metadata?: ActionFormData
   onMetadataChange?: (values: ActionFormData) => void
 }) {
   const scopes = useSelector(getScope)
@@ -419,6 +431,18 @@ function ReviewComponent({
                               />
                             )
 
+                            const error = getFieldValidationErrors({
+                              field,
+                              values: form
+                            })
+
+                            const errorDisplay =
+                              error.errors.length > 0 ? (
+                                <ValidationError key={field.id}>
+                                  {intl.formatMessage(error.errors[0].message)}
+                                </ValidationError>
+                              ) : null
+
                             return (
                               <ListReview.Row
                                 key={field.id}
@@ -440,7 +464,11 @@ function ReviewComponent({
                                 }
                                 id={field.id}
                                 label={intl.formatMessage(field.label)}
-                                value={valueDisplay}
+                                value={
+                                  error.errors.length > 0
+                                    ? errorDisplay
+                                    : valueDisplay
+                                }
                               />
                             )
                           })}
@@ -562,32 +590,57 @@ const ActionContainer = styled.div`
     margin-bottom: 8px;
   }
 `
+const incompleteFormWarning: MessageDescriptor = {
+  id: 'v2.reviewAction.incompleteForm',
+  defaultMessage:
+    'Please add mandatory information correctly before registering.',
+  description: 'The label for warning of incomplete form'
+}
 
-function PreviewActionComponent({
+function ReviewActionComponent({
   onConfirm,
+  formConfig,
+  form,
+  metadata,
   onReject,
-  messages
+  messages,
+  primaryButtonType
 }: {
   onConfirm: () => void
   onReject?: () => void
+  formConfig: FormConfig
+  form: ActionFormData
+  metadata?: ActionFormData
   messages: {
     title: MessageDescriptor
     description: MessageDescriptor
     onConfirm: MessageDescriptor
   }
+  primaryButtonType?: 'positive' | 'primary'
 }) {
   const intl = useIntl()
+  const errorExist = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+  const background = errorExist ? 'error' : 'success'
+  const descriptionMessage = errorExist
+    ? incompleteFormWarning
+    : messages.description
+
   return (
     <Container>
-      <UnderLayBackground background="success">
+      <UnderLayBackground background={background}>
         <Content>
           <Title>{intl.formatMessage(messages.title)}</Title>
-          <Description>{intl.formatMessage(messages.description)}</Description>
+          <Description>{intl.formatMessage(descriptionMessage)}</Description>
           <ActionContainer>
             <Button
+              disabled={errorExist}
               id="validateDeclarationBtn"
               size="large"
-              type="positive"
+              type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
               <Icon name="Check" />
@@ -662,8 +715,8 @@ function ActionModal({
   action
 }: {
   copy?: {
-    cancel?: MessageDescriptor
-    primaryAction?: MessageDescriptor
+    onCancel?: MessageDescriptor
+    onConfirm?: MessageDescriptor
     title?: MessageDescriptor
     description?: MessageDescriptor
   }
@@ -683,7 +736,9 @@ function ActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(copy?.cancel || reviewMessages.actionModalCancel)}
+          {intl.formatMessage(
+            copy?.onCancel || reviewMessages.actionModalCancel
+          )}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -694,7 +749,7 @@ function ActionModal({
           }}
         >
           {intl.formatMessage(
-            copy?.primaryAction || reviewMessages.actionModalPrimaryAction,
+            copy?.onConfirm || reviewMessages.actionModalPrimaryAction,
             {
               action
             }
@@ -722,7 +777,7 @@ function ActionModal({
 
 export const Review = {
   Body: ReviewComponent,
-  Actions: PreviewActionComponent,
+  Actions: ReviewActionComponent,
   EditModal: EditModal,
   ActionModal: ActionModal
 }

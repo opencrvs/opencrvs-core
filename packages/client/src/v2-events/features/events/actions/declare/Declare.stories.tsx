@@ -11,13 +11,14 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { userEvent, within, expect } from '@storybook/test'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
-import * as Request from './index'
+import { Pages } from './index'
 
-const meta: Meta<typeof Request.Pages> = {
+const meta: Meta<typeof Pages> = {
   title: 'Declare',
   beforeEach: () => {
     useEventFormData.getState().clear()
@@ -26,7 +27,7 @@ const meta: Meta<typeof Request.Pages> = {
 
 export default meta
 
-type Story = StoryObj<typeof Request.Pages>
+type Story = StoryObj<typeof Pages>
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -36,12 +37,20 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+// Use an undeclared draft event for tests
+const undeclaredDraftEvent = {
+  ...tennisClueMembershipEventDocument,
+  actions: tennisClueMembershipEventDocument.actions.filter(
+    ({ type }) => type === 'CREATE'
+  )
+}
+
 export const Page: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
+        eventId: undeclaredDraftEvent.id,
         pageId: 'applicant'
       })
     },
@@ -49,26 +58,66 @@ export const Page: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return undeclaredDraftEvent
           })
         ]
       }
     }
   }
 }
-export const Review: Story = {
+
+export const FilledPagesVisibleInReview: Story = {
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText(/Who is applying for the membership?/)
+
+    await expect(
+      await canvas.findByTestId('event-menu-toggle-button-image')
+    ).toBeInTheDocument()
+
+    await step('Fill the applicant details', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____firstname'),
+        'John'
+      )
+
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____surname'),
+        'Doe'
+      )
+
+      const continueButton = await canvas.findByText('Continue')
+      await userEvent.click(continueButton)
+      await userEvent.click(continueButton)
+    })
+
+    await step('Verify that filled pages are visible in review', async () => {
+      const applicantFirstNameRow = await canvas.findByText(
+        "Applicant's first name"
+      )
+      await expect(applicantFirstNameRow).toBeInTheDocument()
+      const applicantFirstNameCell = applicantFirstNameRow.nextElementSibling
+      await expect(applicantFirstNameCell).toHaveTextContent('John')
+
+      const applicantSurnameRow = await canvas.findByText("Applicant's surname")
+      const applicantSurnameCell = applicantSurnameRow.nextElementSibling
+      await expect(applicantSurnameCell).toHaveTextContent('Doe')
+    })
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
       })
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return undeclaredDraftEvent
           })
         ]
       }
