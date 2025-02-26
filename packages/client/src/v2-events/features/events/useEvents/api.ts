@@ -8,10 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MutationObserverOptions, OmitKeyof } from '@tanstack/react-query'
+import {
+  MutationObserverOptions,
+  OmitKeyof,
+  QueryFunctionContext
+} from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import {
   DecorateMutationProcedure,
+  DecorateQueryProcedure,
   inferInput,
   inferOutput
 } from '@trpc/tanstack-react-query'
@@ -38,6 +43,19 @@ export async function invalidateEventsList() {
   })
 }
 
+/**
+ * Sets the default options for a mutation procedure.
+ *
+ * This function should be the primary method of changing settings for mutations
+ * because it ensures that mutations stored in IndexedDB for later processing
+ * after the application has reloaded can use the same settings without running
+ * the same code paths again.
+ *
+ * @template P - The type of the mutation procedure e.g. trpc.events.get.
+ * @template Context - The type of the context, defaults to `any`.
+ * @param {P} mutation - The mutation procedure to set defaults for.
+ * @param {OmitKeyof<MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>, Context>, 'mutationKey'>} options - The options to set as defaults, excluding the `mutationKey`.
+ */
 export function setMutationDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   P extends DecorateMutationProcedure<any>,
@@ -55,6 +73,28 @@ export function setMutationDefaults<
     ...trpcOptions,
     ...options
   })
+}
+
+export type TRPCQueryKey<T> = [readonly string[], { input: T }]
+
+export function setQueryDefaults<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  P extends DecorateQueryProcedure<any>
+>(
+  query: P,
+  options: Omit<
+    Parameters<typeof queryClient.setQueryDefaults>[1],
+    'queryFn'
+  > & {
+    queryFn: (
+      input: QueryFunctionContext<TRPCQueryKey<inferInput<P>>>
+    ) => inferOutput<P> | Promise<inferOutput<P>>
+  }
+) {
+  queryClient.setQueryDefaults(
+    query.queryKey(),
+    options as Parameters<typeof queryClient.setQueryDefaults>[1]
+  )
 }
 
 type TRPCError = TRPCClientError<AppRouter>

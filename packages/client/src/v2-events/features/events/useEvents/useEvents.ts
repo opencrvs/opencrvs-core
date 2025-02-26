@@ -23,9 +23,10 @@ import {
   EventIndex,
   getEventConfiguration
 } from '@opencrvs/commons/client'
-import { cacheFiles } from '@client/v2-events/features/files/cache'
-import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { cacheFiles } from '@client/v2-events/features/files/cache'
+import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
+import { setQueryDefaults } from './api'
 import { useEventAction } from './procedures/action'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
@@ -76,45 +77,39 @@ function filterOutboxEventsWithMutation<
  * This ensures the full record can be browsed even when the user goes offline
  */
 
-type GetEventQueryOptions = ReturnType<
-  typeof useTRPC
->['event']['get']['queryOptions']
-type QueryOptions = ReturnType<GetEventQueryOptions>
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyFn = (...args: any[]) => any
-type QueryFnParams = Parameters<Extract<QueryOptions['queryFn'], AnyFn>>
-
-function precacheAttachments<T extends QueryOptions>(queryOptions: T) {
-  return {
-    ...queryOptions,
-    queryFn: async (...params: QueryFnParams) => {
-      const { meta } = params[0]
-      if (!meta) {
-        throw new Error(
-          'api.event.get was called without passing mandatory event configuration'
-        )
-      }
-
-      if (typeof queryOptions.queryFn !== 'function') {
-        throw new Error('queryFn is not a function')
-      }
-      /*
-       * This is a query directly to the tRPC server
-       */
-      const response = await queryOptions.queryFn(...params)
-
-      const eventDocument = EventDocument.parse(response)
-
-      const eventConfig = getEventConfiguration(
-        meta.eventConfig as EventConfig[],
-        eventDocument.type
+setQueryDefaults(utils.event.get, {
+  queryFn: async (...params) => {
+    const {
+      meta,
+      queryKey: [, input]
+    } = params[0]
+    if (!meta) {
+      throw new Error(
+        'api.event.get was called without passing mandatory event configuration'
       )
-
-      await cacheFiles(eventDocument, eventConfig)
-      return eventDocument
     }
+
+    const queryOptions = utils.event.get.queryOptions(input.input)
+
+    if (typeof queryOptions.queryFn !== 'function') {
+      throw new Error('queryFn is not a function')
+    }
+    /*
+     * This is a query directly to the tRPC server
+     */
+    const response = await queryOptions.queryFn(...params)
+
+    const eventDocument = EventDocument.parse(response)
+
+    const eventConfig = getEventConfiguration(
+      meta.eventConfig as EventConfig[],
+      eventDocument.type
+    )
+
+    await cacheFiles(eventDocument, eventConfig)
+    return eventDocument
   }
-}
+})
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -168,30 +163,30 @@ export function useEvents() {
     getEvent: {
       useQuery: (id: string) => {
         const eventConfig = useEventConfigurations()
+        // Skip the queryFn defined by tRPC and use our own default defined above
+        const { queryFn, ...options } = trpc.event.get.queryOptions(id)
 
-        return useQuery(
-          precacheAttachments({
-            ...trpc.event.get.queryOptions(id),
+        return useQuery({
+          ...options,
+          queryKey: trpc.event.get.queryKey(id),
+          meta: {
+            eventConfig
+          }
+        })
+      },
+      useSuspenseQuery: (id: string) => {
+        const eventConfig = useEventConfigurations()
+        // Skip the queryFn defined by tRPC and use our own default defined above
+        const { queryFn, ...options } = trpc.event.get.queryOptions(id)
+
+        return [
+          useSuspenseQuery({
+            ...options,
             queryKey: trpc.event.get.queryKey(id),
             meta: {
               eventConfig
             }
-          })
-        )
-      },
-      useSuspenseQuery: (id: string) => {
-        const eventConfig = useEventConfigurations()
-
-        return [
-          useSuspenseQuery(
-            precacheAttachments({
-              ...trpc.event.get.queryOptions(id),
-              queryKey: trpc.event.get.queryKey(id),
-              meta: {
-                eventConfig
-              }
-            })
-          ).data
+          }).data
         ]
       }
     },
