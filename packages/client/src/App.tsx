@@ -519,7 +519,11 @@ export function App({ client, store, router }: IAppProps) {
           <I18nContainer>
             <ThemeProvider theme={getTheme()}>
               <StyledErrorBoundary>
-                <RouterProvider router={router} />
+                <RouterProvider
+                  router={router}
+                  // v7_startTransition used to be true for a moment, but it changed the routing and broke some farajaland e2e tests (and possibly changed actual functionality as well).
+                  future={{ v7_startTransition: false }}
+                />
               </StyledErrorBoundary>
             </ThemeProvider>
           </I18nContainer>
