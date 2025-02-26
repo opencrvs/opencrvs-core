@@ -75,7 +75,7 @@ export function setMutationDefaults<
   })
 }
 
-export type TRPCQueryKey<T> = [readonly string[], { input: T }]
+type TRPCQueryKey<T> = [readonly string[], { input: T }]
 
 export function setQueryDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

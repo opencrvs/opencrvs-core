@@ -15,16 +15,15 @@ import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
-import * as Register from '@client/v2-events/features/events/actions/register'
 import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
+import * as Register from '@client/v2-events/features/events/actions/register'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
+import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
-import { ErrorBoundary } from '@client/components/ErrorBoundary'
 import { ROUTES } from './routes'
 
 /**
@@ -66,7 +65,6 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
       element: <Outlet />,
-      errorElement: <h1>error</h1>,
       children: [
         {
           index: true,

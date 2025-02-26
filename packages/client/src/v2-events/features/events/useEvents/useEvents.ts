@@ -19,8 +19,7 @@ import {
 import {
   DecorateMutationProcedure,
   inferInput,
-  inferOutput,
-  TRPCMutationOptions
+  inferOutput
 } from '@trpc/tanstack-react-query'
 import {
   EventConfig,
@@ -38,13 +37,13 @@ import { useDeleteEvent } from './procedures/delete'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getPendingMutations<T extends DecorateMutationProcedure<any>>(
-  mutation: T
+  procedure: T
 ) {
   // type MutationFn = Exclude<T['mutationFn'], undefined>
   type Data = inferOutput<T>
   type Variables = inferInput<T>
 
-  const mutationOptions = mutation.mutationOptions()
+  const mutationOptions = procedure.mutationOptions()
   const key = mutationOptions.mutationKey
 
   return queryClient
