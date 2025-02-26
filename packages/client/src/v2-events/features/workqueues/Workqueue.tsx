@@ -10,7 +10,7 @@
  */
 
 import React, { useState } from 'react'
-import { mapKeys, orderBy } from 'lodash'
+import { orderBy } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
@@ -22,7 +22,6 @@ import {
   defaultColumns,
   EventConfig,
   EventIndex,
-  getAllFields,
   getOrThrow,
   RootWorkqueueConfig,
   workqueues
@@ -44,7 +43,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 
 import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
 import {
   flattenEventIndex,
   getFieldsWithPopulatedValues,
@@ -107,7 +105,7 @@ function changeSortedColumn(
   }
 }
 
-function WorkqueueContainer() {
+export function WorkqueueContainer() {
   // @TODO: We need to revisit on how the workqueue id is passed.
   // We'll follow up during 'workqueue' feature.
   const workqueueId = 'all'
@@ -355,5 +353,3 @@ function Workqueue({
     </WQContentWrapper>
   )
 }
-
-export const WorkqueueIndex = withSuspense(WorkqueueContainer)

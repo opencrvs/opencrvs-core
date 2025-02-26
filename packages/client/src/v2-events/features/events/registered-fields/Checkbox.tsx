@@ -39,7 +39,8 @@ function CheckboxInput({
 }
 
 function CheckboxOutput({ value }: { value?: boolean }) {
-  return value ? 'Yes' : 'No'
+  // We explicity check for boolean true, so that e.g. string values are not interpreted as true
+  return value === true ? 'Yes' : 'No'
 }
 
 export const Checkbox = {

@@ -100,3 +100,35 @@ export const TextOutputWithPreviousValue: Story = {
     }
   }
 }
+
+export const CheckboxOutput: Story = {
+  args: {
+    value: true,
+    previousValue: true,
+    field: {
+      type: FieldType.CHECKBOX,
+      id: 'recommender.none',
+      label: {
+        id: 'recommender.none',
+        defaultMessage: 'No recommender',
+        description: 'No recommender'
+      }
+    }
+  }
+}
+
+export const CheckboxOutputWithUndefinedPreviousValue: Story = {
+  args: {
+    value: true,
+    previousValue: undefined,
+    field: {
+      type: FieldType.CHECKBOX,
+      id: 'recommender.none',
+      label: {
+        id: 'recommender.none',
+        defaultMessage: 'No recommender',
+        description: 'No recommender'
+      }
+    }
+  }
+}

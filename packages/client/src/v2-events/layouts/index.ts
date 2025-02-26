@@ -8,7 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { WorkqueueLayout } from './workqueues'
+import { EventOverviewLayout } from './eventOverview'
+import { FormLayout } from './form'
 
-export * from './form'
-export * from './workqueues'
-export * from './eventOverview'
+const SuspendedWorkqueueLayout = withSuspense(WorkqueueLayout)
+const SuspendedFormLayout = withSuspense(FormLayout)
+const SuspendedEventOverviewLayout = withSuspense(EventOverviewLayout)
+
+export {
+  SuspendedWorkqueueLayout as WorkqueueLayout,
+  SuspendedFormLayout as FormLayout,
+  SuspendedEventOverviewLayout as EventOverviewLayout
+}
