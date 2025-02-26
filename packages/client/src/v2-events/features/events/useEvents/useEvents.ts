@@ -21,10 +21,6 @@ import { useGetEvent } from './procedures/get'
 
 export function useEvents() {
   const trpc = useTRPC()
-  const eventListQuery = useQuery({
-    ...trpc.event.list.queryOptions(),
-    queryKey: trpc.event.list.queryKey()
-  })
 
   function getDrafts(): EventDocument[] {
     const queries = queryClient.getQueriesData<EventDocument>({
@@ -42,7 +38,10 @@ export function useEvents() {
     createEvent: useCreateEvent,
     getEvent: useGetEvent(),
     getEvents: {
-      useQuery: () => eventListQuery,
+      useQuery: useQuery({
+        ...trpc.event.list.queryOptions(),
+        queryKey: trpc.event.list.queryKey()
+      }),
       useSuspenseQuery: () => [
         useSuspenseQuery({
           ...trpc.event.list.queryOptions(),
