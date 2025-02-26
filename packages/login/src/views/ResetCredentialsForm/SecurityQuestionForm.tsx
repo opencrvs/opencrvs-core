@@ -26,7 +26,6 @@ import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { constantsMessages } from '@login/i18n/messages/constants'
-import { RouteComponentProps, withRouter } from '@login/common/WithRouterProps'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
 
@@ -118,7 +117,9 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
       }
       if (location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME) {
         await authApi.sendUserName(location.state.nonce)
-        return navigate(routes.SUCCESS, { state: location.state.forgottenItem })
+        return navigate(routes.SUCCESS, {
+          state: { forgottenItem: location.state.forgottenItem }
+        })
       }
 
       navigate(routes.UPDATE_PASSWORD, { state: { nonce: result.nonce } })

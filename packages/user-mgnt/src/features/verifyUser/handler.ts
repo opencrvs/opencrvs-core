@@ -8,6 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { fetchJSON, joinURL, Roles } from '@opencrvs/commons'
+import { env } from '@user-mgnt/environment'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized, conflict, badRequest } from '@hapi/boom'
@@ -29,6 +31,7 @@ interface IVerifyPayload {
 interface IVerifyResponse {
   name: IUserName[]
   mobile?: string
+  scope: string[]
   status: string
   securityQuestionKey: string
   id: string
@@ -67,12 +70,17 @@ export default async function verifyUserHandler(
     throw conflict("User doesn't have security questions")
   }
 
+  const roles = await fetchJSON<Roles>(
+    joinURL(env.COUNTRY_CONFIG_URL, '/roles')
+  )
+
   const response: IVerifyResponse = {
     name: user.name,
     mobile: user.mobile,
     status: user.status,
     securityQuestionKey: getRandomQuestionKey(user.securityQuestionAnswers),
     id: user.id,
+    scope: roles.find((role) => role.id === user.role)?.scopes || [],
     username: user.username,
     email: user.emailForNotification,
     practitionerId: user.practitionerId
@@ -109,6 +117,7 @@ export const responseSchema = Joi.object({
   ),
   mobile: Joi.string(),
   email: Joi.string(),
+  scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   securityQuestionKey: Joi.string(),
   id: Joi.string(),
