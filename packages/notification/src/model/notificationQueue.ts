@@ -18,6 +18,7 @@ const errorSchema = {
 const notificationQueueSchema = new Schema({
   subject: { type: String, required: true },
   body: { type: String, required: true },
+  recipientEmail: { type: String },
   bcc: { type: [String], required: true },
   status: {
     type: String,
