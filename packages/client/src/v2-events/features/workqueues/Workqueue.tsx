@@ -43,9 +43,13 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 import { formattedDuration } from '@client/utils/date-formatting'
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import {
+  flattenEventIndex,
+  getFieldsWithPopulatedValues,
+  getTitle
+} from '@client/v2-events/utils'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
@@ -175,13 +179,8 @@ function Workqueue({
   }
 
   const workqueue = validEvents
-    .map((event) => {
-      const { data, ...rest } = event
-      return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
-    })
     .filter((event) => eventConfigs.some((e) => e.id === event.type))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((event: Omit<EventIndex, 'data'> & { [key: string]: any }) => {
+    .map((event) => {
       /** We already filtered invalid events, this should never happen. */
       const eventConfig = getOrThrow(
         eventConfigs.find((e) => e.id === event.type),
@@ -203,46 +202,42 @@ function Workqueue({
         return event.status
       }
 
-      const allPropertiesWithEmptyValues = setEmptyValuesForFields(
-        getAllFields(eventConfig)
-      )
-
       const eventWorkqueue = getOrThrow(
         eventConfig.workqueues.find((wq) => wq.id === workqueueConfig.id),
         `Could not find workqueue config for ${workqueueConfig.id}`
       )
 
-      const fieldsWithPopulatedValues: Record<string, string> =
-        eventWorkqueue.fields.reduce(
-          (acc, field) => ({
-            ...acc,
-            [field.column]: flattenedIntl.formatMessage(field.label, {
-              ...allPropertiesWithEmptyValues,
-              ...event
-            })
-          }),
-          {}
-        )
+      const fieldsWithPopulatedValues = getFieldsWithPopulatedValues({
+        event,
+        workqueue: eventWorkqueue,
+        intl: flattenedIntl,
+        eventConfig
+      })
 
       const titleColumnId = workqueueConfig.columns[0].id
 
+      const title = getTitle({
+        event,
+        eventConfig,
+        workqueue: eventWorkqueue,
+        intl: flattenedIntl,
+        titleColumn: titleColumnId
+      })
+
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
-          <IconWithName
-            name={fieldsWithPopulatedValues[titleColumnId]}
-            status={'OUTBOX'}
-          />
+          <IconWithName name={title} status={'OUTBOX'} />
         ) : (
           <IconWithNameEvent
             event={intl.formatMessage(eventConfig.label)}
-            name={fieldsWithPopulatedValues[titleColumnId]}
+            name={title}
             status={'OUTBOX'}
           />
         )
 
       return {
         ...fieldsWithPopulatedValues,
-        ...event,
+        ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
         modifiedAt: formattedDuration(new Date(event.modifiedAt)),
