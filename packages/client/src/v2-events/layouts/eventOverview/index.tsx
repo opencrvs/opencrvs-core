@@ -14,6 +14,7 @@ import React from 'react'
 import { noop } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { useIntl, defineMessages } from 'react-intl'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   AppBar,
   Button,
@@ -24,11 +25,15 @@ import {
   Stack
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { workqueues } from '@opencrvs/commons/client'
+import { getOrThrow } from '@opencrvs/commons/client'
+import { BackArrow } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { Hamburger } from '@client/components/Header/Hamburger'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { getTitle } from '@client/v2-events/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -43,13 +48,31 @@ const messagesToDefine = {
 }
 const messages = defineMessages(messagesToDefine)
 
-export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
+export function EventOverviewLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const { getEvents } = useEvents()
+  const [events] = getEvents.useSuspenseQuery()
+  const event = getOrThrow(
+    events.find(({ id }) => id === eventId),
+    `Could not find event for ${eventId}`
+  )
+
+  const allEvents = useEventConfigurations()
+  const eventConfig = getOrThrow(
+    allEvents.find(({ id }) => id === event.type),
+    `Could not find event config for ${event.type}`
+  )
+
   const navigate = useNavigate()
   const intl = useIntl()
-  const allEvents = useEventConfigurations()
+  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
 
   const advancedSearchEvents = allEvents.filter(
-    (event) => event.advancedSearch.length > 0
+    (e) => e.advancedSearch.length > 0
   )
 
   const advancedSearchNavigationList: INavigationType[] = [
@@ -97,20 +120,13 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
             </Stack>
           }
           desktopRight={<ProfileMenu key="profileMenu" />}
-          mobileLeft={<Hamburger />}
-          mobileRight={
-            <Button
-              type={'icon'}
-              onClick={() => navigate(ROUTES.V2.SEARCH.path)}
-            >
-              <Icon color="primary" name="MagnifyingGlass" size="medium" />
+          mobileLeft={
+            <Button type={'icon'} onClick={() => navigate(-1)}>
+              <BackArrow />
             </Button>
           }
-          /**
-           * We need to revisit on how the workqueue is picked
-           * during 'workqueue' feature.
-           */
-          mobileTitle={intl.formatMessage(workqueues.all.title)}
+          mobileRight={<ActionMenu eventId={eventId} />}
+          mobileTitle={getTitle({ event, eventConfig, intl: flattenedIntl })}
         />
       }
       skipToContentText="skip"
