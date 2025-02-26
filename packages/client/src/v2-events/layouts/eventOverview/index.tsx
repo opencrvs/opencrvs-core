@@ -33,6 +33,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { getTitle } from '@client/v2-events/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -124,14 +125,7 @@ export function EventOverviewLayout({
               <BackArrow />
             </Button>
           }
-          mobileRight={
-            <Button
-              type={'icon'}
-              onClick={() => navigate(ROUTES.V2.SEARCH.path)}
-            >
-              <Icon color="primary" name="MagnifyingGlass" size="medium" />
-            </Button>
-          }
+          mobileRight={<ActionMenu eventId={eventId} />}
           mobileTitle={getTitle({ event, eventConfig, intl: flattenedIntl })}
         />
       }
