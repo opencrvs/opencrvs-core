@@ -106,6 +106,10 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               <Icon color="primary" name="MagnifyingGlass" size="medium" />
             </Button>
           }
+          /**
+           * We need to revisit on how the workqueue is picked
+           * during 'workqueue' feature.
+           */
           mobileTitle={intl.formatMessage(workqueues.all.title)}
         />
       }
