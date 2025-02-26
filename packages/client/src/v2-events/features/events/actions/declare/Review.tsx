@@ -14,6 +14,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useSelector } from 'react-redux'
 import {
   Button,
   Checkbox,
@@ -22,7 +23,14 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionFormData,
+  ActionType,
+  findActiveActionForm,
+  FormConfig,
+  Scope,
+  SCOPES
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -31,30 +39,14 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 
-const messages = defineMessages({
-  reviewActionTitle: {
-    id: 'v2.reviewAction.title',
-    defaultMessage: 'Declare event',
-    description: 'The title for review action'
-  },
-  reviewActionDescription: {
-    id: 'v2.reviewAction.description',
-    defaultMessage:
-      'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
-    description: 'The description for review action'
-  },
-  reviewActionDeclare: {
-    id: 'v2.reviewAction.Declare',
-    defaultMessage: 'Declare',
-    description: 'The label for declare button of review action'
-  },
-  reviewActionReject: {
-    id: 'v2.reviewAction.reject',
-    defaultMessage: 'Reject',
-    description: 'The label for reject button of review action'
-  },
+// eslint-disable-next-line no-restricted-imports
+import { getScope } from '@client/profile/profileSelectors'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+
+const modalMessages = defineMessages({
   rejectModalCancel: {
     id: 'v2.rejectModal.cancel',
     defaultMessage: 'Cancel',
@@ -88,6 +80,171 @@ const messages = defineMessages({
   }
 })
 
+const registerMessages = {
+  title: {
+    id: 'v2.review.register.title',
+    defaultMessage: 'Register event',
+    description: 'The title shown when reviewing a record to register'
+  },
+  onConfirm: {
+    id: 'v2.review.register.confirm',
+    defaultMessage: 'Register',
+    description: 'The label for register button of review action'
+  }
+}
+
+const validateMessages = {
+  title: {
+    id: 'v2.review.validate.title',
+    defaultMessage: 'Send for approval',
+    description: 'The title shown when reviewing a record to validate'
+  },
+  onConfirm: {
+    id: 'v2.review.validate.confirm',
+    defaultMessage: 'Send for approval',
+    description: 'The label for review action button when validating'
+  }
+}
+
+const declareMessages = {
+  onConfirm: {
+    id: 'v2.review.declare.confirm',
+    defaultMessage: 'Send for review',
+    description: 'The label for review action button when declaring'
+  }
+}
+
+const reviewMessages = {
+  complete: {
+    register: {
+      title: registerMessages.title,
+      description: {
+        id: 'v2.review.register.description.complete',
+        defaultMessage:
+          'By clicking register, you confirm that the information entered is correct and the event can be registered.',
+        description:
+          'The description for registration action when form is complete'
+      },
+      onConfirm: registerMessages.onConfirm
+    },
+    validate: {
+      title: validateMessages.title,
+      description: {
+        id: 'v2.review.validate.description.complete',
+        defaultMessage:
+          'The informant will receive an email with a registration number that they can use to collect the certificate',
+        description: 'The description for validate action when form is complete'
+      },
+      onConfirm: validateMessages.onConfirm
+    },
+    declare: {
+      title: {
+        id: 'v2.review.declare.title.complete',
+        defaultMessage: 'Declaration complete',
+        description:
+          'The title shown when reviewing an incomplete record to declare'
+      },
+      description: {
+        id: 'v2.review.declare.description.complete',
+        defaultMessage:
+          'The informant will receive an email with a registration number that they can use to collect the certificate',
+        description: 'The description for declare action when form is complete'
+      },
+      onConfirm: declareMessages.onConfirm
+    }
+  },
+  incomplete: {
+    register: {
+      title: registerMessages.title,
+      description: {
+        id: 'v2.reviewAction.register.description.incomplete',
+        defaultMessage: 'Please add mandatory information before registering',
+        description:
+          'The description for registration action when form is incomplete'
+      },
+      onConfirm: registerMessages.onConfirm
+    },
+    validate: {
+      title: validateMessages.title,
+      description: {
+        id: 'v2.review.validate.description.incomplete',
+        defaultMessage:
+          'Please add mandatory information before sending for approval',
+        description: 'The description for validate action when form is complete'
+      },
+      onConfirm: validateMessages.onConfirm
+    },
+    declare: {
+      title: {
+        id: 'v2.review.declare.title.incomplete',
+        defaultMessage: 'Declaration incomplete',
+        description:
+          'The title shown when reviewing an incomplete record to declare'
+      },
+      description: {
+        id: 'v2.review.declare.description.complete',
+        defaultMessage:
+          'The informant will receive an email with a tracking ID that they can use to provide the additional mandatory information required for registration',
+        description: 'The description for declare action when form is complete'
+      },
+      onConfirm: declareMessages.onConfirm
+    }
+  }
+}
+function getReviewActionConfig({
+  formConfig,
+  form,
+  metadata,
+  scopes
+}: {
+  formConfig: FormConfig
+  form: ActionFormData
+  metadata?: ActionFormData
+  scopes?: Scope[]
+}) {
+  const incomplete = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
+  const isDisabled = incomplete
+    ? !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
+    : false
+
+  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
+    return {
+      incomplete,
+      isDisabled,
+      messages: incomplete
+        ? reviewMessages.incomplete.register
+        : reviewMessages.complete.register
+    }
+  }
+
+  if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+    return {
+      incomplete,
+      isDisabled,
+      messages: incomplete
+        ? reviewMessages.incomplete.validate
+        : reviewMessages.complete.validate
+    }
+  }
+
+  if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
+    return {
+      incomplete,
+      isDisabled,
+      messages: incomplete
+        ? reviewMessages.incomplete.declare
+        : reviewMessages.complete.declare
+    }
+  }
+
+  throw new Error('No valid scope found for the action')
+}
+
 // eslint-disable-next-line no-shadow
 enum REJECT_ACTIONS {
   ARCHIVE,
@@ -119,8 +276,18 @@ export function Review() {
   }
 
   const form = useEventFormData((state) => state.formValues)
+
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(eventId, {})
+
+  const scopes = useSelector(getScope) ?? undefined
+
+  const reviewActionConfiguration = getReviewActionConfig({
+    formConfig,
+    form,
+    metadata,
+    scopes
+  })
 
   async function handleEdit({
     pageId,
@@ -219,11 +386,7 @@ export function Review() {
         <ReviewComponent.Actions
           form={form}
           formConfig={formConfig}
-          messages={{
-            title: messages.reviewActionTitle,
-            description: messages.reviewActionDescription,
-            onConfirm: messages.reviewActionDeclare
-          }}
+          messages={reviewActionConfiguration.messages}
           metadata={metadata}
           onConfirm={handleDeclaration}
           onReject={handleReject}
@@ -259,7 +422,7 @@ function RejectModal({
             close(null)
           }}
         >
-          {intl.formatMessage(messages.rejectModalCancel)}
+          {intl.formatMessage(modalMessages.rejectModalCancel)}
         </Button>,
         <Button
           key="confirm_reject_with_archive"
@@ -272,7 +435,7 @@ function RejectModal({
             })
           }}
         >
-          {intl.formatMessage(messages.rejectModalArchive)}
+          {intl.formatMessage(modalMessages.rejectModalArchive)}
         </Button>,
         <Button
           key="confirm_reject_with_update"
@@ -285,17 +448,17 @@ function RejectModal({
             })
           }}
         >
-          {intl.formatMessage(messages.rejectModalSendForUpdate)}
+          {intl.formatMessage(modalMessages.rejectModalSendForUpdate)}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(messages.rejectModalTitle)}
+      title={intl.formatMessage(modalMessages.rejectModalTitle)}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(messages.rejectModalDescription)}
+          {intl.formatMessage(modalMessages.rejectModalDescription)}
         </Text>
         <TextInput
           required={true}
@@ -305,7 +468,7 @@ function RejectModal({
           }
         />
         <Checkbox
-          label={intl.formatMessage(messages.rejectModalMarkAsDuplicate)}
+          label={intl.formatMessage(modalMessages.rejectModalMarkAsDuplicate)}
           name={'markDUplicate'}
           selected={state.isDuplicate}
           value={''}
@@ -317,3 +480,5 @@ function RejectModal({
     </ResponsiveModal>
   )
 }
+
+export const ReviewIndex = withSuspense(Review)

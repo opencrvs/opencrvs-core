@@ -151,8 +151,7 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
         residentialArea: 'Example Residential Area',
         street: 'Example Street',
         number: '55',
-        zipCode: '123456',
-        village: 'Example Village'
+        zipCode: '123456'
       }
     case FieldType.DATE:
       return '2021-01-01'
