@@ -9,9 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Pages } from './Pages'
 import { Review } from './Review'
-import { OnboardingIndex as Onboarding } from './Onboarding/Onboarding'
+import { Onboarding } from './Onboarding/Onboarding'
 import { Summary } from './Summary/Summary'
 import { AdditionalDetails } from './AdditionalDetails/AdditionalDetails'
-export { Pages, Review, Onboarding, Summary, AdditionalDetails }
+
+const PagesIndex = withSuspense(Pages)
+const OnboardingIndex = withSuspense(Onboarding)
+const SummaryIndex = withSuspense(Summary)
+const ReviewIndex = withSuspense(Review)
+const AdditionalDetailsIndex = withSuspense(AdditionalDetails)
+
+export {
+  PagesIndex as Pages,
+  ReviewIndex as Review,
+  OnboardingIndex as Onboarding,
+  SummaryIndex as Summary,
+  AdditionalDetailsIndex as AdditionalDetails
+}
