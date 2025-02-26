@@ -42,6 +42,7 @@ function getPendingMutations(
 function filterOutboxEventsWithMutation<
   T extends
     | typeof api.event.create
+    | typeof api.event.actions.validate
     | typeof api.event.actions.declare
     | typeof api.event.actions.register
 >(
@@ -147,7 +148,7 @@ export function useEvents() {
 
     const eventFromValidateActions = filterOutboxEventsWithMutation(
       eventsList,
-      trpc.event.actions.validate.mutationOptions(undefined),
+      api.event.actions.validate,
       (event, parameters) => {
         return event.id === parameters.eventId && !parameters.draft
       }
