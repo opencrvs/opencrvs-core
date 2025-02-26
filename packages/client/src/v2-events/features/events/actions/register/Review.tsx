@@ -65,8 +65,9 @@ export function Review() {
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(
     eventId,
-    event.actions.find((a) => a.type === 'DECLARE')?.metadata
+    event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
   )
+
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
   const formConfig = findActiveActionForm(config, ActionType.REGISTER)
@@ -74,15 +75,16 @@ export function Review() {
     throw new Error('No active form configuration found for declare action')
   }
 
-  const setFormValues = useEventFormData((state) => state.setFormValuesIfEmpty)
+  const setFormValuesIfEmpty = useEventFormData(
+    (state) => state.setFormValuesIfEmpty
+  )
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data
+  const form = getFormValues(eventId)
 
   useEffect(() => {
-    setFormValues(eventId, getCurrentEventState(event).data)
-  }, [event, eventId, setFormValues])
-
-  const form = getFormValues(eventId)
+    setFormValuesIfEmpty(eventId, previousFormValues)
+  }, [event, eventId, setFormValuesIfEmpty, previousFormValues])
 
   async function handleEdit({
     pageId,
