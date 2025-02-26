@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.0 Release candidate
+
+### Improvements
+
+- Improved text color for disabled text inputs and dropdowns
+
 ## 1.7.0 Release candidate
 
 ### Breaking changes
