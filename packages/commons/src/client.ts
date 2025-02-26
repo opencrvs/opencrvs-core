@@ -19,5 +19,6 @@ export * from './utils'
 // eslint-disable-next-line import/export
 export * from './conditionals/validate'
 export { DEFAULT_ROLES_DEFINITION } from './authentication'
+export * from './fixtures'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
