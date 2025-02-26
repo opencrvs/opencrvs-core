@@ -117,7 +117,8 @@ export function isCorrection(declaration: IDeclaration) {
   return (
     registrationStatus === RegStatus.Registered ||
     registrationStatus === RegStatus.Certified ||
-    registrationStatus === RegStatus.Issued
+    registrationStatus === RegStatus.Issued ||
+    registrationStatus === RegStatus.CorrectionRequested
   )
 }
 
