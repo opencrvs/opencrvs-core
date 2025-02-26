@@ -12,7 +12,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import {
-  ActionFormData,
   FieldConfig,
   FieldValue,
   isAddressFieldType,
@@ -47,15 +46,6 @@ import {
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
-`
-export const ValidationError = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
-  display: inline-block;
-  text-transform: lowercase;
-
-  &::first-letter {
-    text-transform: uppercase;
-  }
 `
 
 interface FieldWithValue {
@@ -141,6 +131,7 @@ function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
   return value?.toString() || ''
 }
 
+// @TODO: This only works for text fields, each components output function should handle the case for undefined value
 function getEmptyValueForFieldType(field: FieldWithValue) {
   return '-'
 }
@@ -178,6 +169,7 @@ export function Output({
       </>
     )
   }
+
   if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>

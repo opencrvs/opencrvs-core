@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { generateActionInput } from '@events/tests/generators'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionType, generateActionInput, SCOPES } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
 
@@ -64,7 +63,14 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
-      'recommender.none': true
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
   })
 
@@ -81,7 +87,14 @@ test('Skips required field validation when they are conditionally hidden', async
     'applicant.dob': '2024-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': true
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const data = generator.event.actions.declare(event.id, {
@@ -105,7 +118,14 @@ test('Prevents adding birth date in future', async () => {
     'applicant.dob': '2040-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': true
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const payload = generator.event.actions.declare(event.id, {
