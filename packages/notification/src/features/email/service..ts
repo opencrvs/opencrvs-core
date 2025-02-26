@@ -100,14 +100,19 @@ async function dispatch(
   recipientEmail: string | null,
   record: NotificationQueueRecord
 ) {
-  const filteredRecord = record.bcc.filter((item) => item !== recipientEmail)
+  const filteredRecord = recipientEmail
+    ? record.bcc.filter((item) => item !== recipientEmail)
+    : undefined
 
   return notifyCountryConfig(
     {
       email: 'allUserNotification',
       sms: 'allUserNotification'
     },
-    { email: recipientEmail || undefined, bcc: filteredRecord },
+    {
+      email: recipientEmail ? recipientEmail : record.bcc[0],
+      bcc: recipientEmail ? filteredRecord : record.bcc.slice(1)
+    },
     'user',
     {
       subject: record.subject,
