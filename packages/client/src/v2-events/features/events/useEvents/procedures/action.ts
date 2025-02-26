@@ -191,6 +191,16 @@ setMutationDefaults(utils.event.actions.correction.reject, {
   }
 })
 
+/**
+ * A custom hook that wraps a tRPC mutation procedure for event actions.
+ *
+ * This hook performs two main operations:
+ * 1. Ensures the event the action is for is actually created and not just a local copy before the action is sent.
+ * 2. Strips away all fields that should not be part of the payload based on the conditions in the form fields.
+ *
+ * @template P - The type of the tRPC mutation procedure.
+ * @param {P} procedure - The tRPC mutation procedure to be wrapped.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useEventAction<P extends DecorateMutationProcedure<any>>(
   procedure: P
