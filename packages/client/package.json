@@ -48,7 +48,6 @@
     "@tanstack/react-query-devtools": "^5.62.2",
     "@tanstack/react-query-persist-client": "^5.62.2",
     "@trpc/client": "^11.0.0-rc.804",
-    "@trpc/react-query": "^11.0.0-rc.804",
     "@trpc/server": "^11.0.0-rc.804",
     "@trpc/tanstack-react-query": "^11.0.0-rc.804",
     "@types/bcryptjs": "^2.4.2",

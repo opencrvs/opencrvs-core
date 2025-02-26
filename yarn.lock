@@ -8958,11 +8958,6 @@
   resolved "https://registry.yarnpkg.com/@trpc/client/-/client-11.0.0-rc.804.tgz#8f5e370a8ca85667c7610e30f0d36cb4bc58026f"
   integrity sha512-JEgAjI2tFdcIpnIMqQFpqmc9KWAFcG5uNIMOo3rwpgIh5RGOEhPwlnXj3AAexC+r97QmSlsbUZSnjPAh4wxxJA==
 
-"@trpc/react-query@^11.0.0-rc.804":
-  version "11.0.0-rc.804"
-  resolved "https://registry.yarnpkg.com/@trpc/react-query/-/react-query-11.0.0-rc.804.tgz#dedea3493451ff5bf82495aca322c99f119dee81"
-  integrity sha512-tYrJyanWJ7vqJcEmsokW/4z5eoKK4eq1ZmmT7RqQvSqn7UmPJoodIsDmDpak7n2EZx+5MHRjw/QHGqQHYC5ajQ==
-
 "@trpc/server@^11.0.0-rc.532":
   version "11.0.0-rc.604"
   resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.0.0-rc.604.tgz#99929ca7840fe1d01f0adefe35536d66778f02bd"
