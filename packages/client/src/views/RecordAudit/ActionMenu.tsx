@@ -332,10 +332,14 @@ const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
 > = ({ toggleDisplayDialog, isActionable, declarationStatus }) => {
   const intl = useIntl()
+  const online = useOnlineStatus()
   if (!canBeReinstated(declarationStatus)) return null
 
   return (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isActionable}>
+    <DropdownMenu.Item
+      onClick={toggleDisplayDialog}
+      disabled={!isActionable || !online}
+    >
       <Icon name="FileArrowUp" color="currentColor" size="large" />
       {intl.formatMessage(messages.reinstateRecord)}
     </DropdownMenu.Item>
