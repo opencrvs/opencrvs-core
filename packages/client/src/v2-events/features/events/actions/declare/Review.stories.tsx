@@ -106,7 +106,7 @@ export const ReviewForLocalRegistrarComplete: Story = {
         await canvas.findByRole('button', { name: 'Register' })
       )
 
-      const modal = within(await canvas.findByRole('modal'))
+      const modal = within(await canvas.findByRole('dialog'))
 
       await modal.findByText('Register?')
       await modal.findByRole('button', { name: 'Register' })
@@ -209,7 +209,7 @@ export const ReviewForRegistrationAgentComplete: Story = {
         await canvas.findByRole('button', { name: 'Send for approval' })
       )
 
-      const modal = within(await canvas.findByRole('modal'))
+      const modal = within(await canvas.findByRole('dialog'))
 
       await modal.findByText('Send for approval?')
       await modal.findByRole('button', { name: 'Confirm' })
@@ -313,7 +313,7 @@ export const ReviewForFieldAgentComplete: Story = {
         await canvas.findByRole('button', { name: 'Send for review' })
       )
 
-      const modal = within(await canvas.findByRole('modal'))
+      const modal = within(await canvas.findByRole('dialog'))
 
       await modal.findByText('Send for review?')
       await modal.findByRole('button', { name: 'Confirm' })
