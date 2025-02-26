@@ -43,6 +43,9 @@ export async function invalidateEventsList() {
   })
 }
 
+type TRPCError = TRPCClientError<AppRouter>
+type TRPCQueryKey<T> = [readonly string[], { input: T }]
+
 /**
  * Sets the default options for a mutation procedure.
  *
@@ -51,32 +54,28 @@ export async function invalidateEventsList() {
  * after the application has reloaded can use the same settings without running
  * the same code paths again.
  *
+ * i.e. if you want to override mutationFn, you must use setMutationDefault to do so.
+ *
  * @template P - The type of the mutation procedure e.g. trpc.events.get.
  * @template Context - The type of the context, defaults to `any`.
  * @param {P} mutation - The mutation procedure to set defaults for.
- * @param {OmitKeyof<MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>, Context>, 'mutationKey'>} options - The options to set as defaults, excluding the `mutationKey`.
  */
 export function setMutationDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  P extends DecorateMutationProcedure<any>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Context = any
+  P extends DecorateMutationProcedure<any>
 >(
   mutation: P,
   options: OmitKeyof<
-    MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>, Context>,
+    MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>>,
     'mutationKey'
   >
 ) {
-  const trpcOptions = mutation.mutationOptions<Context>()
-  queryClient.setMutationDefaults(mutation.mutationKey(), {
-    ...trpcOptions,
-    ...options
-  })
+  queryClient.setMutationDefaults(mutation.mutationKey(), options)
 }
 
-type TRPCQueryKey<T> = [readonly string[], { input: T }]
-
+/**
+ * Sets the default options for a mutation procedure.
+ */
 export function setQueryDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   P extends DecorateQueryProcedure<any>
@@ -96,5 +95,3 @@ export function setQueryDefaults<
     options as Parameters<typeof queryClient.setQueryDefaults>[1]
   )
 }
-
-type TRPCError = TRPCClientError<AppRouter>

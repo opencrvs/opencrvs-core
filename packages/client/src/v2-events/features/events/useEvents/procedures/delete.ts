@@ -12,39 +12,46 @@
 import { useMutation } from '@tanstack/react-query'
 import {
   invalidateEventsList,
-  setEventListData
+  setEventListData,
+  setMutationDefaults
 } from '@client/v2-events/features/events/useEvents/api'
 import { utils } from '@client/v2-events/trpc'
 import { waitUntilEventIsCreated } from './create'
 
-export const useDeleteEvent = () =>
-  useMutation({
-    ...utils.event.delete.mutationOptions(),
-    retry: (_, error) => {
-      if (error.data?.httpStatus === 404 || error.data?.httpStatus === 400) {
-        return false
-      }
-      return true
-    },
-    retryDelay: 10000,
-    onSuccess: () => {
-      void invalidateEventsList()
-    },
-    /*
-     * This ensures that when the application is reloaded with pending mutations in IndexedDB, the
-     * temporary event IDs in the requests get properly replaced with canonical IDs.
-     * Also check utils.event.create.onSuccess for the same logic but for when even is created.
-     */
-    mutationFn: async (variables) => {
-      setEventListData((oldData = []) => {
-        return oldData.filter((event) => event.id !== variables.eventId)
-      })
-
-      const originalMutationFn = utils.event.delete.mutationOptions().mutationFn
-
-      if (typeof originalMutationFn !== 'function') {
-        throw new Error('Mutation function is not defined')
-      }
-      return waitUntilEventIsCreated(originalMutationFn)(variables)
+setMutationDefaults(utils.event.delete, {
+  retry: (_, error) => {
+    if (error.data?.httpStatus === 404 || error.data?.httpStatus === 400) {
+      return false
     }
+    return true
+  },
+  retryDelay: 10000,
+  onSuccess: () => {
+    void invalidateEventsList()
+  },
+  /*
+   * This ensures that when the application is reloaded with pending mutations in IndexedDB, the
+   * temporary event IDs in the requests get properly replaced with canonical IDs.
+   * Also check utils.event.create.onSuccess for the same logic but for when even is created.
+   */
+  mutationFn: async (variables) => {
+    setEventListData((oldData = []) => {
+      return oldData.filter((event) => event.id !== variables.eventId)
+    })
+
+    const originalMutationFn = utils.event.delete.mutationOptions().mutationFn
+
+    if (typeof originalMutationFn !== 'function') {
+      throw new Error('Mutation function is not defined')
+    }
+    return waitUntilEventIsCreated(originalMutationFn)(variables)
+  }
+})
+
+export const useDeleteEvent = () => {
+  const { retry, retryDelay, onSuccess, mutationFn, ...options } =
+    utils.event.delete.mutationOptions()
+  return useMutation({
+    ...options
   })
+}
