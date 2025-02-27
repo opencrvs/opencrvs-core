@@ -101,7 +101,7 @@ export function AdditionalDetails() {
           pageId={currentPageId}
           setFormData={correctionRequestData.setFormValues}
           showReviewButton={false}
-          submitButtonText={intl.formatMessage(buttonMessages.continueButton)}
+          continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
           onFormPageChange={(nextPageId: string) => {
             return navigate(
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS.buildPath({

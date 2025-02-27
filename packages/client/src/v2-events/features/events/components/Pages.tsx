@@ -27,7 +27,7 @@ export function Pages({
   formPages,
   onFormPageChange,
   onSubmit,
-  submitButtonText,
+  continueButtonText,
   setFormData,
   children
 }: {
@@ -38,7 +38,7 @@ export function Pages({
   formPages: FormPage[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
-  submitButtonText?: string
+  continueButtonText?: string
   children?: (page: FormPage) => React.ReactNode
 }) {
   const intl = useIntl()
@@ -66,7 +66,7 @@ export function Pages({
       currentPage={currentPage}
       pageTitle={intl.formatMessage(page.title)}
       showReviewButton={showReviewButton}
-      submitButtonText={submitButtonText}
+      continueButtonText={continueButtonText}
       totalPages={total}
       onNextPage={next}
       onPreviousPage={previous}
