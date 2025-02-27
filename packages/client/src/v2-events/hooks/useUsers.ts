@@ -9,10 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { api } from '@client/v2-events/trpc'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useTRPC } from '@client/v2-events/trpc'
 
 export function useUsers() {
+  const trpc = useTRPC()
   return {
-    getUsers: api.user.list
+    getUsers: {
+      useQuery: (ids: string[]) => useQuery(trpc.user.list.queryOptions(ids)),
+      useSuspenseQuery: (ids: string[]) => [
+        useSuspenseQuery(trpc.user.list.queryOptions(ids)).data
+      ]
+    }
   }
 }
