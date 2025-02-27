@@ -40,6 +40,8 @@ jobs:
         with:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - name: Delete public key
+        run: rm -f ~/.ssh/id_rsa.pub
       - name: Clear data from given environment
         run: ssh root@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD ELASTICSEARCH_ADMIN_USER=$ELASTICSEARCH_ADMIN_USER ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_ADMIN_PASSWORD /opt/opencrvs/infrastructure/clear-all-data.sh $REPLICAS $ENV"
       - name: Restore backup data in given environment
