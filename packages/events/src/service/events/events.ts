@@ -49,7 +49,10 @@ export async function getEventById(id: string) {
   const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne({ id: id })
+  const event = await collection.findOne<Omit<EventDocument, '_id'>>(
+    { id: id },
+    { projection: { _id: 0 } }
+  )
 
   if (!event) {
     throw new EventNotFoundError(id)
