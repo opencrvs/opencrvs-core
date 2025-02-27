@@ -22,6 +22,7 @@ import {
   defaultColumns,
   EventConfig,
   EventIndex,
+  getAllFields,
   getOrThrow,
   RootWorkqueueConfig,
   workqueues
@@ -43,11 +44,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 
 import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  flattenEventIndex,
-  getFieldsWithPopulatedValues,
-  getEventTitle
-} from '@client/v2-events/utils'
+import { flattenEventIndex } from '@client/v2-events/utils'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
@@ -200,21 +198,15 @@ function Workqueue({
         return event.status
       }
 
-      const eventWorkqueue = getOrThrow(
-        eventConfig.workqueues.find((wq) => wq.id === workqueueConfig.id),
-        `Could not find workqueue config for ${workqueueConfig.id}`
-      )
-
-      const fieldsWithPopulatedValues = getFieldsWithPopulatedValues({
-        event,
-        workqueue: eventWorkqueue,
-        intl: flattenedIntl,
-        eventConfig
-      })
-
       const titleColumnId = workqueueConfig.columns[0].id
 
-      const title = fieldsWithPopulatedValues[titleColumnId]
+      const title = flattenedIntl.formatMessage(
+        eventConfig.summary.title.label,
+        {
+          ...setEmptyValuesForFields(getAllFields(eventConfig)),
+          ...flattenEventIndex(event)
+        }
+      )
 
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
@@ -228,7 +220,6 @@ function Workqueue({
         )
 
       return {
-        ...fieldsWithPopulatedValues,
         ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),

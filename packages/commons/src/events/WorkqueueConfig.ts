@@ -10,7 +10,6 @@
  */
 
 import { z } from 'zod'
-import { TranslationConfig } from './TranslationConfig'
 import { EventStatuses } from './EventMetadata'
 
 /**
@@ -19,13 +18,6 @@ import { EventStatuses } from './EventMetadata'
 export const WorkqueueConfig = z
   .object({
     id: z.string().describe('Unique identifier for workqueue.'),
-    fields: z.array(
-      z.object({
-        // @TODO: Improve typing by enforcing EventMetadataKeys and form page fields as possible values
-        column: z.string(),
-        label: TranslationConfig
-      })
-    ),
     filters: z
       .array(
         z.object({

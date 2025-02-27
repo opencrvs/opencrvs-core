@@ -16,7 +16,6 @@ import {
   ActionDocument,
   EventConfig,
   EventIndex,
-  WorkqueueConfig,
   getAllFields
 } from '@opencrvs/commons/client'
 import { setEmptyValuesForFields } from './components/forms/utils'
@@ -85,33 +84,6 @@ export function flattenEventIndex(
 ): Omit<EventIndex, 'data'> & { [key: string]: any } {
   const { data, ...rest } = event
   return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
-}
-
-export function getFieldsWithPopulatedValues({
-  workqueue,
-  intl,
-  eventConfig,
-  event
-}: {
-  event: EventIndex
-  workqueue: WorkqueueConfig
-  intl: IntlShape
-  eventConfig: EventConfig
-}): Record<string, string> {
-  const allPropertiesWithEmptyValues = setEmptyValuesForFields(
-    getAllFields(eventConfig)
-  )
-
-  return workqueue.fields.reduce(
-    (acc, field) => ({
-      ...acc,
-      [field.column]: intl.formatMessage(field.label, {
-        ...allPropertiesWithEmptyValues,
-        ...flattenEventIndex(event)
-      })
-    }),
-    {}
-  )
 }
 
 export function getEventTitle({
