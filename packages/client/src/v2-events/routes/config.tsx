@@ -25,8 +25,8 @@ import { router as workqueueRouter } from '@client/v2-events/features/workqueues
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
+import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { ROUTES } from './routes'
-import { TRPCErrorBoundary } from './StyledErrorBoundary'
 
 /**
  * Configuration for the routes of the v2-events feature.

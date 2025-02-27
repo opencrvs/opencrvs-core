@@ -16,6 +16,9 @@ import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Box } from '@opencrvs/components/lib/Box'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
+import { redirectToAuthentication } from '@client/profile/profileActions'
+import { connect } from 'react-redux'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 const ErrorContainer = styled(Box)`
   display: flex;
@@ -34,27 +37,23 @@ const ErrorMessage = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.copy};
   margin-bottom: 32px;
+  text-align: center;
 `
 
 const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
 
-interface Props {
+interface Props extends IntlShapeProps {
   children: React.ReactNode
+  redirectToAuthentication: typeof redirectToAuthentication
 }
+
 interface State {
   error: Error | null
 }
 
-interface Props {
-  children: ReactNode
-}
-interface State {
-  error: Error | null
-}
-
-export class TRPCErrorBoundary extends Component<Props, State> {
+class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { error: null }
@@ -69,24 +68,36 @@ export class TRPCErrorBoundary extends Component<Props, State> {
   }
 
   render() {
-    const intl = { formatMessage: (message: any) => message.defaultMessage }
+    const { intl, redirectToAuthentication } = this.props
+
     if (this.state.error) {
       const error = this.state.error
       let httpCode = 500
-      let message = 'Something went wrong.'
+      let message = error.message
 
-      console.log(error, 'error')
       if (error instanceof TRPCClientError) {
-        console.log('error.data', error.data)
-        httpCode = error.data?.httpStatus ?? 500
-        message = error.message
+        if (
+          error.meta &&
+          typeof error.meta === 'object' &&
+          'response' in error.meta &&
+          error.meta.response &&
+          typeof error.meta.response === 'object' &&
+          'status' in error.meta.response &&
+          'statusText' in error.meta.response
+        ) {
+          httpCode = Number(error.meta.response.status)
+          message = String(error.meta.response.statusText)
+        }
       }
-
+      /**
+       * TODO: Improve the error message design once the probable errors are defined
+       * and the design/ux is ready.
+       */
       return (
         <Sentry.ErrorBoundary
           showDialog={!development}
           onError={(error) => {
-            console.log(error)
+            console.log('Sentry.ErrorBoundary: ', error)
           }}
         >
           <PageWrapper>
@@ -99,23 +110,27 @@ export class TRPCErrorBoundary extends Component<Props, State> {
                   <ErrorMessage>
                     {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
                   </ErrorMessage>
+                  <TertiaryButton
+                    id="GoToLoginPage"
+                    onClick={() => redirectToAuthentication(true)}
+                  >
+                    {intl.formatMessage(buttonMessages.login)}
+                  </TertiaryButton>
                 </>
               ) : (
                 <>
                   <ErrorTitle>
                     {intl.formatMessage(errorMessages.errorTitle)}
                   </ErrorTitle>
-                  <ErrorMessage>
-                    {intl.formatMessage(errorMessages.unknownErrorDescription)}
-                  </ErrorMessage>
+                  <ErrorMessage>{message}</ErrorMessage>
+                  <TertiaryButton
+                    id="GoToHomepage"
+                    onClick={() => (window.location.href = '/')}
+                  >
+                    {intl.formatMessage(buttonMessages.goToHomepage)}
+                  </TertiaryButton>
                 </>
               )}
-              <TertiaryButton
-                id="GoToHomepage"
-                onClick={() => (window.location.href = '/')}
-              >
-                {intl.formatMessage(buttonMessages.goToHomepage)}
-              </TertiaryButton>
             </ErrorContainer>
           </PageWrapper>
         </Sentry.ErrorBoundary>
@@ -125,3 +140,7 @@ export class TRPCErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
+
+export const TRPCErrorBoundary = connect(null, { redirectToAuthentication })(
+  injectIntl(ErrorBoundary)
+)

@@ -85,11 +85,6 @@ export const eventRouter = router({
       )
       .output(z.array(EventConfig))
       .query(async (options) => {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Invalid event type'
-        })
-        // eslint-disable-next-line
         return getEventConfigurations(options.ctx.token)
       })
   }),
