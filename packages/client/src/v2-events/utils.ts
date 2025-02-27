@@ -137,6 +137,9 @@ export function getTitle({
 
   return (
     (titleColumn && fieldsWithPopulatedValues[titleColumn]) ??
-    fieldsWithPopulatedValues[workqueue.fields[0].column]
+    intl.formatMessage(
+      eventConfig.summary.title.label,
+      flattenEventIndex(event)
+    )
   )
 }
