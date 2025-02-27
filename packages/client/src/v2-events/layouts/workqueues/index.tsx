@@ -70,6 +70,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           desktopCenter={
             <Stack gap={16}>
               <Button
+                id="header_new_event"
                 type="iconPrimary"
                 onClick={() => {
                   navigate(ROUTES.V2.EVENTS.CREATE.path)
