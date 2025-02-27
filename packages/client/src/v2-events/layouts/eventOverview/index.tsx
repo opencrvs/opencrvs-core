@@ -29,7 +29,10 @@ import { getOrThrow } from '@opencrvs/commons/client'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  useEventConfiguration,
+  useEventConfigurations
+} from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { getEventTitle } from '@client/v2-events/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
@@ -62,10 +65,7 @@ export function EventOverviewLayout({
   )
 
   const allEvents = useEventConfigurations()
-  const eventConfig = getOrThrow(
-    allEvents.find(({ id }) => id === event.type),
-    `Could not find event config for ${event.type}`
-  )
+  const eventConfig = useEventConfiguration(event.type)
 
   const navigate = useNavigate()
   const intl = useIntl()
