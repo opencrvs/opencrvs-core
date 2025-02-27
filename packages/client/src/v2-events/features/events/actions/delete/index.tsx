@@ -24,7 +24,11 @@ export function DeleteEvent() {
   useEffect(() => {
     deleteEvent.mutate({ eventId })
     navigate(ROUTES.V2.path)
-  }, [deleteEvent, eventId, navigate])
+    // If you add deleteEvent to the dependencies, it will cause the delete
+    // to be called >1 times. This is because the deleteEvent contains updating data fields describing
+    // the state of the request
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return <div />
 }
