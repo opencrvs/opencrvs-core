@@ -164,9 +164,22 @@ jobs:
   prepare-client-tests:
     name: Prepare client tests
     runs-on: ubuntu-24.04
+    outputs:
+      chromatic_required: ${{ steps.detect-changes.outputs.chromatic_required }}
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Ensure we have at least one previous commit for comparison
+
+      - name: Detect changes in v2-events
+        id: detect-changes
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q 'packages/client/src/v2-events/'; then
+            echo "chromatic_required=true" >> $GITHUB_OUTPUT
+          else
+            echo "chromatic_required=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
@@ -232,7 +245,6 @@ jobs:
           path: |
             .
             !**/node_modules
-
   lint-client:
     name: Lint client
     needs: prepare-client-tests
@@ -268,10 +280,12 @@ jobs:
 
       - name: Run linting
         run: cd packages/client && yarn lint
+
   chromatic:
     name: Run chromatic visual tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
+    if: needs.prepare-client-tests.outputs.chromatic_required == 'true'
 
     steps:
       - name: Download filesystem artifact
