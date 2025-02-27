@@ -38,8 +38,8 @@ export function ValidateEvent() {
       duplicates: []
     })
     navigate(ROUTES.V2.path)
-    // If you add deleteEvent to the dependencies, it will cause the delete
-    // to be called >1 times. This is because the deleteEvent contains updating data fields describing
+    // If you add validateEvent to the dependencies, it will cause the action
+    // to be called >1 times. This is because the validateEvent contains updating data fields describing
     // the state of the request
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
