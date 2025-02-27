@@ -13,6 +13,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { v4 as uuid } from 'uuid'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
@@ -23,12 +24,16 @@ export function ValidateEvent() {
   const events = useEvents()
   const validateEvent = events.actions.validate
 
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
+
+  const latestEvent = getCurrentEventState(event)
+
   const transactionId = uuid()
 
   useEffect(() => {
     validateEvent.mutate({
       eventId,
-      data: {},
+      data: latestEvent.data,
       transactionId,
       duplicates: []
     })
