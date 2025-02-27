@@ -17,9 +17,9 @@ import {
 import { UUID } from '@opencrvs/commons'
 import { fetchFromHearth } from '@config/services/hearth'
 import { MongoClient } from 'mongodb'
-import { env } from '@config/environment'
+import { HEARTH_MONGO_URL } from '@config/config/constants'
 
-const client = new MongoClient(env.HEARTH_MONGO_URL)
+const client = new MongoClient(HEARTH_MONGO_URL)
 
 export const resolveLocationChildren = async (id: UUID) => {
   try {
