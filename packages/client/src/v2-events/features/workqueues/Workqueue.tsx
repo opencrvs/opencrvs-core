@@ -73,7 +73,7 @@ const NondecoratedLink = styled(Link)`
   color: 'primary';
 `
 
-const FABContainer = styled.div`
+const FabContainer = styled.div`
   position: fixed;
   right: 40px;
   bottom: 55px;
@@ -342,14 +342,14 @@ function Workqueue({
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
       />
-      <FABContainer>
+      <FabContainer>
         <Link to={ROUTES.V2.EVENTS.CREATE.path}>
           <FloatingActionButton
             icon={() => <PlusTransparentWhite />}
             id="new_event_declaration"
           />
         </Link>
-      </FABContainer>
+      </FabContainer>
     </WQContentWrapper>
   )
 }
