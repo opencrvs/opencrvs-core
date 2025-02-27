@@ -114,7 +114,7 @@ export function getFieldsWithPopulatedValues({
   )
 }
 
-export function getTitle({
+export function getEventTitle({
   event,
   eventConfig,
   workqueue: wq,

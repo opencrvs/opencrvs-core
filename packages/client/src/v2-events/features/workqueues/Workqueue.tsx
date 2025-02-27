@@ -46,7 +46,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import {
   flattenEventIndex,
   getFieldsWithPopulatedValues,
-  getTitle
+  getEventTitle
 } from '@client/v2-events/utils'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
@@ -214,7 +214,7 @@ function Workqueue({
 
       const titleColumnId = workqueueConfig.columns[0].id
 
-      const title = getTitle({
+      const title = getEventTitle({
         event,
         eventConfig,
         workqueue: eventWorkqueue,

@@ -31,7 +31,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { getTitle } from '@client/v2-events/utils'
+import { getEventTitle } from '@client/v2-events/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 
@@ -126,7 +126,11 @@ export function EventOverviewLayout({
             </Button>
           }
           mobileRight={<ActionMenu eventId={eventId} />}
-          mobileTitle={getTitle({ event, eventConfig, intl: flattenedIntl })}
+          mobileTitle={getEventTitle({
+            event,
+            eventConfig,
+            intl: flattenedIntl
+          })}
         />
       }
       skipToContentText="skip"
