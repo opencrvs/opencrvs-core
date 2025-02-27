@@ -24,7 +24,9 @@ import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, utils } from '@client/v2-events/trpc'
 
 export function getLocalEventData(eventId: string) {
-  return queryClient.getQueryData(utils.event.get.queryKey(eventId))
+  return queryClient.getQueryData(
+    utils.event.get.queryKey(eventId)
+  ) as EventDocument
 }
 
 export function setEventData(id: string, data: EventDocument) {

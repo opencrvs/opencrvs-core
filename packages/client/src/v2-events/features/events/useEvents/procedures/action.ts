@@ -25,6 +25,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
+  getLocalEventData,
   invalidateEventsList,
   setEventData,
   setEventListData,
@@ -119,6 +120,7 @@ function updateEventOptimistically<T extends ActionInput>(
 }
 
 setMutationDefaults(utils.event.actions.declare, {
+  mutationFn: createMutationFn(utils.event.actions.declare),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -129,6 +131,7 @@ setMutationDefaults(utils.event.actions.declare, {
 })
 
 setMutationDefaults(utils.event.actions.register, {
+  mutationFn: createMutationFn(utils.event.actions.register),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -138,6 +141,7 @@ setMutationDefaults(utils.event.actions.register, {
 })
 
 setMutationDefaults(utils.event.actions.notify, {
+  mutationFn: createMutationFn(utils.event.actions.notify),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -147,6 +151,7 @@ setMutationDefaults(utils.event.actions.notify, {
 })
 
 setMutationDefaults(utils.event.actions.validate, {
+  mutationFn: createMutationFn(utils.event.actions.validate),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -156,6 +161,7 @@ setMutationDefaults(utils.event.actions.validate, {
 })
 
 setMutationDefaults(utils.event.actions.printCertificate, {
+  mutationFn: createMutationFn(utils.event.actions.printCertificate),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -165,6 +171,7 @@ setMutationDefaults(utils.event.actions.printCertificate, {
 })
 
 setMutationDefaults(utils.event.actions.correction.request, {
+  mutationFn: createMutationFn(utils.event.actions.correction.request),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -174,6 +181,7 @@ setMutationDefaults(utils.event.actions.correction.request, {
 })
 
 setMutationDefaults(utils.event.actions.correction.approve, {
+  mutationFn: createMutationFn(utils.event.actions.correction.approve),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -183,6 +191,7 @@ setMutationDefaults(utils.event.actions.correction.approve, {
 })
 
 setMutationDefaults(utils.event.actions.correction.reject, {
+  mutationFn: createMutationFn(utils.event.actions.correction.reject),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -190,6 +199,35 @@ setMutationDefaults(utils.event.actions.correction.reject, {
     actionType: ActionType.REJECT_CORRECTION
   }
 })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createMutationFn<P extends DecorateMutationProcedure<any>>(
+  procedure: P
+) {
+  /*
+   * Merge default tRPC mutationOptions with the ones provided above
+   */
+  const mutationOptions = {
+    ...procedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(procedure.mutationKey())
+  }
+
+  if (!mutationOptions.mutationFn) {
+    throw new Error(
+      'No mutation fn found for operation. This should never happen'
+    )
+  }
+
+  const defaultMutationFn = mutationOptions.mutationFn
+
+  return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
+    async ({ eventType, ...params }) => {
+      return defaultMutationFn({
+        ...params,
+        data: params.data
+      })
+    }
+  )
+}
 
 /**
  * A custom hook that wraps a tRPC mutation procedure for event actions.
@@ -207,38 +245,36 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 ) {
   const eventConfigurations = useEventConfigurations()
 
-  /*
-   * Merge default tRPC mutationOptions with the ones provided above
-   */
-  const mutationOptions = {
+  const allOptions = {
     ...procedure.mutationOptions(),
     ...queryClient.getMutationDefaults(procedure.mutationKey())
   }
 
-  if (!mutationOptions.mutationFn) {
-    throw new Error(
-      'No mutation fn found for operation. This should never happen'
-    )
-  }
+  const { mutationFn, ...mutationOptions } = allOptions
 
-  const defaultMutationFn = mutationOptions.mutationFn
   const actionType = mutationOptions.meta?.actionType as ActionType | undefined
 
   if (!actionType) {
     throw new Error('No event action type found. This should never happen')
   }
 
-  const mutationFn = waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
-    async ({ eventType, ...params }) => {
+  const mutation = useMutation({
+    ...mutationOptions
+  })
+
+  return {
+    mutate: (params: inferInput<P>) => {
+      const localEvent = getLocalEventData(params.eventId)
+
       const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === eventType
+        (event) => event.id === localEvent.type
       )
 
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
       }
 
-      return defaultMutationFn({
+      return mutation.mutate({
         ...params,
         data: stripHiddenOrDisabledFields(
           actionType,
@@ -247,10 +283,5 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         )
       })
     }
-  )
-
-  return useMutation({
-    ...mutationOptions,
-    mutationFn
-  })
+  }
 }

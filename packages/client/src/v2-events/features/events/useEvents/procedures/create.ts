@@ -34,6 +34,7 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
 ): (params: T) => Promise<R> {
   return async (params) => {
     const { eventId } = params
+
     if (!isTemporaryId(eventId)) {
       return canonicalMutationFn({ ...params, eventId: eventId })
     }
