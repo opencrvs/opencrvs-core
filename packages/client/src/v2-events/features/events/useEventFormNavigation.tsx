@@ -53,7 +53,7 @@ export function useEventFormNavigation() {
   const navigate = useNavigate()
 
   const events = useEvents()
-  const deleteEvent = events.deleteEvent
+  const deleteEvent = events.deleteEvent.useMutation()
 
   const [modal, openModal] = useModal()
 
