@@ -29,6 +29,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { Hamburger } from '@client/components/Header/Hamburger'
+import * as routes from '@client/navigation/routes'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -99,10 +100,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<Hamburger />}
           mobileRight={
-            <Button
-              type={'icon'}
-              onClick={() => navigate(ROUTES.V2.SEARCH.path)}
-            >
+            <Button type={'icon'} onClick={() => navigate(routes.SEARCH)}>
               <Icon color="primary" name="MagnifyingGlass" size="medium" />
             </Button>
           }
