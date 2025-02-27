@@ -208,7 +208,10 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -296,7 +299,10 @@ export const ReviewForFieldAgentIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
