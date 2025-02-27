@@ -10,7 +10,7 @@
  */
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { WorkqueueLayout } from './workqueues'
-import { EventOverviewLayout } from './eventOverview'
+import { EventOverviewLayout } from './EventOverview'
 import { FormLayout } from './form'
 
 const SuspendedWorkqueueLayout = withSuspense(WorkqueueLayout)

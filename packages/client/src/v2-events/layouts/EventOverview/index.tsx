@@ -65,7 +65,7 @@ export function EventOverviewLayout({
   )
 
   const allEvents = useEventConfigurations()
-  const eventConfig = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const navigate = useNavigate()
   const intl = useIntl()
@@ -128,7 +128,7 @@ export function EventOverviewLayout({
           mobileRight={<ActionMenu eventId={eventId} />}
           mobileTitle={getEventTitle({
             event,
-            eventConfig,
+            eventConfig: eventConfiguration,
             intl: flattenedIntl
           })}
         />
