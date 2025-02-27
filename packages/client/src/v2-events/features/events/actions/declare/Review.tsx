@@ -46,7 +46,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
-const modalMessages = defineMessages({
+const rejectModalMessages = defineMessages({
   rejectModalCancel: {
     id: 'v2.rejectModal.cancel',
     defaultMessage: 'Cancel',
@@ -79,6 +79,78 @@ const modalMessages = defineMessages({
     description: 'The label for mark as duplicate checkbox of reject modal'
   }
 })
+
+const confirmModalMessages = {
+  complete: {
+    declare: {
+      title: {
+        id: 'v2.review.declare.confirmModal.title',
+        defaultMessage: 'Send for review?',
+        description: 'The title for review action modal when declaring'
+      },
+      description: {
+        id: 'v2.review.declare.confirmModal.description',
+        defaultMessage: 'This declaration will be sent for review',
+        description: 'The description for review action modal when declaring'
+      },
+      onConfirm: {
+        id: 'v2.review.declare.confirmModal.confirm',
+        defaultMessage: 'Confirm',
+        description: 'The label for modal confirm button when declaring'
+      },
+      onCancel: {
+        id: 'v2.review.declare.confirmModal.cancel',
+        defaultMessage: 'Cancel',
+        description: 'The label for modal cancel button when declaring'
+      }
+    },
+    validate: {
+      title: {
+        id: 'v2.review.validate.confirmModal.title',
+        defaultMessage: 'Send for approval?',
+        description: 'The title for review action modal when validating'
+      },
+      description: {
+        id: 'v2.review.validate.confirmModal.description',
+        defaultMessage:
+          'This declaration will be sent for approval prior to registration.',
+        description: 'The description for review action modal when validating'
+      },
+      onConfirm: {
+        id: 'v2.review.validate.confirmModal.confirm',
+        defaultMessage: 'Confirm',
+        description: 'The label for modal confirm button when validating'
+      },
+      onCancel: {
+        id: 'v2.review.validate.confirmModal.cancel',
+        defaultMessage: 'Cancel',
+        description: 'The label for modal cancel button when validating'
+      }
+    },
+    register: {
+      title: {
+        id: 'v2.review.register.confirmModal.title',
+        defaultMessage: 'Register?',
+        description: 'The title for review action modal when registering'
+      },
+      description: {
+        id: 'v2.review.register.confirmModal.description',
+        defaultMessage: '‎', // intentionally empty, as the description is not used in v1
+        description: 'The description for review action modal when registering'
+      },
+      onConfirm: {
+        id: 'v2.review.register.confirmModal.confirm',
+        defaultMessage: 'Register',
+        description: 'The label for modal confirm button when registering'
+      },
+      onCancel: {
+        id: 'v2.review.register.confirmModal.cancel',
+        defaultMessage: 'Cancel',
+        description: 'The label for modal cancel button when registering'
+      }
+    }
+  }
+}
 
 const registerMessages = {
   title: {
@@ -125,7 +197,8 @@ const reviewMessages = {
         description:
           'The description for registration action when form is complete'
       },
-      onConfirm: registerMessages.onConfirm
+      onConfirm: registerMessages.onConfirm,
+      modal: confirmModalMessages.complete.register
     },
     validate: {
       title: validateMessages.title,
@@ -135,7 +208,8 @@ const reviewMessages = {
           'The informant will receive an email with a registration number that they can use to collect the certificate',
         description: 'The description for validate action when form is complete'
       },
-      onConfirm: validateMessages.onConfirm
+      onConfirm: validateMessages.onConfirm,
+      modal: confirmModalMessages.complete.validate
     },
     declare: {
       title: {
@@ -150,7 +224,8 @@ const reviewMessages = {
           'The informant will receive an email with a registration number that they can use to collect the certificate',
         description: 'The description for declare action when form is complete'
       },
-      onConfirm: declareMessages.onConfirm
+      onConfirm: declareMessages.onConfirm,
+      modal: confirmModalMessages.complete.declare
     }
   },
   incomplete: {
@@ -162,7 +237,8 @@ const reviewMessages = {
         description:
           'The description for registration action when form is incomplete'
       },
-      onConfirm: registerMessages.onConfirm
+      onConfirm: registerMessages.onConfirm,
+      modal: {}
     },
     validate: {
       title: validateMessages.title,
@@ -172,7 +248,8 @@ const reviewMessages = {
           'Please add mandatory information before sending for approval',
         description: 'The description for validate action when form is complete'
       },
-      onConfirm: validateMessages.onConfirm
+      onConfirm: validateMessages.onConfirm,
+      modal: {}
     },
     declare: {
       title: {
@@ -187,7 +264,8 @@ const reviewMessages = {
           'The informant will receive an email with a tracking ID that they can use to provide the additional mandatory information required for registration',
         description: 'The description for declare action when form is complete'
       },
-      onConfirm: declareMessages.onConfirm
+      onConfirm: declareMessages.onConfirm,
+      modal: {}
     }
   }
 }
@@ -214,6 +292,7 @@ function getReviewActionConfig({
 
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
     return {
+      buttonType: 'positive' as const,
       incomplete,
       isDisabled,
       messages: incomplete
@@ -224,6 +303,7 @@ function getReviewActionConfig({
 
   if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
     return {
+      buttonType: 'positive' as const,
       incomplete,
       isDisabled,
       messages: incomplete
@@ -234,6 +314,7 @@ function getReviewActionConfig({
 
   if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
     return {
+      buttonType: 'primary' as const,
       incomplete,
       isDisabled,
       messages: incomplete
@@ -321,7 +402,11 @@ export function Review() {
 
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal action="Declare" close={close} />
+      <ReviewComponent.ActionModal
+        action="Declare"
+        close={close}
+        copy={reviewActionConfiguration.messages.modal}
+      />
     ))
     if (confirmedDeclaration) {
       declareMutation.mutate({
@@ -388,6 +473,7 @@ export function Review() {
           formConfig={formConfig}
           messages={reviewActionConfiguration.messages}
           metadata={metadata}
+          primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
           onReject={handleReject}
         />
@@ -422,7 +508,7 @@ function RejectModal({
             close(null)
           }}
         >
-          {intl.formatMessage(modalMessages.rejectModalCancel)}
+          {intl.formatMessage(rejectModalMessages.rejectModalCancel)}
         </Button>,
         <Button
           key="confirm_reject_with_archive"
@@ -435,7 +521,7 @@ function RejectModal({
             })
           }}
         >
-          {intl.formatMessage(modalMessages.rejectModalArchive)}
+          {intl.formatMessage(rejectModalMessages.rejectModalArchive)}
         </Button>,
         <Button
           key="confirm_reject_with_update"
@@ -448,17 +534,17 @@ function RejectModal({
             })
           }}
         >
-          {intl.formatMessage(modalMessages.rejectModalSendForUpdate)}
+          {intl.formatMessage(rejectModalMessages.rejectModalSendForUpdate)}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(modalMessages.rejectModalTitle)}
+      title={intl.formatMessage(rejectModalMessages.rejectModalTitle)}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(modalMessages.rejectModalDescription)}
+          {intl.formatMessage(rejectModalMessages.rejectModalDescription)}
         </Text>
         <TextInput
           required={true}
@@ -468,7 +554,9 @@ function RejectModal({
           }
         />
         <Checkbox
-          label={intl.formatMessage(modalMessages.rejectModalMarkAsDuplicate)}
+          label={intl.formatMessage(
+            rejectModalMessages.rejectModalMarkAsDuplicate
+          )}
           name={'markDUplicate'}
           selected={state.isDuplicate}
           value={''}
