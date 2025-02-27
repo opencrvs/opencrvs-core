@@ -13,7 +13,7 @@ import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
 import {
-  getLocalEventData,
+  findLocalEventData,
   invalidateEventsList,
   setEventData,
   setEventListData,
@@ -39,7 +39,7 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
       return canonicalMutationFn({ ...params, eventId: eventId })
     }
 
-    const localVersion = getLocalEventData(eventId)
+    const localVersion = findLocalEventData(eventId)
     if (!localVersion || isTemporaryId(localVersion.id)) {
       throw new Error('Event that has not been stored yet cannot be deleted')
     }

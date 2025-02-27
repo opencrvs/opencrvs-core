@@ -17,15 +17,17 @@ import {
   inferOutput
 } from '@trpc/tanstack-react-query'
 import {
+  ActionFormData,
   ActionInput,
   ActionType,
   EventDocument,
   getCurrentEventState,
+  getUUID,
   stripHiddenOrDisabledFields
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
-  getLocalEventData,
+  findLocalEventData,
   invalidateEventsList,
   setEventData,
   setEventListData,
@@ -119,7 +121,7 @@ function updateEventOptimistically<T extends ActionInput>(
   }
 }
 
-setMutationDefaults(utils.event.actions.declare, {
+const declareMutationDefaults = {
   mutationFn: createMutationFn(utils.event.actions.declare),
   retry: true,
   retryDelay: 10000,
@@ -128,9 +130,19 @@ setMutationDefaults(utils.event.actions.declare, {
   meta: {
     actionType: ActionType.DECLARE
   }
-})
+}
 
-setMutationDefaults(utils.event.actions.register, {
+const validateMutationDefaults = {
+  mutationFn: createMutationFn(utils.event.actions.validate),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.VALIDATE
+  }
+}
+
+const registerMutationDefaults = {
   mutationFn: createMutationFn(utils.event.actions.register),
   retry: true,
   retryDelay: 10000,
@@ -138,7 +150,94 @@ setMutationDefaults(utils.event.actions.register, {
   meta: {
     actionType: ActionType.REGISTER
   }
-})
+}
+
+/**
+ * Runs a sequence of actions from declare to register.
+ *
+ * Defining the function here, statically allows offline support.
+ * Moving the function to one level up will break offline support since the definition needs to be static.
+ */
+async function registerOnDeclare({
+  eventId,
+  data,
+  metadata
+}: {
+  eventId: string
+  data: ActionFormData
+  metadata?: ActionFormData
+}) {
+  const actionConfig = [
+    [utils.event.actions.declare, declareMutationDefaults],
+    [utils.event.actions.validate, validateMutationDefaults],
+    [utils.event.actions.register, registerMutationDefaults]
+  ] as const
+
+  for (const [action, options] of actionConfig) {
+    try {
+      await options.mutationFn({
+        data,
+        eventId,
+        transactionId: getUUID(),
+        metadata,
+        duplicates: []
+      })
+    } catch (error) {
+      console.error(`Mutation failed for ${action.mutationKey()}:`, error)
+    }
+  }
+}
+
+/**
+ * Waits until the event is created before running the actions.
+ */
+export const registerOnDeclareMutation =
+  waitUntilEventIsCreated(registerOnDeclare)
+
+/**
+ * Runs a sequence of actions from declare to validate.
+ *
+ * Defining the function here, statically allows offline support.
+ * Moving the function to one level up will break offline support since the definition needs to be static.
+ */
+export async function validateOnDeclare({
+  eventId,
+  data,
+  metadata
+}: {
+  eventId: string
+  data: ActionFormData
+  metadata?: ActionFormData
+}) {
+  const actionConfig = [
+    [utils.event.actions.declare, declareMutationDefaults],
+    [utils.event.actions.validate, validateMutationDefaults]
+  ] as const
+
+  for (const [action, options] of actionConfig) {
+    try {
+      await options.mutationFn({
+        data,
+        eventId,
+        transactionId: getUUID(),
+        metadata,
+        duplicates: []
+      })
+    } catch (error) {
+      console.error(`Mutation failed for ${action.mutationKey()}:`, error)
+    }
+  }
+}
+
+/**
+ * Waits until the event is created before running the actions.
+ */
+export const validateOnDeclareMutation =
+  waitUntilEventIsCreated(validateOnDeclare)
+
+setMutationDefaults(utils.event.actions.declare, declareMutationDefaults)
+setMutationDefaults(utils.event.actions.validate, validateMutationDefaults)
+setMutationDefaults(utils.event.actions.register, registerMutationDefaults)
 
 setMutationDefaults(utils.event.actions.notify, {
   mutationFn: createMutationFn(utils.event.actions.notify),
@@ -147,16 +246,6 @@ setMutationDefaults(utils.event.actions.notify, {
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.NOTIFY
-  }
-})
-
-setMutationDefaults(utils.event.actions.validate, {
-  mutationFn: createMutationFn(utils.event.actions.validate),
-  retry: true,
-  retryDelay: 10000,
-  onSuccess: updateLocalEvent,
-  meta: {
-    actionType: ActionType.VALIDATE
   }
 })
 
@@ -229,6 +318,44 @@ function createMutationFn<P extends DecorateMutationProcedure<any>>(
   )
 }
 
+interface ActionMutationPayload {
+  eventId: string
+  data: ActionFormData
+  metadata?: ActionFormData
+}
+
+type CustomActionMutationFn = (params: ActionMutationPayload) => Promise<void>
+
+/**
+ * Sets configuration for a custom mutation procedure.
+ * mutation should consists of the actual actions defined by the system (declare, validate, etc.)
+ *
+ * Original use case is preparing a custom mutation that binds multiple actions together.
+ */
+export function useCustomActionMutation(mutationFn: CustomActionMutationFn): {
+  mutate: (params: ActionMutationPayload) => void
+} {
+  const options = {
+    retry: true,
+    retryDelay: 10000,
+    onSuccess: () => {
+      console.log('All mutations completed successfully')
+    },
+    onError: (error: Error) => {
+      console.error('Error executing mutations:', error)
+    }
+  }
+
+  const mutation = useMutation({
+    mutationFn,
+    ...options
+  })
+
+  return {
+    mutate: (params) => mutation.mutate(params)
+  }
+}
+
 /**
  * A custom hook that wraps a tRPC mutation procedure for event actions.
  *
@@ -264,10 +391,10 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
   return {
     mutate: (params: inferInput<P>) => {
-      const localEvent = getLocalEventData(params.eventId)
+      const localEvent = findLocalEventData(params.eventId)
 
       const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent.type
+        (event) => event.id === localEvent?.type
       )
 
       if (!eventConfiguration) {

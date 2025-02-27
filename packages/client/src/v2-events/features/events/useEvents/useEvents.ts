@@ -14,7 +14,12 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { EventDocument } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { useOutbox } from './outbox'
-import { useEventAction } from './procedures/action'
+import {
+  registerOnDeclareMutation,
+  useEventAction,
+  useCustomActionMutation,
+  validateOnDeclareMutation
+} from './procedures/action'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 import { useGetEvent } from './procedures/get'
@@ -65,6 +70,10 @@ export function useEvents() {
         approve: useEventAction(trpc.event.actions.correction.approve),
         reject: useEventAction(trpc.event.actions.correction.reject)
       }
+    },
+    customActions: {
+      registerOnDeclare: useCustomActionMutation(registerOnDeclareMutation),
+      validateOnDeclare: useCustomActionMutation(validateOnDeclareMutation)
     }
   }
 }
