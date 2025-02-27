@@ -117,29 +117,18 @@ export function getFieldsWithPopulatedValues({
 export function getEventTitle({
   event,
   eventConfig,
-  workqueue: wq,
-  intl,
-  titleColumn
+  intl
 }: {
   event: EventIndex
   eventConfig: EventConfig
-  workqueue?: WorkqueueConfig
   intl: IntlShape
-  titleColumn?: string
 }): string {
-  const workqueue = wq ?? eventConfig.workqueues[0]
-  const fieldsWithPopulatedValues = getFieldsWithPopulatedValues({
-    workqueue,
-    intl,
-    eventConfig,
-    event
-  })
-
-  return (
-    (titleColumn && fieldsWithPopulatedValues[titleColumn]) ??
-    intl.formatMessage(
-      eventConfig.summary.title.label,
-      flattenEventIndex(event)
-    )
+  const allPropertiesWithEmptyValues = setEmptyValuesForFields(
+    getAllFields(eventConfig)
   )
+
+  return intl.formatMessage(eventConfig.summary.title.label, {
+    ...allPropertiesWithEmptyValues,
+    ...flattenEventIndex(event)
+  })
 }

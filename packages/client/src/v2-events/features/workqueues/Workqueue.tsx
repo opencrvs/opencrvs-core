@@ -214,13 +214,7 @@ function Workqueue({
 
       const titleColumnId = workqueueConfig.columns[0].id
 
-      const title = getEventTitle({
-        event,
-        eventConfig,
-        workqueue: eventWorkqueue,
-        intl: flattenedIntl,
-        titleColumn: titleColumnId
-      })
+      const title = fieldsWithPopulatedValues[titleColumnId]
 
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
