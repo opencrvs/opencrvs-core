@@ -45,6 +45,11 @@ const messages = defineMessages({
     id: 'v2.registerAction.Declare',
     defaultMessage: 'Register',
     description: 'The label for declare button of register action'
+  },
+  registerActionReject: {
+    id: 'v2.registerAction.Reject',
+    defaultMessage: 'Reject',
+    description: 'The label for reject button of register action'
   }
 })
 
@@ -162,7 +167,8 @@ export function Review() {
           messages={{
             title: messages.registerActionTitle,
             description: messages.registerActionDescription,
-            onConfirm: messages.registerActionDeclare
+            onConfirm: messages.registerActionDeclare,
+            onReject: messages.registerActionReject
           }}
           metadata={metadata}
           onConfirm={handleRegistration}

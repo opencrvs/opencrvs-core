@@ -615,6 +615,7 @@ function ReviewActionComponent({
     title: MessageDescriptor
     description: MessageDescriptor
     onConfirm: MessageDescriptor
+    onReject: MessageDescriptor
   }
   primaryButtonType?: 'positive' | 'primary'
 }) {
@@ -645,6 +646,15 @@ function ReviewActionComponent({
             >
               <Icon name="Check" />
               {intl.formatMessage(messages.onConfirm)}
+            </Button>
+            <Button
+              id="review-reject"
+              size="large"
+              type={'negative'}
+              onClick={onReject}
+            >
+              <Icon name="X" />
+              {intl.formatMessage(messages.onReject)}
             </Button>
           </ActionContainer>
         </Content>
