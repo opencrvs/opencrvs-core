@@ -49,7 +49,8 @@ function getSectionFields(
   event: EventConfig,
   formValues: Record<string, FieldValue>,
   handleFieldChange: (fieldId: string, value: FieldValue) => void,
-  intl: IntlShape
+  intl: IntlShape,
+  fieldValues?: Record<string, string>
 ) {
   const advancedSearchSections = event.advancedSearch
   const allUniqueFields = getAllUniqueFields(event)
@@ -79,6 +80,7 @@ function getSectionFields(
           fields={modifiedFields}
           formData={formValues}
           id={section.id}
+          initialValues={fieldValues}
           setAllFieldsDirty={false}
           onChange={(updatedValues) => {
             Object.entries(updatedValues).forEach(([fieldId, value]) => {
@@ -91,7 +93,13 @@ function getSectionFields(
   })
 }
 
-export function TabSearch({ currentEvent }: { currentEvent: EventConfig }) {
+export function TabSearch({
+  currentEvent,
+  fieldValues
+}: {
+  currentEvent: EventConfig
+  fieldValues?: Record<string, string>
+}) {
   const intl = useIntl()
   const [formValues, setFormValues] = React.useState<
     Record<string, FieldValue>
@@ -129,7 +137,8 @@ export function TabSearch({ currentEvent }: { currentEvent: EventConfig }) {
     currentEvent,
     formValues,
     handleFieldChange,
-    intl
+    intl,
+    fieldValues
   )
 
   const hasEnoughParams = Object.entries(formValues).length > 0

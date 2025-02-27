@@ -13,9 +13,9 @@ import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { defineMessages, useIntl } from 'react-intl'
 import styled, { useTheme } from 'styled-components'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { mapKeys } from 'lodash'
-import { ErrorText } from '@opencrvs/components/lib'
+import { ErrorText, Link as StyledLink } from '@opencrvs/components/lib'
 import {
   EventSearchIndex,
   FieldConfig,
@@ -71,6 +71,19 @@ const COLUMNS = {
 const NondecoratedLink = styled(Link)`
   text-decoration: none;
   color: 'primary';
+`
+
+const SearchParamContainer = styled.div`
+  margin: 16px 0px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.primaryDark};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    max-height: 200px;
+    overflow-y: scroll;
+  }
 `
 
 interface Column {
@@ -185,6 +198,11 @@ function changeSortedColumn(
 }
 
 const messagesToDefine = {
+  edit: {
+    defaultMessage: 'Edit',
+    description: 'Edit button text',
+    id: 'buttons.edit'
+  },
   noResult: {
     id: 'v2.search.noResult',
     defaultMessage: 'No results',
@@ -247,6 +265,12 @@ export const SearchResult = (props: IProps) => {
   >(SORT_ORDER.ASCENDING)
 
   const searchParams = parse(window.location.search)
+  const normalizedSearchParams: Record<string, string> = Object.fromEntries(
+    Object.entries(searchParams).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? value.join(',') : value ?? ''
+    ])
+  )
 
   const allFields = getAllUniqueFields(eventConfiguration)
   const outbox = getOutbox()
@@ -448,6 +472,9 @@ export const SearchResult = (props: IProps) => {
           isMobileSize={false}
           noContent={total < 1 && !isLoading}
           noResultText={noResultText}
+          tabBarContent={
+            <SearchModifierComponent searchParams={normalizedSearchParams} />
+          }
           title={`${intl.formatMessage(messages.searchResult)} ${
             isLoading ? '' : ' (' + total + ')'
           }`}
@@ -456,5 +483,29 @@ export const SearchResult = (props: IProps) => {
         </WQContentWrapper>
       </WorkqueueLayout>
     </div>
+  )
+}
+
+function SearchModifierComponent({
+  searchParams
+}: {
+  searchParams: Record<string, string>
+}) {
+  const navigate = useNavigate()
+  const intl = useIntl()
+
+  return (
+    <>
+      <SearchParamContainer>
+        <StyledLink
+          font="bold14"
+          onClick={() =>
+            navigate(ROUTES.V2.ADVANCED_SEARCH.path, { state: searchParams })
+          }
+        >
+          {intl.formatMessage(messages.edit)}
+        </StyledLink>
+      </SearchParamContainer>
+    </>
   )
 }
