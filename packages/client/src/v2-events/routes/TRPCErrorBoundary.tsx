@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,13 +13,14 @@ import React, { Component } from 'react'
 import * as Sentry from '@sentry/react'
 import styled from 'styled-components'
 import { TRPCClientError } from '@trpc/client'
+import { connect } from 'react-redux'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Box } from '@opencrvs/components/lib/Box'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
+// eslint-disable-next-line no-restricted-imports
 import { redirectToAuthentication } from '@client/profile/profileActions'
-import { connect } from 'react-redux'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 const ErrorContainer = styled(Box)`
   display: flex;
@@ -64,12 +66,13 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error) {
+    // eslint-disable-next-line no-console
     console.error('TRPC Error Caught:', error)
   }
 
   render() {
+    // eslint-disable-next-line no-shadow
     const { intl, redirectToAuthentication } = this.props
-
     if (this.state.error) {
       const error = this.state.error
       let httpCode = 500
@@ -96,8 +99,9 @@ class ErrorBoundary extends Component<Props, State> {
       return (
         <Sentry.ErrorBoundary
           showDialog={!development}
-          onError={(error) => {
-            console.log('Sentry.ErrorBoundary: ', error)
+          onError={(err) => {
+            // eslint-disable-next-line no-console
+            console.log('Sentry.ErrorBoundary: ', err)
           }}
         >
           <PageWrapper>

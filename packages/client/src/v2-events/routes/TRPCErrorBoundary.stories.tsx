@@ -34,8 +34,10 @@ export default meta
 export const Default: StoryFn<typeof TRPCErrorBoundary> = () => (
   <TRPCErrorBoundary>
     <div>
-      <h2>Normal Render</h2>
-      <p>This content is inside the error boundary and renders correctly.</p>
+      <h2>{'Normal Render'}</h2>
+      <p>
+        {'This content is inside the error boundary and renders correctly.'}
+      </p>
     </div>
   </TRPCErrorBoundary>
 )
@@ -54,7 +56,7 @@ export const UnauthorizedError: StoryFn<typeof TRPCErrorBoundary> = () => (
   <TRPCErrorBoundary>
     {(() => {
       ;(() => {
-        const error = new TRPCClientError<any>('Unauthorized', {
+        const error = new TRPCClientError<never>('Unauthorized', {
           meta: {
             response: {
               status: 401,
