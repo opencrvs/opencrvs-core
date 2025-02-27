@@ -12,16 +12,25 @@ import React, { useState } from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { defineMessages, useIntl } from 'react-intl'
-import { useTheme } from 'styled-components'
+import styled, { useTheme } from 'styled-components'
+import { Link } from 'react-router-dom'
+import { mapKeys } from 'lodash'
 import { ErrorText } from '@opencrvs/components/lib'
 import {
   EventSearchIndex,
   FieldConfig,
   FieldValue,
-  validateFieldInput
+  getAllFields,
+  validateFieldInput,
+  workqueues,
+  defaultColumns,
+  getOrThrow
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
-import { Workqueue, IColumn } from '@opencrvs/components/lib/Workqueue'
+import {
+  Workqueue,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/Workqueue'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
@@ -30,6 +39,10 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
 import { LoadingIndicator } from '@client/v2-events/components/LoadingIndicator'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
+import { formattedDuration } from '@client/utils/date-formatting'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 
 const SORT_ORDER = {
   ASCENDING: 'asc',
@@ -55,16 +68,25 @@ const COLUMNS = {
   NONE: 'none'
 } as const
 
-const ColumnContentAlignment = {
-  LEFT: 'left',
-  RIGHT: 'right',
-  CENTER: 'center'
-} as const
+const NondecoratedLink = styled(Link)`
+  text-decoration: none;
+  color: 'primary';
+`
+
+interface Column {
+  label?: string
+  width: number
+  key: string
+  sortFunction?: (columnName: string) => void
+  isActionColumn?: boolean
+  isSorted?: boolean
+  alignment?: ColumnContentAlignment
+}
 
 function validateEventSearchParams(
   fields: FieldConfig[],
   values: Record<string, any>
-): Record<string, FieldValue> {
+) {
   const errors = fields.reduce(
     (
       errorResults: { message: string; id: string; value: FieldValue }[],
@@ -91,11 +113,7 @@ function validateEventSearchParams(
     []
   )
 
-  if (errors) {
-    console.log(errors)
-  }
-
-  return values as Record<string, FieldValue>
+  return errors
 }
 
 function changeSortedColumn(
@@ -167,9 +185,9 @@ function changeSortedColumn(
 }
 
 const messagesToDefine = {
-  noResultFor: {
-    id: 'v2.search.noResultFor',
-    defaultMessage: 'No results for ”{param}”',
+  noResult: {
+    id: 'v2.search.noResult',
+    defaultMessage: 'No results',
     description: 'The no result text'
   },
   searchResult: {
@@ -214,9 +232,12 @@ interface IProps {
 
 export const SearchResult = (props: IProps) => {
   const intl = useIntl()
-  const { search } = useEvents()
+  const { search, getOutbox, getDrafts } = useEvents()
+  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
+  const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
+  const { eventConfiguration } = useEventConfiguration(eventType)
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
@@ -226,12 +247,12 @@ export const SearchResult = (props: IProps) => {
   >(SORT_ORDER.ASCENDING)
 
   const searchParams = parse(window.location.search)
-  const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
 
-  const { eventConfiguration } = useEventConfiguration(eventType)
   const allFields = getAllUniqueFields(eventConfiguration)
+  const outbox = getOutbox()
+  const drafts = getDrafts()
 
-  validateEventSearchParams(allFields, searchParams)
+  const fieldValueErrors = validateEventSearchParams(allFields, searchParams)
 
   const {
     data: queryData,
@@ -243,7 +264,15 @@ export const SearchResult = (props: IProps) => {
   })
 
   const total = queryData?.length || 0
-  const searchText = 'searchText'
+  const workqueueId = 'all'
+  const workqueueConfig =
+    workqueueId in workqueues
+      ? workqueues[workqueueId as keyof typeof workqueues]
+      : null
+
+  if (!workqueueConfig) {
+    return null
+  }
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -255,78 +284,148 @@ export const SearchResult = (props: IProps) => {
     setSortOrder(newSortOrder)
   }
 
-  const transformData = (data: EventSearchIndex[]) => {
-    return data.map((doc) => {
-      // @todo get the name from the event data
-      const Name =
-        doc.data?.['applicant.firstname'] +
-        ' ' +
-        doc.data?.['applicant.surname']
-      const event = intl.formatMessage(eventConfiguration.label)
-      const dateOfEvent = new Date(doc.createdAt).toLocaleDateString()
+  const transformData = (eventData: EventSearchIndex[]) => {
+    return eventData
+      .map((event) => {
+        const { data, ...rest } = event
+        return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
+      })
+      .map((doc) => {
+        const isInOutbox = outbox.some(
+          (outboxEvent) => outboxEvent.id === doc.id
+        )
+        const isInDrafts = drafts.some((draft) => draft.id === doc.id)
 
-      return {
-        iconWithName: <IconWithName name={Name} />,
-        event,
-        dateOfEvent
-      }
-    })
+        const getEventStatus = () => {
+          if (isInOutbox) {
+            return 'OUTBOX'
+          }
+          if (isInDrafts) {
+            return 'DRAFT'
+          }
+          return doc.status
+        }
+
+        const eventWorkqueue = getOrThrow(
+          eventConfiguration.workqueues.find(
+            (wq) => wq.id === workqueueConfig.id
+          ),
+          `Could not find workqueue config for ${workqueueConfig.id}`
+        )
+
+        const allPropertiesWithEmptyValues = setEmptyValuesForFields(
+          getAllFields(eventConfiguration)
+        )
+
+        const fieldsWithPopulatedValues: Record<string, string> =
+          eventWorkqueue.fields.reduce(
+            (acc, field) => ({
+              ...acc,
+              [field.column]: flattenedIntl.formatMessage(field.label, {
+                ...allPropertiesWithEmptyValues,
+                ...doc
+              })
+            }),
+            {}
+          )
+        const titleColumnId = workqueueConfig.columns[0].id
+        const status = doc.status
+
+        return {
+          ...fieldsWithPopulatedValues,
+          ...doc,
+          event: intl.formatMessage(eventConfiguration.label),
+          createdAt: formattedDuration(new Date(doc.createdAt)),
+          modifiedAt: formattedDuration(new Date(doc.modifiedAt)),
+          status: intl.formatMessage(
+            {
+              id: `events.status`,
+              defaultMessage:
+                '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+            },
+            {
+              status: getEventStatus()
+            }
+          ),
+          [titleColumnId]: (
+            <NondecoratedLink
+              to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                eventId: doc.id
+              })}
+            >
+              <IconWithName
+                name={fieldsWithPopulatedValues[titleColumnId]}
+                status={status}
+              />
+            </NondecoratedLink>
+          )
+        }
+      })
   }
 
-  const getContentTableColumns = () => {
+  function getDefaultColumns(): Array<Column> {
+    return (
+      (workqueueConfig &&
+        workqueueConfig.defaultColumns.map(
+          (column): Column => ({
+            label:
+              column in defaultColumns
+                ? intl.formatMessage(
+                    defaultColumns[column as keyof typeof defaultColumns].label
+                  )
+                : '',
+            width: 25,
+            key: column,
+            sortFunction: onColumnClick,
+            isSorted: sortedCol === column
+          })
+        )) ??
+      []
+    )
+  }
+
+  // @todo: update when workqueue actions buttons are updated
+  // @TODO: separate types for action button vs other columns
+  function getColumns(): Array<Column> {
     if (windowWidth > theme.grid.breakpoints.lg) {
-      return [
-        {
-          width: 35,
-          label: intl.formatMessage(messages.name),
-          key: COLUMNS.ICON_WITH_NAME,
-          isSorted: sortedCol === COLUMNS.NAME,
-          sortFunction: onColumnClick
-        },
-        {
-          label: intl.formatMessage(messages.event),
-          width: 20,
-          key: COLUMNS.EVENT
-        },
-        {
-          label: intl.formatMessage(messages.eventDate),
-          width: 20,
-          key: COLUMNS.DATE_OF_EVENT,
-          isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
-          sortFunction: onColumnClick
-        },
-        {
-          width: 25,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
-        }
-      ] as IColumn[]
+      return (
+        (workqueueConfig &&
+          workqueueConfig.columns.map((column) => ({
+            label: intl.formatMessage(column.label),
+            width: 35,
+            key: column.id,
+            sortFunction: onColumnClick,
+            isSorted: sortedCol === column.id
+          }))) ??
+        []
+      )
     } else {
-      return [
-        {
-          label: intl.formatMessage(messages.name),
-          width: 70,
-          key: COLUMNS.ICON_WITH_NAME_EVENT
-        },
-        {
-          width: 30,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
-        }
-      ] as IColumn[]
+      return (
+        (workqueueConfig &&
+          workqueueConfig.columns
+            .map((column) => ({
+              label: intl.formatMessage(column.label),
+              width: 35,
+              key: column.id,
+              sortFunction: onColumnClick,
+              isSorted: sortedCol === column.id
+            }))
+            .slice(0, 2)) ??
+        []
+      )
     }
   }
 
   let content
+  let noResultText = intl.formatMessage(messages.noResult)
   if (isLoading) {
     content = (
       <div id="advanced-search_loader">
         <LoadingIndicator loading={true} />
       </div>
     )
-  } else if (error) {
+  } else if (error || fieldValueErrors.length > 0) {
+    noResultText = ''
     content = (
       <ErrorText id="advanced-search-result-error-text">
         {intl.formatMessage(messages.queryError)}
@@ -335,7 +434,7 @@ export const SearchResult = (props: IProps) => {
   } else if (queryData && total > 0) {
     content = (
       <Workqueue
-        columns={getContentTableColumns()}
+        columns={getColumns().concat(getDefaultColumns())}
         content={transformData(queryData)}
         hideLastBorder={true}
         noResultText={intl.formatMessage(messages.noResults)}
@@ -344,18 +443,18 @@ export const SearchResult = (props: IProps) => {
   }
   return (
     <div>
-      <WQContentWrapper
-        isMobileSize={false}
-        noContent={total < 1 && !isLoading}
-        noResultText={intl.formatMessage(messages.noResultFor, {
-          param: searchText
-        })}
-        title={`${intl.formatMessage(messages.searchResult)} ${
-          isLoading ? '' : ' (' + total + ')'
-        }`}
-      >
-        {content}
-      </WQContentWrapper>
+      <WorkqueueLayout>
+        <WQContentWrapper
+          isMobileSize={false}
+          noContent={total < 1 && !isLoading}
+          noResultText={noResultText}
+          title={`${intl.formatMessage(messages.searchResult)} ${
+            isLoading ? '' : ' (' + total + ')'
+          }`}
+        >
+          {content}
+        </WQContentWrapper>
+      </WorkqueueLayout>
     </div>
   )
 }
