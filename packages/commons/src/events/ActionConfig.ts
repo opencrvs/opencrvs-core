@@ -49,6 +49,14 @@ const ValidateConfig = ActionConfigBase.merge(
   })
 )
 
+const RejectDeclarationConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT),
+    comment: z.string(),
+    isDuplicate: z.boolean()
+  })
+)
+
 const RegisterConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER)
@@ -104,6 +112,7 @@ export type AllActionConfigFields =
   | typeof CreateConfig
   | typeof DeclareConfig
   | typeof ValidateConfig
+  | typeof RejectDeclarationConfig
   | typeof RegisterConfig
   | typeof DeleteConfig
   | typeof PrintCertificateActionConfig
@@ -117,6 +126,7 @@ export type InferredActionConfig =
   | z.infer<typeof CreateConfig>
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
+  | z.infer<typeof RejectDeclarationConfig>
   | z.infer<typeof RegisterConfig>
   | z.infer<typeof DeleteConfig>
   | z.infer<typeof PrintCertificateActionConfig>
@@ -129,6 +139,7 @@ export const ActionConfig = z.discriminatedUnion('type', [
   CreateConfig,
   DeclareConfig,
   ValidateConfig,
+  RejectDeclarationConfig,
   RegisterConfig,
   DeleteConfig,
   PrintCertificateActionConfig,

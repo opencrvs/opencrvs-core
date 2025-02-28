@@ -26,7 +26,8 @@ export const ActionType = {
   DECLARE: 'DECLARE',
   DELETE: 'DELETE',
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
-  CUSTOM: 'CUSTOM'
+  CUSTOM: 'CUSTOM',
+  REJECT: 'REJECT'
 } as const
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
