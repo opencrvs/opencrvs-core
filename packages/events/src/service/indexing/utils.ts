@@ -18,7 +18,7 @@ const FIELD_SEPARATOR = '____'
 export const DEFAULT_SIZE = 10
 
 export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
-  const should: QueryDslQueryContainer[] = Object.entries(event).map(
+  const must: QueryDslQueryContainer[] = Object.entries(event).map(
     ([key, value]) => ({
       match: {
         [`data.${key.replaceAll('.', FIELD_SEPARATOR)}`]: value
@@ -28,7 +28,7 @@ export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
 
   return {
     bool: {
-      should
+      must
     }
   } as SearchRequest['query']
 }
