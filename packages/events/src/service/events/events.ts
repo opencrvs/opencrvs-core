@@ -120,25 +120,24 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
-async function deleteSpecificFieldAttachments(
+async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   token: string,
   event: EventDocument,
   field: string,
   fileValue: FileFieldValue
 ) {
   for (const action of event.actions) {
-    for (const [key, value] of Object.entries(action.data)) {
-      const isFile = key === field
-      const currentActionFileValue = FileFieldValue.safeParse(value)
-      if (
-        !isFile ||
-        !currentActionFileValue.success ||
-        isEqual(fileValue, currentActionFileValue)
-      ) {
-        continue
-      }
-      await deleteFile(currentActionFileValue.data.filename, token)
+    if (!action.data[field]) {
+      continue
     }
+    const currentActionFileValue = FileFieldValue.safeParse(action.data[field])
+    if (
+      !currentActionFileValue.success ||
+      isEqual(fileValue, currentActionFileValue)
+    ) {
+      continue
+    }
+    await deleteFile(currentActionFileValue.data.filename, token)
   }
 }
 
@@ -233,11 +232,11 @@ export async function addAction(
     if (!(await fileExists(fileValue.data.filename, token))) {
       throw new Error(`File not found: ${fileValue.data.filename}`)
     }
-    await deleteSpecificFieldAttachments(
+    await cleanUnreferencedAttachmentsFromPreviousDrafts(
       token,
       event,
       key,
-      value as FileFieldValue
+      fileValue.data
     )
   }
 
