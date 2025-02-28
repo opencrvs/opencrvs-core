@@ -128,17 +128,16 @@ export async function deleteFile(filename: string, token: string) {
   const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
     method: 'DELETE',
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: token
     }
   })
-
   return res.ok
 }
 export async function fileExists(filename: string, token: string) {
   const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
     method: 'HEAD',
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: token
     }
   })
 
@@ -154,7 +153,7 @@ async function presignFiles(
     body: JSON.stringify({ filenames }),
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      Authorization: token
     }
   })
 
