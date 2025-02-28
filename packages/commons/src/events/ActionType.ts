@@ -28,7 +28,8 @@ export const ActionType = {
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
   CUSTOM: 'CUSTOM',
   REJECT: 'REJECT',
-  MARKED_AS_DUPLICATE: 'MARKED_AS_DUPLICATE'
+  MARKED_AS_DUPLICATE: 'MARKED_AS_DUPLICATE',
+  ARCHIVED: 'ARCHIVED'
 } as const
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]

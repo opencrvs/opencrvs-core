@@ -103,6 +103,13 @@ export type MarkedAsDuplicateActionInput = z.infer<
   typeof MarkedAsDuplicateActionInput
 >
 
+export const ArchivedActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVED).default(ActionType.ARCHIVED)
+  })
+)
+export type ArchivedActionInput = z.infer<typeof ArchivedActionInput>
+
 const AssignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),
@@ -169,6 +176,7 @@ export const ActionInput = z.discriminatedUnion('type', [
   DeclareActionInput,
   RejectDeclarationActionInput,
   MarkedAsDuplicateActionInput,
+  ArchivedActionInput,
   AssignActionInput,
   UnassignActionInput,
   PrintCertificateActionInput,
