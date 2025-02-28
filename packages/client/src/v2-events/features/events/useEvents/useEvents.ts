@@ -9,20 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { EventDocument } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { useOutbox } from './outbox'
-import {
-  registerOnDeclareMutation,
-  useEventAction,
-  useCustomActionMutation,
-  validateOnDeclareMutation
-} from './procedures/action'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 import { useGetEvent } from './procedures/get'
+import { customMutationKeys, useEventAction } from './procedures/action'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -72,8 +66,12 @@ export function useEvents() {
       }
     },
     customActions: {
-      registerOnDeclare: useCustomActionMutation(registerOnDeclareMutation),
-      validateOnDeclare: useCustomActionMutation(validateOnDeclareMutation)
+      registerOnDeclare: useMutation({
+        mutationKey: customMutationKeys.registerOnDeclare
+      }),
+      validateOnDeclare: useMutation({
+        mutationKey: customMutationKeys.validateOnDeclare
+      })
     }
   }
 }

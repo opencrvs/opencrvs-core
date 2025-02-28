@@ -22,10 +22,11 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { ROUTES } from '@client/v2-events/routes'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { createTemporaryId } from '../../utils'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
-import { createTemporaryId } from './useEvents/procedures/create'
 import { useEvents } from './useEvents/useEvents'
 
 const messages = defineMessages({
@@ -184,3 +185,5 @@ export function EventSelection() {
     </Frame>
   )
 }
+
+export const EventSelectionIndex = withSuspense(EventSelection)

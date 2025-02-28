@@ -87,7 +87,7 @@ function createIDBPersister(idbValidKey = 'reactQuery') {
 
 const persister = createIDBPersister()
 
-const trpcClient = getTrpcClient()
+export const trpcClient = getTrpcClient()
 
 export const queryClient = getQueryClient()
 export const utils = createTRPCOptionsProxy({ queryClient, client: trpcClient })

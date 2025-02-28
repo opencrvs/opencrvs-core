@@ -16,7 +16,7 @@ import {
   setMutationDefaults
 } from '@client/v2-events/features/events/useEvents/api'
 import { utils } from '@client/v2-events/trpc'
-import { waitUntilEventIsCreated } from './create'
+import { waitUntilEventIsCreated } from '@client/v2-events/features/events/useEvents/utils'
 
 setMutationDefaults(utils.event.delete, {
   retry: (_, error) => {

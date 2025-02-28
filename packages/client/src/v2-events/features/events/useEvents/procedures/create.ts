@@ -10,47 +10,15 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { v4 as uuid } from 'uuid'
 import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
 import {
-  findLocalEventData,
   invalidateEventsList,
   setEventData,
   setEventListData,
   setMutationDefaults
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
-
-export function createTemporaryId() {
-  return `tmp-${uuid()}`
-}
-
-export function isTemporaryId(id: string) {
-  return id.startsWith('tmp-')
-}
-
-export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
-  canonicalMutationFn: (params: T) => Promise<R>
-): (params: T) => Promise<R> {
-  return async (params) => {
-    const { eventId } = params
-
-    if (!isTemporaryId(eventId)) {
-      return canonicalMutationFn({ ...params, eventId: eventId })
-    }
-
-    const localVersion = findLocalEventData(eventId)
-    if (!localVersion || isTemporaryId(localVersion.id)) {
-      throw new Error('Event that has not been stored yet cannot be deleted')
-    }
-
-    return canonicalMutationFn({
-      ...params,
-      eventId: localVersion.id,
-      eventType: localVersion.type
-    })
-  }
-}
+import { createTemporaryId } from '@client/v2-events/utils'
 
 setMutationDefaults(utils.event.create, {
   retry: true,

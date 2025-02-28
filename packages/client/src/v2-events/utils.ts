@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import { v4 as uuid } from 'uuid'
 import { uniq, isString, get } from 'lodash'
 import {
   ResolvedUser,
@@ -72,4 +72,12 @@ export const getAllUniqueFields = (currentEvent: EventConfig) => {
       )
     ).values()
   ]
+}
+
+export function isTemporaryId(id: string) {
+  return id.startsWith('tmp-')
+}
+
+export function createTemporaryId() {
+  return `tmp-${uuid()}`
 }
