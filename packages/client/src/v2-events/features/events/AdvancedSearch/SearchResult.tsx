@@ -31,7 +31,6 @@ import {
   Workqueue,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
-import { ITheme } from '@opencrvs/components/lib/theme'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { getAllUniqueFields } from '@client/v2-events/utils'
@@ -244,11 +243,7 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
-interface IProps {
-  theme: ITheme
-}
-
-export const SearchResult = (props: IProps) => {
+export const SearchResult = () => {
   const intl = useIntl()
   const { search, getOutbox, getDrafts } = useEvents()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
