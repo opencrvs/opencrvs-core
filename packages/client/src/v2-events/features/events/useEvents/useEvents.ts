@@ -54,7 +54,6 @@ export function useEvents() {
     },
     getOutbox: useOutbox,
     getDrafts,
-    search: api.event.search.useQuery,
     actions: {
       validate: useEventAction(trpc.event.actions.validate),
       notify: useEventAction(trpc.event.actions.notify),

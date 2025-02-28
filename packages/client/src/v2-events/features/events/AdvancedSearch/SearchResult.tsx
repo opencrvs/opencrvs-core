@@ -15,6 +15,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import styled, { useTheme } from 'styled-components'
 import { Link, useNavigate } from 'react-router-dom'
 import { mapKeys } from 'lodash'
+import { useQuery } from '@tanstack/react-query'
 import { ErrorText, Link as StyledLink } from '@opencrvs/components/lib'
 import {
   EventSearchIndex,
@@ -42,6 +43,7 @@ import { setEmptyValuesForFields } from '@client/v2-events/components/forms/util
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
+import { useTRPC } from '@client/v2-events/trpc'
 
 const SORT_ORDER = {
   ASCENDING: 'asc',
@@ -245,7 +247,8 @@ const messages = defineMessages(messagesToDefine)
 
 export const SearchResult = () => {
   const intl = useIntl()
-  const { search, getOutbox, getDrafts } = useEvents()
+  const trpc = useTRPC()
+  const { getOutbox, getDrafts } = useEvents()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
@@ -277,9 +280,15 @@ export const SearchResult = () => {
     data: queryData,
     isLoading,
     error
-  } = search({
-    ...searchParams,
-    type: eventType
+  } = useQuery({
+    ...trpc.event.search.queryOptions({
+      ...searchParams,
+      type: eventType
+    }),
+    queryKey: trpc.event.search.queryKey({
+      ...searchParams,
+      type: eventType
+    })
   })
 
   const total = queryData?.length || 0
