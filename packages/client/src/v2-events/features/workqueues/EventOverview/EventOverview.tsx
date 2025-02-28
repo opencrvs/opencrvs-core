@@ -27,7 +27,6 @@ import {
   useEventConfigurations
 } from '@client/v2-events/features/events/useEventConfiguration'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -35,6 +34,10 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
+import {
+  RecursiveStringRecord,
+  useFormDataStringifier
+} from '@client/v2-events/hooks/useFormDataStringifier'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -93,15 +96,19 @@ function EventOverview({
   history: ActionDocument[]
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const allFields = getAllFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
 
-  // @TODO: this seems bit redundant. Check if we can get rid of one of these.
-  const { toString } = useTransformer(event.type)
-  const eventWithDefaults = toString(event.data)
+  const stringifyFormData = useFormDataStringifier()
+
+  const eventWithDefaults = stringifyFormData(allFields, event.data)
 
   const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
 
-  const flattenedEventIndex: Record<string, FieldValue | null> = {
+  const flattenedEventIndex: Record<
+    string,
+    FieldValue | null | RecursiveStringRecord
+  > = {
     ...emptyEvent,
     ...eventWithDefaults
   }

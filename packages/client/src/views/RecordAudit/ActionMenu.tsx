@@ -136,7 +136,7 @@ export const ActionMenu: React.FC<{
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger>
+        <DropdownMenu.Trigger asChild>
           <PrimaryButton icon={() => <CaretDown />}>
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
@@ -263,6 +263,7 @@ const ViewAction: React.FC<{
 
   return (
     <DropdownMenu.Item
+      key={'view-action'}
       onClick={() => {
         navigate(
           formatUrl(routes.VIEW_RECORD, {
@@ -295,6 +296,7 @@ const CorrectRecordAction: React.FC<
 
   return (
     <DropdownMenu.Item
+      key={'correct-record-action'}
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
 
@@ -320,7 +322,11 @@ const ArchiveAction: React.FC<
   if (!isArchivable(declarationStatus)) return null
 
   return (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isActionable}>
+    <DropdownMenu.Item
+      key={'archive-action'}
+      onClick={toggleDisplayDialog}
+      disabled={!isActionable}
+    >
       <Icon name="Archive" color="currentColor" size="large" />
       {intl.formatMessage(messages.archiveRecord)}
     </DropdownMenu.Item>
@@ -334,7 +340,11 @@ const ReinstateAction: React.FC<
   if (!canBeReinstated(declarationStatus)) return null
 
   return (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isActionable}>
+    <DropdownMenu.Item
+      key={'reinstate-action'}
+      onClick={toggleDisplayDialog}
+      disabled={!isActionable}
+    >
       <Icon name="FileArrowUp" color="currentColor" size="large" />
       {intl.formatMessage(messages.reinstateRecord)}
     </DropdownMenu.Item>
@@ -353,6 +363,7 @@ const ReviewAction: React.FC<
 
   return (
     <DropdownMenu.Item
+      key={'review-action'}
       onClick={() => {
         navigate(
           generateGoToPageUrl({
@@ -383,6 +394,7 @@ const ReviewCorrectionAction: React.FC<
 
   return (
     <DropdownMenu.Item
+      key={'review-correction-action'}
       onClick={() => {
         if (type) {
           navigate(
@@ -434,6 +446,7 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 
   return (
     <DropdownMenu.Item
+      key={'update-action'}
       onClick={() => {
         navigate(
           generateGoToPageUrl({
@@ -466,6 +479,7 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 
   return (
     <DropdownMenu.Item
+      key={'print-action'}
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
 
@@ -497,6 +511,7 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 
   return (
     <DropdownMenu.Item
+      key={'issue-action'}
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
         navigate(
@@ -520,7 +535,7 @@ const DeleteAction: React.FC<{
   const intl = useIntl()
   if (declarationStatus !== SUBMISSION_STATUS.DRAFT) return null
   return (
-    <DropdownMenu.Item onClick={handleDelete}>
+    <DropdownMenu.Item key={'delete-action'} onClick={handleDelete}>
       <Icon name="Trash" color="currentColor" size="large" />
       {intl.formatMessage(buttonMessages.deleteDeclaration)}
     </DropdownMenu.Item>
@@ -543,7 +558,7 @@ const UnassignAction: React.FC<{
     return null
 
   return (
-    <DropdownMenu.Item onClick={handleUnassign}>
+    <DropdownMenu.Item key={'unassign-action'} onClick={handleUnassign}>
       <Icon name="ArrowCircleDown" color="currentColor" size="large" />
       {intl.formatMessage(buttonMessages.unassign)}
     </DropdownMenu.Item>

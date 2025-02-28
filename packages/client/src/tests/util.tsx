@@ -242,7 +242,7 @@ export const selectOption = (
   const input = wrapper.find(selector).hostNodes()
 
   input.find('input').simulate('focus').update()
-  input.find('.react-select__control').simulate('mousedown').update()
+  input.find('.react-select__control').first().simulate('mousedown').update()
 
   const availableOptions: string[] = []
 
@@ -264,9 +264,9 @@ export const selectOption = (
     )
   }
 
-  nodes.simulate('click').update()
+  nodes.first().simulate('click').update()
 
-  return input.find('.react-select__control')
+  return input.find('.react-select__control').first()
 }
 
 const eventAddressData = {

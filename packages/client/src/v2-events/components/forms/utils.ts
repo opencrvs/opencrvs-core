@@ -11,49 +11,42 @@
 import { formatISO } from 'date-fns'
 import {
   ActionFormData,
-  BaseField,
-  ConditionalParameters,
   FieldConfig,
+  Inferred,
   FieldValue,
-  validate
+  isFieldHidden
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 
-export function handleInitialValue(
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik. This function unflattens
+ */
+export const FIELD_SEPARATOR = '____'
+
+export function handleDefaultValue(
   field: FieldConfig,
   formData: ActionFormData
 ) {
-  const initialValue = field.initialValue
+  const defaultValue = field.defaultValue
 
-  if (hasInitialValueDependencyInfo(initialValue)) {
-    return evalExpressionInFieldDefinition(initialValue.expression, {
+  if (hasDefaultValueDependencyInfo(defaultValue)) {
+    return evalExpressionInFieldDefinition(defaultValue.expression, {
       $form: formData
     })
   }
 
-  return initialValue
+  return defaultValue
 }
 
 export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return getConditionalActionsForField(field, {
+  return !isFieldHidden(field, {
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
     })
-  }).every((fieldAction) => fieldAction !== 'HIDE')
-}
-
-export function getConditionalActionsForField(
-  field: FieldConfig,
-  values: ConditionalParameters
-) {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (!field.conditionals) {
-    return []
-  }
-  return field.conditionals
-    .filter((conditional) => validate(conditional.conditional, values))
-    .map((conditional) => conditional.type)
+  })
 }
 
 export function evalExpressionInFieldDefinition(
@@ -67,10 +60,10 @@ export function evalExpressionInFieldDefinition(
   return eval(expression) as FieldValue
 }
 
-export function hasInitialValueDependencyInfo(
-  value: BaseField['initialValue']
+export function hasDefaultValueDependencyInfo(
+  value: Inferred['defaultValue']
 ): value is DependencyInfo {
-  return typeof value === 'object' && 'dependsOn' in value
+  return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
 }
 
 export function getDependentFields(
@@ -78,13 +71,13 @@ export function getDependentFields(
   fieldName: string
 ): FieldConfig[] {
   return fields.filter((field) => {
-    if (!field.initialValue) {
+    if (!field.defaultValue) {
       return false
     }
-    if (!hasInitialValueDependencyInfo(field.initialValue)) {
+    if (!hasDefaultValueDependencyInfo(field.defaultValue)) {
       return false
     }
-    return field.initialValue.dependsOn.includes(fieldName)
+    return field.defaultValue.dependsOn.includes(fieldName)
   })
 }
 
@@ -105,4 +98,36 @@ export function setEmptyValuesForFields(fields: FieldConfig[]) {
 
 export interface Stringifiable {
   toString(): string
+}
+
+/**
+ *
+ * @param fields field config in OpenCRVS format (separated with `.`)
+ * @param values form values in formik format (separated with `FIELD_SEPARATOR`)
+ * @returns adds 0 before single digit days and months to make them 2 digit
+ * because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
+ */
+export function makeDatesFormatted(
+  fields: FieldConfig[],
+  values: Record<string, FieldValue>
+) {
+  return fields.reduce((acc, field) => {
+    const fieldId = field.id.replaceAll('.', FIELD_SEPARATOR)
+
+    if (field.type === 'DATE' && fieldId in values) {
+      const value = values[fieldId as keyof typeof values]
+      if (typeof value === 'string') {
+        const formattedDate = formatDateFieldValue(value)
+        return { ...acc, [fieldId]: formattedDate }
+      }
+    }
+    return acc
+  }, values)
+}
+
+export function formatDateFieldValue(value: string) {
+  return value
+    .split('-')
+    .map((d: string) => d.padStart(2, '0'))
+    .join('-')
 }

@@ -9,8 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { uniq, isString, get } from 'lodash'
-import { ResolvedUser, ActionDocument } from '@opencrvs/commons/client'
+import { uniq, isString, get, mapKeys } from 'lodash'
+import { IntlShape } from 'react-intl'
+import {
+  ResolvedUser,
+  ActionDocument,
+  EventConfig,
+  EventIndex,
+  WorkqueueConfig,
+  getAllFields
+} from '@opencrvs/commons/client'
+import { setEmptyValuesForFields } from './components/forms/utils'
 
 /**
  *
@@ -36,6 +45,7 @@ export function getUsersFullName(
 }
 
 /** Utility to get all keys from union */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**
@@ -53,4 +63,83 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   )
 
   return uniq(userIds)
+}
+
+export const getAllUniqueFields = (currentEvent: EventConfig) => {
+  return [
+    ...new Map(
+      currentEvent.actions.flatMap((action) =>
+        action.forms.flatMap((form) =>
+          form.pages.flatMap((page) =>
+            page.fields.map((field) => [field.id, field])
+          )
+        )
+      )
+    ).values()
+  ]
+}
+
+export function flattenEventIndex(
+  event: EventIndex
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Omit<EventIndex, 'data'> & { [key: string]: any } {
+  const { data, ...rest } = event
+  return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
+}
+
+export function getFieldsWithPopulatedValues({
+  workqueue,
+  intl,
+  eventConfig,
+  event
+}: {
+  event: EventIndex
+  workqueue: WorkqueueConfig
+  intl: IntlShape
+  eventConfig: EventConfig
+}): Record<string, string> {
+  const allPropertiesWithEmptyValues = setEmptyValuesForFields(
+    getAllFields(eventConfig)
+  )
+
+  return workqueue.fields.reduce(
+    (acc, field) => ({
+      ...acc,
+      [field.column]: intl.formatMessage(field.label, {
+        ...allPropertiesWithEmptyValues,
+        ...flattenEventIndex(event)
+      })
+    }),
+    {}
+  )
+}
+
+export function getEventTitle({
+  event,
+  eventConfig,
+  workqueue: wq,
+  intl,
+  titleColumn
+}: {
+  event: EventIndex
+  eventConfig: EventConfig
+  workqueue?: WorkqueueConfig
+  intl: IntlShape
+  titleColumn?: string
+}): string {
+  const workqueue = wq ?? eventConfig.workqueues[0]
+  const fieldsWithPopulatedValues = getFieldsWithPopulatedValues({
+    workqueue,
+    intl,
+    eventConfig,
+    event
+  })
+
+  return (
+    (titleColumn && fieldsWithPopulatedValues[titleColumn]) ??
+    intl.formatMessage(
+      eventConfig.summary.title.label,
+      flattenEventIndex(event)
+    )
+  )
 }

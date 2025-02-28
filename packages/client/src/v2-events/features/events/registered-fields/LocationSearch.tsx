@@ -10,11 +10,14 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons/client'
 // eslint-disable-next-line no-restricted-imports
-import { getFacilityLocations } from '@client/offline/selectors'
-import { LocationProps } from './Location'
+import { getLocations, getOfflineData } from '@client/offline/selectors'
+import { getListOfLocations } from '@client/utils/validate'
+import { generateLocations } from '@client/utils/locationUtils'
+import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
 interface SearchLocation {
   id: string
@@ -22,54 +25,61 @@ interface SearchLocation {
   displayLabel: string
 }
 
-interface Facility extends LocationProps {
-  type: 'HEALTH_FACILITY'
-  physicalType: 'Building'
-}
+function useAdministrativeAreas(
+  searchableResource: ('locations' | 'facilities' | 'offices')[]
+) {
+  const offlineCountryConfig = useSelector(getOfflineData)
+  const intl = useIntl()
+  const locationList = generateLocations(
+    searchableResource.reduce((locations, resource) => {
+      return {
+        ...locations,
+        ...getListOfLocations(offlineCountryConfig, resource)
+      }
+    }, {}),
+    intl
+  )
 
-function toSearchOption(facility: Facility) {
-  return {
-    id: facility.id,
-    searchableText: facility.name,
-    displayLabel: facility.alias
-  }
-}
-
-function useFacilityLocations(value?: string) {
-  const locationMap = useSelector(getFacilityLocations)
-
-  const locations = Object.values(locationMap)
-
-  const location = value && locationMap[value]
-  const initialLocation = location ? toSearchOption(location) : undefined
-  const options = locations.map(toSearchOption)
-  return { options, initialLocation }
+  return locationList
 }
 
 function LocationSearchInput({
   setFieldValue,
   value,
+  searchableResource,
   ...props
-}: FieldProps<'LOCATION'> & {
+}: FieldProps<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   setFieldValue: (name: string, val: string | undefined) => void
+  searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string
 }) {
-  const { options, initialLocation } = useFacilityLocations()
+  const locationList = useAdministrativeAreas(searchableResource)
+  const selectedLocation = locationList.find(
+    (location) => location.id === value
+  )
 
   return (
     <LocationSearchComponent
       buttonLabel="Health facility"
-      locationList={options}
+      locationList={locationList}
       searchHandler={(location: SearchLocation) =>
         setFieldValue(props.id, location.id)
       }
-      selectedLocation={initialLocation}
+      selectedLocation={selectedLocation}
       {...props}
     />
   )
 }
 
+function LocationSearchOutput({ value }: { value: Stringifiable }) {
+  const locations = useSelector(getLocations)
+
+  const location = value.toString() && locations[value.toString()]
+
+  return location ? location.name : ''
+}
+
 export const LocationSearch = {
   Input: LocationSearchInput,
-  Output: null
+  Output: LocationSearchOutput
 }

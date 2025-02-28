@@ -10,12 +10,13 @@
  */
 
 import {
+  AddressFieldValue,
   EventConfig,
   EventDocument,
   EventIndex,
   FieldConfig,
-  getCurrentEventState,
-  mapFieldTypeToElasticsearch
+  FieldType,
+  getCurrentEventState
 } from '@opencrvs/commons/events'
 import { type estypes } from '@elastic/elasticsearch'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -27,7 +28,6 @@ import {
 import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
-
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
 }
@@ -119,6 +119,86 @@ export function encodeFieldId(fieldId: string) {
 
 function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(SEPARATOR, '.')
+}
+
+type _Combine<
+  T,
+  K extends PropertyKey = T extends unknown ? keyof T : never
+> = T extends unknown ? T & Partial<Record<Exclude<K, keyof T>, never>> : never
+
+type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
+type AllFieldsUnion = Combine<AddressFieldValue>
+
+function mapFieldTypeToElasticsearch(field: FieldConfig) {
+  switch (field.type) {
+    case FieldType.NUMBER:
+      return { type: 'double' }
+    case FieldType.DATE:
+      // @TODO: This should be changed back to 'date'
+      // When we have proper validation of custom fields.
+      return { type: 'text' }
+    case FieldType.TEXT:
+    case FieldType.TEXTAREA:
+    case FieldType.SIGNATURE:
+    case FieldType.PARAGRAPH:
+    case FieldType.BULLET_LIST:
+    case FieldType.PAGE_HEADER:
+    case FieldType.EMAIL:
+      return { type: 'text' }
+    case FieldType.DIVIDER:
+    case FieldType.RADIO_GROUP:
+    case FieldType.SELECT:
+    case FieldType.COUNTRY:
+    case FieldType.CHECKBOX:
+    case FieldType.LOCATION:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
+      return { type: 'keyword' }
+    case FieldType.ADDRESS:
+      const addressProperties = {
+        country: { type: 'keyword' },
+        province: { type: 'keyword' },
+        district: { type: 'keyword' },
+        urbanOrRural: { type: 'keyword' },
+        town: { type: 'keyword' },
+        residentialArea: { type: 'keyword' },
+        street: { type: 'keyword' },
+        number: { type: 'keyword' },
+        zipCode: { type: 'keyword' },
+        village: { type: 'keyword' }
+      } satisfies {
+        [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
+      }
+      return {
+        type: 'object',
+        properties: addressProperties
+      }
+    case FieldType.FILE:
+      return {
+        type: 'object',
+        properties: {
+          filename: { type: 'keyword' },
+          originalFilename: { type: 'keyword' },
+          type: { type: 'keyword' }
+        }
+      }
+    case FieldType.FILE_WITH_OPTIONS:
+      return {
+        type: 'nested',
+        properties: {
+          filename: { type: 'keyword' },
+          originalFilename: { type: 'keyword' },
+          type: { type: 'keyword' },
+          option: { type: 'keyword' }
+        }
+      }
+    default:
+      const _exhaustiveCheck: never = field
+      throw new Error(
+        `Unhandled field type: ${JSON.stringify(_exhaustiveCheck)}`
+      )
+  }
 }
 
 function formFieldsToDataMapping(fields: FieldConfig[]) {

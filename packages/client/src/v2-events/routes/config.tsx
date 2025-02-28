@@ -10,18 +10,21 @@
  */
 
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, RouteObject } from 'react-router-dom'
+
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
-import * as Register from '@client/v2-events/features/events/actions/register'
 import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
+import * as Register from '@client/v2-events/features/events/actions/register'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
+import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
-import { WorkqueueLayout } from '@client/v2-events/layouts'
+import { EventOverviewLayout } from '@client/v2-events/layouts'
+import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from './routes'
 
@@ -34,19 +37,21 @@ import { ROUTES } from './routes'
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
-    <TRPCProvider>
-      <Outlet />
-      <Debug />
-    </TRPCProvider>
+    <TRPCErrorBoundary>
+      <TRPCProvider>
+        <Outlet />
+        <Debug />
+      </TRPCProvider>
+    </TRPCErrorBoundary>
   ),
   children: [
     workqueueRouter,
     {
       path: ROUTES.V2.EVENTS.OVERVIEW.path,
       element: (
-        <WorkqueueLayout>
+        <EventOverviewLayout>
           <EventOverviewIndex />
-        </WorkqueueLayout>
+        </EventOverviewLayout>
       )
     },
     {
@@ -115,6 +120,10 @@ export const routesConfig = {
           element: <PrintCertificate.Review />
         }
       ]
+    },
+    {
+      path: ROUTES.V2.ADVANCED_SEARCH.path,
+      element: <AdvancedSearch />
     }
   ]
-}
+} satisfies RouteObject

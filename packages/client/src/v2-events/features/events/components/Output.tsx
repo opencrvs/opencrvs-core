@@ -14,13 +14,17 @@ import styled from 'styled-components'
 import {
   FieldConfig,
   FieldValue,
+  isAddressFieldType,
+  isAdministrativeAreaFieldType,
   isBulletListFieldType,
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
+  isEmailFieldType,
+  isFacilityFieldType,
   isFileFieldType,
-  isLocationFieldType,
+  isNumberFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
@@ -30,25 +34,31 @@ import {
 
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
+  Address,
+  AdministrativeArea,
   Checkbox,
+  Date as DateField,
+  LocationSearch,
   RadioGroup,
   Select,
-  Location,
-  SelectCountry,
-  Date as DateField
+  SelectCountry
 } from '@client/v2-events/features/events/registered-fields'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
 
+interface FieldWithValue {
+  config: FieldConfig
+  value: FieldValue
+}
 /**
  *  Used for setting output/read (REVIEW) values for FORM input/write fields (string defaults based on FieldType).
  * For setting default fields for intl object @see setEmptyValuesForFields
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
+function ValueOutput(field: FieldWithValue) {
   /* eslint-disable react/destructuring-assignment */
   if (isDateFieldType(field)) {
     return <DateField.Output value={field.value} />
@@ -63,6 +73,10 @@ function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isTextFieldType(field)) {
+    return <DefaultOutput value={field.value} />
+  }
+
+  if (isNumberFieldType(field)) {
     return <DefaultOutput value={field.value} />
   }
 
@@ -86,23 +100,40 @@ function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     return <Checkbox.Output value={field.value} />
   }
 
+  if (isEmailFieldType(field)) {
+    return <DefaultOutput value={field.value} />
+  }
+
+  if (isAddressFieldType(field)) {
+    return <Address.Output value={field.value} />
+  }
+
   if (isRadioGroupFieldType(field)) {
     return (
       <RadioGroup.Output options={field.config.options} value={field.value} />
     )
   }
 
-  if (isLocationFieldType(field)) {
-    return <Location.Output value={field.value} />
+  if (isAdministrativeAreaFieldType(field)) {
+    return <AdministrativeArea.Output value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
     return <DefaultOutput value={field.value} />
   }
+
+  if (isFacilityFieldType(field)) {
+    return <LocationSearch.Output value={field.value} />
+  }
 }
 
 function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
   return value?.toString() || ''
+}
+
+// @TODO: This only works for text fields, each components output function should handle the case for undefined value
+function getEmptyValueForFieldType(field: FieldWithValue) {
+  return '-'
 }
 
 export function Output({
@@ -116,7 +147,10 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
-  if (!value) {
+  // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
+  const hasValue = value !== null && value !== undefined
+
+  if (!hasValue) {
     if (previousValue) {
       return <ValueOutput config={field} value={previousValue} />
     }
@@ -135,11 +169,15 @@ export function Output({
       </>
     )
   }
-  if (!previousValue && value && showPreviouslyMissingValuesAsChanged) {
+
+  if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
         <Deleted>
-          <ValueOutput config={field} value={'-'} />
+          <ValueOutput
+            config={field}
+            value={getEmptyValueForFieldType({ config: field, value })}
+          />
         </Deleted>
         <br />
         <ValueOutput config={field} value={value} />

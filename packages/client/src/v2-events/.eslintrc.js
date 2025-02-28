@@ -52,7 +52,9 @@ module.exports = {
           '!@client/storage',
           '!@client/forms',
           '!@client/i18n',
-          '!@client/search'
+          '!@client/search',
+          '!@client/offline',
+          '!@client/config'
         ]
       }
     ]

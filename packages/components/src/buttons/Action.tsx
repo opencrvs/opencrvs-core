@@ -43,7 +43,7 @@ const ActionTitle = styled.h3<{ disabled?: boolean }>`
 
 const ActionDescription = styled.p<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.secondary};
+    disabled ? theme.colors.disabled : theme.colors.primary};
   ${({ theme }) => theme.fonts.reg16};
   margin: 0;
   margin-top: 3px;

@@ -9,9 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
-import { api, utils } from '@client/v2-events/trpc'
+import {
+  getLocalEventData,
+  invalidateEventsList,
+  setEventData,
+  setEventListData,
+  setMutationDefaults
+} from '@client/v2-events/features/events/useEvents/api'
+import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
 
 export function createTemporaryId() {
   return `tmp-${uuid()}`
@@ -21,8 +29,30 @@ export function isTemporaryId(id: string) {
   return id.startsWith('tmp-')
 }
 
-utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
-  mutationFn: canonicalMutationFn,
+export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
+  canonicalMutationFn: (params: T) => Promise<R>
+): (params: T) => Promise<R> {
+  return async (params) => {
+    const { eventId } = params
+
+    if (!isTemporaryId(eventId)) {
+      return canonicalMutationFn({ ...params, eventId: eventId })
+    }
+
+    const localVersion = getLocalEventData(eventId)
+    if (!localVersion || isTemporaryId(localVersion.id)) {
+      throw new Error('Event that has not been stored yet cannot be deleted')
+    }
+
+    return canonicalMutationFn({
+      ...params,
+      eventId: localVersion.id,
+      eventType: localVersion.type
+    })
+  }
+}
+
+setMutationDefaults(utils.event.create, {
   retry: true,
   onMutate: (newEvent) => {
     const optimisticEvent = {
@@ -44,19 +74,30 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       ]
     }
 
-    utils.event.get.setData(newEvent.transactionId, optimisticEvent)
-    utils.event.list.setData(undefined, (eventIndices) =>
+    setEventData(newEvent.transactionId, optimisticEvent)
+    setEventListData((eventIndices) =>
       eventIndices?.concat(getCurrentEventState(optimisticEvent))
     )
     return optimisticEvent
   },
   onSuccess: async (response, _variables, context) => {
-    utils.event.get.setData(response.id, response)
-    utils.event.get.setData(context.transactionId, response)
-    await utils.event.list.invalidate()
+    setEventData(response.id, response)
+    setEventData(context.transactionId, response)
+    await invalidateEventsList()
   }
-}))
+})
 
-export function createEvent() {
-  return api.event.create.useMutation({})
+export function useCreateEvent() {
+  const trpc = useTRPC()
+  const options = trpc.event.create.mutationOptions<{
+    transactionId: string
+  }>()
+
+  const overrides = queryClient.getMutationDefaults(
+    utils.event.create.mutationKey()
+  )
+  return useMutation({
+    ...options,
+    ...overrides
+  })
 }

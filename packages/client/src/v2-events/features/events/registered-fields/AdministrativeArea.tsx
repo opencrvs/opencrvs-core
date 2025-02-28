@@ -19,18 +19,6 @@ import {
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { Select } from './Select'
 
-export interface LocationProps {
-  id: string
-  name: string
-  status: string
-  alias: string
-  physicalType: string
-  jurisdictionType?: string
-  statisticalId: string
-  type: string
-  partOf: string
-}
-
 function useAdminLocations(partOf: string) {
   const locationMap = useSelector(getAdminStructureLocations)
 
@@ -50,12 +38,12 @@ function useAdminLocations(partOf: string) {
   }))
 }
 
-function LocationInput({
+function AdministrativeAreaInput({
   setFieldValue,
   value,
   partOf,
   ...props
-}: FieldProps<'LOCATION'> & {
+}: FieldProps<'ADMINISTRATIVE_AREA'> & {
   setFieldValue: (name: string, val: string | undefined) => void
   partOf: string | null
   value?: string
@@ -65,6 +53,7 @@ function LocationInput({
   return (
     <Select.Input
       {...props}
+      data-testid={`location__${props.id}`}
       options={options}
       type="SELECT"
       value={value}
@@ -73,7 +62,7 @@ function LocationInput({
   )
 }
 
-function LocationOutput({ value }: { value: Stringifiable }) {
+function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   const locations = useSelector(getLocations)
 
   const location = value.toString() && locations[value.toString()]
@@ -81,7 +70,13 @@ function LocationOutput({ value }: { value: Stringifiable }) {
   return location ? location.name : ''
 }
 
-export const Location = {
-  Input: LocationInput,
-  Output: LocationOutput
+function useStringifier() {
+  const locations = useSelector(getLocations)
+  return (value: string) => locations[value].name
+}
+
+export const AdministrativeArea = {
+  Input: AdministrativeAreaInput,
+  Output: AdministrativeAreaOutput,
+  useStringifier: useStringifier
 }

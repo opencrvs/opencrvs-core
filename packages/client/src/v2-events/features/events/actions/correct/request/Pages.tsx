@@ -21,7 +21,7 @@ import { Pages as PagesComponent } from '@client/v2-events/features/events/compo
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 
 export function Pages() {

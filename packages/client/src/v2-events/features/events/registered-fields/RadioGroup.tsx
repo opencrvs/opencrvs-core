@@ -10,7 +10,11 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { FieldProps, SelectOption } from '@opencrvs/commons/client'
+import {
+  FieldProps,
+  RadioGroup as RadioGroupField,
+  SelectOption
+} from '@opencrvs/commons/client'
 import {
   RadioGroup as RadioGroupComponent,
   RadioSize
@@ -39,6 +43,7 @@ function RadioGroupInput({
 
   return (
     <RadioGroupComponent
+      data-testid={props.id}
       name={props.id}
       options={formattedOptions}
       size={
@@ -66,7 +71,26 @@ function RadioGroupOutput({
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
 }
 
+function useStringifier() {
+  const intl = useIntl()
+
+  return (value: string, fieldConfig: RadioGroupField) => {
+    const option = fieldConfig.options.find((opt) => opt.value === value)
+
+    if (!option) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `Could not find option with value ${value} for field ${fieldConfig.id}`
+      )
+      return value
+    }
+
+    return intl.formatMessage(option.label)
+  }
+}
+
 export const RadioGroup = {
   Input: RadioGroupInput,
-  Output: RadioGroupOutput
+  Output: RadioGroupOutput,
+  useStringifier: useStringifier
 }

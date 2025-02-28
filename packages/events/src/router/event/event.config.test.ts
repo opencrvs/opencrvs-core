@@ -8,4 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './Legend'
+
+import { createTestClient, setupTestCase } from '@events/tests/utils'
+
+test('event config can be fetched', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+  const config = await client.event.config.get()
+
+  expect(config[0].id).toEqual('TENNIS_CLUB_MEMBERSHIP')
+  expect(config[1].id).toEqual('TENNIS_CLUB_MEMBERSHIP_PREMIUM')
+
+  expect(config.length).toEqual(2)
+})

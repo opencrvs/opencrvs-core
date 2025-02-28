@@ -16,8 +16,18 @@ import { FieldValue } from './FieldValue'
 const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  draft: z.boolean().optional().default(false),
-  data: z.record(z.string(), FieldValue)
+  draft: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe('Is the action visible only to the creator'),
+  incomplete: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe('Allows action with partial data to be saved'),
+  data: z.record(z.string(), FieldValue),
+  metadata: z.record(z.string(), FieldValue).optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -89,8 +99,7 @@ export const RequestCorrectionActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.REQUEST_CORRECTION)
-      .default(ActionType.REQUEST_CORRECTION),
-    metadata: z.record(z.string(), FieldValue)
+      .default(ActionType.REQUEST_CORRECTION)
   })
 )
 

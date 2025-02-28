@@ -135,3 +135,24 @@ export function printPDF(template: PDFTemplate, declarationId: string) {
 
 - When introducing a new `MessageDescriptor` create a new row in `client.csv`
 - Each message used under events should have `v2.`-prefix
+
+# Input / Output Components
+
+Every form input is defined as a set of three functions:
+
+- **Input**
+  Defines how a `FieldConfig` is rendered as a React input component inside the form.
+
+- **Output**
+  Defines how the value produced by this input should be as a React component (e.g. review page).
+
+- **useStringifier**
+  Defines how the value produced by this component can be represented as a string. This is required for certificates and internationalized messages.
+
+## Grouped Inputs (e.g., Address)
+
+In some cases, an input component may consist of a collection of other inputs. A good approach for building such a component is to use `<FormFieldGenerator />` internally.
+
+### useStringifier
+
+For grouped inputs, it's often best to create a stringifier that simply redirects the input value back to the form stringifier. This ensures that individual field stringifiers can handle their own values appropriately.

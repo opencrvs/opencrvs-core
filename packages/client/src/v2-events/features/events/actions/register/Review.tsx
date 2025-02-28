@@ -14,7 +14,11 @@ import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { getCurrentEventState, ActionType } from '@opencrvs/commons/client'
+import {
+  getCurrentEventState,
+  ActionType,
+  findActiveActionForm
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -22,7 +26,8 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { FormLayout } from '@client/v2-events/layouts'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -57,32 +62,44 @@ export function Review() {
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata(
+    eventId,
+    event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
+  )
+
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const { forms: formConfigs } = config.actions.filter(
-    (action) => action.type === ActionType.REGISTER
-  )[0]
+  const formConfig = findActiveActionForm(config, ActionType.REGISTER)
+  if (!formConfig) {
+    throw new Error('No active form configuration found for declare action')
+  }
 
-  const setFormValues = useEventFormData((state) => state.setFormValuesIfEmpty)
+  const setFormValuesIfEmpty = useEventFormData(
+    (state) => state.setFormValuesIfEmpty
+  )
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data
+  const form = getFormValues(eventId)
 
   useEffect(() => {
-    setFormValues(eventId, getCurrentEventState(event).data)
-  }, [event, eventId, setFormValues])
-
-  const form = getFormValues(eventId)
+    setFormValuesIfEmpty(eventId, previousFormValues)
+  }, [event, eventId, setFormValuesIfEmpty, previousFormValues])
 
   async function handleEdit({
     pageId,
-    fieldId
+    fieldId,
+    confirmation
   }: {
     pageId: string
     fieldId?: string
+    confirmation?: boolean
   }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close} />
-    ))
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close} />
+      )))
 
     if (confirmedEdit) {
       navigate(
@@ -106,7 +123,8 @@ export function Review() {
       registerMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: uuid()
+        transactionId: uuid(),
+        metadata
       })
 
       goToHome()
@@ -121,7 +139,8 @@ export function Review() {
           eventId: event.id,
           data: form,
           transactionId: uuid(),
-          draft: true
+          draft: true,
+          metadata
         })
         goToHome()
       }}
@@ -129,17 +148,23 @@ export function Review() {
       <ReviewComponent.Body
         eventConfig={config}
         form={form}
-        formConfig={formConfigs[0]}
+        formConfig={formConfig}
+        isUploadButtonVisible={true}
+        metadata={metadata}
         previousFormValues={previousFormValues}
         title=""
         onEdit={handleEdit}
+        onMetadataChange={(values) => setMetadata(eventId, values)}
       >
         <ReviewComponent.Actions
+          form={form}
+          formConfig={formConfig}
           messages={{
             title: messages.registerActionTitle,
             description: messages.registerActionDescription,
             onConfirm: messages.registerActionDeclare
           }}
+          metadata={metadata}
           onConfirm={handleRegistration}
         />
         {modal}

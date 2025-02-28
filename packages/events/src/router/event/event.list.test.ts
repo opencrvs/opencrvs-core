@@ -9,8 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventStatus } from '@opencrvs/commons'
+import { EventStatus, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { TRPCError } from '@trpc/server'
+
+test('prevents forbidden access if missing required scope', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(client.event.list()).rejects.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
+})
+
+test(`allows access with required scope`, async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
+
+  await expect(client.event.list()).resolves.not.toThrow()
+})
 
 test('Returns empty list when no events', async () => {
   const { user } = await setupTestCase()
@@ -42,12 +59,18 @@ test('Returns aggregated event with updated status and values', async () => {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-01',
-    'recommender.firstname': 'Jane',
-    'recommender.surname': 'Doer',
-    'recommender.id': '123-124'
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const event = await client.event.create(generator.event.create())
+
   await client.event.actions.declare(
     generator.event.actions.declare(event.id, {
       data: initialData
@@ -60,7 +83,7 @@ test('Returns aggregated event with updated status and values', async () => {
   expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
   expect(initialEvents[0].data).toEqual(initialData)
 
-  const updatedData = { ...initialData, 'recommender.firstname': 'Yane' }
+  const updatedData = { ...initialData, 'applicant.firstname': 'Jane' }
   await client.event.actions.declare(
     generator.event.actions.declare(event.id, {
       data: updatedData
