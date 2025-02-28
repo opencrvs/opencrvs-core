@@ -22,6 +22,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import {
+  REJECT_ACTIONS,
   RejectionState,
   Review as ReviewComponent
 } from '@client/v2-events/features/events/components/Review'
@@ -144,8 +145,17 @@ export function Review() {
       (close) => <ReviewComponent.ActionModal.Reject close={close} />
     )
     if (confirmedRejection) {
-      console.log({ confirmedRejection })
-      alert('Rejected declaration with id' + event.id)
+      const { rejectAction, message, isDuplicate } = confirmedRejection
+
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId: event.id,
+          data: {},
+          transactionId: uuid(),
+          draft: true,
+          metadata: { message }
+        })
+      }
 
       goToHome()
     }

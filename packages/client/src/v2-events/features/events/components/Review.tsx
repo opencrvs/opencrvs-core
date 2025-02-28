@@ -825,14 +825,14 @@ function AcceptActionModal({
   )
 }
 
-// eslint-disable-next-line no-shadow
-export enum REJECT_ACTIONS {
-  ARCHIVE,
-  SEND_FOR_UPDATE
-}
+export const REJECT_ACTIONS = {
+  ARCHIVE: 'ARCHIVE',
+  SEND_FOR_UPDATE: 'SEND_FOR_UPDATE'
+} as const
 export interface RejectionState {
-  rejectAction: REJECT_ACTIONS
-  details: string
+  rejectAction: keyof typeof REJECT_ACTIONS
+
+  message: string
   isDuplicate: boolean
 }
 
@@ -843,7 +843,7 @@ export function RejectActionModal({
 }) {
   const [state, setState] = useState<RejectionState>({
     rejectAction: REJECT_ACTIONS.ARCHIVE,
-    details: '',
+    message: '',
     isDuplicate: false
   })
 
@@ -864,7 +864,7 @@ export function RejectActionModal({
         </Button>,
         <Button
           key="confirm_reject_with_archive"
-          disabled={!state.details}
+          disabled={!state.message}
           id="confirm_reject_with_archive"
           type="secondaryNegative"
           onClick={() => {
@@ -878,7 +878,7 @@ export function RejectActionModal({
         </Button>,
         <Button
           key="confirm_reject_with_update"
-          disabled={!state.details}
+          disabled={!state.message}
           id="confirm_reject_with_update"
           type="negative"
           onClick={() => {
@@ -903,9 +903,9 @@ export function RejectActionModal({
         </Text>
         <TextArea
           required={true}
-          value={state.details}
+          value={state.message}
           onChange={(e) =>
-            setState((prev) => ({ ...prev, details: e.target.value }))
+            setState((prev) => ({ ...prev, message: e.target.value }))
           }
         />
         <Checkbox
