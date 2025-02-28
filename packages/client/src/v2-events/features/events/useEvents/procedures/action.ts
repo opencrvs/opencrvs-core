@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Mutation as TanstackMutation } from '@tanstack/query-core'
 import { useMutation } from '@tanstack/react-query'
 import {
   DecorateMutationProcedure,
@@ -48,46 +47,46 @@ async function updateLocalEvent(updatedEvent: EventDocument) {
  * The draft stage in the middle will be cancelled. This is to prevent race conditions
  * between when the backend receives the draft and when it receives the declare action.
  */
-function cancelOngoingDraftRequests({ eventId, draft }: ActionInput) {
-  const mutationCache = queryClient.getMutationCache()
+// function cancelOngoingDraftRequests({ eventId, draft }: ActionInput) {
+//   const mutationCache = queryClient.getMutationCache()
 
-  const isDraftMutation = (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutation: TanstackMutation<unknown, Error, any, unknown>
-  ): mutation is TanstackMutation<unknown, Error, ActionInput, unknown> => {
-    const mutationKey = mutation.options.mutationKey
-    if (!mutationKey || !mutationKey[0]) {
-      return false
-    }
-    return ['event', 'actions'].every((key) => mutationKey.flat().includes(key))
-  }
+//   const isDraftMutation = (
+//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//     mutation: TanstackMutation<unknown, Error, any, unknown>
+//   ): mutation is TanstackMutation<unknown, Error, ActionInput, unknown> => {
+//     const mutationKey = mutation.options.mutationKey
+//     if (!mutationKey || !mutationKey[0]) {
+//       return false
+//     }
+//     return ['event', 'actions'].every((key) => mutationKey.flat().includes(key))
+//   }
 
-  const draftMutationsForThisEvent = mutationCache
-    .getAll()
-    .filter(
-      (mutation) =>
-        isDraftMutation(mutation) &&
-        mutation.state.variables?.eventId === eventId &&
-        mutation.state.variables.draft
-    )
+//   const draftMutationsForThisEvent = mutationCache
+//     .getAll()
+//     .filter(
+//       (mutation) =>
+//         isDraftMutation(mutation) &&
+//         mutation.state.variables?.eventId === eventId &&
+//         mutation.state.variables.draft
+//     )
 
-  if (!draft) {
-    draftMutationsForThisEvent.forEach((mutation) => {
-      mutationCache.remove(mutation)
-    })
-  } else {
-    // Keep the last draft mutation as it's this current request
-    draftMutationsForThisEvent.slice(0, -1).forEach((mutation) => {
-      mutationCache.remove(mutation)
-    })
-  }
-}
+//   if (!draft) {
+//     draftMutationsForThisEvent.forEach((mutation) => {
+//       mutationCache.remove(mutation)
+//     })
+//   } else {
+//     // Keep the last draft mutation as it's this current request
+//     draftMutationsForThisEvent.slice(0, -1).forEach((mutation) => {
+//       mutationCache.remove(mutation)
+//     })
+//   }
+// }
 
 function updateEventOptimistically<T extends ActionInput>(
   actionType: 'DECLARE'
 ) {
   return (variables: T) => {
-    cancelOngoingDraftRequests(variables)
+    // cancelOngoingDraftRequests(variables)
 
     const localEvent = queryClient.getQueryData(
       utils.event.get.queryKey(variables.eventId)
@@ -118,6 +117,12 @@ function updateEventOptimistically<T extends ActionInput>(
     )
   }
 }
+
+setMutationDefaults(utils.event.actions.draft.create, {
+  retry: true,
+  mutationFn: createMutationFn(utils.event.actions.draft.create),
+  retryDelay: 10000
+})
 
 setMutationDefaults(utils.event.actions.declare, {
   mutationFn: createMutationFn(utils.event.actions.declare),
@@ -227,6 +232,12 @@ function createMutationFn<P extends DecorateMutationProcedure<any>>(
       })
     }
   )
+}
+
+export function useCreateDraft() {
+  const { mutationFn, ...options } =
+    utils.event.actions.draft.create.mutationOptions()
+  return useMutation(options)
 }
 
 /**

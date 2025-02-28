@@ -16,7 +16,8 @@ import {
   ActionDocument,
   getAllFields,
   SummaryConfig,
-  FieldValue
+  FieldValue,
+  getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -50,14 +51,18 @@ import { EventOverviewProvider } from './EventOverviewContext'
 
 function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvents, getEvent } = useEvents()
+  const { getEvent, getDrafts } = useEvents()
   const { getUsers } = useUsers()
 
   const configs = useEventConfigurations()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const [events] = getEvents.useSuspenseQuery()
-  const event = events.find((e) => e.id === params.eventId)
+  const drafts = getDrafts()
+
+  const event = getCurrentEventStateWithDrafts(
+    fullEvent,
+    drafts.filter((d) => d.eventId === fullEvent.id)
+  )
 
   const config = configs.find((c) => c.id === event?.type)
 
@@ -76,7 +81,7 @@ function EventOverviewContainer() {
     <EventOverviewProvider locations={locations} users={users}>
       <EventOverview
         event={event}
-        history={fullEvent.actions.filter((action) => !action.draft)}
+        history={fullEvent.actions}
         summary={config.summary}
       />
     </EventOverviewProvider>

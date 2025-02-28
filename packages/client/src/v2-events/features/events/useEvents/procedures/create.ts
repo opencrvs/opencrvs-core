@@ -41,6 +41,12 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
 
     const localVersion = getLocalEventData(eventId)
     if (!localVersion || isTemporaryId(localVersion.id)) {
+      // eslint-disable-next-line no-console
+      console.debug('Waiting for event to be created', {
+        eventId,
+        eventType: localVersion.type,
+        params
+      })
       throw new Error('Event that has not been stored yet cannot be deleted')
     }
 
@@ -68,7 +74,6 @@ setMutationDefaults(utils.event.create, {
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
           createdAtLocation: 'TODO',
-          draft: false,
           data: {}
         } satisfies CreatedAction
       ]

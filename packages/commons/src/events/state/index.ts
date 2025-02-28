@@ -10,19 +10,18 @@
  */
 
 import { ActionType } from '../ActionType'
-import { ActionDocument } from '../ActionDocument'
+import { ActionDocument, Metadata } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
+import { Draft } from '../Draft'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
     if (action.type === ActionType.CREATE) {
       return EventStatus.CREATED
     }
-    if (action.draft) {
-      return status
-    }
+
     if (action.type === ActionType.DECLARE) {
       return EventStatus.DECLARED
     }
@@ -91,9 +90,7 @@ function getData(actions: Array<ActionDocument>) {
 }
 
 export function isUndeclaredDraft(event: EventDocument): boolean {
-  return event.actions.every(
-    ({ type, draft }) => type === ActionType.CREATE || draft
-  )
+  return event.actions.every(({ type }) => type === ActionType.CREATE)
 }
 
 export function getCurrentEventState(event: EventDocument): EventIndex {
@@ -119,4 +116,47 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     updatedBy: latestAction.createdBy,
     data: getData(event.actions)
   }
+}
+
+export function getCurrentEventStateWithDrafts(
+  event: EventDocument,
+  drafts: Draft[]
+): EventIndex {
+  const actions = [
+    ...event.actions,
+    ...drafts.map((draft) => draft.action as ActionDocument)
+  ].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  )
+  const withDrafts: EventDocument = {
+    ...event,
+    actions
+  }
+  return getCurrentEventState(withDrafts)
+}
+
+export function getMetadataForAction(
+  event: EventDocument,
+  actionType: ActionType,
+  draftsForEvent: Draft[]
+): Metadata {
+  const action = event.actions.find((action) => actionType === action.type)
+
+  const drafts = draftsForEvent.filter((draft) => draft.eventId === event.id)
+
+  const sorted = [
+    ...(action ? [action] : []),
+    ...drafts.map((draft) => draft.action as ActionDocument)
+  ].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  )
+
+  const metadata = sorted.reduce((metadata, action) => {
+    return {
+      ...metadata,
+      ...action.metadata
+    }
+  }, {})
+
+  return metadata
 }

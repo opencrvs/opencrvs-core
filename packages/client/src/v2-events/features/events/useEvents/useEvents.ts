@@ -11,10 +11,10 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { EventDocument } from '@opencrvs/commons/client'
-import { queryClient, useTRPC } from '@client/v2-events/trpc'
+import { Draft } from '@opencrvs/commons/client'
+import { useTRPC } from '@client/v2-events/trpc'
 import { useOutbox } from './outbox'
-import { useEventAction } from './procedures/action'
+import { useCreateDraft, useEventAction } from './procedures/action'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 import { useGetEvent } from './procedures/get'
@@ -22,16 +22,11 @@ import { useGetEvent } from './procedures/get'
 export function useEvents() {
   const trpc = useTRPC()
 
-  function getDrafts(): EventDocument[] {
-    const queries = queryClient.getQueriesData<EventDocument>({
-      queryKey: trpc.event.get.queryKey(undefined)
-    })
-
-    return queries
-      .map((query) => query[1])
-      .filter((event): event is EventDocument =>
-        Boolean(event && event.actions[event.actions.length - 1].draft)
-      )
+  function useDrafts(): Draft[] {
+    const drafts = useSuspenseQuery(
+      trpc.event.actions.draft.list.queryOptions()
+    ).data
+    return drafts
   }
 
   return {
@@ -53,7 +48,7 @@ export function useEvents() {
       useMutation: useDeleteEvent
     },
     getOutbox: useOutbox,
-    getDrafts,
+    getDrafts: useDrafts,
     actions: {
       validate: useEventAction(trpc.event.actions.validate),
       notify: useEventAction(trpc.event.actions.notify),
@@ -64,6 +59,10 @@ export function useEvents() {
         request: useEventAction(trpc.event.actions.correction.request),
         approve: useEventAction(trpc.event.actions.correction.approve),
         reject: useEventAction(trpc.event.actions.correction.reject)
+      },
+      draft: {
+        list: trpc.event.actions.draft.list,
+        create: useCreateDraft()
       }
     }
   }

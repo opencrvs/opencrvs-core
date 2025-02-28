@@ -109,7 +109,7 @@ export function WorkqueueContainer() {
   // @TODO: We need to revisit on how the workqueue id is passed.
   // We'll follow up during 'workqueue' feature.
   const workqueueId = 'all'
-  const { getEvents } = useEvents()
+  const { getEvents, actions } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const [events] = getEvents.useSuspenseQuery()
@@ -188,7 +188,7 @@ function Workqueue({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
-      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+      const isInDrafts = drafts.some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {
@@ -244,7 +244,7 @@ function Workqueue({
           {
             id: `events.status`,
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {THIS_SHOULD_NEVER_BE_SHOWN} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
           },
           {
             status: getEventStatus()

@@ -68,7 +68,11 @@ export const routesConfig = {
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
-      element: <Outlet />,
+      element: (
+        <Declare.Action>
+          <Outlet />
+        </Declare.Action>
+      ),
       children: [
         {
           index: true,

@@ -81,11 +81,12 @@ export function Pages() {
     <FormLayout
       route={ROUTES.V2.EVENTS.REGISTER}
       onSaveAndExit={() => {
-        events.actions.register.mutate({
+        events.actions.draft.create.mutate({
           eventId: event.id,
           data: form,
+          type: ActionType.REGISTER,
           transactionId: uuid(),
-          draft: true
+          createdAt: new Date().toISOString()
         })
         goToHome()
       }}

@@ -27,6 +27,7 @@ import * as events from '@events/storage/mongodb/events'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { deleteDraftsByEventId } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await events.getClient()
@@ -86,11 +87,12 @@ export async function deleteEvent(
     })
   }
 
-  await deleteEventAttachments(token, event)
-
   const { id } = event
-  await collection.deleteOne({ id })
+  await deleteEventAttachments(token, event)
   await deleteEventIndex(event)
+  await deleteDraftsByEventId(id)
+  await collection.deleteOne({ id })
+
   return { id }
 }
 
@@ -156,7 +158,6 @@ export async function createEvent({
         createdAt: now,
         createdBy,
         createdAtLocation,
-        draft: false,
         id: getUUID(),
         data: {}
       }
@@ -225,7 +226,6 @@ export async function addAction(
           createdBy,
           createdAt: now,
           createdAtLocation,
-          draft: input.draft || false,
           id: getUUID()
         }
       },

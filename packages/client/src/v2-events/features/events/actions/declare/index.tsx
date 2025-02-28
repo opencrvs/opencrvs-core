@@ -10,9 +10,12 @@
  */
 
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { Action } from './Action'
 import { Pages } from './Pages'
 import { Review } from './Review'
 
 const PagesIndex = withSuspense(Pages)
 const ReviewIndex = withSuspense(Review)
-export { PagesIndex as Pages, ReviewIndex as Review }
+const ActionIndex = withSuspense(Action)
+
+export { ActionIndex as Action, PagesIndex as Pages, ReviewIndex as Review }
