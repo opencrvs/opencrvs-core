@@ -10,12 +10,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { useSelector } from 'react-redux'
 import {
   ActionFormData,
+  ActionType,
   FieldConfig,
   FormConfig,
   getFieldValidationErrors,
@@ -26,6 +27,7 @@ import {
 import {
   Accordion,
   Button,
+  Checkbox,
   DocumentViewer,
   Icon,
   IDocumentViewerOptions,
@@ -33,7 +35,9 @@ import {
   ListReview,
   ResponsiveModal,
   Stack,
-  Text
+  Text,
+  TextArea,
+  TextInput
 } from '@opencrvs/components'
 
 import { EventConfig, EventIndex } from '@opencrvs/commons'
@@ -222,6 +226,37 @@ const reviewMessages = defineMessages({
     defaultMessage: 'Add attachement',
     description: 'Edit documents text',
     id: 'review.documents.editDocuments'
+  },
+  rejectModalCancel: {
+    id: 'v2.rejectModal.cancel',
+    defaultMessage: 'Cancel',
+    description: 'The label for cancel button of reject modal'
+  },
+  rejectModalArchive: {
+    id: 'v2.rejectModal.archive',
+    defaultMessage: 'Archive',
+    description: 'The label for archive button of reject modal'
+  },
+  rejectModalSendForUpdate: {
+    id: 'v2.rejectModal.sendForUpdate',
+    defaultMessage: 'Send For Update',
+    description: 'The label for send For Update button of reject modal'
+  },
+  rejectModalTitle: {
+    id: 'v2.rejectModal.title',
+    defaultMessage: 'Reason for rejection?',
+    description: 'The title for reject modal'
+  },
+  rejectModalDescription: {
+    id: 'v2.rejectModal.description',
+    defaultMessage:
+      'Please describe the updates required to this record for follow up action.',
+    description: 'The description for reject modal'
+  },
+  rejectModalMarkAsDuplicate: {
+    id: 'v2.rejectModal.markAsDuplicate',
+    defaultMessage: 'Mark as a duplicate',
+    description: 'The label for mark as duplicate checkbox of reject modal'
   }
 })
 
@@ -604,7 +639,8 @@ function ReviewActionComponent({
   metadata,
   onReject,
   messages,
-  primaryButtonType
+  primaryButtonType,
+  action
 }: {
   onConfirm: () => void
   onReject?: () => void
@@ -618,6 +654,7 @@ function ReviewActionComponent({
     onReject: MessageDescriptor
   }
   primaryButtonType?: 'positive' | 'primary'
+  action?: string
 }) {
   const intl = useIntl()
   const errorExist = validationErrorsInActionFormExist(
@@ -647,15 +684,17 @@ function ReviewActionComponent({
               <Icon name="Check" />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
-            <Button
-              id="review-reject"
-              size="large"
-              type={'negative'}
-              onClick={onReject}
-            >
-              <Icon name="X" />
-              {intl.formatMessage(messages.onReject)}
-            </Button>
+            {action !== ActionType.DECLARE && (
+              <Button
+                id="review-reject"
+                size="large"
+                type={'negative'}
+                onClick={onReject}
+              >
+                <Icon name="X" />
+                {intl.formatMessage(messages.onReject)}
+              </Button>
+            )}
           </ActionContainer>
         </Content>
       </UnderLayBackground>
@@ -679,6 +718,7 @@ function EditModal({
   return (
     <ResponsiveModal
       autoHeight
+      showHeaderBorder
       actions={[
         <Button
           key="cancel_edit"
@@ -719,7 +759,7 @@ function EditModal({
   )
 }
 
-function ActionModal({
+function AcceptActionModal({
   copy,
   close,
   action
@@ -737,6 +777,7 @@ function ActionModal({
   return (
     <ResponsiveModal
       autoHeight
+      showHeaderBorder
       actions={[
         <Button
           key={'cancel_' + action}
@@ -767,7 +808,6 @@ function ActionModal({
         </Button>
       ]}
       handleClose={() => close(null)}
-      responsive={false}
       show={true}
       title={intl.formatMessage(
         copy?.title || reviewMessages.actionModalTitle,
@@ -785,9 +825,109 @@ function ActionModal({
   )
 }
 
+// eslint-disable-next-line no-shadow
+export enum REJECT_ACTIONS {
+  ARCHIVE,
+  SEND_FOR_UPDATE
+}
+export interface RejectionState {
+  rejectAction: REJECT_ACTIONS
+  details: string
+  isDuplicate: boolean
+}
+
+export function RejectActionModal({
+  close
+}: {
+  close: (result: RejectionState | null) => void
+}) {
+  const [state, setState] = useState<RejectionState>({
+    rejectAction: REJECT_ACTIONS.ARCHIVE,
+    details: '',
+    isDuplicate: false
+  })
+
+  const intl = useIntl()
+  return (
+    <ResponsiveModal
+      showHeaderBorder
+      actions={[
+        <Button
+          key="cancel_reject"
+          id="cancel_reject"
+          type="tertiary"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          {intl.formatMessage(reviewMessages.rejectModalCancel)}
+        </Button>,
+        <Button
+          key="confirm_reject_with_archive"
+          disabled={!state.details}
+          id="confirm_reject_with_archive"
+          type="secondaryNegative"
+          onClick={() => {
+            close({
+              ...state,
+              rejectAction: REJECT_ACTIONS.ARCHIVE
+            })
+          }}
+        >
+          {intl.formatMessage(reviewMessages.rejectModalArchive)}
+        </Button>,
+        <Button
+          key="confirm_reject_with_update"
+          disabled={!state.details}
+          id="confirm_reject_with_update"
+          type="negative"
+          onClick={() => {
+            close({
+              ...state,
+              rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
+            })
+          }}
+        >
+          {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
+        </Button>
+      ]}
+      contentHeight={270}
+      handleClose={() => close(null)}
+      show={true}
+      title={intl.formatMessage(reviewMessages.rejectModalTitle)}
+      width={918}
+    >
+      <Stack alignItems="left" direction="column">
+        <Text color="grey500" element="p" variant="reg16">
+          {intl.formatMessage(reviewMessages.rejectModalDescription)}
+        </Text>
+        <TextArea
+          required={true}
+          value={state.details}
+          onChange={(e) =>
+            setState((prev) => ({ ...prev, details: e.target.value }))
+          }
+        />
+        <Checkbox
+          label={intl.formatMessage(reviewMessages.rejectModalMarkAsDuplicate)}
+          name={'markDUplicate'}
+          selected={state.isDuplicate}
+          value={''}
+          onChange={() =>
+            setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
+          }
+        />
+      </Stack>
+    </ResponsiveModal>
+  )
+}
+
 export const Review = {
   Body: ReviewComponent,
   Actions: ReviewActionComponent,
   EditModal: EditModal,
-  ActionModal: ActionModal
+  ActionModal: {
+    Accept: AcceptActionModal,
+    Reject: RejectActionModal
+  }
 }

@@ -118,7 +118,7 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
 
     async function handleDeclaration() {
       await openModal<boolean | null>((close) => (
-        <Review.ActionModal action="Declare" close={close} />
+        <Review.ActionModal.Accept action="Declare" close={close} />
       ))
     }
 
@@ -156,6 +156,11 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
               onConfirm: {
                 id: 'ourOnConfirm',
                 defaultMessage: 'Confirm test',
+                description: 'The title for review action'
+              },
+              onReject: {
+                id: 'ourOnReject',
+                defaultMessage: 'Reject test',
                 description: 'The title for review action'
               }
             }}
@@ -222,6 +227,11 @@ export const ReviewWithValidationErrors: Story = {
             onConfirm: {
               id: 'ourOnConfirm',
               defaultMessage: 'Confirm test',
+              description: 'The title for review action'
+            },
+            onReject: {
+              id: 'ourOnReject',
+              defaultMessage: 'Reject test',
               description: 'The title for review action'
             }
           }}

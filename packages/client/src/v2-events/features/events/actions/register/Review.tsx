@@ -21,7 +21,10 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  RejectionState,
+  Review as ReviewComponent
+} from '@client/v2-events/features/events/components/Review'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -122,7 +125,7 @@ export function Review() {
 
   async function handleRegistration() {
     const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal action="Register" close={close} />
+      <ReviewComponent.ActionModal.Accept action="Register" close={close} />
     ))
     if (confirmedRegistration) {
       registerMutation.mutate({
@@ -131,6 +134,18 @@ export function Review() {
         transactionId: uuid(),
         metadata
       })
+
+      goToHome()
+    }
+  }
+
+  async function handleRejection() {
+    const confirmedRejection = await openModal<RejectionState | null>(
+      (close) => <ReviewComponent.ActionModal.Reject close={close} />
+    )
+    if (confirmedRejection) {
+      console.log({ confirmedRejection })
+      alert('Rejected declaration with id' + event.id)
 
       goToHome()
     }
@@ -172,6 +187,7 @@ export function Review() {
           }}
           metadata={metadata}
           onConfirm={handleRegistration}
+          onReject={handleRejection}
         />
         {modal}
       </ReviewComponent.Body>
