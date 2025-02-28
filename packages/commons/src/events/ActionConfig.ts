@@ -56,6 +56,13 @@ const RejectDeclarationConfig = ActionConfigBase.merge(
     isDuplicate: z.boolean()
   })
 )
+const MarkedAsDuplicateConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE),
+    comment: z.string(),
+    duplicates: z.array(z.string()).describe('UUIDs of duplicate records')
+  })
+)
 
 const RegisterConfig = ActionConfigBase.merge(
   z.object({
@@ -113,6 +120,7 @@ export type AllActionConfigFields =
   | typeof DeclareConfig
   | typeof ValidateConfig
   | typeof RejectDeclarationConfig
+  | typeof MarkedAsDuplicateConfig
   | typeof RegisterConfig
   | typeof DeleteConfig
   | typeof PrintCertificateActionConfig
@@ -127,6 +135,7 @@ export type InferredActionConfig =
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
   | z.infer<typeof RejectDeclarationConfig>
+  | z.infer<typeof MarkedAsDuplicateConfig>
   | z.infer<typeof RegisterConfig>
   | z.infer<typeof DeleteConfig>
   | z.infer<typeof PrintCertificateActionConfig>
@@ -140,6 +149,7 @@ export const ActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,
   ValidateConfig,
   RejectDeclarationConfig,
+  MarkedAsDuplicateConfig,
   RegisterConfig,
   DeleteConfig,
   PrintCertificateActionConfig,
