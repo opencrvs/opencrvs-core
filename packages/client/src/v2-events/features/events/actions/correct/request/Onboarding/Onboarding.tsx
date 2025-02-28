@@ -24,6 +24,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 const messages = defineMessages({
   title: {

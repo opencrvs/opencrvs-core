@@ -18,7 +18,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
     "@opencrvs/commons": "^1.7.0",
-    "@trpc/server": "^11.0.0-rc.532",
+    "@trpc/server": "^11.0.0-rc.804",
     "app-module-path": "^2.2.0",
     "date-fns": "^4.1.0",
     "envalid": "^8.0.0",

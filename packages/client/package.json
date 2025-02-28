@@ -22,7 +22,9 @@
     "build:clean": "rm -rf build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook"
+    "test-storybook": "test-storybook",
+    "test-storybook:watch": "test-storybook --watch",
+    "chromatic": "chromatic --onlyChanged --exitZeroOnChanged"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -45,9 +47,9 @@
     "@tanstack/react-query": "^5.61.5",
     "@tanstack/react-query-devtools": "^5.62.2",
     "@tanstack/react-query-persist-client": "^5.62.2",
-    "@trpc/client": "^11.0.0-rc.648",
-    "@trpc/react-query": "^11.0.0-rc.648",
-    "@trpc/server": "^11.0.0-rc.648",
+    "@trpc/client": "^11.0.0-rc.804",
+    "@trpc/server": "^11.0.0-rc.804",
+    "@trpc/tanstack-react-query": "^11.0.0-rc.804",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
     "@types/html-to-pdfmake": "^2.4.4",
@@ -96,7 +98,7 @@
     "react-intl": "5.25.1",
     "react-page-visibility": "^3.2.1",
     "react-redux": "^7.1.1",
-    "react-router-dom": "^6.28.0",
+    "react-router-dom": "^6.28.1",
     "react-router-typesafe-routes": "1.2.2",
     "react-stickynode": "^2.0.1",
     "react-tooltip": "^4.2.21",
@@ -164,6 +166,7 @@
     "@vitest/coverage-c8": "^0.25.5",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "chalk": "^2.4.1",
+    "chromatic": "^11.25.2",
     "crypto-js": "^4.2.0",
     "csv-stringify": "^6.4.6",
     "csv2json": "^2.0.2",
@@ -210,6 +213,11 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }

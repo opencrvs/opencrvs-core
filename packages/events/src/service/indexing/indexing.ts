@@ -121,8 +121,18 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(SEPARATOR, '.')
 }
 
+type _Combine<
+  T,
+  K extends PropertyKey = T extends unknown ? keyof T : never
+> = T extends unknown ? T & Partial<Record<Exclude<K, keyof T>, never>> : never
+
+type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
+type AllFieldsUnion = Combine<AddressFieldValue>
+
 function mapFieldTypeToElasticsearch(field: FieldConfig) {
   switch (field.type) {
+    case FieldType.NUMBER:
+      return { type: 'double' }
     case FieldType.DATE:
       // @TODO: This should be changed back to 'date'
       // When we have proper validation of custom fields.
@@ -141,6 +151,9 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.CHECKBOX:
     case FieldType.LOCATION:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
@@ -155,9 +168,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         zipCode: { type: 'keyword' },
         village: { type: 'keyword' }
       } satisfies {
-        [K in keyof Required<
-          NonNullable<AddressFieldValue>
-        >]: estypes.MappingProperty
+        [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
       return {
         type: 'object',
@@ -170,6 +181,16 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           filename: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
+        }
+      }
+    case FieldType.FILE_WITH_OPTIONS:
+      return {
+        type: 'nested',
+        properties: {
+          filename: { type: 'keyword' },
+          originalFilename: { type: 'keyword' },
+          type: { type: 'keyword' },
+          option: { type: 'keyword' }
         }
       }
     default:

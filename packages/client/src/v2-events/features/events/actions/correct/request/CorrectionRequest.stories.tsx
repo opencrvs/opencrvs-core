@@ -40,26 +40,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-export const Onboarding: Story = {
-  parameters: {
-    reactRouter: {
-      router: router,
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
-        pageId: 'corrector'
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
 function FormClear() {
   const form = useEventFormData()
   const requestDetails = useCorrectionRequestData()
@@ -67,7 +47,8 @@ function FormClear() {
     form.setFormValues(tennisClueMembershipEventDocument.id, {
       'applicant.firstname': 'Max',
       'applicant.surname': 'McLaren',
-      'applicant.dob': '2020-01-02'
+      'applicant.dob': '2020-01-02',
+      'recommender.none': true
     })
     requestDetails.setFormValues({
       'correction.requester.relationship': 'ANOTHER_AGENT',
