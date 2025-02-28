@@ -308,8 +308,13 @@ export async function getIndexedEvents() {
 
 export async function getIndex(eventParams: EventSearchIndex) {
   const esClient = getOrCreateClient()
-  const { type, ...rest } = eventParams
-  const query = generateQuery(rest)
+  const { type, ...queryParams } = eventParams
+
+  if (Object.values(queryParams).length === 0) {
+    throw new Error('No search params provided')
+  }
+
+  const query = generateQuery(queryParams)
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventIndexName(type),

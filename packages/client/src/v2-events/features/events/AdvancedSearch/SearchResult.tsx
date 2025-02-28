@@ -279,7 +279,7 @@ export const SearchResult = () => {
   const {
     data: queryData,
     isLoading,
-    error
+    error: queryError
   } = useQuery({
     ...trpc.event.search.queryOptions({
       ...searchParams,
@@ -452,7 +452,7 @@ export const SearchResult = () => {
         <LoadingIndicator loading={true} />
       </div>
     )
-  } else if (error || fieldValueErrors.length > 0) {
+  } else if (queryError || fieldValueErrors.length > 0) {
     noResultText = ''
     content = (
       <ErrorText id="advanced-search-result-error-text">
