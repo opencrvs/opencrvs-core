@@ -70,8 +70,7 @@ jobs:
         with:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-      - name: Delete public key
-        run: rm -f ~/.ssh/id_rsa.pub
+          if_key_exists: replace
       - name: Deploy to staging
         env:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
