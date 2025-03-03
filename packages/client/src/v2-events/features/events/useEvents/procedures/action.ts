@@ -28,15 +28,13 @@ import {
   invalidateEventsList,
   setEventData,
   setEventListData,
-  setMutationDefaults
+  setMutationDefaults,
+  findLocalEventData
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, utils } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 import * as customApi from '@client/v2-events/custom-api'
-import {
-  findLocalEventData,
-  waitUntilEventIsCreated
-} from '@client/v2-events/features/events/useEvents/utils'
+import { waitUntilEventIsCreated } from './create'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
@@ -122,25 +120,6 @@ function updateEventOptimistically<T extends ActionInput>(
     )
   }
 }
-export const customMutationKeys = {
-  validateOnDeclare: ['validateOnDeclare'],
-  registerOnDeclare: ['registerOnDeclare']
-} as const
-
-queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
-  mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
-  retry: true,
-  retryDelay: 10000,
-
-  onSuccess: updateLocalEvent
-})
-
-queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
-  mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
-  retry: true,
-  retryDelay: 10000,
-  onSuccess: updateLocalEvent
-})
 
 setMutationDefaults(utils.event.actions.declare, {
   mutationFn: createMutationFn(utils.event.actions.declare),
@@ -223,16 +202,36 @@ setMutationDefaults(utils.event.actions.correction.reject, {
   }
 })
 
+export const customMutationKeys = {
+  validateOnDeclare: ['validateOnDeclare'],
+  registerOnDeclare: ['registerOnDeclare']
+} as const
+
+queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
+  mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
+  retry: true,
+  retryDelay: 10000,
+
+  onSuccess: updateLocalEvent
+})
+
+queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
+  mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent
+})
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createMutationFn<P extends DecorateMutationProcedure<any>>(
-  procedure: P
+  trpcProcedure: P
 ) {
   /*
    * Merge default tRPC mutationOptions with the ones provided above
    */
   const mutationOptions = {
-    ...procedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(procedure.mutationKey())
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
   }
 
   if (!mutationOptions.mutationFn) {
@@ -261,17 +260,17 @@ function createMutationFn<P extends DecorateMutationProcedure<any>>(
  * 2. Strips away all fields that should not be part of the payload based on the conditions in the form fields.
  *
  * @template P - The type of the tRPC mutation procedure.
- * @param {P} procedure - The tRPC mutation procedure to be wrapped.
+ * @param {P} trpcProcedure - The tRPC mutation procedure to be wrapped.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useEventAction<P extends DecorateMutationProcedure<any>>(
-  procedure: P
+  trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
 
   const allOptions = {
-    ...procedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(procedure.mutationKey())
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
   }
 
   const { mutationFn, ...mutationOptions } = allOptions
@@ -293,6 +292,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   return {
     mutate: (params: inferInput<P>) => {
       const localEvent = findLocalEventData(params.eventId)
+
+      console.log('localEvent', localEvent)
 
       const eventConfiguration = eventConfigurations.find(
         (event) => event.id === localEvent?.type

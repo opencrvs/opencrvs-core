@@ -10,18 +10,51 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
+import { v4 as uuid } from 'uuid'
 import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
 import {
   invalidateEventsList,
   setEventData,
   setEventListData,
-  setMutationDefaults
+  setMutationDefaults,
+  findLocalEventData
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
-import { createTemporaryId } from '@client/v2-events/utils'
+
+export function createTemporaryId() {
+  return `tmp-${uuid()}`
+}
+
+export function isTemporaryId(id: string) {
+  return id.startsWith('tmp-')
+}
+
+export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
+  canonicalMutationFn: (params: T) => Promise<R>
+): (params: T) => Promise<R> {
+  return async (params) => {
+    const { eventId } = params
+
+    if (!isTemporaryId(eventId)) {
+      return canonicalMutationFn({ ...params, eventId: eventId })
+    }
+
+    const localVersion = findLocalEventData(eventId)
+    if (!localVersion || isTemporaryId(localVersion.id)) {
+      throw new Error('Event that has not been stored yet cannot be deleted')
+    }
+
+    return canonicalMutationFn({
+      ...params,
+      eventId: localVersion.id,
+      eventType: localVersion.type
+    })
+  }
+}
 
 setMutationDefaults(utils.event.create, {
   retry: true,
+  retryDelay: 1000,
   onMutate: (newEvent) => {
     const optimisticEvent = {
       id: newEvent.transactionId,
@@ -48,7 +81,13 @@ setMutationDefaults(utils.event.create, {
     )
     return optimisticEvent
   },
+  throwOnError: true,
+
+  onError: (a) => {
+    console.log('a', a)
+  },
   onSuccess: async (response, _variables, context) => {
+    console.log('success')
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
     await invalidateEventsList()
