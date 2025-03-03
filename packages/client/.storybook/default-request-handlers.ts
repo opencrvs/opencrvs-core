@@ -53,6 +53,11 @@ export const handlers = {
       return []
     })
   ],
+  deleteEvent: [
+    tRPCMsw.event.delete.mutation(() => {
+      return { id: '123' }
+    })
+  ],
   events: [
     tRPCMsw.event.config.get.query(() => {
       return [tennisClubMembershipEvent, birthEvent]
