@@ -145,14 +145,14 @@ export function Review() {
       (close) => <ReviewComponent.ActionModal.Reject close={close} />
     )
     if (confirmedRejection) {
-      const { rejectAction, message, isDuplicate } = confirmedRejection
+      const { rejectAction, message } = confirmedRejection
 
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
         events.actions.reject.mutate({
           eventId: event.id,
           data: {},
           transactionId: uuid(),
-          draft: true,
+          draft: false,
           metadata: { message }
         })
       }
