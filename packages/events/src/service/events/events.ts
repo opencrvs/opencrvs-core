@@ -120,6 +120,16 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
+function generateTrackingId(): string {
+  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  let result = ''
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length)
+    result += characters[randomIndex]
+  }
+  return result
+}
+
 type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
 export async function createEvent({
   eventInput,
@@ -143,6 +153,7 @@ export async function createEvent({
 
   const now = new Date().toISOString()
   const id = getUUID()
+  const trackingId = generateTrackingId()
 
   await collection.insertOne({
     ...eventInput,
@@ -150,6 +161,7 @@ export async function createEvent({
     transactionId,
     createdAt: now,
     updatedAt: now,
+    trackingId,
     actions: [
       {
         type: ActionType.CREATE,

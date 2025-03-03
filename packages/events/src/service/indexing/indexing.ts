@@ -99,7 +99,8 @@ export async function createIndex(
           data: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)
-          }
+          },
+          trackingId: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }

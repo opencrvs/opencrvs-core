@@ -17,7 +17,8 @@ export const EventDocument = z.object({
   type: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-  actions: z.array(ActionDocument)
+  actions: z.array(ActionDocument),
+  trackingId: z.string()
 })
 
 export type EventDocument = z.infer<typeof EventDocument>
