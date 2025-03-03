@@ -57,6 +57,7 @@ import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import * as routes from '@client/navigation/routes'
 import { useNavigate } from 'react-router-dom'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IBasePrintTabProps {
   queryData: {
@@ -91,6 +92,7 @@ export const ReadyToIssue = ({
   const outboxDeclarations = useSelector(
     (store: IStoreState) => store.declarationsState.declarations
   )
+  const userDetails = useSelector(getUserDetails)
 
   const theme = useTheme()
 
@@ -169,13 +171,18 @@ export const ReadyToIssue = ({
       const foundDeclaration = outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
+      const assignedToOther = !!(
+        reg.assignment &&
+        reg.assignment.practitionerId !== userDetails?.practitionerId
+      )
       const actions: IAction[] = []
       const downloadStatus = foundDeclaration?.downloadStatus
 
       if (width > theme.grid.breakpoints.lg) {
         actions.push({
           label: intl.formatMessage(buttonMessages.issue),
-          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
+          disabled:
+            downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED || assignedToOther,
           handler: (
             e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
           ) => {

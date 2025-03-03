@@ -34,7 +34,7 @@ import * as routes from '@client/navigation/routes'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
   isBirthEvent,
   isDeathEvent,
@@ -79,7 +79,7 @@ import {
 import * as React from 'react'
 import { useState } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { withTheme } from 'styled-components'
 
@@ -121,6 +121,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
 
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NOTIFICATION_SENT)
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.DESCENDING)
+  const userDetails = useSelector(getUserDetails)
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -144,6 +145,12 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       if (!reg) {
         throw new Error('Registration is null')
       }
+
+      const assignedToOther = !!(
+        reg.registration?.assignment &&
+        reg.registration.assignment.practitionerId !==
+          userDetails?.practitionerId
+      )
 
       const regId = reg.id
       const event = reg.type
@@ -211,7 +218,8 @@ function InProgressComponent(props: IRegistrarHomeProps) {
               )
             }
           },
-          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+          disabled:
+            downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED || assignedToOther
         })
       }
       if (reg.registration?.status) {

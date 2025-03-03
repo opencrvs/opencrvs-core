@@ -22,7 +22,7 @@ import {
 import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { withTheme } from 'styled-components'
 import {
   buttonMessages,
@@ -61,6 +61,7 @@ import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { useState } from 'react'
 import * as routes from '@client/navigation/routes'
 import { useNavigate } from 'react-router-dom'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -84,6 +85,7 @@ function ReadyToPrintComponent(props: IPrintTabProps) {
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
+  const userDetails = useSelector(getUserDetails)
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -158,6 +160,10 @@ function ReadyToPrintComponent(props: IPrintTabProps) {
 
     const transformedData = transformData(data, props.intl)
     const items = transformedData.map((reg, index) => {
+      const assignedToOther = !!(
+        reg.assignment &&
+        reg.assignment.practitionerId !== userDetails?.practitionerId
+      )
       const foundDeclaration = props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
@@ -167,7 +173,8 @@ function ReadyToPrintComponent(props: IPrintTabProps) {
       if (width > props.theme.grid.breakpoints.lg) {
         actions.push({
           label: props.intl.formatMessage(buttonMessages.print),
-          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
+          disabled:
+            downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED || assignedToOther,
           handler: (
             e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
           ) => {
