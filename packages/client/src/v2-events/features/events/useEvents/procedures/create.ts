@@ -58,7 +58,7 @@ setMutationDefaults(utils.event.create, {
     const optimisticEvent = {
       id: newEvent.transactionId,
       type: newEvent.type,
-      trackingId: '',
+      trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
