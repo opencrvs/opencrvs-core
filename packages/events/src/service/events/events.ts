@@ -120,12 +120,16 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
+const TRACKING_ID_LENGTH = 6
+const TRACKING_ID_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 function generateTrackingId(): string {
-  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   let result = ''
-  for (let i = 0; i < 6; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length)
-    result += characters[randomIndex]
+  for (let i = 0; i < TRACKING_ID_LENGTH; i++) {
+    const randomIndex = Math.floor(
+      Math.random() * TRACKING_ID_CHARACTERS.length
+    )
+    result += TRACKING_ID_CHARACTERS[randomIndex]
   }
   return result
 }
