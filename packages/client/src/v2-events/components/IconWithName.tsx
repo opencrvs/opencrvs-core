@@ -31,6 +31,17 @@ interface IIconWith {
   isArchived?: boolean
 }
 
+const Event = styled.div`
+  color: ${({ theme }) => theme.colors.grey500};
+  ${({ theme }) => theme.fonts.reg16}
+`
+
+const NameEventContainer = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
+
 const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
   OUTBOX: 'grey',
   ARCHIVED: 'grey',
@@ -93,6 +104,31 @@ export function IconWithName({
         />
       )}
       {name}
+    </Flex>
+  )
+}
+
+export function IconWithNameEvent({
+  status,
+  name,
+  event,
+  isDuplicate,
+  isValidatedOnReview,
+  isArchived
+}: IIconWith) {
+  return (
+    <Flex id="flex">
+      {status && (
+        <IconComp
+          isArchived={isArchived}
+          isValidatedOnReview={isValidatedOnReview}
+          status={status}
+        />
+      )}
+      <NameEventContainer id="nameEvent">
+        {name}
+        {event && <Event>{event}</Event>}
+      </NameEventContainer>
     </Flex>
   )
 }
