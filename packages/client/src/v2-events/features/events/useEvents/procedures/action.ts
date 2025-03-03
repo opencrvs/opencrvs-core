@@ -132,16 +132,6 @@ setMutationDefaults(utils.event.actions.declare, {
   }
 })
 
-setMutationDefaults(utils.event.actions.validate, {
-  mutationFn: createMutationFn(utils.event.actions.validate),
-  retry: true,
-  retryDelay: 10000,
-  onSuccess: updateLocalEvent,
-  meta: {
-    actionType: ActionType.VALIDATE
-  }
-})
-
 setMutationDefaults(utils.event.actions.register, {
   mutationFn: createMutationFn(utils.event.actions.register),
   retry: true,
@@ -159,6 +149,16 @@ setMutationDefaults(utils.event.actions.notify, {
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.NOTIFY
+  }
+})
+
+setMutationDefaults(utils.event.actions.validate, {
+  mutationFn: createMutationFn(utils.event.actions.validate),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.VALIDATE
   }
 })
 
