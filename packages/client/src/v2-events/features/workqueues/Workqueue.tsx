@@ -17,7 +17,7 @@ import styled, { useTheme } from 'styled-components'
 
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   defaultColumns,
   EventConfig,
@@ -32,7 +32,7 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
-import { Link } from '@opencrvs/components'
+import { Link as TextButton } from '@opencrvs/components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -49,7 +49,6 @@ import {
   getFieldsWithPopulatedValues,
   getEventTitle
 } from '@client/v2-events/utils'
-import { formatUrl } from '@client/navigation'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
@@ -251,7 +250,7 @@ function Workqueue({
         [titleColumnId]: isInOutbox ? (
           TitleColumn
         ) : (
-          <Link
+          <TextButton
             onClick={() => {
               return navigate(
                 ROUTES.V2.EVENTS.OVERVIEW.buildPath({
@@ -261,7 +260,7 @@ function Workqueue({
             }}
           >
             {TitleColumn}
-          </Link>
+          </TextButton>
         )
       }
     })
