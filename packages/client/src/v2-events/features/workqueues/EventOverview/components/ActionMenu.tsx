@@ -69,7 +69,6 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                 key={action.type}
                 onClick={() => {
                   if (
-                    action.type === ActionType.CREATE ||
                     action.type === ActionType.APPROVE_CORRECTION ||
                     action.type === ActionType.REJECT_CORRECTION ||
                     action.type === ActionType.CUSTOM
