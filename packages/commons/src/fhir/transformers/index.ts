@@ -3132,7 +3132,7 @@ export function updateFHIRBundle<T extends Bundle>(
   // scratch allowing deletion of any removed documents
   const composition = existingBundle.entry
     .map((e) => e.resource)
-    .find((resource) => isComposition(resource)) as Composition | undefined
+    .find((resource): resource is Composition => isComposition(resource)) 
 
   if (composition) {
     const documentSection = findCompositionSection(
