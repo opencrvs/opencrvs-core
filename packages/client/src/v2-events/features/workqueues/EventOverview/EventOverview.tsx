@@ -117,6 +117,7 @@ function EventOverview({
     ...emptyEvent,
     ...eventWithDefaults
   }
+
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
 
   const fallbackTitle = summary.title.emptyValueMessage

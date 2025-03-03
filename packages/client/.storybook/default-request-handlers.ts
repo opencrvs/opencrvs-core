@@ -16,7 +16,10 @@ import superjson from 'superjson'
 import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
-import { tennisClubMembershipEventIndex } from '../src/v2-events/features/events/fixtures'
+import {
+  tennisClubMembershipEventIndex,
+  tennisClueMembershipEventDocument
+} from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
@@ -45,6 +48,11 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 export const handlers = {
+  drafts: [
+    tRPCMsw.event.actions.draft.list.query(() => {
+      return []
+    })
+  ],
   events: [
     tRPCMsw.event.config.get.query(() => {
       return [tennisClubMembershipEvent, birthEvent]
@@ -1072,6 +1080,23 @@ export const handlers = {
           }
         }
       })
+    }),
+    tRPCMsw.user.list.query(() => {
+      return [
+        {
+          id: '6780dbf7a263c6515c7b97d2',
+          name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+          role: 'LOCAL_REGISTRAR'
+        }
+      ]
+    })
+  ],
+  event: [
+    tRPCMsw.event.get.query(() => {
+      return tennisClueMembershipEventDocument
+    }),
+    tRPCMsw.event.list.query(() => {
+      return [tennisClubMembershipEventIndex]
     })
   ],
   locations: [

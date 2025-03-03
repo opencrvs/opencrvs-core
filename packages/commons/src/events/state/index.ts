@@ -122,15 +122,21 @@ export function getCurrentEventStateWithDrafts(
   event: EventDocument,
   drafts: Draft[]
 ): EventIndex {
-  const actions = [
-    ...event.actions,
-    ...drafts.map((draft) => draft.action as ActionDocument)
-  ].sort(
+  const actions = event.actions.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  )
+  const lastAction = actions[actions.length - 1]
+
+  const activeDrafts = drafts
+    .filter(({ createdAt }) => createdAt > lastAction.createdAt)
+    .map((draft) => draft.action as ActionDocument)
+
+  const actionWithDrafts = [...actions, ...activeDrafts].sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   )
   const withDrafts: EventDocument = {
     ...event,
-    actions
+    actions: actionWithDrafts
   }
   return getCurrentEventState(withDrafts)
 }

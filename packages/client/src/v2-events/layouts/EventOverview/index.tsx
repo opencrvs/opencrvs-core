@@ -57,12 +57,8 @@ export function EventOverviewLayout({
   children: React.ReactNode
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvents } = useEvents()
-  const [events] = getEvents.useSuspenseQuery()
-  const event = getOrThrow(
-    events.find(({ id }) => id === eventId),
-    `Could not find event for ${eventId}`
-  )
+  const { getEvent } = useEvents()
+  const [event] = getEvent.useSuspenseQuery(eventId)
 
   const allEvents = useEventConfigurations()
   const { eventConfiguration } = useEventConfiguration(event.type)
