@@ -40,7 +40,8 @@ import {
   RegisterActionInput,
   ValidateActionInput,
   FieldValue,
-  RejectDeclarationActionInput
+  RejectDeclarationActionInput,
+  ArchivedActionInput
 } from '@opencrvs/commons/events'
 import { router, publicProcedure } from '@events/router/trpc'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
@@ -181,6 +182,19 @@ export const eventRouter = router({
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_FOR_UPDATES]))
       .input(RejectDeclarationActionInput)
       .use(middleware.validateAction(ActionType.REJECT))
+      .mutation(async (options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token,
+          transactionId: options.input.transactionId
+        })
+      }),
+    archive: publicProcedure
+      .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARATION_ARCHIVE]))
+      .input(ArchivedActionInput)
+      .use(middleware.validateAction(ActionType.ARCHIVED))
       .mutation(async (options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,

@@ -38,6 +38,10 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.REJECT) {
       return EventStatus.REQUIRES_UPDATE
     }
+
+    if (action.type === ActionType.ARCHIVED) {
+      return EventStatus.ARCHIVED
+    }
     return status
   }, EventStatus.CREATED)
 }

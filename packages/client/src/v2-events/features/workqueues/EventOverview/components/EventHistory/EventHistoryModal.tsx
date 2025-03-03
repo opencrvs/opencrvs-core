@@ -25,7 +25,7 @@ import { IDynamicValues } from '@client/navigation'
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
-    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} other {Unknown}}'
+    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} other {Unknown}}'
 }
 
 const messages = defineMessages({
@@ -48,6 +48,9 @@ function prepareComments(
   const comments: IDynamicValues[] = []
 
   if (action === ActionType.REJECT && metadata.message) {
+    comments.push({ comment: metadata.message as string })
+  }
+  if (action === ActionType.ARCHIVED && metadata.message) {
     comments.push({ comment: metadata.message as string })
   }
   return comments

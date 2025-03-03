@@ -196,6 +196,10 @@ export function useEvents() {
         utils.event.actions.reject,
         api.event.actions.reject
       ),
+      archive: useEventAction(
+        utils.event.actions.archive,
+        api.event.actions.archive
+      ),
       register: useEventAction(
         utils.event.actions.register,
         api.event.actions.register

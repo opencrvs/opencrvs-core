@@ -15,9 +15,9 @@ import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
-import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
+import { useNavigate } from 'react-router-dom'
 import {
   defaultColumns,
   EventConfig,
@@ -33,6 +33,7 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
+import { Link } from '@opencrvs/components'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -40,6 +41,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { formattedDuration } from '@client/utils/date-formatting'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { ROUTES } from '@client/v2-events/routes'
+import { formatUrl } from '@client/navigation'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
@@ -58,11 +60,6 @@ const messages = defineMessages({
 
 const ToolTipContainer = styled.span`
   text-align: center;
-`
-
-const NondecoratedLink = styled(Link)`
-  text-decoration: none;
-  color: 'primary';
 `
 
 function changeSortedColumn(
@@ -148,6 +145,7 @@ function Workqueue({
   const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
   const drafts = getDrafts()
+  const navigate = useNavigate()
 
   const validEvents = events.filter((event) =>
     eventConfigs.some((e) => e.id === event.type)
@@ -221,7 +219,7 @@ function Workqueue({
           {
             id: `events.status`,
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REQUIRES_UPDATE {Requires update} ARCHIVED {Archived} other {Unknown}}'
           },
           {
             status: getEventStatus()
@@ -233,16 +231,20 @@ function Workqueue({
             status={'OUTBOX'}
           />
         ) : (
-          <NondecoratedLink
-            to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-              eventId: event.id
-            })}
+          <Link
+            onClick={() => {
+              return navigate(
+                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                  eventId: event.id
+                })
+              )
+            }}
           >
             <IconWithName
               name={fieldsWithPopulatedValues[titleColumnId]}
               status={event.status}
             />
-          </NondecoratedLink>
+          </Link>
         )
       }
     })
