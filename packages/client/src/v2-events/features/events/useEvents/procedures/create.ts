@@ -58,6 +58,7 @@ setMutationDefaults(utils.event.create, {
     const optimisticEvent = {
       id: newEvent.transactionId,
       type: newEvent.type,
+      trackingId: '',
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

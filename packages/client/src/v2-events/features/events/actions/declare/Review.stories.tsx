@@ -51,6 +51,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const eventDocument = {
   type: 'TENNIS_CLUB_MEMBERSHIP',
   id: eventId,
+  trackingId: 'TEST12',
   createdAt: '2025-01-23T05:30:02.615Z',
   updatedAt: '2025-01-23T05:35:27.689Z',
   actions: [
