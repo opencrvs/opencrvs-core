@@ -190,7 +190,7 @@ export const down = async (db: Db, client: MongoClient) => {
     await new MongoClient(DASHBOARD_MONGO_URL).connect()
   ).db()
 
-  dashboardDb.collection('corrections').dropIndex('id_1')
+  await dashboardDb.collection('corrections').dropIndex('id_1')
   await db
     .collection('Task')
     .aggregate([
