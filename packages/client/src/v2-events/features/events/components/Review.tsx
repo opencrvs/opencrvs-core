@@ -878,7 +878,7 @@ export function RejectActionModal({
         </Button>,
         <Button
           key="confirm_reject_with_update"
-          disabled={!state.message}
+          disabled={!state.message || state.isDuplicate}
           id="confirm_reject_with_update"
           type="negative"
           onClick={() => {
