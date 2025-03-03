@@ -11,7 +11,7 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { ResponsiveModal, Stack, Table } from '@opencrvs/components'
+import { Pill, ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
@@ -38,6 +38,10 @@ const messages = defineMessages({
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
     id: 'v2.constants.comment'
+  },
+  markAsDuplicate: {
+    id: 'v2.event.history.markAsDuplicate',
+    defaultMessage: 'Marked as a duplicate'
   }
 })
 
@@ -114,6 +118,16 @@ export function EventHistoryModal({
       {content.length > 0 && (
         <Table columns={commentsColumn} content={content} noResultText=" " />
       )}
+      {history.type === ActionType.ARCHIVED &&
+        history.metadata?.isDuplicate && (
+          <p>
+            <Pill
+              label={intl.formatMessage(messages.markAsDuplicate)}
+              size="small"
+              type="inactive"
+            />
+          </p>
+        )}
     </ResponsiveModal>
   )
 }
