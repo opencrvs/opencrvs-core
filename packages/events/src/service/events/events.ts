@@ -213,10 +213,35 @@ export async function addAction(
     }
   }
 
+  if (input.type === ActionType.ARCHIVED && input.metadata?.isDuplicate) {
+    await db.collection<EventDocument>('events').updateOne(
+      {
+        id: eventId,
+        'actions.transactionId': { $ne: transactionId }
+      },
+      {
+        $push: {
+          actions: {
+            ...input,
+            type: ActionType.MARKED_AS_DUPLICATE,
+            createdBy,
+            createdAt: now,
+            createdAtLocation,
+            draft: input.draft || false,
+            id: getUUID()
+          }
+        },
+        $set: {
+          updatedAt: now
+        }
+      }
+    )
+  }
+
   await db.collection<EventDocument>('events').updateOne(
     {
       id: eventId,
-      'actions.transactionId': { $ne: transactionId }
+      'actions.transactionId': { $ne: getUUID() }
     },
     {
       $push: {

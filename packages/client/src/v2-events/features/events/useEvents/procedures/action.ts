@@ -32,7 +32,6 @@ import {
   setMutationDefaults
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, utils } from '@client/v2-events/trpc'
-import { rejectCorrection } from '../../../../../review/reject-correction'
 import { createTemporaryId, waitUntilEventIsCreated } from './create'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
