@@ -57,6 +57,7 @@ const createHandler = trpcHandler(async ({ request }) => {
   return HttpResponse.json({
     type: 'TENNIS_CLUB_MEMBERSHIP',
     id: '_REAL_UUID_',
+    trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
