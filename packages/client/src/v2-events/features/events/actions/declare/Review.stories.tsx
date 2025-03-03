@@ -13,7 +13,10 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { graphql, HttpResponse } from 'msw'
 import { userEvent, within } from '@storybook/test'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  EventDocument,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -60,11 +63,10 @@ const eventDocument = {
       createdAt: '2025-01-23T05:30:02.615Z',
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
-      draft: false,
       data: {}
     }
   ]
-}
+} satisfies EventDocument
 
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {

@@ -56,7 +56,6 @@ function updateEventOptimistically<T extends ActionInput>(
           id: createTemporaryId(),
           type: actionType,
           data: variables.data,
-          draft: false,
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdAtLocation: '@todo'
