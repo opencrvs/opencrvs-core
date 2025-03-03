@@ -235,6 +235,7 @@ describe('"event" conditionals', () => {
       $event: {
         id: '123',
         type: 'birth',
+        trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
         actions: [

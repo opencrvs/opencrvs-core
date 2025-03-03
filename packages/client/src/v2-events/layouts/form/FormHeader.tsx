@@ -100,7 +100,7 @@ export function FormHeader({
               </Button>
               {menuItems.length > 0 && (
                 <ToggleMenu
-                  id={'event-menu'}
+                  id="event-menu"
                   menuItems={menuItems}
                   toggleButton={
                     <Icon
