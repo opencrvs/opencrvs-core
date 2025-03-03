@@ -128,7 +128,9 @@ export function getCurrentEventStateWithDrafts(
   const lastAction = actions[actions.length - 1]
 
   const activeDrafts = drafts
-    .filter(({ createdAt }) => createdAt > lastAction.createdAt)
+    .filter(
+      ({ createdAt }) => new Date(createdAt) > new Date(lastAction.createdAt)
+    )
     .map((draft) => draft.action as ActionDocument)
 
   const actionWithDrafts = [...actions, ...activeDrafts].sort(
@@ -138,7 +140,35 @@ export function getCurrentEventStateWithDrafts(
     ...event,
     actions: actionWithDrafts
   }
+
   return getCurrentEventState(withDrafts)
+}
+
+export function applyDraftsToEventIndex(
+  eventIndex: EventIndex,
+  drafts: Draft[]
+) {
+  const indexedAt = eventIndex.modifiedAt
+
+  const activeDrafts = drafts
+    .filter(({ createdAt }) => new Date(createdAt) > new Date(indexedAt))
+    .map((draft) => draft.action as ActionDocument)
+    .sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )
+
+  if (activeDrafts.length === 0) {
+    return eventIndex
+  }
+
+  return {
+    ...eventIndex,
+    data: {
+      ...eventIndex.data,
+      ...activeDrafts[activeDrafts.length - 1].data
+    }
+  }
 }
 
 export function getMetadataForAction(

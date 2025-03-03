@@ -52,22 +52,22 @@ export function Action({ children }: PropsWithChildren) {
   }, [draftsForThisEvent, event])
 
   useEffect(() => {
+    /*
+     * Clear the form completely first so Formik doesn't think there already
+     * was some input in the form
+     */
+    clearFormValues()
+    clearMetadata()
+
     setFormValues(eventDataWithDrafts.id, eventDataWithDrafts.data)
     setMetadata(eventDataWithDrafts.id, declareMetadata)
-
-    return () => {
-      clearFormValues()
-      clearMetadata()
-    }
-  }, [
-    clearFormValues,
-    clearMetadata,
-    declareMetadata,
-    eventDataWithDrafts.data,
-    eventDataWithDrafts.id,
-    setFormValues,
-    setMetadata
-  ])
+    /*
+     * This is fine to only run once on mount and unmount as
+     * At the point of this code being run, there absolutely must be an event that has already been
+     * fetched of which data can be used to initialise the form
+     */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return children
 }

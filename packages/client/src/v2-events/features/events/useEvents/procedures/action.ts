@@ -25,6 +25,7 @@ import {
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   getLocalEventData,
+  invalidateDraftsList,
   invalidateEventsList,
   setEventData,
   setEventListData,
@@ -74,6 +75,10 @@ function updateEventOptimistically<T extends ActionInput>(
 setMutationDefaults(utils.event.actions.draft.create, {
   retry: true,
   mutationFn: createMutationFn(utils.event.actions.draft.create),
+  onSuccess: async () => {
+    await invalidateEventsList()
+    await invalidateDraftsList()
+  },
   retryDelay: 10000
 })
 
@@ -188,9 +193,14 @@ function createMutationFn<P extends DecorateMutationProcedure<any>>(
 }
 
 export function useCreateDraft() {
-  const { mutationFn, ...options } =
-    utils.event.actions.draft.create.mutationOptions()
-  return useMutation(options)
+  const options = utils.event.actions.draft.create.mutationOptions()
+
+  return useMutation({
+    ...options,
+    ...queryClient.getMutationDefaults(
+      utils.event.actions.draft.create.mutationKey()
+    )
+  })
 }
 
 /**

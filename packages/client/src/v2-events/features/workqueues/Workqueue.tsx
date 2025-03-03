@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
 import {
+  applyDraftsToEventIndex,
   defaultColumns,
   EventConfig,
   EventIndex,
@@ -113,6 +114,7 @@ export function WorkqueueContainer() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const [events] = getEvents.useSuspenseQuery()
+
   const eventConfigs = useEventConfigurations()
 
   const workqueueConfig =
@@ -178,6 +180,16 @@ function Workqueue({
 
   const workqueue = validEvents
     .filter((event) => eventConfigs.some((e) => e.id === event.type))
+    /*
+     * Apply pending drafts to the event index.
+     * This is necessary to show the most up to date information in the workqueue.
+     */
+    .map((event) =>
+      applyDraftsToEventIndex(
+        event,
+        drafts.filter((d) => d.eventId === event.id)
+      )
+    )
     .map((event) => {
       /** We already filtered invalid events, this should never happen. */
       const eventConfig = getOrThrow(
