@@ -122,7 +122,7 @@ function updateEventOptimistically<T extends ActionInput>(
 }
 
 setMutationDefaults(utils.event.actions.declare, {
-  mutationFn: createMutationFn(utils.event.actions.declare),
+  mutationFn: createEventActionMutationFn(utils.event.actions.declare),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -133,7 +133,7 @@ setMutationDefaults(utils.event.actions.declare, {
 })
 
 setMutationDefaults(utils.event.actions.register, {
-  mutationFn: createMutationFn(utils.event.actions.register),
+  mutationFn: createEventActionMutationFn(utils.event.actions.register),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -143,7 +143,7 @@ setMutationDefaults(utils.event.actions.register, {
 })
 
 setMutationDefaults(utils.event.actions.notify, {
-  mutationFn: createMutationFn(utils.event.actions.notify),
+  mutationFn: createEventActionMutationFn(utils.event.actions.notify),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -153,7 +153,7 @@ setMutationDefaults(utils.event.actions.notify, {
 })
 
 setMutationDefaults(utils.event.actions.validate, {
-  mutationFn: createMutationFn(utils.event.actions.validate),
+  mutationFn: createEventActionMutationFn(utils.event.actions.validate),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -163,7 +163,7 @@ setMutationDefaults(utils.event.actions.validate, {
 })
 
 setMutationDefaults(utils.event.actions.printCertificate, {
-  mutationFn: createMutationFn(utils.event.actions.printCertificate),
+  mutationFn: createEventActionMutationFn(utils.event.actions.printCertificate),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -173,7 +173,9 @@ setMutationDefaults(utils.event.actions.printCertificate, {
 })
 
 setMutationDefaults(utils.event.actions.correction.request, {
-  mutationFn: createMutationFn(utils.event.actions.correction.request),
+  mutationFn: createEventActionMutationFn(
+    utils.event.actions.correction.request
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -183,7 +185,9 @@ setMutationDefaults(utils.event.actions.correction.request, {
 })
 
 setMutationDefaults(utils.event.actions.correction.approve, {
-  mutationFn: createMutationFn(utils.event.actions.correction.approve),
+  mutationFn: createEventActionMutationFn(
+    utils.event.actions.correction.approve
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -193,7 +197,9 @@ setMutationDefaults(utils.event.actions.correction.approve, {
 })
 
 setMutationDefaults(utils.event.actions.correction.reject, {
-  mutationFn: createMutationFn(utils.event.actions.correction.reject),
+  mutationFn: createEventActionMutationFn(
+    utils.event.actions.correction.reject
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -223,7 +229,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createMutationFn<P extends DecorateMutationProcedure<any>>(
+function createEventActionMutationFn<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
   /*

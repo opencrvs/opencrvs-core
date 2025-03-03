@@ -28,7 +28,6 @@ import { setQueryDefaults } from '@client/v2-events/features/events/useEvents/ap
  *
  * This ensures the full record can be browsed even when the user goes offline
  */
-
 setQueryDefaults(utils.event.get, {
   queryFn: async (...params) => {
     const {

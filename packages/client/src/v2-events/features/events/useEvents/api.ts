@@ -62,6 +62,7 @@ type TRPCQueryKey<T> = [readonly string[], { input: T }]
  * @template Context - The type of the context, defaults to `any`.
  * @param {OmitKeyof<MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>, Context>, 'mutationKey'>} options - The options to set as defaults, excluding the `mutationKey`.
  */
+type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 export function setMutationDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   P extends DecorateMutationProcedure<any>,
@@ -69,9 +70,17 @@ export function setMutationDefaults<
   Context = any
 >(
   mutation: P,
-  options: OmitKeyof<
-    MutationObserverOptions<inferOutput<P>, TRPCError, inferInput<P>, Context>,
-    'mutationKey'
+  options: RequireKey<
+    OmitKeyof<
+      MutationObserverOptions<
+        inferOutput<P>,
+        TRPCError,
+        inferInput<P>,
+        Context
+      >,
+      'mutationKey'
+    >,
+    'mutationFn'
   >
 ) {
   queryClient.setMutationDefaults(mutation.mutationKey(), options)

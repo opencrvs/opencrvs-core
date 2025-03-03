@@ -11,7 +11,12 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
+import { DecorateMutationProcedure } from '@trpc/tanstack-react-query'
+import {
+  ActionType,
+  CreatedAction,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
 import {
   invalidateEventsList,
   setEventData,
@@ -51,10 +56,34 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
     })
   }
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
+  trpcProcedure: P
+) {
+  const mutationOptions = {
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
+  }
+
+  if (!mutationOptions.mutationFn) {
+    throw new Error(
+      'No mutation fn found for operation. This should never happen'
+    )
+  }
+
+  const defaultMutationFn = mutationOptions.mutationFn
+
+  return (params: any) =>
+    defaultMutationFn({
+      ...params,
+      data: params.data
+    })
+}
 
 setMutationDefaults(utils.event.create, {
   retry: true,
   retryDelay: 1000,
+  mutationFn: createEventCreationMutation(utils.event.create),
   onMutate: (newEvent) => {
     const optimisticEvent = {
       id: newEvent.transactionId,
@@ -64,7 +93,7 @@ setMutationDefaults(utils.event.create, {
       updatedAt: new Date().toISOString(),
       actions: [
         {
-          type: 'CREATE',
+          type: ActionType.CREATE,
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
