@@ -129,8 +129,10 @@ export const eventRouter = router({
         return getDraftsByUserId(options.ctx.user.id)
       }),
       create: publicProcedure.input(DraftInput).mutation(async (options) => {
+        const eventId = options.input.eventId
+        await getEventById(eventId)
         return createDraft(options.input, {
-          eventId: options.input.eventId,
+          eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token,

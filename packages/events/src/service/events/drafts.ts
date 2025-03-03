@@ -13,7 +13,6 @@ import { DraftInput, Draft } from '@opencrvs/commons/events'
 
 import * as events from '@events/storage/mongodb/events'
 import { getUUID } from '@opencrvs/commons'
-import { getEventById } from './events'
 
 export async function createDraft(
   input: DraftInput,
@@ -32,10 +31,9 @@ export async function createDraft(
 ) {
   const db = await events.getClient()
   const now = new Date().toISOString()
-  const event = await getEventById(eventId)
 
   const draft: Draft = {
-    eventId: event.id,
+    eventId: eventId,
     createdAt: now,
     transactionId,
     action: {
