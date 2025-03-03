@@ -28,13 +28,12 @@ import {
   invalidateEventsList,
   setEventData,
   setEventListData,
-  setMutationDefaults,
   findLocalEventData
 } from '@client/v2-events/features/events/useEvents/api'
-import { queryClient, utils } from '@client/v2-events/trpc'
+import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 import * as customApi from '@client/v2-events/custom-api'
-import { waitUntilEventIsCreated } from './create'
+import { setMutationDefaults, waitUntilEventIsCreated } from './utils'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
@@ -92,7 +91,7 @@ function updateEventOptimistically<T extends ActionInput>(
     cancelOngoingDraftRequests(variables)
 
     const localEvent = queryClient.getQueryData(
-      utils.event.get.queryKey(variables.eventId)
+      trpcOptionsProxy.event.get.queryKey(variables.eventId)
     )
     if (!localEvent) {
       return
@@ -121,8 +120,10 @@ function updateEventOptimistically<T extends ActionInput>(
   }
 }
 
-setMutationDefaults(utils.event.actions.declare, {
-  mutationFn: createEventActionMutationFn(utils.event.actions.declare),
+setMutationDefaults(trpcOptionsProxy.event.actions.declare, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.declare
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -132,8 +133,10 @@ setMutationDefaults(utils.event.actions.declare, {
   }
 })
 
-setMutationDefaults(utils.event.actions.register, {
-  mutationFn: createEventActionMutationFn(utils.event.actions.register),
+setMutationDefaults(trpcOptionsProxy.event.actions.register, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.register
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -142,8 +145,10 @@ setMutationDefaults(utils.event.actions.register, {
   }
 })
 
-setMutationDefaults(utils.event.actions.notify, {
-  mutationFn: createEventActionMutationFn(utils.event.actions.notify),
+setMutationDefaults(trpcOptionsProxy.event.actions.notify, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.notify
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -152,8 +157,10 @@ setMutationDefaults(utils.event.actions.notify, {
   }
 })
 
-setMutationDefaults(utils.event.actions.validate, {
-  mutationFn: createEventActionMutationFn(utils.event.actions.validate),
+setMutationDefaults(trpcOptionsProxy.event.actions.validate, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.validate
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -162,8 +169,10 @@ setMutationDefaults(utils.event.actions.validate, {
   }
 })
 
-setMutationDefaults(utils.event.actions.printCertificate, {
-  mutationFn: createEventActionMutationFn(utils.event.actions.printCertificate),
+setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.printCertificate
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -172,9 +181,9 @@ setMutationDefaults(utils.event.actions.printCertificate, {
   }
 })
 
-setMutationDefaults(utils.event.actions.correction.request, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
   mutationFn: createEventActionMutationFn(
-    utils.event.actions.correction.request
+    trpcOptionsProxy.event.actions.correction.request
   ),
   retry: true,
   retryDelay: 10000,
@@ -184,9 +193,9 @@ setMutationDefaults(utils.event.actions.correction.request, {
   }
 })
 
-setMutationDefaults(utils.event.actions.correction.approve, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve, {
   mutationFn: createEventActionMutationFn(
-    utils.event.actions.correction.approve
+    trpcOptionsProxy.event.actions.correction.approve
   ),
   retry: true,
   retryDelay: 10000,
@@ -196,9 +205,9 @@ setMutationDefaults(utils.event.actions.correction.approve, {
   }
 })
 
-setMutationDefaults(utils.event.actions.correction.reject, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
   mutationFn: createEventActionMutationFn(
-    utils.event.actions.correction.reject
+    trpcOptionsProxy.event.actions.correction.reject
   ),
   retry: true,
   retryDelay: 10000,

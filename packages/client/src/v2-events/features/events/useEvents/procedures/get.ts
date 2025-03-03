@@ -18,8 +18,8 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
-import { useTRPC, utils } from '@client/v2-events/trpc'
-import { setQueryDefaults } from '@client/v2-events/features/events/useEvents/api'
+import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { setQueryDefaults } from './utils'
 
 /*
  * This logic overrides the default behaviour of "api.event.get"
@@ -28,7 +28,7 @@ import { setQueryDefaults } from '@client/v2-events/features/events/useEvents/ap
  *
  * This ensures the full record can be browsed even when the user goes offline
  */
-setQueryDefaults(utils.event.get, {
+setQueryDefaults(trpcOptionsProxy.event.get, {
   queryFn: async (...params) => {
     const {
       meta,
@@ -40,7 +40,7 @@ setQueryDefaults(utils.event.get, {
       )
     }
 
-    const queryOptions = utils.event.get.queryOptions(input.input)
+    const queryOptions = trpcOptionsProxy.event.get.queryOptions(input.input)
 
     if (typeof queryOptions.queryFn !== 'function') {
       throw new Error('queryFn is not a function')

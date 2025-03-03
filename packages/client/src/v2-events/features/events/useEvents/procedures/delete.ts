@@ -12,13 +12,12 @@
 import { useMutation } from '@tanstack/react-query'
 import {
   invalidateEventsList,
-  setEventListData,
-  setMutationDefaults
+  setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
-import { utils } from '@client/v2-events/trpc'
-import { waitUntilEventIsCreated } from './create'
+import { trpcOptionsProxy } from '@client/v2-events/trpc'
+import { setMutationDefaults, waitUntilEventIsCreated } from './utils'
 
-setMutationDefaults(utils.event.delete, {
+setMutationDefaults(trpcOptionsProxy.event.delete, {
   retry: (_, error) => {
     if (error.data?.httpStatus === 404 || error.data?.httpStatus === 400) {
       return false
@@ -39,7 +38,8 @@ setMutationDefaults(utils.event.delete, {
       return oldData.filter((event) => event.id !== variables.eventId)
     })
 
-    const originalMutationFn = utils.event.delete.mutationOptions().mutationFn
+    const originalMutationFn =
+      trpcOptionsProxy.event.delete.mutationOptions().mutationFn
 
     if (typeof originalMutationFn !== 'function') {
       throw new Error('Mutation function is not defined')
@@ -50,7 +50,7 @@ setMutationDefaults(utils.event.delete, {
 
 export const useDeleteEvent = () => {
   const { retry, retryDelay, onSuccess, mutationFn, ...options } =
-    utils.event.delete.mutationOptions()
+    trpcOptionsProxy.event.delete.mutationOptions()
   return useMutation({
     ...options
   })

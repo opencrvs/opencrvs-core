@@ -10,7 +10,6 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { v4 as uuid } from 'uuid'
 import { DecorateMutationProcedure } from '@trpc/tanstack-react-query'
 import {
   ActionType,
@@ -20,42 +19,12 @@ import {
 import {
   invalidateEventsList,
   setEventData,
-  setEventListData,
-  setMutationDefaults,
-  findLocalEventData
+  setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
-import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
+import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { createTemporaryId } from '@client/v2-events/utils'
+import { setMutationDefaults } from './utils'
 
-export function createTemporaryId() {
-  return `tmp-${uuid()}`
-}
-
-export function isTemporaryId(id: string) {
-  return id.startsWith('tmp-')
-}
-
-export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
-  canonicalMutationFn: (params: T) => Promise<R>
-): (params: T) => Promise<R> {
-  return async (params) => {
-    const { eventId } = params
-
-    if (!isTemporaryId(eventId)) {
-      return canonicalMutationFn({ ...params, eventId: eventId })
-    }
-
-    const localVersion = findLocalEventData(eventId)
-    if (!localVersion || isTemporaryId(localVersion.id)) {
-      throw new Error('Event that has not been stored yet cannot be deleted')
-    }
-
-    return canonicalMutationFn({
-      ...params,
-      eventId: localVersion.id,
-      eventType: localVersion.type
-    })
-  }
-}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
@@ -80,10 +49,10 @@ function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
     })
 }
 
-setMutationDefaults(utils.event.create, {
+setMutationDefaults(trpcOptionsProxy.event.create, {
   retry: true,
   retryDelay: 1000,
-  mutationFn: createEventCreationMutation(utils.event.create),
+  mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
     const optimisticEvent = {
       id: newEvent.transactionId,
@@ -130,7 +99,7 @@ export function useCreateEvent() {
   }>()
 
   const overrides = queryClient.getMutationDefaults(
-    utils.event.create.mutationKey()
+    trpcOptionsProxy.event.create.mutationKey()
   )
   return useMutation({
     ...options,
