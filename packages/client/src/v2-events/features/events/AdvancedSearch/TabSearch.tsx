@@ -70,17 +70,17 @@ function getSectionFields(
 
     return (
       <Accordion
-        key={section.id}
+        key={section.title.id}
         expand={true}
         label={intl.formatMessage(section.title)}
         labelForHideAction={intl.formatMessage(messages.hide)}
         labelForShowAction={intl.formatMessage(messages.show)}
-        name={section.id}
+        name={section.title.id}
       >
         <FormFieldGenerator
           fields={modifiedFields}
           formData={formValues}
-          id={section.id}
+          id={section.title.id}
           initialValues={fieldValues}
           setAllFieldsDirty={false}
           onChange={(updatedValues) => {
