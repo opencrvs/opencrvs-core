@@ -18,7 +18,6 @@ import { validationMessages as messages } from '@client/i18n/messages'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
-  INFORMANT_MINIMUM_AGE,
   NATIONAL_ID
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
@@ -277,6 +276,28 @@ export const minAgeGapExist = (
     365
   return diff >= minAgeGap
 }
+
+export const isAgeInYearsBetween =
+  (min: number, max?: number): Validation =>
+  (value: IFormFieldValue) => {
+    const dateFormat = /^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01])$/
+    if (dateFormat.test(value.toString())) {
+      max = max || 120 // defaulting to 120 years as max if max is not provided
+      const today = new Date()
+      const dateOfBirth = new Date(value.toString())
+      const ageFromDateOfBirth = today.getFullYear() - dateOfBirth.getFullYear()
+
+      const ageIsWithinRange =
+        ageFromDateOfBirth >= min && ageFromDateOfBirth <= max
+      if (ageIsWithinRange) return undefined
+
+      return {
+        message: messages.isAgeInYearsBetween,
+        props: { min, max }
+      }
+    }
+    return undefined
+  }
 
 export const isValidBirthDate: Validation = (
   value: IFormFieldValue,
@@ -735,24 +756,6 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
     ) {
       return {
         message: messages.isMoVisitBeforeBirth
-      }
-    }
-  }
-}
-
-export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
-  if (value) {
-    if (
-      minAgeGapExist(
-        format(new Date(Date.now()), 'yyyy-MM-dd'),
-        value.toString(),
-        INFORMANT_MINIMUM_AGE
-      )
-    ) {
-      return undefined
-    } else {
-      return {
-        message: messages.isInformantOfLegalAge
       }
     }
   }
