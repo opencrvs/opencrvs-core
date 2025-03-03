@@ -19,7 +19,7 @@ export function DeleteEvent() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DELETE)
   const navigate = useNavigate()
   const events = useEvents()
-  const deleteEvent = events.deleteEvent
+  const deleteEvent = events.deleteEvent.useMutation()
 
   useEffect(() => {
     deleteEvent.mutate({ eventId })

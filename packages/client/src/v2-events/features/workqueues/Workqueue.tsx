@@ -10,7 +10,7 @@
  */
 
 import React, { useState } from 'react'
-import { mapKeys, orderBy } from 'lodash'
+import { orderBy } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
@@ -22,7 +22,6 @@ import {
   defaultColumns,
   EventConfig,
   EventIndex,
-  getAllFields,
   getOrThrow,
   RootWorkqueueConfig,
   workqueues
@@ -34,13 +33,22 @@ import {
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
 import { Link } from '@opencrvs/components'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
+import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
+import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/v2-events/components/IconWithName'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 import { formattedDuration } from '@client/utils/date-formatting'
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { ROUTES } from '@client/v2-events/routes'
+import {
+  flattenEventIndex,
+  getFieldsWithPopulatedValues,
+  getEventTitle
+} from '@client/v2-events/utils'
 import { formatUrl } from '@client/navigation'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
@@ -60,6 +68,15 @@ const messages = defineMessages({
 
 const ToolTipContainer = styled.span`
   text-align: center;
+`
+
+const FabContainer = styled.div`
+  position: fixed;
+  right: 40px;
+  bottom: 55px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 
 function changeSortedColumn(
@@ -146,6 +163,7 @@ function Workqueue({
   const outbox = getOutbox()
   const drafts = getDrafts()
   const navigate = useNavigate()
+  const { width } = useWindowSize()
 
   const validEvents = events.filter((event) =>
     eventConfigs.some((e) => e.id === event.type)
@@ -157,13 +175,8 @@ function Workqueue({
   }
 
   const workqueue = validEvents
-    .map((event) => {
-      const { data, ...rest } = event
-      return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
-    })
     .filter((event) => eventConfigs.some((e) => e.id === event.type))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((event: Omit<EventIndex, 'data'> & { [key: string]: any }) => {
+    .map((event) => {
       /** We already filtered invalid events, this should never happen. */
       const eventConfig = getOrThrow(
         eventConfigs.find((e) => e.id === event.type),
@@ -185,32 +198,42 @@ function Workqueue({
         return event.status
       }
 
-      const allPropertiesWithEmptyValues = setEmptyValuesForFields(
-        getAllFields(eventConfig)
-      )
-
       const eventWorkqueue = getOrThrow(
         eventConfig.workqueues.find((wq) => wq.id === workqueueConfig.id),
         `Could not find workqueue config for ${workqueueConfig.id}`
       )
 
-      const fieldsWithPopulatedValues: Record<string, string> =
-        eventWorkqueue.fields.reduce(
-          (acc, field) => ({
-            ...acc,
-            [field.column]: flattenedIntl.formatMessage(field.label, {
-              ...allPropertiesWithEmptyValues,
-              ...event
-            })
-          }),
-          {}
-        )
+      const fieldsWithPopulatedValues = getFieldsWithPopulatedValues({
+        event,
+        workqueue: eventWorkqueue,
+        intl: flattenedIntl,
+        eventConfig
+      })
 
       const titleColumnId = workqueueConfig.columns[0].id
 
+      const title = getEventTitle({
+        event,
+        eventConfig,
+        workqueue: eventWorkqueue,
+        intl: flattenedIntl,
+        titleColumn: titleColumnId
+      })
+
+      const TitleColumn =
+        width > theme.grid.breakpoints.lg ? (
+          <IconWithName name={title} status={'OUTBOX'} />
+        ) : (
+          <IconWithNameEvent
+            event={intl.formatMessage(eventConfig.label)}
+            name={title}
+            status={'OUTBOX'}
+          />
+        )
+
       return {
         ...fieldsWithPopulatedValues,
-        ...event,
+        ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
         modifiedAt: formattedDuration(new Date(event.modifiedAt)),
@@ -226,10 +249,7 @@ function Workqueue({
           }
         ),
         [titleColumnId]: isInOutbox ? (
-          <IconWithName
-            name={fieldsWithPopulatedValues[titleColumnId]}
-            status={'OUTBOX'}
-          />
+          TitleColumn
         ) : (
           <Link
             onClick={() => {
@@ -240,16 +260,12 @@ function Workqueue({
               )
             }}
           >
-            <IconWithName
-              name={fieldsWithPopulatedValues[titleColumnId]}
-              status={event.status}
-            />
+            {TitleColumn}
           </Link>
         )
       }
     })
 
-  const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
@@ -282,24 +298,21 @@ function Workqueue({
 
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
-    if (width > theme.grid.breakpoints.lg) {
-      return workqueueConfig.columns.map((column) => ({
+    const configuredColumns: Array<Column> = workqueueConfig.columns.map(
+      (column) => ({
         label: intl.formatMessage(column.label),
         width: 35,
         key: column.id,
         sortFunction: onColumnClick,
         isSorted: sortedCol === column.id
-      }))
+      })
+    )
+    const allColumns = configuredColumns.concat(getDefaultColumns())
+
+    if (width > theme.grid.breakpoints.lg) {
+      return allColumns
     } else {
-      return workqueueConfig.columns
-        .map((column) => ({
-          label: intl.formatMessage(column.label),
-          width: 35,
-          key: column.id,
-          sortFunction: onColumnClick,
-          isSorted: sortedCol === column.id
-        }))
-        .slice(0, 2)
+      return allColumns.slice(0, 1)
     }
   }
 
@@ -325,12 +338,20 @@ function Workqueue({
         </ToolTipContainer>
       </ReactTooltip>
       <WorkqueueComponent
-        columns={getColumns().concat(getDefaultColumns())}
+        columns={getColumns()}
         content={orderBy(workqueue, sortedCol, sortOrder)}
         hideLastBorder={!isShowPagination}
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
       />
+      <FabContainer>
+        <Link to={ROUTES.V2.EVENTS.CREATE.path}>
+          <FloatingActionButton
+            icon={() => <PlusTransparentWhite />}
+            id="new_event_declaration"
+          />
+        </Link>
+      </FabContainer>
     </WQContentWrapper>
   )
 }
