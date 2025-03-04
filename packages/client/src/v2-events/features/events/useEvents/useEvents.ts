@@ -12,6 +12,7 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { EventDocument } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
+import { OnDeclareParams } from '@client/v2-events/custom-api'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
@@ -66,10 +67,10 @@ export function useEvents() {
       }
     },
     customActions: {
-      registerOnDeclare: useMutation({
+      registerOnDeclare: useMutation<unknown, Error, OnDeclareParams>({
         mutationKey: customMutationKeys.registerOnDeclare
       }),
-      validateOnDeclare: useMutation({
+      validateOnDeclare: useMutation<unknown, Error, OnDeclareParams>({
         mutationKey: customMutationKeys.validateOnDeclare
       })
     }

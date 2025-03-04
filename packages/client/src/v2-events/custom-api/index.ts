@@ -14,6 +14,11 @@ import { trpcClient } from '@client/v2-events/trpc'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
+export interface OnDeclareParams {
+  eventId: string
+  data: ActionFormData
+  metadata?: ActionFormData
+}
 /**
  * Runs a sequence of actions from declare to register.
  *
