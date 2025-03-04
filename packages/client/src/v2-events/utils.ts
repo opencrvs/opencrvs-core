@@ -17,7 +17,6 @@ import {
   ActionDocument,
   EventConfig,
   EventIndex,
-  WorkqueueConfig,
   getAllFields
 } from '@opencrvs/commons/client'
 import { setEmptyValuesForFields } from './components/forms/utils'
@@ -96,61 +95,23 @@ export function flattenEventIndex(
   return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
 }
 
-export function getFieldsWithPopulatedValues({
-  workqueue,
-  intl,
+export function getEventTitle({
+  event,
   eventConfig,
-  event
+  intl
 }: {
   event: EventIndex
-  workqueue: WorkqueueConfig
-  intl: IntlShape
   eventConfig: EventConfig
-}): Record<string, string> {
+  intl: IntlShape
+}): string {
   const allPropertiesWithEmptyValues = setEmptyValuesForFields(
     getAllFields(eventConfig)
   )
 
-  return workqueue.fields.reduce(
-    (acc, field) => ({
-      ...acc,
-      [field.column]: intl.formatMessage(field.label, {
-        ...allPropertiesWithEmptyValues,
-        ...flattenEventIndex(event)
-      })
-    }),
-    {}
-  )
-}
-
-export function getEventTitle({
-  event,
-  eventConfig,
-  workqueue: wq,
-  intl,
-  titleColumn
-}: {
-  event: EventIndex
-  eventConfig: EventConfig
-  workqueue?: WorkqueueConfig
-  intl: IntlShape
-  titleColumn?: string
-}): string {
-  const workqueue = wq ?? eventConfig.workqueues[0]
-  const fieldsWithPopulatedValues = getFieldsWithPopulatedValues({
-    workqueue,
-    intl,
-    eventConfig,
-    event
+  return intl.formatMessage(eventConfig.summary.title.label, {
+    ...allPropertiesWithEmptyValues,
+    ...flattenEventIndex(event)
   })
-
-  return (
-    (titleColumn && fieldsWithPopulatedValues[titleColumn]) ??
-    intl.formatMessage(
-      eventConfig.summary.title.label,
-      flattenEventIndex(event)
-    )
-  )
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
