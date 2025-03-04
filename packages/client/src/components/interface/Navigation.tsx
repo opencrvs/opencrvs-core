@@ -41,7 +41,6 @@ import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
@@ -274,9 +273,29 @@ const NavigationView = (props: IFullProps) => {
     >
       {hasAccess(TAB_GROUPS.declarations) && (
         <NavigationGroup>
+          {hasAccess(WORKQUEUE_TABS.outbox) && (
+            <NavigationItem
+              icon={() => <Icon name="PaperPlaneTilt" size="small" />}
+              id={`navigation_${WORKQUEUE_TABS.outbox}`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TABS.outbox]
+              )}
+              count={declarationCount.outbox}
+              isSelected={tabId === WORKQUEUE_TABS.outbox}
+              onClick={() => {
+                props.router.navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.outbox
+                  })
+                )
+
+                menuCollapse && menuCollapse()
+              }}
+            />
+          )}
           {hasAccess(WORKQUEUE_TABS.myDrafts) && (
             <NavigationItem
-              icon={() => <Icon name="FileDotted" />}
+              icon={() => <Icon name="FileDotted" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.myDrafts}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.myDrafts]
@@ -296,7 +315,7 @@ const NavigationView = (props: IFullProps) => {
           )}
           {hasAccess(WORKQUEUE_TABS.inProgress) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'purple'} />}
+              icon={() => <Icon name="File" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.inProgress}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.inProgress]
@@ -316,7 +335,7 @@ const NavigationView = (props: IFullProps) => {
           )}
           {hasAccess(WORKQUEUE_TABS.sentForReview) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
+              icon={() => <Icon name="FileSearch" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.sentForReview}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.sentForReview]
@@ -336,7 +355,7 @@ const NavigationView = (props: IFullProps) => {
           )}
           {hasAccess(WORKQUEUE_TABS.readyForReview) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
+              icon={() => <Icon name="FileSearch" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.readyForReview]
@@ -356,7 +375,7 @@ const NavigationView = (props: IFullProps) => {
           )}
           {hasAccess(WORKQUEUE_TABS.requiresUpdate) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'red'} />}
+              icon={() => <Icon name="FileX" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.requiresUpdate]
@@ -376,7 +395,7 @@ const NavigationView = (props: IFullProps) => {
           )}
           {hasAccess(WORKQUEUE_TABS.sentForApproval) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'grey'} />}
+              icon={() => <Icon name="FileText" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.sentForApproval]
@@ -397,7 +416,7 @@ const NavigationView = (props: IFullProps) => {
           {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE &&
             hasAccess(WORKQUEUE_TABS.externalValidation) && (
               <NavigationItem
-                icon={() => <DeclarationIconSmall color={'teal'} />}
+                icon={() => <Icon name="Files" size="small" />}
                 id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
                 label={intl.formatMessage(
                   navigationMessages[WORKQUEUE_TABS.externalValidation]
@@ -416,7 +435,7 @@ const NavigationView = (props: IFullProps) => {
             )}
           {hasAccess(WORKQUEUE_TABS.readyToPrint) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'green'} />}
+              icon={() => <Icon name="Printer" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.readyToPrint}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.readyToPrint]
@@ -436,7 +455,7 @@ const NavigationView = (props: IFullProps) => {
           )}
           {isOnePrintInAdvanceOn && hasAccess(WORKQUEUE_TABS.readyToIssue) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'teal'} />}
+              icon={() => <Icon name="Handshake" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.readyToIssue]
@@ -454,26 +473,6 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {hasAccess(WORKQUEUE_TABS.outbox) && (
-            <NavigationItem
-              icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
-              id={`navigation_${WORKQUEUE_TABS.outbox}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.outbox]
-              )}
-              count={declarationCount.outbox}
-              isSelected={tabId === WORKQUEUE_TABS.outbox}
-              onClick={() => {
-                props.router.navigate(
-                  generateGoToHomeTabUrl({
-                    tabId: WORKQUEUE_TABS.outbox
-                  })
-                )
-
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
         </NavigationGroup>
       )}
       {hasAccess(TAB_GROUPS.organisations) && (
@@ -482,7 +481,7 @@ const NavigationView = (props: IFullProps) => {
             <>
               {hasAccess(WORKQUEUE_TABS.organisation) && (
                 <NavigationItem
-                  icon={() => <Icon name="Buildings" size="medium" />}
+                  icon={() => <Icon name="Buildings" size="small" />}
                   id={`navigation_${WORKQUEUE_TABS.organisation}`}
                   label={intl.formatMessage(
                     navigationMessages[WORKQUEUE_TABS.organisation]
@@ -503,7 +502,7 @@ const NavigationView = (props: IFullProps) => {
 
               {hasAccess(WORKQUEUE_TABS.team) && (
                 <NavigationItem
-                  icon={() => <Icon name="Users" size="medium" />}
+                  icon={() => <Icon name="Users" size="small" />}
                   id={`navigation_${WORKQUEUE_TABS.team}`}
                   label={intl.formatMessage(
                     navigationMessages[WORKQUEUE_TABS.team]
@@ -530,7 +529,7 @@ const NavigationView = (props: IFullProps) => {
           {hasAccess(WORKQUEUE_TABS.config) && (
             <>
               <NavigationItem
-                icon={() => <Icon name="Compass" size="medium" />}
+                icon={() => <Icon name="Compass" size="small" />}
                 id={`navigation_${WORKQUEUE_TABS.config}_main`}
                 label={intl.formatMessage(
                   navigationMessages[WORKQUEUE_TABS.config]
@@ -566,7 +565,7 @@ const NavigationView = (props: IFullProps) => {
           {hasAccess(WORKQUEUE_TABS.config) && (
             <>
               <NavigationItem
-                icon={() => <Icon name="ChatCircle" size="medium" />}
+                icon={() => <Icon name="ChatCircle" size="small" />}
                 id={`navigation_${WORKQUEUE_TABS.communications}_main`}
                 label={intl.formatMessage(
                   navigationMessages[WORKQUEUE_TABS.communications]
@@ -609,7 +608,7 @@ const NavigationView = (props: IFullProps) => {
             <>
               {showRegDashboard && hasAccess(WORKQUEUE_TABS.dashboard) && (
                 <NavigationItem
-                  icon={() => <Icon name="ChartLine" size="medium" />}
+                  icon={() => <Icon name="ChartLine" size="small" />}
                   label={intl.formatMessage(navigationMessages['dashboard'])}
                   onClick={() =>
                     router.navigate(routes.PERFORMANCE_DASHBOARD, {
@@ -624,7 +623,7 @@ const NavigationView = (props: IFullProps) => {
               )}
               {showStatistics && hasAccess(WORKQUEUE_TABS.statistics) && (
                 <NavigationItem
-                  icon={() => <Icon name="Activity" size="medium" />}
+                  icon={() => <Icon name="Activity" size="small" />}
                   label={intl.formatMessage(navigationMessages['statistics'])}
                   onClick={() =>
                     router.navigate(routes.PERFORMANCE_STATISTICS, {
@@ -639,7 +638,7 @@ const NavigationView = (props: IFullProps) => {
               )}
               {showLeaderboard && hasAccess(WORKQUEUE_TABS.leaderboards) && (
                 <NavigationItem
-                  icon={() => <Icon name="Medal" size="medium" />}
+                  icon={() => <Icon name="Medal" size="small" />}
                   label={intl.formatMessage(navigationMessages['leaderboards'])}
                   onClick={() =>
                     router.navigate(routes.PERFORMANCE_LEADER_BOARDS, {
@@ -654,7 +653,7 @@ const NavigationView = (props: IFullProps) => {
               )}
               {userDetails && hasAccess(WORKQUEUE_TABS.performance) && (
                 <NavigationItem
-                  icon={() => <Icon name="ChartBar" size="medium" />}
+                  icon={() => <Icon name="ChartBar" size="small" />}
                   label={intl.formatMessage(navigationMessages['performance'])}
                   onClick={() => {
                     props.router.navigate(
@@ -674,7 +673,7 @@ const NavigationView = (props: IFullProps) => {
           }
           {hasAccess(WORKQUEUE_TABS.vsexports) && (
             <NavigationItem
-              icon={() => <Icon name="Export" size="medium" />}
+              icon={() => <Icon name="Export" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.vsexports}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.vsexports]
@@ -699,7 +698,7 @@ const NavigationView = (props: IFullProps) => {
                   <Icon
                     name="Star"
                     color="yellow"
-                    size="medium"
+                    size="small"
                     weight="fill"
                   ></Icon>
                 )}
