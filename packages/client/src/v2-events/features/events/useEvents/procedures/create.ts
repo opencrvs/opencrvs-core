@@ -79,13 +79,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     )
     return optimisticEvent
   },
-  throwOnError: true,
-
-  onError: (a) => {
-    console.log('a', a)
-  },
   onSuccess: async (response, _variables, context) => {
-    console.log('success')
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
     await invalidateEventsList()

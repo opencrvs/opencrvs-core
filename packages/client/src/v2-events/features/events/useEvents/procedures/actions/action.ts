@@ -200,6 +200,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
   }
 
+  // mutationFn will be removed at this stage to ensure it has been specified in a serializable manner under /procedures. This ensures early error detection
+  // without explicitly testing offline functionality.
   const { mutationFn, ...mutationOptions } = allOptions
 
   const actionType = mutationOptions.meta?.actionType as ActionType | undefined

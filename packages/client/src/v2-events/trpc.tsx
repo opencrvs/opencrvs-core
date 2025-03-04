@@ -104,41 +104,25 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         buster: 'persisted-indexed-db',
         dehydrateOptions: {
           shouldDehydrateMutation: (mutation) => {
-            console.log('dehdrate mutation', mutation)
             if (mutation.state.status === 'error') {
               const error = mutation.state.error
               if (error instanceof TRPCClientError && error.data?.httpStatus) {
                 return !error.data.httpStatus.toString().startsWith('4')
               }
 
-              console.log('should dehydrate true')
               return true
             }
 
-            console.log('should dehydrate state', mutation.state.status)
             return mutation.state.status !== 'success'
           }
         }
       }}
       onSuccess={async () => {
-        console.log('foo-bar')
-        console.log('queryClient', queryClient)
-        try {
-          console.log('1')
-          await queryClient.resumePausedMutations().finally(() => {
-            console.log('jj')
-          })
-          console.log('2')
-        } catch (err) {
-          console.log('err', err)
-        }
+        await queryClient.resumePausedMutations()
 
         const mutations = queryClient.getMutationCache().getAll()
 
-        console.log('mutations', mutations)
-
         for (const mutation of mutations) {
-          console.log('mutation', mutation)
           await mutation.continue()
         }
       }}
