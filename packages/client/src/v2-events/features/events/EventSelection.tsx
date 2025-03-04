@@ -140,7 +140,7 @@ function EventSelector() {
   )
 }
 
-export function EventSelection() {
+function EventSelection() {
   const intl = useIntl()
   const { goToHome } = useEventFormNavigation()
 

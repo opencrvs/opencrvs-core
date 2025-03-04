@@ -29,7 +29,7 @@ import { createTemporaryId } from '@client/v2-events/utils'
  * The draft stage in the middle will be cancelled. This is to prevent race conditions
  * between when the backend receives the draft and when it receives the declare action.
  */
-export function cancelOngoingDraftRequests({ eventId, draft }: ActionInput) {
+function cancelOngoingDraftRequests({ eventId, draft }: ActionInput) {
   const mutationCache = queryClient.getMutationCache()
 
   const isDraftMutation = (
