@@ -94,7 +94,8 @@ export const resolvers: GQLResolver = {
           SCOPES.SEARCH_MARRIAGE,
           SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
           SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION,
+          SCOPES.RECORDSEARCH
         ])
       )
         return {
@@ -103,22 +104,36 @@ export const resolvers: GQLResolver = {
         }
 
       const userIdentifier = getTokenPayload(authHeader.Authorization).sub
-      const user = await dataSources.usersAPI.getUserById(userIdentifier!)
-      const office = await dataSources.locationsAPI.getLocation(
-        user.primaryOfficeId
-      )
-      const officeLocationId =
-        office.partOf?.reference &&
-        resourceIdentifierToUUID(office.partOf.reference)
+      let user
+      let system
 
-      if (!officeLocationId) {
+      try {
+        user = await dataSources.usersAPI.getUserById(userIdentifier!)
+      } catch (error) {
+        //user not found, attempting to find the system
+        system = await getSystem({ systemId: userIdentifier }, authHeader)
+
+        if (!system) {
+          throw new Error('API client system not found')
+        }
+      }
+
+      const office = user
+        ? await dataSources.locationsAPI.getLocation(user.primaryOfficeId)
+        : undefined
+      const officeLocationId = office
+        ? office.partOf?.reference &&
+          resourceIdentifierToUUID(office.partOf.reference)
+        : undefined
+
+      if (user && !officeLocationId) {
         throw new Error('User office not found')
       }
 
       const transformedSearchParams = transformSearchParams(
         getTokenPayload(authHeader.Authorization).scope,
         advancedSearchParameters,
-        officeLocationId
+        ''
       )
 
       const searchCriteria: ISearchCriteria = {
@@ -145,10 +160,7 @@ export const resolvers: GQLResolver = {
       }
 
       const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
-      if (isExternalAPI) {
-        const payload = getTokenPayload(authHeader.Authorization)
-        const system = await getSystem({ systemId: payload.sub }, authHeader)
-
+      if (isExternalAPI && system) {
         const getTotalRequest = await getMetrics(
           '/advancedSearch',
           {},
