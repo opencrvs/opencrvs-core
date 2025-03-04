@@ -20,9 +20,8 @@ import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionFormData } from './ActionDocument'
-import { formatISO } from 'date-fns'
 import { FormConfig } from './FormConfig'
-import { isFieldHidden } from '../conditionals/validate'
+import { isFormFieldVisible } from '../conditionals/validate'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -184,17 +183,8 @@ export function getEventConfiguration(
 }
 
 export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
-  const now = formatISO(new Date(), { representation: 'date' })
-
   return omitBy(data, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
-
-    return (
-      !field ||
-      isFieldHidden(field, {
-        $form: data,
-        $now: now
-      })
-    )
+    return !field || !isFormFieldVisible(field, data)
   })
 }

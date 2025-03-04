@@ -43,30 +43,34 @@ function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
-export function isFieldHidden(
-  field: FieldConfig,
-  params: ConditionalParameters
-) {
+export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
   const hasShowRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'SHOW'
   )
-  const validConditionals = getConditionalActionsForField(field, params)
 
-  const isVisible = !hasShowRule || validConditionals.includes('SHOW')
+  const validConditionals = getConditionalActionsForField(field, {
+    $form: form,
+    $now: formatISO(new Date(), {
+      representation: 'date'
+    })
+  })
 
-  return !isVisible
+  return !hasShowRule || validConditionals.includes('SHOW')
 }
 
-export function isFieldDisabled(
-  field: FieldConfig,
-  params: ConditionalParameters
-) {
+export function isFormFieldEnabled(field: FieldConfig, form: ActionFormData) {
   const hasEnableRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'ENABLE'
   )
-  const validConditionals = getConditionalActionsForField(field, params)
-  const isEnabled = !hasEnableRule || validConditionals.includes('ENABLE')
-  return !isEnabled
+
+  const validConditionals = getConditionalActionsForField(field, {
+    $form: form,
+    $now: formatISO(new Date(), {
+      representation: 'date'
+    })
+  })
+
+  return !hasEnableRule || validConditionals.includes('ENABLE')
 }
 
 /**
@@ -157,8 +161,8 @@ export function getFieldValidationErrors({
   }
 
   if (
-    isFieldHidden(field, conditionalParameters) ||
-    isFieldDisabled(field, conditionalParameters)
+    !isFormFieldVisible(field, values) ||
+    !isFormFieldEnabled(field, values)
   ) {
     if (values[field.id]) {
       return {

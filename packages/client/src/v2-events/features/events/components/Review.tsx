@@ -23,7 +23,8 @@ import {
   isFileFieldWithOptionType,
   SCOPES,
   EventConfig,
-  EventIndex
+  EventIndex,
+  isFormFieldVisible
 } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -38,7 +39,6 @@ import {
   Text
 } from '@opencrvs/components'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
