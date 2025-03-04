@@ -60,6 +60,7 @@ export function validationErrorsInActionFormExist(
   form: ActionFormData,
   metadata?: ActionFormData
 ): boolean {
+  // We don't want to validate hidden fields
   const formWithoutHiddenFields = stripHiddenFields(
     getFormFields(formConfig),
     form
