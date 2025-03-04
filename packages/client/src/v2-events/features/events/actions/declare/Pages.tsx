@@ -20,11 +20,11 @@ import { ActionType } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { FormLayout } from '@client/v2-events/layouts'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
+import { FormLayout } from '@client/v2-events/layouts'
+import { ROUTES } from '@client/v2-events/routes'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -35,19 +35,9 @@ export function Pages() {
   const { modal, goToHome } = useEventFormNavigation()
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const {
-    getFormValues,
-    eventId: formEventId,
-    setFormValues
-  } = useEventFormData()
+  const { getFormValues, setFormValues } = useEventFormData()
 
   const formValues = getFormValues(eventId)
-
-  useEffect(() => {
-    if (formEventId !== event.id) {
-      setFormValues(event.id, formValues)
-    }
-  }, [event.id, setFormValues, formEventId, formValues])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

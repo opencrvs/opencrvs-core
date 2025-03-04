@@ -11,17 +11,16 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 
+import { fireEvent, within } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
-import { fireEvent, within } from '@storybook/test'
 import {
   AddressFieldValue,
-  tennisClubMembershipEvent,
-  TENNIS_CLUB_FORM
+  TENNIS_CLUB_FORM,
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { Review } from './Review'
@@ -53,9 +52,6 @@ const meta: Meta<typeof Review.Body> = {
     form: mockFormData,
     onEdit: () => undefined,
     title: 'Member declaration for John Doe'
-  },
-  beforeEach: () => {
-    useEventFormData.getState().clear()
   },
   decorators: [
     (Story) => (

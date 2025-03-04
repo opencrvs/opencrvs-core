@@ -1926,7 +1926,7 @@ export const handlers = {
   ],
   config: [
     http.get(
-      'http://localhost:6006/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
+      '/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
       () => {
         return HttpResponse.text(
           tennisClubMembershipCertifiedCertificateTemplate
@@ -1934,7 +1934,7 @@ export const handlers = {
       }
     ),
     http.get(
-      'http://localhost:6006/api/countryconfig/certificates/tennis-club-membership-certified-certificate.svg',
+      '/api/countryconfig/certificates/tennis-club-membership-certified-certificate.svg',
       () => {
         return HttpResponse.text(
           tennisClubMembershipCertifiedCertificateTemplate
@@ -1942,16 +1942,13 @@ export const handlers = {
       }
     ),
 
-    http.get(
-      'http://localhost:6006/api/countryconfig/fonts/NotoSans-Regular.ttf',
-      async () => {
-        const fontResponse = await fetch(
-          'http://localhost:3040/fonts/NotoSans-Regular.ttf'
-        )
-        const fontArrayBuffer = await fontResponse.arrayBuffer()
-        return HttpResponse.arrayBuffer(fontArrayBuffer)
-      }
-    ),
+    http.get('/api/countryconfig/fonts/NotoSans-Regular.ttf', async () => {
+      const fontResponse = await fetch(
+        'http://localhost:3040/fonts/NotoSans-Regular.ttf'
+      )
+      const fontArrayBuffer = await fontResponse.arrayBuffer()
+      return HttpResponse.arrayBuffer(fontArrayBuffer)
+    }),
 
     http.get('http://localhost:2021/config', () => {
       return HttpResponse.json({

@@ -9,20 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import { expect, userEvent, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { userEvent, within, expect } from '@storybook/test'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter } from '@client/v2-events/trpc'
 import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {
-  title: 'Declare',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'Declare'
 }
 
 export default meta

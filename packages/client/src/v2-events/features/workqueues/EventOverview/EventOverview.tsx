@@ -59,10 +59,7 @@ function EventOverviewContainer() {
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
   const drafts = getDrafts()
 
-  const event = getCurrentEventStateWithDrafts(
-    fullEvent,
-    drafts.filter((d) => d.eventId === fullEvent.id)
-  )
+  const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
 
   const config = configs.find((c) => c.id === event?.type)
 

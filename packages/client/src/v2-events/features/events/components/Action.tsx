@@ -12,12 +12,6 @@
 import { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
-  useLocation,
-  useMatches,
-  useNavigate,
-  useViewTransitionState
-} from 'react-router-dom'
-import {
   ActionType,
   getCurrentEventStateWithDrafts,
   getMetadataForAction
@@ -26,14 +20,16 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
-export function Action({ children }: PropsWithChildren) {
+export function ActionComponent({ children }: PropsWithChildren) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
   const { getEvent, getDrafts } = useEvents()
-  const setFormValues = useEventFormData((state) => state.setFormValuesIfEmpty)
-  const clearFormValues = useEventFormData((state) => state.clear)
+  const setInitialFormValues = useEventFormData(
+    (state) => state.setInitialFormValues
+  )
+
   const setMetadata = useEventMetadata((state) => state.setMetadata)
-  const clearMetadata = useEventMetadata((state) => state.clear)
 
   const [event] = getEvent.useSuspenseQuery(params.eventId)
   const drafts = getDrafts()
@@ -52,15 +48,9 @@ export function Action({ children }: PropsWithChildren) {
   }, [draftsForThisEvent, event])
 
   useEffect(() => {
-    /*
-     * Clear the form completely first so Formik doesn't think there already
-     * was some input in the form
-     */
-    clearFormValues()
-    clearMetadata()
-
-    setFormValues(eventDataWithDrafts.id, eventDataWithDrafts.data)
+    setInitialFormValues(eventDataWithDrafts.id, eventDataWithDrafts.data)
     setMetadata(eventDataWithDrafts.id, declareMetadata)
+
     /*
      * This is fine to only run once on mount and unmount as
      * At the point of this code being run, there absolutely must be an event that has already been
@@ -71,3 +61,5 @@ export function Action({ children }: PropsWithChildren) {
 
   return children
 }
+
+export const Action = withSuspense(ActionComponent)

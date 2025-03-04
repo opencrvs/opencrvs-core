@@ -10,8 +10,8 @@
  */
 
 /**
-    This is an exact copy of `useEventFormData` except for `useSubscribeEventFormData`.  
-    Due to how `useSubscribeEventFormData` works, it’s not possible to use `useEventFormData` 
+    This is an exact copy of `useEventFormData` except for `useSubscribeEventFormData`.
+    Due to how `useSubscribeEventFormData` works, it’s not possible to use `useEventFormData`
     for adding additional metadata fields on review pages.
  */
 
@@ -23,7 +23,7 @@ import { storage } from '@client/storage'
 interface EventMetadata {
   metadata: ActionFormData
   setMetadata: (eventId: string, data: ActionFormData) => void
-  setMetadataIfEmpty: (eventId: string, data: ActionFormData) => void
+  setInitialMetadataValues: (eventId: string, data: ActionFormData) => void
   getMetadata: (
     eventId: string,
     initialValues?: ActionFormData
@@ -44,7 +44,7 @@ function removeUndefinedKeys(data: ActionFormData) {
  *
  * @property {ActionFormData} metadata - The current form values.
  * @property {function} setMetadata - Sets the form values for a given event ID.
- * @property {function} setMetadataIfEmpty - Sets the form values for a given event ID only if they are empty.
+ * @property {function} setInitialMetadataValues - Sets the form values for a given event ID only if they are empty.
  * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
  * @property {function} getMetadata - Retrieves the form values for a given event ID.
  * @property {function} getTouchedFields - Retrieves the fields that have been touched.
@@ -63,7 +63,7 @@ export const useEventMetadata = create<EventMetadata>()(
         const metadata = removeUndefinedKeys(data)
         return set(() => ({ eventId, metadata }))
       },
-      setMetadataIfEmpty: (eventId: string, data: ActionFormData) => {
+      setInitialMetadataValues: (eventId: string, data: ActionFormData) => {
         if (get().eventId === eventId) {
           return
         }

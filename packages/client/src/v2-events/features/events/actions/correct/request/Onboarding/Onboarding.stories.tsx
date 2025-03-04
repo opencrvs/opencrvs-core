@@ -19,10 +19,7 @@ import { router } from '@client/v2-events/features/events/actions/correct/reques
 import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 
 const meta: Meta<typeof Onboarding> = {
-  title: 'CorrectionRequest',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'CorrectionRequest'
 }
 
 export default meta

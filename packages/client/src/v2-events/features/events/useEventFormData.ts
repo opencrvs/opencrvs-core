@@ -18,7 +18,7 @@ import { storage } from '@client/storage'
 interface EventFormData {
   formValues: ActionFormData
   setFormValues: (eventId: string, data: ActionFormData) => void
-  setFormValuesIfEmpty: (eventId: string, data: ActionFormData) => void
+  setInitialFormValues: (eventId: string, data: ActionFormData) => void
   getFormValues: (
     eventId: string,
     initialValues?: ActionFormData
@@ -38,7 +38,7 @@ function removeUndefinedKeys(data: ActionFormData) {
  * Interface representing the form data and related operations for an event.
  *
  * @property {ActionFormData} formValues - The current form values.
- * @property {function} setFormValues - Sets the form values for a given event ID.
+ * @property {function} setFormValues - Sets the form values for a given event ID. This method should only be used as directly connected to Formik's `onChange` hook.
  * @property {function} setFormValuesIfEmpty - Sets the form values for a given event ID only if they are empty.
  * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
  * @property {function} getFormValues - Retrieves the form values for a given event ID.
@@ -57,7 +57,7 @@ export const useEventFormData = create<EventFormData>()(
         const formValues = removeUndefinedKeys(data)
         return set(() => ({ eventId, formValues }))
       },
-      setFormValuesIfEmpty: (eventId: string, data: ActionFormData) => {
+      setInitialFormValues: (eventId: string, data: ActionFormData) => {
         if (get().eventId === eventId) {
           return
         }

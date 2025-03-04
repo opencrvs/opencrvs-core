@@ -24,6 +24,8 @@ export const ActionBase = z.object({
   createdAtLocation: z.string()
 })
 
+export type ActionBase = z.infer<typeof ActionBase>
+
 const AssignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN),

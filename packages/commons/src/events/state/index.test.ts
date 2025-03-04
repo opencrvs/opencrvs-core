@@ -129,6 +129,7 @@ describe('drafts applied to event', () => {
         type: 'TENNIS_CLUB_MEMBERSHIP',
         createdAt: '2025-01-23T05:30:02.615Z',
         updatedAt: '2025-01-23T05:35:27.689Z',
+        trackingId: '123',
         actions: [
           {
             id: 'ae9618d8-319d-48a7-adfe-7ad6cfbc56b7',

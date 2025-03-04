@@ -22,10 +22,7 @@ import { useCorrectionRequestData } from './useCorrectionRequestData'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'CorrectionRequest'
 }
 
 export default meta

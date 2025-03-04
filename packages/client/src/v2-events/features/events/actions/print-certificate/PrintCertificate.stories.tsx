@@ -22,10 +22,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Pages> = {
-  title: 'Print Certificate',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'Print Certificate'
 }
 
 export default meta

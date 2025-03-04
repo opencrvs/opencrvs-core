@@ -20,9 +20,6 @@ import { Output } from './Output'
 const meta: Meta<typeof Output> = {
   title: 'Output',
   component: Output,
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  },
   decorators: [
     (Story) => (
       <TRPCProvider>

@@ -129,6 +129,7 @@ export function getCurrentEventStateWithDrafts(
   const lastAction = actions[actions.length - 1]
 
   const activeDrafts = drafts
+    .filter(({ eventId }) => eventId === event.id)
     .filter(
       ({ createdAt }) => new Date(createdAt) > new Date(lastAction.createdAt)
     )

@@ -112,6 +112,14 @@ const generator = testDataGenerator()
 const preview: Preview = {
   loaders: [mswLoader],
   beforeEach: async () => {
+    /*
+     * Clear all indexedDB databases before each story
+     */
+    const databases = await window.indexedDB.databases()
+    for (const db of databases) {
+      window.indexedDB.deleteDatabase(db.name!)
+    }
+
     window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
   },
   decorators: [

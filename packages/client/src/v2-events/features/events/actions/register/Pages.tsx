@@ -16,7 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { v4 as uuid } from 'uuid'
-import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -32,20 +32,13 @@ export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
-  const { eventId: formEventId, formValues: form } = useSubscribeEventFormData()
+  const { formValues: form } = useSubscribeEventFormData()
 
   const navigate = useNavigate()
   const events = useEvents()
   const { modal, goToHome } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-  const currentState = getCurrentEventState(event)
-
-  useEffect(() => {
-    if (formEventId !== event.id) {
-      setFormValues(event.id, currentState.data)
-    }
-  }, [currentState.data, event.id, formEventId, setFormValues])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

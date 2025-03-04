@@ -26,6 +26,7 @@ import { router as workqueueRouter } from '@client/v2-events/features/workqueues
 import { EventOverviewLayout } from '@client/v2-events/layouts'
 import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { Action } from '@client/v2-events/features/events/components/Action'
 import { ROUTES } from './routes'
 
 /**
@@ -69,9 +70,9 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
       element: (
-        <Declare.Action>
+        <Action>
           <Outlet />
-        </Declare.Action>
+        </Action>
       ),
       children: [
         {
@@ -91,7 +92,11 @@ export const routesConfig = {
     correctionRouter,
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
-      element: <Outlet />,
+      element: (
+        <Action>
+          <Outlet />
+        </Action>
+      ),
       children: [
         {
           index: true,
@@ -109,7 +114,11 @@ export const routesConfig = {
     },
     {
       path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,
-      element: <Outlet />,
+      element: (
+        <Action>
+          <Outlet />
+        </Action>
+      ),
       children: [
         {
           index: true,
