@@ -20,6 +20,7 @@ import {
   ActionInput,
   ActionType,
   EventDocument,
+  findActiveActionFields,
   getCurrentEventState,
   stripHiddenOrDisabledFields
 } from '@opencrvs/commons/client'
@@ -274,13 +275,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         throw new Error('Event configuration not found')
       }
 
+      const fields = findActiveActionFields(eventConfiguration, actionType)
+
       return mutation.mutate({
         ...params,
-        data: stripHiddenOrDisabledFields(
-          actionType,
-          eventConfiguration,
-          params.data
-        )
+        data: stripHiddenOrDisabledFields(fields, params.data)
       })
     }
   }

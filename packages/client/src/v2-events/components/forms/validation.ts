@@ -62,6 +62,7 @@ export function validationErrorsInActionFormExist(
     const fieldErrors = getValidationErrorsForForm(page.fields, form)
     return Object.values(fieldErrors).some((field) => field.errors.length > 0)
   })
+
   const hasMetadataValidationErrors = Object.values(
     getValidationErrorsForForm(formConfig.review.fields, metadata ?? {})
   ).some((field) => field.errors.length > 0)

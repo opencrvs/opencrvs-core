@@ -22,6 +22,7 @@ import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionFormData } from './ActionDocument'
 import { formatISO } from 'date-fns'
 import { isFieldHiddenOrDisabled } from '../conditionals/validate'
+import { FormConfig } from './FormConfig'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -157,14 +158,18 @@ export const findActiveActionForm = (
   return form
 }
 
+export const getFormFields = (formConfig: FormConfig) => {
+  return formConfig.pages.flatMap((p) => p.fields)
+}
+
 export const findActiveActionFields = (
   configuration: EventConfig,
   action: ActionType
-) => {
+): FieldConfig[] => {
   const form = findActiveActionForm(configuration, action)
 
   /** Let caller decide whether to throw or default to empty array */
-  return form?.pages.flatMap((p) => p.fields)
+  return form ? getFormFields(form) : []
 }
 
 export function getEventConfiguration(
@@ -179,20 +184,17 @@ export function getEventConfiguration(
 }
 
 export function stripHiddenOrDisabledFields(
-  actionType: ActionType,
-  eventConfiguration: EventConfig,
+  fields: FieldConfig[],
   data: ActionFormData
 ) {
-  const activeFields =
-    findActiveActionFields(eventConfiguration, actionType) ?? []
-
   const now = formatISO(new Date(), { representation: 'date' })
 
   return omitBy(data, (_, fieldId) => {
-    const field = activeFields.find((f) => f.id === fieldId)
+    const field = fields.find((f) => f.id === fieldId)
 
     return (
       !field ||
+      // TODO CIHAN: remove hidden fields, not disabled fields??
       isFieldHiddenOrDisabled(field, {
         $form: data,
         $now: now

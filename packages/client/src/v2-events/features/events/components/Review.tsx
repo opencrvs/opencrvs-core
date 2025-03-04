@@ -21,7 +21,11 @@ import {
   getFieldValidationErrors,
   isFileFieldType,
   isFileFieldWithOptionType,
-  SCOPES
+  SCOPES,
+  stripHiddenOrDisabledFields,
+  EventConfig,
+  EventIndex,
+  getFormFields
 } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -35,8 +39,6 @@ import {
   Stack,
   Text
 } from '@opencrvs/components'
-
-import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -618,11 +620,20 @@ function ReviewActionComponent({
   }
   primaryButtonType?: 'positive' | 'primary'
 }) {
+  const formWithoutHiddenFields = stripHiddenOrDisabledFields(
+    getFormFields(formConfig),
+    form
+  )
+  const metadataWithoutHiddenFields = stripHiddenOrDisabledFields(
+    formConfig.review.fields,
+    metadata ?? {}
+  )
+
   const intl = useIntl()
   const errorExist = validationErrorsInActionFormExist(
     formConfig,
-    form,
-    metadata
+    formWithoutHiddenFields,
+    metadataWithoutHiddenFields
   )
   const background = errorExist ? 'error' : 'success'
   const descriptionMessage = errorExist
