@@ -135,7 +135,7 @@ export function Review() {
     <FormLayout
       route={ROUTES.V2.EVENTS.REGISTER}
       onSaveAndExit={() => {
-        events.actions.draft.create.mutate({
+        events.draft.create.mutate({
           eventId: event.id,
           data: form,
           transactionId: uuid(),

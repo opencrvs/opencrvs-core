@@ -47,7 +47,7 @@ export async function invalidateEventsList() {
 
 export async function invalidateDraftsList() {
   return queryClient.invalidateQueries({
-    queryKey: utils.event.actions.draft.list.queryKey()
+    queryKey: utils.event.draft.list.queryKey()
   })
 }
 

@@ -90,7 +90,7 @@ export function Pages() {
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
       onSaveAndExit={() => {
-        events.actions.draft.create.mutate({
+        events.draft.create.mutate({
           eventId: event.id,
           data: formValues,
           transactionId: uuid(),

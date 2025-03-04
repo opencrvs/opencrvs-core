@@ -443,7 +443,7 @@ export function Review() {
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
       onSaveAndExit={() => {
-        events.actions.draft.create.mutate({
+        events.draft.create.mutate({
           type: ActionType.DECLARE,
           eventId: event.id,
           data: form,

@@ -73,9 +73,9 @@ function updateEventOptimistically<T extends ActionInput>(
   }
 }
 
-setMutationDefaults(utils.event.actions.draft.create, {
+setMutationDefaults(utils.event.draft.create, {
   retry: true,
-  mutationFn: createMutationFn(utils.event.actions.draft.create),
+  mutationFn: createMutationFn(utils.event.draft.create),
   onSuccess: async () => {
     await invalidateEventsList()
     await invalidateDraftsList()
@@ -194,12 +194,12 @@ function createMutationFn<P extends DecorateMutationProcedure<any>>(
 }
 
 export function useCreateDraft() {
-  const options = utils.event.actions.draft.create.mutationOptions()
+  const options = utils.event.draft.create.mutationOptions()
 
   return useMutation({
     ...options,
     ...queryClient.getMutationDefaults(
-      utils.event.actions.draft.create.mutationKey()
+      utils.event.draft.create.mutationKey()
     )
   })
 }

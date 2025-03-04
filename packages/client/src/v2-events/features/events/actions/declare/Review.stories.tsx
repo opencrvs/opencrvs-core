@@ -82,7 +82,7 @@ export const ReviewForLocalRegistrarComplete: Story = {
     msw: {
       handlers: {
         drafts: [
-          tRPCMsw.event.actions.draft.list.query(() => {
+          tRPCMsw.event.draft.list.query(() => {
             return [draft]
           })
         ],
@@ -179,7 +179,7 @@ export const ReviewForRegistrationAgentComplete: Story = {
     msw: {
       handlers: {
         drafts: [
-          tRPCMsw.event.actions.draft.list.query(() => {
+          tRPCMsw.event.draft.list.query(() => {
             return [draft]
           })
         ],
@@ -278,7 +278,7 @@ export const ReviewForFieldAgentComplete: Story = {
     msw: {
       handlers: {
         drafts: [
-          tRPCMsw.event.actions.draft.list.query(() => {
+          tRPCMsw.event.draft.list.query(() => {
             return [draft]
           })
         ],
@@ -337,7 +337,7 @@ export const ReviewForFieldAgentIncomplete: Story = {
     msw: {
       handlers: {
         drafts: [
-          tRPCMsw.event.actions.draft.list.query(() => {
+          tRPCMsw.event.draft.list.query(() => {
             return [draft]
           })
         ],

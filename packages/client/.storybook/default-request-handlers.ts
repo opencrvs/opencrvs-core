@@ -49,7 +49,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 export const handlers = {
   drafts: [
-    tRPCMsw.event.actions.draft.list.query(() => {
+    tRPCMsw.event.draft.list.query(() => {
       return []
     })
   ],

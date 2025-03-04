@@ -74,7 +74,7 @@ export const Overview: Story = {
           })
         ],
         drafts: [
-          tRPCMsw.event.actions.draft.list.query(() => {
+          tRPCMsw.event.draft.list.query(() => {
             return [
               {
                 eventId: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',

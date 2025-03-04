@@ -23,9 +23,7 @@ export function useEvents() {
   const trpc = useTRPC()
 
   function useDrafts(): Draft[] {
-    const drafts = useSuspenseQuery(
-      trpc.event.actions.draft.list.queryOptions()
-    ).data
+    const drafts = useSuspenseQuery(trpc.event.draft.list.queryOptions()).data
     return drafts
   }
 
@@ -61,7 +59,7 @@ export function useEvents() {
         reject: useEventAction(trpc.event.actions.correction.reject)
       },
       draft: {
-        list: trpc.event.actions.draft.list,
+        list: trpc.event.draft.list,
         create: useCreateDraft()
       }
     }

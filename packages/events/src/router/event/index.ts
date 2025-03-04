@@ -123,23 +123,23 @@ export const eventRouter = router({
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
-  actions: router({
-    draft: router({
-      list: publicProcedure.output(z.array(Draft)).query(async (options) => {
-        return getDraftsByUserId(options.ctx.user.id)
-      }),
-      create: publicProcedure.input(DraftInput).mutation(async (options) => {
-        const eventId = options.input.eventId
-        await getEventById(eventId)
-        return createDraft(options.input, {
-          eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token,
-          transactionId: options.input.transactionId
-        })
-      })
+  draft: router({
+    list: publicProcedure.output(z.array(Draft)).query(async (options) => {
+      return getDraftsByUserId(options.ctx.user.id)
     }),
+    create: publicProcedure.input(DraftInput).mutation(async (options) => {
+      const eventId = options.input.eventId
+      await getEventById(eventId)
+      return createDraft(options.input, {
+        eventId,
+        createdBy: options.ctx.user.id,
+        createdAtLocation: options.ctx.user.primaryOfficeId,
+        token: options.ctx.token,
+        transactionId: options.input.transactionId
+      })
+    })
+  }),
+  actions: router({
     notify: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))
       .input(NotifyActionInput)
