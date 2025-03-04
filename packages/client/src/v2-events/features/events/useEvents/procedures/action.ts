@@ -22,7 +22,7 @@ import {
   EventDocument,
   findActiveActionFields,
   getCurrentEventState,
-  stripHiddenOrDisabledFields
+  stripHiddenFields
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -279,7 +279,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
       return mutation.mutate({
         ...params,
-        data: stripHiddenOrDisabledFields(fields, params.data)
+        data: stripHiddenFields(fields, params.data)
       })
     }
   }

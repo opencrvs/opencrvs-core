@@ -22,7 +22,7 @@ import {
   isFileFieldType,
   isFileFieldWithOptionType,
   SCOPES,
-  stripHiddenOrDisabledFields,
+  stripHiddenFields,
   EventConfig,
   EventIndex,
   getFormFields
@@ -620,11 +620,11 @@ function ReviewActionComponent({
   }
   primaryButtonType?: 'positive' | 'primary'
 }) {
-  const formWithoutHiddenFields = stripHiddenOrDisabledFields(
+  const formWithoutHiddenFields = stripHiddenFields(
     getFormFields(formConfig),
     form
   )
-  const metadataWithoutHiddenFields = stripHiddenOrDisabledFields(
+  const metadataWithoutHiddenFields = stripHiddenFields(
     formConfig.review.fields,
     metadata ?? {}
   )
