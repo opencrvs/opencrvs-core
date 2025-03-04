@@ -20,6 +20,7 @@ import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
+import { ConditionalType } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true
@@ -43,11 +44,13 @@ function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
-// export function isUncheckedCheckbox()
-
-export function isFieldVisible(field: FieldConfig, form: ActionFormData) {
-  const hasShowRule = (field.conditionals ?? []).some(
-    (conditional) => conditional.type === 'SHOW'
+function isFieldConditionMet(
+  field: FieldConfig,
+  form: ActionFormData,
+  conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
+) {
+  const hasRule = (field.conditionals ?? []).some(
+    (conditional) => conditional.type === conditionalType
   )
 
   const validConditionals = getConditionalActionsForField(field, {
@@ -57,22 +60,15 @@ export function isFieldVisible(field: FieldConfig, form: ActionFormData) {
     })
   })
 
-  return !hasShowRule || validConditionals.includes('SHOW')
+  return !hasRule || validConditionals.includes(conditionalType)
+}
+
+export function isFieldVisible(field: FieldConfig, form: ActionFormData) {
+  return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
 export function isFieldEnabled(field: FieldConfig, form: ActionFormData) {
-  const hasEnableRule = (field.conditionals ?? []).some(
-    (conditional) => conditional.type === 'ENABLE'
-  )
-
-  const validConditionals = getConditionalActionsForField(field, {
-    $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
-    })
-  })
-
-  return !hasEnableRule || validConditionals.includes('ENABLE')
+  return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
 
 /**
