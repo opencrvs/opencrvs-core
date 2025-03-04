@@ -124,3 +124,89 @@ export const FilledPagesVisibleInReview: Story = {
     }
   }
 }
+
+export const CanSubmitValidlyFilledForm: Story = {
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText(/Who is applying for the membership?/)
+
+    await step('Fill the applicant details', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____firstname'),
+        'John'
+      )
+
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____surname'),
+        'Doe'
+      )
+
+      await userEvent.type(await canvas.findByPlaceholderText('dd'), '11')
+
+      await userEvent.type(await canvas.findByPlaceholderText('mm'), '11')
+
+      await userEvent.type(await canvas.findByPlaceholderText('yyyy'), '1990')
+
+      await userEvent.click(
+        await canvas.findByText('Tennis club membership application')
+      )
+
+      await userEvent.click(await canvas.findByText('Select...'))
+      await userEvent.click(await canvas.findByText('Albania'))
+      await userEvent.click(await canvas.findByText('Select...'))
+      await userEvent.click(await canvas.findByText('Central'))
+      await userEvent.click(await canvas.findByText('Select...'))
+      await userEvent.click(await canvas.findByText('Ibombo'))
+
+      const continueButton = await canvas.findByText('Continue')
+      await userEvent.click(continueButton)
+    })
+
+    // First fill in the recommenders name, but then click 'No recommender'. This should not cause validation errors on review page.
+    await step('Fill the recommenders details', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__recommender____firstname'),
+        'John'
+      )
+
+      await userEvent.type(
+        await canvas.findByTestId('text__recommender____surname'),
+        'Dory'
+      )
+
+      await userEvent.click(await canvas.findByLabelText('No recommender'))
+
+      const continueButton = await canvas.findByText('Continue')
+      await userEvent.click(continueButton)
+    })
+
+    await step(
+      'Verify that register button is enabled and that no validation errors are shown',
+      async () => {
+        await expect(
+          canvas.queryByText('Required for registration')
+        ).not.toBeInTheDocument()
+        await expect(await canvas.findByText('Register')).toBeEnabled()
+      }
+    )
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return undeclaredDraftEvent
+          })
+        ]
+      }
+    }
+  }
+}
