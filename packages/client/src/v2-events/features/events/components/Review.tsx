@@ -22,10 +22,8 @@ import {
   isFileFieldType,
   isFileFieldWithOptionType,
   SCOPES,
-  stripHiddenFields,
   EventConfig,
-  EventIndex,
-  getFormFields
+  EventIndex
 } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -620,20 +618,11 @@ function ReviewActionComponent({
   }
   primaryButtonType?: 'positive' | 'primary'
 }) {
-  const formWithoutHiddenFields = stripHiddenFields(
-    getFormFields(formConfig),
-    form
-  )
-  const metadataWithoutHiddenFields = stripHiddenFields(
-    formConfig.review.fields,
-    metadata ?? {}
-  )
-
   const intl = useIntl()
   const errorExist = validationErrorsInActionFormExist(
     formConfig,
-    formWithoutHiddenFields,
-    metadataWithoutHiddenFields
+    form,
+    metadata
   )
   const background = errorExist ? 'error' : 'success'
   const descriptionMessage = errorExist
