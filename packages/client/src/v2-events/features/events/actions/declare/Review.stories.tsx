@@ -112,9 +112,9 @@ export const ReviewForLocalRegistrarComplete: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Register' })
-      )
+      const button = await canvas.findByRole('button', { name: 'Register' })
+      await waitFor(() => expect(button).not.toBeDisabled())
+      await userEvent.click(button)
 
       const modal = within(await canvas.findByRole('dialog'))
 
@@ -209,9 +209,12 @@ export const ReviewForRegistrationAgentComplete: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for approval' })
-      )
+      const button = await canvas.findByRole('button', {
+        name: 'Send for approval'
+      })
+      await waitFor(() => expect(button).not.toBeDisabled())
+
+      await userEvent.click(button)
 
       const modal = within(await canvas.findByRole('dialog'))
 
@@ -308,9 +311,11 @@ export const ReviewForFieldAgentComplete: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for review' })
-      )
+      const button = await canvas.findByRole('button', {
+        name: 'Send for review'
+      })
+      await waitFor(() => expect(button).not.toBeDisabled())
+      await userEvent.click(button)
 
       const modal = within(await canvas.findByRole('dialog'))
 
