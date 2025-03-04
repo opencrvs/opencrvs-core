@@ -35,3 +35,8 @@ export async function invalidateEventsList() {
     queryKey: trpcOptionsProxy.event.list.queryKey()
   })
 }
+
+export async function updateLocalEvent(updatedEvent: EventDocument) {
+  setEventData(updatedEvent.id, updatedEvent)
+  return invalidateEventsList()
+}

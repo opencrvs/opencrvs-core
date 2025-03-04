@@ -16,7 +16,7 @@ import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 import { useGetEvent } from './procedures/get'
-import { customMutationKeys, useEventAction } from './procedures/action'
+import { customMutationKeys, useEventAction } from './procedures/actions/action'
 
 export function useEvents() {
   const trpc = useTRPC()
