@@ -43,7 +43,9 @@ function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
-export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
+// export function isUncheckedCheckbox()
+
+export function isFieldVisible(field: FieldConfig, form: ActionFormData) {
   const hasShowRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'SHOW'
   )
@@ -58,7 +60,7 @@ export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
   return !hasShowRule || validConditionals.includes('SHOW')
 }
 
-export function isFormFieldEnabled(field: FieldConfig, form: ActionFormData) {
+export function isFieldEnabled(field: FieldConfig, form: ActionFormData) {
   const hasEnableRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'ENABLE'
   )
@@ -160,10 +162,7 @@ export function getFieldValidationErrors({
     $now: formatISO(new Date(), { representation: 'date' })
   }
 
-  if (
-    !isFormFieldVisible(field, values) ||
-    !isFormFieldEnabled(field, values)
-  ) {
+  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
     if (values[field.id]) {
       return {
         errors: [

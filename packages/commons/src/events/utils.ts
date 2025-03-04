@@ -21,7 +21,7 @@ import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionFormData } from './ActionDocument'
 import { FormConfig } from './FormConfig'
-import { isFormFieldVisible } from '../conditionals/validate'
+import { isFieldVisible } from '../conditionals/validate'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -185,6 +185,6 @@ export function getEventConfiguration(
 export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
   return omitBy(data, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
-    return !field || !isFormFieldVisible(field, data)
+    return !field || !isFieldVisible(field, data)
   })
 }

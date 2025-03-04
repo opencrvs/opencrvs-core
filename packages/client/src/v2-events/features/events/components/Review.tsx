@@ -24,7 +24,7 @@ import {
   SCOPES,
   EventConfig,
   EventIndex,
-  isFormFieldVisible
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -415,7 +415,7 @@ function ReviewComponent({
                     >
                       <ListReview id={'Section_' + page.id}>
                         {page.fields
-                          .filter((field) => isFormFieldVisible(field, form))
+                          .filter((field) => isFieldVisible(field, form))
                           .map((field) => {
                             const value = form[field.id]
                             const previousValue = previousForm[field.id]

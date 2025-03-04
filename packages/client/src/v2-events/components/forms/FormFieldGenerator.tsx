@@ -43,7 +43,7 @@ import {
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
-  isFormFieldEnabled,
+  isFieldEnabled,
   isFileFieldType,
   isFileFieldWithOptionType,
   isLocationFieldType,
@@ -57,7 +57,7 @@ import {
   isTextFieldType,
   isNumberFieldType,
   isEmailFieldType,
-  isFormFieldVisible
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -654,11 +654,11 @@ class FormSectionComponent extends React.Component<AllProps> {
             valuesWithFormattedDate
           )
 
-          if (!isFormFieldVisible(field, formData)) {
+          if (!isFieldVisible(field, formData)) {
             return null
           }
 
-          const isDisabled = !isFormFieldEnabled(field, formData)
+          const isDisabled = !isFieldEnabled(field, formData)
 
           return (
             <FormItem
