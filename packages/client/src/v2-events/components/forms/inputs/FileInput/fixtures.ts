@@ -189,16 +189,6 @@ export const birthEvent = {
   workqueues: [
     {
       id: 'all',
-      fields: [
-        {
-          column: 'title',
-          label: {
-            id: 'event.birth.workqueue.all.name.label',
-            defaultMessage: '{child.surname} {child.firstname}',
-            description: 'Label for name in all workqueue'
-          }
-        }
-      ],
       filters: []
     }
   ],
