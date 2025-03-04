@@ -58,13 +58,11 @@ export function FormHeader({
 
   const onExit = useCallback(async () => {
     await exit(event)
-    form.clear()
-  }, [event, exit, form])
+  }, [event, exit])
 
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId)
-    form.clear()
-  }, [eventId, deleteDeclaration, form])
+  }, [eventId, deleteDeclaration])
 
   const menuItems = isUndeclaredDraft(event)
     ? [

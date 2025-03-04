@@ -14,6 +14,7 @@ import {
   ActionInputWithType,
   EventDocument,
   EventInput,
+  FieldType,
   FileFieldValue,
   isUndeclaredDraft
 } from '@opencrvs/commons/events'
@@ -95,19 +96,11 @@ export async function deleteEvent(
 }
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
-  const config = await getEventConfigurations(token)
-
-  const form = config
-    .find((c) => c.id === event.type)
-    ?.actions.find((action) => action.type === event.type)
-    ?.forms.find((f) => f.active)
-
-  const fieldTypes = form?.pages.flatMap((page) => page.fields)
-
-  for (const action of event.actions) {
-    for (const [key, value] of Object.entries(action.data)) {
+  for (const ac of event.actions) {
+    const fieldTypes = await getActiveFormFieldTypes(token, event, ac.type)
+    for (const [key, value] of Object.entries(ac.data)) {
       const isFile =
-        fieldTypes?.find((field) => field.id === key)?.type === 'FILE'
+        fieldTypes.find((field) => field.id === key)?.type === FieldType.FILE
 
       const fileValue = FileFieldValue.safeParse(value)
 
@@ -116,85 +109,6 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
       }
 
       await deleteFile(fileValue.data.filename, token)
-    }
-  }
-}
-
-async function cleanUnreferencedAttachmentsFromPreviousDrafts(
-  token: string,
-  event: EventDocument,
-  action: ActionDocument
-) {
-  if (action.draft) {
-    return
-  }
-  const previousDrafts = event.actions.filter(
-    (x: ActionDocument) =>
-      x.type === action.type && x.createdBy === action.createdBy && x.draft
-  )
-  if (previousDrafts.length === 0) {
-    return
-  }
-  const config = await getEventConfigurations(token)
-
-  const form = config
-    .find((c) => c.id === event.type)
-    ?.actions.find((ac) => ac.type === action.type)
-    ?.forms.find((f) => f.active)
-
-  const fieldTypes = form?.pages.flatMap((page) => page.fields) ?? []
-
-  // all FileValue’s in the drafts
-  const previousFileValuesInTheDrafts: Array<{
-    fieldName: string
-    file: FileFieldValue
-  }> = []
-  for (const draft of previousDrafts) {
-    for (const [key, value] of Object.entries(draft.data)) {
-      const isFile =
-        fieldTypes.find((field) => field.id === key)?.type === 'FILE'
-      if (!isFile) {
-        continue
-      }
-      const fileValue = FileFieldValue.safeParse(value)
-      if (fileValue.data) {
-        previousFileValuesInTheDrafts.push({
-          file: fileValue.data,
-          fieldName: key
-        })
-      }
-    }
-  }
-
-  // all FileValues in the now submitted action
-  const currentFileValuesInTheAction: Array<{
-    fieldName: string
-    file?: FileFieldValue
-  }> = []
-  for (const [key, value] of Object.entries(action.data)) {
-    const isFile = fieldTypes.find((field) => field.id === key)?.type === 'FILE'
-    const fileValue = FileFieldValue.safeParse(value)
-    if (!isFile) {
-      continue
-    }
-    currentFileValuesInTheAction.push({
-      file: fileValue.data,
-      fieldName: key
-    })
-  }
-
-  // find and delete unreferenced attachments from the previous drafts
-  for (const previousDraft of previousFileValuesInTheDrafts) {
-    if (
-      !currentFileValuesInTheAction.some(
-        (curr) =>
-          // checking field name too because there could be multiple file inputs in the form
-          curr.fieldName === previousDraft.fieldName &&
-          curr.file &&
-          curr.file.filename === previousDraft.file.filename
-      )
-    ) {
-      await deleteFile(previousDraft.file.filename, token)
     }
   }
 }
@@ -264,6 +178,81 @@ export async function createEvent({
   return event
 }
 
+function extractFileValues(
+  data: Record<string, unknown>,
+  fieldTypes: Array<{ id: string; type: string }>
+): Array<{ fieldName: string; file: FileFieldValue }> {
+  const fileValues: Array<{ fieldName: string; file: FileFieldValue }> = []
+  for (const [key, value] of Object.entries(data)) {
+    const isFile =
+      fieldTypes.find((field) => field.id === key)?.type === FieldType.FILE
+    const fileValue = FileFieldValue.safeParse(value)
+    if (!isFile || !fileValue.success) {
+      continue
+    }
+
+    fileValues.push({
+      file: fileValue.data,
+      fieldName: key
+    })
+  }
+  return fileValues
+}
+
+async function getActiveFormFieldTypes(
+  token: string,
+  event: EventDocument,
+  actionType: ActionType
+) {
+  const config = await getEventConfigurations(token)
+  const form = config
+    .find((c) => c.id === event.type)
+    ?.actions.find((ac) => ac.type === actionType)
+    ?.forms.find((f) => f.active)
+  const fieldTypes = form?.pages.flatMap((page) => page.fields) ?? []
+  return fieldTypes
+}
+
+async function cleanUnreferencedAttachmentsFromPreviousDrafts(
+  token: string,
+  event: EventDocument,
+  action: ActionDocument
+): Promise<void> {
+  const previousDrafts: ActionDocument[] = []
+  for (let i = event.actions.length - 1; i >= 0; i--) {
+    const x = event.actions[i]
+    if (x.type === action.type && x.createdBy === action.createdBy && x.draft) {
+      previousDrafts.push(x)
+    } else {
+      break
+    }
+  }
+
+  if (previousDrafts.length === 0) {
+    return
+  }
+  const fieldTypes = await getActiveFormFieldTypes(token, event, action.type)
+  const previousFileValuesInTheDrafts = previousDrafts
+    .map((draft) => extractFileValues(draft.data, fieldTypes))
+    .flat()
+  const currentFileValuesInTheAction = extractFileValues(
+    action.data,
+    fieldTypes
+  )
+
+  for (const previousDraft of previousFileValuesInTheDrafts) {
+    if (
+      !currentFileValuesInTheAction.some(
+        (curr) =>
+          curr.fieldName === previousDraft.fieldName &&
+          curr.file.filename === previousDraft.file.filename
+      )
+    ) {
+      await deleteFile(previousDraft.file.filename, token)
+    }
+  }
+}
+
 export async function addAction(
   input: ActionInputWithType,
   {
@@ -279,34 +268,18 @@ export async function addAction(
     token: string
     transactionId: string
   }
-) {
+): Promise<EventDocument> {
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
-
-  const config = await getEventConfigurations(token)
-
-  const form = config
-    .find((c) => c.id === event.type)
-    ?.actions.find((action) => action.type === input.type)
-    ?.forms.find((f) => f.active)
-
-  const fieldTypes = form?.pages.flatMap((page) => page.fields)
-
-  for (const [key, value] of Object.entries(input.data)) {
-    const isFile =
-      fieldTypes?.find((field) => field.id === key)?.type === 'FILE'
-
-    const fileValue = FileFieldValue.safeParse(value)
-
-    if (!isFile || !fileValue.success) {
-      continue
-    }
-
-    if (!(await fileExists(fileValue.data.filename, token))) {
-      throw new Error(`File not found: ${fileValue.data.filename}`)
+  const fieldTypes = await getActiveFormFieldTypes(token, event, input.type)
+  const inputFiles = extractFileValues(input.data, fieldTypes)
+  for (const file of inputFiles) {
+    if (!(await fileExists(file.file.filename, token))) {
+      throw new Error(`File not found: ${file.file.filename}`)
     }
   }
+
   const action: ActionDocument = {
     ...input,
     createdBy,
@@ -315,22 +288,17 @@ export async function addAction(
     draft: input.draft || false,
     id: getUUID()
   }
-  await db.collection<EventDocument>('events').updateOne(
-    {
-      id: eventId,
-      'actions.transactionId': { $ne: transactionId }
-    },
-    {
-      $push: {
-        actions: action
-      },
-      $set: {
-        updatedAt: now
-      }
-    }
-  )
 
-  await cleanUnreferencedAttachmentsFromPreviousDrafts(token, event, action)
+  await db
+    .collection<EventDocument>('events')
+    .updateOne(
+      { id: eventId, 'actions.transactionId': { $ne: transactionId } },
+      { $push: { actions: action }, $set: { updatedAt: now } }
+    )
+
+  if (!action.draft) {
+    await cleanUnreferencedAttachmentsFromPreviousDrafts(token, event, action)
+  }
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
   await notifyOnAction(input, updatedEvent, token)
