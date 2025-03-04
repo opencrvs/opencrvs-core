@@ -42,7 +42,7 @@ function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
 
   const defaultMutationFn = mutationOptions.mutationFn
 
-  return (params: any) =>
+  return async (params: any) =>
     defaultMutationFn({
       ...params,
       data: params.data

@@ -47,30 +47,6 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createEventMutationFn<P extends DecorateMutationProcedure<any>>(
-  trpcProcedure: P
-) {
-  const mutationOptions = {
-    ...trpcProcedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
-  }
-
-  if (!mutationOptions.mutationFn) {
-    throw new Error(
-      'No mutation fn found for operation. This should never happen'
-    )
-  }
-
-  const defaultMutationFn = mutationOptions.mutationFn
-
-  return (params: any) =>
-    defaultMutationFn({
-      ...params,
-      data: params.data
-    })
-}
-
 type TRPCError = TRPCClientError<AppRouter>
 type TRPCQueryKey<T> = [readonly string[], { input: T }]
 /**
