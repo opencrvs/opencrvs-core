@@ -17,7 +17,8 @@ import {
 } from '@trpc/tanstack-react-query'
 import {
   ActionType,
-  stripHiddenOrDisabledFields
+  findActiveActionFields,
+  stripHiddenFields
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -229,14 +230,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
       }
+      const fields = findActiveActionFields(eventConfiguration, actionType)
 
       return mutation.mutate({
         ...params,
-        data: stripHiddenOrDisabledFields(
-          actionType,
-          eventConfiguration,
-          params.data
-        )
+        data: stripHiddenFields(fields, params.data)
       })
     }
   }

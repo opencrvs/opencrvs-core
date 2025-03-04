@@ -41,6 +41,18 @@ test('event can be created and fetched', async () => {
   expect(fetchedEvent).toEqual(event)
 })
 
+test('created event should have be assigned a random 6 character tracking ID', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await client.event.create(generator.event.create())
+
+  // trackingId should be 6 characters long and include only uppercase letters and numbers
+  expect(event.trackingId).toMatch(/^[A-Z0-9]{6}$/)
+
+  const fetchedEvent = await client.event.get(event.id)
+  expect(fetchedEvent.trackingId).toMatch(/^[A-Z0-9]{6}$/)
+})
+
 test('creating an event is an idempotent operation', async () => {
   const { user, generator, eventsDb } = await setupTestCase()
   const client = createTestClient(user)
