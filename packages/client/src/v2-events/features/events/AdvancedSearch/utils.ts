@@ -46,3 +46,15 @@ export const getAdvancedSearchFieldErrors = (
 
 export const flattenFieldErrors = (fieldErrors: Errors) =>
   Object.values(fieldErrors).flatMap((errObj) => errObj.errors)
+
+export const buildSearchParams = (formValues: Record<string, FieldValue>) => {
+  const searchParams = new URLSearchParams()
+
+  Object.entries(formValues).forEach(([key, value]) => {
+    if (value) {
+      searchParams.append(key, String(value)) // Convert all values to strings
+    }
+  })
+
+  return searchParams
+}

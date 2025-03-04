@@ -20,7 +20,11 @@ import { EventConfig } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
+import {
+  buildSearchParams,
+  flattenFieldErrors,
+  getAdvancedSearchFieldErrors
+} from './utils'
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -132,14 +136,7 @@ export function TabSearch({
   )
 
   const handleSearch = () => {
-    const searchParams = new URLSearchParams()
-
-    Object.entries(formValues).forEach(([key, value]) => {
-      if (value) {
-        searchParams.append(key, String(value))
-      } // Convert all values to strings
-    })
-
+    const searchParams = buildSearchParams(formValues)
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: currentEvent.id
     })
