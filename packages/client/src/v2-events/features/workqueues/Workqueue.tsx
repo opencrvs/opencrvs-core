@@ -198,7 +198,9 @@ function Workqueue({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
-      const isInDrafts = drafts.some((draft) => draft.eventId === event.id)
+      const isInDrafts = drafts
+        .filter((draft) => draft.createdAt > event.modifiedAt)
+        .some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {

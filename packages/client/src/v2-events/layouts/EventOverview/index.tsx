@@ -25,7 +25,10 @@ import {
   Stack
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { getOrThrow } from '@opencrvs/commons/client'
+import {
+  getCurrentEventStateWithDrafts,
+  getOrThrow
+} from '@opencrvs/commons/client'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
@@ -57,7 +60,8 @@ export function EventOverviewLayout({
   children: React.ReactNode
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvent } = useEvents()
+  const { getEvent, getDrafts } = useEvents()
+  const drafts = getDrafts()
   const [event] = getEvent.useSuspenseQuery(eventId)
 
   const allEvents = useEventConfigurations()
@@ -123,7 +127,7 @@ export function EventOverviewLayout({
           }
           mobileRight={<ActionMenu eventId={eventId} />}
           mobileTitle={getEventTitle({
-            event,
+            event: getCurrentEventStateWithDrafts(event, drafts),
             eventConfig: eventConfiguration,
             intl: flattenedIntl
           })}
