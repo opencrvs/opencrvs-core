@@ -654,7 +654,7 @@ function ReviewActionComponent({
               type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
-              <Icon name="Check" />
+              <Icon name="Check" color="white" />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
           </ActionContainer>
