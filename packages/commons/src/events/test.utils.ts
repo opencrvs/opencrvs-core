@@ -218,6 +218,7 @@ export function generateEventDocument({
   actions: ActionType[]
 }): EventDocument {
   return {
+    trackingId: getUUID(),
     type: configuration.id,
     actions: actions.map((action) =>
       generateActionDocument({ configuration, action })
