@@ -76,8 +76,8 @@ jobs:
         run: |
           AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
           echo "PR is created by $AUTHOR"
-          echo "AUTHOR=$(echo $AUTHOR)" >> $GITHUB_ENV
-          echo "::set-output name=AUTHOR::$AUTHOR"
+          echo "AUTHOR=$AUTHOR" >> $GITHUB_ENV
+          echo "AUTHOR=$AUTHOR" >> $GITHUB_OUTPUT
 
       - name: Get Branch Name (on PR creation)
         if: ${{ github.event_name != 'workflow_dispatch' }}
