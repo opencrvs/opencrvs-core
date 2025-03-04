@@ -10,7 +10,6 @@
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Upload } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
@@ -371,7 +370,7 @@ const ReviewActionComponent = ({
                 onClick={toggleSubmitModalOpen}
                 disabled={!completeDeclaration || totalFileSizeExceeded}
               >
-                <Icon name="Check" />
+                <Icon name="Check" color="white" />
                 {intl.formatMessage(buttonMessages.register)}
               </Button>
             </ProtectedComponent>
@@ -384,7 +383,7 @@ const ReviewActionComponent = ({
                 onClick={toggleSubmitModalOpen}
                 disabled={!completeDeclaration || totalFileSizeExceeded}
               >
-                <Icon name="PaperPlaneTilt" />
+                <Icon name="PaperPlaneTilt" color="white" />
                 {intl.formatMessage(buttonMessages.sendForApproval)}
               </Button>
             </ProtectedComponent>
@@ -398,7 +397,7 @@ const ReviewActionComponent = ({
                   onClick={toggleSubmitModalOpen}
                   disabled={totalFileSizeExceeded}
                 >
-                  <Upload />
+                  <Icon name="PaperPlaneTilt" color="white" />
                   {intl.formatMessage(buttonMessages.sendForReview)}
                 </Button>
               </ProtectedComponent>
@@ -413,7 +412,7 @@ const ReviewActionComponent = ({
                   onClick={toggleSubmitModalOpen}
                   disabled={hasErrorsOnFields || totalFileSizeExceeded}
                 >
-                  <Upload />
+                  <Icon name="PaperPlaneTilt" color="white" />
                   {intl.formatMessage(buttonMessages.sendIncomplete)}
                 </Button>
               </ProtectedComponent>
