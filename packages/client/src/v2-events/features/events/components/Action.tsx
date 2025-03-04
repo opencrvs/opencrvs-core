@@ -22,7 +22,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
-export function ActionComponent({ children }: PropsWithChildren) {
+function ActionComponent({ children }: PropsWithChildren) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
   const { getEvent, getDrafts } = useEvents()
   const setInitialFormValues = useEventFormData(
