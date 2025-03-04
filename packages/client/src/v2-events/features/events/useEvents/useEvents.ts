@@ -57,11 +57,11 @@ export function useEvents() {
         request: useEventAction(trpc.event.actions.correction.request),
         approve: useEventAction(trpc.event.actions.correction.approve),
         reject: useEventAction(trpc.event.actions.correction.reject)
-      },
-      draft: {
-        list: trpc.event.draft.list,
-        create: useCreateDraft()
       }
+    },
+    draft: {
+      list: trpc.event.draft.list,
+      create: useCreateDraft()
     }
   }
 }
