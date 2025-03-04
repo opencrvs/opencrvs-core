@@ -222,8 +222,6 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     mutate: (params: inferInput<P>) => {
       const localEvent = findLocalEventData(params.eventId)
 
-      console.log('localEvent', localEvent)
-
       const eventConfiguration = eventConfigurations.find(
         (event) => event.id === localEvent?.type
       )
