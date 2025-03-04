@@ -31,7 +31,7 @@ const generator = testDataGenerator()
 const eventId = '123-456-789'
 
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Declare'
+  title: 'Review'
 }
 
 export default meta

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -75,16 +75,9 @@ export function Review() {
     throw new Error('No active form configuration found for declare action')
   }
 
-  const setInitialFormValues = useEventFormData(
-    (state) => state.setInitialFormValues
-  )
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data
   const form = getFormValues(eventId)
-
-  useEffect(() => {
-    setInitialFormValues(eventId, previousFormValues)
-  }, [event, eventId, setInitialFormValues, previousFormValues])
 
   async function handleEdit({
     pageId,

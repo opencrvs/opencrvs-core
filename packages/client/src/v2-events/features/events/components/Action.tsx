@@ -29,7 +29,9 @@ export function ActionComponent({ children }: PropsWithChildren) {
     (state) => state.setInitialFormValues
   )
 
-  const setMetadata = useEventMetadata((state) => state.setMetadata)
+  const setInitialMetadataValues = useEventMetadata(
+    (state) => state.setInitialMetadataValues
+  )
 
   const [event] = getEvent.useSuspenseQuery(params.eventId)
   const drafts = getDrafts()
@@ -49,7 +51,7 @@ export function ActionComponent({ children }: PropsWithChildren) {
 
   useEffect(() => {
     setInitialFormValues(eventDataWithDrafts.id, eventDataWithDrafts.data)
-    setMetadata(eventDataWithDrafts.id, declareMetadata)
+    setInitialMetadataValues(eventDataWithDrafts.id, declareMetadata)
 
     /*
      * This is fine to only run once on mount and unmount as
