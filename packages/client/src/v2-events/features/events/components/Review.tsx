@@ -619,13 +619,13 @@ function ReviewActionComponent({
   primaryButtonType?: 'positive' | 'primary'
 }) {
   const intl = useIntl()
-  const errorExist = validationErrorsInActionFormExist(
+  const hasValidationErrors = validationErrorsInActionFormExist(
     formConfig,
     form,
     metadata
   )
-  const background = errorExist ? 'error' : 'success'
-  const descriptionMessage = errorExist
+  const background = hasValidationErrors ? 'error' : 'success'
+  const descriptionMessage = hasValidationErrors
     ? incompleteFormWarning
     : messages.description
 
@@ -637,7 +637,7 @@ function ReviewActionComponent({
           <Description>{intl.formatMessage(descriptionMessage)}</Description>
           <ActionContainer>
             <Button
-              disabled={errorExist}
+              disabled={hasValidationErrors}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}
