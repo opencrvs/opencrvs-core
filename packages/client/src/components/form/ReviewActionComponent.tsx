@@ -370,7 +370,7 @@ const ReviewActionComponent = ({
                 onClick={toggleSubmitModalOpen}
                 disabled={!completeDeclaration || totalFileSizeExceeded}
               >
-                <Icon name="Check" color="white" />
+                <Icon name="Check" />
                 {intl.formatMessage(buttonMessages.register)}
               </Button>
             </ProtectedComponent>
@@ -383,7 +383,7 @@ const ReviewActionComponent = ({
                 onClick={toggleSubmitModalOpen}
                 disabled={!completeDeclaration || totalFileSizeExceeded}
               >
-                <Icon name="PaperPlaneTilt" color="white" />
+                <Icon name="PaperPlaneTilt" />
                 {intl.formatMessage(buttonMessages.sendForApproval)}
               </Button>
             </ProtectedComponent>
@@ -397,7 +397,7 @@ const ReviewActionComponent = ({
                   onClick={toggleSubmitModalOpen}
                   disabled={totalFileSizeExceeded}
                 >
-                  <Icon name="PaperPlaneTilt" color="white" />
+                  <Icon name="PaperPlaneTilt" />
                   {intl.formatMessage(buttonMessages.sendForReview)}
                 </Button>
               </ProtectedComponent>
@@ -412,7 +412,7 @@ const ReviewActionComponent = ({
                   onClick={toggleSubmitModalOpen}
                   disabled={hasErrorsOnFields || totalFileSizeExceeded}
                 >
-                  <Icon name="PaperPlaneTilt" color="white" />
+                  <Icon name="PaperPlaneTilt" />
                   {intl.formatMessage(buttonMessages.sendIncomplete)}
                 </Button>
               </ProtectedComponent>
