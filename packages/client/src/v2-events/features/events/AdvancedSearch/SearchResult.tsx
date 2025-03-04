@@ -19,10 +19,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ErrorText, Link as StyledLink } from '@opencrvs/components/lib'
 import {
   EventSearchIndex,
-  FieldConfig,
-  FieldValue,
   getAllFields,
-  validateFieldInput,
   workqueues,
   defaultColumns,
   getOrThrow
@@ -34,7 +31,6 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
-import { getAllUniqueFields } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
 import { LoadingIndicator } from '@client/v2-events/components/LoadingIndicator'
@@ -44,6 +40,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { useTRPC } from '@client/v2-events/trpc'
+import { getAdvancedSearchFieldErrors } from './utils'
 
 const SORT_ORDER = {
   ASCENDING: 'asc',
@@ -95,39 +92,6 @@ interface Column {
   isActionColumn?: boolean
   isSorted?: boolean
   alignment?: ColumnContentAlignment
-}
-
-function validateEventSearchParams(
-  fields: FieldConfig[],
-  values: Record<string, any>
-) {
-  const errors = fields.reduce(
-    (
-      errorResults: { message: string; id: string; value: FieldValue }[],
-      field: FieldConfig
-    ) => {
-      const fieldErrors = validateFieldInput({
-        field: { ...field, required: false },
-        value: values[field.id]
-      })
-
-      if (fieldErrors.length === 0) {
-        return errorResults
-      }
-
-      // For backend, use the default message without translations.
-      const errormessageWithId = fieldErrors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value: values[field.id]
-      }))
-
-      return [...errorResults, ...errormessageWithId]
-    },
-    []
-  )
-
-  return errors
 }
 
 function changeSortedColumn(
@@ -202,7 +166,7 @@ const messagesToDefine = {
   edit: {
     defaultMessage: 'Edit',
     description: 'Edit button text',
-    id: 'buttons.edit'
+    id: 'v2.buttons.edit'
   },
   noResult: {
     id: 'v2.search.noResult',
@@ -218,7 +182,7 @@ const messagesToDefine = {
   name: {
     defaultMessage: 'Name',
     description: 'Name label',
-    id: 'v2.onstants.name'
+    id: 'v2.constants.name'
   },
   event: {
     defaultMessage: 'Event',
@@ -253,7 +217,7 @@ export const SearchResult = () => {
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
-  const { eventConfiguration } = useEventConfiguration(eventType)
+  const { eventConfiguration: currentEvent } = useEventConfiguration(eventType)
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
@@ -262,19 +226,21 @@ export const SearchResult = () => {
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
   >(SORT_ORDER.ASCENDING)
 
-  const searchParams = parse(window.location.search)
-  const normalizedSearchParams: Record<string, string> = Object.fromEntries(
+  const searchParams = parse(window.location.search) as Record<string, string>
+  const normalizedSearchParams = Object.fromEntries(
     Object.entries(searchParams).map(([key, value]) => [
       key,
       Array.isArray(value) ? value.join(',') : value ?? ''
     ])
   )
 
-  const allFields = getAllUniqueFields(eventConfiguration)
   const outbox = getOutbox()
   const drafts = getDrafts()
-
-  const fieldValueErrors = validateEventSearchParams(allFields, searchParams)
+  const fieldErrors = getAdvancedSearchFieldErrors(currentEvent, searchParams)
+  const fieldValueErrors = Object.values(fieldErrors).flatMap(
+    //@ts-ignore
+    (errObj) => errObj.errors
+  )
 
   const {
     data: queryData,
@@ -335,14 +301,12 @@ export const SearchResult = () => {
         }
 
         const eventWorkqueue = getOrThrow(
-          eventConfiguration.workqueues.find(
-            (wq) => wq.id === workqueueConfig.id
-          ),
+          currentEvent.workqueues.find((wq) => wq.id === workqueueConfig.id),
           `Could not find workqueue config for ${workqueueConfig.id}`
         )
 
         const allPropertiesWithEmptyValues = setEmptyValuesForFields(
-          getAllFields(eventConfiguration)
+          getAllFields(currentEvent)
         )
 
         const fieldsWithPopulatedValues: Record<string, string> =
@@ -362,7 +326,7 @@ export const SearchResult = () => {
         return {
           ...fieldsWithPopulatedValues,
           ...doc,
-          event: intl.formatMessage(eventConfiguration.label),
+          event: intl.formatMessage(currentEvent.label),
           createdAt: formattedDuration(new Date(doc.createdAt)),
           modifiedAt: formattedDuration(new Date(doc.modifiedAt)),
           status: intl.formatMessage(

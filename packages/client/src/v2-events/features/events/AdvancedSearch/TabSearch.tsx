@@ -20,7 +20,7 @@ import { EventConfig } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
+import { getAdvancedSearchFieldErrors } from './utils'
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -99,13 +99,17 @@ export function TabSearch({
   fieldValues
 }: {
   currentEvent: EventConfig
+  /** For editing already searched params by the edit button in advanced search result */
   fieldValues?: Record<string, string>
 }) {
-  const [hasEnoughParams, setHasEnoughParams] = React.useState(false)
   const intl = useIntl()
   const [formValues, setFormValues] = React.useState<
     Record<string, FieldValue>
-  >({})
+  >(fieldValues ?? {})
+
+  const [hasEnoughParams, setHasEnoughParams] = React.useState(
+    Object.entries(formValues).length > 0
+  )
   const navigate = useNavigate()
 
   React.useEffect(() => {
@@ -123,36 +127,10 @@ export function TabSearch({
     }))
   }
 
-  const advancedSearchSections = currentEvent.advancedSearch
-  const allUniqueFields = getAllUniqueFields(currentEvent)
-  const fieldErrors = advancedSearchSections.reduce(
-    (errorsOnFields, currentSection) => {
-      const advancedSearchFieldIds = currentSection.fields.map(
-        (f: { fieldId: string }) => f.fieldId
-      )
-      const advancedSearchFields = allUniqueFields.filter((field) =>
-        advancedSearchFieldIds.includes(field.id)
-      )
-
-      const modifiedFields = advancedSearchFields.map((f) => ({
-        ...f,
-        required: false // advanced search fields need not be required
-      }))
-
-      const err = getValidationErrorsForForm(modifiedFields, formValues)
-
-      return {
-        ...errorsOnFields,
-        ...err
-      }
-    },
-    {}
-  )
-
-  const allErrors = Object.values(fieldErrors).flatMap(
-    // @ts-ignore
-    (errObj) => errObj.errors
-  )
+  const advancedSearchFieldErrors = Object.values(
+    getAdvancedSearchFieldErrors(currentEvent, formValues)
+    //@ts-ignore
+  ).flatMap((errObj) => errObj.errors)
 
   const handleSearch = () => {
     const searchParams = new URLSearchParams()
@@ -182,7 +160,7 @@ export function TabSearch({
     <SearchButton
       key="search"
       fullWidth
-      disabled={!hasEnoughParams || allErrors.length > 0}
+      disabled={!hasEnoughParams || advancedSearchFieldErrors.length > 0}
       id="search"
       size="large"
       type="primary"
