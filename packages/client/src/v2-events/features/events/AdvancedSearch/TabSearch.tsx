@@ -20,7 +20,7 @@ import { EventConfig } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { getAdvancedSearchFieldErrors } from './utils'
+import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -127,10 +127,9 @@ export function TabSearch({
     }))
   }
 
-  const advancedSearchFieldErrors = Object.values(
+  const advancedSearchFieldErrors = flattenFieldErrors(
     getAdvancedSearchFieldErrors(currentEvent, formValues)
-    //@ts-ignore
-  ).flatMap((errObj) => errObj.errors)
+  )
 
   const handleSearch = () => {
     const searchParams = new URLSearchParams()

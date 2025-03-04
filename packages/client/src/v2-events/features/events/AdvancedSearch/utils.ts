@@ -11,7 +11,10 @@
 
 import { EventConfig, FieldValue } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
-import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
+import {
+  Errors,
+  getValidationErrorsForForm
+} from '@client/v2-events/components/forms/validation'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
@@ -40,3 +43,6 @@ export const getAdvancedSearchFieldErrors = (
     {}
   )
 }
+
+export const flattenFieldErrors = (fieldErrors: Errors) =>
+  Object.values(fieldErrors).flatMap((errObj) => errObj.errors)

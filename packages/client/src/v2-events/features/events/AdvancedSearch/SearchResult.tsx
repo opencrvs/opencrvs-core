@@ -40,7 +40,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { useTRPC } from '@client/v2-events/trpc'
-import { getAdvancedSearchFieldErrors } from './utils'
+import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
 
 const SORT_ORDER = {
   ASCENDING: 'asc',
@@ -237,10 +237,7 @@ export const SearchResult = () => {
   const outbox = getOutbox()
   const drafts = getDrafts()
   const fieldErrors = getAdvancedSearchFieldErrors(currentEvent, searchParams)
-  const fieldValueErrors = Object.values(fieldErrors).flatMap(
-    //@ts-ignore
-    (errObj) => errObj.errors
-  )
+  const fieldValueErrors = flattenFieldErrors(fieldErrors)
 
   const {
     data: queryData,
