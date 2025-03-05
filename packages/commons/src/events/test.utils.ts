@@ -11,6 +11,7 @@
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import {
+  ArchivedActionInput,
   DeclareActionInput,
   RegisterActionInput,
   RequestCorrectionActionInput,
@@ -68,6 +69,16 @@ export const eventPayloadGenerator = {
       input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
     ) => ({
       type: ActionType.VALIDATE,
+      transactionId: input.transactionId ?? getUUID(),
+      data: input.data ?? {},
+      duplicates: [],
+      eventId
+    }),
+    archive: (
+      eventId: string,
+      input: Partial<Pick<ArchivedActionInput, 'transactionId' | 'data'>> = {}
+    ) => ({
+      type: ActionType.ARCHIVED,
       transactionId: input.transactionId ?? getUUID(),
       data: input.data ?? {},
       duplicates: [],
