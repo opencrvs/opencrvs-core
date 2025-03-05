@@ -11,85 +11,48 @@
 import { resolveLocationParents } from './locationTreeSolver'
 import * as fixtures from '@opencrvs/commons/fixtures'
 import { UUID } from '@opencrvs/commons'
-import { fetchFromHearth } from '@config/services/hearth'
-import { SavedLocation } from '@opencrvs/commons/types'
-
-jest.mock('@config/services/hearth', () => ({
-  fetchFromHearth: jest.fn()
-}))
-
-const fetchFromHearthMock = fetchFromHearth as jest.Mock
-
-const mockHearthLocations = (locations: SavedLocation[]) => {
-  fetchFromHearthMock.mockImplementation((id: string) => {
-    const location = locations.find((l) => `Location/${l.id}` === id)
-    return Promise.resolve(location)
-  })
-}
 
 describe('resolveLocationParents', () => {
-  it('should return child location only if the location has no parent', async () => {
+  it('should return an empty array if the location has no parent', () => {
     const location = fixtures.savedLocation({
       id: 'uuid1' as UUID,
       partOf: undefined
     })
 
-    mockHearthLocations([location])
-
-    const result = await resolveLocationParents(location.id)
-    expect(result).toEqual([location])
+    const result = resolveLocationParents(location, [location])
+    expect(result).toEqual([])
   })
 
-  it('should return child location only if the location parent is Location/0', async () => {
-    const topLevel = '0' as UUID
-    const location = fixtures.savedLocation({
-      id: 'uuid1' as UUID,
-      partOf: {
-        reference: `Location/${topLevel}`
-      }
-    })
-
-    mockHearthLocations([location])
-
-    const result = await resolveLocationParents(location.id)
-    expect(result).toEqual([location])
-  })
-
-  it('should resolve a single level parent correctly', async () => {
+  it('should resolve a single level parent correctly', () => {
     const parent = fixtures.savedLocation({
       id: 'uuid1' as UUID,
       partOf: undefined
     })
-
     const child = fixtures.savedLocation({
       id: 'uuid2' as UUID,
-      partOf: { reference: `Location/${parent.id}` }
+      partOf: { reference: 'Location/uuid1' as `Location/${UUID}` }
     })
 
-    mockHearthLocations([child, parent])
-
-    const result = await resolveLocationParents(child.id)
-    expect(result).toEqual([parent, child])
+    const result = resolveLocationParents(child, [child, parent])
+    expect(result).toEqual([parent])
   })
 
-  it('should resolve multiple levels of parents correctly', async () => {
+  it('should resolve multiple levels of parents correctly', () => {
     const grandparent = fixtures.savedLocation({
       id: 'uuid1' as UUID,
       partOf: undefined
     })
     const parent = fixtures.savedLocation({
       id: 'uuid2' as UUID,
-      partOf: { reference: `Location/${grandparent.id}` }
+      partOf: { reference: 'Location/uuid1' as `Location/${UUID}` }
     })
     const child = fixtures.savedLocation({
       id: 'uuid3' as UUID,
-      partOf: { reference: `Location/${parent.id}` }
+      partOf: { reference: 'Location/uuid2' as `Location/${UUID}` }
     })
-    const locations = [grandparent, parent, child]
+    const locations = [child, parent, grandparent]
 
-    mockHearthLocations(locations)
-
-    const result = await resolveLocationParents(child.id)
-    expect(result).toEqual(locations)
+    const result = resolveLocationParents(child, locations)
+    expect(result).toEqual([grandparent, parent])
   })
 })
