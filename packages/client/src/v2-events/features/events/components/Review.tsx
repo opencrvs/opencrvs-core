@@ -24,7 +24,9 @@ import {
   isFileFieldWithOptionType,
   SCOPES,
   EventConfig,
-  EventIndex
+  EventIndex,
+  isFieldVisible,
+  isOptionalUncheckedCheckbox
 } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -41,7 +43,6 @@ import {
   TextArea
 } from '@opencrvs/components'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -450,7 +451,10 @@ function ReviewComponent({
                     >
                       <ListReview id={'Section_' + page.id}>
                         {page.fields
-                          .filter((field) => isFormFieldVisible(field, form))
+                          .filter((field) => isFieldVisible(field, form))
+                          .filter(
+                            (field) => !isOptionalUncheckedCheckbox(field, form)
+                          )
                           .map((field) => {
                             const value = form[field.id]
                             const previousValue = previousForm[field.id]
@@ -657,13 +661,13 @@ function ReviewActionComponent({
   action?: string
 }) {
   const intl = useIntl()
-  const errorExist = validationErrorsInActionFormExist(
+  const hasValidationErrors = validationErrorsInActionFormExist(
     formConfig,
     form,
     metadata
   )
-  const background = errorExist ? 'error' : 'success'
-  const descriptionMessage = errorExist
+  const background = hasValidationErrors ? 'error' : 'success'
+  const descriptionMessage = hasValidationErrors
     ? incompleteFormWarning
     : messages.description
 
@@ -675,7 +679,7 @@ function ReviewActionComponent({
           <Description>{intl.formatMessage(descriptionMessage)}</Description>
           <ActionContainer>
             <Button
-              disabled={errorExist}
+              disabled={hasValidationErrors}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}

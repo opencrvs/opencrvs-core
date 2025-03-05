@@ -22,7 +22,8 @@ import {
   generateTransactionId,
   getCurrentEventState,
   Scope,
-  SCOPES
+  SCOPES,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -39,10 +40,7 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 
-import {
-  isFormFieldVisible,
-  setEmptyValuesForFields
-} from '@client/v2-events/components/forms/utils'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -181,8 +179,8 @@ export function Summary() {
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFormFieldVisible(field, previousFormValues)
-      const isHidden = !isFormFieldVisible(field, form)
+      const wasVisible = isFieldVisible(field, previousFormValues)
+      const isHidden = !isFieldVisible(field, form)
 
       return wasVisible && isHidden
     })
@@ -287,8 +285,8 @@ export function Summary() {
             const content = page.fields
               .filter((field) => {
                 const visibilityChanged =
-                  isFormFieldVisible(field, previousFormValues) !==
-                  isFormFieldVisible(field, form)
+                  isFieldVisible(field, previousFormValues) !==
+                  isFieldVisible(field, form)
 
                 return (
                   stringifiedPreviousForm[field.id] !==
@@ -296,7 +294,7 @@ export function Summary() {
                 )
               })
               .map((field) => {
-                const wasHidden = !isFormFieldVisible(field, form)
+                const wasHidden = !isFieldVisible(field, form)
                 return {
                   item: intl.formatMessage(field.label),
                   original: stringifiedPreviousForm[field.id] || '-',
