@@ -229,9 +229,8 @@ export function useReviewActionConfig({
     metadata
   )
 
-  const isDisabled = incomplete
-    ? !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
-    : false
+  const isDisabled =
+    incomplete && !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
 
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
     return {

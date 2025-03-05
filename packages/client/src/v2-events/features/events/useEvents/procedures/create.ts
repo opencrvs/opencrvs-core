@@ -10,7 +10,10 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { DecorateMutationProcedure } from '@trpc/tanstack-react-query'
+import {
+  DecorateMutationProcedure,
+  inferInput
+} from '@trpc/tanstack-react-query'
 import {
   ActionType,
   CreatedAction,
@@ -42,7 +45,7 @@ function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
 
   const defaultMutationFn = mutationOptions.mutationFn
 
-  return async (params: any) =>
+  return async (params: inferInput<P>) =>
     defaultMutationFn({
       ...params,
       data: params.data
@@ -96,6 +99,7 @@ export function useCreateEvent() {
   const overrides = queryClient.getMutationDefaults(
     trpcOptionsProxy.event.create.mutationKey()
   )
+
   return useMutation({
     ...options,
     ...overrides
