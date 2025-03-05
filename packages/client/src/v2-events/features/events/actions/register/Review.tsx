@@ -130,7 +130,7 @@ export function Review() {
     ))
     if (confirmedRegistration) {
       registerMutation.mutate({
-        eventId: event.id,
+        eventId,
         data: form,
         transactionId: uuid(),
         metadata
@@ -149,7 +149,7 @@ export function Review() {
 
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
         events.actions.reject.mutate({
-          eventId: event.id,
+          eventId,
           data: {},
           transactionId: uuid(),
           draft: false,
@@ -159,7 +159,7 @@ export function Review() {
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
         events.actions.archive.mutate({
-          eventId: event.id,
+          eventId,
           data: {},
           transactionId: uuid(),
           draft: false,

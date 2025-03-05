@@ -208,6 +208,10 @@ function generateActionDocument({
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
+    case ActionType.ARCHIVED:
+      return { ...actionBase, type: action }
+    case ActionType.REJECT:
+      return { ...actionBase, type: action }
     case ActionType.CREATE:
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
