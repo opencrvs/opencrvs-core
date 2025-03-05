@@ -1052,6 +1052,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSection,
       activeSectionGroup,
       declaration,
+      isCorrection(declaration),
       userDetails
     )
 
