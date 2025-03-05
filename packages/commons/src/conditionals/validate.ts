@@ -53,6 +53,10 @@ function isFieldConditionMet(
     (conditional) => conditional.type === conditionalType
   )
 
+  if (!hasRule) {
+    return true
+  }
+
   const validConditionals = getConditionalActionsForField(field, {
     $form: form,
     $now: formatISO(new Date(), {
@@ -60,7 +64,7 @@ function isFieldConditionMet(
     })
   })
 
-  return !hasRule || validConditionals.includes(conditionalType)
+  return validConditionals.includes(conditionalType)
 }
 
 export function isFieldVisible(field: FieldConfig, form: ActionFormData) {
