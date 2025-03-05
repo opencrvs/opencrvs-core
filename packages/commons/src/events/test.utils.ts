@@ -14,6 +14,7 @@ import {
   ArchivedActionInput,
   DeclareActionInput,
   RegisterActionInput,
+  RejectDeclarationActionInput,
   RequestCorrectionActionInput,
   ValidateActionInput
 } from './ActionInput'
@@ -79,6 +80,18 @@ export const eventPayloadGenerator = {
       input: Partial<Pick<ArchivedActionInput, 'transactionId' | 'data'>> = {}
     ) => ({
       type: ActionType.ARCHIVED,
+      transactionId: input.transactionId ?? getUUID(),
+      data: input.data ?? {},
+      duplicates: [],
+      eventId
+    }),
+    reject: (
+      eventId: string,
+      input: Partial<
+        Pick<RejectDeclarationActionInput, 'transactionId' | 'data'>
+      > = {}
+    ) => ({
+      type: ActionType.REJECT,
       transactionId: input.transactionId ?? getUUID(),
       data: input.data ?? {},
       duplicates: [],
