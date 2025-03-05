@@ -29,6 +29,8 @@ export interface Errors {
   [fieldName: string]: FieldErrors
 }
 
+import { Checkbox } from '@opencrvs/commons/client'
+
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: ActionFormData,
