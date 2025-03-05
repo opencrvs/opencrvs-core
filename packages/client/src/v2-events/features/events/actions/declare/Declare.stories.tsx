@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, within } from '@storybook/test'
+import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { DraftInput } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -59,6 +60,42 @@ export const Page: Story = {
         ]
       }
     }
+  }
+}
+const spy = fn()
+export const SaveAndExit: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
+      })
+    },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.create.mutation((req: DraftInput) => {
+            spy()
+            return { ...req, id: 'test-draft-id' }
+          }),
+          tRPCMsw.event.draft.list.query(() => {
+            return []
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return undeclaredDraftEvent
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    const button = await canvas.findByRole('button', { name: /Save & Exit/ })
+    await userEvent.click(button)
+    await waitFor(async () => expect(spy).toHaveBeenCalled())
   }
 }
 
