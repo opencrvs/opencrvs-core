@@ -9,38 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import { parse } from 'query-string'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { defineMessages, useIntl } from 'react-intl'
 import styled, { useTheme } from 'styled-components'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { mapKeys } from 'lodash'
-import { useQuery } from '@tanstack/react-query'
-import { ErrorText, Link as StyledLink } from '@opencrvs/components/lib'
 import {
   getAllFields,
-  workqueues,
   defaultColumns,
   EventIndex,
-  EventConfig
+  EventConfig,
+  workqueues
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
   Workqueue,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
-import { LoadingIndicator } from '@client/v2-events/components/LoadingIndicator'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
-import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
-import { useTRPC } from '@client/v2-events/trpc'
-import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
 import { SearchModifierComponent } from './SearchModifier'
 
 const SORT_ORDER = {
@@ -198,18 +189,14 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 interface IProps {
-  workqueueConfig: any
-  outbox: any
-  drafts: any
+  workqueueConfig: (typeof workqueues)['all']
   currentEvent: EventConfig
   normalizedSearchParams: Record<string, string>
-  queryData: any
+  queryData: EventIndex[]
 }
 
 export const SearchResult = ({
   workqueueConfig,
-  outbox,
-  drafts,
   currentEvent,
   normalizedSearchParams,
   queryData
@@ -220,6 +207,10 @@ export const SearchResult = ({
   const theme = useTheme()
   const total = queryData.length
   const noResultText = intl.formatMessage(messages.noResult)
+
+  const { getOutbox, getDrafts } = useEvents()
+  const outbox = getOutbox()
+  const drafts = getDrafts()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
@@ -302,23 +293,19 @@ export const SearchResult = ({
   }
 
   function getDefaultColumns(): Array<Column> {
-    return (
-      (workqueueConfig &&
-        workqueueConfig.defaultColumns.map(
-          (column): Column => ({
-            label:
-              column in defaultColumns
-                ? intl.formatMessage(
-                    defaultColumns[column as keyof typeof defaultColumns].label
-                  )
-                : '',
-            width: 25,
-            key: column,
-            sortFunction: onColumnClick,
-            isSorted: sortedCol === column
-          })
-        )) ??
-      []
+    return workqueueConfig.defaultColumns.map(
+      (column): Column => ({
+        label:
+          column in defaultColumns
+            ? intl.formatMessage(
+                defaultColumns[column as keyof typeof defaultColumns].label
+              )
+            : '',
+        width: 25,
+        key: column,
+        sortFunction: onColumnClick,
+        isSorted: sortedCol === column
+      })
     )
   }
 
@@ -326,31 +313,23 @@ export const SearchResult = ({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     if (windowWidth > theme.grid.breakpoints.lg) {
-      return (
-        (workqueueConfig &&
-          workqueueConfig.columns.map((column) => ({
-            label: intl.formatMessage(column.label),
-            width: 35,
-            key: column.id,
-            sortFunction: onColumnClick,
-            isSorted: sortedCol === column.id
-          }))) ??
-        []
-      )
+      return workqueueConfig.columns.map((column) => ({
+        label: intl.formatMessage(column.label),
+        width: 35,
+        key: column.id,
+        sortFunction: onColumnClick,
+        isSorted: sortedCol === column.id
+      }))
     } else {
-      return (
-        (workqueueConfig &&
-          workqueueConfig.columns
-            .map((column) => ({
-              label: intl.formatMessage(column.label),
-              width: 35,
-              key: column.id,
-              sortFunction: onColumnClick,
-              isSorted: sortedCol === column.id
-            }))
-            .slice(0, 2)) ??
-        []
-      )
+      return workqueueConfig.columns
+        .map((column) => ({
+          label: intl.formatMessage(column.label),
+          width: 35,
+          key: column.id,
+          sortFunction: onColumnClick,
+          isSorted: sortedCol === column.id
+        }))
+        .slice(0, 2)
     }
   }
 
@@ -370,7 +349,6 @@ export const SearchResult = ({
         columns={getColumns().concat(getDefaultColumns())}
         content={transformData(queryData)}
         hideLastBorder={true}
-        noResultText={intl.formatMessage(messages.noResults)}
       />
     </WQContentWrapper>
   )

@@ -54,6 +54,30 @@ export function useEvents() {
     },
     getOutbox: useOutbox,
     getDrafts,
+    searchEvent: {
+      useQuery: (type: string, searchParams: Record<string, string>) =>
+        useQuery({
+          ...trpc.event.search.queryOptions({
+            ...searchParams,
+            type
+          }),
+          queryKey: trpc.event.search.queryKey({
+            ...searchParams,
+            type
+          })
+        }),
+      useSuspenseQuery: (type: string, searchParams: Record<string, string>) =>
+        useSuspenseQuery({
+          ...trpc.event.search.queryOptions({
+            ...searchParams,
+            type
+          }),
+          queryKey: trpc.event.search.queryKey({
+            ...searchParams,
+            type
+          })
+        }).data
+    },
     actions: {
       validate: useEventAction(trpc.event.actions.validate),
       notify: useEventAction(trpc.event.actions.notify),
