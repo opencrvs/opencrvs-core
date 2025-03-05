@@ -63,10 +63,10 @@ export function Pages({
 
   return (
     <FormWizard
+      continueButtonText={continueButtonText}
       currentPage={currentPage}
       pageTitle={intl.formatMessage(page.title)}
       showReviewButton={showReviewButton}
-      continueButtonText={continueButtonText}
       totalPages={total}
       onNextPage={next}
       onPreviousPage={previous}
