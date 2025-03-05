@@ -24,7 +24,8 @@ import {
   SCOPES,
   EventConfig,
   EventIndex,
-  isFieldVisible
+  isFieldVisible,
+  isFieldAnUncheckedCheckbox
 } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -416,6 +417,9 @@ function ReviewComponent({
                       <ListReview id={'Section_' + page.id}>
                         {page.fields
                           .filter((field) => isFieldVisible(field, form))
+                          .filter(
+                            (field) => !isFieldAnUncheckedCheckbox(field, form)
+                          )
                           .map((field) => {
                             const value = form[field.id]
                             const previousValue = previousForm[field.id]

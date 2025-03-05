@@ -15,7 +15,8 @@ import {
   ActionFormData,
   FormConfig,
   stripHiddenFields,
-  getFormFields
+  getFormFields,
+  FieldType
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -33,7 +34,12 @@ export function getValidationErrorsForForm(
   values: ActionFormData,
   checkValidationErrorsOnly?: boolean
 ) {
-  return fields.reduce((errorsForAllFields: Errors, field) => {
+  return fields.reduce((errorsForAllFields: Errors, field: FieldConfig) => {
+    // A checkbox can never have validation errors
+    if (field.type === FieldType.CHECKBOX) {
+      return errorsForAllFields
+    }
+
     if (
       // eslint-disable-next-line
       errorsForAllFields[field.id] &&
