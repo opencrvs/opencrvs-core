@@ -13,7 +13,9 @@ import {
   FieldConfig,
   getFieldValidationErrors,
   ActionFormData,
-  FormConfig
+  FormConfig,
+  stripHiddenFields,
+  getFormFields
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -58,12 +60,29 @@ export function validationErrorsInActionFormExist(
   form: ActionFormData,
   metadata?: ActionFormData
 ): boolean {
+  // We don't want to validate hidden fields
+  const formWithoutHiddenFields = stripHiddenFields(
+    getFormFields(formConfig),
+    form
+  )
+  const metadataWithoutHiddenFields = stripHiddenFields(
+    formConfig.review.fields,
+    metadata ?? {}
+  )
+
   const hasValidationErrors = formConfig.pages.some((page) => {
-    const fieldErrors = getValidationErrorsForForm(page.fields, form)
+    const fieldErrors = getValidationErrorsForForm(
+      page.fields,
+      formWithoutHiddenFields
+    )
     return Object.values(fieldErrors).some((field) => field.errors.length > 0)
   })
+
   const hasMetadataValidationErrors = Object.values(
-    getValidationErrorsForForm(formConfig.review.fields, metadata ?? {})
+    getValidationErrorsForForm(
+      formConfig.review.fields,
+      metadataWithoutHiddenFields
+    )
   ).some((field) => field.errors.length > 0)
 
   return hasValidationErrors || hasMetadataValidationErrors

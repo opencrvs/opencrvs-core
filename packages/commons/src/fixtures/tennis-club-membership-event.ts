@@ -857,9 +857,9 @@ export const tennisClubMembershipEvent = defineConfig({
     title: {
       id: 'event.tennis-club-membership.summary.title',
       label: {
-        defaultMessage: 'Summary',
+        defaultMessage: '{applicant.firstname} {applicant.surname}',
         description: 'This is the title of the summary',
-        id: 'event.tennis-club-membership.summary.title'
+        id: 'v2.event.tennis-club-membership.summary.title'
       },
       emptyValueMessage: {
         defaultMessage: 'Membership application',
@@ -892,31 +892,10 @@ export const tennisClubMembershipEvent = defineConfig({
   workqueues: [
     {
       id: 'all',
-      fields: [
-        {
-          column: 'title',
-          label: {
-            defaultMessage: '{applicant.firstname} {applicant.surname}',
-            description: 'Label for name in all workqueue',
-            id: 'event.tennis-club-membership.workqueue.all.name.label'
-          }
-        }
-      ],
       filters: []
     },
     {
       id: 'ready-for-review',
-
-      fields: [
-        {
-          column: 'title',
-          label: {
-            defaultMessage: '{applicant.firstname} {applicant.surname}',
-            description: 'Label for name in all workqueue',
-            id: 'event.tennis-club-membership.workqueue.readyForReview.name.label'
-          }
-        }
-      ],
       filters: [
         {
           status: ['DECLARED']
@@ -925,17 +904,6 @@ export const tennisClubMembershipEvent = defineConfig({
     },
     {
       id: 'registered',
-
-      fields: [
-        {
-          column: 'title',
-          label: {
-            defaultMessage: '{applicant.firstname} {applicant.surname}',
-            description: 'Label for name in all workqueue',
-            id: 'event.tennis-club-membership.workqueue.registered.name.label'
-          }
-        }
-      ],
       filters: [
         {
           status: ['REGISTERED']
