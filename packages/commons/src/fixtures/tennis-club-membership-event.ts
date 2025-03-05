@@ -762,6 +762,16 @@ export const TENNIS_CLUB_FORM = defineForm({
           }
         },
         {
+          id: 'applicant.image',
+          type: 'FILE',
+          required: false,
+          label: {
+            defaultMessage: "Applicant's profile picture",
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.image.label'
+          }
+        },
+        {
           id: 'applicant.address',
           type: 'ADDRESS',
           required: true,

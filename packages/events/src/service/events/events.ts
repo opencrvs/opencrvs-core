@@ -16,6 +16,7 @@ import {
   EventInput,
   FieldType,
   FileFieldValue,
+  findActiveActionFields,
   isUndeclaredDraft
 } from '@opencrvs/commons/events'
 import {
@@ -97,10 +98,10 @@ export async function deleteEvent(
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
   for (const ac of event.actions) {
-    const fieldTypes = await getActiveFormFieldTypes(token, event, ac.type)
+    const fieldConfigs = await getActiveFormFieldConfigs(token, event, ac.type)
     for (const [key, value] of Object.entries(ac.data)) {
       const isFile =
-        fieldTypes.find((field) => field.id === key)?.type === FieldType.FILE
+        fieldConfigs.find((field) => field.id === key)?.type === FieldType.FILE
 
       const fileValue = FileFieldValue.safeParse(value)
 
@@ -199,18 +200,27 @@ function extractFileValues(
   return fileValues
 }
 
-async function getActiveFormFieldTypes(
+async function getActiveFormFieldConfigs(
   token: string,
   event: EventDocument,
   actionType: ActionType
 ) {
-  const config = await getEventConfigurations(token)
-  const form = config
-    .find((c) => c.id === event.type)
-    ?.actions.find((ac) => ac.type === actionType)
-    ?.forms.find((f) => f.active)
-  const fieldTypes = form?.pages.flatMap((page) => page.fields) ?? []
-  return fieldTypes
+  const configs = await getEventConfigurations(token)
+  const config = configs.find((c) => c.id === event.type)
+  if (!config) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Event config not found with ID: ${event.type}`
+    })
+  }
+  const fieldConfigs = findActiveActionFields(config, actionType)
+  if (!fieldConfigs) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Active Form config not found with Event ID: ${event.type}, Action type: ${actionType}`
+    })
+  }
+  return fieldConfigs
 }
 
 async function cleanUnreferencedAttachmentsFromPreviousDrafts(
@@ -231,13 +241,17 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   if (previousDrafts.length === 0) {
     return
   }
-  const fieldTypes = await getActiveFormFieldTypes(token, event, action.type)
+  const fieldConfigs = await getActiveFormFieldConfigs(
+    token,
+    event,
+    action.type
+  )
   const previousFileValuesInTheDrafts = previousDrafts
-    .map((draft) => extractFileValues(draft.data, fieldTypes))
+    .map((draft) => extractFileValues(draft.data, fieldConfigs))
     .flat()
   const currentFileValuesInTheAction = extractFileValues(
     action.data,
-    fieldTypes
+    fieldConfigs
   )
 
   for (const previousDraft of previousFileValuesInTheDrafts) {
@@ -272,8 +286,8 @@ export async function addAction(
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
-  const fieldTypes = await getActiveFormFieldTypes(token, event, input.type)
-  const inputFiles = extractFileValues(input.data, fieldTypes)
+  const fieldConfigs = await getActiveFormFieldConfigs(token, event, input.type)
+  const inputFiles = extractFileValues(input.data, fieldConfigs)
   for (const file of inputFiles) {
     if (!(await fileExists(file.file.filename, token))) {
       throw new Error(`File not found: ${file.file.filename}`)

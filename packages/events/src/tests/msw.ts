@@ -26,6 +26,14 @@ const handlers = [
       tennisClubMembershipEvent,
       { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
     ])
+  }),
+  // event.delete.test.ts
+  http.head(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
+    return HttpResponse.json({ ok: true })
+  }),
+  // event.delete.test.ts
+  http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
+    return HttpResponse.json({ ok: true })
   })
 ]
 
