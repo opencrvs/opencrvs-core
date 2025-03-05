@@ -223,11 +223,11 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   fileValuesInCurrentAction: { fieldName: string; file: FileFieldValue }[],
   previousDrafts: ActionDocument[]
 ): Promise<void> {
-  const previousFileValuesInTheDrafts = previousDrafts
+  const previousFileValuesInDrafts = previousDrafts
     .map((draft) => extractFileValues(draft.data, fieldConfigs))
     .flat()
 
-  for (const previousFileValue of previousFileValuesInTheDrafts) {
+  for (const previousFileValue of previousFileValuesInDrafts) {
     if (
       !fileValuesInCurrentAction.some(
         (curr) =>
