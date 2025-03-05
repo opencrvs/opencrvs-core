@@ -17,7 +17,6 @@ import type { TranslationConfig } from '@opencrvs/commons/events'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AllowedRouteWithEventId } from './utils'
 
 const messages = defineMessages({
@@ -45,7 +44,6 @@ export function FormHeader({
   appbarIcon?: React.ReactNode
 }) {
   const intl = useIntl()
-  const form = useEventFormData()
   const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
 
   const { eventId } = useTypedParams(route)

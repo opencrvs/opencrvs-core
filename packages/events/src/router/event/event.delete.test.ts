@@ -94,7 +94,7 @@ describe('it should check unreferenced draft attachments are deleted while final
     originalFilename: 'abcd.png',
     type: 'image/png'
   }
-  test.only('should delete previous draft attachments', async () => {
+  test('should delete previous draft attachments', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
