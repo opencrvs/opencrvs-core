@@ -15,8 +15,7 @@ import {
   ActionFormData,
   FormConfig,
   stripHiddenFields,
-  getFormFields,
-  FieldType
+  getFormFields
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
