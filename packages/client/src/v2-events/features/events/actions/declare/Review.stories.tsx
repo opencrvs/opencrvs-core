@@ -63,12 +63,18 @@ const eventDocument = {
   ]
 } satisfies EventDocument
 
-const draft = {
+const draft: Draft = {
+  id: 'gfdc282f-0b37-48ab-9dc4-48f6d8348808',
   transactionId: 'f80c282f-0b37-48ab-9dc4-48f6d8348808',
-  action: generator.event.actions.declare(eventId),
+  action: {
+    ...generator.event.actions.declare(eventId),
+    createdAt: '2025-03-03T15:56:10.439Z',
+    createdAtLocation: 'test-location-id',
+    createdBy: 'test-user-id'
+  },
   createdAt: '2025-03-03T15:56:10.439Z',
   eventId: eventId
-} as unknown as Draft
+}
 
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {

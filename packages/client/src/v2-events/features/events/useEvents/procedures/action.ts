@@ -26,14 +26,14 @@ import {
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   getLocalEventData,
-  invalidateDraftsList,
   invalidateEventsList,
   setEventData,
   setEventListData,
-  setMutationDefaults
+  setMutationDefaults,
+  createTemporaryId,
+  waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, utils } from '@client/v2-events/trpc'
-import { createTemporaryId, waitUntilEventIsCreated } from './create'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
@@ -72,16 +72,6 @@ function updateEventOptimistically<T extends ActionInput>(
     )
   }
 }
-
-setMutationDefaults(utils.event.draft.create, {
-  retry: true,
-  mutationFn: createMutationFn(utils.event.draft.create),
-  onSuccess: async () => {
-    await invalidateEventsList()
-    await invalidateDraftsList()
-  },
-  retryDelay: 10000
-})
 
 setMutationDefaults(utils.event.actions.declare, {
   mutationFn: createMutationFn(utils.event.actions.declare),
@@ -191,17 +181,6 @@ function createMutationFn<P extends DecorateMutationProcedure<any>>(
       })
     }
   )
-}
-
-export function useCreateDraft() {
-  const options = utils.event.draft.create.mutationOptions()
-
-  return useMutation({
-    ...options,
-    ...queryClient.getMutationDefaults(
-      utils.event.draft.create.mutationKey()
-    )
-  })
 }
 
 /**

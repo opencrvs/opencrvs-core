@@ -22,9 +22,10 @@ import { Pages as PagesComponent } from '@client/v2-events/features/events/compo
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { isTemporaryId } from '@client/v2-events/features/events/useEvents/api'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -32,6 +33,7 @@ export function Pages() {
 
   const navigate = useNavigate()
   const events = useEvents()
+  const drafts = useDrafts()
   const { modal, goToHome } = useEventFormNavigation()
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -90,14 +92,7 @@ export function Pages() {
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
       onSaveAndExit={() => {
-        events.draft.create.mutate({
-          eventId: event.id,
-          data: formValues,
-          transactionId: uuid(),
-          type: ActionType.DECLARE,
-          createdAt: new Date().toISOString()
-        })
-
+        drafts.submitLocalDraft()
         goToHome()
       }}
     >

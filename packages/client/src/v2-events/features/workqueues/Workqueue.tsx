@@ -49,6 +49,7 @@ import { flattenEventIndex } from '@client/v2-events/utils'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 const messages = defineMessages({
   empty: {
@@ -162,9 +163,10 @@ function Workqueue({
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
-  const { getOutbox, getDrafts } = useEvents()
+  const { getOutbox } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
-  const drafts = getDrafts()
+  const drafts = getRemoteDrafts()
   const { width } = useWindowSize()
 
   const validEvents = events.filter((event) =>
@@ -243,7 +245,7 @@ function Workqueue({
           {
             id: `events.status`,
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {THIS_SHOULD_NEVER_BE_SHOWN} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {CREATED_STATUS_SHOULD_NEVER_BE_SHOWN} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
           },
           {
             status: getEventStatus()

@@ -11,22 +11,15 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { Draft } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useOutbox } from './outbox'
-import { useCreateDraft, useEventAction } from './procedures/action'
+import { useEventAction } from './procedures/action'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 import { useGetEvent } from './procedures/get'
 
 export function useEvents() {
   const trpc = useTRPC()
-
-  function useDrafts(): Draft[] {
-    const drafts = useSuspenseQuery(trpc.event.draft.list.queryOptions()).data
-    return drafts
-  }
-
   return {
     createEvent: useCreateEvent,
     getEvent: useGetEvent(),
@@ -46,7 +39,6 @@ export function useEvents() {
       useMutation: useDeleteEvent
     },
     getOutbox: useOutbox,
-    getDrafts: useDrafts,
     actions: {
       validate: useEventAction(trpc.event.actions.validate),
       notify: useEventAction(trpc.event.actions.notify),
@@ -58,10 +50,6 @@ export function useEvents() {
         approve: useEventAction(trpc.event.actions.correction.approve),
         reject: useEventAction(trpc.event.actions.correction.reject)
       }
-    },
-    draft: {
-      list: trpc.event.draft.list,
-      create: useCreateDraft()
     }
   }
 }

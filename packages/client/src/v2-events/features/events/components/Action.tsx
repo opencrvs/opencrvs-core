@@ -16,15 +16,62 @@ import {
   getCurrentEventStateWithDrafts,
   getMetadataForAction
 } from '@opencrvs/commons/client'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { createTemporaryId } from '@client/v2-events/features/events/useEvents/api'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
 
-function ActionComponent({ children }: PropsWithChildren) {
+type Props = PropsWithChildren<{ type: ActionType }>
+function ActionComponent({ children, type }: Props) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
-  const { getEvent, getDrafts } = useEvents()
+
+  const { getEvent } = useEvents()
+
+  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
+
+  const drafts = getRemoteDrafts()
+
+  const localDraft = getLocalDraftOrDefault({
+    id: createTemporaryId(),
+    eventId: params.eventId,
+    createdAt: new Date().toISOString(),
+    transactionId: createTemporaryId(),
+    action: {
+      type,
+      data: {},
+      metadata: {},
+      createdAt: new Date().toISOString(),
+      createdBy: '',
+      createdAtLocation: ''
+    }
+  })
+
+  /*
+   * Keep the local draft updated as per the form changes
+   */
+  const formValues = useEventFormData((state) => state.formValues)
+  const metadataValues = useEventMetadata((state) => state.metadata)
+
+  useEffect(() => {
+    setLocalDraft({
+      ...localDraft,
+      action: {
+        ...localDraft.action,
+        data: formValues,
+        metadata: metadataValues
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formValues, metadataValues])
+
+  /*
+   * Initialize the form state
+   */
+
   const setInitialFormValues = useEventFormData(
     (state) => state.setInitialFormValues
   )
@@ -34,11 +81,10 @@ function ActionComponent({ children }: PropsWithChildren) {
   )
 
   const [event] = getEvent.useSuspenseQuery(params.eventId)
-  const drafts = getDrafts()
-  const draftsForThisEvent = useMemo(
-    () => drafts.filter((d) => d.eventId === event.id),
-    [drafts, event.id]
-  )
+
+  const draftsForThisEvent = drafts
+    .filter((d) => d.eventId === event.id)
+    .concat(localDraft)
 
   const eventDataWithDrafts = useMemo(
     () => getCurrentEventStateWithDrafts(event, draftsForThisEvent),
@@ -52,6 +98,14 @@ function ActionComponent({ children }: PropsWithChildren) {
   useEffect(() => {
     setInitialFormValues(eventDataWithDrafts.id, eventDataWithDrafts.data)
     setInitialMetadataValues(eventDataWithDrafts.id, declareMetadata)
+
+    return () => {
+      /*
+       * When user leaves the action, remove all
+       * staged drafts the user has for this event id and type
+       */
+      setLocalDraft(null)
+    }
 
     /*
      * This is fine to only run once on mount and unmount as

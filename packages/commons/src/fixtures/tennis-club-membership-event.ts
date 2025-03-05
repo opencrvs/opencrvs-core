@@ -943,10 +943,10 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: 'REGISTER',
       label: {
-        defaultMessage: 'Send an application',
+        defaultMessage: 'Register',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.declare.label'
+        id: 'event.tennis-club-membership.action.register.label'
       },
       forms: [TENNIS_CLUB_FORM]
     },

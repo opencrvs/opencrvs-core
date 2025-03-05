@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
+import { createTemporaryId } from '@client/v2-events/features/events/useEvents/api'
+import { ROUTES } from '@client/v2-events/routes'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -21,11 +20,12 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { ROUTES } from '@client/v2-events/routes'
+import React, { useState } from 'react'
+import { defineMessages, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
-import { createTemporaryId } from './useEvents/procedures/create'
 import { useEvents } from './useEvents/useEvents'
 
 const messages = defineMessages({

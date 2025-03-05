@@ -33,6 +33,7 @@ export async function createDraft(
   const now = new Date().toISOString()
 
   const draft: Draft = {
+    id: getUUID(),
     eventId: eventId,
     createdAt: now,
     transactionId,
@@ -41,8 +42,7 @@ export async function createDraft(
       type: input.type,
       createdBy,
       createdAt: now,
-      createdAtLocation,
-      id: getUUID()
+      createdAtLocation
     }
   }
 

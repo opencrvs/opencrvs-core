@@ -52,43 +52,22 @@ function removeUndefinedKeys(data: ActionFormData) {
  * @property {string} eventId - The ID of the event.
  */
 
-export const useEventMetadata = create<EventMetadata>()(
-  persist(
-    (set, get) => ({
-      metadata: {},
-      eventId: '',
-      getMetadata: (eventId: string, initialValues?: ActionFormData) =>
-        get().eventId === eventId ? get().metadata : initialValues ?? {},
-      setMetadata: (eventId: string, data: ActionFormData) => {
-        const metadata = removeUndefinedKeys(data)
-        return set(() => ({ eventId, metadata }))
-      },
-      setInitialMetadataValues: (eventId: string, data: ActionFormData) => {
-        if (get().eventId === eventId) {
-          return
-        }
-        const metadata = removeUndefinedKeys(data)
-        return set(() => ({ eventId, metadata }))
-      },
-      getTouchedFields: () =>
-        Object.fromEntries(
-          Object.entries(get().metadata).map(([key, value]) => [key, true])
-        ),
-      clear: () => set(() => ({ eventId: '', metadata: {} }))
-    }),
-    {
-      name: 'event-meta-data',
-      storage: createJSONStorage(() => ({
-        getItem: async (key) => {
-          return storage.getItem(key)
-        },
-        setItem: async (key, value) => {
-          await storage.setItem(key, value)
-        },
-        removeItem: async (key) => {
-          await storage.removeItem(key)
-        }
-      }))
-    }
-  )
-)
+export const useEventMetadata = create<EventMetadata>()((set, get) => ({
+  metadata: {},
+  eventId: '',
+  getMetadata: (eventId: string, initialValues?: ActionFormData) =>
+    get().eventId === eventId ? get().metadata : initialValues ?? {},
+  setMetadata: (eventId: string, data: ActionFormData) => {
+    const metadata = removeUndefinedKeys(data)
+    return set(() => ({ eventId, metadata }))
+  },
+  setInitialMetadataValues: (eventId: string, data: ActionFormData) => {
+    const metadata = removeUndefinedKeys(data)
+    return set(() => ({ eventId, metadata }))
+  },
+  getTouchedFields: () =>
+    Object.fromEntries(
+      Object.entries(get().metadata).map(([key, value]) => [key, true])
+    ),
+  clear: () => set(() => ({ eventId: '', metadata: {} }))
+}))

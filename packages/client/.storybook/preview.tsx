@@ -13,6 +13,14 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import type { Preview } from '@storybook/react'
 import { initialize, mswLoader } from 'msw-storybook-addon'
 import React, { PropsWithChildren } from 'react'
+
+import { Page } from '@client/components/Page'
+import { I18nContainer } from '@client/i18n/components/I18nContainer'
+import { createStore } from '@client/store'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useApolloClient } from '@client/utils/apolloClient'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { Provider } from 'react-redux'
 import {
   createMemoryRouter,
@@ -21,15 +29,8 @@ import {
   RouterProvider
 } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
-import { Page } from '@client/components/Page'
-import { I18nContainer } from '@client/i18n/components/I18nContainer'
-import { createStore } from '@client/store'
-import { useApolloClient } from '@client/utils/apolloClient'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
-import { TRPCProvider } from '@client/v2-events/trpc'
-import { handlers } from './default-request-handlers'
 import WebFont from 'webfontloader'
-import { testDataGenerator } from '@client/tests/test-data-generators'
+import { handlers } from './default-request-handlers'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -120,6 +121,7 @@ const preview: Preview = {
       window.indexedDB.deleteDatabase(db.name!)
     }
 
+    queryClient.clear()
     window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
   },
   decorators: [

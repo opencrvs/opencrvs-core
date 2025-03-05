@@ -28,6 +28,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -55,6 +56,7 @@ const messages = defineMessages({
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER)
   const events = useEvents()
+  const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
@@ -128,14 +130,7 @@ export function Review() {
     <FormLayout
       route={ROUTES.V2.EVENTS.REGISTER}
       onSaveAndExit={() => {
-        events.draft.create.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          type: ActionType.REGISTER,
-          createdAt: new Date().toISOString(),
-          metadata
-        })
+        drafts.submitLocalDraft()
         goToHome()
       }}
     >

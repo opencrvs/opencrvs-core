@@ -27,6 +27,7 @@ import {
   useSubscribeEventFormData
 } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
@@ -36,6 +37,7 @@ export function Pages() {
 
   const navigate = useNavigate()
   const events = useEvents()
+  const drafts = useDrafts()
   const { modal, goToHome } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
@@ -74,13 +76,7 @@ export function Pages() {
     <FormLayout
       route={ROUTES.V2.EVENTS.REGISTER}
       onSaveAndExit={() => {
-        events.draft.create.mutate({
-          eventId: event.id,
-          data: form,
-          type: ActionType.REGISTER,
-          transactionId: uuid(),
-          createdAt: new Date().toISOString()
-        })
+        drafts.submitLocalDraft()
         goToHome()
       }}
     >

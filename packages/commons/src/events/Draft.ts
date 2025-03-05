@@ -15,12 +15,13 @@ import { BaseActionInput } from './ActionInput'
 import { ActionType } from './ActionType'
 
 export const Draft = z.object({
+  id: z.string(),
   eventId: z.string(),
   transactionId: z.string(),
   createdAt: z.string().datetime(),
   action: ActionBase.extend({
     type: z.enum(Object.values(ActionType) as [ActionType, ...ActionType[]])
-  })
+  }).omit({ id: true })
 })
 
 export const DraftInput = BaseActionInput.extend({

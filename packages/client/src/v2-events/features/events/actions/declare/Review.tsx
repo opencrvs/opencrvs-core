@@ -40,6 +40,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
@@ -341,6 +342,7 @@ interface RejectionState {
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
+  const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
@@ -443,14 +445,7 @@ export function Review() {
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
       onSaveAndExit={() => {
-        events.draft.create.mutate({
-          type: ActionType.DECLARE,
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          createdAt: new Date().toISOString(),
-          metadata
-        })
+        drafts.submitLocalDraft()
         goToHome()
       }}
     >

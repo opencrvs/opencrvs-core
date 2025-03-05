@@ -37,7 +37,7 @@ import { noop } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -57,8 +57,9 @@ export function EventOverviewLayout({
   children: React.ReactNode
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvent, getDrafts } = useEvents()
-  const drafts = getDrafts()
+  const { getEvent } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
+  const drafts = getRemoteDrafts()
   const [event] = getEvent.useSuspenseQuery(eventId)
 
   const allEvents = useEventConfigurations()

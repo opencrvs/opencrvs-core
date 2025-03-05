@@ -39,6 +39,7 @@ import {
   RecursiveStringRecord,
   useFormDataStringifier
 } from '@client/v2-events/hooks/useFormDataStringifier'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -51,13 +52,14 @@ import { EventOverviewProvider } from './EventOverviewContext'
 
 function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvent, getDrafts } = useEvents()
+  const { getEvent } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
   const { getUsers } = useUsers()
 
   const configs = useEventConfigurations()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const drafts = getDrafts()
+  const drafts = getRemoteDrafts()
 
   const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
 

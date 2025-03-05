@@ -77,6 +77,7 @@ export const Overview: Story = {
           tRPCMsw.event.draft.list.query(() => {
             return [
               {
+                id: '5b0f8f3e-4c7d-4b6b-8b0e-2c7d4f2edsd1b',
                 eventId: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
                 transactionId: 'da0d54ee-dd89-4643-8953-649de9a0f7b7',
                 createdAt: '2025-01-23T05:35:27.689Z',

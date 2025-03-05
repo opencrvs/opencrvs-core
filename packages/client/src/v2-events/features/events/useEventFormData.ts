@@ -9,11 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
 import { useEffect, useRef } from 'react'
+import { create } from 'zustand'
 import { ActionFormData } from '@opencrvs/commons/client'
-import { storage } from '@client/storage'
 
 interface EventFormData {
   formValues: ActionFormData
@@ -46,46 +44,24 @@ function removeUndefinedKeys(data: ActionFormData) {
  * @property {function} clear - Clears the form values.
  * @property {string} eventId - The ID of the event.
  */
-export const useEventFormData = create<EventFormData>()(
-  persist(
-    (set, get) => ({
-      formValues: {},
-      eventId: '',
-      getFormValues: (eventId: string, initialValues?: ActionFormData) =>
-        get().eventId === eventId ? get().formValues : initialValues ?? {},
-      setFormValues: (eventId: string, data: ActionFormData) => {
-        const formValues = removeUndefinedKeys(data)
-        return set(() => ({ eventId, formValues }))
-      },
-      setInitialFormValues: (eventId: string, data: ActionFormData) => {
-        if (get().eventId === eventId) {
-          return
-        }
-        const formValues = removeUndefinedKeys(data)
-        return set(() => ({ eventId, formValues }))
-      },
-      getTouchedFields: () =>
-        Object.fromEntries(
-          Object.entries(get().formValues).map(([key, value]) => [key, true])
-        ),
-      clear: () => set(() => ({ eventId: '', formValues: {} }))
-    }),
-    {
-      name: 'event-form-data',
-      storage: createJSONStorage(() => ({
-        getItem: async (key) => {
-          return storage.getItem(key)
-        },
-        setItem: async (key, value) => {
-          await storage.setItem(key, value)
-        },
-        removeItem: async (key) => {
-          await storage.removeItem(key)
-        }
-      }))
-    }
-  )
-)
+export const useEventFormData = create<EventFormData>()((set, get) => ({
+  formValues: {},
+  eventId: '',
+  getFormValues: (eventId: string, initialValues?: ActionFormData) =>
+    get().eventId === eventId ? get().formValues : initialValues ?? {},
+  setFormValues: (eventId: string, data: ActionFormData) => {
+    const formValues = removeUndefinedKeys(data)
+    return set(() => ({ eventId, formValues }))
+  },
+  setInitialFormValues: (eventId: string, data: ActionFormData) => {
+    return set(() => ({ eventId, formValues: removeUndefinedKeys(data) }))
+  },
+  getTouchedFields: () =>
+    Object.fromEntries(
+      Object.entries(get().formValues).map(([key, value]) => [key, true])
+    ),
+  clear: () => set(() => ({ eventId: '', formValues: {} }))
+}))
 /**
  * Based on https://github.com/pmndrs/zustand?tab=readme-ov-file#transient-updates-for-often-occurring-state-changes
  *

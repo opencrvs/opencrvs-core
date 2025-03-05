@@ -180,11 +180,11 @@ describe('drafts applied to event', () => {
       },
       [
         {
+          id: 'dd2fcd37-6850-47bd-b5fe-2af7c82ae902',
           eventId: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
           transactionId: 'da0d54ee-dd89-4643-8953-649de9a0f7b7',
           createdAt: '2025-01-23T05:35:27.689Z',
           action: {
-            id: 'dd2fcd37-6850-47bd-b5fe-2af7c82ae902',
             createdAt: '2025-01-23T05:35:27.689Z',
             createdBy: '6798e55cc1fea36ff4f3c74c',
             data: {
@@ -198,5 +198,62 @@ describe('drafts applied to event', () => {
       ]
     )
     expect(result.data['applicant.firstname']).toBe('Riku')
+  })
+  test('drafts do not apply when they there is a committed action for the action type', () => {
+    const result = getCurrentEventStateWithDrafts(
+      {
+        id: '0bedbeb4-6907-470d-99a8-12bb8da634fc',
+        type: 'tennis-club-membership',
+        createdAt: '2025-03-05T10:59:02.011Z',
+        updatedAt: '2025-03-05T10:59:02.011Z',
+        actions: [
+          {
+            id: '1f312b4d-73f2-4773-80a3-649e8e075067',
+            createdAt: '2025-03-05T10:59:02.011Z',
+            createdBy: '6798e55cc1fea36ff4f3c74c',
+            data: {},
+            createdAtLocation: 'e8d46ca3-8af3-4326-9140-cf297dc651cc',
+            type: 'CREATE'
+          }
+        ],
+        trackingId: 'J4T6PI'
+      },
+      [
+        {
+          id: '45b64339-c533-46c3-aeb5-3dcc8c7d40e1',
+          eventId: '0bedbeb4-6907-470d-99a8-12bb8da634fc',
+          transactionId: '9f5fc52f-7c0a-46f9-bb73-381078f2d490',
+          createdAt: '2025-03-05T11:49:13.443Z',
+          action: {
+            createdAt: '2025-03-05T11:49:13.443Z',
+            createdBy: '6798e55cc1fea36ff4f3c74c',
+            data: {
+              'applicant.firstname': 'Riku2xxxxxy',
+              'applicant.surname': 'Rouvilaf'
+            },
+            createdAtLocation: 'e8d46ca3-8af3-4326-9140-cf297dc651cc',
+            type: 'DECLARE'
+          }
+        },
+        {
+          id: 'tmp-aa358c0b-5688-4201-a502-9f45356a3f83',
+          eventId: '0bedbeb4-6907-470d-99a8-12bb8da634fc',
+          createdAt: '2025-03-05T11:05:46.546Z',
+          transactionId: 'tmp-560028e1-625f-4286-bfa5-899687237d80',
+          action: {
+            type: 'DECLARE',
+            data: {
+              'applicant.firstname': 'Foo',
+              'applicant.surname': 'Rouvilaf'
+            },
+            metadata: {},
+            createdAt: '2025-03-05T11:05:46.546Z',
+            createdBy: '',
+            createdAtLocation: ''
+          }
+        }
+      ]
+    )
+    expect(result.data['applicant.firstname']).toBe('Foo')
   })
 })

@@ -12,6 +12,7 @@
 import React from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
+import { ActionType } from '@opencrvs/commons/client'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
@@ -70,7 +71,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
       element: (
-        <Action>
+        <Action type={ActionType.DECLARE}>
           <Outlet />
         </Action>
       ),
@@ -93,7 +94,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
       element: (
-        <Action>
+        <Action type={ActionType.REGISTER}>
           <Outlet />
         </Action>
       ),
@@ -115,7 +116,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,
       element: (
-        <Action>
+        <Action type={ActionType.PRINT_CERTIFICATE}>
           <Outlet />
         </Action>
       ),
