@@ -168,9 +168,30 @@ export function getEventConfiguration(
   return config
 }
 
+// TODO CIHAN: take this in to use
+export function isFieldAnUncheckedCheckbox(
+  field: FieldConfig,
+  form: ActionFormData
+) {
+  if (field.type !== 'CHECKBOX') {
+    return false
+  }
+
+  return !form[field.id]
+}
+
 export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
   return omitBy(data, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
-    return !field || !isFieldVisible(field, data)
+
+    if (!field) {
+      return true
+    }
+
+    // if (isFieldAnUncheckedCheckbox(field, data)) {
+    //   return true
+    // }
+
+    return !isFieldVisible(field, data)
   })
 }
