@@ -31,12 +31,6 @@ export const ActionConfigBase = z.object({
   forms: z.array(FormConfig)
 })
 
-const CreateConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.CREATE)
-  })
-)
-
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE)
@@ -124,7 +118,6 @@ const CustomConfig = ActionConfigBase.merge(
  */
 /** @knipignore */
 export type AllActionConfigFields =
-  | typeof CreateConfig
   | typeof DeclareConfig
   | typeof ValidateConfig
   | typeof RejectDeclarationConfig
@@ -140,7 +133,6 @@ export type AllActionConfigFields =
 
 /** @knipignore */
 export type InferredActionConfig =
-  | z.infer<typeof CreateConfig>
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
   | z.infer<typeof RejectDeclarationConfig>
@@ -155,7 +147,6 @@ export type InferredActionConfig =
   | z.infer<typeof CustomConfig>
 
 export const ActionConfig = z.discriminatedUnion('type', [
-  CreateConfig,
   DeclareConfig,
   ValidateConfig,
   RejectDeclarationConfig,

@@ -22,7 +22,9 @@ import {
   getFieldValidationErrors,
   isFileFieldType,
   isFileFieldWithOptionType,
-  SCOPES
+  SCOPES,
+  EventConfig,
+  EventIndex
 } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -39,8 +41,6 @@ import {
   TextArea,
   TextInput
 } from '@opencrvs/components'
-
-import { EventConfig, EventIndex } from '@opencrvs/commons'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -681,7 +681,7 @@ function ReviewActionComponent({
               type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
-              <Icon name="Check" />
+              <Icon name="Check" color="white" />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
             {action !== ActionType.DECLARE && (

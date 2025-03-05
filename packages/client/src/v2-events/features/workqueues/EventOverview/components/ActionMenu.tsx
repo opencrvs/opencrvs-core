@@ -69,7 +69,6 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                 key={action.type}
                 onClick={() => {
                   if (
-                    action.type === ActionType.CREATE ||
                     action.type === ActionType.REJECT ||
                     action.type === ActionType.ARCHIVED ||
                     action.type === ActionType.MARKED_AS_DUPLICATE ||

@@ -11,7 +11,7 @@
 
 import { TranslationConfig } from './TranslationConfig'
 
-import { flattenDeep, isEqual, omitBy } from 'lodash'
+import { flattenDeep, omitBy } from 'lodash'
 import { workqueues } from '../workqueues'
 import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
@@ -21,7 +21,8 @@ import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionFormData } from './ActionDocument'
 import { formatISO } from 'date-fns'
-import { isFieldHiddenOrDisabled } from '../conditionals/validate'
+import { FormConfig } from './FormConfig'
+import { isFieldHidden } from '../conditionals/validate'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -129,20 +130,6 @@ export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
         `Invalid workqueue configuration: workqueue not found with id:  ${workqueue.id}`
       )
     }
-
-    const rootWorkqueueFields = rootWorkqueue.columns.map(({ id }) => id).sort()
-
-    const workqueueConfigFields = workqueue.fields
-      .map(({ column }) => column)
-      .sort()
-
-    if (!isEqual(rootWorkqueueFields, workqueueConfigFields)) {
-      throw new Error(
-        `Invalid workqueue configuration: [${rootWorkqueueFields.join(
-          ','
-        )}] does not match [${workqueueConfigFields.join(',')}]`
-      )
-    }
   })
 }
 
@@ -157,14 +144,18 @@ export const findActiveActionForm = (
   return form
 }
 
+export const getFormFields = (formConfig: FormConfig) => {
+  return formConfig.pages.flatMap((p) => p.fields)
+}
+
 export const findActiveActionFields = (
   configuration: EventConfig,
   action: ActionType
-) => {
+): FieldConfig[] => {
   const form = findActiveActionForm(configuration, action)
 
   /** Let caller decide whether to throw or default to empty array */
-  return form?.pages.flatMap((p) => p.fields)
+  return form ? getFormFields(form) : []
 }
 
 export function getEventConfiguration(
@@ -178,22 +169,15 @@ export function getEventConfiguration(
   return config
 }
 
-export function stripHiddenOrDisabledFields(
-  actionType: ActionType,
-  eventConfiguration: EventConfig,
-  data: ActionFormData
-) {
-  const activeFields =
-    findActiveActionFields(eventConfiguration, actionType) ?? []
-
+export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
   const now = formatISO(new Date(), { representation: 'date' })
 
   return omitBy(data, (_, fieldId) => {
-    const field = activeFields.find((f) => f.id === fieldId)
+    const field = fields.find((f) => f.id === fieldId)
 
     return (
       !field ||
-      isFieldHiddenOrDisabled(field, {
+      isFieldHidden(field, {
         $form: data,
         $now: now
       })

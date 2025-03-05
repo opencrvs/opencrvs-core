@@ -14,6 +14,7 @@ import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
   type: 'TENNIS_CLUB_MEMBERSHIP',
+  trackingId: 'TEST12',
   status: 'CREATED',
   createdAt: '2023-03-01T00:00:00.000Z',
   createdBy: uuid(),
@@ -31,6 +32,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
 export const tennisClueMembershipEventDocument: EventDocument = {
   type: 'TENNIS_CLUB_MEMBERSHIP',
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
+  trackingId: 'TEST12',
   createdAt: '2025-01-23T05:30:02.615Z',
   updatedAt: '2025-01-23T05:35:27.689Z',
   actions: [

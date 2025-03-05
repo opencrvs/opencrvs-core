@@ -44,7 +44,8 @@ export const EventMetadata = z.object({
   createdAtLocation: z.string(),
   modifiedAt: z.string().datetime(),
   assignedTo: z.string().nullable(),
-  updatedBy: z.string()
+  updatedBy: z.string(),
+  trackingId: z.string()
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
@@ -104,5 +105,10 @@ export const eventMetadataLabelMap: Record<
     id: 'event.updatedBy.label',
     defaultMessage: 'Updated By',
     description: 'Updated By'
+  },
+  'event.trackingId': {
+    id: 'event.trackingId.label',
+    defaultMessage: 'Tracking ID',
+    description: 'Tracking ID'
   }
 }
