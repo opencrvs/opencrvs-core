@@ -43,8 +43,7 @@ import {
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
-  isFieldDisabled,
-  isFieldHidden,
+  isFieldEnabled,
   isFileFieldType,
   isFileFieldWithOptionType,
   isLocationFieldType,
@@ -57,7 +56,8 @@ import {
   isTextAreaFieldType,
   isTextFieldType,
   isNumberFieldType,
-  isEmailFieldType
+  isEmailFieldType,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -650,18 +650,15 @@ class FormSectionComponent extends React.Component<AllProps> {
             error = intl.formatMessage(firstError.message)
           }
 
-          const formParams = {
-            $form: makeFormikFieldIdsOpenCRVSCompatible(
-              valuesWithFormattedDate
-            ),
-            $now: formatISO(new Date(), { representation: 'date' })
-          }
+          const formData = makeFormikFieldIdsOpenCRVSCompatible(
+            valuesWithFormattedDate
+          )
 
-          if (isFieldHidden(field, formParams)) {
+          if (!isFieldVisible(field, formData)) {
             return null
           }
 
-          const isDisabled = isFieldDisabled(field, formParams)
+          const isDisabled = !isFieldEnabled(field, formData)
 
           return (
             <FormItem
