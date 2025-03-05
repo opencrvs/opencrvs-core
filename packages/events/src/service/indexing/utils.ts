@@ -17,6 +17,10 @@ import {
 const FIELD_SEPARATOR = '____'
 export const DEFAULT_SIZE = 10
 
+/**
+ * Generates an Elasticsearch query to search within `document.data`
+ * using the provided search payload.
+ */
 export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
   const must: QueryDslQueryContainer[] = Object.entries(event).map(
     ([key, value]) => ({
