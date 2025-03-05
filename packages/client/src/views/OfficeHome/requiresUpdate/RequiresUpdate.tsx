@@ -10,7 +10,7 @@
  */
 import { formatUrl, generateGoToPageUrl } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -25,7 +25,7 @@ import { IAction } from '@opencrvs/components/lib/common-types'
 import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
 import {
   buttonMessages,
@@ -86,7 +86,6 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.SENT_FOR_UPDATES)
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
-  const userDetails = useSelector(getUserDetails)
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -169,10 +168,6 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
 
     const transformedData = transformData(data, props.intl)
     const items = transformedData.map((reg, index) => {
-      const assignedToOther = !!(
-        reg.assignment &&
-        reg.assignment.practitionerId !== userDetails?.practitionerId
-      )
       const actions = [] as IAction[]
       const foundDeclaration = props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
@@ -180,28 +175,36 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
       const downloadStatus = foundDeclaration?.downloadStatus
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
-      if (width > props.theme.grid.breakpoints.lg && isReviewer) {
-        actions.push({
-          label: props.intl.formatMessage(buttonMessages.update),
-          disabled:
-            downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED || assignedToOther,
-          handler: (
-            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-          ) => {
-            if (e) {
-              e.stopPropagation()
-            }
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        if (width > props.theme.grid.breakpoints.lg && isReviewer) {
+          actions.push({
+            label: props.intl.formatMessage(buttonMessages.update),
+            handler: () => {},
+            disabled: true
+          })
+        }
+      } else {
+        if (width > props.theme.grid.breakpoints.lg && isReviewer) {
+          actions.push({
+            label: props.intl.formatMessage(buttonMessages.update),
+            handler: (
+              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+            ) => {
+              if (e) {
+                e.stopPropagation()
+              }
 
-            navigate(
-              generateGoToPageUrl({
-                pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
-                declarationId: reg.id,
-                pageId: 'review',
-                event: reg.event ? reg.event.toLowerCase() : ''
-              })
-            )
-          }
-        })
+              navigate(
+                generateGoToPageUrl({
+                  pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
+                  declarationId: reg.id,
+                  pageId: 'review',
+                  event: reg.event ? reg.event.toLowerCase() : ''
+                })
+              )
+            }
+          })
+        }
       }
       actions.push({
         actionComponent: (

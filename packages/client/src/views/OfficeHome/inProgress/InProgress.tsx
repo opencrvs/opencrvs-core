@@ -34,7 +34,7 @@ import * as routes from '@client/navigation/routes'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { getScope } from '@client/profile/profileSelectors'
 import {
   isBirthEvent,
   isDeathEvent,
@@ -79,7 +79,7 @@ import {
 import * as React from 'react'
 import { useState } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { withTheme } from 'styled-components'
 
@@ -121,7 +121,6 @@ function InProgressComponent(props: IRegistrarHomeProps) {
 
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NOTIFICATION_SENT)
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.DESCENDING)
-  const userDetails = useSelector(getUserDetails)
 
   const storedDeclarations = useSelector(
     (state: IStoreState) => state.declarationsState.declarations
@@ -151,12 +150,6 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       }
 
       const storedDeclaration = storedDeclarations.find((d) => d.id === reg.id)
-
-      const assignedToOther = !!(
-        reg.registration?.assignment &&
-        reg.registration.assignment.practitionerId !==
-          userDetails?.practitionerId
-      )
 
       const regId = reg.id
       const event = reg.type
@@ -224,8 +217,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
               )
             }
           },
-          disabled:
-            downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED || assignedToOther
+          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
         })
       }
       if (reg.registration?.status) {
