@@ -21,6 +21,7 @@ import {
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { logger } from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@auth/metrics'
+import { env } from '@auth/environment'
 
 interface IPayload {
   nonce: string
@@ -41,17 +42,27 @@ export default async function sendUserNameHandler(
     return h.response().code(401)
   }
 
+  const isDemoUser = retrievalStepInformation.scope.indexOf('demo') > -1
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
-
-  await sendUserName(
-    retrievalStepInformation.username,
-    retrievalStepInformation.userFullName,
-    retrievalStepInformation.mobile,
-    retrievalStepInformation.email
-  )
+  if (!env.isProd || isDemoUser) {
+    logger.info(
+      `Sending a verification SMS,
+        ${JSON.stringify({
+          mobile: retrievalStepInformation.mobile,
+          username: retrievalStepInformation.username
+        })}`
+    )
+  } else {
+    await sendUserName(
+      retrievalStepInformation.username,
+      retrievalStepInformation.userFullName,
+      retrievalStepInformation.mobile,
+      retrievalStepInformation.email
+    )
+  }
 
   try {
     await postUserActionToMetrics(
