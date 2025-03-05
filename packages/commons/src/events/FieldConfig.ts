@@ -261,7 +261,7 @@ const Select = BaseField.extend({
 const Checkbox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX),
   defaultValue: z.union([CheckboxFieldValue, DependencyExpression]).optional(),
-  required: z.literal(false).optional()
+  required: z.literal(false).optional() // Checkboxes are always optional since they represent a boolean choice that defaults to unchecked
 }).describe('Boolean checkbox field')
 
 export type Checkbox = z.infer<typeof Checkbox>

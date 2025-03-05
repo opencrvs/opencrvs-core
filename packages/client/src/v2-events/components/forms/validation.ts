@@ -35,7 +35,7 @@ export function getValidationErrorsForForm(
   checkValidationErrorsOnly?: boolean
 ) {
   return fields.reduce((errorsForAllFields: Errors, field: FieldConfig) => {
-    // A checkbox can never have validation errors
+    // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
     if (field.type === FieldType.CHECKBOX) {
       return errorsForAllFields
     }
