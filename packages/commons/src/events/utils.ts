@@ -168,11 +168,16 @@ export function getEventConfiguration(
   return config
 }
 
-export function isFieldAnUncheckedCheckbox(
+export function isFieldAnUncheckedAndUnrequiredCheckbox(
   field: FieldConfig,
   form: ActionFormData
 ) {
   if (field.type !== 'CHECKBOX') {
+    return false
+  }
+
+  // For required checkbox fields, we want to display the field even if it is not checked
+  if (field.required) {
     return false
   }
 
@@ -187,7 +192,7 @@ export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
       return true
     }
 
-    if (isFieldAnUncheckedCheckbox(field, data)) {
+    if (isFieldAnUncheckedAndUnrequiredCheckbox(field, data)) {
       return true
     }
 
