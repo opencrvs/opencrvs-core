@@ -21,7 +21,8 @@ import {
   getAllFields,
   workqueues,
   defaultColumns,
-  EventIndex
+  EventIndex,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -40,6 +41,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/featu
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { useTRPC } from '@client/v2-events/trpc'
 import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
+import { SearchModifierComponent } from './SearchModifier'
 
 const SORT_ORDER = {
   ASCENDING: 'asc',
@@ -68,19 +70,6 @@ const COLUMNS = {
 const NondecoratedLink = styled(Link)`
   text-decoration: none;
   color: 'primary';
-`
-
-const SearchParamContainer = styled.div`
-  margin: 16px 0px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-  color: ${({ theme }) => theme.colors.primaryDark};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    max-height: 200px;
-    overflow-y: scroll;
-  }
 `
 
 interface Column {
@@ -208,15 +197,29 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
-export const SearchResult = () => {
+interface IProps {
+  workqueueConfig: any
+  outbox: any
+  drafts: any
+  currentEvent: EventConfig
+  normalizedSearchParams: Record<string, string>
+  queryData: any
+}
+
+export const SearchResult = ({
+  workqueueConfig,
+  outbox,
+  drafts,
+  currentEvent,
+  normalizedSearchParams,
+  queryData
+}: IProps) => {
   const intl = useIntl()
-  const trpc = useTRPC()
-  const { getOutbox, getDrafts } = useEvents()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
-  const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
-  const { eventConfiguration: currentEvent } = useEventConfiguration(eventType)
+  const total = queryData.length
+  const noResultText = intl.formatMessage(messages.noResult)
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
@@ -224,45 +227,6 @@ export const SearchResult = () => {
   const [sortOrder, setSortOrder] = useState<
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
   >(SORT_ORDER.ASCENDING)
-
-  const searchParams = parse(window.location.search) as Record<string, string>
-  const normalizedSearchParams = Object.fromEntries(
-    Object.entries(searchParams).map(([key, value]) => [
-      key,
-      Array.isArray(value) ? value.join(',') : value ?? ''
-    ])
-  )
-
-  const outbox = getOutbox()
-  const drafts = getDrafts()
-  const fieldErrors = getAdvancedSearchFieldErrors(currentEvent, searchParams)
-  const fieldValueErrors = flattenFieldErrors(fieldErrors)
-
-  const {
-    data: queryData,
-    isLoading,
-    error: queryError
-  } = useQuery({
-    ...trpc.event.search.queryOptions({
-      ...searchParams,
-      type: eventType
-    }),
-    queryKey: trpc.event.search.queryKey({
-      ...searchParams,
-      type: eventType
-    })
-  })
-
-  const total = queryData?.length || 0
-  const workqueueId = 'all'
-  const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
-      : null
-
-  if (!workqueueConfig) {
-    return null
-  }
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -390,72 +354,24 @@ export const SearchResult = () => {
     }
   }
 
-  let content
-  let noResultText = intl.formatMessage(messages.noResult)
-  if (isLoading) {
-    content = (
-      <div id="advanced-search_loader">
-        <LoadingIndicator loading={true} />
-      </div>
-    )
-  } else if (queryError || fieldValueErrors.length > 0) {
-    noResultText = ''
-    content = (
-      <ErrorText id="advanced-search-result-error-text">
-        {intl.formatMessage(messages.queryError)}
-      </ErrorText>
-    )
-  } else if (queryData && total > 0) {
-    content = (
+  return (
+    <WQContentWrapper
+      isMobileSize={false}
+      noContent={total < 1}
+      noResultText={noResultText}
+      tabBarContent={
+        <SearchModifierComponent searchParams={normalizedSearchParams} />
+      }
+      title={`${intl.formatMessage(messages.searchResult)} ${
+        ' (' + total + ')'
+      }`}
+    >
       <Workqueue
         columns={getColumns().concat(getDefaultColumns())}
         content={transformData(queryData)}
         hideLastBorder={true}
         noResultText={intl.formatMessage(messages.noResults)}
       />
-    )
-  }
-  return (
-    <div>
-      <WorkqueueLayout>
-        <WQContentWrapper
-          isMobileSize={false}
-          noContent={total < 1 && !isLoading}
-          noResultText={noResultText}
-          tabBarContent={
-            <SearchModifierComponent searchParams={normalizedSearchParams} />
-          }
-          title={`${intl.formatMessage(messages.searchResult)} ${
-            isLoading ? '' : ' (' + total + ')'
-          }`}
-        >
-          {content}
-        </WQContentWrapper>
-      </WorkqueueLayout>
-    </div>
-  )
-}
-
-function SearchModifierComponent({
-  searchParams
-}: {
-  searchParams: Record<string, string>
-}) {
-  const navigate = useNavigate()
-  const intl = useIntl()
-
-  return (
-    <>
-      <SearchParamContainer>
-        <StyledLink
-          font="bold14"
-          onClick={() =>
-            navigate(ROUTES.V2.ADVANCED_SEARCH.path, { state: searchParams })
-          }
-        >
-          {intl.formatMessage(messages.edit)}
-        </StyledLink>
-      </SearchParamContainer>
-    </>
+    </WQContentWrapper>
   )
 }

@@ -23,10 +23,10 @@ import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/Adv
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
-import { EventOverviewLayout } from '@client/v2-events/layouts'
+import { EventOverviewLayout, WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { SearchResult } from '@client/v2-events/features/events/AdvancedSearch/SearchResult'
+import { SearchResultIndex } from '../features/events/AdvancedSearch/SearchResultIndex'
 import { ROUTES } from './routes'
 
 /**
@@ -128,7 +128,11 @@ export const routesConfig = {
     },
     {
       path: ROUTES.V2.SEARCH_RESULT.path,
-      element: <SearchResult />
+      element: (
+        <WorkqueueLayout>
+          <SearchResultIndex />
+        </WorkqueueLayout>
+      )
     }
   ]
 } satisfies RouteObject
