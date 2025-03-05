@@ -21,6 +21,7 @@ import { Draft } from '@opencrvs/commons/client'
 import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
 import {
   createTemporaryId,
+  invalidateEventsList,
   setMutationDefaults,
   waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/api'
@@ -62,7 +63,11 @@ const useLocalDrafts = create<DraftStore>()(
       name: 'local-drafts',
       storage: createJSONStorage(() => ({
         getItem: async (key) => {
-          return storage.getItem(key)
+          console.log('Im loading now')
+
+          const data = await storage.getItem(key)
+          console.log('This was in the store', data)
+          return data
         },
         setItem: async (key, value) => {
           await storage.setItem(key, value)
@@ -124,8 +129,8 @@ setMutationDefaults(utils.event.draft.create, {
     return optimisticDraft
   },
   onSuccess: async () => {
-    // await invalidateEventsList()
-    // await invalidateDraftsList()
+    await invalidateEventsList()
+    await invalidateDraftsList()
   },
   retryDelay: 10000
 })

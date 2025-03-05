@@ -13,6 +13,7 @@ import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
+  Draft,
   getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -77,26 +78,7 @@ export const SaveAndExit: Story = {
     },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.create.mutation((req) => {
-            spy()
-            return {
-              id: 'test-draft-id',
-              eventId: req.eventId,
-              transactionId: req.transactionId,
-              createdAt: new Date().toISOString(),
-              action: {
-                ...req,
-                createdBy: 'test-user',
-                createdAtLocation: 'test-location',
-                createdAt: new Date().toISOString()
-              }
-            }
-          }),
-          tRPCMsw.event.draft.list.query(() => {
-            return []
-          })
-        ],
+        drafts: createDraftHandlers(),
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
@@ -137,6 +119,32 @@ export const SaveAndExit: Story = {
   }
 }
 
+function createDraftHandlers() {
+  const draftList = fn<() => Draft[]>(() => [])
+  return [
+    tRPCMsw.event.draft.create.mutation((req) => {
+      const response: Draft = {
+        id: 'test-draft-id',
+        eventId: req.eventId,
+        transactionId: req.transactionId,
+        createdAt: new Date().toISOString(),
+        action: {
+          ...req,
+          createdBy: 'test-user',
+          createdAtLocation: 'test-location',
+          createdAt: new Date().toISOString()
+        }
+      }
+      spy()
+      draftList.mockReturnValue([response])
+      return response
+    }),
+    tRPCMsw.event.draft.list.query(() => {
+      return draftList()
+    })
+  ]
+}
+
 export const DraftShownInForm: Story = {
   name: 'Form with an existing remote draft',
   parameters: {
@@ -149,26 +157,7 @@ export const DraftShownInForm: Story = {
     },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.create.mutation((req) => {
-            spy()
-            return {
-              id: 'test-draft-id',
-              eventId: req.eventId,
-              transactionId: req.transactionId,
-              createdAt: new Date().toISOString(),
-              action: {
-                ...req,
-                createdBy: 'test-user',
-                createdAtLocation: 'test-location',
-                createdAt: new Date().toISOString()
-              }
-            }
-          }),
-          tRPCMsw.event.draft.list.query(() => {
-            return []
-          })
-        ],
+        drafts: createDraftHandlers(),
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
