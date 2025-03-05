@@ -12,7 +12,7 @@
 
 import React, { useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
-import styled, { useTheme } from 'styled-components'
+import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import {
   ActionFormData,
@@ -38,8 +38,7 @@ import {
   ResponsiveModal,
   Stack,
   Text,
-  TextArea,
-  TextInput
+  TextArea
 } from '@opencrvs/components'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
@@ -49,6 +48,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
+import { registerMessages } from '@client/v2-events/features/events/actions/declare/useReviewActionConfig'
 import { Output } from './Output'
 
 const ValidationError = styled.span`
@@ -651,7 +651,7 @@ function ReviewActionComponent({
     title: MessageDescriptor
     description: MessageDescriptor
     onConfirm: MessageDescriptor
-    onReject: MessageDescriptor
+    onReject?: MessageDescriptor
   }
   primaryButtonType?: 'positive' | 'primary'
   action?: string
@@ -681,7 +681,7 @@ function ReviewActionComponent({
               type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
-              <Icon name="Check" color="white" />
+              <Icon color="white" name="Check" />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
             {action !== ActionType.DECLARE && (
@@ -692,7 +692,9 @@ function ReviewActionComponent({
                 onClick={onReject}
               >
                 <Icon name="X" />
-                {intl.formatMessage(messages.onReject)}
+                {intl.formatMessage(
+                  messages.onReject || registerMessages.onReject
+                )}
               </Button>
             )}
           </ActionContainer>

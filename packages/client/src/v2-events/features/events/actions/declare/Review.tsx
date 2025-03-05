@@ -15,14 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import {
-  ActionFormData,
-  ActionType,
-  findActiveActionForm,
-  FormConfig,
-  Scope,
-  SCOPES
-} from '@opencrvs/commons/client'
+import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -35,8 +28,8 @@ import { FormLayout } from '@client/v2-events/layouts'
 
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
-import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useReviewActionConfig } from './useReviewActionConfig'
 
 const confirmModalMessages = {
   complete: {
@@ -149,152 +142,6 @@ const declareMessages = {
   }
 }
 
-const reviewMessages = {
-  complete: {
-    register: {
-      title: registerMessages.title,
-      description: {
-        id: 'v2.review.register.description.complete',
-        defaultMessage:
-          'By clicking register, you confirm that the information entered is correct and the event can be registered.',
-        description:
-          'The description for registration action when form is complete'
-      },
-      onConfirm: registerMessages.onConfirm,
-      onReject: validateMessages.onReject,
-      modal: confirmModalMessages.complete.register
-    },
-    validate: {
-      title: validateMessages.title,
-      description: {
-        id: 'v2.review.validate.description.complete',
-        defaultMessage:
-          'The informant will receive an email with a registration number that they can use to collect the certificate',
-        description: 'The description for validate action when form is complete'
-      },
-      onConfirm: validateMessages.onConfirm,
-      onReject: validateMessages.onReject,
-      modal: confirmModalMessages.complete.validate
-    },
-    declare: {
-      title: {
-        id: 'v2.review.declare.title.complete',
-        defaultMessage: 'Declaration complete',
-        description:
-          'The title shown when reviewing an incomplete record to declare'
-      },
-      description: {
-        id: 'v2.review.declare.description.complete',
-        defaultMessage:
-          'The informant will receive an email with a registration number that they can use to collect the certificate',
-        description: 'The description for declare action when form is complete'
-      },
-      onConfirm: declareMessages.onConfirm,
-      onReject: validateMessages.onReject,
-      modal: confirmModalMessages.complete.declare
-    }
-  },
-  incomplete: {
-    register: {
-      title: registerMessages.title,
-      description: {
-        id: 'v2.reviewAction.register.description.incomplete',
-        defaultMessage: 'Please add mandatory information before registering',
-        description:
-          'The description for registration action when form is incomplete'
-      },
-      onConfirm: registerMessages.onConfirm,
-      onReject: validateMessages.onReject,
-      modal: {}
-    },
-    validate: {
-      title: validateMessages.title,
-      description: {
-        id: 'v2.review.validate.description.incomplete',
-        defaultMessage:
-          'Please add mandatory information before sending for approval',
-        description: 'The description for validate action when form is complete'
-      },
-      onConfirm: validateMessages.onConfirm,
-      onReject: validateMessages.onReject,
-      modal: {}
-    },
-    declare: {
-      title: {
-        id: 'v2.review.declare.title.incomplete',
-        defaultMessage: 'Declaration incomplete',
-        description:
-          'The title shown when reviewing an incomplete record to declare'
-      },
-      description: {
-        id: 'v2.review.declare.description.complete',
-        defaultMessage:
-          'The informant will receive an email with a tracking ID that they can use to provide the additional mandatory information required for registration',
-        description: 'The description for declare action when form is complete'
-      },
-      onConfirm: declareMessages.onConfirm,
-      onReject: validateMessages.onReject,
-      modal: {}
-    }
-  }
-}
-function getReviewActionConfig({
-  formConfig,
-  form,
-  metadata,
-  scopes
-}: {
-  formConfig: FormConfig
-  form: ActionFormData
-  metadata?: ActionFormData
-  scopes?: Scope[]
-}) {
-  const incomplete = validationErrorsInActionFormExist(
-    formConfig,
-    form,
-    metadata
-  )
-
-  const isDisabled = incomplete
-    ? !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
-    : false
-
-  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
-    return {
-      buttonType: 'positive' as const,
-      incomplete,
-      isDisabled,
-      messages: incomplete
-        ? reviewMessages.incomplete.register
-        : reviewMessages.complete.register
-    }
-  }
-
-  if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
-    return {
-      buttonType: 'positive' as const,
-      incomplete,
-      isDisabled,
-      messages: incomplete
-        ? reviewMessages.incomplete.validate
-        : reviewMessages.complete.validate
-    }
-  }
-
-  if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
-    return {
-      buttonType: 'primary' as const,
-      incomplete,
-      isDisabled,
-      messages: incomplete
-        ? reviewMessages.incomplete.declare
-        : reviewMessages.complete.declare
-    }
-  }
-
-  throw new Error('No valid scope found for the action')
-}
-
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
@@ -302,7 +149,6 @@ export function Review() {
   const [modal, openModal] = useModal()
   const intl = useIntl()
   const { goToHome } = useEventFormNavigation()
-  const declareMutation = events.actions.declare
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -320,7 +166,7 @@ export function Review() {
 
   const scopes = useSelector(getScope) ?? undefined
 
-  const reviewActionConfiguration = getReviewActionConfig({
+  const reviewActionConfiguration = useReviewActionConfig({
     formConfig,
     form,
     metadata,
@@ -366,12 +212,8 @@ export function Review() {
       />
     ))
     if (confirmedDeclaration) {
-      declareMutation.mutate({
-        eventId: event.id,
-        data: form,
-        transactionId: uuid(),
-        metadata
-      })
+      reviewActionConfiguration.onConfirm(eventId)
+
       goToHome()
     }
   }
