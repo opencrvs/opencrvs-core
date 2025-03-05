@@ -12,7 +12,7 @@ import { z } from 'zod'
 import { FieldValue } from './FieldValue'
 import { ActionType } from './ActionType'
 
-const ActionBase = z.object({
+export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
@@ -21,6 +21,8 @@ const ActionBase = z.object({
   draft: z.boolean().optional().default(false),
   createdAtLocation: z.string()
 })
+
+export type ActionBase = z.infer<typeof ActionBase>
 
 const AssignedAction = ActionBase.merge(
   z.object({
