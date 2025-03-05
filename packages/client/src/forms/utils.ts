@@ -59,7 +59,10 @@ import {
   Ii18nIDReaderFormField,
   QRReaderType,
   ReaderType,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  ILoaderFormField,
+  LOADER,
+  Ii18nLoaderFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -212,6 +215,12 @@ export const internationaliseFieldObject = (
     )
     ;(base as Ii18nIDReaderFormField).manualInputInstructionLabel =
       intl.formatMessage(field.manualInputInstructionLabel)
+  }
+
+  if (isFieldLoader(field)) {
+    ;(base as Ii18nLoaderFormField).loadingText = intl.formatMessage(
+      field.loadingText
+    )
   }
 
   return base as Ii18nFormField
@@ -814,6 +823,10 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
 
 export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
+}
+
+export function isFieldLoader(field: IFormField): field is ILoaderFormField {
+  return field.type === LOADER
 }
 
 export function isReaderQR(reader: ReaderType): reader is QRReaderType {
