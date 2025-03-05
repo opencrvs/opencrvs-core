@@ -1397,7 +1397,6 @@ export interface GQLAssignmentData {
   firstName?: string
   lastName?: string
   officeName?: string
-  createdAt?: string
   avatarURL: string
 }
 

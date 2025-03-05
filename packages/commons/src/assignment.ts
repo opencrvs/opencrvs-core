@@ -73,7 +73,7 @@ export const findAssignment = <T extends SavedBundle>(bundle: T) => {
     )!
     const office = findResourceFromBundleById<SavedOffice>(bundle, officeId)!
 
-    return { practitioner, office, createdAt: task.lastModified }
+    return { practitioner, office }
   }
 
   return null

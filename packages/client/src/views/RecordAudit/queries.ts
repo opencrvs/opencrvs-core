@@ -31,7 +31,6 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           lastName
           officeName
           avatarURL
-          createdAt
         }
       }
       ... on BirthRegistration {

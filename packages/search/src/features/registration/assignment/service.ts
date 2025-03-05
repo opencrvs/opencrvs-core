@@ -61,7 +61,6 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
   body.assignment = {} as IAssignment
   body.assignment.officeName = regLastOffice?.name ?? ''
   body.assignment.practitionerId = practitionerId
-  body.assignment.createdAt = new Date().toISOString()
   body.updatedBy =
     regLastUserIdentifier &&
     regLastUserIdentifier.valueReference &&

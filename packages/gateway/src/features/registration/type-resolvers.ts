@@ -1068,8 +1068,7 @@ export const typeResolvers: GQLResolver = {
           practitionerId: user.id,
           firstName: user.name[0].given?.join(' '),
           lastName: user.name[0].family,
-          officeName: assignment?.office.name || '',
-          createdAt: assignment?.createdAt
+          officeName: assignment?.office.name || ''
         }
       }
 
