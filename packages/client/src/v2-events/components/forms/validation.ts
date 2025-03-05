@@ -31,15 +31,9 @@ export interface Errors {
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: ActionFormData,
-  checkValidationErrorsOnly?: boolean
+  values: ActionFormData
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
-    // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
-    if (field.type === FieldType.CHECKBOX) {
-      return errorsForAllFields
-    }
-
     if (
       // eslint-disable-next-line
       errorsForAllFields[field.id] &&
@@ -50,13 +44,7 @@ export function getValidationErrorsForForm(
 
     return {
       ...errorsForAllFields,
-      [field.id]: getFieldValidationErrors({
-        field: {
-          ...field,
-          required: field.required && !checkValidationErrorsOnly
-        },
-        values
-      })
+      [field.id]: getFieldValidationErrors({ field, values })
     }
   }, {})
 }
