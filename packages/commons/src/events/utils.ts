@@ -168,7 +168,7 @@ export function getEventConfiguration(
   return config
 }
 
-export function isFieldAnUncheckedAndUnrequiredCheckbox(
+export function isOptionalUncheckedCheckbox(
   field: FieldConfig,
   form: ActionFormData
 ) {
@@ -192,7 +192,7 @@ export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
       return true
     }
 
-    if (isFieldAnUncheckedAndUnrequiredCheckbox(field, data)) {
+    if (isOptionalUncheckedCheckbox(field, data)) {
       return true
     }
 

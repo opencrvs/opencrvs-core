@@ -25,7 +25,7 @@ import {
   EventConfig,
   EventIndex,
   isFieldVisible,
-  isFieldAnUncheckedAndUnrequiredCheckbox
+  isOptionalUncheckedCheckbox
 } from '@opencrvs/commons/client'
 import {
   Accordion,
@@ -418,11 +418,7 @@ function ReviewComponent({
                         {page.fields
                           .filter((field) => isFieldVisible(field, form))
                           .filter(
-                            (field) =>
-                              !isFieldAnUncheckedAndUnrequiredCheckbox(
-                                field,
-                                form
-                              )
+                            (field) => !isOptionalUncheckedCheckbox(field, form)
                           )
                           .map((field) => {
                             const value = form[field.id]
