@@ -11,7 +11,7 @@
 
 import { TranslationConfig } from './TranslationConfig'
 
-import { flattenDeep, isEqual, omitBy } from 'lodash'
+import { flattenDeep, omitBy } from 'lodash'
 import { workqueues } from '../workqueues'
 import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
@@ -127,20 +127,6 @@ export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
     if (!rootWorkqueue) {
       throw new Error(
         `Invalid workqueue configuration: workqueue not found with id:  ${workqueue.id}`
-      )
-    }
-
-    const rootWorkqueueFields = rootWorkqueue.columns.map(({ id }) => id).sort()
-
-    const workqueueConfigFields = workqueue.fields
-      .map(({ column }) => column)
-      .sort()
-
-    if (!isEqual(rootWorkqueueFields, workqueueConfigFields)) {
-      throw new Error(
-        `Invalid workqueue configuration: [${rootWorkqueueFields.join(
-          ','
-        )}] does not match [${workqueueConfigFields.join(',')}]`
       )
     }
   })
