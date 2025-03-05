@@ -159,8 +159,7 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
       return true
     case FieldType.FILE:
       return {
-        filename:
-          '4f095fc4-4312-4de2-aa38-86dcc0f71044.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20250304%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20250304T113416Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=6e65c690882b7b6912167c251fdfcef3c5067ee7d30cf95283dd109185ca4fec',
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue

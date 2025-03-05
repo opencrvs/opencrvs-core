@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { SCOPES } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -61,7 +62,7 @@ test('stored events can be deleted', async () => {
   )
 })
 
-describe('it should check unreferenced draft attachments are deleted while final action submission', () => {
+describe('check unreferenced draft attachments are deleted while final action submission', () => {
   const deleteUnreferencedDraftAttachmentsMock = vi.fn()
   const fileExistMock = vi.fn()
 
@@ -72,7 +73,7 @@ describe('it should check unreferenced draft attachments are deleted while final
     request: Request
     requestId: string
   }) {
-    if (!request.url.startsWith('http://localhost:9050/files')) {
+    if (!request.url.startsWith(`${env.DOCUMENTS_URL}/files`)) {
       return
     }
 
@@ -88,51 +89,53 @@ describe('it should check unreferenced draft attachments are deleted while final
     mswServer.events.on('response:mocked', mockListener)
   })
 
-  const file = {
-    filename:
-      '4f095fc4-4312-4de2-aa38-86dcc0f71044.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20250304%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20250304T113416Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=6e65c690882b7b6912167c251fdfcef3c5067ee7d30cf95283dd109185ca4fec',
-    originalFilename: 'abcd.png',
-    type: 'image/png'
-  }
   test('should delete previous draft attachments', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
-    const getDraft = (
-      fileName: string,
-      transactionId: string,
-      draft: boolean
-    ) => ({
-      data: {
-        ...generator.event.actions.declare(event.id).data,
-        'applicant.image': {
-          type: 'png',
-          originalFilename: fileName,
-          filename: fileName
-        }
-      },
-      draft,
-      transactionId,
-      eventId: event.id
-    })
+    const getDraft = (n: number, draft: boolean) => {
+      return {
+        data: {
+          ...generator.event.actions.declare(event.id).data,
+          'applicant.image': {
+            type: 'image/png',
+            originalFilename: `${n}-abcd.png`,
+            filename: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png`
+          }
+        },
+        draft,
+        transactionId: `transactionId-${n}`,
+        eventId: event.id
+      }
+    }
 
-    // declaring 5 drafts with different file attachments
-    await client.event.actions.declare(getDraft(`0${file.filename}`, '0', true))
-    await client.event.actions.declare(getDraft(`1${file.filename}`, '1', true))
-    await client.event.actions.declare(getDraft(`2${file.filename}`, '2', true))
-    await client.event.actions.declare(getDraft(`3${file.filename}`, '3', true))
-    await client.event.actions.declare(getDraft(`4${file.filename}`, '4', true))
+    // declaring 5 drafts with  4 different file attachments
+    await client.event.actions.declare(getDraft(1, true))
+    await client.event.actions.declare(getDraft(2, true))
+    await client.event.actions.declare(getDraft(2, true))
+    await client.event.actions.declare(getDraft(4, true))
+    await client.event.actions.declare(getDraft(5, true))
 
     // declaring final action submission
-    await client.event.actions.declare(
-      getDraft(`final${file.filename}`, 'final', false)
-    )
+    await client.event.actions.declare(getDraft(6, false))
 
     // total 6 file attachment exist api should be called
     expect(fileExistMock.mock.calls).toHaveLength(6)
 
-    // total 5 unreferenced draft attachments should be deleted
-    expect(deleteUnreferencedDraftAttachmentsMock.mock.calls).toHaveLength(5)
+    // total 4 unreferenced draft attachments should be deleted
+    expect(deleteUnreferencedDraftAttachmentsMock.mock.calls).toHaveLength(4)
+
+    const updatedEvent = await client.event.get(event.id)
+
+    // since declare action has been submitted 5 times
+    expect(updatedEvent.actions).toEqual([
+      expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.DECLARE })
+    ])
   })
 
   afterEach(() => {
