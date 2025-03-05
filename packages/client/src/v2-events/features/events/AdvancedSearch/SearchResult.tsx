@@ -18,11 +18,10 @@ import { mapKeys } from 'lodash'
 import { useQuery } from '@tanstack/react-query'
 import { ErrorText, Link as StyledLink } from '@opencrvs/components/lib'
 import {
-  EventSearchIndex,
   getAllFields,
   workqueues,
   defaultColumns,
-  getOrThrow
+  EventIndex
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -275,7 +274,7 @@ export const SearchResult = () => {
     setSortOrder(newSortOrder)
   }
 
-  const transformData = (eventData: EventSearchIndex[]) => {
+  const transformData = (eventData: EventIndex[]) => {
     return eventData
       .map((event) => {
         const { data, ...rest } = event
@@ -297,31 +296,18 @@ export const SearchResult = () => {
           return doc.status
         }
 
-        const eventWorkqueue = getOrThrow(
-          currentEvent.workqueues.find((wq) => wq.id === workqueueConfig.id),
-          `Could not find workqueue config for ${workqueueConfig.id}`
-        )
-
-        const allPropertiesWithEmptyValues = setEmptyValuesForFields(
-          getAllFields(currentEvent)
-        )
-
-        const fieldsWithPopulatedValues: Record<string, string> =
-          eventWorkqueue.fields.reduce(
-            (acc, field) => ({
-              ...acc,
-              [field.column]: flattenedIntl.formatMessage(field.label, {
-                ...allPropertiesWithEmptyValues,
-                ...doc
-              })
-            }),
-            {}
-          )
         const titleColumnId = workqueueConfig.columns[0].id
         const status = doc.status
 
+        const title = flattenedIntl.formatMessage(
+          currentEvent.summary.title.label,
+          {
+            ...setEmptyValuesForFields(getAllFields(currentEvent)),
+            ...doc
+          }
+        )
+
         return {
-          ...fieldsWithPopulatedValues,
           ...doc,
           event: intl.formatMessage(currentEvent.label),
           createdAt: formattedDuration(new Date(doc.createdAt)),
@@ -336,16 +322,15 @@ export const SearchResult = () => {
               status: getEventStatus()
             }
           ),
-          [titleColumnId]: (
+          [titleColumnId]: isInOutbox ? (
+            <IconWithName name={title} status={status} />
+          ) : (
             <NondecoratedLink
               to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
                 eventId: doc.id
               })}
             >
-              <IconWithName
-                name={fieldsWithPopulatedValues[titleColumnId]}
-                status={status}
-              />
+              <IconWithName name={title} status={status} />
             </NondecoratedLink>
           )
         }
