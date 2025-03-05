@@ -24,7 +24,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
-import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
+import { isTemporaryId } from '@client/v2-events/utils'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)

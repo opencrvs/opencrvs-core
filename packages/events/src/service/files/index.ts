@@ -38,9 +38,9 @@ function getFieldDefinitionForActionDataField(
   )
 
   if (!formConfiguration) {
-    logger.error('Failed to find active form configuration', {
-      actionType
-    })
+    logger.error(
+      `Failed to find active form configuration for action: ${actionType}`
+    )
 
     throw new Error('Failed to find active form configuration')
   }
@@ -63,9 +63,7 @@ export async function presignFilesInEvent(event: EventDocument, token: string) {
   )
 
   if (!configuration) {
-    logger.error('Failed to find configuration for event', {
-      event: event.type
-    })
+    logger.error(`Failed to find configuration for event: ${event.type}`)
 
     throw new Error('Failed to find configuration for event')
   }
