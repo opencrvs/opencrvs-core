@@ -16,7 +16,7 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
 import { ActionFormData } from '../events/ActionDocument'
-import { Checkbox, FieldConfig } from '../events/FieldConfig'
+import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
@@ -155,7 +155,7 @@ export function getFieldValidationErrors({
   values
 }: {
   // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
-  field: Exclude<FieldConfig, Checkbox>
+  field: FieldConfig
   values: ActionFormData
 }) {
   const conditionalParameters = {
