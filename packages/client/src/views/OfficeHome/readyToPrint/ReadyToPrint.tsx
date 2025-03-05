@@ -199,7 +199,10 @@ function ReadyToPrintComponent(props: IPrintTabProps) {
               event: reg.event,
               compositionId: reg.id,
               action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: reg.assignment || undefined
+              assignment:
+                foundDeclaration?.assignmentStatus ??
+                reg.assignment ??
+                undefined
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}

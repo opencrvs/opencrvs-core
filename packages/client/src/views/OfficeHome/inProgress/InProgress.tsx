@@ -123,6 +123,10 @@ function InProgressComponent(props: IRegistrarHomeProps) {
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.DESCENDING)
   const userDetails = useSelector(getUserDetails)
 
+  const storedDeclarations = useSelector(
+    (state: IStoreState) => state.declarationsState.declarations
+  )
+
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
@@ -145,6 +149,8 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       if (!reg) {
         throw new Error('Registration is null')
       }
+
+      const storedDeclaration = storedDeclarations.find((d) => d.id === reg.id)
 
       const assignedToOther = !!(
         reg.registration?.assignment &&
@@ -230,7 +236,9 @@ function InProgressComponent(props: IRegistrarHomeProps) {
                 event: event as string,
                 compositionId: reg.id,
                 action: DownloadAction.LOAD_REVIEW_DECLARATION,
-                assignment: reg?.registration?.assignment
+                assignment:
+                  storedDeclaration?.assignmentStatus ??
+                  reg?.registration?.assignment
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus}
