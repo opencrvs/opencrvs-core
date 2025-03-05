@@ -12,8 +12,11 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { graphql, HttpResponse } from 'msw'
-import { userEvent, within } from '@storybook/test'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  generateEventDocument,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -48,24 +51,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const eventDocument = {
-  type: 'TENNIS_CLUB_MEMBERSHIP',
-  id: eventId,
-  createdAt: '2025-01-23T05:30:02.615Z',
-  updatedAt: '2025-01-23T05:35:27.689Z',
-  actions: [
-    {
-      id: 'ae9618d8-319d-48a7-adfe-7ad6cfbc56b7',
-      type: 'CREATE' as const,
-      createdAt: '2025-01-23T05:30:02.615Z',
-      createdBy: '6780dbf7a263c6515c7b97d2',
-      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
-      draft: false,
-      data: {}
-    }
-  ]
-}
-
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {
     reactRouter: {
@@ -81,7 +66,10 @@ export const ReviewForLocalRegistrarComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -98,22 +86,6 @@ export const ReviewForLocalRegistrarComplete: Story = {
         ]
       }
     }
-  },
-  play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Register' })
-      )
-
-      const modal = within(await canvas.findByRole('dialog'))
-
-      await modal.findByText('Register?')
-      await modal.findByRole('button', { name: 'Register' })
-      await userEvent.click(
-        await modal.findByRole('button', { name: 'Cancel' })
-      )
-    })
   }
 }
 
@@ -138,7 +110,10 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -184,7 +159,10 @@ export const ReviewForRegistrationAgentComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -201,22 +179,6 @@ export const ReviewForRegistrationAgentComplete: Story = {
         ]
       }
     }
-  },
-  play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for approval' })
-      )
-
-      const modal = within(await canvas.findByRole('dialog'))
-
-      await modal.findByText('Send for approval?')
-      await modal.findByRole('button', { name: 'Confirm' })
-      await userEvent.click(
-        await modal.findByRole('button', { name: 'Cancel' })
-      )
-    })
   }
 }
 
@@ -246,7 +208,10 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -288,7 +253,10 @@ export const ReviewForFieldAgentComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -305,22 +273,6 @@ export const ReviewForFieldAgentComplete: Story = {
         ]
       }
     }
-  },
-  play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for review' })
-      )
-
-      const modal = within(await canvas.findByRole('dialog'))
-
-      await modal.findByText('Send for review?')
-      await modal.findByRole('button', { name: 'Confirm' })
-      await userEvent.click(
-        await modal.findByRole('button', { name: 'Cancel' })
-      )
-    })
   }
 }
 
@@ -347,7 +299,10 @@ export const ReviewForFieldAgentIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]

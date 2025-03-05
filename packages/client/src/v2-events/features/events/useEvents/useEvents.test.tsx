@@ -57,6 +57,7 @@ const createHandler = trpcHandler(async ({ request }) => {
   return HttpResponse.json({
     type: 'TENNIS_CLUB_MEMBERSHIP',
     id: '_REAL_UUID_',
+    trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
@@ -163,7 +164,8 @@ describe('events that have unsynced actions', () => {
   }) => {
     server.use(http.post('/api/events/event.create', errorHandler))
 
-    createEventHook.result.current.mutate({
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await createEventHook.result.current.mutate({
       type: 'TENNIS_CLUB_MEMBERSHIP',
       transactionId: '_TEST_TRANSACTION_'
     })

@@ -49,7 +49,10 @@ export async function getEventById(id: string) {
   const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne({ id: id })
+  const event = await collection.findOne<Omit<EventDocument, '_id'>>(
+    { id: id },
+    { projection: { _id: 0 } }
+  )
 
   if (!event) {
     throw new EventNotFoundError(id)
@@ -120,6 +123,20 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
+const TRACKING_ID_LENGTH = 6
+const TRACKING_ID_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+function generateTrackingId(): string {
+  let result = ''
+  for (let i = 0; i < TRACKING_ID_LENGTH; i++) {
+    const randomIndex = Math.floor(
+      Math.random() * TRACKING_ID_CHARACTERS.length
+    )
+    result += TRACKING_ID_CHARACTERS[randomIndex]
+  }
+  return result
+}
+
 type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
 export async function createEvent({
   eventInput,
@@ -143,6 +160,7 @@ export async function createEvent({
 
   const now = new Date().toISOString()
   const id = getUUID()
+  const trackingId = generateTrackingId()
 
   await collection.insertOne({
     ...eventInput,
@@ -150,6 +168,7 @@ export async function createEvent({
     transactionId,
     createdAt: now,
     updatedAt: now,
+    trackingId,
     actions: [
       {
         type: ActionType.CREATE,

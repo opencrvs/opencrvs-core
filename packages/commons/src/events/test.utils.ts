@@ -10,6 +10,7 @@
  */
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
+import { ActionBase, ActionDocument } from './ActionDocument'
 import {
   DeclareActionInput,
   RegisterActionInput,
@@ -18,9 +19,10 @@ import {
 } from './ActionInput'
 import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
+import { EventDocument } from './EventDocument'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
-import { findActiveActionFields, stripHiddenOrDisabledFields } from './utils'
+import { findActiveActionFields, stripHiddenFields } from './utils'
 
 export function generateActionInput(
   configuration: EventConfig,
@@ -38,7 +40,7 @@ export function generateActionInput(
 
   // Strip away hidden or disabled fields from mock action data
   // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-  return stripHiddenOrDisabledFields(action, configuration, data)
+  return stripHiddenFields(fields, data)
 }
 
 export const eventPayloadGenerator = {
@@ -153,5 +155,76 @@ export const eventPayloadGenerator = {
         requestId
       })
     }
+  }
+}
+
+function generateActionDocument({
+  configuration,
+  action
+}: {
+  configuration: EventConfig
+  action: ActionType
+}): ActionDocument {
+  const actionBase = {
+    createdAt: new Date().toISOString(),
+    createdBy: getUUID(),
+    draft: false,
+    id: getUUID(),
+    createdAtLocation: 'TODO',
+    data: generateActionInput(configuration, action),
+    metadata: {}
+  } satisfies ActionBase
+
+  switch (action) {
+    case ActionType.DECLARE:
+      return { ...actionBase, type: action }
+    case ActionType.UNASSIGN:
+      return { ...actionBase, type: action }
+    case ActionType.ASSIGN:
+      return { ...actionBase, assignedTo: getUUID(), type: action }
+    case ActionType.VALIDATE:
+      return { ...actionBase, type: action }
+    case ActionType.CREATE:
+      return { ...actionBase, type: action }
+    case ActionType.NOTIFY:
+      return { ...actionBase, type: action }
+    case ActionType.PRINT_CERTIFICATE:
+      return { ...actionBase, type: action }
+    case ActionType.REQUEST_CORRECTION:
+      return { ...actionBase, type: action }
+    case ActionType.APPROVE_CORRECTION:
+      return { ...actionBase, requestId: getUUID(), type: action }
+    case ActionType.REJECT_CORRECTION:
+      return { ...actionBase, requestId: getUUID(), type: action }
+    case ActionType.CUSTOM:
+      return { ...actionBase, type: action }
+    case ActionType.REGISTER:
+      return {
+        ...actionBase,
+        type: action,
+        identifiers: { trackingId: getUUID(), registrationNumber: getUUID() }
+      }
+
+    default:
+      throw new Error(`Unsupported action type: ${action}`)
+  }
+}
+
+export function generateEventDocument({
+  configuration,
+  actions
+}: {
+  configuration: EventConfig
+  actions: ActionType[]
+}): EventDocument {
+  return {
+    trackingId: getUUID(),
+    type: configuration.id,
+    actions: actions.map((action) =>
+      generateActionDocument({ configuration, action })
+    ),
+    createdAt: new Date().toISOString(),
+    id: getUUID(),
+    updatedAt: new Date().toISOString()
   }
 }

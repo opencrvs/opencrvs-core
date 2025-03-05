@@ -24,7 +24,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 const messages = defineMessages({
   title: {
@@ -103,12 +102,12 @@ export function Onboarding() {
     >
       <PagesComponent
         // @TODO: Use subscription if needed
+        continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         form={correctionRequestData.getFormValues()}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={correctionRequestData.setFormValues}
         showReviewButton={false}
-        submitButtonText={intl.formatMessage(buttonMessages.continueButton)}
         onFormPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({

@@ -131,6 +131,16 @@ export function printPDF(template: PDFTemplate, declarationId: string) {
 }
 ```
 
+## Naming HTML attributes
+
+Use kebab-case for HTML attributes such as `id`, `data-testid`, etc.
+
+good:
+
+```
+<div id="event-menu" />
+```
+
 # Coding conventions, definition of done
 
 - When introducing a new `MessageDescriptor` create a new row in `client.csv`
