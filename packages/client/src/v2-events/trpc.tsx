@@ -27,7 +27,6 @@ import {
 } from '@trpc/tanstack-react-query'
 import React from 'react'
 import superjson from 'superjson'
-
 import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
 
@@ -87,10 +86,13 @@ function createIDBPersister(idbValidKey = 'reactQuery') {
 
 const persister = createIDBPersister()
 
-const trpcClient = getTrpcClient()
+export const trpcClient = getTrpcClient()
 
 export const queryClient = getQueryClient()
-export const utils = createTRPCOptionsProxy({ queryClient, client: trpcClient })
+export const trpcOptionsProxy = createTRPCOptionsProxy({
+  queryClient,
+  client: trpcClient
+})
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -107,6 +109,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
               if (error instanceof TRPCClientError && error.data?.httpStatus) {
                 return !error.data.httpStatus.toString().startsWith('4')
               }
+
               return true
             }
 
@@ -117,10 +120,11 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       onSuccess={async () => {
         await queryClient.resumePausedMutations()
 
-        queryClient
-          .getMutationCache()
-          .getAll()
-          .map(async (m) => m.continue())
+        const mutations = queryClient.getMutationCache().getAll()
+
+        for (const mutation of mutations) {
+          await mutation.continue()
+        }
       }}
     >
       <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>

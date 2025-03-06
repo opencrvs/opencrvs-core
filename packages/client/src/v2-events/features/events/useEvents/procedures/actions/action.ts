@@ -16,76 +16,40 @@ import {
   inferOutput
 } from '@trpc/tanstack-react-query'
 import {
-  ActionInput,
   ActionType,
-  EventDocument,
   findActiveActionFields,
-  getCurrentEventState,
   stripHiddenFields
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
-  invalidateEventsList,
-  setEventData,
-  setEventListData,
-  createTemporaryId,
-  waitUntilEventIsCreated,
-  findLocalEventData
+  findLocalEventData,
+  updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
-import { setMutationDefaults } from './utils'
-
-async function updateLocalEvent(updatedEvent: EventDocument) {
-  setEventData(updatedEvent.id, updatedEvent)
-  return invalidateEventsList()
-}
-
-function updateEventOptimistically<T extends ActionInput>(
-  actionType: 'DECLARE'
-) {
-  return (variables: T) => {
-    const localEvent = queryClient.getQueryData(
-      trpcOptionsProxy.event.get.queryKey(variables.eventId)
-    )
-    if (!localEvent) {
-      return
-    }
-    const optimisticEvent: EventDocument = {
-      ...localEvent,
-      actions: [
-        ...localEvent.actions,
-        {
-          id: createTemporaryId(),
-          type: actionType,
-          data: variables.data,
-          createdAt: new Date().toISOString(),
-          createdBy: '@todo',
-          createdAtLocation: '@todo'
-        }
-      ]
-    }
-
-    setEventListData((eventIndices) =>
-      eventIndices
-        ?.filter((ei) => ei.id !== optimisticEvent.id)
-        .concat(getCurrentEventState(optimisticEvent))
-    )
-  }
-}
+import * as customApi from '@client/v2-events/custom-api'
+import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
+import {
+  waitUntilEventIsCreated,
+  setMutationDefaults
+} from '@client/v2-events/features/events/useEvents/procedures/utils'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare, {
-  mutationFn: createMutationFn(trpcOptionsProxy.event.actions.declare),
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.declare
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
-  onMutate: updateEventOptimistically('DECLARE'),
+  onMutate: updateEventOptimistically(ActionType.DECLARE),
   meta: {
     actionType: ActionType.DECLARE
   }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.register, {
-  mutationFn: createMutationFn(trpcOptionsProxy.event.actions.register),
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.register
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -95,7 +59,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.notify, {
-  mutationFn: createMutationFn(trpcOptionsProxy.event.actions.notify),
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.notify
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -105,7 +71,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.validate, {
-  mutationFn: createMutationFn(trpcOptionsProxy.event.actions.validate),
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.validate
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -115,7 +83,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate, {
-  mutationFn: createMutationFn(trpcOptionsProxy.event.actions.printCertificate),
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.printCertificate
+  ),
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
@@ -125,7 +95,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
-  mutationFn: createMutationFn(
+  mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.request
   ),
   retry: true,
@@ -137,7 +107,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve, {
-  mutationFn: createMutationFn(
+  mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.approve
   ),
   retry: true,
@@ -149,7 +119,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
-  mutationFn: createMutationFn(
+  mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.reject
   ),
   retry: true,
@@ -159,16 +129,36 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
     actionType: ActionType.REJECT_CORRECTION
   }
 })
+
+export const customMutationKeys = {
+  validateOnDeclare: ['validateOnDeclare'],
+  registerOnDeclare: ['registerOnDeclare']
+} as const
+
+queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
+  mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent
+})
+
+queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
+  mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent
+})
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createMutationFn<P extends DecorateMutationProcedure<any>>(
-  procedure: P
+function createEventActionMutationFn<P extends DecorateMutationProcedure<any>>(
+  trpcProcedure: P
 ) {
   /*
    * Merge default tRPC mutationOptions with the ones provided above
    */
   const mutationOptions = {
-    ...procedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(procedure.mutationKey())
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
   }
 
   if (!mutationOptions.mutationFn) {
@@ -197,25 +187,31 @@ function createMutationFn<P extends DecorateMutationProcedure<any>>(
  * 2. Strips away all fields that should not be part of the payload based on the conditions in the form fields.
  *
  * @template P - The type of the tRPC mutation procedure.
- * @param {P} procedure - The tRPC mutation procedure to be wrapped.
+ * @param {P} trpcProcedure - The tRPC mutation procedure to be wrapped.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useEventAction<P extends DecorateMutationProcedure<any>>(
-  procedure: P
+  trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
 
   const allOptions = {
-    ...procedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(procedure.mutationKey())
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
   }
 
+  // mutationFn will be removed at this stage to ensure it has been specified in a serializable manner under /procedures. This ensures early error detection
+  // without explicitly testing offline functionality.
   const { mutationFn, ...mutationOptions } = allOptions
 
   const actionType = mutationOptions.meta?.actionType as ActionType | undefined
 
   if (!actionType) {
-    throw new Error('No event action type found. This should never happen')
+    throw new Error(
+      `No event action type found. This should never happen, ${JSON.stringify(
+        mutationOptions
+      )}`
+    )
   }
 
   const mutation = useMutation({
@@ -233,8 +229,40 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
       }
-
       const fields = findActiveActionFields(eventConfiguration, actionType)
+
+      return mutation.mutate({
+        ...params,
+        data: stripHiddenFields(fields, params.data)
+      })
+    }
+  }
+}
+
+export function useEventCustomAction(mutationKey: string[]) {
+  const eventConfigurations = useEventConfigurations()
+  const mutation = useMutation(queryClient.getMutationDefaults(mutationKey))
+
+  return {
+    mutate: (params: customApi.OnDeclareParams) => {
+      const localEvent = findLocalEventData(params.eventId)
+
+      const eventConfiguration = eventConfigurations.find(
+        (event) => event.id === localEvent?.type
+      )
+
+      if (!eventConfiguration) {
+        throw new Error('Event configuration not found')
+      }
+
+      /**
+       * @TODO: In the future all of these forms should be the same 'primary' declare form.
+       * When that is done, we can shouldn't need the action type explicitly here.
+       */
+      const fields = findActiveActionFields(
+        eventConfiguration,
+        ActionType.DECLARE
+      )
 
       return mutation.mutate({
         ...params,
