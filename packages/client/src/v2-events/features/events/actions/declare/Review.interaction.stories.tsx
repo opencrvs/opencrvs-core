@@ -110,10 +110,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           tRPCMsw.event.create.mutation(() => {
             callTracker.localRegistrar['event.create']++
 
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.actions.declare.mutation(() => {
             callTracker.localRegistrar['event.actions.declare']++
@@ -235,10 +232,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           tRPCMsw.event.create.mutation(() => {
             callTracker.registrationAgent['event.create']++
 
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.actions.declare.mutation(() => {
             callTracker.registrationAgent['event.actions.declare']++
@@ -357,10 +351,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
           tRPCMsw.event.create.mutation(() => {
             callTracker.fieldAgent['event.create']++
 
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.actions.declare.mutation(() => {
             callTracker.fieldAgent['event.actions.declare']++
