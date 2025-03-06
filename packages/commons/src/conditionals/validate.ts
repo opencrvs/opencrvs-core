@@ -20,6 +20,7 @@ import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
+import { ConditionalType } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true
@@ -43,30 +44,35 @@ function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
-export function isFieldHidden(
+function isFieldConditionMet(
   field: FieldConfig,
-  params: ConditionalParameters
+  form: ActionFormData,
+  conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
 ) {
-  const hasShowRule = (field.conditionals ?? []).some(
-    (conditional) => conditional.type === 'SHOW'
+  const hasRule = (field.conditionals ?? []).some(
+    (conditional) => conditional.type === conditionalType
   )
-  const validConditionals = getConditionalActionsForField(field, params)
 
-  const isVisible = !hasShowRule || validConditionals.includes('SHOW')
+  if (!hasRule) {
+    return true
+  }
 
-  return !isVisible
+  const validConditionals = getConditionalActionsForField(field, {
+    $form: form,
+    $now: formatISO(new Date(), {
+      representation: 'date'
+    })
+  })
+
+  return validConditionals.includes(conditionalType)
 }
 
-export function isFieldDisabled(
-  field: FieldConfig,
-  params: ConditionalParameters
-) {
-  const hasEnableRule = (field.conditionals ?? []).some(
-    (conditional) => conditional.type === 'ENABLE'
-  )
-  const validConditionals = getConditionalActionsForField(field, params)
-  const isEnabled = !hasEnableRule || validConditionals.includes('ENABLE')
-  return !isEnabled
+export function isFieldVisible(field: FieldConfig, form: ActionFormData) {
+  return isFieldConditionMet(field, form, ConditionalType.SHOW)
+}
+
+export function isFieldEnabled(field: FieldConfig, form: ActionFormData) {
+  return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
 
 /**
@@ -148,6 +154,7 @@ export function getFieldValidationErrors({
   field,
   values
 }: {
+  // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
   field: FieldConfig
   values: ActionFormData
 }) {
@@ -156,10 +163,7 @@ export function getFieldValidationErrors({
     $now: formatISO(new Date(), { representation: 'date' })
   }
 
-  if (
-    isFieldHidden(field, conditionalParameters) ||
-    isFieldDisabled(field, conditionalParameters)
-  ) {
+  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
     if (values[field.id]) {
       return {
         errors: [
