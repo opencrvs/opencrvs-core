@@ -21,8 +21,11 @@ import {
   inferOutput
 } from '@trpc/tanstack-react-query'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
-import { RequireKey, isTemporaryId } from '@client/v2-events/utils'
-import { findLocalEventData } from '@client/v2-events/features/events/useEvents/api'
+import { RequireKey } from '@client/v2-events/utils'
+import {
+  findLocalEventData,
+  isTemporaryId
+} from '@client/v2-events/features/events/useEvents/api'
 
 export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   canonicalMutationFn: (params: T) => Promise<R>

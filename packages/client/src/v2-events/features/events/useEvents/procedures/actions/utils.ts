@@ -16,9 +16,11 @@ import {
   EventDocument,
   getCurrentEventState
 } from '@opencrvs/commons/client'
-import { setEventListData } from '@client/v2-events/features/events/useEvents/api'
+import {
+  createTemporaryId,
+  setEventListData
+} from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
-import { createTemporaryId } from '@client/v2-events/utils'
 
 /*
  * This makes sure that if you are offline and do
