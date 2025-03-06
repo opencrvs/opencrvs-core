@@ -13,6 +13,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { v4 as uuid } from 'uuid'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
@@ -23,18 +24,22 @@ export function ValidateEvent() {
   const events = useEvents()
   const validateEvent = events.actions.validate
 
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
+
+  const latestEvent = getCurrentEventState(event)
+
   const transactionId = uuid()
 
   useEffect(() => {
     validateEvent.mutate({
       eventId,
-      data: {},
+      data: latestEvent.data,
       transactionId,
       duplicates: []
     })
     navigate(ROUTES.V2.path)
-    // If you add deleteEvent to the dependencies, it will cause the delete
-    // to be called >1 times. This is because the deleteEvent contains updating data fields describing
+    // If you add validateEvent to the dependencies, it will cause the action
+    // to be called >1 times. This is because the validateEvent contains updating data fields describing
     // the state of the request
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

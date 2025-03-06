@@ -26,7 +26,7 @@ export const eventHistoryStatusMessage = {
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'v2.event.history.timeFormat',
+    id: 'v2.configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   }
 })

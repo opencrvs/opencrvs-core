@@ -164,7 +164,8 @@ describe('events that have unsynced actions', () => {
   }) => {
     server.use(http.post('/api/events/event.create', errorHandler))
 
-    createEventHook.result.current.mutate({
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await createEventHook.result.current.mutate({
       type: 'TENNIS_CLUB_MEMBERSHIP',
       transactionId: '_TEST_TRANSACTION_'
     })

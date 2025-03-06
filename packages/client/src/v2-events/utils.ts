@@ -8,8 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import { v4 as uuid } from 'uuid'
 import { uniq, isString, get, mapKeys } from 'lodash'
+
 import { IntlShape } from 'react-intl'
 import {
   ResolvedUser,
@@ -78,6 +79,14 @@ export const getAllUniqueFields = (currentEvent: EventConfig) => {
   ]
 }
 
+export function isTemporaryId(id: string) {
+  return id.startsWith('tmp-')
+}
+
+export function createTemporaryId() {
+  return `tmp-${uuid()}`
+}
+
 export function flattenEventIndex(
   event: EventIndex
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -104,3 +113,5 @@ export function getEventTitle({
     ...flattenEventIndex(event)
   })
 }
+
+export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
