@@ -133,14 +133,30 @@ export function getCurrentEventStateWithDrafts(
     .filter(
       ({ createdAt }) => new Date(createdAt) > new Date(lastAction.createdAt)
     )
-    .map((draft) => draft.action as ActionDocument)
+    .map((draft) => draft.action)
+    .flatMap((action) => {
+      /*
+       * If the action encountered is "REQUEST_CORRECTION", we want to pretend like it was approved
+       * so previews etc are shown correctly
+       */
+      if (action.type === ActionType.REQUEST_CORRECTION) {
+        return [
+          action,
+          {
+            ...action,
+            type: ActionType.APPROVE_CORRECTION
+          }
+        ]
+      }
+      return [action]
+    })
 
   const actionWithDrafts = [...actions, ...activeDrafts].sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   )
   const withDrafts: EventDocument = {
     ...event,
-    actions: actionWithDrafts
+    actions: actionWithDrafts as ActionDocument[]
   }
 
   return getCurrentEventState(withDrafts)

@@ -8,18 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { createTemporaryId } from '@client/v2-events/features/events/useEvents/api'
+import { ROUTES } from '@client/v2-events/routes'
+import { AppRouter } from '@client/v2-events/trpc'
+import { ActionType } from '@opencrvs/commons/client'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { ROUTES } from '@client/v2-events/routes'
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter } from '@client/v2-events/trpc'
-import { router } from './router'
-import { useCorrectionRequestData } from './useCorrectionRequestData'
 import * as Request from './index'
+import { router } from './router'
 
 const meta: Meta<typeof Request.Pages> = {
   title: 'CorrectionRequest'
@@ -38,18 +39,29 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 function FormClear() {
-  const form = useEventFormData()
-  const requestDetails = useCorrectionRequestData()
+  const drafts = useDrafts()
   useEffect(() => {
-    form.setFormValues(tennisClueMembershipEventDocument.id, {
-      'applicant.firstname': 'Max',
-      'applicant.surname': 'McLaren',
-      'applicant.dob': '2020-01-02',
-      'recommender.none': true
-    })
-    requestDetails.setFormValues({
-      'correction.requester.relationship': 'ANOTHER_AGENT',
-      'correction.request.reason': "Child's name was incorrect"
+    drafts.setLocalDraft({
+      id: createTemporaryId(),
+      eventId: tennisClueMembershipEventDocument.id,
+      createdAt: new Date().toISOString(),
+      transactionId: createTemporaryId(),
+      action: {
+        type: ActionType.REQUEST_CORRECTION,
+        data: {
+          'applicant.firstname': 'Max',
+          'applicant.surname': 'McLaren',
+          'applicant.dob': '2020-01-02',
+          'recommender.none': true
+        },
+        metadata: {
+          'correction.requester.relationship': 'ANOTHER_AGENT',
+          'correction.request.reason': "Child's name was incorrect"
+        },
+        createdAt: new Date().toISOString(),
+        createdBy: '',
+        createdAtLocation: ''
+      }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
