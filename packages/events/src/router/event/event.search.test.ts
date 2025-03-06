@@ -79,7 +79,7 @@ test('Returns list of events matching applicant text field criteria', async () =
   }
 
   const record_3 = {
-    'applicant.firstname': 'Johnson',
+    'applicant.firstname': 'Johnson', // different first name than previous records
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
@@ -123,7 +123,7 @@ test('Returns list of events matching applicant text field criteria', async () =
   expect(fetchedEvents).toHaveLength(2)
 })
 
-test.only('Returns list of events matching applicant date field criteria', async () => {
+test('Returns list of events matching applicant date field criteria', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -144,7 +144,7 @@ test.only('Returns list of events matching applicant date field criteria', async
   const record_2 = {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'applicant.dob': '2000-01-12',
+    'applicant.dob': '2000-01-12', // different dob
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -176,5 +176,60 @@ test.only('Returns list of events matching applicant date field criteria', async
 
   const fetchedEvents = await client.event.search(searchCriteria)
 
+  expect(fetchedEvents).toHaveLength(1)
+})
+
+test('Returns empty list of events by searching with similar dob', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const record_1 = {
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'applicant.dob': '2024-11-11',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const record_2 = {
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'applicant.dob': '2024-12-12',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const event_1 = await client.event.create(generator.event.create())
+  const event_2 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare(
+    generator.event.actions.declare(event_1.id, {
+      data: record_1
+    })
+  )
+  await client.event.actions.declare(
+    generator.event.actions.declare(event_2.id, {
+      data: record_2
+    })
+  )
+
+  const searchCriteria = {
+    'applicant.dob': '1999-11-11', // search with same day and month
+    type: 'TENNIS_CLUB_MEMBERSHIP'
+  }
+
+  const fetchedEvents = await client.event.search(searchCriteria)
   expect(fetchedEvents).toHaveLength(1)
 })
