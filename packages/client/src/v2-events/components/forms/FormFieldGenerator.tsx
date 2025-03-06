@@ -78,7 +78,7 @@ import { File } from './inputs/FileInput/FileInput'
 import {
   BulletList,
   Checkbox,
-  Date as DateField,
+  DateField,
   RadioGroup,
   LocationSearch,
   Select,

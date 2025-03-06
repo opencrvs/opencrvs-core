@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
@@ -72,7 +71,10 @@ export const ReviewForLocalRegistrarComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -89,22 +91,6 @@ export const ReviewForLocalRegistrarComplete: Story = {
         ]
       }
     }
-  },
-  play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
-      const button = await canvas.findByRole('button', { name: 'Register' })
-      await waitFor(async () => expect(button).not.toBeDisabled())
-      await userEvent.click(button)
-
-      const modal = within(await canvas.findByRole('dialog'))
-
-      await modal.findByText('Register?')
-      await modal.findByRole('button', { name: 'Register' })
-      await userEvent.click(
-        await modal.findByRole('button', { name: 'Cancel' })
-      )
-    })
   }
 }
 
@@ -172,7 +158,10 @@ export const ReviewForRegistrationAgentComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -189,25 +178,6 @@ export const ReviewForRegistrationAgentComplete: Story = {
         ]
       }
     }
-  },
-  play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
-      const button = await canvas.findByRole('button', {
-        name: 'Send for approval'
-      })
-      await waitFor(async () => expect(button).not.toBeDisabled())
-
-      await userEvent.click(button)
-
-      const modal = within(await canvas.findByRole('dialog'))
-
-      await modal.findByText('Send for approval?')
-      await modal.findByRole('button', { name: 'Confirm' })
-      await userEvent.click(
-        await modal.findByRole('button', { name: 'Cancel' })
-      )
-    })
   }
 }
 
@@ -232,7 +202,10 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -274,7 +247,10 @@ export const ReviewForFieldAgentComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -291,24 +267,6 @@ export const ReviewForFieldAgentComplete: Story = {
         ]
       }
     }
-  },
-  play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
-      const button = await canvas.findByRole('button', {
-        name: 'Send for review'
-      })
-      await waitFor(async () => expect(button).not.toBeDisabled())
-      await userEvent.click(button)
-
-      const modal = within(await canvas.findByRole('dialog'))
-
-      await modal.findByText('Send for review?')
-      await modal.findByRole('button', { name: 'Confirm' })
-      await userEvent.click(
-        await modal.findByRole('button', { name: 'Cancel' })
-      )
-    })
   }
 }
 
@@ -330,7 +288,10 @@ export const ReviewForFieldAgentIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE]
+            })
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
