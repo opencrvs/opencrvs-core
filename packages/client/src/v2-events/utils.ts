@@ -79,14 +79,6 @@ export const getAllUniqueFields = (currentEvent: EventConfig) => {
   ]
 }
 
-export function isTemporaryId(id: string) {
-  return id.startsWith('tmp-')
-}
-
-export function createTemporaryId() {
-  return `tmp-${uuid()}`
-}
-
 export function flattenEventIndex(
   event: EventIndex
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
