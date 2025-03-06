@@ -67,10 +67,10 @@ async function cacheOfficeCount(authHeader: IAuthHeader) {
   ])
   locations.forEach(({ id }) => (OFFICE_COUNT_CACHE[id] = -1))
   const locationsMap = locations.reduce<LocationsMap>(
-    (locationsMap, location) => ({
-      ...locationsMap,
-      [location.id]: location
-    }),
+    (locationsMap, location) => {
+      locationsMap[location.id] = location
+      return locationsMap
+    },
     {}
   )
   const adjacency: Record<string, string[] | undefined> = {}
