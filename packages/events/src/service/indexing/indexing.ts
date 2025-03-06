@@ -138,9 +138,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.NUMBER:
       return { type: 'double' }
     case FieldType.DATE:
-      // @TODO: This should be changed back to 'date'
-      // When we have proper validation of custom fields.
-      return { type: 'text' }
+      return { type: 'date' }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.SIGNATURE:
