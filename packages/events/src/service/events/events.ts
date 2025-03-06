@@ -233,10 +233,11 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVED && input.metadata?.isDuplicate) {
+    input.transactionId = getUUID()
     await db.collection<EventDocument>('events').updateOne(
       {
         id: eventId,
-        'actions.transactionId': { $ne: transactionId }
+        'actions.transactionId': { $nin: [transactionId, input.transactionId] }
       },
       {
         $push: {
@@ -255,12 +256,13 @@ export async function addAction(
         }
       }
     )
+    input.transactionId = transactionId
   }
 
   await db.collection<EventDocument>('events').updateOne(
     {
       id: eventId,
-      'actions.transactionId': { $ne: getUUID() }
+      'actions.transactionId': { $ne: transactionId }
     },
     {
       $push: {
