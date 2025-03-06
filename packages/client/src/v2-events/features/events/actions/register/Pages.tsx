@@ -15,7 +15,6 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { v4 as uuid } from 'uuid'
 import { ActionType } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'

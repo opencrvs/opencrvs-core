@@ -12,11 +12,15 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { useTRPC } from '@client/v2-events/trpc'
+import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
-import { useEventAction } from './procedures/action'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
-import { useGetEvent } from './procedures/get'
+import {
+  customMutationKeys,
+  useEventAction,
+  useEventCustomAction
+} from './procedures/actions/action'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -50,6 +54,14 @@ export function useEvents() {
         approve: useEventAction(trpc.event.actions.correction.approve),
         reject: useEventAction(trpc.event.actions.correction.reject)
       }
+    },
+    customActions: {
+      registerOnDeclare: useEventCustomAction([
+        ...customMutationKeys.registerOnDeclare
+      ]),
+      validateOnDeclare: useEventCustomAction([
+        ...customMutationKeys.validateOnDeclare
+      ])
     }
   }
 }

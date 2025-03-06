@@ -18,25 +18,26 @@ import {
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { Draft } from '@opencrvs/commons/client'
-import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
+import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import {
   createTemporaryId,
   invalidateEventsList,
-  setMutationDefaults,
   waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/api'
 import { storage } from '@client/storage'
+import { setMutationDefaults } from '@client/v2-events/features/events/useEvents/procedures/utils'
 
 // This directly manipulates React query state
 function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
-  return queryClient.setQueryData(utils.event.draft.list.queryKey(), (drafts) =>
-    updater(drafts || [])
+  return queryClient.setQueryData(
+    trpcOptionsProxy.event.draft.list.queryKey(),
+    (drafts) => updater(drafts || [])
   )
 }
 
 async function invalidateDraftsList() {
   return queryClient.invalidateQueries({
-    queryKey: utils.event.draft.list.queryKey()
+    queryKey: trpcOptionsProxy.event.draft.list.queryKey()
   })
 }
 
@@ -63,10 +64,7 @@ const useLocalDrafts = create<DraftStore>()(
       name: 'local-drafts',
       storage: createJSONStorage(() => ({
         getItem: async (key) => {
-          console.log('Im loading now')
-
           const data = await storage.getItem(key)
-          console.log('This was in the store', data)
           return data
         },
         setItem: async (key, value) => {
@@ -110,9 +108,9 @@ function createMutationFn<P extends DecorateMutationProcedure<any>>(
   )
 }
 
-setMutationDefaults(utils.event.draft.create, {
+setMutationDefaults(trpcOptionsProxy.event.draft.create, {
   retry: true,
-  mutationFn: createMutationFn(utils.event.draft.create),
+  mutationFn: createMutationFn(trpcOptionsProxy.event.draft.create),
   onMutate: (variables) => {
     const optimisticDraft: Draft = {
       id: createTemporaryId(),
@@ -136,11 +134,13 @@ setMutationDefaults(utils.event.draft.create, {
 })
 
 export function useCreateDraft() {
-  const options = utils.event.draft.create.mutationOptions()
+  const options = trpcOptionsProxy.event.draft.create.mutationOptions()
 
   return useMutation({
     ...options,
-    ...queryClient.getMutationDefaults(utils.event.draft.create.mutationKey())
+    ...queryClient.getMutationDefaults(
+      trpcOptionsProxy.event.draft.create.mutationKey()
+    )
   })
 }
 
@@ -154,10 +154,7 @@ export function useDrafts() {
   const localDraft = useLocalDrafts((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
   return {
-    // create: useCreateDraft(),
     setLocalDraft: (draft: Draft | null) => {
-      console.log('Set draft', draft?.action.data)
-
       setDraft(draft)
     },
     getLocalDraftOrDefault: getLocalDraftOrDefault,
@@ -165,13 +162,6 @@ export function useDrafts() {
       if (!localDraft) {
         throw new Error('No draft to submit')
       }
-      console.log('Submit', {
-        eventId: localDraft.eventId,
-        data: localDraft.action.data,
-        transactionId: localDraft.transactionId,
-        type: localDraft.action.type,
-        createdAt: new Date().toISOString()
-      })
 
       createDraft.mutate({
         eventId: localDraft.eventId,

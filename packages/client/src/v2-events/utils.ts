@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { uniq, isString, get, mapKeys } from 'lodash'
+
 import { IntlShape } from 'react-intl'
 import {
   ResolvedUser,
@@ -104,3 +104,5 @@ export function getEventTitle({
     ...flattenEventIndex(event)
   })
 }
+
+export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>

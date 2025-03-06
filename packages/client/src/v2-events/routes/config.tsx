@@ -21,7 +21,7 @@ import * as PrintCertificate from '@client/v2-events/features/events/actions/pri
 import * as Register from '@client/v2-events/features/events/actions/register'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
 import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
-import { EventSelection } from '@client/v2-events/features/events/EventSelection'
+import { EventSelectionIndex } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { EventOverviewLayout } from '@client/v2-events/layouts'
@@ -58,7 +58,7 @@ export const routesConfig = {
     },
     {
       path: ROUTES.V2.EVENTS.CREATE.path,
-      element: <EventSelection />
+      element: <EventSelectionIndex />
     },
     {
       path: ROUTES.V2.EVENTS.DELETE.path,

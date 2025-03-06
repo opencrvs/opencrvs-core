@@ -16,7 +16,7 @@ import { EventDocument } from '@opencrvs/commons'
 import { isUndeclaredDraft } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useDrafts } from '../drafts/useDrafts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEvents } from './useEvents/useEvents'
 
 const modalMessages = defineMessages({

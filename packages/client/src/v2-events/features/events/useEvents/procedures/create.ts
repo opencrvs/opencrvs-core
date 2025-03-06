@@ -10,19 +10,54 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
+import {
+  DecorateMutationProcedure,
+  inferInput
+} from '@trpc/tanstack-react-query'
+import {
+  ActionType,
+  CreatedAction,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
 
-import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
 import {
   createTemporaryId,
   invalidateEventsList,
   setEventData,
-  setEventListData,
-  setMutationDefaults
+  setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
-import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
+import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 
-setMutationDefaults(utils.event.create, {
+import { setMutationDefaults } from './utils'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
+  trpcProcedure: P
+) {
+  const mutationOptions = {
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
+  }
+
+  if (!mutationOptions.mutationFn) {
+    throw new Error(
+      'No mutation fn found for operation. This should never happen'
+    )
+  }
+
+  const defaultMutationFn = mutationOptions.mutationFn
+
+  return async (params: inferInput<P>) =>
+    defaultMutationFn({
+      ...params,
+      data: params.data
+    })
+}
+
+setMutationDefaults(trpcOptionsProxy.event.create, {
   retry: true,
+  retryDelay: 1000,
+  mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
     const optimisticEvent = {
       id: newEvent.transactionId,
@@ -33,7 +68,7 @@ setMutationDefaults(utils.event.create, {
       updatedAt: new Date().toISOString(),
       actions: [
         {
-          type: 'CREATE',
+          type: ActionType.CREATE,
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
@@ -63,8 +98,9 @@ export function useCreateEvent() {
   }>()
 
   const overrides = queryClient.getMutationDefaults(
-    utils.event.create.mutationKey()
+    trpcOptionsProxy.event.create.mutationKey()
   )
+
   return useMutation({
     ...options,
     ...overrides

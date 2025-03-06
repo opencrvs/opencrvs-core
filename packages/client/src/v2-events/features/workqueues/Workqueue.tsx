@@ -47,9 +47,9 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 const messages = defineMessages({
   empty: {
@@ -109,7 +109,7 @@ export function WorkqueueContainer() {
   // @TODO: We need to revisit on how the workqueue id is passed.
   // We'll follow up during 'workqueue' feature.
   const workqueueId = 'all'
-  const { getEvents, actions } = useEvents()
+  const { getEvents } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const [events] = getEvents.useSuspenseQuery()

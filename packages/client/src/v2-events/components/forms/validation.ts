@@ -30,8 +30,7 @@ export interface Errors {
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: ActionFormData,
-  checkValidationErrorsOnly?: boolean
+  values: ActionFormData
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -44,13 +43,7 @@ export function getValidationErrorsForForm(
 
     return {
       ...errorsForAllFields,
-      [field.id]: getFieldValidationErrors({
-        field: {
-          ...field,
-          required: field.required && !checkValidationErrorsOnly
-        },
-        values
-      })
+      [field.id]: getFieldValidationErrors({ field, values })
     }
   }, {})
 }
