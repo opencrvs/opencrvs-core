@@ -11,10 +11,21 @@
 
 /* eslint-disable */
 import {
-  DateField,
+  DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
+import format from 'date-fns/format'
 import * as React from 'react'
+import { DateValue } from '@opencrvs/commons/client'
+import { defineMessages, useIntl } from 'react-intl'
+
+const messages = defineMessages({
+  dateFormat: {
+    defaultMessage: 'd MMMM y',
+    id: 'v2.configuration.dateFormat',
+    description: 'Default format for date values'
+  }
+})
 
 function DateInput({
   onChange,
@@ -24,14 +35,26 @@ function DateInput({
   onChange: (newValue: string) => void
   value?: string
 }) {
-  return <DateField {...props} value={value ?? ''} onChange={onChange} />
+  return (
+    <DateFieldComponent {...props} value={value ?? ''} onChange={onChange} />
+  )
 }
 
 function DateOutput({ value }: { value?: string }) {
+  const intl = useIntl()
+  const parsed = DateValue.safeParse(value)
+
+  if (parsed.success) {
+    return format(
+      new Date(parsed.data),
+      intl.formatMessage(messages.dateFormat)
+    )
+  }
+
   return value ?? ''
 }
 
-export const Date = {
+export const DateField = {
   Input: DateInput,
   Output: DateOutput
 }

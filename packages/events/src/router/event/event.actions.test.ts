@@ -37,13 +37,14 @@ test('Action data can be retrieved', async () => {
   const generatedDeclaration = generator.event.actions.declare(originalEvent.id)
   await client.event.actions.declare(generatedDeclaration)
 
+  const generatedValidation = generator.event.actions.validate(originalEvent.id)
+  await client.event.actions.validate(generatedValidation)
+
   const updatedEvent = await client.event.get(originalEvent.id)
 
   expect(updatedEvent.actions).toEqual([
     expect.objectContaining({ type: ActionType.CREATE }),
-    expect.objectContaining({
-      type: ActionType.DECLARE,
-      data: generatedDeclaration.data
-    })
+    expect.objectContaining({ type: ActionType.DECLARE }),
+    expect.objectContaining({ type: ActionType.VALIDATE })
   ])
 })

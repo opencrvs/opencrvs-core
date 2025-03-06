@@ -8,13 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   FieldConfig,
   Inferred,
-  FieldValue,
-  isFieldHidden
+  FieldValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 
@@ -38,15 +36,6 @@ export function handleDefaultValue(
   }
 
   return defaultValue
-}
-
-export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return !isFieldHidden(field, {
-    $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
-    })
-  })
 }
 
 export function evalExpressionInFieldDefinition(

@@ -158,6 +158,11 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
     case FieldType.CHECKBOX:
       return true
     case FieldType.FILE:
+      return {
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+        originalFilename: 'abcd.png',
+        type: 'image/png'
+      } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return null
   }
