@@ -19,9 +19,8 @@ import { fetchFromHearth } from '@config/services/hearth'
 import { MongoClient } from 'mongodb'
 import { env } from '@config/environment'
 
-const client = new MongoClient(env.HEARTH_MONGO_URL)
-
 export const resolveLocationChildren = async (id: UUID) => {
+  const client = new MongoClient(HEARTH_MONGO_URL)
   try {
     const connectedClient = await client.connect()
     const db = connectedClient.db()
@@ -37,6 +36,15 @@ export const resolveLocationChildren = async (id: UUID) => {
           connectFromField: 'id',
           connectToField: 'partOf.reference',
           as: 'children'
+        }
+      },
+      {
+        $project: {
+          children: {
+            id: 1,
+            name: 1,
+            type: 1
+          }
         }
       }
     ]
