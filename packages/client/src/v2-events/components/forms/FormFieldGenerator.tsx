@@ -206,7 +206,12 @@ const GeneratedInputField = React.memo(
           <DateField.Input
             {...inputProps}
             value={field.value}
-            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+            onBlur={(val, e) => {
+              console.log('onBlur', fieldDefinition.id, val)
+              setFieldValue(fieldDefinition.id, val)
+              // TODO CIHAN: make this work
+              return inputProps.onBlur(e)
+            }}
           />
         </InputField>
       )

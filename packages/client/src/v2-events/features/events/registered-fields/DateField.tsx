@@ -12,10 +12,10 @@
 /* eslint-disable */
 import {
   DateField as DateFieldComponent,
-  IDateFieldProps as DateFieldProps
+  IDateFieldProps
 } from '@opencrvs/components/lib/DateField'
 import format from 'date-fns/format'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { DateValue } from '@opencrvs/commons/client'
 import { defineMessages, useIntl } from 'react-intl'
 
@@ -27,16 +27,24 @@ const messages = defineMessages({
   }
 })
 
-function DateInput({
-  onChange,
-  value,
-  ...props
-}: DateFieldProps & {
-  onChange: (newValue: string) => void
+type DateFieldProps = Omit<IDateFieldProps, 'onChange' | 'onBlur'> & {
+  onBlur: (value: string, e: React.FocusEvent<HTMLInputElement>) => void
   value?: string
-}) {
+}
+
+// TODO CIHAN: improve types?
+function DateInput({ value, onBlur, ...props }: DateFieldProps) {
+  const [date, setDate] = useState<string>(value ?? '')
+
   return (
-    <DateFieldComponent {...props} value={value ?? ''} onChange={onChange} />
+    <DateFieldComponent
+      {...props}
+      value={date}
+      onChange={setDate}
+      onBlur={(e) => {
+        return onBlur(date, e)
+      }}
+    />
   )
 }
 
