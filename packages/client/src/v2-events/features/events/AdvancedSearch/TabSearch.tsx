@@ -111,18 +111,12 @@ export function TabSearch({
     Record<string, FieldValue>
   >(fieldValues ?? {})
 
-  const [hasEnoughParams, setHasEnoughParams] = React.useState(
-    Object.entries(formValues).length > 0
-  )
+  const hasEnoughParams = Object.entries(formValues).length > 0
   const navigate = useNavigate()
 
   React.useEffect(() => {
     setFormValues({})
   }, [currentEvent])
-
-  React.useEffect(() => {
-    setHasEnoughParams(Object.entries(formValues).length > 0)
-  }, [formValues])
 
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
     setFormValues((prev) => ({

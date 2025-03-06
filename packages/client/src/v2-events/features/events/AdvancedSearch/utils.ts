@@ -30,7 +30,8 @@ export const getAdvancedSearchFieldErrors = (
 
       const modifiedFields = advancedSearchFields.map((f) => ({
         ...f,
-        required: false // advanced search fields need not be required
+        required: false, // advanced search fields need not be required
+        validation: formValues[f.id] ? f.validation : [] // need to validate fields only when they are not empty
       }))
 
       const err = getValidationErrorsForForm(modifiedFields, formValues)
