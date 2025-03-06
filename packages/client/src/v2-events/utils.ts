@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { v4 as uuid } from 'uuid'
 import { uniq, isString, get, mapKeys } from 'lodash'
 
 import { IntlShape } from 'react-intl'

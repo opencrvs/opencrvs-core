@@ -16,9 +16,7 @@
  */
 
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
 import { ActionFormData } from '@opencrvs/commons/client'
-import { storage } from '@client/storage'
 
 interface EventMetadata {
   metadata: ActionFormData

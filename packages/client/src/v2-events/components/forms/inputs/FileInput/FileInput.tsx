@@ -25,7 +25,7 @@ function FileInput(
     label?: string
   }
 ) {
-  const { value, onChange, name, description, allowedDocType } = props
+  const { value, onChange, name, description, allowedDocType, label } = props
 
   const [file, setFile] = React.useState(value)
 
@@ -51,7 +51,7 @@ function FileInput(
       description={description}
       error={''}
       file={file}
-      label={props.label ?? file?.originalFilename}
+      label={label ?? file?.originalFilename}
       name={name}
       onComplete={(newFile) => {
         if (newFile) {

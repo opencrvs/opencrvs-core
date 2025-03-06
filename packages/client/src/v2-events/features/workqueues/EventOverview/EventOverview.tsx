@@ -72,6 +72,7 @@ function EventOverviewContainer() {
   if (!config) {
     return null
   }
+
   if (!event) {
     return null
   }

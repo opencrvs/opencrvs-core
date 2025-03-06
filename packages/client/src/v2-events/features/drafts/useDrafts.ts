@@ -64,10 +64,7 @@ const useLocalDrafts = create<DraftStore>()(
       name: 'local-drafts',
       storage: createJSONStorage(() => ({
         getItem: async (key) => {
-          console.log('Im loading now')
-
           const data = await storage.getItem(key)
-          console.log('This was in the store', data)
           return data
         },
         setItem: async (key, value) => {
@@ -158,8 +155,6 @@ export function useDrafts() {
   const createDraft = useCreateDraft()
   return {
     setLocalDraft: (draft: Draft | null) => {
-      console.log('Set draft', draft?.action.data)
-
       setDraft(draft)
     },
     getLocalDraftOrDefault: getLocalDraftOrDefault,
@@ -167,13 +162,6 @@ export function useDrafts() {
       if (!localDraft) {
         throw new Error('No draft to submit')
       }
-      console.log('Submit', {
-        eventId: localDraft.eventId,
-        data: localDraft.action.data,
-        transactionId: localDraft.transactionId,
-        type: localDraft.action.type,
-        createdAt: new Date().toISOString()
-      })
 
       createDraft.mutate({
         eventId: localDraft.eventId,
