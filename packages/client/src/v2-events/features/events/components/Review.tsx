@@ -842,7 +842,7 @@ export interface RejectionState {
   isDuplicate: boolean
 }
 
-export function RejectActionModal({
+function RejectActionModal({
   close
 }: {
   close: (result: RejectionState | null) => void
