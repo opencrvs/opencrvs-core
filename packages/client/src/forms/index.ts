@@ -69,6 +69,7 @@ export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 export const TIME = 'TIME'
+export const TIME_AMPM = 'TIME_AMPM'
 export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
 export const DIVIDER = 'DIVIDER'
 export const HEADING3 = 'HEADING3'
@@ -716,6 +717,13 @@ export interface ITimeFormFIeld extends IFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
 }
+
+export interface ITimeFormFieldAmPm extends IFormFieldBase {
+  type: typeof TIME_AMPM
+  ignorePlaceHolder?: boolean
+  is12Hr?: boolean
+}
+
 export interface INidVerificationButton extends IFormFieldBase {
   type: typeof NID_VERIFICATION_BUTTON
   labelForVerified: MessageDescriptor
@@ -790,6 +798,7 @@ export type IFormField =
   | ILocationSearchInputFormField
   | IDateRangePickerFormField
   | ITimeFormFIeld
+  | ITimeFormFieldAmPm
   | INidVerificationButton
   | IDividerFormField
   | ISignatureFormField
@@ -1260,6 +1269,12 @@ export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
   ignorePlaceHolder?: boolean
 }
 
+export interface Ii18nTimeFormFieldAmPm extends Ii18nFormFieldBase {
+  type: typeof TIME_AMPM
+  ignorePlaceHolder?: boolean
+  is12Hr?: boolean
+}
+
 export interface Ii18nSignatureField extends Ii18nFormFieldBase {
   type: typeof SIGNATURE
   maxSizeMb?: number
@@ -1325,6 +1340,7 @@ export type Ii18nFormField =
   | Ii18nLocationSearchInputFormField
   | Ii18nDateRangePickerFormField
   | Ii18nTimeFormField
+  | Ii18nTimeFormFieldAmPm
   | Ii18nNidVerificationButtonField
   | I18nDividerField
   | I18nHeading3Field

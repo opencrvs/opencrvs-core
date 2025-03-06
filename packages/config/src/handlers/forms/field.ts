@@ -106,6 +106,7 @@ const LocationSearchInputField = base.extend({
   type: z.literal('LOCATION_SEARCH_INPUT')
 })
 const TimeField = base.extend({ type: z.literal('TIME') })
+const TimeFieldAmPm = base.extend({ type: z.literal('TIME_AMPM') })
 const NidVerificationButtonField = base.extend({
   type: z.literal('NID_VERIFICATION_BUTTON')
 })
@@ -165,6 +166,7 @@ export const field = z.discriminatedUnion('type', [
   FetchButtonField,
   LocationSearchInputField,
   TimeField,
+  TimeFieldAmPm,
   NidVerificationButtonField,
   DividerField,
   Heading3Field,

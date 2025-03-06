@@ -16,6 +16,7 @@ import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { TimeField } from '@opencrvs/components/lib/TimeField'
+import { TimeFieldAmPm } from '@opencrvs/components/lib/TimeFieldAmPm'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
@@ -82,6 +83,7 @@ import {
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
   TIME,
+  TIME_AMPM,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton,
   DIVIDER,
@@ -444,6 +446,20 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </InputField>
       )
     }
+    if (fieldDefinition.type === TIME_AMPM) {
+      return (
+        <InputField {...inputFieldProps}>
+          <TimeFieldAmPm
+            {...inputProps}
+            ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+            is12Hr={fieldDefinition.is12Hr}
+            onChange={onChangeGroupInput}
+            value={value as string}
+          />
+        </InputField>
+      )
+    }
+
     if (fieldDefinition.type === DATE_RANGE_PICKER) {
       return (
         <InputField {...inputFieldProps}>
