@@ -133,7 +133,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
   retryDelay: 10000
 })
 
-export function useCreateDraft() {
+function useCreateDraft() {
   const options = trpcOptionsProxy.event.draft.create.mutationOptions()
 
   return useMutation({
