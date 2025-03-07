@@ -25,7 +25,7 @@ function FileInput(
     label?: string
   }
 ) {
-  const { label, value, onChange, name, description, allowedDocType } = props
+  const { value, onChange, name, description, allowedDocType, label } = props
 
   const [file, setFile] = React.useState(value)
 

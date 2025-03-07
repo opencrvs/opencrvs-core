@@ -9,20 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { userEvent, within, expect } from '@storybook/test'
+import {
+  Draft,
+  getCurrentEventState,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter } from '@client/v2-events/trpc'
 import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {
-  title: 'Declare',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'Declare'
 }
 
 export default meta
@@ -63,6 +64,140 @@ export const Page: Story = {
         ]
       }
     }
+  }
+}
+const spy = fn()
+export const SaveAndExit: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
+      })
+    },
+    msw: {
+      handlers: {
+        drafts: createDraftHandlers(),
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [getCurrentEventState(undeclaredDraftEvent)]
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return undeclaredDraftEvent
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Fill the applicant details', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____firstname'),
+        'Clearly'
+      )
+
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____surname'),
+        'Draft'
+      )
+    })
+    const continueButton = await canvas.findByText('Continue')
+    await userEvent.click(continueButton)
+    const button = await canvas.findByRole('button', { name: /Save & Exit/ })
+    await userEvent.click(button)
+    await waitFor(async () => expect(spy).toHaveBeenCalled())
+    await canvas.findByText('Clearly Draft')
+    const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
+    await expect(recordInCreatedState).not.toBeInTheDocument()
+  }
+}
+
+function createDraftHandlers() {
+  const draftList = fn<() => Draft[]>(() => [])
+  return [
+    tRPCMsw.event.draft.create.mutation((req) => {
+      const response: Draft = {
+        id: 'test-draft-id',
+        eventId: req.eventId,
+        transactionId: req.transactionId,
+        createdAt: new Date().toISOString(),
+        action: {
+          ...req,
+          createdBy: 'test-user',
+          createdAtLocation: 'test-location',
+          createdAt: new Date().toISOString()
+        }
+      }
+      spy()
+      draftList.mockReturnValue([response])
+      return response
+    }),
+    tRPCMsw.event.draft.list.query(() => {
+      return draftList()
+    })
+  ]
+}
+
+export const DraftShownInForm: Story = {
+  name: 'Form with an existing remote draft',
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
+      })
+    },
+    msw: {
+      handlers: {
+        drafts: createDraftHandlers(),
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [getCurrentEventState(undeclaredDraftEvent)]
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return undeclaredDraftEvent
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Fill the applicant details', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____firstname'),
+        'Clearly'
+      )
+
+      await userEvent.type(
+        await canvas.findByTestId('text__applicant____surname'),
+        'Draft'
+      )
+    })
+    const continueButton = await canvas.findByText('Continue')
+    await userEvent.click(continueButton)
+    const button = await canvas.findByRole('button', { name: /Save & Exit/ })
+    await userEvent.click(button)
+    await userEvent.click(await canvas.findByText('Clearly Draft'))
+    await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
+    await userEvent.click(await canvas.findByText(/Send an application/))
+
+    await expect(
+      await canvas.findByTestId('text__applicant____surname')
+    ).toHaveValue('Draft')
   }
 }
 

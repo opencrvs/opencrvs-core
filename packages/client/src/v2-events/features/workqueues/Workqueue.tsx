@@ -19,6 +19,7 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
 import { Link, useNavigate } from 'react-router-dom'
 import {
+  applyDraftsToEventIndex,
   defaultColumns,
   EventConfig,
   EventIndex,
@@ -47,6 +48,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
@@ -107,6 +109,7 @@ export function WorkqueueContainer() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const [events] = getEvents.useSuspenseQuery()
+
   const eventConfigs = useEventConfigurations()
 
   const workqueueConfig =
@@ -156,9 +159,10 @@ function Workqueue({
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
-  const { getOutbox, getDrafts } = useEvents()
+  const { getOutbox } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
-  const drafts = getDrafts()
+  const drafts = getRemoteDrafts()
   const navigate = useNavigate()
   const { width } = useWindowSize()
 
@@ -173,6 +177,16 @@ function Workqueue({
 
   const workqueue = validEvents
     .filter((event) => eventConfigs.some((e) => e.id === event.type))
+    /*
+     * Apply pending drafts to the event index.
+     * This is necessary to show the most up to date information in the workqueue.
+     */
+    .map((event) =>
+      applyDraftsToEventIndex(
+        event,
+        drafts.filter((d) => d.eventId === event.id)
+      )
+    )
     .map((event) => {
       /** We already filtered invalid events, this should never happen. */
       const eventConfig = getOrThrow(
@@ -183,7 +197,9 @@ function Workqueue({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
-      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+      const isInDrafts = drafts
+        .filter((draft) => draft.createdAt > event.modifiedAt)
+        .some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {

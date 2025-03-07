@@ -9,10 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
-import { getEventWithOnlyUserSpecificDrafts } from '@events/drafts'
+import * as middleware from '@events/router/middleware'
+import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
+import { publicProcedure, router } from '@events/router/trpc'
 import { getEventConfigurations } from '@events/service/config/config'
+import { approveCorrection } from '@events/service/events/actions/approve-correction'
+import { rejectCorrection } from '@events/service/events/actions/reject-correction'
+import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   addAction,
   createEvent,
@@ -22,32 +25,31 @@ import {
 import { presignFilesInEvent } from '@events/service/files'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
 import {
-  EventConfig,
-  getUUID,
   ApproveCorrectionActionInput,
+  EventConfig,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
   SCOPES,
+  getUUID,
   logger
 } from '@opencrvs/commons'
 import {
   ActionType,
-  PrintCertificateActionInput,
+  ArchivedActionInput,
   DeclareActionInput,
+  Draft,
+  DraftInput,
   EventIndex,
   EventInput,
-  NotifyActionInput,
-  RegisterActionInput,
-  ValidateActionInput,
   FieldValue,
+  NotifyActionInput,
+  PrintCertificateActionInput,
+  RegisterActionInput,
   RejectDeclarationActionInput,
-  ArchivedActionInput
+  ValidateActionInput
 } from '@opencrvs/commons/events'
-import { router, publicProcedure } from '@events/router/trpc'
-import { approveCorrection } from '@events/service/events/actions/approve-correction'
-import { rejectCorrection } from '@events/service/events/actions/reject-correction'
-import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 function validateEventType({
   eventTypes,
@@ -115,11 +117,7 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-
-      return getEventWithOnlyUserSpecificDrafts(
-        eventWithSignedFiles,
-        ctx.user.id
-      )
+      return eventWithSignedFiles
     }),
   delete: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
@@ -127,6 +125,22 @@ export const eventRouter = router({
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
+  draft: router({
+    list: publicProcedure.output(z.array(Draft)).query(async (options) => {
+      return getDraftsByUserId(options.ctx.user.id)
+    }),
+    create: publicProcedure.input(DraftInput).mutation(async (options) => {
+      const eventId = options.input.eventId
+      await getEventById(eventId)
+      return createDraft(options.input, {
+        eventId,
+        createdBy: options.ctx.user.id,
+        createdAtLocation: options.ctx.user.primaryOfficeId,
+        token: options.ctx.token,
+        transactionId: options.input.transactionId
+      })
+    })
+  }),
   actions: router({
     notify: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))

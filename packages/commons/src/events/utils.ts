@@ -110,7 +110,10 @@ export const resolveLabelsFromKnownFields = ({
 export function getAllFields(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => form.pages.flatMap((page) => page.fields))
+    .flatMap((form) => [
+      ...form.review.fields,
+      ...form.pages.flatMap((page) => page.fields)
+    ])
 }
 
 export function getAllPages(configuration: EventConfig) {
@@ -152,9 +155,9 @@ export const findActiveActionFields = (
   action: ActionType
 ): FieldConfig[] => {
   const form = findActiveActionForm(configuration, action)
-
+  const reviewFields = form?.review.fields || []
   /** Let caller decide whether to throw or default to empty array */
-  return form ? getFormFields(form) : []
+  return (form ? getFormFields(form) : []).concat(reviewFields)
 }
 
 export function getEventConfiguration(

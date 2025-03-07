@@ -126,7 +126,7 @@ export function Review() {
   const [locations] = getLocations.useSuspenseQuery()
 
   const { getFormValues, clear } = useEventFormData()
-  const form = getFormValues(eventId)
+  const form = getFormValues()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(

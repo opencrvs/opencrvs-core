@@ -8,13 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventDocument, EventIndex } from '@opencrvs/commons/client'
+
+import { Draft, EventDocument, EventIndex } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 
 export function findLocalEventData(eventId: string) {
   return queryClient.getQueryData(
     trpcOptionsProxy.event.get.queryKey(eventId)
   ) as EventDocument | undefined
+}
+
+export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
+  return queryClient.setQueryData(
+    trpcOptionsProxy.event.draft.list.queryKey(),
+    (drafts) => updater(drafts || [])
+  )
 }
 
 export function setEventData(id: string, data: EventDocument) {
@@ -39,4 +47,10 @@ export async function invalidateEventsList() {
 export async function updateLocalEvent(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
   return invalidateEventsList()
+}
+
+export async function invalidateDraftsList() {
+  return queryClient.invalidateQueries({
+    queryKey: trpcOptionsProxy.event.draft.list.queryKey()
+  })
 }

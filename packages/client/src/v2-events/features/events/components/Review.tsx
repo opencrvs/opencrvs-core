@@ -12,22 +12,9 @@
 
 import React, { useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
-import styled from 'styled-components'
 import { useSelector } from 'react-redux'
-import {
-  ActionFormData,
-  ActionType,
-  FieldConfig,
-  FormConfig,
-  getFieldValidationErrors,
-  isFileFieldType,
-  isFileFieldWithOptionType,
-  SCOPES,
-  EventConfig,
-  EventIndex,
-  isFieldVisible,
-  isOptionalUncheckedCheckbox
-} from '@opencrvs/commons/client'
+import styled from 'styled-components'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import {
   Accordion,
   Button,
@@ -42,14 +29,25 @@ import {
   Text,
   TextArea
 } from '@opencrvs/components'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  ActionFormData,
+  EventConfig,
+  EventIndex,
+  FieldConfig,
+  FormConfig,
+  getFieldValidationErrors,
+  isFieldVisible,
+  isFileFieldType,
+  isFileFieldWithOptionType,
+  isOptionalUncheckedCheckbox,
+  SCOPES
+} from '@opencrvs/commons/client'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
-import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
-import { registerMessages } from '@client/v2-events/features/events/actions/declare/useReviewActionConfig'
 import { Output } from './Output'
 
 const ValidationError = styled.span`
