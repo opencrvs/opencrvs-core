@@ -36,7 +36,7 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     }
 
     if (action.type === ActionType.REJECT) {
-      return EventStatus.REQUIRES_UPDATE
+      return EventStatus.REJECTED
     }
 
     if (action.type === ActionType.ARCHIVED) {
