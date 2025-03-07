@@ -79,6 +79,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
       eventId: variables.eventId,
       transactionId: variables.transactionId,
       action: {
+        createdAt: new Date().toISOString(),
         createdBy: '@todo',
         createdAtLocation: '@todo',
         ...variables
@@ -129,8 +130,7 @@ export function useDrafts() {
         eventId: localDraft.eventId,
         data: localDraft.action.data,
         transactionId: localDraft.transactionId,
-        type: localDraft.action.type,
-        createdAt: new Date().toISOString()
+        type: localDraft.action.type
       })
     },
     getRemoteDrafts: function useDraftList(): Draft[] {

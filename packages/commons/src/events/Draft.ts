@@ -14,6 +14,11 @@ import { ActionBase } from './ActionDocument'
 import { BaseActionInput } from './ActionInput'
 import { ActionType } from './ActionType'
 
+/*
+ * A temporary storage for an action.
+ * Stored with details of the event, creator and creation time.
+ * Drafts are deleted when the action is committed.
+ */
 export const Draft = z.object({
   id: z.string(),
   eventId: z.string(),
@@ -25,8 +30,6 @@ export const Draft = z.object({
 })
 
 export const DraftInput = BaseActionInput.extend({
-  /* Backend doesn't really use this field for now but it helps the client to keep things in order */
-  createdAt: z.string().datetime(),
   type: z.enum(Object.values(ActionType) as [ActionType, ...ActionType[]])
 })
 

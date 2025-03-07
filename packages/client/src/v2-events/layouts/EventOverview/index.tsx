@@ -11,16 +11,10 @@
 
 import React from 'react'
 
-import { ProfileMenu } from '@client/components/ProfileMenu'
-import {
-  useEventConfiguration,
-  useEventConfigurations
-} from '@client/v2-events/features/events/useEventConfiguration'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
-import { ROUTES } from '@client/v2-events/routes'
-import { getEventTitle } from '@client/v2-events/utils'
+import { noop } from 'lodash'
+import { defineMessages, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { getCurrentEventStateWithDrafts } from '@opencrvs/commons/client'
 import {
   AppBar,
@@ -33,11 +27,17 @@ import {
 } from '@opencrvs/components'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { Plus } from '@opencrvs/components/src/icons'
-import { noop } from 'lodash'
-import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import {
+  useEventConfiguration,
+  useEventConfigurations
+} from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { ROUTES } from '@client/v2-events/routes'
+import { getEventTitle } from '@client/v2-events/utils'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */

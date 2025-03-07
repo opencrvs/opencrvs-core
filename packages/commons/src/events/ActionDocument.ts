@@ -12,15 +12,15 @@ import { z } from 'zod'
 import { FieldValue } from './FieldValue'
 import { ActionType } from './ActionType'
 
-export const Metadata = z.record(z.string(), FieldValue)
-export type Metadata = z.infer<typeof Metadata>
+export const ActionMetadata = z.record(z.string(), FieldValue)
+export type ActionMetadata = z.infer<typeof ActionMetadata>
 
 export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
-  metadata: Metadata.optional(),
+  metadata: ActionMetadata.optional(),
   createdAtLocation: z.string()
 })
 
