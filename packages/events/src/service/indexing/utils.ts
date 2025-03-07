@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { EventSearchIndex } from '@opencrvs/commons/events'
-import {
-  QueryDslQueryContainer,
-  SearchRequest
-} from '@elastic/elasticsearch/lib/api/types'
+import { estypes } from '@elastic/elasticsearch'
 
 const FIELD_SEPARATOR = '____'
 export const DEFAULT_SIZE = 10
@@ -22,7 +19,7 @@ export const DEFAULT_SIZE = 10
  * using the provided search payload.
  */
 export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
-  const must: QueryDslQueryContainer[] = Object.entries(event).map(
+  const must: estypes.QueryDslQueryContainer[] = Object.entries(event).map(
     ([key, value]) => ({
       match: {
         [`data.${key.replaceAll('.', FIELD_SEPARATOR)}`]: value
@@ -34,5 +31,5 @@ export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
     bool: {
       must
     }
-  } as SearchRequest['query']
+  } as estypes.SearchRequest['query']
 }
