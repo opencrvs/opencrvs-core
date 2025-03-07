@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { env } from '@events/environment'
+import { mswServer } from '@events/tests/msw'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { SCOPES } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -58,4 +60,85 @@ test('stored events can be deleted', async () => {
   await expect(client.event.get(event.id)).rejects.toThrow(
     `Event not found with ID: ${event.id}`
   )
+})
+
+describe('check unreferenced draft attachments are deleted while final action submission', () => {
+  const deleteUnreferencedDraftAttachmentsMock = vi.fn()
+  const fileExistMock = vi.fn()
+
+  function mockListener({
+    request
+  }: {
+    response: Response
+    request: Request
+    requestId: string
+  }) {
+    if (!request.url.startsWith(`${env.DOCUMENTS_URL}/files`)) {
+      return
+    }
+
+    if (request.method === 'DELETE') {
+      deleteUnreferencedDraftAttachmentsMock(request.url, request.body)
+    }
+
+    if (request.method === 'HEAD') {
+      fileExistMock(request.url, request.body)
+    }
+  }
+  beforeEach(() => {
+    mswServer.events.on('response:mocked', mockListener)
+  })
+
+  test('should delete previous draft attachments', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+    const getDraft = (n: number, draft: boolean) => {
+      return {
+        data: {
+          ...generator.event.actions.declare(event.id).data,
+          'applicant.image': {
+            type: 'image/png',
+            originalFilename: `${n}-abcd.png`,
+            filename: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png`
+          }
+        },
+        draft,
+        transactionId: `transactionId-${n}`,
+        eventId: event.id
+      }
+    }
+
+    // declaring 5 drafts with  4 different file attachments
+    await client.event.actions.declare(getDraft(1, true))
+    await client.event.actions.declare(getDraft(2, true))
+    await client.event.actions.declare(getDraft(2, true))
+    await client.event.actions.declare(getDraft(4, true))
+    await client.event.actions.declare(getDraft(5, true))
+
+    // declaring final action submission
+    await client.event.actions.declare(getDraft(6, false))
+
+    // total 6 file attachment exist api should be called
+    expect(fileExistMock.mock.calls).toHaveLength(6)
+
+    // total 4 unreferenced draft attachments should be deleted
+    expect(deleteUnreferencedDraftAttachmentsMock.mock.calls).toHaveLength(4)
+
+    const updatedEvent = await client.event.get(event.id)
+
+    // since declare action has been submitted 5 times
+    expect(updatedEvent.actions).toEqual([
+      expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.DECLARE })
+    ])
+  })
+
+  afterEach(() => {
+    mswServer.events.removeListener('response:mocked', mockListener)
+  })
 })
