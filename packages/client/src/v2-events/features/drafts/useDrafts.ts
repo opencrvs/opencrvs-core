@@ -141,7 +141,7 @@ export function useDrafts() {
         queryKey: trpc.event.draft.list.queryKey()
       })
 
-      return drafts.data || []
+      return drafts.data
     }
   }
 }
