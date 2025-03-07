@@ -11,6 +11,7 @@
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { SCOPES } from '@opencrvs/commons'
+import { ActionType } from '@opencrvs/commons/client'
 import { TRPCError } from '@trpc/server'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -35,7 +36,7 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`should contain reject action for a valid request`, async () => {
+test(`should contain REJECT action for a valid request`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -51,5 +52,5 @@ test(`should contain reject action for a valid request`, async () => {
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual('REJECT')
+  expect(actions.at(-1)).toStrictEqual(ActionType.REJECT)
 })

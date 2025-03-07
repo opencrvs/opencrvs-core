@@ -11,6 +11,7 @@
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { SCOPES } from '@opencrvs/commons'
+import { ActionType } from '@opencrvs/commons/client'
 import { TRPCError } from '@trpc/server'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -35,7 +36,7 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`should contain both marked_as_duplicate and archived action if marked as duplicate`, async () => {
+test(`should contain both MARKED_AS_DUPLICATE and ARCHIVED action if marked as duplicate`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -51,11 +52,11 @@ test(`should contain both marked_as_duplicate and archived action if marked as d
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual('ARCHIVED')
-  expect(actions.at(-2)).toStrictEqual('MARKED_AS_DUPLICATE')
+  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVED)
+  expect(actions.at(-2)).toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
 })
 
-test(`should only contain archived action if not marked as duplicate`, async () => {
+test(`should only contain ARCHIVED action if not marked as duplicate`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -71,6 +72,6 @@ test(`should only contain archived action if not marked as duplicate`, async () 
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual('ARCHIVED')
-  expect(actions.at(-2)).not.toStrictEqual('MARKED_AS_DUPLICATE')
+  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVED)
+  expect(actions.at(-2)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
 })
