@@ -289,7 +289,6 @@ export async function addAction(
             createdBy,
             createdAt: now,
             createdAtLocation,
-            draft: input.draft || false,
             id: getUUID()
           }
         },
