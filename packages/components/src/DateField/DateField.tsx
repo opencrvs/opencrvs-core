@@ -107,9 +107,6 @@ export const DateField = ({
       const updatedValue = { ...date, [segmentType]: val }
       setDate(updatedValue)
 
-      if (yyyy === '' && mm === '' && dd === '') {
-        return onChange('')
-      }
       onChange(`${updatedValue.yyyy}-${updatedValue.mm}-${updatedValue.dd}`)
     }
   }

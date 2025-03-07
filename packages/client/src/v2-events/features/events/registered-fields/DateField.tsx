@@ -29,14 +29,34 @@ const messages = defineMessages({
 
 function DateInput({
   onChange,
-  value,
+  value = '',
   ...props
 }: DateFieldProps & {
   onChange: (newValue: string) => void
   value?: string
 }) {
   return (
-    <DateFieldComponent {...props} value={value ?? ''} onChange={onChange} />
+    <DateFieldComponent
+      {...props}
+      value={value ?? ''}
+      onChange={onChange}
+      onBlur={(e) => {
+        const segmentType = String(e.target.id.split('-').pop())
+        const val = e.target.value
+        const dateSegmentVals = value.split('-')
+
+        // Add possibly missing leading 0 for days and months
+        if (segmentType === 'dd' && val.length === 1) {
+          onChange(`${dateSegmentVals[0]}-${dateSegmentVals[1]}-0${val}`)
+        }
+
+        if (segmentType === 'mm' && val.length === 1) {
+          onChange(`${dateSegmentVals[0]}-0${val}-${dateSegmentVals[2]}`)
+        }
+
+        return props.onBlur && props?.onBlur(e)
+      }}
+    />
   )
 }
 
