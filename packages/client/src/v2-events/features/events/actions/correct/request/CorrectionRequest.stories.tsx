@@ -16,6 +16,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ActionType } from '@opencrvs/commons/client'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
@@ -41,28 +42,9 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 function FormClear() {
   const drafts = useDrafts()
   useEffect(() => {
-    drafts.setLocalDraft({
-      id: createTemporaryId(),
-      eventId: tennisClueMembershipEventDocument.id,
-      createdAt: new Date().toISOString(),
-      transactionId: createTemporaryId(),
-      action: {
-        type: ActionType.REQUEST_CORRECTION,
-        data: {
-          'applicant.firstname': 'Max',
-          'applicant.surname': 'McLaren',
-          'applicant.dob': '2020-01-02',
-          'recommender.none': true
-        },
-        metadata: {
-          'correction.requester.relationship': 'ANOTHER_AGENT',
-          'correction.request.reason': "Child's name was incorrect"
-        },
-        createdAt: new Date().toISOString(),
-        createdBy: '',
-        createdAtLocation: ''
-      }
-    })
+    drafts.setLocalDraft(
+      testDataGenerator().event.draft(tennisClueMembershipEventDocument.id)
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return <Outlet />

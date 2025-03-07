@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { merge } from 'lodash'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import { ActionBase, ActionDocument } from './ActionDocument'
@@ -54,6 +55,32 @@ export const eventPayloadGenerator = {
     type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
     id
   }),
+  draft: (eventId: string, input: Partial<Draft> = {}) =>
+    merge(
+      {
+        id: getUUID(),
+        eventId,
+        createdAt: new Date().toISOString(),
+        transactionId: getUUID(),
+        action: {
+          type: ActionType.REQUEST_CORRECTION,
+          data: {
+            'applicant.firstname': 'Max',
+            'applicant.surname': 'McLaren',
+            'applicant.dob': '2020-01-02',
+            'recommender.none': true
+          },
+          metadata: {
+            'correction.requester.relationship': 'ANOTHER_AGENT',
+            'correction.request.reason': "Child's name was incorrect"
+          },
+          createdAt: new Date().toISOString(),
+          createdBy: '',
+          createdAtLocation: ''
+        }
+      },
+      input
+    ),
   actions: {
     declare: (
       eventId: string,
