@@ -59,14 +59,7 @@ import {
   isEmailFieldType,
   isFieldVisible
 } from '@opencrvs/commons/client'
-import {
-  Field,
-  FieldProps,
-  Formik,
-  FormikProps,
-  FormikTouched,
-  FormikValues
-} from 'formik'
+import { Field, FieldProps, Formik, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -478,8 +471,6 @@ const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
     const fieldInitialValue = handleDefaultValue(field, formData)
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
-
-type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 
 interface ExposedProps {
   fields: FieldConfig[]
