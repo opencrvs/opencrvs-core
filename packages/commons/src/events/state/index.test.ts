@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { tennisClubMembershipEvent } from 'src/fixtures'
+import { tennisClubMembershipEvent } from '../../fixtures'
 import { getCurrentEventState, getCurrentEventStateWithDrafts } from '.'
 import { generateEventDocument } from '../test.utils'
 import { ActionType } from '../ActionType'
