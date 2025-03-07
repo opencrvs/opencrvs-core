@@ -267,6 +267,7 @@ export async function addAction(
     action: input.type
   })
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
+
   for (const file of fileValuesInCurrentAction) {
     if (!(await fileExists(file.file.filename, token))) {
       throw new Error(`File not found: ${file.file.filename}`)
