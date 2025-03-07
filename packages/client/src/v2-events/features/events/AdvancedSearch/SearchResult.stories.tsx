@@ -55,8 +55,8 @@ export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
       <React.Suspense>
         <SearchResult
           currentEvent={tennisClubMembershipEvent}
-          normalizedSearchParams={mockSearchParams}
           queryData={mockQueryData}
+          searchParams={mockSearchParams}
           workqueueConfig={workqueues['all']}
         />
       </React.Suspense>

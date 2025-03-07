@@ -43,13 +43,12 @@ const TableDiv = styled.div`
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const messages = defineMessages({
-  'event.history.timeFormat': {
+  timeFormat: {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'v2.event.history.timeFormat',
+    id: 'v2.configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   },
-
-  'event.history.role': {
+  role: {
     id: 'v2.event.history.role',
     defaultMessage:
       '{role, select, LOCAL_REGISTRAR{Local Registrar} other{Unknown}}',
@@ -80,7 +79,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
     return {
       date: format(
         new Date(item.createdAt),
-        intl.formatMessage(messages['event.history.timeFormat'])
+        intl.formatMessage(messages.timeFormat)
       ),
       action: (
         <Link
@@ -114,7 +113,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
           />
         </Link>
       ),
-      role: intl.formatMessage(messages['event.history.role'], {
+      role: intl.formatMessage(messages.role, {
         role: user.role
       }),
       location: (

@@ -37,7 +37,7 @@ import {
   Address,
   AdministrativeArea,
   Checkbox,
-  Date as DateField,
+  DateField,
   LocationSearch,
   RadioGroup,
   Select,
