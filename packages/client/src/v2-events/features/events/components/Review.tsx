@@ -688,7 +688,7 @@ function ReviewActionComponent({
               <Icon color="white" name="Check" />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
-            {action !== ActionType.DECLARE && (
+            {onReject && messages.onReject && (
               <Button
                 id="review-reject"
                 size="large"
@@ -696,9 +696,7 @@ function ReviewActionComponent({
                 onClick={onReject}
               >
                 <Icon name="X" />
-                {intl.formatMessage(
-                  messages.onReject || registerMessages.onReject
-                )}
+                {intl.formatMessage(messages.onReject)}
               </Button>
             )}
           </ActionContainer>
