@@ -914,7 +914,7 @@ function RejectActionModal({
         />
         <Checkbox
           label={intl.formatMessage(reviewMessages.rejectModalMarkAsDuplicate)}
-          name={'markDUplicate'}
+          name={'markDuplicate'}
           selected={state.isDuplicate}
           value={''}
           onChange={() =>
