@@ -9,15 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable */
+import format from 'date-fns/format'
+import React, { useState } from 'react'
+import { defineMessages, useIntl } from 'react-intl'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps
 } from '@opencrvs/components/lib/DateField'
-import format from 'date-fns/format'
-import React, { useState } from 'react'
 import { DateValue } from '@opencrvs/commons/client'
-import { defineMessages, useIntl } from 'react-intl'
 
 const messages = defineMessages({
   dateFormat: {
@@ -39,14 +38,10 @@ function DateInput({ value, onBlur, ...props }: DateFieldProps) {
     <DateFieldComponent
       {...props}
       value={date}
-      onChange={(val) => {
-        // console.log('onChange', val, typeof val)
-        setDate(val)
-      }}
       onBlur={(e) => {
         const segmentType = String(e.target.id.split('-').pop())
         const val = e.target.value
-        const dateSegmentVals = date?.split('-') || []
+        const dateSegmentVals = date.split('-')
 
         // Add possibly missing leading 0 for days and months
         if (segmentType === 'dd' && val.length === 1) {
@@ -59,6 +54,7 @@ function DateInput({ value, onBlur, ...props }: DateFieldProps) {
 
         return onBlur(date, e)
       }}
+      onChange={setDate}
     />
   )
 }
