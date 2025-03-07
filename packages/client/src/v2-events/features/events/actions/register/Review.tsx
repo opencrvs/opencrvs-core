@@ -147,7 +147,6 @@ export function Review() {
           eventId,
           data: {},
           transactionId: uuid(),
-          draft: false,
           metadata: { message }
         })
       }
@@ -157,7 +156,6 @@ export function Review() {
           eventId,
           data: {},
           transactionId: uuid(),
-          draft: false,
           metadata: { message, isDuplicate }
         })
       }
