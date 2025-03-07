@@ -79,11 +79,13 @@ export const eventPayloadGenerator = {
     }),
     archive: (
       eventId: string,
-      input: Partial<Pick<ArchivedActionInput, 'transactionId' | 'data'>> = {}
+      input: Partial<Pick<ArchivedActionInput, 'transactionId' | 'data'>> = {},
+      isDuplicate?: boolean
     ) => ({
       type: ActionType.ARCHIVED,
       transactionId: input.transactionId ?? getUUID(),
       data: input.data ?? {},
+      metadata: { isDuplicate: isDuplicate ?? false },
       duplicates: [],
       eventId
     }),

@@ -34,3 +34,43 @@ test(`allows access if required scope is present`, async () => {
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
+
+test(`should contain both marked_as_duplicate and archived action if marked as duplicate`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare(declareInput)
+
+  const actions = (
+    await client.event.actions.archive(
+      generator.event.actions.archive(originalEvent.id, {}, true)
+    )
+  ).actions.map(({ type }) => type)
+
+  expect(actions.at(-1)).toStrictEqual('ARCHIVED')
+  expect(actions.at(-2)).toStrictEqual('MARKED_AS_DUPLICATE')
+})
+
+test(`should only contain archived action if not marked as duplicate`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare(declareInput)
+
+  const actions = (
+    await client.event.actions.archive(
+      generator.event.actions.archive(originalEvent.id)
+    )
+  ).actions.map(({ type }) => type)
+
+  expect(actions.at(-1)).toStrictEqual('ARCHIVED')
+  expect(actions.at(-2)).not.toStrictEqual('MARKED_AS_DUPLICATE')
+})
