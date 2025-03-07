@@ -115,7 +115,6 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
-  setFieldTouched: (name: string, isTouched?: boolean) => void
 }
 
 const GeneratedInputField = React.memo(
@@ -187,7 +186,6 @@ const GeneratedInputField = React.memo(
             value={field.value}
             onBlur={(val, e) => {
               setFieldValue(fieldDefinition.id, val)
-              // TODO CIHAN: make this work
               return inputProps.onBlur(e)
             }}
           />
@@ -592,11 +590,9 @@ class FormSectionComponent extends React.Component<AllProps> {
     const {
       values,
       fields: fieldsWithDotIds,
-      setFieldTouched,
       touched,
       intl,
-      className,
-      formData
+      className
     } = this.props
 
     const language = this.props.intl.locale
@@ -645,7 +641,6 @@ class FormSectionComponent extends React.Component<AllProps> {
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
-                      setFieldTouched={setFieldTouched}
                       setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
                       disabled={isDisabled}
