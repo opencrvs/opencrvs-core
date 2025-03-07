@@ -61,6 +61,24 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
+const RejectAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT)
+  })
+)
+
+const MarkAsDuplicateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
+  })
+)
+
+const ArchivedAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVED)
+  })
+)
+
 const CreatedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CREATE)
@@ -108,6 +126,9 @@ const CustomAction = ActionBase.merge(
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
   ValidateAction,
+  RejectAction,
+  MarkAsDuplicateAction,
+  ArchivedAction,
   NotifiedAction,
   RegisterAction,
   DeclareAction,

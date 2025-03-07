@@ -33,6 +33,14 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.REGISTER) {
       return EventStatus.REGISTERED
     }
+
+    if (action.type === ActionType.REJECT) {
+      return EventStatus.REJECTED
+    }
+
+    if (action.type === ActionType.ARCHIVED) {
+      return EventStatus.ARCHIVED
+    }
     return status
   }, EventStatus.CREATED)
 }
