@@ -12,8 +12,10 @@ import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import { ActionBase, ActionDocument } from './ActionDocument'
 import {
+  ArchivedActionInput,
   DeclareActionInput,
   RegisterActionInput,
+  RejectDeclarationActionInput,
   RequestCorrectionActionInput,
   ValidateActionInput
 } from './ActionInput'
@@ -71,6 +73,30 @@ export const eventPayloadGenerator = {
       input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
     ) => ({
       type: ActionType.VALIDATE,
+      transactionId: input.transactionId ?? getUUID(),
+      data: input.data ?? {},
+      duplicates: [],
+      eventId
+    }),
+    archive: (
+      eventId: string,
+      input: Partial<Pick<ArchivedActionInput, 'transactionId' | 'data'>> = {},
+      isDuplicate?: boolean
+    ) => ({
+      type: ActionType.ARCHIVED,
+      transactionId: input.transactionId ?? getUUID(),
+      data: input.data ?? {},
+      metadata: { isDuplicate: isDuplicate ?? false },
+      duplicates: [],
+      eventId
+    }),
+    reject: (
+      eventId: string,
+      input: Partial<
+        Pick<RejectDeclarationActionInput, 'transactionId' | 'data'>
+      > = {}
+    ) => ({
+      type: ActionType.REJECT,
       transactionId: input.transactionId ?? getUUID(),
       data: input.data ?? {},
       duplicates: [],
@@ -184,6 +210,10 @@ function generateActionDocument({
     case ActionType.ASSIGN:
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
+      return { ...actionBase, type: action }
+    case ActionType.ARCHIVED:
+      return { ...actionBase, type: action }
+    case ActionType.REJECT:
       return { ...actionBase, type: action }
     case ActionType.CREATE:
       return { ...actionBase, type: action }
