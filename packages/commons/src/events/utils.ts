@@ -152,9 +152,9 @@ export const findActiveActionFields = (
   action: ActionType
 ): FieldConfig[] => {
   const form = findActiveActionForm(configuration, action)
-
+  const reviewFields = form?.review.fields || []
   /** Let caller decide whether to throw or default to empty array */
-  return form ? getFormFields(form) : []
+  return (form ? getFormFields(form) : []).concat(reviewFields)
 }
 
 export function getEventConfiguration(
