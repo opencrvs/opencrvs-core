@@ -34,3 +34,22 @@ test(`allows access if required scope is present`, async () => {
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
+
+test(`should contain reject action for a valid request`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare(declareInput)
+
+  const actions = (
+    await client.event.actions.reject(
+      generator.event.actions.reject(originalEvent.id)
+    )
+  ).actions.map(({ type }) => type)
+
+  expect(actions.at(-1)).toStrictEqual('REJECT')
+})
