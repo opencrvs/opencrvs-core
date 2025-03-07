@@ -8,18 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { testDataGenerator } from '@client/tests/test-data-generators'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { ROUTES } from '@client/v2-events/routes'
-import { AppRouter } from '@client/v2-events/trpc'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import * as Request from './index'
+// eslint-disable-next-line
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { ROUTES } from '@client/v2-events/routes'
+import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
+import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
   title: 'CorrectionRequest'
