@@ -10,7 +10,11 @@
  */
 import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
-import { tennisClubMembershipEvent, workqueues } from '@opencrvs/commons/client'
+import {
+  eventQueryDataGenerator,
+  tennisClubMembershipEvent,
+  workqueues
+} from '@opencrvs/commons/client'
 import { SearchResult } from './SearchResult'
 
 const meta: Meta<typeof SearchResult> = {
@@ -25,27 +29,6 @@ const mockSearchParams = {
   'applicant.dob': '1999-11-11'
 }
 
-const mockQueryData = [
-  {
-    id: 'ffd8a958-f52f-4e31-b4b9-c2dddb87b165',
-    type: 'tennis-club-membership',
-    status: 'REGISTERED' as const,
-    createdAt: '2025-03-07T06:49:39.932Z',
-    createdBy: '67c038638a9f2e03f5de69f9',
-    createdAtLocation: 'cd36c0c3-c1af-4cc9-9152-8ecc9f2d4538',
-    modifiedAt: '2025-03-07T06:50:17.123Z',
-    assignedTo: null,
-    updatedBy: '67c038638a9f2e03f5de69f9',
-    data: {
-      'recommender.none': true,
-      'applicant.firstname': 'Danny',
-      'applicant.surname': 'Doe',
-      'applicant.dob': '1999-11-11'
-    },
-    trackingId: 'M3F8YQ'
-  }
-]
-
 export default meta
 
 export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
@@ -55,7 +38,7 @@ export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
       <React.Suspense>
         <SearchResult
           currentEvent={tennisClubMembershipEvent}
-          queryData={mockQueryData}
+          queryData={[eventQueryDataGenerator()]}
           searchParams={mockSearchParams}
           workqueueConfig={workqueues['all']}
         />
