@@ -21,7 +21,9 @@ export const EventStatus = {
   DECLARED: 'DECLARED',
   VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
-  CERTIFIED: 'CERTIFIED'
+  CERTIFIED: 'CERTIFIED',
+  REJECTED: 'REJECTED',
+  ARCHIVED: 'ARCHIVED'
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 

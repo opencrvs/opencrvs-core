@@ -15,9 +15,9 @@ import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
-import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
+import { Link, useNavigate } from 'react-router-dom'
 import {
   defaultColumns,
   EventConfig,
@@ -33,6 +33,7 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
+import { Link as TextButton } from '@opencrvs/components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -64,11 +65,6 @@ const messages = defineMessages({
 
 const ToolTipContainer = styled.span`
   text-align: center;
-`
-
-const NondecoratedLink = styled(Link)`
-  text-decoration: none;
-  color: 'primary';
 `
 
 const FabContainer = styled.div`
@@ -163,6 +159,7 @@ function Workqueue({
   const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
   const drafts = getDrafts()
+  const navigate = useNavigate()
   const { width } = useWindowSize()
 
   const validEvents = events.filter((event) =>
@@ -229,7 +226,7 @@ function Workqueue({
           {
             id: `events.status`,
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} other {Unknown}}'
           },
           {
             status: getEventStatus()
@@ -238,13 +235,17 @@ function Workqueue({
         [titleColumnId]: isInOutbox ? (
           TitleColumn
         ) : (
-          <NondecoratedLink
-            to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-              eventId: event.id
-            })}
+          <TextButton
+            onClick={() => {
+              return navigate(
+                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                  eventId: event.id
+                })
+              )
+            }}
           >
             {TitleColumn}
-          </NondecoratedLink>
+          </TextButton>
         )
       }
     })

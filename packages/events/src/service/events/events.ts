@@ -271,6 +271,33 @@ export async function addAction(
     }
   }
 
+  if (input.type === ActionType.ARCHIVED && input.metadata?.isDuplicate) {
+    input.transactionId = getUUID()
+    await db.collection<EventDocument>('events').updateOne(
+      {
+        id: eventId,
+        'actions.transactionId': { $nin: [transactionId, input.transactionId] }
+      },
+      {
+        $push: {
+          actions: {
+            ...input,
+            type: ActionType.MARKED_AS_DUPLICATE,
+            createdBy,
+            createdAt: now,
+            createdAtLocation,
+            draft: input.draft || false,
+            id: getUUID()
+          }
+        },
+        $set: {
+          updatedAt: now
+        }
+      }
+    )
+    input.transactionId = transactionId
+  }
+
   const action: ActionDocument = {
     ...input,
     createdBy,
