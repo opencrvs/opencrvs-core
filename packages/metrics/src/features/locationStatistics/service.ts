@@ -66,13 +66,11 @@ async function cacheOfficeCount(authHeader: IAuthHeader) {
     fetchLocationsByType('CRVS_OFFICE', authHeader)
   ])
   locations.forEach(({ id }) => (OFFICE_COUNT_CACHE[id] = -1))
-  const locationsMap = locations.reduce<LocationsMap>(
-    (locationsMap, location) => {
-      locationsMap[location.id] = location
-      return locationsMap
-    },
-    {}
+
+  const locationsMap = Object.fromEntries(
+    locations.map((location) => [location.id, location])
   )
+
   const adjacency: Record<string, string[] | undefined> = {}
   ;[...offices, ...locations].forEach((location) => {
     const partOf = location.partOf?.reference?.split('/')[1]
