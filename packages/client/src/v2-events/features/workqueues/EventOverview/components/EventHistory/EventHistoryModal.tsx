@@ -11,13 +11,7 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import {
-  IDynamicValues,
-  Pill,
-  ResponsiveModal,
-  Stack,
-  Table
-} from '@opencrvs/components'
+import { Pill, ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
@@ -53,13 +47,13 @@ function prepareComments(
   action: ActionType,
   metadata: Record<string, FieldValue>
 ) {
-  const comments: IDynamicValues[] = []
+  const comments: { comment: string }[] = []
 
-  if (action === ActionType.REJECT && metadata.message) {
-    comments.push({ comment: metadata.message as string })
+  if (action === ActionType.REJECT && typeof metadata.message === 'string') {
+    comments.push({ comment: metadata.message })
   }
-  if (action === ActionType.ARCHIVED && metadata.message) {
-    comments.push({ comment: metadata.message as string })
+  if (action === ActionType.ARCHIVED && typeof metadata.message === 'string') {
+    comments.push({ comment: metadata.message })
   }
   return comments
 }
