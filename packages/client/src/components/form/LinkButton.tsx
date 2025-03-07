@@ -62,6 +62,12 @@ export const LinkButtonField = ({
     loading
   }) => {
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
+    if (data) {
+      // remove query parameters from the URL after successful callback request
+      const url = new URL(window.location.href)
+      url.search = '' // Remove all query parameters
+      window.history.replaceState({}, document.title, url)
+    }
   }
 
   const hasCallbackRequestBeenMade = useRef(false)
