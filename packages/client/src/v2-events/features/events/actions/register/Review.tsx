@@ -75,7 +75,6 @@ export function Review() {
 
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(
-    eventId,
     event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
   )
 
@@ -88,7 +87,7 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data
-  const form = getFormValues(eventId)
+  const form = getFormValues()
 
   async function handleEdit({
     pageId,
@@ -181,7 +180,7 @@ export function Review() {
         previousFormValues={previousFormValues}
         title=""
         onEdit={handleEdit}
-        onMetadataChange={(values) => setMetadata(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           form={form}

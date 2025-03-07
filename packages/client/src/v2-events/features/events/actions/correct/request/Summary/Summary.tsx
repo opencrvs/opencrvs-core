@@ -107,7 +107,7 @@ export function Summary() {
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const stringifyFormData = useFormDataStringifier()
 
-  const form = getFormValues(eventId)
+  const form = getFormValues()
   const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
@@ -147,7 +147,7 @@ export function Summary() {
 
   const metadata = useEventMetadata()
 
-  const metadataForm = metadata.getMetadata(eventId)
+  const metadataForm = metadata.getMetadata()
 
   const stringiedRequestData = stringifyFormData(allFields, metadataForm)
 

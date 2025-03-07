@@ -49,10 +49,10 @@ export function Review() {
     throw new Error('No active form configuration found for declare action')
   }
 
-  const form = useEventFormData((state) => state.formValues)
+  const form = useEventFormData((state) => state.getFormValues())
 
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(eventId, {})
+  const metadata = getMetadata({})
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -129,7 +129,7 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
         metadata={metadata}
-        onMetadataChange={(values) => setMetadata(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           action={ActionType.DECLARE}

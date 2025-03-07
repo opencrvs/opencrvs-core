@@ -19,16 +19,12 @@ import { create } from 'zustand'
 import { ActionFormData } from '@opencrvs/commons/client'
 
 interface EventMetadata {
-  metadata: ActionFormData
-  setMetadata: (eventId: string, data: ActionFormData) => void
-  setInitialMetadataValues: (eventId: string, data: ActionFormData) => void
-  getMetadata: (
-    eventId: string,
-    initialValues?: ActionFormData
-  ) => ActionFormData
+  metadata: ActionFormData | null
+  setMetadata: (data: ActionFormData) => void
+  setInitialMetadataValues: (data: ActionFormData) => void
+  getMetadata: (initialValues?: ActionFormData) => ActionFormData
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
-  eventId: string
 }
 
 function removeUndefinedKeys(data: ActionFormData) {
@@ -41,31 +37,29 @@ function removeUndefinedKeys(data: ActionFormData) {
  * Interface representing the form data and related operations for an event.
  *
  * @property {ActionFormData} metadata - The current form values.
- * @property {function} setMetadata - Sets the form values for a given event ID.
- * @property {function} setInitialMetadataValues - Sets the form values for a given event ID only if they are empty.
+ * @property {function} setMetadata - Sets the form values.
+ * @property {function} setInitialMetadataValues - Sets the form values only if they are empty.
  * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
- * @property {function} getMetadata - Retrieves the form values for a given event ID.
+ * @property {function} getMetadata - Retrieves the form values.
  * @property {function} getTouchedFields - Retrieves the fields that have been touched.
  * @property {function} clear - Clears the form values.
- * @property {string} eventId - The ID of the event.
  */
 
 export const useEventMetadata = create<EventMetadata>()((set, get) => ({
-  metadata: {},
-  eventId: '',
-  getMetadata: (eventId: string, initialValues?: ActionFormData) =>
-    get().eventId === eventId ? get().metadata : initialValues ?? {},
-  setMetadata: (eventId: string, data: ActionFormData) => {
+  metadata: null,
+  getMetadata: (initialValues?: ActionFormData) =>
+    get().metadata || initialValues || {},
+  setMetadata: (data: ActionFormData) => {
     const metadata = removeUndefinedKeys(data)
-    return set(() => ({ eventId, metadata }))
+    return set(() => ({ metadata }))
   },
-  setInitialMetadataValues: (eventId: string, data: ActionFormData) => {
+  setInitialMetadataValues: (data: ActionFormData) => {
     const metadata = removeUndefinedKeys(data)
-    return set(() => ({ eventId, metadata }))
+    return set(() => ({ metadata }))
   },
   getTouchedFields: () =>
     Object.fromEntries(
-      Object.entries(get().metadata).map(([key, value]) => [key, true])
+      Object.entries(get().getMetadata()).map(([key, value]) => [key, true])
     ),
-  clear: () => set(() => ({ eventId: '', metadata: {} }))
+  clear: () => set(() => ({ metadata: null }))
 }))

@@ -51,7 +51,7 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const form = getFormValues(eventId)
+  const form = getFormValues()
 
   async function handleEdit({
     pageId,

@@ -14,16 +14,12 @@ import { create } from 'zustand'
 import { ActionFormData } from '@opencrvs/commons/client'
 
 interface EventFormData {
-  formValues: ActionFormData
-  setFormValues: (eventId: string, data: ActionFormData) => void
-  setInitialFormValues: (eventId: string, data: ActionFormData) => void
-  getFormValues: (
-    eventId: string,
-    initialValues?: ActionFormData
-  ) => ActionFormData
+  formValues: null | ActionFormData
+  setFormValues: (data: ActionFormData) => void
+  setInitialFormValues: (data: ActionFormData) => void
+  getFormValues: (initialValues?: ActionFormData) => ActionFormData
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
-  eventId: string
 }
 
 function removeUndefinedKeys(data: ActionFormData) {
@@ -36,31 +32,29 @@ function removeUndefinedKeys(data: ActionFormData) {
  * Interface representing the form data and related operations for an event.
  *
  * @property {ActionFormData} formValues - The current form values.
- * @property {function} setFormValues - Sets the form values for a given event ID. This method should only be used as directly connected to Formik's `onChange` hook.
- * @property {function} setFormValuesIfEmpty - Sets the form values for a given event ID only if they are empty.
+ * @property {function} setFormValues - Sets the form values. This method should only be used as directly connected to Formik's `onChange` hook.
+ * @property {function} setFormValuesIfEmpty - Sets the form values only if they are empty.
  * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
- * @property {function} getFormValues - Retrieves the form values for a given event ID.
+ * @property {function} getFormValues - Retrieves the form values.
  * @property {function} getTouchedFields - Retrieves the fields that have been touched.
  * @property {function} clear - Clears the form values.
- * @property {string} eventId - The ID of the event.
  */
 export const useEventFormData = create<EventFormData>()((set, get) => ({
-  formValues: {},
-  eventId: '',
-  getFormValues: (eventId: string, initialValues?: ActionFormData) =>
-    get().eventId === eventId ? get().formValues : initialValues ?? {},
-  setFormValues: (eventId: string, data: ActionFormData) => {
+  formValues: null,
+  getFormValues: (initialValues?: ActionFormData) =>
+    get().formValues || initialValues || {},
+  setFormValues: (data: ActionFormData) => {
     const formValues = removeUndefinedKeys(data)
-    return set(() => ({ eventId, formValues }))
+    return set(() => ({ formValues }))
   },
-  setInitialFormValues: (eventId: string, data: ActionFormData) => {
-    return set(() => ({ eventId, formValues: removeUndefinedKeys(data) }))
+  setInitialFormValues: (data: ActionFormData) => {
+    return set(() => ({ formValues: removeUndefinedKeys(data) }))
   },
   getTouchedFields: () =>
     Object.fromEntries(
-      Object.entries(get().formValues).map(([key, value]) => [key, true])
+      Object.entries(get().getFormValues()).map(([key, value]) => [key, true])
     ),
-  clear: () => set(() => ({ eventId: '', formValues: {} }))
+  clear: () => set(() => ({ formValues: null }))
 }))
 /**
  * Based on https://github.com/pmndrs/zustand?tab=readme-ov-file#transient-updates-for-often-occurring-state-changes
@@ -68,27 +62,17 @@ export const useEventFormData = create<EventFormData>()((set, get) => ({
  * Access state through subscription-pattern to avoid re-renders on every state change
  */
 export const useSubscribeEventFormData = () => {
-  const stateEventIdRef = useRef(useEventFormData.getState().eventId)
-  const stateFormRef = useRef(useEventFormData.getState().formValues)
+  const stateFormRef = useRef(useEventFormData.getState().getFormValues())
 
   useEffect(
     () =>
       useEventFormData.subscribe(
-        (state) => (stateEventIdRef.current = state.eventId)
-      ),
-    []
-  )
-
-  useEffect(
-    () =>
-      useEventFormData.subscribe(
-        (state) => (stateFormRef.current = state.formValues)
+        (state) => (stateFormRef.current = state.getFormValues())
       ),
     []
   )
 
   return {
-    eventId: stateEventIdRef.current,
     formValues: stateFormRef.current
   }
 }

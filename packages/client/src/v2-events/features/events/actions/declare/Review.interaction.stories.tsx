@@ -33,7 +33,6 @@ const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Review/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
-      eventId,
       formValues: generator.event.actions.declare(eventId).data
     })
   }
@@ -195,7 +194,6 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      eventId,
       formValues: generator.event.actions.declare(eventId).data
     })
 
@@ -317,7 +315,6 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 export const ReviewForFieldAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      eventId,
       formValues: generator.event.actions.declare(eventId).data
     })
 

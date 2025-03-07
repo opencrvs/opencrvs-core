@@ -35,7 +35,6 @@ const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Review/Rejection',
   beforeEach: () => {
     useEventFormData.setState({
-      eventId,
       formValues: generator.event.actions.declare(eventId).data
     })
   }

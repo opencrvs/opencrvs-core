@@ -35,6 +35,8 @@ function ActionComponent({ children, type }: Props) {
 
   const drafts = getRemoteDrafts()
 
+  const [event] = getEvent.useSuspenseQuery(params.eventId)
+
   const localDraft = getLocalDraftOrDefault({
     id: createTemporaryId(),
     eventId: params.eventId,
@@ -53,12 +55,13 @@ function ActionComponent({ children, type }: Props) {
   /*
    * Keep the local draft updated as per the form changes
    */
-  const formValues = useEventFormData((state) => state.formValues)
-  const metadataValues = useEventMetadata((state) => state.metadata)
+  const formValues = useEventFormData((state) => state.getFormValues())
+  const metadataValues = useEventMetadata((state) => state.getMetadata())
 
   useEffect(() => {
     setLocalDraft({
       ...localDraft,
+      eventId: event.id,
       action: {
         ...localDraft.action,
         data: formValues,
@@ -67,18 +70,6 @@ function ActionComponent({ children, type }: Props) {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formValues, metadataValues])
-
-  /*
-   * If params.eventId changes (from tmp id to concrete id) then change the local draft id
-   */
-
-  useEffect(() => {
-    setLocalDraft({
-      ...localDraft,
-      eventId: params.eventId
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.eventId])
 
   /*
    * Initialize the form state
@@ -92,8 +83,6 @@ function ActionComponent({ children, type }: Props) {
     (state) => state.setInitialMetadataValues
   )
 
-  const [event] = getEvent.useSuspenseQuery(params.eventId)
-
   const draftsForThisEvent = drafts
     .filter((d) => d.eventId === event.id)
     .concat({
@@ -104,7 +93,15 @@ function ActionComponent({ children, type }: Props) {
        * then a CREATE action request finishes in the background and is stored with a later
        * timestamp
        */
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      /*
+       * If params.eventId changes (from tmp id to concrete id) then change the local draft id
+       */
+      eventId: event.id,
+      action: {
+        ...localDraft.action,
+        createdAt: new Date().toISOString()
+      }
     })
 
   const eventDataWithDrafts = useMemo(
@@ -117,8 +114,8 @@ function ActionComponent({ children, type }: Props) {
   }, [draftsForThisEvent, event])
 
   useEffect(() => {
-    setInitialFormValues(eventDataWithDrafts.id, eventDataWithDrafts.data)
-    setInitialMetadataValues(eventDataWithDrafts.id, declareMetadata)
+    setInitialFormValues(eventDataWithDrafts.data)
+    setInitialMetadataValues(declareMetadata)
 
     return () => {
       /*

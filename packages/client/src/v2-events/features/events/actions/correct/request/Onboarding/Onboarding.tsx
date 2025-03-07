@@ -47,7 +47,7 @@ export function Onboarding() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
   const events = useEvents()
-  const metadata = useEventMetadata((state) => state.getMetadata(eventId))
+  const metadata = useEventMetadata((state) => state.getMetadata())
   const setMetadata = useEventMetadata((state) => state.setMetadata)
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
@@ -107,7 +107,7 @@ export function Onboarding() {
         form={metadata}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={(data) => setMetadata(eventId, data)}
+        setFormData={(data) => setMetadata(data)}
         showReviewButton={false}
         onFormPageChange={(nextPageId: string) => {
           return navigate(

@@ -84,7 +84,7 @@ export function Pages() {
         form={form}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={(data) => setFormValues(eventId, data)}
+        setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(

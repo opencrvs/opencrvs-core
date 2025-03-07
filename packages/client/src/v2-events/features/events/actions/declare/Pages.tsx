@@ -38,7 +38,7 @@ export function Pages() {
 
   const { getFormValues, setFormValues } = useEventFormData()
 
-  const formValues = getFormValues(eventId)
+  const formValues = getFormValues()
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -100,7 +100,7 @@ export function Pages() {
         form={formValues}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={(data) => setFormValues(eventId, data)}
+        setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
