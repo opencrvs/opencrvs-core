@@ -69,6 +69,21 @@ export async function getDraftsByUserId(createdBy: string) {
   return drafts
 }
 
+export async function getDraftsForAction(
+  eventId: string,
+  createdBy: string,
+  actionType: string
+) {
+  const db = await events.getClient()
+  const collection = db.collection<Draft>('drafts')
+
+  const drafts = await collection
+    .find({ eventId, 'action.createdBy': createdBy, 'action.type': actionType })
+    .toArray()
+
+  return drafts
+}
+
 export async function deleteDraftsByEventId(eventId: string) {
   const db = await events.getClient()
   const collection = db.collection<Draft>('drafts')

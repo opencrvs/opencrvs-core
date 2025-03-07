@@ -29,8 +29,8 @@ function FileInput(
 
   const [file, setFile] = React.useState(value)
 
-  const { uploadFile, deleteFile } = useFileUpload(name, {
-    onSuccess: ({ type, originalFilename, filename }) => {
+  const { uploadFile } = useFileUpload(name, {
+    onSuccess: ({ filename, originalFilename, type }) => {
       setFile({
         filename,
         originalFilename: originalFilename,
@@ -63,7 +63,7 @@ function FileInput(
           uploadFile(newFile)
         }
         if (!newFile && file) {
-          deleteFile(file.filename)
+          setFile(undefined)
         }
         setFile(undefined)
         onChange(undefined)
