@@ -43,39 +43,16 @@ export async function updateLocalEvent(updatedEvent: EventDocument) {
   return invalidateEventsList()
 }
 
+export async function invalidateDraftsList() {
+  return queryClient.invalidateQueries({
+    queryKey: trpcOptionsProxy.event.draft.list.queryKey()
+  })
+}
+
 export function createTemporaryId() {
   return `tmp-${uuid()}`
 }
 
 export function isTemporaryId(id: string) {
   return id.startsWith('tmp-')
-}
-
-export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
-  canonicalMutationFn: (params: T) => Promise<R>
-): (params: T) => Promise<R> {
-  return async (params) => {
-    const { eventId } = params
-
-    if (!isTemporaryId(eventId)) {
-      return canonicalMutationFn({ ...params, eventId: eventId })
-    }
-
-    const localVersion = findLocalEventData(eventId)
-    if (!localVersion || isTemporaryId(localVersion.id)) {
-      // eslint-disable-next-line no-console
-      console.debug('Waiting for event to be created', {
-        eventId,
-        eventType: localVersion?.type,
-        params
-      })
-      throw new Error('Event that has not been stored yet cannot be deleted')
-    }
-
-    return canonicalMutationFn({
-      ...params,
-      eventId: localVersion.id,
-      eventType: localVersion.type
-    })
-  }
 }

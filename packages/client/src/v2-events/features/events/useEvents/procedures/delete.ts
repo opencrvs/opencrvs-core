@@ -12,11 +12,10 @@
 import { useMutation } from '@tanstack/react-query'
 import {
   invalidateEventsList,
-  setEventListData,
-  waitUntilEventIsCreated
+  setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
 import { trpcOptionsProxy } from '@client/v2-events/trpc'
-import { setMutationDefaults } from './utils'
+import { setMutationDefaults, waitUntilEventIsCreated } from './utils'
 
 setMutationDefaults(trpcOptionsProxy.event.delete, {
   retry: (_, error) => {

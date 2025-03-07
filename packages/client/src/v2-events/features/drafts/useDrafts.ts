@@ -10,22 +10,20 @@
  */
 
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import {
-  DecorateMutationProcedure,
-  inferInput,
-  inferOutput
-} from '@trpc/tanstack-react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { Draft } from '@opencrvs/commons/client'
-import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { storage } from '@client/storage'
 import {
   createTemporaryId,
-  invalidateEventsList,
-  waitUntilEventIsCreated
+  invalidateDraftsList,
+  invalidateEventsList
 } from '@client/v2-events/features/events/useEvents/api'
-import { storage } from '@client/storage'
-import { setMutationDefaults } from '@client/v2-events/features/events/useEvents/procedures/utils'
+import {
+  createEventActionMutationFn,
+  setMutationDefaults
+} from '@client/v2-events/features/events/useEvents/procedures/utils'
+import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 
 // This directly manipulates React query state
 function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
@@ -33,12 +31,6 @@ function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
     trpcOptionsProxy.event.draft.list.queryKey(),
     (drafts) => updater(drafts || [])
   )
-}
-
-async function invalidateDraftsList() {
-  return queryClient.invalidateQueries({
-    queryKey: trpcOptionsProxy.event.draft.list.queryKey()
-  })
 }
 
 interface DraftStore {
@@ -78,39 +70,9 @@ const useLocalDrafts = create<DraftStore>()(
   )
 )
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createMutationFn<P extends DecorateMutationProcedure<any>>(
-  procedure: P
-) {
-  /*
-   * Merge default tRPC mutationOptions with the ones provided above
-   */
-  const mutationOptions = {
-    ...procedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(procedure.mutationKey())
-  }
-
-  if (!mutationOptions.mutationFn) {
-    throw new Error(
-      'No mutation fn found for operation. This should never happen'
-    )
-  }
-
-  const defaultMutationFn = mutationOptions.mutationFn
-
-  return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
-    async ({ eventType, ...params }) => {
-      return defaultMutationFn({
-        ...params,
-        data: params.data
-      })
-    }
-  )
-}
-
 setMutationDefaults(trpcOptionsProxy.event.draft.create, {
   retry: true,
-  mutationFn: createMutationFn(trpcOptionsProxy.event.draft.create),
+  mutationFn: createEventActionMutationFn(trpcOptionsProxy.event.draft.create),
   onMutate: (variables) => {
     const optimisticDraft: Draft = {
       id: createTemporaryId(),
