@@ -20,9 +20,8 @@ import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionFormData } from './ActionDocument'
-import { formatISO } from 'date-fns'
 import { FormConfig } from './FormConfig'
-import { isFieldHidden } from '../conditionals/validate'
+import { isFieldVisible } from '../conditionals/validate'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -169,18 +168,34 @@ export function getEventConfiguration(
   return config
 }
 
-export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
-  const now = formatISO(new Date(), { representation: 'date' })
+export function isOptionalUncheckedCheckbox(
+  field: FieldConfig,
+  form: ActionFormData
+) {
+  if (field.type !== 'CHECKBOX') {
+    return false
+  }
 
+  // For required checkbox fields, we want to display the field even if it is not checked
+  if (field.required) {
+    return false
+  }
+
+  return !form[field.id]
+}
+
+export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
   return omitBy(data, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
 
-    return (
-      !field ||
-      isFieldHidden(field, {
-        $form: data,
-        $now: now
-      })
-    )
+    if (!field) {
+      return true
+    }
+
+    if (isOptionalUncheckedCheckbox(field, data)) {
+      return true
+    }
+
+    return !isFieldVisible(field, data)
   })
 }

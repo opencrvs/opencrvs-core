@@ -22,6 +22,7 @@ export const env = cleanEnv(process.env, {
   ES_INDEX_PREFIX: str({ default: 'events' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
+  MINIO_URL: url({ devDefault: 'http://localhost:3535' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' })
 })
