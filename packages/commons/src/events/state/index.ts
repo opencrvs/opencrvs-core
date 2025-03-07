@@ -131,7 +131,7 @@ export function getCurrentEventStateWithDrafts(
   event: EventDocument,
   drafts: Draft[]
 ): EventIndex {
-  const actions = event.actions.sort()
+  const actions = event.actions.slice().sort()
   const lastAction = actions[actions.length - 1]
 
   const activeDrafts = drafts

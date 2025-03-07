@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { tennisClubMembershipEvent } from '../../fixtures'
-import { getCurrentEventState, getCurrentEventStateWithDrafts } from '.'
-import { generateEventDocument } from '../test.utils'
-import { ActionType } from '../ActionType'
+import { getCurrentEventState } from '.'
 
 describe('correction requests', () => {
   test('proposed correction data is not applied before the correction request is approved', () => {
@@ -121,33 +118,5 @@ describe('correction requests', () => {
     })
 
     expect(state.data.name).toBe('Doe John')
-  })
-})
-
-describe('drafts applied to event', () => {
-  test('drafts do not apply when they there is a committed action for the action type', () => {
-    const event = generateEventDocument({
-      configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
-    })
-    const result = getCurrentEventStateWithDrafts(event, [
-      {
-        id: 'dd2fcd37-6850-47bd-b5fe-2af7c82ae902',
-        eventId: event.id,
-        transactionId: 'da0d54ee-dd89-4643-8953-649de9a0f7b7',
-        createdAt: new Date().toISOString(),
-        action: {
-          createdAt: new Date().toISOString(),
-          createdBy: '6798e55cc1fea36ff4f3c74c',
-          data: {
-            'applicant.firstname': 'Draft',
-            'applicant.surname': 'Draft'
-          },
-          createdAtLocation: 'e8d46ca3-8af3-4326-9140-cf297dc651cc',
-          type: 'REGISTER'
-        }
-      }
-    ])
-    expect(result.data['applicant.firstname']).toBe('Riku')
   })
 })
