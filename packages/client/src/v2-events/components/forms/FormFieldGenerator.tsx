@@ -89,7 +89,6 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 
 import { SubHeader } from '@opencrvs/components'
-import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
@@ -132,16 +131,11 @@ const GeneratedInputField = React.memo(
     onChange,
     onBlur,
     setFieldValue,
-    resetDependentSelectValues,
     error,
     touched,
     value,
     formData,
-    disabled,
-    setFieldTouched,
-    requiredErrorMessage,
-    fields,
-    values
+    disabled
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
 
@@ -150,16 +144,8 @@ const GeneratedInputField = React.memo(
       label: fieldDefinition.hideLabel
         ? undefined
         : intl.formatMessage(fieldDefinition.label),
-      // helperText: fieldDefinition.helperText,
-      // tooltip: fieldDefinition.tooltip,
-      // description: fieldDefinition.description,
       required: fieldDefinition.required,
       disabled: fieldDefinition.disabled,
-      // prefix: fieldDefinition.prefix,
-      // postfix: fieldDefinition.postfix,
-      // unit: fieldDefinition.unit,
-      // hideAsterisk: fieldDefinition.hideAsterisk,
-      // hideInputHeader: fieldDefinition.hideHeader,
       error,
       touched
     }
@@ -207,7 +193,6 @@ const GeneratedInputField = React.memo(
             {...inputProps}
             value={field.value}
             onBlur={(val, e) => {
-              console.log('onBlur', fieldDefinition.id, val)
               setFieldValue(fieldDefinition.id, val)
               // TODO CIHAN: make this work
               return inputProps.onBlur(e)
@@ -503,7 +488,6 @@ interface ExposedProps {
   setAllFieldsDirty: boolean
   onChange: (values: ActionFormData) => void
   formData: Record<string, FieldValue>
-  onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
   initialValues?: ActionFormData
@@ -542,10 +526,6 @@ class FormSectionComponent extends React.Component<AllProps> {
       this.showValidationErrors(this.props.fields)
     }
 
-    if (this.props.onSetTouched) {
-      this.props.onSetTouched(this.props.setTouched)
-    }
-
     if (window.location.hash) {
       setTimeout(() => {
         const newScroll = document.documentElement.scrollTop - 100
@@ -575,10 +555,6 @@ class FormSectionComponent extends React.Component<AllProps> {
     }, {})
 
     this.props.setTouched(touched)
-  }
-
-  handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    this.props.setFieldTouched(e.target.name)
   }
 
   setFieldValuesWithDependency = (

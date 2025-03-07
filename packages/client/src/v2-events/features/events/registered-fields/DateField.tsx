@@ -39,7 +39,10 @@ function DateInput({ value, onBlur, ...props }: DateFieldProps) {
     <DateFieldComponent
       {...props}
       value={date}
-      onChange={setDate}
+      onChange={(val) => {
+        // console.log('onChange', val, typeof val)
+        setDate(val)
+      }}
       onBlur={(e) => {
         const segmentType = String(e.target.id.split('-').pop())
         const val = e.target.value

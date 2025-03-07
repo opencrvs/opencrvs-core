@@ -79,6 +79,10 @@ export const InputField = (props: IInputFieldProps) => {
     }
   )
 
+  if (id === 'applicant____dob') {
+    console.log('inputFieldProps', error, touched)
+  }
+
   return (
     <div id={`${id}-form-input`} className={props.className}>
       {!hideInputHeader && (
