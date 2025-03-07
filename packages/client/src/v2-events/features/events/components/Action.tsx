@@ -69,6 +69,18 @@ function ActionComponent({ children, type }: Props) {
   }, [formValues, metadataValues])
 
   /*
+   * If params.eventId changes (from tmp id to concrete id) then change the local draft id
+   */
+
+  useEffect(() => {
+    setLocalDraft({
+      ...localDraft,
+      eventId: params.eventId
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.eventId])
+
+  /*
    * Initialize the form state
    */
 
@@ -84,7 +96,16 @@ function ActionComponent({ children, type }: Props) {
 
   const draftsForThisEvent = drafts
     .filter((d) => d.eventId === event.id)
-    .concat(localDraft)
+    .concat({
+      ...localDraft,
+      /*
+       * Force the local draft always to be the latest
+       * This is to prevent a situation where the local draft gets created,
+       * then a CREATE action request finishes in the background and is stored with a later
+       * timestamp
+       */
+      createdAt: new Date().toISOString()
+    })
 
   const eventDataWithDrafts = useMemo(
     () => getCurrentEventStateWithDrafts(event, draftsForThisEvent),
