@@ -33,7 +33,7 @@ function DateInput({
   ...props
 }: DateFieldProps & {
   onChange: (newValue: string) => void
-  value?: string
+  value: string
 }) {
   return (
     <DateFieldComponent
