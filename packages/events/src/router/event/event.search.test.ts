@@ -46,7 +46,7 @@ test('Returns empty list when no events match search criteria', async () => {
   expect(fetchedEvents).toEqual([])
 })
 
-test('Returns list of events matching applicant text field criteria', async () => {
+test('Returns events that match the text field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -123,12 +123,12 @@ test('Returns list of events matching applicant text field criteria', async () =
   expect(fetchedEvents).toHaveLength(2)
 })
 
-test('Returns list of events matching applicant date field criteria', async () => {
+test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const record_1 = {
-    'applicant.firstname': 'John',
+    'applicant.firstname': 'Johnson',
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
@@ -175,11 +175,11 @@ test('Returns list of events matching applicant date field criteria', async () =
   }
 
   const fetchedEvents = await client.event.search(searchCriteria)
-
+  expect(fetchedEvents[0].data['applicant.firstname']).toBe('Johnson') // fetches first document as result
   expect(fetchedEvents).toHaveLength(1)
 })
 
-test('Returns empty list of events by searching with similar dob', async () => {
+test('Does not return events when searching with a similar but different date of birth', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -231,5 +231,5 @@ test('Returns empty list of events by searching with similar dob', async () => {
   }
 
   const fetchedEvents = await client.event.search(searchCriteria)
-  expect(fetchedEvents).toHaveLength(1)
+  expect(fetchedEvents).toHaveLength(0)
 })
