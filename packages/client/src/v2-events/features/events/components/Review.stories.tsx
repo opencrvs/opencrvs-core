@@ -24,7 +24,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { Review } from './Review'
+import { RejectionState, Review } from './Review'
 
 const mockFormData = {
   'applicant.firstname': 'John',
@@ -122,6 +122,12 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
       ))
     }
 
+    async function handleRejection() {
+      await openModal<RejectionState | null>((close) => (
+        <Review.ActionModal.Reject close={close} />
+      ))
+    }
+
     async function handleEdit() {
       await openModal<boolean | null>((close) => (
         <Review.EditModal close={close}></Review.EditModal>
@@ -165,6 +171,7 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
               }
             }}
             onConfirm={handleDeclaration}
+            onReject={handleRejection}
           />
         </Review.Body>
         {modal}
@@ -202,6 +209,13 @@ export const ReviewWithValidationErrors: Story = {
     }
   },
   render: function Component() {
+    const [modal, openModal] = useModal()
+
+    async function handleRejection() {
+      await openModal<RejectionState | null>((close) => (
+        <Review.ActionModal.Reject close={close} />
+      ))
+    }
     return (
       <Review.Body
         eventConfig={tennisClubMembershipEvent}
@@ -236,7 +250,9 @@ export const ReviewWithValidationErrors: Story = {
             }
           }}
           onConfirm={() => undefined}
+          onReject={handleRejection}
         />
+        {modal}
       </Review.Body>
     )
   }
