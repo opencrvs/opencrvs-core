@@ -37,6 +37,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 const rejectModalMessages = defineMessages({
@@ -92,6 +93,7 @@ export function Review() {
   const [modal, openModal] = useModal()
   const intl = useIntl()
   const { goToHome } = useEventFormNavigation()
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -184,16 +186,18 @@ export function Review() {
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
-      onSaveAndExit={() => {
-        events.actions.declare.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          metadata,
-          draft: true
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          events.actions.declare.mutate({
+            eventId: event.id,
+            data: form,
+            transactionId: uuid(),
+            metadata,
+            draft: true
+          })
+          goToHome()
         })
-        goToHome()
-      }}
+      }
     >
       <ReviewComponent.Body
         eventConfig={config}
@@ -221,6 +225,7 @@ export function Review() {
         />
       </ReviewComponent.Body>
       {modal}
+      {saveAndExitModal}
     </FormLayout>
   )
 }

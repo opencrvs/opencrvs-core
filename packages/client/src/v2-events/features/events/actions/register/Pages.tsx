@@ -27,12 +27,14 @@ import {
   useSubscribeEventFormData
 } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const { eventId: formEventId, formValues: form } = useSubscribeEventFormData()
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const navigate = useNavigate()
   const events = useEvents()
@@ -80,15 +82,17 @@ export function Pages() {
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.REGISTER}
-      onSaveAndExit={() => {
-        events.actions.register.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          draft: true
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          events.actions.register.mutate({
+            eventId: event.id,
+            data: form,
+            transactionId: uuid(),
+            draft: true
+          })
+          goToHome()
         })
-        goToHome()
-      }}
+      }
     >
       {modal}
       <PagesComponent
@@ -109,6 +113,7 @@ export function Pages() {
           navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
         }
       />
+      {saveAndExitModal}
     </FormLayout>
   )
 }
