@@ -22,9 +22,9 @@ import { storage } from '@client/storage'
 
 interface EventMetadata {
   metadata: ActionFormData
-  setMetadata: (eventId: string, data: ActionFormData) => void
-  setMetadataIfEmpty: (eventId: string, data: ActionFormData) => void
-  getMetadata: (
+  setMetadataFormValues: (eventId: string, data: ActionFormData) => void
+  setMetadataFormValuesIfEmpty: (eventId: string, data: ActionFormData) => void
+  getMetadataFormValues: (
     eventId: string,
     initialValues?: ActionFormData
   ) => ActionFormData
@@ -43,10 +43,10 @@ function removeUndefinedKeys(data: ActionFormData) {
  * Interface representing the form data and related operations for an event.
  *
  * @property {ActionFormData} metadata - The current form values.
- * @property {function} setMetadata - Sets the form values for a given event ID.
- * @property {function} setMetadataIfEmpty - Sets the form values for a given event ID only if they are empty.
+ * @property {function} setMetadataFormValues - Sets the form values for a given event ID.
+ * @property {function} setMetadataFormValuesIfEmpty - Sets the form values for a given event ID only if they are empty.
  * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
- * @property {function} getMetadata - Retrieves the form values for a given event ID.
+ * @property {function} getMetadataFormValues - Retrieves the form values for a given event ID.
  * @property {function} getTouchedFields - Retrieves the fields that have been touched.
  * @property {function} clear - Clears the form values.
  * @property {string} eventId - The ID of the event.
@@ -57,13 +57,15 @@ export const useEventMetadata = create<EventMetadata>()(
     (set, get) => ({
       metadata: {},
       eventId: '',
-      getMetadata: (eventId: string, initialValues?: ActionFormData) =>
-        get().eventId === eventId ? get().metadata : initialValues ?? {},
-      setMetadata: (eventId: string, data: ActionFormData) => {
+      getMetadataFormValues: (
+        eventId: string,
+        initialValues?: ActionFormData
+      ) => (get().eventId === eventId ? get().metadata : initialValues ?? {}),
+      setMetadataFormValues: (eventId: string, data: ActionFormData) => {
         const metadata = removeUndefinedKeys(data)
         return set(() => ({ eventId, metadata }))
       },
-      setMetadataIfEmpty: (eventId: string, data: ActionFormData) => {
+      setMetadataFormValuesIfEmpty: (eventId: string, data: ActionFormData) => {
         if (get().eventId === eventId) {
           return
         }

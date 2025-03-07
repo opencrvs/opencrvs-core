@@ -23,7 +23,11 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  findActiveActionForm,
+  getActionsMetadata
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -104,8 +108,11 @@ export function Review() {
 
   const form = useEventFormData((state) => state.formValues)
 
-  const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(eventId, {})
+  const { setMetadataFormValues, getMetadataFormValues } = useEventMetadata()
+  const metadata = getMetadataFormValues(
+    eventId,
+    getActionsMetadata(event.actions)
+  )
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -208,7 +215,7 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
         metadata={metadata}
-        onMetadataChange={(values) => setMetadata(eventId, values)}
+        onMetadataChange={(values) => setMetadataFormValues(eventId, values)}
       >
         <ReviewComponent.Actions
           form={form}
