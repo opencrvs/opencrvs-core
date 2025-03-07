@@ -21,7 +21,11 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  REJECT_ACTIONS,
+  RejectionState,
+  Review as ReviewComponent
+} from '@client/v2-events/features/events/components/Review'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -45,6 +49,11 @@ const messages = defineMessages({
     id: 'v2.registerAction.Declare',
     defaultMessage: 'Register',
     description: 'The label for declare button of register action'
+  },
+  registerActionReject: {
+    id: 'v2.registerAction.Reject',
+    defaultMessage: 'Reject',
+    description: 'The label for reject button of register action'
   }
 })
 
@@ -117,15 +126,46 @@ export function Review() {
 
   async function handleRegistration() {
     const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal action="Register" close={close} />
+      <ReviewComponent.ActionModal.Accept action="Register" close={close} />
     ))
     if (confirmedRegistration) {
       registerMutation.mutate({
-        eventId: event.id,
+        eventId,
         data: form,
         transactionId: uuid(),
         metadata
       })
+
+      goToHome()
+    }
+  }
+
+  async function handleRejection() {
+    const confirmedRejection = await openModal<RejectionState | null>(
+      (close) => <ReviewComponent.ActionModal.Reject close={close} />
+    )
+    if (confirmedRejection) {
+      const { rejectAction, message, isDuplicate } = confirmedRejection
+
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId,
+          data: {},
+          transactionId: uuid(),
+          draft: false,
+          metadata: { message }
+        })
+      }
+
+      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
+        events.actions.archive.mutate({
+          eventId,
+          data: {},
+          transactionId: uuid(),
+          draft: false,
+          metadata: { message, isDuplicate }
+        })
+      }
 
       goToHome()
     }
@@ -162,10 +202,12 @@ export function Review() {
           messages={{
             title: messages.registerActionTitle,
             description: messages.registerActionDescription,
-            onConfirm: messages.registerActionDeclare
+            onConfirm: messages.registerActionDeclare,
+            onReject: messages.registerActionReject
           }}
           metadata={metadata}
           onConfirm={handleRegistration}
+          onReject={handleRejection}
         />
         {modal}
       </ReviewComponent.Body>
