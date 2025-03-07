@@ -81,7 +81,11 @@ export const Overview: Story = {
             return [
               generateEventDraftDocument(
                 tennisClueMembershipEventDocument.id,
-                ActionType.REGISTER
+                ActionType.REGISTER,
+                {
+                  'applicant.firstname': 'Riku',
+                  'applicant.surname': 'This value is from a draft'
+                }
               )
             ]
           })

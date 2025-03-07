@@ -79,7 +79,7 @@ const eventDocument = generateEventDocument({
 
 const eventId = eventDocument.id
 
-const draft = generateEventDraftDocument(eventId)
+const draft = generateEventDraftDocument(eventId, ActionType.REGISTER)
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   parameters: {

@@ -110,7 +110,10 @@ export const resolveLabelsFromKnownFields = ({
 export function getAllFields(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => form.pages.flatMap((page) => page.fields))
+    .flatMap((form) => [
+      ...form.review.fields,
+      ...form.pages.flatMap((page) => page.fields)
+    ])
 }
 
 export function getAllPages(configuration: EventConfig) {

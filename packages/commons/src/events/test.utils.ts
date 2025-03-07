@@ -27,6 +27,7 @@ import { EventDocument } from './EventDocument'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import { findActiveActionFields, stripHiddenFields } from './utils'
+import { FieldValue } from './FieldValue'
 
 export function generateActionInput(
   configuration: EventConfig,
@@ -288,15 +289,23 @@ export function generateEventDocument({
 
 export function generateEventDraftDocument(
   eventId: string,
-  actionType: ActionType = ActionType.DECLARE
+  actionType: ActionType = ActionType.DECLARE,
+  data: Record<string, FieldValue> = {}
 ): Draft {
+  const action = generateActionDocument({
+    configuration: tennisClubMembershipEvent,
+    action: actionType
+  })
   return {
     id: getUUID(),
     transactionId: getUUID(),
-    action: generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: actionType
-    }),
+    action: {
+      ...action,
+      data: {
+        ...action.data,
+        ...data
+      }
+    },
     createdAt: new Date().toISOString(),
     eventId
   }
