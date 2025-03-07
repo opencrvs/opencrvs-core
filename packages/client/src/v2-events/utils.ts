@@ -11,6 +11,7 @@
 import { uniq, isString, get, mapKeys } from 'lodash'
 
 import { IntlShape } from 'react-intl'
+import { v4 as uuid } from 'uuid'
 import {
   ResolvedUser,
   ActionDocument,
@@ -106,3 +107,11 @@ export function getEventTitle({
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+
+export function isTemporaryId(id: string) {
+  return id.startsWith('tmp-')
+}
+
+export function createTemporaryId() {
+  return `tmp-${uuid()}`
+}

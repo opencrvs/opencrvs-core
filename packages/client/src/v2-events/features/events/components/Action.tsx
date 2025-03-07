@@ -21,7 +21,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { createTemporaryId } from '@client/v2-events/features/events/useEvents/api'
+import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 
@@ -45,8 +45,8 @@ function ActionComponent({ children, type }: Props) {
       data: {},
       metadata: {},
       createdAt: new Date().toISOString(),
-      createdBy: '',
-      createdAtLocation: ''
+      createdBy: '@todo',
+      createdAtLocation: '@todo'
     }
   })
 

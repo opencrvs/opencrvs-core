@@ -75,8 +75,8 @@ export const eventPayloadGenerator = {
             'correction.request.reason': "Child's name was incorrect"
           },
           createdAt: new Date().toISOString(),
-          createdBy: '',
-          createdAtLocation: ''
+          createdBy: '@todo',
+          createdAtLocation: '@todo'
         }
       },
       input
@@ -256,16 +256,17 @@ export function generateEventDocument({
   }
 }
 
-export function generateEventDraftDocument(eventId: string): Draft {
+export function generateEventDraftDocument(
+  eventId: string,
+  actionType: ActionType = ActionType.DECLARE
+): Draft {
   return {
     id: getUUID(),
     transactionId: getUUID(),
-    action: {
-      ...eventPayloadGenerator.actions.declare(eventId),
-      createdAt: new Date().toISOString(),
-      createdAtLocation: 'TODO',
-      createdBy: getUUID()
-    },
+    action: generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: actionType
+    }),
     createdAt: new Date().toISOString(),
     eventId
   }

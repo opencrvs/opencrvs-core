@@ -9,15 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { ActionType } from '@opencrvs/commons/client'
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
+import {
+  ActionType,
+  generateEventDraftDocument
+} from '@opencrvs/commons/client'
+import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {
@@ -76,23 +79,10 @@ export const Overview: Story = {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              {
-                id: '5b0f8f3e-4c7d-4b6b-8b0e-2c7d4f2edsd1b',
-                eventId: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
-                transactionId: 'da0d54ee-dd89-4643-8953-649de9a0f7b7',
-                createdAt: '2025-01-23T05:35:27.689Z',
-                action: {
-                  id: 'dd2fcd37-6850-47bd-b5fe-2af7c82ae902',
-                  createdAt: '2025-01-23T05:35:27.689Z',
-                  createdBy: '6798e55cc1fea36ff4f3c74c',
-                  data: {
-                    'applicant.firstname': 'Riku',
-                    'applicant.surname': 'This value is from a draft'
-                  },
-                  createdAtLocation: 'e8d46ca3-8af3-4326-9140-cf297dc651cc',
-                  type: 'REGISTER'
-                }
-              }
+              generateEventDraftDocument(
+                tennisClueMembershipEventDocument.id,
+                ActionType.REGISTER
+              )
             ]
           })
         ]

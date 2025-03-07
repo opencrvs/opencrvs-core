@@ -15,23 +15,16 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { Draft } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
-  createTemporaryId,
   invalidateDraftsList,
-  invalidateEventsList
+  invalidateEventsList,
+  setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
   setMutationDefaults
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
-
-// This directly manipulates React query state
-function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
-  return queryClient.setQueryData(
-    trpcOptionsProxy.event.draft.list.queryKey(),
-    (drafts) => updater(drafts || [])
-  )
-}
+import { createTemporaryId } from '@client/v2-events/utils'
 
 interface DraftStore {
   draft: Draft | null
@@ -39,7 +32,7 @@ interface DraftStore {
   getLocalDraftOrDefault: (draft: Draft) => Draft
 }
 
-const useLocalDrafts = create<DraftStore>()(
+const localDraftStore = create<DraftStore>()(
   persist(
     (set, get) => ({
       draft: null,
@@ -109,17 +102,15 @@ function useCreateDraft() {
 
 export function useDrafts() {
   const trpc = useTRPC()
-  const setDraft = useLocalDrafts((drafts) => drafts.setDraft)
-  const getLocalDraftOrDefault = useLocalDrafts(
+  const setDraft = localDraftStore((drafts) => drafts.setDraft)
+  const getLocalDraftOrDefault = localDraftStore(
     (drafts) => drafts.getLocalDraftOrDefault
   )
 
-  const localDraft = useLocalDrafts((drafts) => drafts.draft)
+  const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
   return {
-    setLocalDraft: (draft: Draft | null) => {
-      setDraft(draft)
-    },
+    setLocalDraft: setDraft,
     getLocalDraftOrDefault: getLocalDraftOrDefault,
     submitLocalDraft: () => {
       if (!localDraft) {

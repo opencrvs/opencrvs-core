@@ -14,11 +14,9 @@ import {
   EventDocument,
   getCurrentEventState
 } from '@opencrvs/commons/client'
-import {
-  createTemporaryId,
-  setEventListData
-} from '@client/v2-events/features/events/useEvents/api'
+import { setEventListData } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { createTemporaryId } from '@client/v2-events/utils'
 
 export function updateEventOptimistically<T extends ActionInput>(
   actionType: typeof ActionType.DECLARE
