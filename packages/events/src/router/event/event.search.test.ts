@@ -50,7 +50,7 @@ test('Returns events that match the text field criteria of applicant', async () 
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const record_1 = {
+  const record1 = {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-01',
@@ -64,7 +64,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     }
   }
 
-  const record_2 = {
+  const record2 = {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-01',
@@ -78,7 +78,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     }
   }
 
-  const record_3 = {
+  const record3 = {
     'applicant.firstname': 'Johnson', // different first name than previous records
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-01',
@@ -92,23 +92,23 @@ test('Returns events that match the text field criteria of applicant', async () 
     }
   }
 
-  const event_1 = await client.event.create(generator.event.create())
-  const event_2 = await client.event.create(generator.event.create())
-  const event_3 = await client.event.create(generator.event.create())
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+  const event3 = await client.event.create(generator.event.create())
 
   await client.event.actions.declare(
-    generator.event.actions.declare(event_1.id, {
-      data: record_1
+    generator.event.actions.declare(event1.id, {
+      data: record1
     })
   )
   await client.event.actions.declare(
-    generator.event.actions.declare(event_2.id, {
-      data: record_2
+    generator.event.actions.declare(event2.id, {
+      data: record2
     })
   )
   await client.event.actions.declare(
-    generator.event.actions.declare(event_3.id, {
-      data: record_3
+    generator.event.actions.declare(event3.id, {
+      data: record3
     })
   )
   const searchCriteria = {
@@ -127,7 +127,7 @@ test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const record_1 = {
+  const record1 = {
     'applicant.firstname': 'Johnson',
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-01',
@@ -141,7 +141,7 @@ test('Returns events that match date of birth of applicant', async () => {
     }
   }
 
-  const record_2 = {
+  const record2 = {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-12', // different dob
@@ -155,17 +155,17 @@ test('Returns events that match date of birth of applicant', async () => {
     }
   }
 
-  const event_1 = await client.event.create(generator.event.create())
-  const event_2 = await client.event.create(generator.event.create())
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
 
   await client.event.actions.declare(
-    generator.event.actions.declare(event_1.id, {
-      data: record_1
+    generator.event.actions.declare(event1.id, {
+      data: record1
     })
   )
   await client.event.actions.declare(
-    generator.event.actions.declare(event_2.id, {
-      data: record_2
+    generator.event.actions.declare(event2.id, {
+      data: record2
     })
   )
 
@@ -183,7 +183,7 @@ test('Does not return events when searching with a similar but different date of
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const record_1 = {
+  const record1 = {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'applicant.dob': '2024-11-11',
@@ -197,7 +197,7 @@ test('Does not return events when searching with a similar but different date of
     }
   }
 
-  const record_2 = {
+  const record2 = {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'applicant.dob': '2024-12-12',
@@ -211,17 +211,17 @@ test('Does not return events when searching with a similar but different date of
     }
   }
 
-  const event_1 = await client.event.create(generator.event.create())
-  const event_2 = await client.event.create(generator.event.create())
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
 
   await client.event.actions.declare(
-    generator.event.actions.declare(event_1.id, {
-      data: record_1
+    generator.event.actions.declare(event1.id, {
+      data: record1
     })
   )
   await client.event.actions.declare(
-    generator.event.actions.declare(event_2.id, {
-      data: record_2
+    generator.event.actions.declare(event2.id, {
+      data: record2
     })
   )
 

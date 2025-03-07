@@ -12,6 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useIntl, defineMessages, IntlShape } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { stringify } from 'query-string'
 import { Accordion } from '@opencrvs/components'
 import { FieldValue } from '@opencrvs/commons/client'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -20,11 +21,7 @@ import { EventConfig } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  buildSearchParams,
-  flattenFieldErrors,
-  getAdvancedSearchFieldErrors
-} from './utils'
+import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -130,7 +127,7 @@ export function TabSearch({
   )
 
   const handleSearch = () => {
-    const searchParams = buildSearchParams(formValues)
+    const searchParams = stringify(formValues)
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: currentEvent.id
     })

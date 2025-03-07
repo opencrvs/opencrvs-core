@@ -27,13 +27,6 @@ export const SearchResultIndex = () => {
     arrayFormat: 'comma'
   }) as Record<string, string>
 
-  const normalizedSearchParams = Object.fromEntries(
-    Object.entries(searchParams).map(([key, value]) => [
-      key,
-      Array.isArray(value) ? value.join(',') : value ?? ''
-    ])
-  )
-
   const queryData = searchEvent.useSuspenseQuery(eventType, searchParams)
 
   const workqueueId = 'all'
@@ -49,8 +42,8 @@ export const SearchResultIndex = () => {
   return (
     <SearchResult
       currentEvent={currentEvent}
-      normalizedSearchParams={normalizedSearchParams}
       queryData={queryData}
+      searchParams={searchParams}
       workqueueConfig={workqueueConfig}
     />
   )

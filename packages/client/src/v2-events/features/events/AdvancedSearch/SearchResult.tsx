@@ -188,19 +188,19 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
-interface IProps {
+interface Props {
   workqueueConfig: (typeof workqueues)['all']
   currentEvent: EventConfig
-  normalizedSearchParams: Record<string, string>
+  searchParams: Record<string, string>
   queryData: EventIndex[]
 }
 
 export const SearchResult = ({
   workqueueConfig,
   currentEvent,
-  normalizedSearchParams,
+  searchParams,
   queryData
-}: IProps) => {
+}: Props) => {
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { width: windowWidth } = useWindowSize()
@@ -269,7 +269,7 @@ export const SearchResult = ({
           modifiedAt: formattedDuration(new Date(doc.modifiedAt)),
           status: intl.formatMessage(
             {
-              id: `events.status`,
+              id: `v2.events.status`,
               defaultMessage:
                 '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
             },
@@ -338,9 +338,7 @@ export const SearchResult = ({
       isMobileSize={false}
       noContent={total < 1}
       noResultText={noResultText}
-      tabBarContent={
-        <SearchModifierComponent searchParams={normalizedSearchParams} />
-      }
+      tabBarContent={<SearchModifierComponent searchParams={searchParams} />}
       title={`${intl.formatMessage(messages.searchResult)} ${
         ' (' + total + ')'
       }`}
