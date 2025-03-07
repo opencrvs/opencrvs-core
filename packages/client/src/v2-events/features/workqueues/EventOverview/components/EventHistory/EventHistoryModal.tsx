@@ -11,7 +11,13 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { Pill, ResponsiveModal, Stack, Table } from '@opencrvs/components'
+import {
+  IDynamicValues,
+  Pill,
+  ResponsiveModal,
+  Stack,
+  Table
+} from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
@@ -20,8 +26,6 @@ import {
 } from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
-import { IDynamicValues } from '@client/navigation'
-
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
