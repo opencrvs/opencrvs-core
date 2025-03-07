@@ -133,12 +133,6 @@ export function Summary() {
     ActionType.REQUEST_CORRECTION
   )
 
-  if (!fields) {
-    throw new Error(
-      `No active form found for ${ActionType.REQUEST_CORRECTION}. This should never happen`
-    )
-  }
-
   const allFields = [
     ...fields,
     ...actionConfig.onboardingForm.flatMap((page) => page.fields),
@@ -204,6 +198,7 @@ export function Summary() {
     fields,
     events.actions.correction.request,
     eventId,
+    metadataForm,
     eventFormNavigation,
     previousFormValues
   ])
