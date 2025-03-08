@@ -5,6 +5,9 @@
 ### Improvements
 
 - Improved text color for disabled text inputs and dropdowns
+- **Github runners upgraded** to lastest Ubuntu LTS release 24.04 [#7045](https://github.com/opencrvs/opencrvs-core/issues/7045)
+- **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
+- **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
 
 ## 1.7.0 Release candidate
 
