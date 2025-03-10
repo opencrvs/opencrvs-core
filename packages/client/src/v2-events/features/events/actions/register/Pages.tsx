@@ -15,8 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { v4 as uuid } from 'uuid'
-import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -27,27 +26,22 @@ import {
   useSubscribeEventFormData
 } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
-  const { eventId: formEventId, formValues: form } = useSubscribeEventFormData()
+  const { formValues: form } = useSubscribeEventFormData()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const navigate = useNavigate()
   const events = useEvents()
+  const drafts = useDrafts()
   const { modal, goToHome } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-  const currentState = getCurrentEventState(event)
-
-  useEffect(() => {
-    if (formEventId !== event.id) {
-      setFormValues(event.id, currentState.data)
-    }
-  }, [currentState.data, event.id, formEventId, setFormValues])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -84,12 +78,7 @@ export function Pages() {
       route={ROUTES.V2.EVENTS.REGISTER}
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
-          events.actions.register.mutate({
-            eventId: event.id,
-            data: form,
-            transactionId: uuid(),
-            draft: true
-          })
+          drafts.submitLocalDraft()
           goToHome()
         })
       }
@@ -99,7 +88,7 @@ export function Pages() {
         form={form}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={(data) => setFormValues(eventId, data)}
+        setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(

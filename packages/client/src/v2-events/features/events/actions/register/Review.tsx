@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -32,6 +32,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 const messages = defineMessages({
@@ -65,6 +66,7 @@ const messages = defineMessages({
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER)
   const events = useEvents()
+  const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
@@ -76,7 +78,6 @@ export function Review() {
 
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(
-    eventId,
     event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
   )
 
@@ -87,16 +88,9 @@ export function Review() {
     throw new Error('No active form configuration found for declare action')
   }
 
-  const setFormValuesIfEmpty = useEventFormData(
-    (state) => state.setFormValuesIfEmpty
-  )
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data
-  const form = getFormValues(eventId)
-
-  useEffect(() => {
-    setFormValuesIfEmpty(eventId, previousFormValues)
-  }, [event, eventId, setFormValuesIfEmpty, previousFormValues])
+  const form = getFormValues()
 
   async function handleEdit({
     pageId,
@@ -155,7 +149,6 @@ export function Review() {
           eventId,
           data: {},
           transactionId: uuid(),
-          draft: false,
           metadata: { message }
         })
       }
@@ -165,7 +158,6 @@ export function Review() {
           eventId,
           data: {},
           transactionId: uuid(),
-          draft: false,
           metadata: { message, isDuplicate }
         })
       }
@@ -179,13 +171,7 @@ export function Review() {
       route={ROUTES.V2.EVENTS.REGISTER}
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
-          events.actions.register.mutate({
-            eventId: event.id,
-            data: form,
-            transactionId: uuid(),
-            draft: true,
-            metadata
-          })
+          drafts.submitLocalDraft()
           goToHome()
         })
       }
@@ -199,7 +185,7 @@ export function Review() {
         previousFormValues={previousFormValues}
         title=""
         onEdit={handleEdit}
-        onMetadataChange={(values) => setMetadata(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           form={form}

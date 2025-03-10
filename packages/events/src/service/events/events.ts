@@ -12,6 +12,7 @@
 import {
   ActionDocument,
   ActionInputWithType,
+  Draft,
   EventDocument,
   EventInput,
   FieldConfig,
@@ -30,6 +31,7 @@ import * as events from '@events/storage/mongodb/events'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await events.getClient()
@@ -92,11 +94,12 @@ export async function deleteEvent(
     })
   }
 
-  await deleteEventAttachments(token, event)
-
   const { id } = event
-  await collection.deleteOne({ id })
+  await deleteEventAttachments(token, event)
   await deleteEventIndex(event)
+  await deleteDraftsByEventId(id)
+  await collection.deleteOne({ id })
+
   return { id }
 }
 
@@ -171,7 +174,6 @@ export async function createEvent({
         createdAt: now,
         createdBy,
         createdAtLocation,
-        draft: false,
         id: getUUID(),
         data: {}
       }
@@ -221,10 +223,10 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   token: string,
   fieldConfigs: FieldConfig[],
   fileValuesInCurrentAction: { fieldName: string; file: FileFieldValue }[],
-  previousDrafts: ActionDocument[]
+  drafts: Draft[]
 ): Promise<void> {
-  const previousFileValuesInDrafts = previousDrafts
-    .map((draft) => extractFileValues(draft.data, fieldConfigs))
+  const previousFileValuesInDrafts = drafts
+    .map((draft) => extractFileValues(draft.action.data, fieldConfigs))
     .flat()
 
   for (const previousFileValue of previousFileValuesInDrafts) {
@@ -265,6 +267,7 @@ export async function addAction(
     action: input.type
   })
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
+
   for (const file of fileValuesInCurrentAction) {
     if (!(await fileExists(file.file.filename, token))) {
       throw new Error(`File not found: ${file.file.filename}`)
@@ -286,7 +289,6 @@ export async function addAction(
             createdBy,
             createdAt: now,
             createdAtLocation,
-            draft: input.draft || false,
             id: getUUID()
           }
         },
@@ -303,7 +305,6 @@ export async function addAction(
     createdBy,
     createdAt: now,
     createdAtLocation,
-    draft: input.draft || false,
     id: getUUID()
   }
 
@@ -314,21 +315,18 @@ export async function addAction(
       { $push: { actions: action }, $set: { updatedAt: now } }
     )
 
-  const actionsLatestFirst = [...event.actions].reverse()
-  const previousDrafts: ActionDocument[] = actionsLatestFirst.filter(
-    (x) => x.type === action.type && x.createdBy === action.createdBy && x.draft
+  const drafts = await getDraftsForAction(eventId, createdBy, input.type)
+
+  await cleanUnreferencedAttachmentsFromPreviousDrafts(
+    token,
+    fieldConfigs,
+    fileValuesInCurrentAction,
+    drafts
   )
 
-  if (!action.draft && previousDrafts.length > 0) {
-    await cleanUnreferencedAttachmentsFromPreviousDrafts(
-      token,
-      fieldConfigs,
-      fileValuesInCurrentAction,
-      previousDrafts
-    )
-  }
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
   await notifyOnAction(input, updatedEvent, token)
+  await deleteDraftsByEventId(eventId)
   return updatedEvent
 }

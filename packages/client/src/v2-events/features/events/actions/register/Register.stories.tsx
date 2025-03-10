@@ -13,15 +13,11 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'Register',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'Register'
 }
 
 export default meta

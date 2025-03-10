@@ -145,7 +145,12 @@ export function FormHeader({
                   }
                 ]}
                 toggleButton={
-                  <Icon color="primary" name="DotsThreeVertical" size="large" />
+                  <Icon
+                    data-testid="event-menu-toggle-button-image"
+                    color="primary"
+                    name="DotsThreeVertical"
+                    size="large"
+                  />
                 }
               />
             </>
