@@ -33,6 +33,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -69,6 +70,8 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+
   const registerMutation = events.actions.register
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
@@ -166,10 +169,12 @@ export function Review() {
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.REGISTER}
-      onSaveAndExit={() => {
-        drafts.submitLocalDraft()
-        goToHome()
-      }}
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          drafts.submitLocalDraft()
+          goToHome()
+        })
+      }
     >
       <ReviewComponent.Body
         eventConfig={config}
@@ -197,6 +202,7 @@ export function Review() {
         />
         {modal}
       </ReviewComponent.Body>
+      {saveAndExitModal}
     </FormLayout>
   )
 }
