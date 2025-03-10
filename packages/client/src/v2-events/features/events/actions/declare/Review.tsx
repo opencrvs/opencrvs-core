@@ -132,11 +132,7 @@ export function Review() {
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
-          action={ActionType.DECLARE}
-          form={form}
-          formConfig={formConfig}
           messages={reviewActionConfiguration.messages}
-          metadata={metadata}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
         />

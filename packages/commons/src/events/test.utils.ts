@@ -26,14 +26,14 @@ import { EventConfig } from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
-import { findActiveActionFields, stripHiddenFields } from './utils'
+import { findActiveActionFormFields, stripHiddenFields } from './utils'
 import { FieldValue } from './FieldValue'
 
 export function generateActionInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const fields = findActiveActionFields(configuration, action) ?? []
+  const fields = findActiveActionFormFields(configuration, action) ?? []
 
   const data = fields.reduce(
     (acc, field, i) => ({

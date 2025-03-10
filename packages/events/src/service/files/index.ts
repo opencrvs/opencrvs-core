@@ -14,40 +14,31 @@ import {
   EventConfig,
   logger,
   EventDocument,
-  FileFieldValue
+  FileFieldValue,
+  FieldType
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { getEventConfigurations } from '@events/service/config/config'
 import { z } from 'zod'
+import { findActiveActionFields } from '@opencrvs/commons/client'
 
 function getFieldDefinitionForActionDataField(
   configuration: EventConfig,
   actionType: ActionDocument['type'],
   fieldId: string
 ) {
-  const actionConfiguration = configuration.actions.find(
-    (action) => action.type === actionType
-  )
+  const actionFields = findActiveActionFields(configuration, actionType)
 
-  if (!actionConfiguration) {
-    return
-  }
-
-  const formConfiguration = actionConfiguration.forms.find(
-    (form) => form.active
-  )
-
-  if (!formConfiguration) {
+  const fieldConfig = actionFields?.find((field) => field.id === fieldId)
+  if (!fieldConfig) {
     logger.error(
-      `Failed to find active form configuration for action: ${actionType}`
+      `Failed to find active field configuration for type: ${fieldId}, action: ${actionType}`
     )
 
     throw new Error('Failed to find active form configuration')
   }
 
-  return formConfiguration.pages
-    .flatMap((page) => page.fields)
-    .find((field) => field.id === fieldId)
+  return fieldConfig
 }
 
 function getFileNameAndSignature(url: string) {
@@ -56,7 +47,10 @@ function getFileNameAndSignature(url: string) {
   return filename + search
 }
 
-export async function presignFilesInEvent(event: EventDocument, token: string) {
+export async function presignFilesInEvent(
+  event: EventDocument,
+  token: string
+): Promise<EventDocument> {
   const configurations = await getEventConfigurations(token)
   const configuration = configurations.find(
     (config) => config.id === event.type
@@ -76,7 +70,7 @@ export async function presignFilesInEvent(event: EventDocument, token: string) {
             configuration,
             action.type,
             fieldId
-          )?.type === 'FILE'
+          ).type === FieldType.FILE
       )
       .filter((value): value is [string, Exclude<FileFieldValue, null>] => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

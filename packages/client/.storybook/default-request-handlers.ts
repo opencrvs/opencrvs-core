@@ -343,6 +343,11 @@ export const handlers = {
     })
   ],
   files: [
+    http.get('/api/presigned-url/event-attachments/:filename', async (req) => {
+      return HttpResponse.json({
+        presignedURL: `http://localhost:3535/ocrvs/tree.svg`
+      })
+    }),
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 

@@ -9,4 +9,5 @@
 | Location     | Describes a physical location. Can be a admin structure, an office or something else. Cannot be anyone's personal home address                                                 |
 | Action       | Event contains one or more actions. Action is a system event which triggers a status change. See `ActionConfig`                                                                |
 | ActionConfig | Each action defines a form, which needs to be filled in order for the status to change. Configuration can have multiple forms, out of which **only one can be active**.        |
+| ActionField  |  Any field either within review page or form pages                                                                                                                             |
 | FormConfig   |  Form config defines separate read (`review`) and write (`pages`) configurations for itself.                                                                                   |

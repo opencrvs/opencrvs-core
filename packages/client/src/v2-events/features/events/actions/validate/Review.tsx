@@ -33,6 +33,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 
 const messages = defineMessages({
   validateActionTitle: {
@@ -55,6 +56,12 @@ const messages = defineMessages({
     id: 'v2.validateAction.Reject',
     defaultMessage: 'Reject',
     description: 'The label for reject button of register action'
+  },
+  validateActionDescriptionIncomplete: {
+    id: 'v2.validateAction.incompleteForm',
+    defaultMessage:
+      'Please add mandatory information before sending for approval',
+    description: 'The label for warning of incomplete form'
   }
 })
 
@@ -167,6 +174,12 @@ export function Review() {
     }
   }
 
+  const hasValidationErrors = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.VALIDATE}
@@ -187,15 +200,16 @@ export function Review() {
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
-          form={form}
-          formConfig={formConfig}
+          isPrimaryActionDisabled={hasValidationErrors}
           messages={{
             title: messages.validateActionTitle,
-            description: messages.validateActionDescription,
+            description: hasValidationErrors
+              ? messages.validateActionDescriptionIncomplete
+              : messages.validateActionDescription,
             onConfirm: messages.validateActionDeclare,
             onReject: messages.validateActionReject
           }}
-          metadata={metadata}
+          primaryButtonType={'positive'}
           onConfirm={handleRegistration}
           onReject={handleRejection}
         />

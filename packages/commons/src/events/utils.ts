@@ -22,6 +22,7 @@ import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionFormData } from './ActionDocument'
 import { FormConfig } from './FormConfig'
 import { isFieldVisible } from '../conditionals/validate'
+import { FieldType } from './FieldType'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -142,7 +143,7 @@ export const findActiveActionForm = (
   const actionConfig = configuration.actions.find((a) => a.type === action)
   const form = actionConfig?.forms.find((f) => f.active)
 
-  /** Let caller decide whether to throw or default to empty array */
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
   return form
 }
 
@@ -157,14 +158,36 @@ export const getFormFields = (formConfig: FormConfig) => {
   return formConfig.pages.flatMap((p) => p.fields)
 }
 
+/**
+ * Returns only form fields for the action type, if any, excluding review fields.
+ */
+export const findActiveActionFormFields = (
+  configuration: EventConfig,
+  action: ActionType
+): FieldConfig[] | undefined => {
+  const form = findActiveActionForm(configuration, action)
+
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
+  return form ? getFormFields(form) : undefined
+}
+
+/**
+ * Returns all fields for the action type, including review fields, if any.
+ */
 export const findActiveActionFields = (
   configuration: EventConfig,
   action: ActionType
-): FieldConfig[] => {
+): FieldConfig[] | undefined => {
   const form = findActiveActionForm(configuration, action)
-  const reviewFields = form?.review.fields || []
-  /** Let caller decide whether to throw or default to empty array */
-  return (form ? getFormFields(form) : []).concat(reviewFields)
+  const reviewFields = form?.review.fields
+
+  const formFields = form ? getFormFields(form) : undefined
+  const allFields = formFields
+    ? formFields.concat(reviewFields ?? [])
+    : reviewFields
+
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
+  return allFields
 }
 
 export function getEventConfiguration(
@@ -182,7 +205,7 @@ export function isOptionalUncheckedCheckbox(
   field: FieldConfig,
   form: ActionFormData
 ) {
-  if (field.type !== 'CHECKBOX') {
+  if (field.type !== FieldType.CHECKBOX) {
     return false
   }
 
