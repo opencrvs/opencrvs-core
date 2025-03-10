@@ -12,6 +12,7 @@
 import React from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
+import { ActionType } from '@opencrvs/commons/client'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
@@ -26,6 +27,7 @@ import { router as workqueueRouter } from '@client/v2-events/features/workqueues
 import { EventOverviewLayout } from '@client/v2-events/layouts'
 import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { Action } from '@client/v2-events/features/events/components/Action'
 import { ROUTES } from './routes'
 
 /**
@@ -68,7 +70,11 @@ export const routesConfig = {
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
-      element: <Outlet />,
+      element: (
+        <Action type={ActionType.DECLARE}>
+          <Outlet />
+        </Action>
+      ),
       children: [
         {
           index: true,
@@ -87,7 +93,11 @@ export const routesConfig = {
     correctionRouter,
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
-      element: <Outlet />,
+      element: (
+        <Action type={ActionType.REGISTER}>
+          <Outlet />
+        </Action>
+      ),
       children: [
         {
           index: true,
@@ -105,7 +115,11 @@ export const routesConfig = {
     },
     {
       path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,
-      element: <Outlet />,
+      element: (
+        <Action type={ActionType.PRINT_CERTIFICATE}>
+          <Outlet />
+        </Action>
+      ),
       children: [
         {
           index: true,
