@@ -9,20 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import {
-  EnableConditional,
-  HideConditional,
-  ShowConditional
-} from './Conditional'
+import { EnableConditional, ShowConditional } from './Conditional'
 import { FormConfig, FormPage } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 
+/**
+ * By default, when conditionals are not defined, action is visible and enabled to the user.
+ */
 const ActionConditional = z.discriminatedUnion('type', [
-  // Action can be shown / hidden
+  /** If conditional is defined, the action is shown to the user only if the condition is met */
   ShowConditional,
-  HideConditional,
-  // Action can be shown to the user in the list but as disabled
+  /** If conditional is defined, the action is enabled only if the condition is met */
   EnableConditional
 ])
 
@@ -33,12 +31,6 @@ export const ActionConfigBase = z.object({
   forms: z.array(FormConfig)
 })
 
-const CreateConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.CREATE)
-  })
-)
-
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE)
@@ -48,6 +40,29 @@ const DeclareConfig = ActionConfigBase.merge(
 const ValidateConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.VALIDATE)
+  })
+)
+
+const RejectDeclarationConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT),
+    comment: z.string(),
+    isDuplicate: z.boolean()
+  })
+)
+const MarkedAsDuplicateConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE),
+    comment: z.string(),
+    duplicates: z.array(z.string()).describe('UUIDs of duplicate records')
+  })
+)
+
+const ArchivedConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVED),
+    comment: z.string(),
+    isDuplicate: z.boolean()
   })
 )
 
@@ -95,10 +110,48 @@ const CustomConfig = ActionConfigBase.merge(
   })
 )
 
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllActionConfigFields =
+  | typeof DeclareConfig
+  | typeof ValidateConfig
+  | typeof RejectDeclarationConfig
+  | typeof MarkedAsDuplicateConfig
+  | typeof ArchivedConfig
+  | typeof RegisterConfig
+  | typeof DeleteConfig
+  | typeof PrintCertificateActionConfig
+  | typeof RequestCorrectionConfig
+  | typeof RejectCorrectionConfig
+  | typeof ApproveCorrectionConfig
+  | typeof CustomConfig
+
+/** @knipignore */
+export type InferredActionConfig =
+  | z.infer<typeof DeclareConfig>
+  | z.infer<typeof ValidateConfig>
+  | z.infer<typeof RejectDeclarationConfig>
+  | z.infer<typeof MarkedAsDuplicateConfig>
+  | z.infer<typeof ArchivedConfig>
+  | z.infer<typeof RegisterConfig>
+  | z.infer<typeof DeleteConfig>
+  | z.infer<typeof PrintCertificateActionConfig>
+  | z.infer<typeof RequestCorrectionConfig>
+  | z.infer<typeof RejectCorrectionConfig>
+  | z.infer<typeof ApproveCorrectionConfig>
+  | z.infer<typeof CustomConfig>
+
 export const ActionConfig = z.discriminatedUnion('type', [
-  CreateConfig,
   DeclareConfig,
   ValidateConfig,
+  RejectDeclarationConfig,
+  MarkedAsDuplicateConfig,
+  ArchivedConfig,
   RegisterConfig,
   DeleteConfig,
   PrintCertificateActionConfig,
@@ -106,6 +159,6 @@ export const ActionConfig = z.discriminatedUnion('type', [
   RejectCorrectionConfig,
   ApproveCorrectionConfig,
   CustomConfig
-])
+]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
 
-export type ActionConfig = z.infer<typeof ActionConfig>
+export type ActionConfig = InferredActionConfig

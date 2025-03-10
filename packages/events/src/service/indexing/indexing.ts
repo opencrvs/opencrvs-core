@@ -14,6 +14,7 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
+  EventSearchIndex,
   FieldConfig,
   FieldType,
   getCurrentEventState
@@ -28,6 +29,8 @@ import {
 import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
+import { DEFAULT_SIZE, generateQuery } from './utils'
+
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
 }
@@ -99,7 +102,8 @@ export async function createIndex(
           data: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)
-          }
+          },
+          trackingId: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }
@@ -121,12 +125,20 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(SEPARATOR, '.')
 }
 
+type _Combine<
+  T,
+  K extends PropertyKey = T extends unknown ? keyof T : never
+> = T extends unknown ? T & Partial<Record<Exclude<K, keyof T>, never>> : never
+
+type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
+type AllFieldsUnion = Combine<AddressFieldValue>
+
 function mapFieldTypeToElasticsearch(field: FieldConfig) {
   switch (field.type) {
+    case FieldType.NUMBER:
+      return { type: 'double' }
     case FieldType.DATE:
-      // @TODO: This should be changed back to 'date'
-      // When we have proper validation of custom fields.
-      return { type: 'text' }
+      return { type: 'date' }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.SIGNATURE:
@@ -141,6 +153,9 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.CHECKBOX:
     case FieldType.LOCATION:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
@@ -155,9 +170,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         zipCode: { type: 'keyword' },
         village: { type: 'keyword' }
       } satisfies {
-        [K in keyof Required<
-          NonNullable<AddressFieldValue>
-        >]: estypes.MappingProperty
+        [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
       return {
         type: 'object',
@@ -170,6 +183,16 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           filename: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
+        }
+      }
+    case FieldType.FILE_WITH_OPTIONS:
+      return {
+        type: 'nested',
+        properties: {
+          filename: { type: 'keyword' },
+          originalFilename: { type: 'keyword' },
+          type: { type: 'keyword' },
+          option: { type: 'keyword' }
         }
       }
     default:
@@ -270,6 +293,33 @@ export async function getIndexedEvents() {
     index: getEventAliasName(),
     size: 10000,
     request_cache: false
+  })
+
+  const events = z.array(EventIndex).parse(
+    response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
+  )
+
+  return events
+}
+
+export async function getIndex(eventParams: EventSearchIndex) {
+  const esClient = getOrCreateClient()
+  const { type, ...queryParams } = eventParams
+
+  if (Object.values(queryParams).length === 0) {
+    throw new Error('No search params provided')
+  }
+
+  const query = generateQuery(queryParams)
+
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventIndexName(type),
+    size: DEFAULT_SIZE,
+    request_cache: false,
+    query
   })
 
   const events = z.array(EventIndex).parse(

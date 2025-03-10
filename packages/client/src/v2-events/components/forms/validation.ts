@@ -8,39 +8,75 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FieldConfig, getFieldValidationErrors } from '@opencrvs/commons/client'
-import { ActionFormData } from '@opencrvs/commons'
-import { IValidationResult } from '@client/utils/validate'
+import { MessageDescriptor } from 'react-intl'
+import {
+  FieldConfig,
+  getFieldValidationErrors,
+  ActionFormData,
+  FormConfig,
+  stripHiddenFields,
+  getFormFields
+} from '@opencrvs/commons/client'
 
-interface IFieldErrors {
-  errors: IValidationResult[]
+interface FieldErrors {
+  errors: {
+    message: MessageDescriptor
+  }[]
 }
 
 export interface Errors {
-  [fieldName: string]: IFieldErrors
+  [fieldName: string]: FieldErrors
 }
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: ActionFormData,
-  checkValidationErrorsOnly?: boolean
+  values: ActionFormData
 ) {
-  return fields.reduce(
-    (errorsForAllFields: Errors, field) =>
+  return fields.reduce((errorsForAllFields: Errors, field) => {
+    if (
       // eslint-disable-next-line
       errorsForAllFields[field.id] &&
       errorsForAllFields[field.id].errors.length > 0
-        ? errorsForAllFields
-        : {
-            ...errorsForAllFields,
-            [field.id]: getFieldValidationErrors({
-              field: {
-                ...field,
-                required: field.required && !checkValidationErrorsOnly
-              },
-              values
-            })
-          },
-    {}
+    ) {
+      return errorsForAllFields
+    }
+
+    return {
+      ...errorsForAllFields,
+      [field.id]: getFieldValidationErrors({ field, values })
+    }
+  }, {})
+}
+
+export function validationErrorsInActionFormExist(
+  formConfig: FormConfig,
+  form: ActionFormData,
+  metadata?: ActionFormData
+): boolean {
+  // We don't want to validate hidden fields
+  const formWithoutHiddenFields = stripHiddenFields(
+    getFormFields(formConfig),
+    form
   )
+  const metadataWithoutHiddenFields = stripHiddenFields(
+    formConfig.review.fields,
+    metadata ?? {}
+  )
+
+  const hasValidationErrors = formConfig.pages.some((page) => {
+    const fieldErrors = getValidationErrorsForForm(
+      page.fields,
+      formWithoutHiddenFields
+    )
+    return Object.values(fieldErrors).some((field) => field.errors.length > 0)
+  })
+
+  const hasMetadataValidationErrors = Object.values(
+    getValidationErrorsForForm(
+      formConfig.review.fields,
+      metadataWithoutHiddenFields
+    )
+  ).some((field) => field.errors.length > 0)
+
+  return hasValidationErrors || hasMetadataValidationErrors
 }

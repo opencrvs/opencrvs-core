@@ -4,6 +4,7 @@
 | EventConfig  | Description of event features defined by the country. Includes configuration for process steps (`Action`) and forms (`ActionConfig`) involved.                                 |
 | EventInput   | A subset of an event. Describes fields that can be sent to the system with the intention of either creating or mutating a an event                                             |
 | EventIndex   | A subset of an event. Describes how the event is stored in the search index. Contains static fields shared by all event types and custom fields defined by event configuration |
+| Draft        | An action that has not been sent yet. Stored with details of the event, creator and creation time. Drafts are deleted when the action is committed.                            |
 | User         | User in the system. Might be a practitioner or an admin or something else.                                                                                                     |
 | Location     | Describes a physical location. Can be a admin structure, an office or something else. Cannot be anyone's personal home address                                                 |
 | Action       | Event contains one or more actions. Action is a system event which triggers a status change. See `ActionConfig`                                                                |

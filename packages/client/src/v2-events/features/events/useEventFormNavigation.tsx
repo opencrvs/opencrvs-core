@@ -16,6 +16,7 @@ import { EventDocument } from '@opencrvs/commons'
 import { isUndeclaredDraft } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEvents } from './useEvents/useEvents'
 
 const modalMessages = defineMessages({
@@ -53,7 +54,9 @@ export function useEventFormNavigation() {
   const navigate = useNavigate()
 
   const events = useEvents()
-  const deleteEvent = events.deleteEvent
+  const { getRemoteDrafts } = useDrafts()
+  const remoteDrafts = getRemoteDrafts()
+  const deleteEvent = events.deleteEvent.useMutation()
 
   const [modal, openModal] = useModal()
 
@@ -107,7 +110,8 @@ export function useEventFormNavigation() {
     if (!exitConfirm) {
       return
     }
-    if (isUndeclaredDraft(event)) {
+    const hasDrafts = remoteDrafts.find((draft) => draft.eventId === event.id)
+    if (isUndeclaredDraft(event) && !hasDrafts) {
       deleteEvent.mutate({ eventId: event.id })
     }
     goToHome()

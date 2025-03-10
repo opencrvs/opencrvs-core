@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { colors } from 'react-select/lib/theme'
+
+const colors = {
+  primary: '#2684FF',
+  danger: '#DE350B'
+}
 
 export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
   let fill: string

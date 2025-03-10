@@ -8,17 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { WorkqueueContainer } from './Workqueue'
 
-import { EventDocument } from '@opencrvs/commons/events'
-
-export function getEventWithOnlyUserSpecificDrafts(
-  event: EventDocument,
-  userId: string
-): EventDocument {
-  return {
-    ...event,
-    actions: event.actions.filter((action) => {
-      return !action.draft || action.createdBy === userId
-    })
-  }
-}
+export const WorkqueueIndex = withSuspense(WorkqueueContainer)

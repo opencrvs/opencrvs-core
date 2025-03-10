@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
+  findActiveActionForm,
   getAllFields,
   getCurrentEventState
 } from '@opencrvs/commons/client'
@@ -27,7 +28,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 
 export function Review() {
@@ -40,12 +41,7 @@ export function Review() {
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
-
-  const { forms: formConfigs } = config.actions.filter(
-    (action) => action.type === ActionType.REQUEST_CORRECTION
-  )[0]
-
-  const formConfig = formConfigs.find((form) => form.active)
+  const formConfig = findActiveActionForm(config, ActionType.REQUEST_CORRECTION)
 
   if (!formConfig) {
     throw new Error(
@@ -55,18 +51,22 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const form = getFormValues(eventId)
+  const form = getFormValues()
 
   async function handleEdit({
     pageId,
-    fieldId
+    fieldId,
+    confirmation
   }: {
     pageId: string
     fieldId?: string
+    confirmation?: boolean
   }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close} />
-    ))
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close} />
+      )))
 
     if (confirmedEdit) {
       navigate(
@@ -104,6 +104,7 @@ export function Review() {
         eventConfig={config}
         form={form}
         formConfig={formConfig}
+        isUploadButtonVisible={true}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(actionConfig.label, {
           ...initialValues,

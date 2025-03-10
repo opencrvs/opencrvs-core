@@ -13,13 +13,14 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
+  generateActionInput,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { generateActionInput } from '@events/tests/generators'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
+
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -135,7 +136,8 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
 
   const data = generator.event.actions.correction.request(event.id, {
     data: {
-      'applicant.dob': '02-02'
+      'applicant.dob': '02-02',
+      'recommender.none': true
     }
   })
 
@@ -159,7 +161,8 @@ test(`${ActionType.APPROVE_CORRECTION} validation error message contains all the
     withCorrectionRequest.id,
     {
       data: {
-        'applicant.dob': '02-02'
+        'applicant.dob': '02-02',
+        'recommender.none': true
       }
     }
   )
@@ -180,7 +183,14 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
-      'recommender.none': false
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
   })
 
@@ -199,7 +209,14 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
     'applicant.dob': '2024-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': false
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const data = generator.event.actions.correction.request(event.id, {
@@ -223,7 +240,14 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
     'applicant.dob': '2040-02-01',
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
-    'recommender.none': false
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const payload = generator.event.actions.correction.request(event.id, {
@@ -278,10 +302,7 @@ describe('when a correction request exists', () => {
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(registeredEvent.id, {
         data: {
-          ...generateActionInput(
-            tennisClubMembershipEvent,
-            ActionType.REQUEST_CORRECTION
-          ),
+          ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
           'applicant.firstName': 'Johnny'
         }
       })

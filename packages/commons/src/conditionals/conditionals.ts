@@ -26,7 +26,11 @@ export function defineConditional(schema: any) {
 
 export type UserConditionalParameters = { $now: string; $user: TokenPayload }
 export type EventConditionalParameters = { $now: string; $event: EventDocument }
-export type FormConditionalParameters = { $now: string; $form: ActionFormData }
+// @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
+export type FormConditionalParameters = {
+  $now: string
+  $form: ActionFormData | Record<string, any>
+}
 
 export type ConditionalParameters =
   | UserConditionalParameters
@@ -137,19 +141,9 @@ export const event = {
                 properties: {
                   type: {
                     const: action
-                  },
-                  draft: {
-                    type: 'boolean'
                   }
                 },
-                required: ['type'],
-                not: {
-                  properties: {
-                    draft: {
-                      const: true
-                    }
-                  }
-                }
+                required: ['type']
               }
             }
           },
@@ -244,6 +238,44 @@ export function field(fieldId: string) {
               }
             },
             required: [fieldId]
+          }
+        },
+        required: ['$form']
+      }),
+    /**
+     * Use case: Some fields are rendered when selection is not made, or boolean false is explicitly selected.
+     * @example field('recommender.none').isFalsy() vs not(field('recommender.none').isEqualTo(true))
+     * @returns whether the field is falsy (undefined, false, null, empty string)
+     *
+     * NOTE: For now, this only works with string, boolean, and null types. 0 is still allowed.
+     *
+     */
+    isFalsy: () =>
+      defineConditional({
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                anyOf: [
+                  { const: 'undefined' },
+                  { const: false },
+                  { const: null },
+                  { const: '' }
+                ]
+              }
+            },
+            anyOf: [
+              {
+                required: [fieldId]
+              },
+              {
+                not: {
+                  required: [fieldId]
+                }
+              }
+            ]
           }
         },
         required: ['$form']

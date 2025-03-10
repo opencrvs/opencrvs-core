@@ -10,19 +10,18 @@
  */
 
 import { ActionType } from '../ActionType'
-import { ActionDocument } from '../ActionDocument'
+import { ActionDocument, ActionMetadata } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
+import { Draft } from '../Draft'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
     if (action.type === ActionType.CREATE) {
       return EventStatus.CREATED
     }
-    if (action.draft) {
-      return status
-    }
+
     if (action.type === ActionType.DECLARE) {
       return EventStatus.DECLARED
     }
@@ -33,6 +32,14 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
 
     if (action.type === ActionType.REGISTER) {
       return EventStatus.REGISTERED
+    }
+
+    if (action.type === ActionType.REJECT) {
+      return EventStatus.REJECTED
+    }
+
+    if (action.type === ActionType.ARCHIVED) {
+      return EventStatus.ARCHIVED
     }
     return status
   }, EventStatus.CREATED)
@@ -91,9 +98,7 @@ function getData(actions: Array<ActionDocument>) {
 }
 
 export function isUndeclaredDraft(event: EventDocument): boolean {
-  return event.actions.every(
-    ({ type, draft }) => type === ActionType.CREATE || draft
-  )
+  return event.actions.every(({ type }) => type === ActionType.CREATE)
 }
 
 export function getCurrentEventState(event: EventDocument): EventIndex {
@@ -117,6 +122,94 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     modifiedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(event.actions),
     updatedBy: latestAction.createdBy,
-    data: getData(event.actions)
+    data: getData(event.actions),
+    trackingId: event.trackingId
   }
+}
+
+export function getCurrentEventStateWithDrafts(
+  event: EventDocument,
+  drafts: Draft[]
+): EventIndex {
+  const actions = event.actions.slice().sort()
+  const lastAction = actions[actions.length - 1]
+
+  const activeDrafts = drafts
+    .filter(({ eventId }) => eventId === event.id)
+    .filter(
+      ({ createdAt }) => new Date(createdAt) > new Date(lastAction.createdAt)
+    )
+    .map((draft) => draft.action)
+    .flatMap((action) => {
+      /*
+       * If the action encountered is "REQUEST_CORRECTION", we want to pretend like it was approved
+       * so previews etc are shown correctly
+       */
+      if (action.type === ActionType.REQUEST_CORRECTION) {
+        return [
+          action,
+          {
+            ...action,
+            type: ActionType.APPROVE_CORRECTION
+          }
+        ] as ActionDocument[]
+      }
+      return [action] as ActionDocument[]
+    })
+
+  const actionWithDrafts = [...actions, ...activeDrafts].sort()
+  const withDrafts: EventDocument = {
+    ...event,
+    actions: actionWithDrafts
+  }
+
+  return getCurrentEventState(withDrafts)
+}
+
+export function applyDraftsToEventIndex(
+  eventIndex: EventIndex,
+  drafts: Draft[]
+) {
+  const indexedAt = eventIndex.modifiedAt
+
+  const activeDrafts = drafts
+    .filter(({ createdAt }) => new Date(createdAt) > new Date(indexedAt))
+    .map((draft) => draft.action)
+    .sort()
+
+  if (activeDrafts.length === 0) {
+    return eventIndex
+  }
+
+  return {
+    ...eventIndex,
+    data: {
+      ...eventIndex.data,
+      ...activeDrafts[activeDrafts.length - 1].data
+    }
+  }
+}
+
+export function getMetadataForAction(
+  event: EventDocument,
+  actionType: ActionType,
+  draftsForEvent: Draft[]
+): ActionMetadata {
+  const action = event.actions.find((action) => actionType === action.type)
+
+  const drafts = draftsForEvent.filter((draft) => draft.eventId === event.id)
+
+  const sorted = [
+    ...(action ? [action] : []),
+    ...drafts.map((draft) => draft.action)
+  ].sort()
+
+  const metadata = sorted.reduce((metadata, action) => {
+    return {
+      ...metadata,
+      ...action.metadata
+    }
+  }, {})
+
+  return metadata
 }

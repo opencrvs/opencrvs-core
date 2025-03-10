@@ -13,6 +13,14 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import type { Preview } from '@storybook/react'
 import { initialize, mswLoader } from 'msw-storybook-addon'
 import React, { PropsWithChildren } from 'react'
+
+import { Page } from '@client/components/Page'
+import { I18nContainer } from '@client/i18n/components/I18nContainer'
+import { createStore } from '@client/store'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useApolloClient } from '@client/utils/apolloClient'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { Provider } from 'react-redux'
 import {
   createMemoryRouter,
@@ -21,14 +29,8 @@ import {
   RouterProvider
 } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
-import { Page } from '../src/components/Page'
-import { I18nContainer } from '../src/i18n/components/I18nContainer'
-import { createStore } from '../src/store'
-import { useApolloClient } from '../src/utils/apolloClient'
-import { ApolloProvider } from '../src/utils/ApolloProvider'
-import { TRPCProvider } from '../src/v2-events/trpc'
-import { handlers } from './default-request-handlers'
 import WebFont from 'webfontloader'
+import { handlers } from './default-request-handlers'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -106,13 +108,27 @@ export const parameters = {
   }
 }
 
+const generator = testDataGenerator()
+
+/*
+ * Clear all indexedDB databases before each story
+ */
+async function clearStorage() {
+  const databases = await window.indexedDB.databases()
+  for (const db of databases) {
+    window.indexedDB.deleteDatabase(db.name!)
+  }
+}
+
+clearStorage()
+
 const preview: Preview = {
   loaders: [mswLoader],
   beforeEach: async () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyZS1iaXJ0aCIsInJlY29yZC5kZWNsYXJlLWRlYXRoIiwicmVjb3JkLmRlY2xhcmUtbWFycmlhZ2UiLCJyZWNvcmQuZGVjbGFyYXRpb24tZWRpdCIsInJlY29yZC5kZWNsYXJhdGlvbi1zdWJtaXQtZm9yLXVwZGF0ZXMiLCJyZWNvcmQucmV2aWV3LWR1cGxpY2F0ZXMiLCJyZWNvcmQuZGVjbGFyYXRpb24tYXJjaGl2ZSIsInJlY29yZC5kZWNsYXJhdGlvbi1yZWluc3RhdGUiLCJyZWNvcmQucmVnaXN0ZXIiLCJyZWNvcmQucmVnaXN0cmF0aW9uLWNvcnJlY3QiLCJyZWNvcmQuZGVjbGFyYXRpb24tcHJpbnQtc3VwcG9ydGluZy1kb2N1bWVudHMiLCJyZWNvcmQuZXhwb3J0LXJlY29yZHMiLCJyZWNvcmQudW5hc3NpZ24tb3RoZXJzIiwicmVjb3JkLnJlZ2lzdHJhdGlvbi1wcmludCZpc3N1ZS1jZXJ0aWZpZWQtY29waWVzIiwicmVjb3JkLmNvbmZpcm0tcmVnaXN0cmF0aW9uIiwicmVjb3JkLnJlamVjdC1yZWdpc3RyYXRpb24iLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwicHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczpteS1vZmZpY2UiLCJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJkZW1vIl0sImlhdCI6MTczNzcyODc1MCwiZXhwIjoxNzM4MzMzNTUwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciIsIm9wZW5jcnZzOnNlYXJjaC11c2VyIiwib3BlbmNydnM6bWV0cmljcy11c2VyIiwib3BlbmNydnM6Y291bnRyeWNvbmZpZy11c2VyIiwib3BlbmNydnM6d2ViaG9va3MtdXNlciIsIm9wZW5jcnZzOmNvbmZpZy11c2VyIiwib3BlbmNydnM6ZG9jdW1lbnRzLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjc5M2EyZDdmYWQ4NmRhOTQ3YmFjY2YxIn0.I9n81VBdwjgyDh9rK7noCa2F4pl9WPbQJttHN6DI3pD6Xu5pPK25j9FdlQ6JiYG47cWji-J6UzsiZ_Nk7kz9paBlJyS2qts0otuSaz95B-vSRIN18MeF45CoM6ZmNJj2qbk8Enn8ZXs8VB4XH6cN8h30KWsa7-117dGc-Zmm62dkAFS61QR3hmXomexPVFtf5t_w4AOOiAfyyUI6qQHevDA6xXCWdfE2UaIXs5p2_5Hh7qUHLH258PCEgvo__qjmVo3FFAKL6bvmSIPVGwu8pMQK6R0y5ILe1rG-ZFb7nhpvVjywCiN4N4GtRbnQ3beBWG5Up8oKxwovxk9gVCbinw'
-    )
+    await clearStorage()
+    queryClient.clear()
+
+    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
   },
   decorators: [
     (Story, context) => {

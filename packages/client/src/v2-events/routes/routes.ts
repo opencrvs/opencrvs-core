@@ -10,12 +10,13 @@
  */
 
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
+import { config } from '@client/config'
 import { routes as correctionRoutes } from '@client/v2-events/features/events/actions/correct/request/routes'
 import { routes as workqueueRoutes } from '@client/v2-events/features/workqueues/routes'
 
 export const ROUTES = {
   V2: route(
-    window.config.FEATURES.V2_EVENTS ? '' : 'v2',
+    config.FEATURES.V2_EVENTS ? '' : 'v2',
     {},
     {
       EVENTS: route(
@@ -83,7 +84,11 @@ export const ROUTES = {
           REQUEST_CORRECTION: correctionRoutes
         }
       ),
-      WORKQUEUES: workqueueRoutes
+      WORKQUEUES: workqueueRoutes,
+      ADVANCED_SEARCH: route('advanced-search'),
+      SEARCH_RESULT: route('search-result/:eventType', {
+        params: { eventType: string().defined() }
+      })
     }
   )
 }

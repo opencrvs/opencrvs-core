@@ -26,7 +26,10 @@ import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
-import { EventHistoryModal } from './EventHistoryModal'
+import {
+  EventHistoryModal,
+  eventHistoryStatusMessage
+} from './EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
 
 /**
@@ -40,17 +43,12 @@ const TableDiv = styled.div`
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const messages = defineMessages({
-  'event.history.timeFormat': {
+  timeFormat: {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'v2.event.history.timeFormat',
+    id: 'v2.configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   },
-  'events.history.status': {
-    id: `v2.events.history.status`,
-    defaultMessage:
-      '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
-  },
-  'event.history.role': {
+  role: {
     id: 'v2.event.history.role',
     defaultMessage:
       '{role, select, LOCAL_REGISTRAR{Local Registrar} other{Unknown}}',
@@ -81,7 +79,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
     return {
       date: format(
         new Date(item.createdAt),
-        intl.formatMessage(messages['event.history.timeFormat'])
+        intl.formatMessage(messages.timeFormat)
       ),
       action: (
         <Link
@@ -90,7 +88,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
             onHistoryRowClick(item, user)
           }}
         >
-          {intl.formatMessage(messages['events.history.status'], {
+          {intl.formatMessage(eventHistoryStatusMessage, {
             status: item.type
           })}
         </Link>
@@ -115,7 +113,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
           />
         </Link>
       ),
-      role: intl.formatMessage(messages['event.history.role'], {
+      role: intl.formatMessage(messages.role, {
         role: user.role
       }),
       location: (

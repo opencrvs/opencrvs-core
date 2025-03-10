@@ -11,7 +11,7 @@
 
 import { TranslationConfig } from './TranslationConfig'
 
-import { flattenDeep, isEqual } from 'lodash'
+import { flattenDeep, omitBy } from 'lodash'
 import { workqueues } from '../workqueues'
 import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
@@ -19,6 +19,9 @@ import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
+import { ActionFormData } from './ActionDocument'
+import { FormConfig } from './FormConfig'
+import { isFieldVisible } from '../conditionals/validate'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -107,7 +110,10 @@ export const resolveLabelsFromKnownFields = ({
 export function getAllFields(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => form.pages.flatMap((page) => page.fields))
+    .flatMap((form) => [
+      ...form.review.fields,
+      ...form.pages.flatMap((page) => page.fields)
+    ])
 }
 
 export function getAllPages(configuration: EventConfig) {
@@ -126,20 +132,6 @@ export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
         `Invalid workqueue configuration: workqueue not found with id:  ${workqueue.id}`
       )
     }
-
-    const rootWorkqueueFields = rootWorkqueue.columns.map(({ id }) => id).sort()
-
-    const workqueueConfigFields = workqueue.fields
-      .map(({ column }) => column)
-      .sort()
-
-    if (!isEqual(rootWorkqueueFields, workqueueConfigFields)) {
-      throw new Error(
-        `Invalid workqueue configuration: [${rootWorkqueueFields.join(
-          ','
-        )}] does not match [${workqueueConfigFields.join(',')}]`
-      )
-    }
   })
 }
 
@@ -154,12 +146,59 @@ export const findActiveActionForm = (
   return form
 }
 
+export const getFormFields = (formConfig: FormConfig) => {
+  return formConfig.pages.flatMap((p) => p.fields)
+}
+
 export const findActiveActionFields = (
   configuration: EventConfig,
   action: ActionType
-) => {
+): FieldConfig[] => {
   const form = findActiveActionForm(configuration, action)
-
+  const reviewFields = form?.review.fields || []
   /** Let caller decide whether to throw or default to empty array */
-  return form?.pages.flatMap((p) => p.fields)
+  return (form ? getFormFields(form) : []).concat(reviewFields)
+}
+
+export function getEventConfiguration(
+  eventConfigurations: EventConfig[],
+  type: string
+): EventConfig {
+  const config = eventConfigurations.find((config) => config.id === type)
+  if (!config) {
+    throw new Error(`Event configuration not found for type: ${type}`)
+  }
+  return config
+}
+
+export function isOptionalUncheckedCheckbox(
+  field: FieldConfig,
+  form: ActionFormData
+) {
+  if (field.type !== 'CHECKBOX') {
+    return false
+  }
+
+  // For required checkbox fields, we want to display the field even if it is not checked
+  if (field.required) {
+    return false
+  }
+
+  return !form[field.id]
+}
+
+export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
+  return omitBy(data, (_, fieldId) => {
+    const field = fields.find((f) => f.id === fieldId)
+
+    if (!field) {
+      return true
+    }
+
+    if (isOptionalUncheckedCheckbox(field, data)) {
+      return true
+    }
+
+    return !isFieldVisible(field, data)
+  })
 }
