@@ -142,8 +142,7 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
           onEdit={handleEdit}
         >
           <Review.Actions
-            form={mockFormData}
-            formConfig={TENNIS_CLUB_FORM}
+            isPrimaryActionDisabled={false}
             messages={{
               title: {
                 id: 'v2.changeModal.title',
@@ -221,8 +220,7 @@ export const ReviewWithValidationErrors: Story = {
         onEdit={() => undefined}
       >
         <Review.Actions
-          form={this.args?.form || {}}
-          formConfig={TENNIS_CLUB_FORM}
+          isPrimaryActionDisabled={false}
           messages={{
             title: {
               id: 'v2.changeModal.title',

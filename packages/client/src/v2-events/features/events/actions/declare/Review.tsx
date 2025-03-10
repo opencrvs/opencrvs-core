@@ -170,6 +170,7 @@ export function Review() {
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
+          isPrimaryActionDisabled={reviewActionConfiguration.isDisabled}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
