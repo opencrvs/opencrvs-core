@@ -19,7 +19,7 @@ import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
 import * as Register from '@client/v2-events/features/events/actions/register'
-import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
+import * as Validate from '@client/v2-events/features/events/actions/validate'
 import AdvancedSearch from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
 import { EventSelectionIndex } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
@@ -65,10 +65,6 @@ export const routesConfig = {
       element: <DeleteEvent />
     },
     {
-      path: ROUTES.V2.EVENTS.VALIDATE.path,
-      element: <ValidateEvent />
-    },
-    {
       path: ROUTES.V2.EVENTS.DECLARE.path,
       element: (
         <Action type={ActionType.DECLARE}>
@@ -87,6 +83,28 @@ export const routesConfig = {
         {
           path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
           element: <Declare.Review />
+        }
+      ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.VALIDATE.path,
+      element: (
+        <Action type={ActionType.VALIDATE}>
+          <Outlet />
+        </Action>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Validate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.VALIDATE.PAGES.path,
+          element: <Validate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
+          element: <Validate.Review />
         }
       ]
     },

@@ -44,6 +44,22 @@ export const ROUTES = {
               })
             }
           ),
+          VALIDATE: route(
+            'validate/:eventId',
+            {
+              params: { eventId: string().defined() }
+            },
+            {
+              REVIEW: route('review'),
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
+                searchParams: {
+                  from: string()
+                },
+                hash: hashValues()
+              })
+            }
+          ),
           REGISTER: route(
             'register/:eventId',
             {
@@ -60,9 +76,6 @@ export const ROUTES = {
               })
             }
           ),
-          VALIDATE: route('validate/:eventId', {
-            params: { eventId: string().defined() }
-          }),
           PRINT_CERTIFICATE: route(
             'print-certificate/:eventId',
             {

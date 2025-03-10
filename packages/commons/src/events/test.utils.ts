@@ -102,7 +102,9 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.VALIDATE,
       transactionId: input.transactionId ?? getUUID(),
-      data: input.data ?? {},
+      data:
+        input.data ??
+        generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
       duplicates: [],
       eventId
     }),

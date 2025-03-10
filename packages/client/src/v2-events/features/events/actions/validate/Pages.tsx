@@ -29,8 +29,8 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 export function Pages() {
-  const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
+  const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE.PAGES)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.VALIDATE.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const { formValues: form } = useSubscribeEventFormData()
 
@@ -44,9 +44,10 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+
   const formPages = findActiveActionFormPages(
     configuration,
-    ActionType.REGISTER
+    ActionType.VALIDATE
   )
 
   if (!formPages) {
@@ -63,7 +64,7 @@ export function Pages() {
   useEffect(() => {
     if (pageId !== currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
+        ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath({
           eventId,
           pageId: currentPageId
         }),
@@ -74,7 +75,7 @@ export function Pages() {
 
   return (
     <FormLayout
-      route={ROUTES.V2.EVENTS.REGISTER}
+      route={ROUTES.V2.EVENTS.VALIDATE}
       onSaveAndExit={() => {
         drafts.submitLocalDraft()
         goToHome()
@@ -89,14 +90,14 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
+            ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath({
               eventId,
               pageId: nextPageId
             })
           )
         }
         onSubmit={() =>
-          navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
+          navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
         }
       />
     </FormLayout>

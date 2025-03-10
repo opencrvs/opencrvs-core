@@ -146,6 +146,13 @@ export const findActiveActionForm = (
   return form
 }
 
+export const findActiveActionFormPages = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  return findActiveActionForm(configuration, action)?.pages
+}
+
 export const getFormFields = (formConfig: FormConfig) => {
   return formConfig.pages.flatMap((p) => p.fields)
 }
