@@ -55,8 +55,7 @@ export type ValidateActionInput = z.infer<typeof ValidateActionInput>
 
 export const NotifyActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
   })
 )
 

@@ -14,16 +14,13 @@ import {
   ActionType,
   FieldConfig,
   FieldValue,
-  getFieldValidationErrors,
-  inScope,
-  SCOPES
+  getFieldValidationErrors
 } from '@opencrvs/commons'
 
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getActionFormFields } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
-import { setBearerForToken } from '@events/router/middleware/authorization'
 
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
@@ -70,24 +67,10 @@ export function validateAction(actionType: ActionType) {
     )
 
     if (errors.length > 0) {
-      if (
-        actionType === ActionType.DECLARE &&
-        inScope({ Authorization: setBearerForToken(opts.ctx.token) }, [
-          SCOPES.RECORD_SUBMIT_INCOMPLETE
-        ])
-      ) {
-        if (!opts.input.metadata) {
-          opts.input.metadata = {}
-        }
-        opts.input.metadata.incomplete = true
-        return opts.next()
-      }
-      {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: JSON.stringify(errors)
-        })
-      }
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: JSON.stringify(errors)
+      })
     }
 
     return opts.next()

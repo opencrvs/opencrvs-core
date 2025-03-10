@@ -245,6 +245,13 @@ export function useReviewActionConfig({
   const isDisabled =
     incomplete && !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
 
+  if (incomplete && scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)) {
+    if (!metadata) {
+      metadata = {}
+    }
+    metadata.incomplete = true
+  }
+
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
     return {
       buttonType: 'positive' as const,
