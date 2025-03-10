@@ -143,11 +143,6 @@ function changeSortedColumn(
 }
 
 const messagesToDefine = {
-  edit: {
-    defaultMessage: 'Edit',
-    description: 'Edit button text',
-    id: 'v2.buttons.edit'
-  },
   noResult: {
     id: 'v2.search.noResult',
     defaultMessage: 'No results',
@@ -158,32 +153,6 @@ const messagesToDefine = {
     description:
       'The label for search result header in advancedSearchResult page',
     id: 'v2.advancedSearchResult.table.searchResult'
-  },
-  name: {
-    defaultMessage: 'Name',
-    description: 'Name label',
-    id: 'v2.constants.name'
-  },
-  event: {
-    defaultMessage: 'Event',
-    description: 'Label for Event of event in work queue list item',
-    id: 'v2.constants.event'
-  },
-  eventDate: {
-    defaultMessage: 'Date of event',
-    description: 'Label for event date in list item',
-    id: 'v2.constants.eventDate'
-  },
-  noResults: {
-    defaultMessage: 'No result',
-    description:
-      'Text to display if the search return no results for the current filters',
-    id: 'v2.constants.noResults'
-  },
-  queryError: {
-    defaultMessage: 'An error occurred while searching',
-    description: 'The error message shown when a search query fails',
-    id: 'v2.error.search'
   }
 }
 
