@@ -69,53 +69,59 @@ export function StepTwoContainer() {
   return (
     <Container id="login-step-two-box">
       <Box id="Box">
-        <LogoContainer>
-          <CountryLogo size="small" src={logo} />
-        </LogoContainer>
-        {resentAuthenticationCode ? (
-          <React.Fragment>
-            <Text element="h1" variant="h2" align="center">
-              {intl.formatMessage(messages.stepTwoResendTitle)}
-            </Text>
-            <Text
-              variant="reg16"
-              align="center"
-              color="supportingCopy"
-              element="p"
-            >
-              {notificationMethod === 'sms' &&
-                intl.formatMessage(messages.resentSMS, {
-                  number: mobileNumber
-                })}
-              {notificationMethod === 'email' &&
-                intl.formatMessage(messages.resentEMAIL, {
-                  email: emailAddress
-                })}
-            </Text>
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            <Text element="h1" variant="h2" align="center">
-              {intl.formatMessage(messages.stepTwoTitle)}
-            </Text>
+        <Stack direction="column" alignItems="stretch" gap={24}>
+          <LogoContainer>
+            <CountryLogo size="small" src={logo} />
+          </LogoContainer>
+          {resentAuthenticationCode ? (
+            <React.Fragment>
+              <Stack direction="column" alignItems="stretch" gap={8}>
+                <Text element="h1" variant="h2" align="center">
+                  {intl.formatMessage(messages.stepTwoResendTitle)}
+                </Text>
+                <Text
+                  variant="reg16"
+                  align="center"
+                  color="supportingCopy"
+                  element="p"
+                >
+                  {notificationMethod === 'sms' &&
+                    intl.formatMessage(messages.resentSMS, {
+                      number: mobileNumber
+                    })}
+                  {notificationMethod === 'email' &&
+                    intl.formatMessage(messages.resentEMAIL, {
+                      email: emailAddress
+                    })}
+                </Text>
+              </Stack>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Stack direction="column" alignItems="stretch" gap={8}>
+                <Text element="h1" variant="h2" align="center">
+                  {intl.formatMessage(messages.stepTwoTitle)}
+                </Text>
 
-            <Text
-              variant="reg16"
-              align="center"
-              color="supportingCopy"
-              element="p"
-            >
-              {notificationMethod === 'sms' &&
-                intl.formatMessage(messages.stepTwoInstructionSMS, {
-                  number: mobileNumber
-                })}
-              {notificationMethod === 'email' &&
-                intl.formatMessage(messages.stepTwoInstructionEMAIL, {
-                  email: emailAddress
-                })}
-            </Text>
-          </React.Fragment>
-        )}
+                <Text
+                  variant="reg16"
+                  align="center"
+                  color="supportingCopy"
+                  element="p"
+                >
+                  {notificationMethod === 'sms' &&
+                    intl.formatMessage(messages.stepTwoInstructionSMS, {
+                      number: mobileNumber
+                    })}
+                  {notificationMethod === 'email' &&
+                    intl.formatMessage(messages.stepTwoInstructionEMAIL, {
+                      email: emailAddress
+                    })}
+                </Text>
+              </Stack>
+            </React.Fragment>
+          )}
+        </Stack>
 
         <Form
           onSubmit={(values: IVerifyCodeNumbers) =>
@@ -144,28 +150,33 @@ export function StepTwoContainer() {
                     </InputField>
                   )}
                 </Field>
-                <Button
-                  size="large"
-                  type="primary"
-                  id="login-mobile-submit"
-                  loading={submitting}
-                >
-                  {intl.formatMessage(messages.verify)}
-                </Button>
+                <Stack direction="column" gap={16}>
+                  <Button
+                    size="large"
+                    type="primary"
+                    fullWidth
+                    id="login-mobile-submit"
+                    loading={submitting}
+                  >
+                    {intl.formatMessage(messages.verify)}
+                  </Button>
 
-                <Button
-                  size="small"
-                  type="tertiary"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    dispatch(
-                      actions.resendAuthenticationCode(notificationEvent)
-                    )
-                  }}
-                  id="login-mobile-resend"
-                >
-                  {intl.formatMessage(messages.resend, { notificationMethod })}
-                </Button>
+                  <Button
+                    size="small"
+                    type="tertiary"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      dispatch(
+                        actions.resendAuthenticationCode(notificationEvent)
+                      )
+                    }}
+                    id="login-mobile-resend"
+                  >
+                    {intl.formatMessage(messages.resend, {
+                      notificationMethod
+                    })}
+                  </Button>
+                </Stack>
               </Stack>
             </FormWrapper>
           )}
