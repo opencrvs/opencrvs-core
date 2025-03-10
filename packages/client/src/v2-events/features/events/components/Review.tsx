@@ -43,7 +43,6 @@ import {
   isOptionalUncheckedCheckbox,
   SCOPES
 } from '@opencrvs/commons/client'
-import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 // eslint-disable-next-line no-restricted-imports

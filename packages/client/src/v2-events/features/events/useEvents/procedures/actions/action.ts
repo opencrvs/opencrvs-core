@@ -16,7 +16,6 @@ import {
 } from '@trpc/tanstack-react-query'
 import {
   ActionType,
-  findActiveActionFields,
   getActiveActionFields,
   stripHiddenFields
 } from '@opencrvs/commons/client'

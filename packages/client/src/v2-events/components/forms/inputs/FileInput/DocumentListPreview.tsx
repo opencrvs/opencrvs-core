@@ -119,7 +119,7 @@ export const DocumentListPreview = ({
                 id="preview_delete"
                 size="small"
                 type="icon"
-                onClick={() => document && onDelete(document.filename)}
+                onClick={() => onDelete(document.filename)}
               >
                 <Icon color="red" name="Trash" size="small" />
               </Button>
