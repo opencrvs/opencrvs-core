@@ -9,15 +9,19 @@
 
 name: Listen for labels added to PRs
 
-
 on:
-  pull_request:
-    types: [push]
+  push
 
 jobs:
   dispatch-deploy:
     runs-on: ubuntu-24.04
     steps:
+      steps:
+      - uses: 8BitJonny/gh-get-current-pr@3.0.0
+        id: PR
+
+      - run: echo "PR ${prNumber} ${prTitle} at ${prUrl} is ${prJSON}"
+        if: steps.PR.outputs.pr_found == 'true'
       - name: Check if added label is "🔒 Keep e2e"
         id: label_check
         run: |
