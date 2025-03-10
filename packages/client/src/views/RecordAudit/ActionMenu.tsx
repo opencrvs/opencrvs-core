@@ -133,7 +133,7 @@ export const ActionMenu: React.FC<{
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger>
+        <DropdownMenu.Trigger asChild>
           <Button type="primary" size="medium">
             {intl.formatMessage(messages.action)}
             <Icon name="CaretDown" color="currentColor" size="small" />
