@@ -642,7 +642,7 @@ function ReviewActionComponent({
   onReject,
   messages,
   primaryButtonType,
-  action
+  canSendIncomplete
 }: {
   onConfirm: () => void
   onReject?: () => void
@@ -657,6 +657,7 @@ function ReviewActionComponent({
   }
   primaryButtonType?: 'positive' | 'primary'
   action?: string
+  canSendIncomplete?: boolean
 }) {
   const intl = useIntl()
   const hasValidationErrors = validationErrorsInActionFormExist(
@@ -677,7 +678,7 @@ function ReviewActionComponent({
           <Description>{intl.formatMessage(descriptionMessage)}</Description>
           <ActionContainer>
             <Button
-              disabled={hasValidationErrors}
+              disabled={hasValidationErrors && !canSendIncomplete}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}

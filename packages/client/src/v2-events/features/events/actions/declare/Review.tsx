@@ -15,7 +15,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { v4 as uuid } from 'uuid'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  findActiveActionForm,
+  SCOPES
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -171,6 +175,7 @@ export function Review() {
       >
         <ReviewComponent.Actions
           action={ActionType.DECLARE}
+          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
           form={form}
           formConfig={formConfig}
           messages={reviewActionConfiguration.messages}
