@@ -107,11 +107,24 @@ export const SaveAndExit: Story = {
         await canvas.findByTestId('text__applicant____surname'),
         'Draft'
       )
+      const continueButton = await canvas.findByText('Continue')
+      await userEvent.click(continueButton)
     })
-    const continueButton = await canvas.findByText('Continue')
-    await userEvent.click(continueButton)
-    const button = await canvas.findByRole('button', { name: /Save & Exit/ })
-    await userEvent.click(button)
+
+    await step('click `Save & Exit` button', async () => {
+      const button = await canvas.findByRole('button', { name: /Save & Exit/ })
+      await userEvent.click(button)
+      const modal = within(await canvas.findByRole('dialog'))
+      await expect(
+        modal.getByRole('heading', { name: /Save & exit\?/ })
+      ).toBeInTheDocument()
+    })
+
+    await step('click `Confirm` button in modal', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
+      await userEvent.click(modal.getByRole('button', { name: /Confirm/ }))
+    })
+
     await waitFor(async () => expect(spy).toHaveBeenCalled())
     await canvas.findByText('Clearly Draft')
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
@@ -191,6 +204,8 @@ export const DraftShownInForm: Story = {
     await userEvent.click(continueButton)
     const button = await canvas.findByRole('button', { name: /Save & Exit/ })
     await userEvent.click(button)
+    const modal = within(await canvas.findByRole('dialog'))
+    await userEvent.click(modal.getByRole('button', { name: /Confirm/ }))
     await userEvent.click(await canvas.findByText('Clearly Draft'))
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
     await userEvent.click(await canvas.findByText(/Send an application/))

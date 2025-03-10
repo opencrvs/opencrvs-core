@@ -23,7 +23,7 @@ import {
   getEventById
 } from '@events/service/events/events'
 import { presignFilesInEvent } from '@events/service/files'
-import { getIndexedEvents } from '@events/service/indexing/indexing'
+import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import {
   ApproveCorrectionActionInput,
   EventConfig,
@@ -46,7 +46,8 @@ import {
   PrintCertificateActionInput,
   RegisterActionInput,
   RejectDeclarationActionInput,
-  ValidateActionInput
+  ValidateActionInput,
+  EventSearchIndex
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
@@ -315,5 +316,10 @@ export const eventRouter = router({
         logger.info(input.data)
         return getEventById(input.eventId)
       })
-  })
+  }),
+  search: publicProcedure
+    .input(EventSearchIndex)
+    .query(async ({ input, ctx }) => {
+      return getIndex(input)
+    })
 })
