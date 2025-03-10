@@ -15,12 +15,12 @@ import {
   logger,
   EventDocument,
   FileFieldValue,
-  FieldType
+  FieldType,
+  findActiveActionFields
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { getEventConfigurations } from '@events/service/config/config'
 import { z } from 'zod'
-import { findActiveActionFields } from '@opencrvs/commons/client'
 
 function getFieldDefinitionForActionDataField(
   configuration: EventConfig,
@@ -29,7 +29,7 @@ function getFieldDefinitionForActionDataField(
 ) {
   const actionFields = findActiveActionFields(configuration, actionType)
 
-  const fieldConfig = actionFields?.find((field) => field.id === fieldId)
+  const fieldConfig = actionFields.find((field) => field.id === fieldId)
   if (!fieldConfig) {
     logger.error(
       `Failed to find active field configuration for type: ${fieldId}, action: ${actionType}`
