@@ -896,6 +896,24 @@ export const tennisClubMembershipEvent = defineConfig({
           description: 'This is the message to show when the field is empty',
           id: 'event.tennis-club-membership.summary.field.firstname.empty'
         }
+      },
+      {
+        id: 'applicant.surname',
+        label: {
+          defaultMessage: "Applicant's last name",
+          description: 'This is the label for the field',
+          id: 'event.tennis-club-membership.summary.field.surname.label'
+        },
+        value: {
+          defaultMessage: '{applicant.surname}',
+          description: 'This is the value to show in the summary',
+          id: 'event.tennis-club-membership.summary.field.surname'
+        },
+        emptyValueMessage: {
+          defaultMessage: 'Last name is not provided',
+          description: 'This is the message to show when the field is empty',
+          id: 'event.tennis-club-membership.summary.field.surname.empty'
+        }
       }
     ]
   },
@@ -935,10 +953,10 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: 'REGISTER',
       label: {
-        defaultMessage: 'Send an application',
+        defaultMessage: 'Register',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.declare.label'
+        id: 'event.tennis-club-membership.action.register.label'
       },
       forms: [TENNIS_CLUB_FORM]
     },
@@ -1221,7 +1239,6 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   advancedSearch: [
     {
-      id: 'RANDOM',
       title: {
         defaultMessage: 'Tennis club registration search',
         description: 'This is what this event is referred as in the system',

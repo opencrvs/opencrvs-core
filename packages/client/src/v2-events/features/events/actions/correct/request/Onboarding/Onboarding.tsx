@@ -16,14 +16,14 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { ActionType } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
+import { buttonMessages } from '@client/i18n/messages'
 import { generateGoToHomeTabUrl } from '@client/navigation'
-import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { buttonMessages } from '@client/i18n/messages'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 
 const messages = defineMessages({
   title: {
@@ -34,7 +34,7 @@ const messages = defineMessages({
 })
 
 export function Onboarding() {
-  const resetMetadata = useCorrectionRequestData((state) => state.clear)
+  const resetMetadata = useEventMetadata((state) => state.clear)
   const resetFormData = useEventFormData((state) => state.clear)
   React.useEffect(() => {
     resetMetadata()
@@ -47,7 +47,8 @@ export function Onboarding() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
   const events = useEvents()
-  const correctionRequestData = useCorrectionRequestData()
+  const metadata = useEventMetadata((state) => state.getMetadata())
+  const setMetadata = useEventMetadata((state) => state.setMetadata)
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -103,10 +104,10 @@ export function Onboarding() {
       <PagesComponent
         // @TODO: Use subscription if needed
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-        form={correctionRequestData.getFormValues()}
+        form={metadata}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={correctionRequestData.setFormValues}
+        setFormData={(data) => setMetadata(data)}
         showReviewButton={false}
         onFormPageChange={(nextPageId: string) => {
           return navigate(
