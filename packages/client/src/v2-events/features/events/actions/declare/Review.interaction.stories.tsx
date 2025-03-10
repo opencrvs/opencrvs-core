@@ -16,7 +16,8 @@ import { userEvent, within, expect, waitFor } from '@storybook/test'
 import {
   ActionType,
   tennisClubMembershipEvent,
-  generateEventDocument
+  generateEventDocument,
+  generateEventDraftDocument
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -28,13 +29,10 @@ import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
 
-const eventId = '123-456-789'
-
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Review/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
-      eventId,
       formValues: generator.event.actions.declare(eventId).data
     })
   }
@@ -73,6 +71,15 @@ const callTracker = {
   }
 }
 
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
+
+const draft = generateEventDraftDocument(eventId, ActionType.REGISTER)
+
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   parameters: {
     reactRouter: {
@@ -84,15 +91,17 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -100,10 +109,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           tRPCMsw.event.create.mutation(() => {
             callTracker.localRegistrar['event.create']++
 
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.actions.declare.mutation(() => {
             callTracker.localRegistrar['event.actions.declare']++
@@ -188,7 +194,6 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      eventId,
       formValues: generator.event.actions.declare(eventId).data
     })
 
@@ -207,15 +212,17 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -223,10 +230,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           tRPCMsw.event.create.mutation(() => {
             callTracker.registrationAgent['event.create']++
 
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.actions.declare.mutation(() => {
             callTracker.registrationAgent['event.actions.declare']++
@@ -311,7 +315,6 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 export const ReviewForFieldAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      eventId,
       formValues: generator.event.actions.declare(eventId).data
     })
 
@@ -327,15 +330,17 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -343,10 +348,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
           tRPCMsw.event.create.mutation(() => {
             callTracker.fieldAgent['event.create']++
 
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.actions.declare.mutation(() => {
             callTracker.fieldAgent['event.actions.declare']++

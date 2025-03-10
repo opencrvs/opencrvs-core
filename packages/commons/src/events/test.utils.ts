@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { merge } from 'lodash'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import { ActionBase, ActionDocument } from './ActionDocument'
@@ -20,12 +21,14 @@ import {
   ValidateActionInput
 } from './ActionInput'
 import { ActionType } from './ActionType'
+import { Draft } from './Draft'
 import { EventConfig } from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import { findActiveActionFields, stripHiddenFields } from './utils'
+import { FieldValue } from './FieldValue'
 
 export function generateActionInput(
   configuration: EventConfig,
@@ -56,6 +59,32 @@ export const eventPayloadGenerator = {
     type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
     id
   }),
+  draft: (eventId: string, input: Partial<Draft> = {}) =>
+    merge(
+      {
+        id: getUUID(),
+        eventId,
+        createdAt: new Date().toISOString(),
+        transactionId: getUUID(),
+        action: {
+          type: ActionType.REQUEST_CORRECTION,
+          data: {
+            'applicant.firstname': 'Max',
+            'applicant.surname': 'McLaren',
+            'applicant.dob': '2020-01-02',
+            'recommender.none': true
+          },
+          metadata: {
+            'correction.requester.relationship': 'ANOTHER_AGENT',
+            'correction.request.reason': "Child's name was incorrect"
+          },
+          createdAt: new Date().toISOString(),
+          createdBy: '@todo',
+          createdAtLocation: '@todo'
+        }
+      },
+      input
+    ),
   actions: {
     declare: (
       eventId: string,
@@ -195,7 +224,6 @@ function generateActionDocument({
   const actionBase = {
     createdAt: new Date().toISOString(),
     createdBy: getUUID(),
-    draft: false,
     id: getUUID(),
     createdAtLocation: 'TODO',
     data: generateActionInput(configuration, action),
@@ -257,6 +285,30 @@ export function generateEventDocument({
     createdAt: new Date().toISOString(),
     id: getUUID(),
     updatedAt: new Date().toISOString()
+  }
+}
+
+export function generateEventDraftDocument(
+  eventId: string,
+  actionType: ActionType = ActionType.DECLARE,
+  data: Record<string, FieldValue> = {}
+): Draft {
+  const action = generateActionDocument({
+    configuration: tennisClubMembershipEvent,
+    action: actionType
+  })
+  return {
+    id: getUUID(),
+    transactionId: getUUID(),
+    action: {
+      ...action,
+      data: {
+        ...action.data,
+        ...data
+      }
+    },
+    createdAt: new Date().toISOString(),
+    eventId
   }
 }
 

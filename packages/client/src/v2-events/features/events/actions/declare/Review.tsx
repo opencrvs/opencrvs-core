@@ -12,7 +12,6 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
@@ -25,6 +24,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
@@ -34,6 +34,7 @@ import { useReviewActionConfig } from './useReviewActionConfig'
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
+  const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
@@ -48,10 +49,10 @@ export function Review() {
     throw new Error('No active form configuration found for declare action')
   }
 
-  const form = useEventFormData((state) => state.formValues)
+  const form = useEventFormData((state) => state.getFormValues())
 
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(eventId, {})
+  const metadata = getMetadata({})
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -111,13 +112,7 @@ export function Review() {
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
       onSaveAndExit={() => {
-        events.actions.declare.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          metadata,
-          draft: true
-        })
+        drafts.submitLocalDraft()
         goToHome()
       }}
     >
@@ -134,7 +129,7 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
         metadata={metadata}
-        onMetadataChange={(values) => setMetadata(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           action={ActionType.DECLARE}

@@ -9,32 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter } from '@client/v2-events/trpc'
 import { Pages } from '@client/v2-events/features/events/actions/declare'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { birthDocument } from './fixtures'
 
 const meta: Meta<typeof Pages> = {
-  title: 'File',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'File'
 }
 
 export default meta
 
 type Story = StoryObj<typeof Pages>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
-})
 
 export const BirthSupportingDocuments: Story = {
   parameters: {
@@ -44,15 +29,6 @@ export const BirthSupportingDocuments: Story = {
         eventId: birthDocument.id,
         pageId: 'documents'
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return birthDocument
-          })
-        ]
-      }
     }
   }
 }
