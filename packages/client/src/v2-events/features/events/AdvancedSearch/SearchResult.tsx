@@ -32,6 +32,7 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { SearchModifierComponent } from './SearchModifier'
 
 const SORT_ORDER = {
@@ -208,9 +209,10 @@ export const SearchResult = ({
   const total = queryData.length
   const noResultText = intl.formatMessage(messages.noResult)
 
-  const { getOutbox, getDrafts } = useEvents()
+  const { getOutbox } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
-  const drafts = getDrafts()
+  const drafts = getRemoteDrafts()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
