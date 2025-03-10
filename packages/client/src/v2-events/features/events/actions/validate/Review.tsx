@@ -39,29 +39,29 @@ const messages = defineMessages({
   validateActionTitle: {
     id: 'v2.validateAction.title',
     defaultMessage: 'Send for approval',
-    description: 'The title for register action'
+    description: 'The title for validate action'
   },
   validateActionDescription: {
     id: 'v2.validateAction.description',
     defaultMessage:
       'The informant will receive an email with a registration number that they can use to collect the certificate',
-    description: 'The description for register action'
+    description: 'The description for validate action'
   },
   validateActionDeclare: {
     id: 'v2.validateAction.Declare',
     defaultMessage: 'Send for approval',
-    description: 'The label for declare button of register action'
+    description: 'The label for declare button of validate action'
   },
   validateActionReject: {
     id: 'v2.validateAction.Reject',
     defaultMessage: 'Reject',
-    description: 'The label for reject button of register action'
+    description: 'The label for reject button of validate action'
   },
   validateActionDescriptionIncomplete: {
     id: 'v2.validateAction.incompleteForm',
     defaultMessage:
       'Please add mandatory information before sending for approval',
-    description: 'The label for warning of incomplete form'
+    description: 'The description for warning of incomplete form'
   }
 })
 
