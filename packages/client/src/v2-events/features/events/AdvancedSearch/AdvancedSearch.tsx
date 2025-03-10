@@ -10,6 +10,7 @@
  */
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
+import { useLocation } from 'react-router-dom'
 import {
   Content,
   ContentSize,
@@ -39,6 +40,8 @@ const messages = defineMessages(messagesToDefine)
 function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
+  const location = useLocation()
+  const searchParams = location.state
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
@@ -77,7 +80,7 @@ function AdvancedSearch() {
         titleColor={'copy'}
       >
         {currentTabSections.length > 0 && (
-          <TabSearch currentEvent={currentEvent} />
+          <TabSearch currentEvent={currentEvent} fieldValues={searchParams} />
         )}
       </Content>
     </>
