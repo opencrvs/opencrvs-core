@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
+import { v4 as uuid } from 'uuid'
 import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -22,7 +23,11 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  REJECT_ACTIONS,
+  RejectionState,
+  Review as ReviewComponent
+} from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
@@ -110,6 +115,35 @@ export function Review() {
     }
   }
 
+  async function handleRejection() {
+    const confirmedRejection = await openModal<RejectionState | null>(
+      (close) => <ReviewComponent.ActionModal.Reject close={close} />
+    )
+    if (confirmedRejection) {
+      const { rejectAction, message, isDuplicate } = confirmedRejection
+
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId,
+          data: {},
+          transactionId: uuid(),
+          metadata: { message }
+        })
+      }
+
+      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
+        events.actions.archive.mutate({
+          eventId,
+          data: {},
+          transactionId: uuid(),
+          metadata: { message, isDuplicate }
+        })
+      }
+
+      goToHome()
+    }
+  }
+
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
@@ -143,6 +177,7 @@ export function Review() {
           metadata={metadata}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
+          onReject={handleRejection}
         />
       </ReviewComponent.Body>
       {modal}
