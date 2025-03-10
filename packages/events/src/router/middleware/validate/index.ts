@@ -36,6 +36,10 @@ export function validateAction(actionType: ActionType) {
       eventType
     })
 
+    const data = {
+      ...opts.input.data,
+      ...opts.input.metadata
+    }
     const errors = formFields.reduce(
       (
         errorResults: { message: string; id: string; value: FieldValue }[],
@@ -43,7 +47,7 @@ export function validateAction(actionType: ActionType) {
       ) => {
         const fieldErrors = getFieldValidationErrors({
           field,
-          values: opts.input.data
+          values: data
         }).errors
 
         if (fieldErrors.length === 0) {
@@ -54,7 +58,7 @@ export function validateAction(actionType: ActionType) {
         const errormessageWithId = fieldErrors.map((error) => ({
           message: error.message.defaultMessage,
           id: field.id,
-          value: opts.input.data[field.id]
+          value: data[field.id as keyof typeof data]
         }))
 
         return [...errorResults, ...errormessageWithId]
