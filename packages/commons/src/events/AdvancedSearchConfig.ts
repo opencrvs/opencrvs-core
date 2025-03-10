@@ -12,7 +12,6 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 
 export const AdvancedSearchConfig = z.object({
-  id: z.string().describe('Advanced search section id'),
   title: TranslationConfig.describe('Advanced search tab title'),
   fields: z
     .array(

@@ -24,6 +24,7 @@ import { ActionType } from './ActionType'
 import { Draft } from './Draft'
 import { EventConfig } from './EventConfig'
 import { EventDocument } from './EventDocument'
+import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import { findActiveActionFields, stripHiddenFields } from './utils'
@@ -310,3 +311,24 @@ export function generateEventDraftDocument(
     eventId
   }
 }
+
+export const eventQueryDataGenerator = (
+  overrides: Partial<EventIndex> = {}
+): EventIndex => ({
+  id: overrides.id ?? getUUID(),
+  type: overrides.type ?? 'tennis-club-membership',
+  status: overrides.status ?? 'REGISTERED',
+  createdAt: overrides.createdAt ?? new Date().toISOString(),
+  createdBy: overrides.createdBy ?? getUUID(),
+  createdAtLocation: overrides.createdAtLocation ?? getUUID(),
+  modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
+  assignedTo: overrides.assignedTo ?? null,
+  updatedBy: overrides.updatedBy ?? getUUID(),
+  data: overrides.data ?? {
+    'recommender.none': true,
+    'applicant.firstname': 'Danny',
+    'applicant.surname': 'Doe',
+    'applicant.dob': '1999-11-11'
+  },
+  trackingId: overrides.trackingId ?? 'M3F8YQ'
+})

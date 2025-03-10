@@ -10,6 +10,7 @@
  */
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
+import { useLocation } from 'react-router-dom'
 import {
   Content,
   ContentSize,
@@ -17,6 +18,7 @@ import {
   IFormTabProps
 } from '@opencrvs/components'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { TabSearch } from './TabSearch'
 
 const messagesToDefine = {
@@ -38,6 +40,8 @@ const messages = defineMessages(messagesToDefine)
 function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
+  const location = useLocation()
+  const searchParams = location.state
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
@@ -76,11 +80,11 @@ function AdvancedSearch() {
         titleColor={'copy'}
       >
         {currentTabSections.length > 0 && (
-          <TabSearch currentEvent={currentEvent} />
+          <TabSearch currentEvent={currentEvent} fieldValues={searchParams} />
         )}
       </Content>
     </>
   )
 }
 
-export default AdvancedSearch
+export default withSuspense(AdvancedSearch)
