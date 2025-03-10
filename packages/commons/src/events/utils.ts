@@ -190,6 +190,22 @@ export const findActiveActionFields = (
   return allFields
 }
 
+/**
+ * Returns all fields for the action type, including review fields, or throws
+ */
+export function getActiveActionFields(
+  configuration: EventConfig,
+  action: ActionType
+): FieldConfig[] {
+  const fields = findActiveActionFields(configuration, action)
+
+  if (!fields) {
+    throw new Error(`No active field config found for action type ${action}`)
+  }
+
+  return fields
+}
+
 export function getEventConfiguration(
   eventConfigurations: EventConfig[],
   type: string
