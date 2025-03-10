@@ -29,7 +29,8 @@ function getFieldDefinitionForActionDataField(
 ) {
   const actionFields = findActiveActionFields(configuration, actionType)
 
-  const fieldConfig = actionFields.find((field) => field.id === fieldId)
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const fieldConfig = actionFields?.find((field) => field.id === fieldId)
   if (!fieldConfig) {
     logger.error(
       `Failed to find active field configuration for type: ${fieldId}, action: ${actionType}`
