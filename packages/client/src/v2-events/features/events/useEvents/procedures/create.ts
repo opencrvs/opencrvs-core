@@ -19,12 +19,14 @@ import {
   CreatedAction,
   getCurrentEventState
 } from '@opencrvs/commons/client'
+
 import {
   invalidateEventsList,
   setEventData,
   setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
+
 import { createTemporaryId } from '@client/v2-events/utils'
 import { setMutationDefaults } from './utils'
 
@@ -71,7 +73,6 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
           createdAtLocation: 'TODO',
-          draft: false,
           data: {}
         } satisfies CreatedAction
       ]

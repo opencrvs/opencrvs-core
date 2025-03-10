@@ -14,6 +14,7 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
+  EventSearchIndex,
   FieldConfig,
   FieldType,
   getCurrentEventState
@@ -28,6 +29,8 @@ import {
 import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
+import { DEFAULT_SIZE, generateQuery } from './utils'
+
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
 }
@@ -135,9 +138,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.NUMBER:
       return { type: 'double' }
     case FieldType.DATE:
-      // @TODO: This should be changed back to 'date'
-      // When we have proper validation of custom fields.
-      return { type: 'text' }
+      return { type: 'date' }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.SIGNATURE:
@@ -292,6 +293,33 @@ export async function getIndexedEvents() {
     index: getEventAliasName(),
     size: 10000,
     request_cache: false
+  })
+
+  const events = z.array(EventIndex).parse(
+    response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
+  )
+
+  return events
+}
+
+export async function getIndex(eventParams: EventSearchIndex) {
+  const esClient = getOrCreateClient()
+  const { type, ...queryParams } = eventParams
+
+  if (Object.values(queryParams).length === 0) {
+    throw new Error('No search params provided')
+  }
+
+  const query = generateQuery(queryParams)
+
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventIndexName(type),
+    size: DEFAULT_SIZE,
+    request_cache: false,
+    query
   })
 
   const events = z.array(EventIndex).parse(

@@ -10,19 +10,15 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React from 'react'
+import { TRPCProvider } from '@client/v2-events/trpc'
 import { FieldType } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { TRPCProvider } from '@client/v2-events/trpc'
+import React from 'react'
 import { Output } from './Output'
 
 const meta: Meta<typeof Output> = {
   title: 'Output',
   component: Output,
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  },
   decorators: [
     (Story) => (
       <TRPCProvider>

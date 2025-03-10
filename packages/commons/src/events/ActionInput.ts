@@ -13,14 +13,9 @@ import { z } from 'zod'
 import { ActionType } from './ActionType'
 import { FieldValue } from './FieldValue'
 
-const BaseActionInput = z.object({
+export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  draft: z
-    .boolean()
-    .optional()
-    .default(false)
-    .describe('Is the action visible only to the creator'),
   incomplete: z
     .boolean()
     .optional()
@@ -82,6 +77,33 @@ export const PrintCertificateActionInput = BaseActionInput.merge(
 )
 
 export type DeclareActionInput = z.infer<typeof DeclareActionInput>
+
+export const RejectDeclarationActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT).default(ActionType.REJECT)
+  })
+)
+export type RejectDeclarationActionInput = z.infer<
+  typeof RejectDeclarationActionInput
+>
+
+export const MarkedAsDuplicateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.MARKED_AS_DUPLICATE)
+      .default(ActionType.MARKED_AS_DUPLICATE)
+  })
+)
+export type MarkedAsDuplicateActionInput = z.infer<
+  typeof MarkedAsDuplicateActionInput
+>
+
+export const ArchivedActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVED).default(ActionType.ARCHIVED)
+  })
+)
+export type ArchivedActionInput = z.infer<typeof ArchivedActionInput>
 
 const AssignActionInput = BaseActionInput.merge(
   z.object({
@@ -147,6 +169,9 @@ export const ActionInput = z.discriminatedUnion('type', [
   RegisterActionInput,
   NotifyActionInput,
   DeclareActionInput,
+  RejectDeclarationActionInput,
+  MarkedAsDuplicateActionInput,
+  ArchivedActionInput,
   AssignActionInput,
   UnassignActionInput,
   PrintCertificateActionInput,

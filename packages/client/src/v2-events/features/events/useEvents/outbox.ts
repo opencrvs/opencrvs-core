@@ -68,7 +68,7 @@ export function useOutbox() {
     eventsList,
     trpc.event.actions.declare,
     (event, parameters) => {
-      return event.id === parameters.eventId && !parameters.draft
+      return event.id === parameters.eventId
     }
   )
 
@@ -76,7 +76,7 @@ export function useOutbox() {
     eventsList,
     trpc.event.actions.validate,
     (event, parameters) => {
-      return event.id === parameters.eventId && !parameters.draft
+      return event.id === parameters.eventId
     }
   )
 
@@ -84,7 +84,7 @@ export function useOutbox() {
     eventsList,
     trpc.event.actions.register,
     (event, parameters) => {
-      return event.id === parameters.eventId && !parameters.draft
+      return event.id === parameters.eventId
     }
   )
 

@@ -41,13 +41,13 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
-import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 
 function shouldBeShownAsAValue(field: FieldConfig) {
   if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
@@ -107,7 +107,7 @@ export function Summary() {
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const stringifyFormData = useFormDataStringifier()
 
-  const form = getFormValues(eventId)
+  const form = getFormValues()
   const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
@@ -133,12 +133,6 @@ export function Summary() {
     ActionType.REQUEST_CORRECTION
   )
 
-  if (!fields) {
-    throw new Error(
-      `No active form found for ${ActionType.REQUEST_CORRECTION}. This should never happen`
-    )
-  }
-
   const allFields = [
     ...fields,
     ...actionConfig.onboardingForm.flatMap((page) => page.fields),
@@ -151,11 +145,11 @@ export function Summary() {
     previousFormValues
   )
 
-  const correctionRequestData = useCorrectionRequestData()
-  const stringiedRequestData = stringifyFormData(
-    allFields,
-    correctionRequestData.getFormValues()
-  )
+  const metadata = useEventMetadata()
+
+  const metadataForm = metadata.getMetadata()
+
+  const stringiedRequestData = stringifyFormData(allFields, metadataForm)
 
   const onboardingFormPages =
     eventConfiguration.actions.find(
@@ -196,7 +190,7 @@ export function Summary() {
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      metadata: correctionRequestData.getFormValues()
+      metadata: metadataForm
     })
     eventFormNavigation.goToHome()
   }, [
@@ -204,7 +198,7 @@ export function Summary() {
     fields,
     events.actions.correction.request,
     eventId,
-    correctionRequestData,
+    metadataForm,
     eventFormNavigation,
     previousFormValues
   ])
