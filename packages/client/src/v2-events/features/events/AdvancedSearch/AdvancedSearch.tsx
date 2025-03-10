@@ -17,6 +17,7 @@ import {
   IFormTabProps
 } from '@opencrvs/components'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { TabSearch } from './TabSearch'
 
 const messagesToDefine = {
@@ -83,4 +84,4 @@ function AdvancedSearch() {
   )
 }
 
-export default AdvancedSearch
+export default withSuspense(AdvancedSearch)
