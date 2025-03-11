@@ -16,48 +16,41 @@ import {
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 import { fetchFromHearth } from '@config/services/hearth'
-import { MongoClient } from 'mongodb'
-import { HEARTH_MONGO_URL } from '@config/config/constants'
+import client from '@config/config/hearthClient'
 
 export const resolveLocationChildren = async (id: UUID) => {
-  const client = new MongoClient(HEARTH_MONGO_URL)
-  try {
-    const connectedClient = await client.connect()
-    const db = connectedClient.db()
+  const db = client.db()
 
-    const childQuery = [
-      {
-        $match: { id: id }
-      },
-      {
-        $graphLookup: {
-          from: 'Location_view_with_plain_ids',
-          startWith: '$id',
-          connectFromField: 'id',
-          connectToField: 'partOf.reference',
-          as: 'children'
-        }
-      },
-      {
-        $project: {
-          children: {
-            id: 1,
-            name: 1,
-            type: 1
-          }
+  const childQuery = [
+    {
+      $match: { id: id }
+    },
+    {
+      $graphLookup: {
+        from: 'Location_view_with_plain_ids',
+        startWith: '$id',
+        connectFromField: 'id',
+        connectToField: 'partOf.reference',
+        as: 'children'
+      }
+    },
+    {
+      $project: {
+        children: {
+          id: 1,
+          name: 1,
+          type: 1
         }
       }
-    ]
+    }
+  ]
 
-    const result = await db
-      .collection<Location>('Location_view_with_plain_ids')
-      .aggregate(childQuery)
-      .toArray()
+  const result = await db
+    .collection<Location>('Location_view_with_plain_ids')
+    .aggregate(childQuery)
+    .toArray()
 
-    return result.length ? result[0].children : []
-  } finally {
-    await client.close()
-  }
+  return result.length ? result[0].children : []
 }
 
 /** Resolves any given location's parents multi-level up to the root node */
