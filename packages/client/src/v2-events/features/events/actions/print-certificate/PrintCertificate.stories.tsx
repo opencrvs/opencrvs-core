@@ -8,24 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import {
   tennisClubMembershipEventIndex,
   tennisClueMembershipEventDocument
 } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import type { Meta, StoryObj } from '@storybook/react'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Pages> = {
-  title: 'Print Certificate',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'Print Certificate'
 }
 
 export default meta

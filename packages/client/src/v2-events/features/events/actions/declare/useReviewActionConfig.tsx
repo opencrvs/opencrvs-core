@@ -92,8 +92,7 @@ const confirmModalMessages = {
     }
   }
 }
-
-export const registerMessages = {
+const registerMessages = {
   title: {
     id: 'v2.review.register.title',
     defaultMessage: 'Register event',

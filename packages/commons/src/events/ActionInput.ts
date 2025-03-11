@@ -13,14 +13,9 @@ import { z } from 'zod'
 import { ActionType } from './ActionType'
 import { FieldValue } from './FieldValue'
 
-const BaseActionInput = z.object({
+export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  draft: z
-    .boolean()
-    .optional()
-    .default(false)
-    .describe('Is the action visible only to the creator'),
   incomplete: z
     .boolean()
     .optional()

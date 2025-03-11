@@ -10,16 +10,16 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 import { graphql, HttpResponse } from 'msw'
+import superjson from 'superjson'
 import {
   ActionType,
   generateEventDocument,
+  generateEventDraftDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
 // eslint-disable-next-line
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -27,16 +27,8 @@ import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
 
-const eventId = '123-456-789'
-
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Declare',
-  beforeEach: () => {
-    useEventFormData.setState({
-      eventId,
-      formValues: generator.event.actions.declare(eventId).data
-    })
-  }
+  title: 'Review'
 }
 
 export default meta
@@ -51,6 +43,14 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
+const draft = generateEventDraftDocument(eventId)
+
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {
     reactRouter: {
@@ -61,15 +61,17 @@ export const ReviewForLocalRegistrarComplete: Story = {
     },
     msw: {
       handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -90,12 +92,6 @@ export const ReviewForLocalRegistrarComplete: Story = {
 }
 
 export const ReviewForLocalRegistrarIncomplete: Story = {
-  beforeEach: () => {
-    useEventFormData.setState({
-      eventId,
-      formValues: {}
-    })
-  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -110,10 +106,7 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -135,11 +128,6 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
 
 export const ReviewForRegistrationAgentComplete: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      eventId,
-      formValues: generator.event.actions.declare(eventId).data
-    })
-
     window.localStorage.setItem(
       'opencrvs',
       generator.user.token.registrationAgent
@@ -154,15 +142,17 @@ export const ReviewForRegistrationAgentComplete: Story = {
     },
     msw: {
       handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -184,11 +174,6 @@ export const ReviewForRegistrationAgentComplete: Story = {
 
 export const ReviewForRegistrationAgentIncomplete: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      eventId,
-      formValues: {}
-    })
-
     window.localStorage.setItem(
       'opencrvs',
       generator.user.token.registrationAgent
@@ -208,10 +193,7 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -232,11 +214,6 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
 }
 export const ReviewForFieldAgentComplete: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      eventId,
-      formValues: generator.event.actions.declare(eventId).data
-    })
-
     window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
   },
   parameters: {
@@ -248,6 +225,11 @@ export const ReviewForFieldAgentComplete: Story = {
     },
     msw: {
       handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
@@ -278,11 +260,6 @@ export const ReviewForFieldAgentComplete: Story = {
 
 export const ReviewForFieldAgentIncomplete: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      eventId,
-      formValues: {}
-    })
-
     window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
   },
   parameters: {
@@ -299,10 +276,7 @@ export const ReviewForFieldAgentIncomplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]

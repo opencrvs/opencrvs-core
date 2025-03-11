@@ -12,9 +12,9 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
+import { v4 as uuid } from 'uuid'
 import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -23,21 +23,29 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  REJECT_ACTIONS,
+  RejectionState,
+  Review as ReviewComponent
+} from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
+  const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
   const { goToHome } = useEventFormNavigation()
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -48,10 +56,10 @@ export function Review() {
     throw new Error('No active form configuration found for declare action')
   }
 
-  const form = useEventFormData((state) => state.formValues)
+  const form = useEventFormData((state) => state.getFormValues())
 
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(eventId, {})
+  const metadata = getMetadata({})
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -107,19 +115,44 @@ export function Review() {
     }
   }
 
+  async function handleRejection() {
+    const confirmedRejection = await openModal<RejectionState | null>(
+      (close) => <ReviewComponent.ActionModal.Reject close={close} />
+    )
+    if (confirmedRejection) {
+      const { rejectAction, message, isDuplicate } = confirmedRejection
+
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId,
+          data: {},
+          transactionId: uuid(),
+          metadata: { message }
+        })
+      }
+
+      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
+        events.actions.archive.mutate({
+          eventId,
+          data: {},
+          transactionId: uuid(),
+          metadata: { message, isDuplicate }
+        })
+      }
+
+      goToHome()
+    }
+  }
+
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
-      onSaveAndExit={() => {
-        events.actions.declare.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          metadata,
-          draft: true
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          drafts.submitLocalDraft()
+          goToHome()
         })
-        goToHome()
-      }}
+      }
     >
       <ReviewComponent.Body
         eventConfig={config}
@@ -134,7 +167,7 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
         metadata={metadata}
-        onMetadataChange={(values) => setMetadata(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           action={ActionType.DECLARE}
@@ -144,9 +177,11 @@ export function Review() {
           metadata={metadata}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
+          onReject={handleRejection}
         />
       </ReviewComponent.Body>
       {modal}
+      {saveAndExitModal}
     </FormLayout>
   )
 }

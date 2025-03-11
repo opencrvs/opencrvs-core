@@ -22,7 +22,6 @@ export const birthDocument: EventDocument = {
       createdAt: '2025-02-06T06:15:39.922Z',
       createdBy: '67810ec1d9bb658e54f4f319',
       createdAtLocation: '7ec76333-d533-4743-b810-5c8ed32169a8',
-      draft: false,
       id: '148ed352-9daf-401c-bf3e-4d13abbb808d',
       data: {}
     }

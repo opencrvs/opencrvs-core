@@ -16,7 +16,8 @@ import {
   ActionDocument,
   getAllFields,
   SummaryConfig,
-  FieldValue
+  FieldValue,
+  getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -38,6 +39,7 @@ import {
   RecursiveStringRecord,
   useFormDataStringifier
 } from '@client/v2-events/hooks/useFormDataStringifier'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -50,14 +52,16 @@ import { EventOverviewProvider } from './EventOverviewContext'
 
 function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvents, getEvent } = useEvents()
+  const { getEvent } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
   const { getUsers } = useUsers()
 
   const configs = useEventConfigurations()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const [events] = getEvents.useSuspenseQuery()
-  const event = events.find((e) => e.id === params.eventId)
+  const drafts = getRemoteDrafts()
+
+  const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
 
   const config = configs.find((c) => c.id === event?.type)
 
@@ -68,6 +72,7 @@ function EventOverviewContainer() {
   if (!config) {
     return null
   }
+
   if (!event) {
     return null
   }
@@ -76,7 +81,7 @@ function EventOverviewContainer() {
     <EventOverviewProvider locations={locations} users={users}>
       <EventOverview
         event={event}
-        history={fullEvent.actions.filter((action) => !action.draft)}
+        history={fullEvent.actions}
         summary={config.summary}
       />
     </EventOverviewProvider>
@@ -112,6 +117,7 @@ function EventOverview({
     ...emptyEvent,
     ...eventWithDefaults
   }
+
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
 
   const fallbackTitle = summary.title.emptyValueMessage
