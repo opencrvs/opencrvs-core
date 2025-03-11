@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { INFLUXDB_URL, INFLUX_DB } from '@metrics/influxdb/constants'
 import {
   FEMALE,
@@ -37,8 +38,8 @@ import {
   ResourceIdentifier,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
-import { createChunks } from '@metrics/utils/batchHelpers'
 import { logger } from '@opencrvs/commons'
+import { createChunks } from '@metrics/utils/batchHelpers'
 
 interface IGroupedByGender {
   total: number
