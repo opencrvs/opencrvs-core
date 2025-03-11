@@ -25,12 +25,10 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:38.343Z',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
-          draft: false,
           id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
           data: {}
         },
         {
-          draft: false,
           data: { name: 'John Doe' },
           type: 'DECLARE',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -39,7 +37,6 @@ describe('correction requests', () => {
           id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8'
         },
         {
-          draft: false,
           data: {},
           type: 'REGISTER',
           identifiers: {
@@ -52,7 +49,6 @@ describe('correction requests', () => {
           id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2'
         },
         {
-          draft: false,
           data: { name: 'Doe John' },
           type: 'REQUEST_CORRECTION',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -78,12 +74,10 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:38.343Z',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
-          draft: false,
           id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
           data: {}
         },
         {
-          draft: false,
           data: { name: 'John Doe' },
           type: 'DECLARE',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -92,7 +86,6 @@ describe('correction requests', () => {
           id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8'
         },
         {
-          draft: false,
           data: {},
           type: 'REGISTER',
           identifiers: {
@@ -105,7 +98,6 @@ describe('correction requests', () => {
           id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2'
         },
         {
-          draft: false,
           data: { name: 'Doe John' },
           type: 'REQUEST_CORRECTION',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -114,7 +106,6 @@ describe('correction requests', () => {
           id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d'
         },
         {
-          draft: false,
           data: {},
           requestId: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
           type: 'APPROVE_CORRECTION',

@@ -21,7 +21,7 @@ import {
   inferOutput
 } from '@trpc/tanstack-react-query'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
-import { RequireKey, isTemporaryId } from '@client/v2-events/utils'
+import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
 import { findLocalEventData } from '@client/v2-events/features/events/useEvents/api'
 
 export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
@@ -106,5 +106,35 @@ export function setQueryDefaults<
   queryClient.setQueryDefaults(
     query.queryKey(),
     options as Parameters<typeof queryClient.setQueryDefaults>[1]
+  )
+}
+
+export function createEventActionMutationFn<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  P extends DecorateMutationProcedure<any>
+>(trpcProcedure: P) {
+  /*
+   * Merge default tRPC mutationOptions with the ones provided above
+   */
+  const mutationOptions = {
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
+  }
+
+  if (!mutationOptions.mutationFn) {
+    throw new Error(
+      'No mutation fn found for operation. This should never happen'
+    )
+  }
+
+  const defaultMutationFn = mutationOptions.mutationFn
+
+  return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
+    async ({ eventType, ...params }) => {
+      return defaultMutationFn({
+        ...params,
+        data: params.data
+      })
+    }
   )
 }
