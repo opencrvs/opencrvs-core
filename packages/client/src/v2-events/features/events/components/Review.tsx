@@ -488,6 +488,7 @@ function ReviewComponent({
                                 key={field.id}
                                 actions={
                                   <Link
+                                    data-testid={`change-button-${field.id}`}
                                     onClick={(e) => {
                                       e.stopPropagation()
 
