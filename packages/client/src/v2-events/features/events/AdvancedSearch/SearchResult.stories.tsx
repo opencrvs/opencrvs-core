@@ -33,7 +33,7 @@ export default meta
 
 export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
   name: 'Default Search Result',
-  render: function Component(args) {
+  render: function Component() {
     return (
       <React.Suspense>
         <SearchResult

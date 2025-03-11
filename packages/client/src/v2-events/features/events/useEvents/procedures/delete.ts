@@ -51,6 +51,7 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
 export const useDeleteEvent = () => {
   // mutationFn will be removed at this stage to ensure it has been specified in a serializable manner under /procedures. This ensures early error detection
   // without explicitly testing offline functionality.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { retry, retryDelay, onSuccess, mutationFn, ...options } =
     trpcOptionsProxy.event.delete.mutationOptions()
   return useMutation({

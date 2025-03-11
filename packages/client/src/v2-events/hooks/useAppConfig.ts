@@ -14,7 +14,6 @@ import {
   LanguageConfig,
   CertificateTemplateConfig
 } from '@opencrvs/commons/events'
-// eslint-disable-next-line no-restricted-imports
 import { getLanguage, getCertificateTemplates } from '@client/offline/selectors'
 
 interface ApplicationConfig {

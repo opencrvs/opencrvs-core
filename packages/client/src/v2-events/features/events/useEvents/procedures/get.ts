@@ -63,6 +63,7 @@ export function useGetEvent() {
     useQuery: (id: string) => {
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { queryFn, ...options } = trpc.event.get.queryOptions(id)
 
       return useQuery({
@@ -76,6 +77,7 @@ export function useGetEvent() {
     useSuspenseQuery: (id: string) => {
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { queryFn, ...options } = trpc.event.get.queryOptions(id)
 
       return [

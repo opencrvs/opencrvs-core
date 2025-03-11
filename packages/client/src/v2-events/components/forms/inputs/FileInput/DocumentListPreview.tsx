@@ -102,7 +102,7 @@ export const DocumentListPreview = ({
                   /\s/g,
                   ''
                 )}_link`}
-                onClick={(_) => onSelect(document)}
+                onClick={() => onSelect(document)}
               >
                 <span>
                   {(inReviewSection &&

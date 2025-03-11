@@ -64,35 +64,6 @@ function addDefaultValue<T extends FieldConfigWithoutAddress>(
   }
 }
 
-/**
- * AddressInput is a form component for capturing address details based on administrative structure.
- *
- * - The form dynamically adjusts the fields displayed based on user input.
- * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
- * - All admin structure fields are hidden until the previous field is selected.
- * - Address details fields are only shown when district is selected (it being the last admin structure field).
- */
-function AddressInput(props: Props) {
-  const { onChange, defaultValue, value = {}, ...otherProps } = props
-
-  const fields = [
-    ...ADMIN_STRUCTURE,
-    ...URBAN_FIELDS,
-    ...RURAL_FIELDS
-  ] satisfies Array<FieldConfigWithoutAddress>
-
-  return (
-    <FormFieldGenerator
-      {...otherProps}
-      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
-      formData={value}
-      initialValues={{ ...defaultValue, ...value }}
-      setAllFieldsDirty={false}
-      onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
-    />
-  )
-}
-
 const displayWhenDistrictUrbanSelected = [
   {
     type: ConditionalType.SHOW,
@@ -274,6 +245,35 @@ const ADMIN_STRUCTURE = [
     }
   }
 ] as const satisfies FieldConfigWithoutAddress[]
+
+/**
+ * AddressInput is a form component for capturing address details based on administrative structure.
+ *
+ * - The form dynamically adjusts the fields displayed based on user input.
+ * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
+ * - All admin structure fields are hidden until the previous field is selected.
+ * - Address details fields are only shown when district is selected (it being the last admin structure field).
+ */
+function AddressInput(props: Props) {
+  const { onChange, defaultValue, value = {}, ...otherProps } = props
+
+  const fields = [
+    ...ADMIN_STRUCTURE,
+    ...URBAN_FIELDS,
+    ...RURAL_FIELDS
+  ] satisfies Array<FieldConfigWithoutAddress>
+
+  return (
+    <FormFieldGenerator
+      {...otherProps}
+      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
+      formData={value}
+      initialValues={{ ...defaultValue, ...value }}
+      setAllFieldsDirty={false}
+      onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
+    />
+  )
+}
 
 const ALL_ADDRESS_FIELDS = [
   ...ADMIN_STRUCTURE,

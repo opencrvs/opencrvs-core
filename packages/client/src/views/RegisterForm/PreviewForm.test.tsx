@@ -34,7 +34,6 @@ import { Store } from 'redux'
 import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
-// eslint-disable-next-line no-restricted-imports
 import * as ReactApollo from '@apollo/client/react'
 import { waitForElement } from '@client/tests/wait-for-element'
 import {

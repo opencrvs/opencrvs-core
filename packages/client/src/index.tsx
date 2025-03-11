@@ -15,7 +15,6 @@ import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-// eslint-disable-next-line no-restricted-imports
 import { SubmissionController } from '@client/SubmissionController'
 import * as Sentry from '@sentry/react'
 import { BrowserTracing } from '@sentry/tracing'

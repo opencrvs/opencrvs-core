@@ -194,6 +194,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
   // mutationFn will be removed at this stage to ensure it has been specified in a serializable manner under /procedures. This ensures early error detection
   // without explicitly testing offline functionality.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mutationFn, ...mutationOptions } = allOptions
 
   const actionType = mutationOptions.meta?.actionType as ActionType | undefined

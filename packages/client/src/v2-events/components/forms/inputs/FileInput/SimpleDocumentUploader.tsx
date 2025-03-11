@@ -138,7 +138,7 @@ function SimpleDocumentUploaderComponent({
     setPreviewImage(null)
   }
 
-  function onDelete(image: FieldValue) {
+  function onDelete() {
     onComplete(null)
     closePreviewSection()
   }

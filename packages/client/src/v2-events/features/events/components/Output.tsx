@@ -61,7 +61,6 @@ const Deleted = styled.del`
  *  @returns sensible default value for the field type given the field configuration.
  */
 function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
-  /* eslint-disable react/destructuring-assignment */
   if (isEmailFieldType(field) || isTextFieldType(field)) {
     return Text.Output({ value: field.value })
   }

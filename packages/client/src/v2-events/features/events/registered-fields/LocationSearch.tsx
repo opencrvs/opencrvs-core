@@ -13,7 +13,6 @@ import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons/client'
-// eslint-disable-next-line no-restricted-imports
 import { getLocations, getOfflineData } from '@client/offline/selectors'
 import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'

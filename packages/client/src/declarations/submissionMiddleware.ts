@@ -42,7 +42,6 @@ import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
 import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { Action, Middleware, createAction } from '@reduxjs/toolkit'
 import { Dispatch } from 'redux'
-// eslint-disable-next-line no-restricted-imports
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'

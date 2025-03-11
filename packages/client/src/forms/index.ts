@@ -380,9 +380,7 @@ export type IFormFieldMapping = {
  */
 
 type UnionKeys<T> = T extends any ? keyof T : never
-type UnionPick<T, K extends any> = T extends any
-  ? Pick<T, Extract<K, keyof T>>
-  : never
+type UnionPick<T, K> = T extends any ? Pick<T, Extract<K, keyof T>> : never
 
 type UnionOmit<T, K extends UnionKeys<T>> = UnionPick<
   T,

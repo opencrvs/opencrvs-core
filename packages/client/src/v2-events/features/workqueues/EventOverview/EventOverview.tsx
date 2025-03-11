@@ -29,7 +29,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-// eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import {
@@ -50,31 +49,6 @@ import { EventOverviewProvider } from './EventOverviewContext'
 /**
  * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
  */
-
-function EventOverviewContainer() {
-  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvent } = useEvents()
-  const { getRemoteDrafts } = useDrafts()
-  const { getUsers } = useUsers()
-
-  const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const drafts = getRemoteDrafts()
-  const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
-
-  const userIds = getUserIdsFromActions(fullEvent.actions)
-  const [users] = getUsers.useSuspenseQuery(userIds)
-  const locations = useSelector(getLocations)
-
-  return (
-    <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview
-        drafts={drafts}
-        event={fullEvent}
-        summary={config.summary}
-      />
-    </EventOverviewProvider>
-  )
-}
 
 function getDefaultFieldValues(trackingId: string, status: EventStatus) {
   return {
@@ -134,6 +108,31 @@ function EventOverview({
       />
       <EventHistory history={event.actions} />
     </Content>
+  )
+}
+
+function EventOverviewContainer() {
+  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const { getEvent } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
+  const { getUsers } = useUsers()
+
+  const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
+  const drafts = getRemoteDrafts()
+  const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
+
+  const userIds = getUserIdsFromActions(fullEvent.actions)
+  const [users] = getUsers.useSuspenseQuery(userIds)
+  const locations = useSelector(getLocations)
+
+  return (
+    <EventOverviewProvider locations={locations} users={users}>
+      <EventOverview
+        drafts={drafts}
+        event={fullEvent}
+        summary={config.summary}
+      />
+    </EventOverviewProvider>
   )
 }
 

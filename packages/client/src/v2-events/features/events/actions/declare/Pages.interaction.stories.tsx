@@ -46,8 +46,34 @@ const undeclaredDraftEvent = {
     ({ type }) => type === ActionType.CREATE
   )
 }
-
 const spy = fn()
+
+function createDraftHandlers() {
+  const draftList = fn<() => Draft[]>(() => [])
+  return [
+    tRPCMsw.event.draft.create.mutation((req) => {
+      const response: Draft = {
+        id: 'test-draft-id',
+        eventId: req.eventId,
+        transactionId: req.transactionId,
+        createdAt: new Date().toISOString(),
+        action: {
+          ...req,
+          createdBy: 'test-user',
+          createdAtLocation: 'test-location',
+          createdAt: new Date().toISOString()
+        }
+      }
+      spy()
+      draftList.mockReturnValue([response])
+      return response
+    }),
+    tRPCMsw.event.draft.list.query(() => {
+      return draftList()
+    })
+  ]
+}
+
 export const SaveAndExit: Story = {
   parameters: {
     reactRouter: {
@@ -111,32 +137,6 @@ export const SaveAndExit: Story = {
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
     await expect(recordInCreatedState).not.toBeInTheDocument()
   }
-}
-
-function createDraftHandlers() {
-  const draftList = fn<() => Draft[]>(() => [])
-  return [
-    tRPCMsw.event.draft.create.mutation((req) => {
-      const response: Draft = {
-        id: 'test-draft-id',
-        eventId: req.eventId,
-        transactionId: req.transactionId,
-        createdAt: new Date().toISOString(),
-        action: {
-          ...req,
-          createdBy: 'test-user',
-          createdAtLocation: 'test-location',
-          createdAt: new Date().toISOString()
-        }
-      }
-      spy()
-      draftList.mockReturnValue([response])
-      return response
-    }),
-    tRPCMsw.event.draft.list.query(() => {
-      return draftList()
-    })
-  ]
 }
 
 export const DraftShownInForm: Story = {
