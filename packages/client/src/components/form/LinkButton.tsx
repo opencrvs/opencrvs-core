@@ -62,7 +62,7 @@ export const LinkButtonField = ({
     loading
   }) => {
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
-    if (data) {
+    if (data || error) {
       // remove query parameters from the URL after successful callback request
       const url = new URL(window.location.href)
       url.search = '' // Remove all query parameters
