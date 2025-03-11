@@ -24,7 +24,8 @@ import {
   getDependentFields,
   handleDefaultValue,
   hasDefaultValueDependencyInfo,
-  makeDatesFormatted
+  makeDatesFormatted,
+  makeFormFieldIdFormikCompatible
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 
@@ -635,7 +636,7 @@ class FormSectionComponent extends React.Component<AllProps> {
 
     const fields = fieldsWithDotIds.map((field) => ({
       ...field,
-      id: field.id.replaceAll('.', FIELD_SEPARATOR)
+      id: makeFormFieldIdFormikCompatible(field.id)
     }))
     const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
 

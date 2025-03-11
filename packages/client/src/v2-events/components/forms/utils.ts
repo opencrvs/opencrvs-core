@@ -23,6 +23,10 @@ import { DependencyInfo } from '@client/forms'
  */
 export const FIELD_SEPARATOR = '____'
 
+export function makeFormFieldIdFormikCompatible(fieldId: string) {
+  return fieldId.replaceAll('.', FIELD_SEPARATOR)
+}
+
 export function handleDefaultValue(
   field: FieldConfig,
   formData: ActionFormData

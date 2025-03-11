@@ -423,3 +423,120 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     })
   }
 }
+
+export const ChangeFieldInReview: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      formValues: generator.event.actions.declare(eventId).data
+    })
+
+    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          }),
+          tRPCMsw.event.create.mutation(() => {
+            callTracker.fieldAgent['event.create']++
+
+            return eventDocument
+          }),
+          tRPCMsw.event.actions.declare.mutation(() => {
+            callTracker.fieldAgent['event.actions.declare']++
+
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE, ActionType.DECLARE]
+            })
+          }),
+          tRPCMsw.event.actions.validate.mutation(() => {
+            callTracker.fieldAgent['event.actions.validate']++
+
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                ActionType.CREATE,
+                ActionType.DECLARE,
+                ActionType.VALIDATE
+              ]
+            })
+          }),
+          tRPCMsw.event.actions.register.mutation(() => {
+            callTracker.fieldAgent['event.actions.register']++
+
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                ActionType.CREATE,
+                ActionType.DECLARE,
+                ActionType.VALIDATE,
+                ActionType.REGISTER
+              ]
+            })
+          })
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.registrationAgent()
+              }
+            })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Start changing the surname', async () => {
+      const surnameChangeButton = await canvas.findByTestId(
+        'change-button-applicant.surname'
+      )
+
+      await userEvent.click(surnameChangeButton)
+
+      const continueButton = await canvas.findByText('Continue')
+      await userEvent.click(continueButton)
+    })
+
+    await step('Change input field value', async () => {
+      const surnameInput = await canvas.findByTestId(
+        'text__applicant____surname'
+      )
+      await userEvent.clear(surnameInput)
+      await userEvent.type(surnameInput, 'Nileem-Rowa')
+    })
+
+    await step('Navigate back to review', async () => {
+      const backToReviewButton = await canvas.findByText('Back to review')
+      await userEvent.click(backToReviewButton)
+
+      const surnameValue = await canvas.findByTestId(
+        'row-value-applicant.surname'
+      )
+      await expect(surnameValue).toHaveTextContent('Nileem-Rowa')
+    })
+  }
+}
