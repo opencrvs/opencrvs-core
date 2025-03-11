@@ -706,7 +706,7 @@ class FormSectionComponent extends React.Component<AllProps> {
 function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
-      key.replaceAll('.', FIELD_SEPARATOR),
+      makeFormFieldIdFormikCompatible(key),
       value
     ])
   )
