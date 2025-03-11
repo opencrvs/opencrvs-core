@@ -429,8 +429,6 @@ export const ChangeFieldInReview: Story = {
     useEventFormData.setState({
       formValues: generator.event.actions.declare(eventId).data
     })
-
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
   },
   parameters: {
     reactRouter: {
@@ -461,39 +459,6 @@ export const ChangeFieldInReview: Story = {
             callTracker.fieldAgent['event.create']++
 
             return eventDocument
-          }),
-          tRPCMsw.event.actions.declare.mutation(() => {
-            callTracker.fieldAgent['event.actions.declare']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE, ActionType.DECLARE]
-            })
-          }),
-          tRPCMsw.event.actions.validate.mutation(() => {
-            callTracker.fieldAgent['event.actions.validate']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.mutation(() => {
-            callTracker.fieldAgent['event.actions.register']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE,
-                ActionType.REGISTER
-              ]
-            })
           })
         ],
         user: [
