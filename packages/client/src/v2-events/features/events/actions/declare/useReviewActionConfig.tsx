@@ -92,7 +92,6 @@ const confirmModalMessages = {
     }
   }
 }
-
 const registerMessages = {
   title: {
     id: 'v2.review.register.title',
@@ -103,6 +102,11 @@ const registerMessages = {
     id: 'v2.review.register.confirm',
     defaultMessage: 'Register',
     description: 'The label for register button of review action'
+  },
+  onReject: {
+    id: 'v2.review.register.reject',
+    defaultMessage: 'Reject',
+    description: 'The label for reject button of review action'
   }
 }
 
@@ -116,6 +120,11 @@ const validateMessages = {
     id: 'v2.review.validate.confirm',
     defaultMessage: 'Send for approval',
     description: 'The label for review action button when validating'
+  },
+  onReject: {
+    id: 'v2.review.validate.reject',
+    defaultMessage: 'Reject',
+    description: 'The label for reject button of review action'
   }
 }
 
@@ -139,6 +148,7 @@ const reviewMessages = {
           'The description for registration action when form is complete'
       },
       onConfirm: registerMessages.onConfirm,
+      onReject: registerMessages.onReject,
       modal: confirmModalMessages.complete.register
     },
     validate: {
@@ -150,6 +160,7 @@ const reviewMessages = {
         description: 'The description for validate action when form is complete'
       },
       onConfirm: validateMessages.onConfirm,
+      onReject: validateMessages.onReject,
       modal: confirmModalMessages.complete.validate
     },
     declare: {
@@ -179,6 +190,7 @@ const reviewMessages = {
           'The description for registration action when form is incomplete'
       },
       onConfirm: registerMessages.onConfirm,
+      onReject: registerMessages.onReject,
       modal: {}
     },
     validate: {
@@ -190,6 +202,7 @@ const reviewMessages = {
         description: 'The description for validate action when form is complete'
       },
       onConfirm: validateMessages.onConfirm,
+      onReject: validateMessages.onReject,
       modal: {}
     },
     declare: {

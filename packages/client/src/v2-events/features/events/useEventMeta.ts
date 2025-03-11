@@ -10,8 +10,8 @@
  */
 
 /**
-    This is an exact copy of `useEventFormData` except for `useSubscribeEventFormData`.  
-    Due to how `useSubscribeEventFormData` works, it’s not possible to use `useEventFormData` 
+    This is an exact copy of `useEventFormData` except for `useSubscribeEventFormData`.
+    Due to how `useSubscribeEventFormData` works, it’s not possible to use `useEventFormData`
     for adding additional metadata fields on review pages.
  */
 

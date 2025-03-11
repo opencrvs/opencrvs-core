@@ -12,26 +12,26 @@
 import { useMutation } from '@tanstack/react-query'
 import {
   DecorateMutationProcedure,
-  inferInput,
-  inferOutput
+  inferInput
 } from '@trpc/tanstack-react-query'
 import {
   ActionType,
   findActiveActionFields,
   stripHiddenFields
 } from '@opencrvs/commons/client'
+import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   findLocalEventData,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
-import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
-import * as customApi from '@client/v2-events/custom-api'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
-  waitUntilEventIsCreated,
-  setMutationDefaults
+  createEventActionMutationFn,
+  setMutationDefaults,
+  waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
+import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare, {
   mutationFn: createEventActionMutationFn(
@@ -79,6 +79,30 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate, {
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.VALIDATE
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.reject, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.reject
+  ),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.REJECT
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.archive, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.archive
+  ),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.ARCHIVED
   }
 })
 
@@ -148,36 +172,6 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   retryDelay: 10000,
   onSuccess: updateLocalEvent
 })
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createEventActionMutationFn<P extends DecorateMutationProcedure<any>>(
-  trpcProcedure: P
-) {
-  /*
-   * Merge default tRPC mutationOptions with the ones provided above
-   */
-  const mutationOptions = {
-    ...trpcProcedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
-  }
-
-  if (!mutationOptions.mutationFn) {
-    throw new Error(
-      'No mutation fn found for operation. This should never happen'
-    )
-  }
-
-  const defaultMutationFn = mutationOptions.mutationFn
-
-  return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
-    async ({ eventType, ...params }) => {
-      return defaultMutationFn({
-        ...params,
-        data: params.data
-      })
-    }
-  )
-}
 
 /**
  * A custom hook that wraps a tRPC mutation procedure for event actions.
