@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { env } from '@config/environment'
 import { logger } from '@opencrvs/commons'
 import { MongoClient } from 'mongodb'
+import { HEARTH_MONGO_URL } from './constants'
 
-const client = new MongoClient(env.HEARTH_MONGO_URL)
+const client = new MongoClient(HEARTH_MONGO_URL)
 
 client.on('close', () => {
   logger.error('MongoDB connection closed.')
