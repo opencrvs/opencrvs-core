@@ -8,20 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ITaskHistory } from '@client/declarations'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { getLocalisedName } from '@client/utils/data-formatting'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
-  GQLHumanName,
   GQLMarriageEventSearchSet,
   GQLRegStatus
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { IntlShape } from 'react-intl'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
-import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import { ITaskHistory } from '@client/declarations'
 
 export const isBirthEvent = (
   req: GQLEventSearchSet
@@ -56,42 +55,40 @@ export const transformData = (
       let birthReg
       let deathReg
       let marriageReg
-      let names
-      let groomNames
-      let brideNames
+      let name
+      let groomName
+      let brideName
       let dateOfEvent
-      let mergedMarriageName
       const assignedReg = reg
+      debugger
 
       if (reg.registration) {
         if (isBirthEvent(reg)) {
           birthReg = reg
-          names = (birthReg.childName as GQLHumanName[]) || []
+          name = birthReg.childName
+            ? getLocalisedName(intl, birthReg.childName[0] as HumanName)
+            : EMPTY_STRING
           dateOfEvent = birthReg.dateOfBirth
         } else if (isDeathEvent(reg)) {
           deathReg = reg
-          names = (deathReg.deceasedName as GQLHumanName[]) || []
+          name = deathReg.deceasedName
+            ? getLocalisedName(intl, deathReg.deceasedName[0] as HumanName)
+            : EMPTY_STRING
           dateOfEvent = deathReg && deathReg.dateOfDeath
         } else if (isMarriageEvent(reg)) {
-          marriageReg = reg
-          groomNames =
-            (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
-          brideNames =
-            (marriageReg && (marriageReg.brideName as GQLHumanName[])) || []
+          groomName = reg.groomName
+            ? getLocalisedName(intl, reg.groomName[0] as HumanName)
+            : EMPTY_STRING
+          brideName = reg.brideName
+            ? getLocalisedName(intl, reg.brideName[0] as HumanName)
+            : EMPTY_STRING
 
-          const groomName =
-            (createNamesMap(groomNames as HumanName[])[locale] as string) ||
-            (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
-          const brideName =
-            (createNamesMap(brideNames as HumanName[])[locale] as string) ||
-            (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
-
-          mergedMarriageName =
+          name =
             brideName && groomName
               ? `${groomName} & ${brideName}`
               : brideName || groomName || EMPTY_STRING
 
-          dateOfEvent = marriageReg && marriageReg.dateOfMarriage
+          dateOfEvent = marriageReg && reg.dateOfMarriage
         }
       }
       const status =
@@ -100,12 +97,7 @@ export const transformData = (
 
       return {
         id: assignedReg.id,
-        name:
-          assignedReg.type === 'Marriage'
-            ? mergedMarriageName
-            : (createNamesMap(names as HumanName[])[locale] as string) ||
-              (createNamesMap(names as HumanName[])[LANG_EN] as string) ||
-              '',
+        name,
         dob:
           (birthReg?.dateOfBirth?.length &&
             formatLongDate(birthReg.dateOfBirth, locale)) ||
