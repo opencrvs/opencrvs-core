@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { useSelector } from 'react-redux'
 import {
   ActionFormData,
   AddressFieldValue,
@@ -23,6 +24,9 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+// eslint-disable-next-line no-restricted-imports
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getLocations } from '@client/offline/selectors'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -70,7 +74,41 @@ function addDefaultValue<T extends FieldConfigWithoutAddress>(
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue, value = {}, ...otherProps } = props
+  const {
+    onChange,
+    defaultValue: initialDefaultValue,
+    value = {},
+    ...otherProps
+  } = props
+
+  const userDetails = useSelector(getUserDetails)
+  const locations = useSelector(getLocations)
+
+  const userPrimaryOfficeLocation = {
+    country: 'FAR',
+    province: '',
+    district: '',
+    urbanOrRural: AddressType.URBAN
+  }
+  const primaryOfficeId = userDetails?.primaryOffice.id
+
+  if (primaryOfficeId) {
+    const primaryOfficeLocation = locations[primaryOfficeId]
+
+    const districtId = primaryOfficeLocation.partOf.split('/')[1]
+    const district = locations[districtId]
+
+    userPrimaryOfficeLocation.district = districtId
+
+    const provinceId = district.partOf.split('/')[1]
+
+    userPrimaryOfficeLocation.province = provinceId
+  }
+
+  const defaultValue = otherProps.configuration
+    ?.defaultsToUserPrimaryOfficeLocation
+    ? userPrimaryOfficeLocation
+    : initialDefaultValue
 
   const fields = [
     ...ADMIN_STRUCTURE,
