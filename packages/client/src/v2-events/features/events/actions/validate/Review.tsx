@@ -34,6 +34,7 @@ import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 const messages = defineMessages({
   validateActionTitle: {
@@ -67,7 +68,7 @@ const messages = defineMessages({
 
 /**
  *
- * Preview of event to be registered.
+ * Preview of event to be validated.
  */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE)
@@ -81,9 +82,10 @@ export function Review() {
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { setMetadata, getMetadata } = useEventMetadata()
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   // @TODO:
   const metadata = getMetadata(
-    event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
+    event.actions.find((a) => a.type === ActionType.VALIDATE)?.metadata
   )
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
@@ -183,10 +185,12 @@ export function Review() {
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.VALIDATE}
-      onSaveAndExit={() => {
-        drafts.submitLocalDraft()
-        goToHome()
-      }}
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          drafts.submitLocalDraft()
+          goToHome()
+        })
+      }
     >
       <ReviewComponent.Body
         eventConfig={config}
@@ -215,6 +219,7 @@ export function Review() {
         />
         {modal}
       </ReviewComponent.Body>
+      {saveAndExitModal}
     </FormLayout>
   )
 }

@@ -27,6 +27,7 @@ import {
 } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE.PAGES)
@@ -40,6 +41,8 @@ export function Pages() {
   const { modal, goToHome } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
+
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -76,10 +79,12 @@ export function Pages() {
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.VALIDATE}
-      onSaveAndExit={() => {
-        drafts.submitLocalDraft()
-        goToHome()
-      }}
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          drafts.submitLocalDraft()
+          goToHome()
+        })
+      }
     >
       {modal}
       <PagesComponent
@@ -100,6 +105,7 @@ export function Pages() {
           navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
         }
       />
+      {saveAndExitModal}
     </FormLayout>
   )
 }
