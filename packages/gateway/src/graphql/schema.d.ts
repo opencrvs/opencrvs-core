@@ -1183,7 +1183,6 @@ export interface GQLAssignmentData {
   firstName?: string
   lastName?: string
   officeName?: string
-  createdAt?: string
   avatarURL: string
 }
 
@@ -7697,7 +7696,6 @@ export interface GQLAssignmentDataTypeResolver<TParent = any> {
   firstName?: AssignmentDataToFirstNameResolver<TParent>
   lastName?: AssignmentDataToLastNameResolver<TParent>
   officeName?: AssignmentDataToOfficeNameResolver<TParent>
-  createdAt?: AssignmentDataToCreatedAtResolver<TParent>
   avatarURL?: AssignmentDataToAvatarURLResolver<TParent>
 }
 
@@ -7738,18 +7736,6 @@ export interface AssignmentDataToLastNameResolver<
 }
 
 export interface AssignmentDataToOfficeNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface AssignmentDataToCreatedAtResolver<
   TParent = any,
   TResult = any
 > {

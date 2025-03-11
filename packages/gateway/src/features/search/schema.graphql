@@ -16,7 +16,6 @@ type AssignmentData {
   firstName: String
   lastName: String
   officeName: String
-  createdAt: String
   avatarURL: String!
 }
 

@@ -589,7 +589,9 @@ export const resolvers: GQLResolver = {
         // return the taskId
         return task.id
       }
-      throw new Error('User does not have enough scope')
+      throw new UnassignError(
+        'User has been unassigned or does not have required scope'
+      )
     },
     async markEventAsDuplicate(
       _,

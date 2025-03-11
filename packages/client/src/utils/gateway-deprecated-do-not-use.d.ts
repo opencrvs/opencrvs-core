@@ -1393,11 +1393,10 @@ export interface GQLWebhookInput {
 }
 
 export interface GQLAssignmentData {
-  practitionerId?: string
+  userId?: string
   firstName?: string
   lastName?: string
   officeName?: string
-  createdAt?: string
   avatarURL: string
 }
 

@@ -50,7 +50,6 @@ export interface IAssignment {
   firstName: string
   lastName: string
   officeName: string
-  createdAt: string
 }
 
 export interface BirthDocument extends SearchDocument {
@@ -216,8 +215,7 @@ export const composeOperationHistories = (bundle: SavedBundle) => {
 
 export const composeAssignment = (
   office: SavedOffice,
-  practitioner: SavedPractitioner,
-  createdAt: string
+  practitioner: SavedPractitioner
 ) => {
   const practitionerName = findName(NAME_EN, practitioner.name)
   const practitionerFirstNames = practitionerName?.given?.join(' ') || ''
@@ -227,8 +225,7 @@ export const composeAssignment = (
     practitionerId: practitioner.id,
     officeName: office.name!,
     firstName: practitionerFirstNames,
-    lastName: practitionerFamilyName,
-    createdAt
+    lastName: practitionerFamilyName
   }
 }
 

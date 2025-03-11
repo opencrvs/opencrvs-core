@@ -164,7 +164,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
           lastName
           officeName
           avatarURL
-          createdAt
         }
         certificates {
           hasShowedVerifiedDocument

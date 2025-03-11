@@ -35,10 +35,17 @@ export type Scalars = {
   Int: number
   Float: number
   Date: any
+  DateTime: any
   FieldValue: any
   Map: any
   PlainDate: PlainDate
 }
+
+export type Action =
+  | CreateAction
+  | DeclareAction
+  | NotifyAction
+  | RegisterAction
 
 export type AdditionalIdWithCompositionId = {
   __typename?: 'AdditionalIdWithCompositionId'
@@ -232,10 +239,13 @@ export type AdvancedSearchParametersInput = {
   trackingId?: InputMaybe<Scalars['String']>
 }
 
+export type ApproveCorrectionActionInput = {
+  data: Array<FieldInput>
+}
+
 export type AssignmentData = {
   __typename?: 'AssignmentData'
   avatarURL: Scalars['String']
-  createdAt?: Maybe<Scalars['String']>
   firstName?: Maybe<Scalars['String']>
   lastName?: Maybe<Scalars['String']>
   officeName?: Maybe<Scalars['String']>
@@ -407,6 +417,10 @@ export type CertificationMetric = {
   total: Scalars['Float']
 }
 
+export type CertifyActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Comment = {
   __typename?: 'Comment'
   comment?: Maybe<Scalars['String']>
@@ -422,7 +436,6 @@ export type CommentInput = {
 }
 
 export type ConfirmRegistrationInput = {
-  comment?: InputMaybe<Scalars['String']>
   identifiers?: InputMaybe<Array<IdentifierInput>>
   registrationNumber: Scalars['String']
 }
@@ -479,6 +492,14 @@ export type CorrectionValueInput = {
   newValue: Scalars['FieldValue']
   oldValue?: InputMaybe<Scalars['FieldValue']>
   section: Scalars['String']
+}
+
+export type CreateAction = {
+  __typename?: 'CreateAction'
+  createdAt: Scalars['DateTime']
+  createdBy: Scalars['String']
+  data: Array<Field>
+  type: Scalars['String']
 }
 
 export type CreatedIds = {
@@ -564,6 +585,19 @@ export type DeclarationsStartedMetrics = {
   officeDeclarations: Scalars['Int']
 }
 
+export type DeclareAction = {
+  __typename?: 'DeclareAction'
+  createdAt: Scalars['DateTime']
+  createdBy: Scalars['String']
+  data: Array<Field>
+  identifiers: Identifiers
+  type: Scalars['String']
+}
+
+export type DeclareActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Dummy = {
   __typename?: 'Dummy'
   dummy: Scalars['String']
@@ -582,6 +616,19 @@ export type Estimation = {
   locationLevel: Scalars['String']
   maleEstimation: Scalars['Float']
   totalEstimation: Scalars['Float']
+}
+
+export type Event = {
+  __typename?: 'Event'
+  actions: Array<Action>
+  createdAt: Scalars['DateTime']
+  id: Scalars['String']
+  type: Scalars['String']
+  updatedAt: Scalars['DateTime']
+}
+
+export type EventInput = {
+  type: Scalars['String']
 }
 
 export type EventMetrics = {
@@ -685,6 +732,17 @@ export type FhiridMap = {
   questionnaireResponse?: InputMaybe<Scalars['String']>
 }
 
+export type Field = {
+  __typename?: 'Field'
+  id: Scalars['String']
+  value: Scalars['FieldValue']
+}
+
+export type FieldInput = {
+  id: Scalars['String']
+  value: Scalars['FieldValue']
+}
+
 export enum Gender {
   Female = 'female',
   Male = 'male',
@@ -758,6 +816,12 @@ export type IdentifierInput = {
   value: Scalars['String']
 }
 
+export type Identifiers = {
+  __typename?: 'Identifiers'
+  registrationNumber: Scalars['String']
+  trackingId: Scalars['String']
+}
+
 export type IdentityInput = {
   fieldsModifiedByIdentity?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   id?: InputMaybe<Scalars['ID']>
@@ -789,6 +853,10 @@ export type IntegratedSystem = {
 
 export enum IntegratingSystemType {
   Other = 'OTHER'
+}
+
+export type IssueActionInput = {
+  data: Array<FieldInput>
 }
 
 export type LocalRegistrar = {
@@ -932,10 +1000,12 @@ export type Mutation = {
   __typename?: 'Mutation'
   activateUser?: Maybe<Scalars['String']>
   approveBirthRegistrationCorrection: Scalars['ID']
+  approveCorrectionEvent: Event
   approveDeathRegistrationCorrection: Scalars['ID']
   approveMarriageRegistrationCorrection: Scalars['ID']
   auditUser?: Maybe<Scalars['String']>
   bookmarkAdvancedSearch?: Maybe<BookMarkedSearches>
+  certifyEvent: Event
   changeAvatar?: Maybe<Avatar>
   changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
@@ -945,11 +1015,14 @@ export type Mutation = {
   createBirthRegistrationCorrection: Scalars['ID']
   createDeathRegistration: CreatedIds
   createDeathRegistrationCorrection: Scalars['ID']
+  createEvent: Event
   createMarriageRegistration: CreatedIds
   createMarriageRegistrationCorrection: Scalars['ID']
   createOrUpdateUser: User
   deactivateSystem?: Maybe<System>
+  declareEvent: Event
   deleteSystem?: Maybe<System>
+  issueEvent: Event
   markBirthAsCertified: Scalars['ID']
   markBirthAsIssued: Scalars['ID']
   markBirthAsRegistered: Scalars['ID']
@@ -970,15 +1043,22 @@ export type Mutation = {
   markMarriageAsIssued: Scalars['ID']
   markMarriageAsRegistered: Scalars['ID']
   markMarriageAsValidated?: Maybe<Scalars['ID']>
+  notifyEvent: Event
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
+  registerEvent: Event
   registerSystem?: Maybe<SystemSecret>
+  reinstateEvent: Event
+  rejectCorrectionEvent: Event
   rejectRegistration: Scalars['ID']
   rejectRegistrationCorrection: Scalars['ID']
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
+  requestCorrectionEvent: Event
   requestRegistrationCorrection: Scalars['ID']
   resendInvite?: Maybe<Scalars['String']>
   resetPasswordInvite?: Maybe<Scalars['String']>
+  revokeCorrectionEvent: Event
+  revokeEvent: Event
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
   upsertRegistrationIdentifier: Scalars['ID']
@@ -994,6 +1074,11 @@ export type MutationActivateUserArgs = {
 export type MutationApproveBirthRegistrationCorrectionArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
+}
+
+export type MutationApproveCorrectionEventArgs = {
+  eventId: Scalars['ID']
+  input: ApproveCorrectionActionInput
 }
 
 export type MutationApproveDeathRegistrationCorrectionArgs = {
@@ -1015,6 +1100,11 @@ export type MutationAuditUserArgs = {
 
 export type MutationBookmarkAdvancedSearchArgs = {
   bookmarkSearchInput: BookmarkSearchInput
+}
+
+export type MutationCertifyEventArgs = {
+  eventId: Scalars['ID']
+  input: CertifyActionInput
 }
 
 export type MutationChangeAvatarArgs = {
@@ -1065,6 +1155,10 @@ export type MutationCreateDeathRegistrationCorrectionArgs = {
   id: Scalars['ID']
 }
 
+export type MutationCreateEventArgs = {
+  event: EventInput
+}
+
 export type MutationCreateMarriageRegistrationArgs = {
   details: MarriageRegistrationInput
 }
@@ -1082,8 +1176,18 @@ export type MutationDeactivateSystemArgs = {
   clientId: Scalars['ID']
 }
 
+export type MutationDeclareEventArgs = {
+  eventId: Scalars['ID']
+  input: DeclareActionInput
+}
+
 export type MutationDeleteSystemArgs = {
   clientId: Scalars['ID']
+}
+
+export type MutationIssueEventArgs = {
+  eventId: Scalars['ID']
+  input: IssueActionInput
 }
 
 export type MutationMarkBirthAsCertifiedArgs = {
@@ -1188,6 +1292,11 @@ export type MutationMarkMarriageAsValidatedArgs = {
   id: Scalars['ID']
 }
 
+export type MutationNotifyEventArgs = {
+  eventId: Scalars['ID']
+  input: NotifyActionInput
+}
+
 export type MutationReactivateSystemArgs = {
   clientId: Scalars['ID']
 }
@@ -1196,8 +1305,23 @@ export type MutationRefreshSystemSecretArgs = {
   clientId: Scalars['String']
 }
 
+export type MutationRegisterEventArgs = {
+  eventId: Scalars['ID']
+  input: RegisterActionInput
+}
+
 export type MutationRegisterSystemArgs = {
   system?: InputMaybe<SystemInput>
+}
+
+export type MutationReinstateEventArgs = {
+  eventId: Scalars['ID']
+  input: ReinstateActionInput
+}
+
+export type MutationRejectCorrectionEventArgs = {
+  eventId: Scalars['ID']
+  input: RejectCorrectionActionInput
 }
 
 export type MutationRejectRegistrationArgs = {
@@ -1214,6 +1338,11 @@ export type MutationRemoveBookmarkedAdvancedSearchArgs = {
   removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
 }
 
+export type MutationRequestCorrectionEventArgs = {
+  eventId: Scalars['ID']
+  input: RequestCorrectionActionInput
+}
+
 export type MutationRequestRegistrationCorrectionArgs = {
   details: CorrectionInput
   id: Scalars['ID']
@@ -1225,6 +1354,16 @@ export type MutationResendInviteArgs = {
 
 export type MutationResetPasswordInviteArgs = {
   userId: Scalars['String']
+}
+
+export type MutationRevokeCorrectionEventArgs = {
+  eventId: Scalars['ID']
+  input: RevokeCorrectionActionInput
+}
+
+export type MutationRevokeEventArgs = {
+  eventId: Scalars['ID']
+  input: RevokeActionInput
 }
 
 export type MutationUpdateDeathRegistrationArgs = {
@@ -1254,6 +1393,18 @@ export type NotificationResult = {
 export enum NotificationType {
   Email = 'EMAIL',
   Sms = 'SMS'
+}
+
+export type NotifyAction = {
+  __typename?: 'NotifyAction'
+  createdAt: Scalars['DateTime']
+  createdBy: Scalars['String']
+  data: Array<Field>
+  type: Scalars['String']
+}
+
+export type NotifyActionInput = {
+  data: Array<FieldInput>
 }
 
 export type ObservationFhirids = {
@@ -1383,6 +1534,7 @@ export type Query = {
   fetchRegistrationForViewing?: Maybe<EventRegistration>
   fetchSystem?: Maybe<System>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
+  getEvent: Event
   getEventsWithProgress?: Maybe<EventProgressResultSet>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
@@ -1464,6 +1616,10 @@ export type QueryGetDeclarationsStartedMetricsArgs = {
   locationId: Scalars['String']
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
+}
+
+export type QueryGetEventArgs = {
+  eventId: Scalars['ID']
 }
 
 export type QueryGetEventsWithProgressArgs = {
@@ -1678,6 +1834,19 @@ export type RegWorkflowInput = {
   user?: InputMaybe<UserInput>
 }
 
+export type RegisterAction = {
+  __typename?: 'RegisterAction'
+  createdAt: Scalars['DateTime']
+  createdBy: Scalars['String']
+  data: Array<Field>
+  identifiers: Identifiers
+  type: Scalars['String']
+}
+
+export type RegisterActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Registration = {
   __typename?: 'Registration'
   _fhirID?: Maybe<Scalars['ID']>
@@ -1766,10 +1935,18 @@ export enum RegistrationType {
   Marriage = 'MARRIAGE'
 }
 
+export type ReinstateActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Reinstated = {
   __typename?: 'Reinstated'
   registrationStatus?: Maybe<RegStatus>
   taskEntryResourceID: Scalars['ID']
+}
+
+export type RejectCorrectionActionInput = {
+  data: Array<FieldInput>
 }
 
 export type RejectRegistrationInput = {
@@ -1837,6 +2014,18 @@ export type RelatedPersonInput = {
 export type RemoveBookmarkedSeachInput = {
   searchId: Scalars['String']
   userId: Scalars['String']
+}
+
+export type RequestCorrectionActionInput = {
+  data: Array<FieldInput>
+}
+
+export type RevokeActionInput = {
+  data: Array<FieldInput>
+}
+
+export type RevokeCorrectionActionInput = {
+  data: Array<FieldInput>
 }
 
 export type SearchFieldAgentResponse = {
@@ -2652,7 +2841,6 @@ export type SearchEventsQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -2691,7 +2879,6 @@ export type SearchEventsQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -2737,7 +2924,6 @@ export type SearchEventsQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -3203,15 +3389,6 @@ export type FetchBirthRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      assignment?: {
-        __typename?: 'AssignmentData'
-        practitionerId?: string | null
-        firstName?: string | null
-        lastName?: string | null
-        officeName?: string | null
-        avatarURL: string
-        createdAt?: string | null
-      } | null
       certificates?: Array<{
         __typename?: 'Certificate'
         hasShowedVerifiedDocument?: boolean | null
@@ -3357,7 +3534,6 @@ export type FetchBirthRegistrationForReviewQuery = {
             description: string
           }
         }
-        primaryOffice: { __typename?: 'Location'; id: string }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -4075,15 +4251,6 @@ export type FetchDeathRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      assignment?: {
-        __typename?: 'AssignmentData'
-        practitionerId?: string | null
-        firstName?: string | null
-        lastName?: string | null
-        officeName?: string | null
-        avatarURL: string
-        createdAt?: string | null
-      } | null
       certificates?: Array<{
         __typename?: 'Certificate'
         hasShowedVerifiedDocument?: boolean | null
@@ -4230,7 +4397,6 @@ export type FetchDeathRegistrationForReviewQuery = {
             description: string
           }
         }
-        primaryOffice: { __typename?: 'Location'; id: string }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -4874,15 +5040,6 @@ export type FetchMarriageRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      assignment?: {
-        __typename?: 'AssignmentData'
-        practitionerId?: string | null
-        firstName?: string | null
-        lastName?: string | null
-        officeName?: string | null
-        avatarURL: string
-        createdAt?: string | null
-      } | null
       certificates?: Array<{
         __typename?: 'Certificate'
         hasShowedVerifiedDocument?: boolean | null
@@ -5018,7 +5175,6 @@ export type FetchMarriageRegistrationForReviewQuery = {
             description: string
           }
         }
-        primaryOffice: { __typename?: 'Location'; id: string }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -5495,7 +5651,6 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
       lastName?: string | null
       officeName?: string | null
       avatarURL: string
-      createdAt?: string | null
     } | null
   } | null
   operationHistories?: Array<{
@@ -5536,7 +5691,6 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
       lastName?: string | null
       officeName?: string | null
       avatarURL: string
-      createdAt?: string | null
     } | null
   } | null
   operationHistories?: Array<{
@@ -5584,7 +5738,6 @@ type EventSearchFields_MarriageEventSearchSet_Fragment = {
       lastName?: string | null
       officeName?: string | null
       avatarURL: string
-      createdAt?: string | null
     } | null
   } | null
   operationHistories?: Array<{
@@ -5600,7 +5753,6 @@ export type EventSearchFieldsFragment =
   | EventSearchFields_MarriageEventSearchSet_Fragment
 
 export type RegistrationHomeQueryVariables = Exact<{
-  userId: Scalars['String']
   declarationLocationId: Scalars['String']
   pageSize?: InputMaybe<Scalars['Int']>
   inProgressSkip?: InputMaybe<Scalars['Int']>
@@ -5610,7 +5762,6 @@ export type RegistrationHomeQueryVariables = Exact<{
   >
   reviewSkip?: InputMaybe<Scalars['Int']>
   rejectSkip?: InputMaybe<Scalars['Int']>
-  sentForReviewSkip?: InputMaybe<Scalars['Int']>
   approvalSkip?: InputMaybe<Scalars['Int']>
   externalValidationSkip?: InputMaybe<Scalars['Int']>
   printSkip?: InputMaybe<Scalars['Int']>
@@ -5654,7 +5805,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -5694,7 +5844,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -5741,7 +5890,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -5788,7 +5936,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -5828,7 +5975,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -5875,7 +6021,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -5922,7 +6067,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -5962,7 +6106,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6009,7 +6152,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6056,7 +6198,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6096,7 +6237,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6143,141 +6283,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | null
-    > | null
-  } | null
-  sentForReviewTab?: {
-    __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
-      | {
-          __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: PlainDate | null
-          id: string
-          type?: string | null
-          childName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-              createdAt?: string | null
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | {
-          __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: PlainDate | null
-          id: string
-          type?: string | null
-          deceasedName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-              createdAt?: string | null
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | {
-          __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: PlainDate | null
-          id: string
-          type?: string | null
-          brideName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          groomName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6324,7 +6329,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6364,7 +6368,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6411,7 +6414,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6458,7 +6460,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6498,7 +6499,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6545,7 +6545,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6592,7 +6591,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6632,7 +6630,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6679,7 +6676,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6726,7 +6722,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6766,7 +6761,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6813,7 +6807,6 @@ export type RegistrationHomeQuery = {
               lastName?: string | null
               officeName?: string | null
               avatarURL: string
-              createdAt?: string | null
             } | null
           } | null
           operationHistories?: Array<{
@@ -6882,7 +6875,6 @@ export type FetchDeclarationShortInfoQuery = {
             lastName?: string | null
             officeName?: string | null
             avatarURL: string
-            createdAt?: string | null
           } | null
         } | null
       }
@@ -6921,7 +6913,6 @@ export type FetchDeclarationShortInfoQuery = {
             lastName?: string | null
             officeName?: string | null
             avatarURL: string
-            createdAt?: string | null
           } | null
         } | null
       }
@@ -6971,7 +6962,6 @@ export type FetchDeclarationShortInfoQuery = {
             lastName?: string | null
             officeName?: string | null
             avatarURL: string
-            createdAt?: string | null
           } | null
         } | null
       }
