@@ -8,13 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   FieldConfig,
   Inferred,
-  FieldValue,
-  isFieldHidden
+  FieldValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 
@@ -24,6 +22,10 @@ import { DependencyInfo } from '@client/forms'
  * to a different character before passing the data to Formik. This function unflattens
  */
 export const FIELD_SEPARATOR = '____'
+
+export function makeFormFieldIdFormikCompatible(fieldId: string) {
+  return fieldId.replaceAll('.', FIELD_SEPARATOR)
+}
 
 export function handleDefaultValue(
   field: FieldConfig,
@@ -38,15 +40,6 @@ export function handleDefaultValue(
   }
 
   return defaultValue
-}
-
-export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return !isFieldHidden(field, {
-    $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
-    })
-  })
 }
 
 export function evalExpressionInFieldDefinition(

@@ -53,6 +53,11 @@ describe('resolveChildren', () => {
 
     const db = connectedClient.db()
     collection = db.collection<Location>('Location_view_with_plain_ids')
+
+    jest.doMock('@config/config/hearthClient', () => ({
+      __esModule: true,
+      default: client
+    }))
   }, 60000 /* Timeout to allow mongo binary download*/)
 
   afterAll(async () => {
@@ -95,8 +100,21 @@ describe('resolveChildren', () => {
         'uuid1' as UUID
       )) as SavedLocation[]
 
+      const projectedChild = {
+        id: child.id,
+        name: child.name,
+        type: child.type
+      }
+      const projectedGrandchild = {
+        id: grandchild.id,
+        name: grandchild.name,
+        type: grandchild.type
+      }
+
       expect(children).toHaveLength(2)
-      expect(children).toEqual(expect.arrayContaining([child, grandchild]))
+      expect(children).toEqual(
+        expect.arrayContaining([projectedChild, projectedGrandchild])
+      )
     })
   })
 })

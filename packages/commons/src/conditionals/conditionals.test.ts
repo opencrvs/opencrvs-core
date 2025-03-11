@@ -235,6 +235,7 @@ describe('"event" conditionals', () => {
       $event: {
         id: '123',
         type: 'birth',
+        trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
         actions: [
@@ -244,8 +245,7 @@ describe('"event" conditionals', () => {
             createdAt: now,
             createdBy: '12345',
             data: {},
-            createdAtLocation: '123456',
-            draft: false
+            createdAtLocation: '123456'
           }
         ]
       }

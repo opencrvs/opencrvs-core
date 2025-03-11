@@ -141,19 +141,9 @@ export const event = {
                 properties: {
                   type: {
                     const: action
-                  },
-                  draft: {
-                    type: 'boolean'
                   }
                 },
-                required: ['type'],
-                not: {
-                  properties: {
-                    draft: {
-                      const: true
-                    }
-                  }
-                }
+                required: ['type']
               }
             }
           },

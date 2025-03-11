@@ -24,7 +24,8 @@ import {
   getDependentFields,
   handleDefaultValue,
   hasDefaultValueDependencyInfo,
-  makeDatesFormatted
+  makeDatesFormatted,
+  makeFormFieldIdFormikCompatible
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 
@@ -43,8 +44,7 @@ import {
   isCountryFieldType,
   isDateFieldType,
   isDividerFieldType,
-  isFieldDisabled,
-  isFieldHidden,
+  isFieldEnabled,
   isFileFieldType,
   isFileFieldWithOptionType,
   isLocationFieldType,
@@ -57,7 +57,8 @@ import {
   isTextAreaFieldType,
   isTextFieldType,
   isNumberFieldType,
-  isEmailFieldType
+  isEmailFieldType,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -78,7 +79,7 @@ import { File } from './inputs/FileInput/FileInput'
 import {
   BulletList,
   Checkbox,
-  Date as DateField,
+  DateField,
   RadioGroup,
   LocationSearch,
   Select,
@@ -635,7 +636,7 @@ class FormSectionComponent extends React.Component<AllProps> {
 
     const fields = fieldsWithDotIds.map((field) => ({
       ...field,
-      id: field.id.replaceAll('.', FIELD_SEPARATOR)
+      id: makeFormFieldIdFormikCompatible(field.id)
     }))
     const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
 
@@ -650,18 +651,15 @@ class FormSectionComponent extends React.Component<AllProps> {
             error = intl.formatMessage(firstError.message)
           }
 
-          const formParams = {
-            $form: makeFormikFieldIdsOpenCRVSCompatible(
-              valuesWithFormattedDate
-            ),
-            $now: formatISO(new Date(), { representation: 'date' })
-          }
+          const formData = makeFormikFieldIdsOpenCRVSCompatible(
+            valuesWithFormattedDate
+          )
 
-          if (isFieldHidden(field, formParams)) {
+          if (!isFieldVisible(field, formData)) {
             return null
           }
 
-          const isDisabled = isFieldDisabled(field, formParams)
+          const isDisabled = !isFieldEnabled(field, formData)
 
           return (
             <FormItem
@@ -708,7 +706,7 @@ class FormSectionComponent extends React.Component<AllProps> {
 function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
-      key.replaceAll('.', FIELD_SEPARATOR),
+      makeFormFieldIdFormikCompatible(key),
       value
     ])
   )

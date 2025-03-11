@@ -31,12 +31,6 @@ export const ActionConfigBase = z.object({
   forms: z.array(FormConfig)
 })
 
-const CreateConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.CREATE)
-  })
-)
-
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE)
@@ -46,6 +40,29 @@ const DeclareConfig = ActionConfigBase.merge(
 const ValidateConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.VALIDATE)
+  })
+)
+
+const RejectDeclarationConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT),
+    comment: z.string(),
+    isDuplicate: z.boolean()
+  })
+)
+const MarkedAsDuplicateConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE),
+    comment: z.string(),
+    duplicates: z.array(z.string()).describe('UUIDs of duplicate records')
+  })
+)
+
+const ArchivedConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVED),
+    comment: z.string(),
+    isDuplicate: z.boolean()
   })
 )
 
@@ -101,9 +118,11 @@ const CustomConfig = ActionConfigBase.merge(
  */
 /** @knipignore */
 export type AllActionConfigFields =
-  | typeof CreateConfig
   | typeof DeclareConfig
   | typeof ValidateConfig
+  | typeof RejectDeclarationConfig
+  | typeof MarkedAsDuplicateConfig
+  | typeof ArchivedConfig
   | typeof RegisterConfig
   | typeof DeleteConfig
   | typeof PrintCertificateActionConfig
@@ -114,9 +133,11 @@ export type AllActionConfigFields =
 
 /** @knipignore */
 export type InferredActionConfig =
-  | z.infer<typeof CreateConfig>
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
+  | z.infer<typeof RejectDeclarationConfig>
+  | z.infer<typeof MarkedAsDuplicateConfig>
+  | z.infer<typeof ArchivedConfig>
   | z.infer<typeof RegisterConfig>
   | z.infer<typeof DeleteConfig>
   | z.infer<typeof PrintCertificateActionConfig>
@@ -126,9 +147,11 @@ export type InferredActionConfig =
   | z.infer<typeof CustomConfig>
 
 export const ActionConfig = z.discriminatedUnion('type', [
-  CreateConfig,
   DeclareConfig,
   ValidateConfig,
+  RejectDeclarationConfig,
+  MarkedAsDuplicateConfig,
+  ArchivedConfig,
   RegisterConfig,
   DeleteConfig,
   PrintCertificateActionConfig,

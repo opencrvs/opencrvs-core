@@ -13,6 +13,7 @@ import { EventConfig, EventDocument } from '@opencrvs/commons/client'
 export const birthDocument: EventDocument = {
   type: 'birth',
   id: 'e1e9ff08-ae5d-490a-b76a-74722269ff4a',
+  trackingId: 'TEST12',
   createdAt: '2025-02-06T06:15:39.922Z',
   updatedAt: '2025-02-06T06:15:39.922Z',
   actions: [
@@ -21,7 +22,6 @@ export const birthDocument: EventDocument = {
       createdAt: '2025-02-06T06:15:39.922Z',
       createdBy: '67810ec1d9bb658e54f4f319',
       createdAtLocation: '7ec76333-d533-4743-b810-5c8ed32169a8',
-      draft: false,
       id: '148ed352-9daf-401c-bf3e-4d13abbb808d',
       data: {}
     }
@@ -188,16 +188,6 @@ export const birthEvent = {
   workqueues: [
     {
       id: 'all',
-      fields: [
-        {
-          column: 'title',
-          label: {
-            id: 'event.birth.workqueue.all.name.label',
-            defaultMessage: '{child.surname} {child.firstname}',
-            description: 'Label for name in all workqueue'
-          }
-        }
-      ],
       filters: []
     }
   ],

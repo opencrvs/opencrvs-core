@@ -10,65 +10,69 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { v4 as uuid } from 'uuid'
-import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
 import {
-  getLocalEventData,
+  DecorateMutationProcedure,
+  inferInput
+} from '@trpc/tanstack-react-query'
+import {
+  ActionType,
+  CreatedAction,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
+
+import {
   invalidateEventsList,
   setEventData,
-  setEventListData,
-  setMutationDefaults
+  setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
-import { queryClient, useTRPC, utils } from '@client/v2-events/trpc'
+import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 
-export function createTemporaryId() {
-  return `tmp-${uuid()}`
-}
+import { createTemporaryId } from '@client/v2-events/utils'
+import { setMutationDefaults } from './utils'
 
-export function isTemporaryId(id: string) {
-  return id.startsWith('tmp-')
-}
-
-export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
-  canonicalMutationFn: (params: T) => Promise<R>
-): (params: T) => Promise<R> {
-  return async (params) => {
-    const { eventId } = params
-
-    if (!isTemporaryId(eventId)) {
-      return canonicalMutationFn({ ...params, eventId: eventId })
-    }
-
-    const localVersion = getLocalEventData(eventId)
-    if (!localVersion || isTemporaryId(localVersion.id)) {
-      throw new Error('Event that has not been stored yet cannot be deleted')
-    }
-
-    return canonicalMutationFn({
-      ...params,
-      eventId: localVersion.id,
-      eventType: localVersion.type
-    })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
+  trpcProcedure: P
+) {
+  const mutationOptions = {
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
   }
+
+  if (!mutationOptions.mutationFn) {
+    throw new Error(
+      'No mutation fn found for operation. This should never happen'
+    )
+  }
+
+  const defaultMutationFn = mutationOptions.mutationFn
+
+  return async (params: inferInput<P>) =>
+    defaultMutationFn({
+      ...params,
+      data: params.data
+    })
 }
 
-setMutationDefaults(utils.event.create, {
+setMutationDefaults(trpcOptionsProxy.event.create, {
   retry: true,
+  retryDelay: 1000,
+  mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
     const optimisticEvent = {
       id: newEvent.transactionId,
       type: newEvent.type,
+      trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       actions: [
         {
-          type: 'CREATE',
+          type: ActionType.CREATE,
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
           createdAtLocation: 'TODO',
-          draft: false,
           data: {}
         } satisfies CreatedAction
       ]
@@ -94,8 +98,9 @@ export function useCreateEvent() {
   }>()
 
   const overrides = queryClient.getMutationDefaults(
-    utils.event.create.mutationKey()
+    trpcOptionsProxy.event.create.mutationKey()
   )
+
   return useMutation({
     ...options,
     ...overrides

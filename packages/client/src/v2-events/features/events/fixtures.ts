@@ -14,6 +14,7 @@ import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
   type: 'TENNIS_CLUB_MEMBERSHIP',
+  trackingId: 'TEST12',
   status: 'CREATED',
   createdAt: '2023-03-01T00:00:00.000Z',
   createdBy: uuid(),
@@ -31,6 +32,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
 export const tennisClueMembershipEventDocument: EventDocument = {
   type: 'TENNIS_CLUB_MEMBERSHIP',
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
+  trackingId: 'TEST12',
   createdAt: '2025-01-23T05:30:02.615Z',
   updatedAt: '2025-01-23T05:35:27.689Z',
   actions: [
@@ -40,12 +42,10 @@ export const tennisClueMembershipEventDocument: EventDocument = {
       createdAt: '2025-01-23T05:30:02.615Z',
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
-      draft: false,
       data: {}
     },
     {
       id: '8db635cf-ee30-40ca-8117-a7188256a2b1',
-      draft: false,
       data: {
         'applicant.firstname': 'Riku',
         'applicant.surname': 'Rouvila',
@@ -67,7 +67,6 @@ export const tennisClueMembershipEventDocument: EventDocument = {
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
-      draft: false,
       data: {
         'applicant.firstname': 'Riku',
         'applicant.surname': 'Rouvila',

@@ -15,13 +15,15 @@ import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
-import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
+import { Link, useNavigate } from 'react-router-dom'
 import {
+  applyDraftsToEventIndex,
   defaultColumns,
   EventConfig,
   EventIndex,
+  getAllFields,
   getOrThrow,
   RootWorkqueueConfig,
   workqueues
@@ -32,6 +34,7 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
+import { Link as TextButton } from '@opencrvs/components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -43,11 +46,9 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 
 import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  flattenEventIndex,
-  getFieldsWithPopulatedValues,
-  getEventTitle
-} from '@client/v2-events/utils'
+import { flattenEventIndex } from '@client/v2-events/utils'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
@@ -66,11 +67,6 @@ const messages = defineMessages({
 
 const ToolTipContainer = styled.span`
   text-align: center;
-`
-
-const NondecoratedLink = styled(Link)`
-  text-decoration: none;
-  color: 'primary';
 `
 
 const FabContainer = styled.div`
@@ -113,6 +109,7 @@ export function WorkqueueContainer() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const [events] = getEvents.useSuspenseQuery()
+
   const eventConfigs = useEventConfigurations()
 
   const workqueueConfig =
@@ -162,9 +159,11 @@ function Workqueue({
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
-  const { getOutbox, getDrafts } = useEvents()
+  const { getOutbox } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
-  const drafts = getDrafts()
+  const drafts = getRemoteDrafts()
+  const navigate = useNavigate()
   const { width } = useWindowSize()
 
   const validEvents = events.filter((event) =>
@@ -178,6 +177,16 @@ function Workqueue({
 
   const workqueue = validEvents
     .filter((event) => eventConfigs.some((e) => e.id === event.type))
+    /*
+     * Apply pending drafts to the event index.
+     * This is necessary to show the most up to date information in the workqueue.
+     */
+    .map((event) =>
+      applyDraftsToEventIndex(
+        event,
+        drafts.filter((d) => d.eventId === event.id)
+      )
+    )
     .map((event) => {
       /** We already filtered invalid events, this should never happen. */
       const eventConfig = getOrThrow(
@@ -188,7 +197,9 @@ function Workqueue({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
-      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+      const isInDrafts = drafts
+        .filter((draft) => draft.createdAt > event.modifiedAt)
+        .some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {
@@ -200,27 +211,15 @@ function Workqueue({
         return event.status
       }
 
-      const eventWorkqueue = getOrThrow(
-        eventConfig.workqueues.find((wq) => wq.id === workqueueConfig.id),
-        `Could not find workqueue config for ${workqueueConfig.id}`
-      )
-
-      const fieldsWithPopulatedValues = getFieldsWithPopulatedValues({
-        event,
-        workqueue: eventWorkqueue,
-        intl: flattenedIntl,
-        eventConfig
-      })
-
       const titleColumnId = workqueueConfig.columns[0].id
 
-      const title = getEventTitle({
-        event,
-        eventConfig,
-        workqueue: eventWorkqueue,
-        intl: flattenedIntl,
-        titleColumn: titleColumnId
-      })
+      const title = flattenedIntl.formatMessage(
+        eventConfig.summary.title.label,
+        {
+          ...setEmptyValuesForFields(getAllFields(eventConfig)),
+          ...flattenEventIndex(event)
+        }
+      )
 
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
@@ -234,7 +233,6 @@ function Workqueue({
         )
 
       return {
-        ...fieldsWithPopulatedValues,
         ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
@@ -244,7 +242,7 @@ function Workqueue({
           {
             id: `events.status`,
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} other {Unknown}}'
           },
           {
             status: getEventStatus()
@@ -253,13 +251,17 @@ function Workqueue({
         [titleColumnId]: isInOutbox ? (
           TitleColumn
         ) : (
-          <NondecoratedLink
-            to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-              eventId: event.id
-            })}
+          <TextButton
+            onClick={() => {
+              return navigate(
+                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                  eventId: event.id
+                })
+              )
+            }}
           >
             {TitleColumn}
-          </NondecoratedLink>
+          </TextButton>
         )
       }
     })
