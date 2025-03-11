@@ -1060,7 +1060,7 @@ export const handlers = {
               }
             ],
             primaryOffice: {
-              id: 'dfcd1cbc-30c7-41a4-afd2-020515b4d78b',
+              id: '028d2c85-ca31-426d-b5d1-2cef545a4902',
               name: 'Ibombo District Office',
               alias: ['Ibombo District Office'],
               status: 'active',
@@ -1362,7 +1362,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/e76fbe62-bd35-44cf-ad0b-9242db1d3085'
+                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
               },
               type: {
                 coding: [
