@@ -451,23 +451,6 @@ export const ChangeFieldInReview: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
-          tRPCMsw.event.create.mutation(() => {
-            callTracker.fieldAgent['event.create']++
-
-            return eventDocument
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent()
-              }
-            })
           })
         ]
       }
