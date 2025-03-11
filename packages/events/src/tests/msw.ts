@@ -20,7 +20,7 @@ const handlers = [
       const request = await info.request.json()
       const filenames = request.filenames.map(
         (x) =>
-          `${env.MINIO_URL}/ocrvs/${x}?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20250305%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20250305T100513Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=b9c1a0c9680fd344dcdfa32d2413319fcfc968090b674a3de5b66ef577d91e9b`
+          `http://localhost:3535/ocrvs/${x}?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20250305%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20250305T100513Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=b9c1a0c9680fd344dcdfa32d2413319fcfc968090b674a3de5b66ef577d91e9b`
       )
       return HttpResponse.json(filenames)
     }
