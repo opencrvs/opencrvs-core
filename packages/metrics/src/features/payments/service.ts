@@ -14,6 +14,8 @@ import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 import { query } from '@metrics/influxdb/client'
 import { fetchLocationChildrenIds } from '@metrics/configApi'
 import { helpers } from '@metrics/utils/queryHelper'
+import { logger } from '@opencrvs/commons'
+import { createChunks } from '@metrics/utils/batchHelpers'
 
 export async function getTotalPayments(
   timeFrom: string,
@@ -48,30 +50,42 @@ export async function getTotalPaymentsByLocation(
   eventType: EVENT_TYPE
 ) {
   const locationIds = await fetchLocationChildrenIds(locationId)
-  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
-    locationIds,
-    'officeLocation'
-  )
 
-  const totalMetrics = await query<
-    Array<{ total: number; paymentType: string }>
-  >(
-    `SELECT SUM(total) AS total
-      FROM payment
-    WHERE eventType = $eventType
-      AND time > $timeFrom
-      AND time <= $timeTo
-      AND (${officeLocationInChildren})
-    GROUP BY paymentType`,
-    {
-      placeholders: {
-        timeFrom,
-        timeTo,
-        eventType,
-        ...locationPlaceholders
-      }
+  const batchQuery = async (locationIds: string[]) => {
+    const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+      locationIds,
+      'officeLocation'
+    )
+
+    try {
+      return await query<Array<{ total: number; paymentType: string }>>(
+        `SELECT SUM(total) AS total
+          FROM payment
+        WHERE eventType = $eventType
+          AND time > $timeFrom
+          AND time <= $timeTo
+          AND (${officeLocationInChildren})
+        GROUP BY paymentType`,
+        {
+          placeholders: {
+            timeFrom,
+            timeTo,
+            eventType,
+            ...locationPlaceholders
+          }
+        }
+      )
+    } catch (error) {
+      logger.error(
+        `Error fetching total payments by location: ${error.message}`
+      )
+      throw error
     }
-  )
+  }
 
-  return totalMetrics
+  const locationBatches = createChunks(locationIds, 1000)
+
+  return await Promise.all(locationBatches.map(batchQuery)).then((res) =>
+    res.flat()
+  )
 }

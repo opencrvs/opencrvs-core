@@ -37,6 +37,9 @@ import {
   ResourceIdentifier,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
+import { createChunks } from '@metrics/utils/batchHelpers'
+import { logger } from '@opencrvs/commons'
+
 interface IGroupedByGender {
   total: number
   gender: string
@@ -1030,26 +1033,39 @@ export async function getTotalMetricsByLocation(
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const locationIds = await fetchLocationChildrenIds(locationId)
-  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
-    locationIds,
-    'officeLocation'
-  )
 
-  const totalMetrics: IMetricsTotalGroup[] = await query(
-    `SELECT COUNT(${column}) AS total
-    FROM ${measurement}
-  WHERE time > $timeFrom
-    AND time <= $timeTo
-    AND (${officeLocationInChildren})
-  GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
-    {
-      placeholders: {
-        timeFrom,
-        timeTo,
-        ...locationPlaceholders
-      }
+  const batchquery = async (locationIds: string[]) => {
+    const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+      locationIds,
+      'officeLocation'
+    )
+    try {
+      return await query(
+        `SELECT COUNT(${column}) AS total
+          FROM ${measurement}
+        WHERE time > $timeFrom
+          AND time <= $timeTo
+          AND (${officeLocationInChildren})
+        GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
+        {
+          placeholders: {
+            timeFrom,
+            timeTo,
+            ...locationPlaceholders
+          }
+        }
+      )
+    } catch (error) {
+      logger.error(`Error fetching total metrics by location: ${error.message}`)
+      throw error
     }
-  )
+  }
+
+  const locationBatches = createChunks(locationIds, 1000)
+
+  const totalMetrics: IMetricsTotalGroup[] = await Promise.all(
+    locationBatches.map(batchquery)
+  ).then((res) => res.flat())
 
   const estimationOfTimeRange: IEstimation =
     await fetchEstimateForTargetDaysByLocationId(
