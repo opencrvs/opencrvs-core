@@ -15,7 +15,8 @@ import { TranslationConfig } from './TranslationConfig'
 export const FormPage = z.object({
   id: z.string().describe('Unique identifier for the page'),
   title: TranslationConfig.describe('Header title of the page'),
-  fields: z.array(FieldConfig).describe('Fields to be rendered on the page')
+  fields: z.array(FieldConfig).describe('Fields to be rendered on the page'),
+  hideOnReview: z.boolean().default(false).optional()
 })
 
 export const FormConfig = z.object({

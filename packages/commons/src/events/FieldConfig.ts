@@ -60,13 +60,15 @@ const BaseField = z.object({
     .optional(),
   dependsOn: z.array(FieldId).default([]).optional(),
   label: TranslationConfig,
-  hideLabel: z.boolean().default(false).optional()
+  hideLabel: z.boolean().default(false).optional(),
+  hideOnReview: z.boolean().default(false).optional()
 })
 
 export type BaseField = z.infer<typeof BaseField>
 
 const Divider = BaseField.extend({
-  type: z.literal(FieldType.DIVIDER)
+  type: z.literal(FieldType.DIVIDER),
+  hideOnReview: z.boolean().default(true)
 })
 export type Divider = z.infer<typeof Divider>
 

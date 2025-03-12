@@ -164,6 +164,11 @@ const ReviewContainter = styled.div`
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
+  changeAllButton: {
+    id: 'v2.buttons.changeAll',
+    defaultMessage: 'Change all',
+    description: 'The label for the change all button'
+  },
   changeButton: {
     id: 'v2.buttons.change',
     defaultMessage: 'Change',
@@ -425,96 +430,105 @@ function ReviewComponent({
           </HeaderContainer>
           <FormData>
             <ReviewContainter>
-              {formConfig.pages.map((page) => {
-                return (
-                  <DeclarationDataContainer
-                    key={'Section_' + page.title.defaultMessage}
-                  >
-                    <Accordion
-                      action={
-                        <Link
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            onEdit({ pageId: page.id })
-                          }}
-                        >
-                          {intl.formatMessage(reviewMessages.changeButton)}
-                        </Link>
-                      }
-                      expand={true}
-                      label={intl.formatMessage(page.title)}
-                      labelForHideAction="Hide"
-                      labelForShowAction="Show"
-                      name={'Accordion_' + page.id}
+              {formConfig.pages
+                .filter(({ hideOnReview }) => !hideOnReview)
+                .map((page) => {
+                  return (
+                    <DeclarationDataContainer
+                      key={'Section_' + page.title.defaultMessage}
                     >
-                      <ListReview id={'Section_' + page.id}>
-                        {page.fields
-                          .filter((field) => isFieldVisible(field, form))
-                          .filter(
-                            (field) => !isOptionalUncheckedCheckbox(field, form)
-                          )
-                          .map((field) => {
-                            const value = form[field.id]
-                            const previousValue = previousForm[field.id]
-
-                            const valueDisplay = (
-                              <Output
-                                field={field}
-                                previousValue={previousValue}
-                                showPreviouslyMissingValuesAsChanged={
-                                  showPreviouslyMissingValuesAsChanged
-                                }
-                                value={value}
-                              />
+                      <Accordion
+                        action={
+                          <Link
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onEdit({ pageId: page.id })
+                            }}
+                          >
+                            {intl.formatMessage(reviewMessages.changeAllButton)}
+                          </Link>
+                        }
+                        expand={true}
+                        label={intl.formatMessage(page.title)}
+                        labelForHideAction="Hide"
+                        labelForShowAction="Show"
+                        name={'Accordion_' + page.id}
+                      >
+                        <ListReview id={'Section_' + page.id}>
+                          {page.fields
+                            .filter(({ hideOnReview }) => !hideOnReview)
+                            .filter((field) => isFieldVisible(field, form))
+                            .filter(
+                              (field) =>
+                                !isOptionalUncheckedCheckbox(field, form)
                             )
+                            .map((field) => {
+                              const value = form[field.id]
+                              const previousValue = previousForm[field.id]
 
-                            const error = getFieldValidationErrors({
-                              field,
-                              values: form
-                            })
+                              const valueDisplay = (
+                                <Output
+                                  field={field}
+                                  previousValue={previousValue}
+                                  showPreviouslyMissingValuesAsChanged={
+                                    showPreviouslyMissingValuesAsChanged
+                                  }
+                                  value={value}
+                                />
+                              )
 
-                            const errorDisplay =
-                              error.errors.length > 0 ? (
-                                <ValidationError key={field.id}>
-                                  {intl.formatMessage(error.errors[0].message)}
-                                </ValidationError>
-                              ) : null
+                              const error = getFieldValidationErrors({
+                                field,
+                                values: form
+                              })
 
-                            return (
-                              <ListReview.Row
-                                key={field.id}
-                                actions={
-                                  <Link
-                                    data-testid={`change-button-${field.id}`}
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-
-                                      onEdit({
-                                        pageId: page.id,
-                                        fieldId: field.id
-                                      })
-                                    }}
-                                  >
+                              const errorDisplay =
+                                error.errors.length > 0 ? (
+                                  <ValidationError key={field.id}>
                                     {intl.formatMessage(
-                                      reviewMessages.changeButton
+                                      error.errors[0].message
                                     )}
-                                  </Link>
-                                }
-                                id={field.id}
-                                label={intl.formatMessage(field.label)}
-                                value={
-                                  error.errors.length > 0
-                                    ? errorDisplay
-                                    : valueDisplay
-                                }
-                              />
-                            )
-                          })}
-                      </ListReview>
-                    </Accordion>
-                  </DeclarationDataContainer>
-                )
-              })}
+                                  </ValidationError>
+                                ) : null
+
+                              // TODO CIHAN: hide paragraph etc. rows
+                              const changeAction = (
+                                <Link
+                                  data-testid={`change-button-${field.id}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+
+                                    onEdit({
+                                      pageId: page.id,
+                                      fieldId: field.id
+                                    })
+                                  }}
+                                >
+                                  {intl.formatMessage(
+                                    reviewMessages.changeButton
+                                  )}
+                                </Link>
+                              )
+
+                              return (
+                                <ListReview.Row
+                                  key={field.id}
+                                  actions={[changeAction]}
+                                  id={field.id}
+                                  label={intl.formatMessage(field.label)}
+                                  value={
+                                    error.errors.length > 0
+                                      ? errorDisplay
+                                      : valueDisplay
+                                  }
+                                />
+                              )
+                            })}
+                        </ListReview>
+                      </Accordion>
+                    </DeclarationDataContainer>
+                  )
+                })}
             </ReviewContainter>
           </FormData>
 
