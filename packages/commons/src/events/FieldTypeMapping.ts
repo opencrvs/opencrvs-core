@@ -37,15 +37,16 @@ import {
 import { FieldType } from './FieldType'
 import {
   AddressFieldValue,
+  AddressFieldValueInput,
   CheckboxFieldValue,
   DateValue,
   EmailValue,
   FieldValue,
-  FieldValueSchema,
+  FieldValueInputSchema,
   FileFieldValue,
   FileFieldWithOptionValue,
   NumberFieldValue,
-  OptionalFieldValueSchema,
+  OptionalNullableFieldValueSchema,
   RequiredTextValue,
   TextValue
 } from './FieldValue'
@@ -62,7 +63,7 @@ import {
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
-  let schema: FieldValueSchema
+  let schema: FieldValueInputSchema
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
@@ -100,15 +101,18 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = FileFieldWithOptionValue
       break
     case FieldType.ADDRESS:
-      schema = AddressFieldValue
+      schema = AddressFieldValueInput
       break
   }
 
-  return required ? schema : schema.optional()
+  return required ? schema : schema.nullable().optional()
 }
 
 export function createValidationSchema(config: FieldConfig[]) {
-  const shape: Record<string, FieldValueSchema | OptionalFieldValueSchema> = {}
+  const shape: Record<
+    string,
+    OptionalNullableFieldValueSchema | FieldValueInputSchema
+  > = {}
 
   for (const field of config) {
     shape[field.id] = mapFieldTypeToZod(field.type, field.required)

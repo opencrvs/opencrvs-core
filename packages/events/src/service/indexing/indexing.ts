@@ -299,7 +299,7 @@ export async function getIndexedEvents() {
     response.hits.hits
       .map((hit) => hit._source)
       .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
+      .map(decodeEventIndex)
   )
 
   return events

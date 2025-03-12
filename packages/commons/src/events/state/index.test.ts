@@ -10,6 +10,8 @@
  */
 
 import { getCurrentEventState } from '.'
+import { ActionDocument } from '../ActionDocument'
+import { ActionType } from '../ActionType'
 
 describe('correction requests', () => {
   test('proposed correction data is not applied before the correction request is approved', () => {
@@ -118,5 +120,108 @@ describe('correction requests', () => {
     })
 
     expect(state.data.name).toBe('Doe John')
+  })
+})
+
+describe('address state transitions', () => {
+  const addressWithoutVillage = {
+    country: 'FAR',
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+    urbanOrRural: 'RURAL' as const
+  }
+
+  const initialAddress = {
+    ...addressWithoutVillage,
+    village: 'Small village'
+  }
+
+  const initialForm = {
+    'applicant.dob': '2000-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true,
+    'applicant.address': { ...initialAddress }
+  }
+
+  const initialActions = [
+    {
+      type: ActionType.CREATE,
+      createdAt: '2025-03-11T13:46:37.365Z',
+      createdBy: '67d03ebdb8e6566a69a1e374',
+      createdAtLocation: 'f224e673-7695-466a-ab13-47d958e25264',
+      id: '1197ca20-d52f-4ad1-9723-caa02829d06d',
+      data: {} as any
+    },
+    {
+      data: initialForm,
+      type: ActionType.DECLARE,
+      createdBy: '67d03ebdb8e6566a69a1e374',
+      createdAt: '2025-03-11T13:46:38.176Z',
+      createdAtLocation: 'f224e673-7695-466a-ab13-47d958e25264',
+      id: '44991b1b-6d20-4196-93c0-964d4448e7d5'
+    }
+  ]
+
+  test('should persist optional "village" field in address, even if it is not included in payload', () => {
+    const actions = [
+      ...initialActions,
+      {
+        data: {
+          'applicant.address': addressWithoutVillage
+        },
+        type: ActionType.DECLARE,
+        createdBy: '67d03ebdb8e6566a69a1e374',
+        createdAt: '2025-03-11T13:46:39.200Z',
+        createdAtLocation: 'f224e673-7695-466a-ab13-47d958e25264',
+        id: '70df47a2-6b79-49b9-b189-d1ab345facfc'
+      }
+    ] satisfies ActionDocument[]
+
+    const state = getCurrentEventState({
+      type: 'TENNIS_CLUB_MEMBERSHIP',
+      id: '1197ca20-d52f-4ad1-9723-caa02829d06d',
+      trackingId: 'TEST12',
+      createdAt: '2025-03-11T13:46:37.365Z',
+      updatedAt: '2025-03-11T13:46:39.200Z',
+      actions: actions
+    })
+
+    expect(state.data).toEqual(initialForm)
+  })
+
+  const addressWithNullVillage = {
+    ...addressWithoutVillage,
+    village: null
+  }
+
+  test('should remove optional "village" field in address when it is set to null', () => {
+    const actions = [
+      ...initialActions,
+      {
+        data: {
+          'applicant.address': addressWithNullVillage as any
+        },
+        type: ActionType.DECLARE,
+        createdBy: '67d03ebdb8e6566a69a1e374',
+        createdAt: '2025-03-11T13:46:39.200Z',
+        createdAtLocation: 'f224e673-7695-466a-ab13-47d958e25264',
+        id: '70df47a2-6b79-49b9-b189-d1ab345facfc'
+      }
+    ] satisfies ActionDocument[]
+
+    const state = getCurrentEventState({
+      type: 'TENNIS_CLUB_MEMBERSHIP',
+      id: '1197ca20-d52f-4ad1-9723-caa02829d06d',
+      trackingId: 'TEST12',
+      createdAt: '2025-03-11T13:46:37.365Z',
+      updatedAt: '2025-03-11T13:46:39.200Z',
+      actions: actions
+    })
+
+    expect(state.data).toEqual({
+      ...initialForm,
+      'applicant.address': addressWithNullVillage
+    })
   })
 })

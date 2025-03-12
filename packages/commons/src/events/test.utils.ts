@@ -214,7 +214,7 @@ export const eventPayloadGenerator = {
   }
 }
 
-function generateActionDocument({
+export function generateActionDocument({
   configuration,
   action
 }: {

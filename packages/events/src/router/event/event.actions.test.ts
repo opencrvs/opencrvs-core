@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, getCurrentEventState } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('actions can be added to created events', async () => {
@@ -47,4 +47,91 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.DECLARE }),
     expect.objectContaining({ type: ActionType.VALIDATE })
   ])
+})
+
+test.only('Action data accepts partial changes', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const addressWithoutVillage = {
+    country: 'FAR',
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+    urbanOrRural: 'RURAL' as const
+  }
+
+  const initialAddress = {
+    ...addressWithoutVillage,
+    village: 'Small village'
+  }
+
+  const initialForm = {
+    'applicant.dob': '2000-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true,
+    'applicant.address': { ...initialAddress }
+  }
+
+  const firstDeclarationPayload = generator.event.actions.declare(
+    originalEvent.id,
+    { data: { ...initialForm } }
+  )
+  await client.event.actions.declare(firstDeclarationPayload)
+
+  const declarationWithoutVillage = generator.event.actions.declare(
+    originalEvent.id,
+    {
+      data: {
+        ...initialForm,
+        'applicant.address': {
+          ...addressWithoutVillage
+        }
+      }
+    }
+  )
+
+  await client.event.actions.declare(declarationWithoutVillage)
+
+  const updatedEvent = await client.event.get(originalEvent.id)
+
+  console.log('updatedEvent')
+  console.log(JSON.stringify(updatedEvent, null, 2))
+  const stateBeforeRemoval = getCurrentEventState(updatedEvent)
+
+  console.log('stateBeforeRemoval', stateBeforeRemoval)
+
+  expect(stateBeforeRemoval.data).toEqual(initialForm)
+
+  const declarationWithVillageNull = generator.event.actions.declare(
+    originalEvent.id,
+    {
+      data: {
+        ...initialForm,
+        'applicant.address': {
+          ...addressWithoutVillage,
+          village: null
+        }
+      }
+    }
+  )
+
+  await client.event.actions.declare(declarationWithVillageNull)
+  const eventAfterRemoval = await client.event.get(originalEvent.id)
+  const stateAfterRemoval = getCurrentEventState(eventAfterRemoval)
+
+  console.log('eventAfterRemoval')
+  console.log(JSON.stringify(eventAfterRemoval, null, 2))
+  expect(stateAfterRemoval.data).toEqual({
+    ...initialForm,
+    'applicant.address': { ...addressWithoutVillage, village: null }
+  })
+
+  const events = await client.event.list()
+
+  console.log('events')
+  console.log(JSON.stringify(events, null, 2))
+  expect(events).toEqual(534)
 })

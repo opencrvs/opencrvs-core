@@ -15,6 +15,7 @@ import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 import { Draft } from '../Draft'
+import * as _ from 'lodash'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
@@ -59,7 +60,7 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
 
 function getData(actions: Array<ActionDocument>) {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
-   * stop auto filling collector form with previous priint action data)
+   * stop auto filling collector form with previous print action data)
    */
   const excludedActions = [
     ActionType.REQUEST_CORRECTION,
@@ -84,16 +85,10 @@ function getData(actions: Array<ActionDocument>) {
       if (!requestAction) {
         return status
       }
-      return {
-        ...status,
-        ...requestAction.data
-      }
+      return deepMerge(status, requestAction.data)
     }
 
-    return {
-      ...status,
-      ...action.data
-    }
+    return deepMerge(status, action.data)
   }, {})
 }
 
@@ -117,6 +112,42 @@ export function getActionsMetadata(
   }, {})
 }
 
+function deepDropNulls<T extends Record<string, any>>(obj: T) {
+  if (!_.isObject(obj)) return obj
+
+  return Object.entries(obj).reduce(
+    (acc: Record<string, any>, [key, value]) => {
+      if (_.isObject(value)) {
+        value = deepDropNulls(value)
+      }
+      if (value !== null) {
+        acc[key] = value
+      }
+      return acc
+    },
+    {} as T
+  )
+}
+
+function deepMerge(
+  currentDocument: ActionDocument['data'],
+  actionDocument: ActionDocument['data']
+) {
+  return _.mergeWith(currentDocument, actionDocument, (objValue, srcValue) => {
+    if (srcValue === undefined) {
+      return objValue // Keep previous value
+    }
+    if (_.isArray(srcValue)) {
+      return srcValue // Replace arrays instead of merging
+    }
+    if (_.isObject(objValue) && _.isObject(srcValue)) {
+      return undefined // Continue deep merging objects
+    }
+
+    return srcValue // Override with latest value
+  })
+}
+
 export function isUndeclaredDraft(event: EventDocument): boolean {
   return event.actions.every(({ type }) => type === ActionType.CREATE)
 }
@@ -132,19 +163,21 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const latestAction = event.actions[event.actions.length - 1]
 
-  return {
-    id: event.id,
-    type: event.type,
-    status: getStatusFromActions(event.actions),
-    createdAt: event.createdAt,
-    createdBy: creationAction.createdBy,
-    createdAtLocation: creationAction.createdAtLocation,
-    modifiedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(event.actions),
-    updatedBy: latestAction.createdBy,
-    data: getData(event.actions),
-    trackingId: event.trackingId
-  }
+  return EventIndex.parse(
+    deepDropNulls({
+      id: event.id,
+      type: event.type,
+      status: getStatusFromActions(event.actions),
+      createdAt: event.createdAt,
+      createdBy: creationAction.createdBy,
+      createdAtLocation: creationAction.createdAtLocation,
+      modifiedAt: latestAction.createdAt,
+      assignedTo: getAssignedUserFromActions(event.actions),
+      updatedBy: latestAction.createdBy,
+      data: getData(event.actions),
+      trackingId: event.trackingId
+    })
+  )
 }
 
 export function getCurrentEventStateWithDrafts(
@@ -156,9 +189,7 @@ export function getCurrentEventStateWithDrafts(
 
   const activeDrafts = drafts
     .filter(({ eventId }) => eventId === event.id)
-    .filter(
-      ({ createdAt }) => new Date(createdAt) > new Date(lastAction.createdAt)
-    )
+    .filter(({ createdAt }) => createdAt > lastAction.createdAt)
     .map((draft) => draft.action)
     .flatMap((action) => {
       /*

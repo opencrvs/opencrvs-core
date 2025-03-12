@@ -43,14 +43,33 @@ const UrbanAddress = AdminStructure.extend({
   zipCode: z.string().optional()
 })
 
+const UrbanAddressInput = AdminStructure.extend({
+  urbanOrRural: z.literal('URBAN'),
+  town: z.string().optional().nullable(),
+  residentialArea: z.string().optional().nullable(),
+  street: z.string().optional().nullable(),
+  number: z.string().optional().nullable(),
+  zipCode: z.string().optional().nullable()
+})
+
 const RuralAddress = AdminStructure.extend({
   urbanOrRural: z.literal('RURAL'),
   village: z.string().optional()
 })
 
+const RuralAddressInput = AdminStructure.extend({
+  urbanOrRural: z.literal('RURAL'),
+  village: z.string().optional().nullable()
+})
+
 export const AddressFieldValue = z.discriminatedUnion('urbanOrRural', [
   UrbanAddress,
   RuralAddress
+])
+
+export const AddressFieldValueInput = z.discriminatedUnion('urbanOrRural', [
+  UrbanAddressInput,
+  RuralAddressInput
 ])
 
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>
@@ -85,6 +104,31 @@ export const FieldValue = z.union([
 
 export type FieldValue = z.infer<typeof FieldValue>
 
+export const FieldValueInput = z.union([
+  TextValue,
+  DateValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  CheckboxFieldValue,
+  NumberFieldValue,
+  UrbanAddressInput,
+  RuralAddressInput
+])
+
+export type FieldValueInput = z.infer<typeof FieldValueInput>
+
+/**
+ * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
+ * */
+export type FieldValueInputSchema =
+  | typeof FileFieldValue
+  | typeof FileFieldWithOptionValue
+  | typeof CheckboxFieldValue
+  | typeof AddressFieldValueInput
+  | typeof NumberFieldValue
+  | z.ZodString
+  | z.ZodBoolean
+
 /**
  * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
  * */
@@ -97,4 +141,6 @@ export type FieldValueSchema =
   | z.ZodString
   | z.ZodBoolean
 
-export type OptionalFieldValueSchema = z.ZodOptional<FieldValueSchema>
+export type OptionalNullableFieldValueSchema = z.ZodOptional<
+  z.ZodNullable<FieldValueInputSchema>
+>

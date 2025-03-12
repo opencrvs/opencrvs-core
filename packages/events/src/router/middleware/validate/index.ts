@@ -13,7 +13,7 @@ import {
   ActionInputWithType,
   ActionType,
   FieldConfig,
-  FieldValue,
+  FieldValueInput,
   getFieldValidationErrors
 } from '@opencrvs/commons'
 
@@ -38,16 +38,23 @@ export function validateAction(actionType: ActionType) {
 
     const data = {
       ...opts.input.data,
-      ...opts.input.metadata
+      ...(opts.input.metadata ?? {})
     }
+
+    console.log('data', data)
+
     const errors = formFields.reduce(
       (
-        errorResults: { message: string; id: string; value: FieldValue }[],
+        errorResults: {
+          message: string
+          id: string
+          value: FieldValueInput
+        }[],
         field: FieldConfig
       ) => {
         const fieldErrors = getFieldValidationErrors({
           field,
-          values: data
+          values: data as any
         }).errors
 
         if (fieldErrors.length === 0) {
