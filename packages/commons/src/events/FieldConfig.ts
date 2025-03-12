@@ -384,8 +384,7 @@ export type Inferred =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
 
-/** @knipignore */
-export type InputInferred =
+type InputInferred =
   | z.input<typeof Address>
   | z.input<typeof TextField>
   | z.input<typeof NumberField>
