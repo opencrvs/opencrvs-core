@@ -108,9 +108,10 @@ const zodToIntlErrorMap = (
   }
 
   if (
-    issue.code === 'invalid_type' &&
-    issue.expected !== issue.received &&
-    issue.received === 'undefined'
+    (issue.code === 'invalid_type' &&
+      issue.expected !== issue.received &&
+      issue.received === 'undefined') ||
+    (issue.code === 'too_small' && issue.message === undefined)
   ) {
     return {
       message: {
