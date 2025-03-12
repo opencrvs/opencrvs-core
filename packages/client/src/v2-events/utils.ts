@@ -17,7 +17,8 @@ import {
   ActionDocument,
   EventConfig,
   EventIndex,
-  getAllFields
+  getAllFields,
+  AddressFieldValue
 } from '@opencrvs/commons/client'
 import { setEmptyValuesForFields } from './components/forms/utils'
 
@@ -114,4 +115,26 @@ export function isTemporaryId(id: string) {
 
 export function createTemporaryId() {
   return `tmp-${uuid()}`
+}
+
+export function replacePlaceholders(
+  defaults: AddressFieldValue,
+  dataObjects: Record<string, Partial<AddressFieldValue>>
+): AddressFieldValue {
+  const result = { ...defaults }
+
+  for (const [key, value] of Object.entries(defaults)) {
+    if (typeof value === 'string' && value.startsWith('$')) {
+      const [objectName, property] = value.slice(1).split('.')
+
+      if (dataObjects[objectName][property as keyof AddressFieldValue]) {
+        if (key !== 'urbanOrRural') {
+          result[key as Exclude<keyof AddressFieldValue, 'urbanOrRural'>] =
+            dataObjects[objectName][property as keyof AddressFieldValue] ??
+            value
+        }
+      }
+    }
+  }
+  return result
 }

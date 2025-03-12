@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useSelector } from 'react-redux'
 import {
   ActionFormData,
   AddressFieldValue,
@@ -25,9 +24,8 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
-// eslint-disable-next-line no-restricted-imports
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { getLocations } from '@client/offline/selectors'
+import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
+import { replacePlaceholders } from '@client/v2-events/utils'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -82,33 +80,10 @@ function AddressInput(props: Props) {
     ...otherProps
   } = props
 
-  const userDetails = useSelector(getUserDetails)
-  const locations = useSelector(getLocations)
+  const user = useUserDetails()
 
-  const userPrimaryOfficeLocation = {
-    country: 'FAR',
-    province: '',
-    district: '',
-    urbanOrRural: AddressType.URBAN
-  }
-  const primaryOfficeId = userDetails?.primaryOffice.id
-
-  if (primaryOfficeId) {
-    const primaryOfficeLocation = locations[primaryOfficeId]
-
-    const districtId = primaryOfficeLocation.partOf.split('/')[1]
-    const district = locations[districtId]
-
-    userPrimaryOfficeLocation.district = districtId
-
-    const provinceId = district.partOf.split('/')[1]
-
-    userPrimaryOfficeLocation.province = provinceId
-  }
-
-  const defaultValue = otherProps.configuration?.defaultToUserDistrict
-    ? userPrimaryOfficeLocation
-    : initialDefaultValue
+  const defaultValue =
+    initialDefaultValue && replacePlaceholders(initialDefaultValue, { user })
 
   const fields = [
     ...ADMIN_STRUCTURE,
@@ -121,7 +96,7 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
       formData={value}
-      initialValues={value}
+      initialValues={{ ...value, ...defaultValue }}
       setAllFieldsDirty={false}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />
