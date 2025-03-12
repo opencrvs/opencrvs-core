@@ -44,7 +44,7 @@ export type ITimeFieldProps = IProps &
 function getFormattedValue(
   time: { hh: string; mm: string },
   use12HourFormat: boolean,
-  amPm: string | null
+  amPm?: string | null
 ) {
   const formattedHours = time.hh.padStart(2, '0')
   return use12HourFormat
@@ -75,14 +75,13 @@ function isValidHours(hours: string, use12HourFormat: boolean) {
     : parsed >= 0 && parsed <= 23
 }
 
-export function TimeField(props: ITimeFieldProps) {
+function TimeInput12(props: ITimeFieldProps) {
   const {
     id,
     meta,
     focusInput,
     notice,
     ignorePlaceHolder,
-    use12HourFormat = false,
     onChange,
     ...otherProps
   } = props
@@ -92,15 +91,13 @@ export function TimeField(props: ITimeFieldProps) {
     mm: ''
   })
 
-  const [amPm, setAmPm] = React.useState<string>(use12HourFormat ? 'AM' : '') // Default to AM for 12-hour format
+  const [amPm, setAmPm] = React.useState<string>('AM') // Default to AM for 12-hour format
 
   React.useEffect(() => {
     function getInitialState(time: string): IState {
-      const parts = time.split(/[:\s]/)
+      const [hh, mm, meridiem] = time.split(/[:\s]/)
 
-      const [hh, mm, meridiem] = parts.length === 3 ? parts : [...parts, null]
-
-      if (use12HourFormat && meridiem) setAmPm(meridiem)
+      setAmPm(meridiem)
 
       return { hh: hh || '', mm: mm || '' }
     }
@@ -111,13 +108,13 @@ export function TimeField(props: ITimeFieldProps) {
 
       if (parts.length !== 2) return false
 
-      return isValidHours(parts[0], use12HourFormat) && isValidMinutes(parts[1])
+      return isValidHours(parts[0], true) && isValidMinutes(parts[1])
     }
 
     if (props.value && isValidTime(props.value)) {
       setState(getInitialState(props.value))
     }
-  }, [props.value, use12HourFormat])
+  }, [props.value])
 
   const hh = React.useRef<HTMLInputElement>(null)
   const mm = React.useRef<HTMLInputElement>(null)
@@ -126,11 +123,7 @@ export function TimeField(props: ITimeFieldProps) {
   function change(event: React.ChangeEvent<HTMLInputElement>) {
     const val = event.target.value
     if (event.target.id.includes('hh')) {
-      if (use12HourFormat) {
-        if (val === '00' || Number(val) < 0 || Number(val) > 12) return
-      } else {
-        if (Number(val) < 0 || Number(val) > 23) return
-      }
+      if (val === '00' || Number(val) < 0 || Number(val) > 12) return
       if (val.length === 2 && mm?.current !== null) {
         mm.current.focus()
       }
@@ -144,7 +137,7 @@ export function TimeField(props: ITimeFieldProps) {
   function padStart(part: 'hh' | 'mm') {
     return (event: React.FocusEvent<HTMLInputElement>) => {
       let val = event.target.value
-      if (part === 'hh' && use12HourFormat && (!val || val === '0')) {
+      if (part === 'hh' && (!val || val === '0')) {
         val = '01'
       }
       const paddedValue = val.padStart(2, '0')
@@ -154,10 +147,10 @@ export function TimeField(props: ITimeFieldProps) {
   }
 
   React.useEffect(() => {
-    if (isValidHours(state.hh, use12HourFormat) && isValidMinutes(state.mm)) {
-      onChange(getFormattedValue(state, use12HourFormat, amPm))
+    if (isValidHours(state.hh, true) && isValidMinutes(state.mm)) {
+      onChange(getFormattedValue(state, true, amPm))
     }
-  }, [state, amPm, onChange, use12HourFormat])
+  }, [state, amPm, onChange])
 
   return (
     <Container id={id}>
@@ -171,8 +164,8 @@ export function TimeField(props: ITimeFieldProps) {
         focusInput={focusInput}
         type="number"
         placeholder={ignorePlaceHolder ? '' : 'hh'}
-        min={use12HourFormat ? 1 : 0}
-        max={use12HourFormat ? 12 : 23}
+        min={1}
+        max={12}
         value={state.hh}
         onChange={change}
         onBlur={padStart('hh')}
@@ -199,36 +192,160 @@ export function TimeField(props: ITimeFieldProps) {
           event.currentTarget.blur()
         }}
       />
-      {use12HourFormat && (
-        <Select
-          {...props}
-          id={`${id}-amPm`}
-          error={Boolean(meta && meta.error)}
-          touched={meta && meta.touched}
-          focusInput={focusInput}
-          placeholder={ignorePlaceHolder ? '' : 'mm'}
-          options={[
-            {
-              label: intl.formatMessage({
-                id: 'timeField.meridiem.am',
-                defaultMessage: 'AM',
-                description: 'Option label: AM'
-              }),
-              value: 'AM'
-            },
-            {
-              label: intl.formatMessage({
-                id: 'timeField.meridiem.pm',
-                defaultMessage: 'PM',
-                description: 'Option label: PM'
-              }),
-              value: 'PM'
-            }
-          ]}
-          value={amPm}
-          onChange={(value: string) => setAmPm(value)}
-        />
-      )}
+      <Select
+        {...props}
+        id={`${id}-amPm`}
+        error={Boolean(meta && meta.error)}
+        touched={meta && meta.touched}
+        focusInput={focusInput}
+        placeholder={ignorePlaceHolder ? '' : 'mm'}
+        options={[
+          {
+            label: intl.formatMessage({
+              id: 'timeField.meridiem.am',
+              defaultMessage: 'AM',
+              description: 'Option label: AM'
+            }),
+            value: 'AM'
+          },
+          {
+            label: intl.formatMessage({
+              id: 'timeField.meridiem.pm',
+              defaultMessage: 'PM',
+              description: 'Option label: PM'
+            }),
+            value: 'PM'
+          }
+        ]}
+        value={amPm}
+        onChange={(value: string) => setAmPm(value)}
+      />
     </Container>
+  )
+}
+
+function TimeInput24(props: ITimeFieldProps) {
+  const {
+    id,
+    meta,
+    focusInput,
+    notice,
+    ignorePlaceHolder,
+    onChange,
+    ...otherProps
+  } = props
+
+  const [state, setState] = React.useState({
+    hh: '',
+    mm: ''
+  })
+
+  React.useEffect(() => {
+    function getInitialState(time: string): IState {
+      const dateSegmentVals = time.split(':')
+      return {
+        hh: dateSegmentVals[0],
+        mm: dateSegmentVals[1]
+      }
+    }
+
+    const isValidTime = (time: string) => {
+      const parts = time.split(':')
+
+      if (parts.length !== 2) {
+        return false
+      }
+
+      return isValidHours(parts[0], false) && isValidMinutes(parts[1])
+    }
+
+    if (props.value && isValidTime(props.value)) {
+      setState(getInitialState(props.value))
+    }
+  }, [props.value])
+
+  const hh = React.useRef<HTMLInputElement>(null)
+  const mm = React.useRef<HTMLInputElement>(null)
+
+  function change(event: React.ChangeEvent<HTMLInputElement>) {
+    const val = event.target.value
+    if (event.target.id.includes('hh')) {
+      if (Number(val) < 0 || Number(val) > 23) return
+      if (val.length === 2 && mm?.current !== null) {
+        mm.current.focus()
+      }
+      setState((state) => ({ ...state, hh: val }))
+    } else if (event.target.id.includes('mm')) {
+      if (Number(val) < 0 || Number(val) > 59 || val.length > 2) return
+      setState((state) => ({ ...state, mm: val }))
+    }
+  }
+
+  function padStart(part: 'hh' | 'mm') {
+    return (event: React.FocusEvent<HTMLInputElement>) => {
+      const val = event.target.value
+      if (part === 'hh') {
+        setState((state) => ({ ...state, hh: val.padStart(2, '0') }))
+      } else if (part === 'mm') {
+        setState((state) => ({ ...state, mm: val.padStart(2, '0') }))
+      }
+    }
+  }
+
+  React.useEffect(() => {
+    if (isValidHours(state.hh, false) && isValidMinutes(state.mm)) {
+      onChange(getFormattedValue(state, false))
+    }
+  }, [state, onChange])
+
+  return (
+    <Container id={id}>
+      <TextInput
+        {...otherProps}
+        id={`${id}-hh`}
+        ref={hh}
+        error={Boolean(meta && meta.error)}
+        isDisabled={props.disabled}
+        touched={meta && meta.touched}
+        focusInput={focusInput}
+        type="number"
+        placeholder={ignorePlaceHolder ? '' : 'hh'}
+        min={0}
+        max={23}
+        value={state.hh}
+        onChange={change}
+        onBlur={padStart('hh')}
+        onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+          event.currentTarget.blur()
+        }}
+      />
+      <TextInput
+        {...otherProps}
+        id={`${id}-mm`}
+        ref={mm}
+        error={Boolean(meta && meta.error)}
+        isDisabled={props.disabled}
+        touched={meta && meta.touched}
+        focusInput={focusInput}
+        type="number"
+        placeholder={ignorePlaceHolder ? '' : 'mm'}
+        min={0}
+        max={59}
+        value={state.mm}
+        onChange={change}
+        onBlur={padStart('mm')}
+        onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+          event.currentTarget.blur()
+        }}
+      />
+    </Container>
+  )
+}
+
+export function TimeField(props: ITimeFieldProps) {
+  return props.use12HourFormat ? (
+    <TimeInput12 {...props} />
+  ) : (
+    <TimeInput24 {...props} />
   )
 }
