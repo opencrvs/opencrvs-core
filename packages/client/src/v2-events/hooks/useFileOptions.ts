@@ -19,7 +19,7 @@ import {
   isFileFieldWithOptionType
 } from '@opencrvs/commons/client'
 import { IDocumentViewerOptions } from '@opencrvs/components'
-import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
+import { getFullUrl } from '@client/v2-events/features/files/useFileUpload'
 
 function getOptions(
   fieldConfig: FieldConfig,
@@ -43,7 +43,7 @@ function getOptions(
       ],
       documentOptions: [
         {
-          value: getFullURL(fieldObj.value.filename),
+          value: getFullUrl(fieldObj.value.filename),
           label: fieldObj.config.id
         }
       ]
@@ -62,7 +62,7 @@ function getOptions(
           return {
             documentOptions: [
               ...acc.documentOptions,
-              { value: getFullURL(specificValue.filename), label: val }
+              { value: getFullUrl(specificValue.filename), label: val }
             ],
             selectOptions: [
               ...acc.selectOptions,
