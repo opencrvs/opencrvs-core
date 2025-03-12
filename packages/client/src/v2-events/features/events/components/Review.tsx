@@ -395,28 +395,26 @@ function ReviewComponent({
                                   </ValidationError>
                                 ) : null
 
-                              const changeAction = (
-                                <Link
-                                  data-testid={`change-button-${field.id}`}
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-
-                                    onEdit({
-                                      pageId: page.id,
-                                      fieldId: field.id
-                                    })
-                                  }}
-                                >
-                                  {intl.formatMessage(
-                                    reviewMessages.changeButton
-                                  )}
-                                </Link>
-                              )
-
                               return (
                                 <ListReview.Row
                                   key={field.id}
-                                  actions={[changeAction]}
+                                  actions={
+                                    <Link
+                                      data-testid={`change-button-${field.id}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+
+                                        onEdit({
+                                          pageId: page.id,
+                                          fieldId: field.id
+                                        })
+                                      }}
+                                    >
+                                      {intl.formatMessage(
+                                        reviewMessages.changeButton
+                                      )}
+                                    </Link>
+                                  }
                                   id={field.id}
                                   label={intl.formatMessage(field.label)}
                                   value={
