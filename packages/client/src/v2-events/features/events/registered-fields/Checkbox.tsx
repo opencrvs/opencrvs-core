@@ -40,6 +40,7 @@ function CheckboxInput({
 
 function CheckboxOutput({ value }: { value?: boolean }) {
   // We explicity check for boolean true, so that e.g. string values are not interpreted as true
+  // TODO CIHAN: 'No' to null?
   return value === true ? 'Yes' : 'No'
 }
 

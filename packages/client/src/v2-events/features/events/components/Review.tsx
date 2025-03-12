@@ -361,16 +361,12 @@ function ReviewComponent({
                             const value = form[field.id]
                             const previousValue = previousForm[field.id]
 
-                            const valueDisplay = (
-                              <Output
-                                field={field}
-                                previousValue={previousValue}
-                                showPreviouslyMissingValuesAsChanged={
-                                  showPreviouslyMissingValuesAsChanged
-                                }
-                                value={value}
-                              />
-                            )
+                            const valueDisplay = Output({
+                              field,
+                              previousValue,
+                              showPreviouslyMissingValuesAsChanged,
+                              value
+                            })
 
                             const error = getFieldValidationErrors({
                               field,
@@ -383,6 +379,17 @@ function ReviewComponent({
                                   {intl.formatMessage(error.errors[0].message)}
                                 </ValidationError>
                               ) : null
+
+                            console.log('field', field.id, field.type)
+                            console.log(
+                              'valueDisplay',
+                              valueDisplay,
+                              typeof valueDisplay
+                            )
+
+                            if (!valueDisplay && !errorDisplay) {
+                              return <></>
+                            }
 
                             return (
                               <ListReview.Row

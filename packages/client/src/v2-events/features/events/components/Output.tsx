@@ -36,12 +36,16 @@ import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
   Address,
   AdministrativeArea,
+  BulletList,
   Checkbox,
   DateField,
+  Divider,
   LocationSearch,
+  PageHeader,
   RadioGroup,
   Select,
-  SelectCountry
+  SelectCountry,
+  Paragraph
 } from '@client/v2-events/features/events/registered-fields'
 
 const Deleted = styled.del`
@@ -65,11 +69,11 @@ function ValueOutput(field: FieldWithValue) {
   }
 
   if (isPageHeaderFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return PageHeader.Output
   }
 
   if (isParagraphFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return Paragraph.Output
   }
 
   if (isTextFieldType(field)) {
@@ -85,7 +89,7 @@ function ValueOutput(field: FieldWithValue) {
   }
 
   if (isBulletListFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return BulletList.Output
   }
 
   if (isSelectFieldType(field)) {
@@ -119,7 +123,7 @@ function ValueOutput(field: FieldWithValue) {
   }
 
   if (isDividerFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return Divider.Output
   }
 
   if (isFacilityFieldType(field)) {
@@ -147,10 +151,10 @@ export function Output({
 
   if (!hasValue) {
     if (previousValue) {
-      return <ValueOutput config={field} value={previousValue} />
+      return ValueOutput({ config: field, value: previousValue })
     }
 
-    return ''
+    return ValueOutput({ config: field, value: '' })
   }
 
   if (previousValue && previousValue !== value) {
@@ -177,5 +181,5 @@ export function Output({
     )
   }
 
-  return <ValueOutput config={field} value={value} />
+  return ValueOutput({ config: field, value })
 }
