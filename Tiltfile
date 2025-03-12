@@ -58,6 +58,10 @@ namespace_create('opencrvs-deps-dev')
 namespace_create('opencrvs-services-dev')
 
 # Create SSL keys
+# TODO: Document or automate
+# openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
+#     -subj "/C=GB/ST=London/L=London/O=OpenCRVS/OU=R&D Department/CN=opencrvs.org" \
+#     -keyout .secrets/_wildcard.opencrvs.localhost-key.pem  -out .secrets/_wildcard.opencrvs.localhost.pem
 secret_create_tls('localhost-cert', key='.secrets/_wildcard.opencrvs.localhost-key.pem', cert='.secrets/_wildcard.opencrvs.localhost.pem',namespace="traefik")
 # Install Traefik GW
 helm_repo('traefik-repo', 'https://traefik.github.io/charts')
