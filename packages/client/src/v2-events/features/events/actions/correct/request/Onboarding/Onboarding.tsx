@@ -13,7 +13,7 @@ import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getActionsMetadata } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { buttonMessages } from '@client/i18n/messages'
@@ -47,8 +47,10 @@ export function Onboarding() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
   const events = useEvents()
-  const metadata = useEventMetadata((state) => state.getMetadata())
-  const setMetadata = useEventMetadata((state) => state.setMetadata)
+  const metadata = useEventMetadata((state) =>
+    state.getMetadataFormValues(event.id, getActionsMetadata(event.actions))
+  )
+  const setMetadata = useEventMetadata((state) => state.setMetadataFormValues)
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -107,7 +109,7 @@ export function Onboarding() {
         form={metadata}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={(data) => setMetadata(data)}
+        setFormData={(data) => setMetadata(event.id, data)}
         showReviewButton={false}
         onFormPageChange={(nextPageId: string) => {
           return navigate(
