@@ -79,7 +79,7 @@ import {
 import * as React from 'react'
 import { useState } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { withTheme } from 'styled-components'
 

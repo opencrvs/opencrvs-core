@@ -1778,6 +1778,8 @@ describe('markEventAsUnassigned()', () => {
         { id },
         authHeaderNotRegCert
       )
-    ).rejects.toThrowError('User does not have enough scope')
+    ).rejects.toThrowError(
+      'User has been unassigned or does not have required scope'
+    )
   })
 })
