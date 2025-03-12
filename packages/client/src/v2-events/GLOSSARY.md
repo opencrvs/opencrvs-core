@@ -10,5 +10,5 @@
 | Action       | Event contains one or more actions. Action is a system event which triggers a status change. See `ActionConfig`                                                                |
 | ActionConfig | Each action defines a form, which needs to be filled in order for the status to change. Configuration can have multiple forms, out of which **only one can be active**.        |
 | FormConfig   | Form config defines separate read (`review`) and write (`pages`) configurations for itself.                                                                                    |
-| Form data    | A collection of data points, so one blob of data derived from data of actions. Changes over time.                                                                              |
+| Form data    | A collection of data points, i.e., a single blob of data derived from the history of actions applied to the event. It evolves over time.                                       |
 | Metadata     | Metadata is data specific to one singular action like a comment, payment details, verification of identity, signature.                                                         |
