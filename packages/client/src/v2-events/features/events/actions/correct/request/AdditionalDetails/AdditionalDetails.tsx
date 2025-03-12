@@ -13,7 +13,7 @@ import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType, getActionsMetadata } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { generateGoToHomeTabUrl } from '@client/navigation'
@@ -39,10 +39,8 @@ export function AdditionalDetails() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS
   )
   const events = useEvents()
-  const metadata = useEventMetadata((state) =>
-    state.getMetadataFormValues(event.id, getActionsMetadata(event.actions))
-  )
-  const setMetadata = useEventMetadata((state) => state.setMetadataFormValues)
+  const metadata = useEventMetadata((state) => state.getMetadata())
+  const setMetadata = useEventMetadata((state) => state.setMetadata)
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -103,7 +101,7 @@ export function AdditionalDetails() {
           form={metadata}
           formPages={formPages}
           pageId={currentPageId}
-          setFormData={(data) => setMetadata(event.id, data)}
+          setFormData={(data) => setMetadata(data)}
           showReviewButton={false}
           onFormPageChange={(nextPageId: string) => {
             return navigate(
