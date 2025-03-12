@@ -70,7 +70,7 @@ function withPostfix(str: string, postfix: string) {
   return str + postfix
 }
 
-export function getFullURL(filename: string) {
+export function getFullUrl(filename: string) {
   const minioURL = window.config.MINIO_URL
   if (minioURL && typeof minioURL === 'string') {
     return new URL(filename, withPostfix(minioURL, '/')).toString()
@@ -110,7 +110,7 @@ async function cacheFile(filename: string, file: File) {
 
   const cache = await caches.open(cacheKey)
   return cache.put(
-    getFullURL(filename),
+    getFullUrl(filename),
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
   )
 }
@@ -128,7 +128,7 @@ async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(getFullURL(filename))
+  return cache.delete(getFullUrl(filename))
 }
 
 export async function precacheFile(filename: string) {
@@ -188,7 +188,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   })
 
   return {
-    getFullURL,
+    getFullUrl,
     deleteFile: (filename: string) => {
       return del.mutate({ filename })
     },
