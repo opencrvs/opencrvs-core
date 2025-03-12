@@ -37,5 +37,11 @@ By default, Events V2 is accessible via the /v2 route, allowing the application�
 
 - Do not import components outside v2-events. If you need a component, copy it in and refactor it.
 - When building new features, aim to have a separate component that handles interaction with router and data fetching when it makes sense. Features should be route independent, and necessary information (ids and such) should be passed in as props or similar. See (`features/events/actions/register` or `features/events/actions/declare`)
-- Use constants through object pattern. e.g.`ActionType.CREATE` over `'CREATE'`. In most situations, it does not matter. However, changing the names will get much easier.
+- Use constants through object pattern. e.g.`ActionType.DECLARE` over `'DECLARE'`. In most situations, it does not matter. However, changing the names will get much easier.
 - When building new features, prefer to import them through `index.ts`. Managing imports will be cleaner and easier that way. See (`/layouts`)
+
+### Fetching data from backend
+
+- All data should be fetched using useMutation or useSuspenseQuery from TanStack Query. If you define a completely new (non-tRPC) query or mutation, use `queryClient.setMutationDefaults({ mutationFn: <operation> })` or `queryClient.setQueryDefaults({ queryFn: <operation> })` to define the data fetcher method. This ensures that TanStack Query knows how to call your function even when the request is first serialized into the local cache and executed later.
+
+- Whenever possible, mutation operations should follow a “fire-and-forget” approach to maintain a snappy UI, even with poor or no internet connection. Perform the query and let it process in the background.

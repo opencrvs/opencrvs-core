@@ -12,15 +12,19 @@ import { z } from 'zod'
 import { FieldValue } from './FieldValue'
 import { ActionType } from './ActionType'
 
-const ActionBase = z.object({
+export const ActionMetadata = z.record(z.string(), FieldValue)
+export type ActionMetadata = z.infer<typeof ActionMetadata>
+
+export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
-  metadata: z.record(z.string(), FieldValue).optional(),
-  draft: z.boolean().optional().default(false),
+  metadata: ActionMetadata.optional(),
   createdAtLocation: z.string()
 })
+
+export type ActionBase = z.infer<typeof ActionBase>
 
 const AssignedAction = ActionBase.merge(
   z.object({
@@ -54,6 +58,24 @@ const DeclareAction = ActionBase.merge(
 const ValidateAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.VALIDATE)
+  })
+)
+
+const RejectAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT)
+  })
+)
+
+const MarkAsDuplicateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
+  })
+)
+
+const ArchivedAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVED)
   })
 )
 
@@ -104,6 +126,9 @@ const CustomAction = ActionBase.merge(
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
   ValidateAction,
+  RejectAction,
+  MarkAsDuplicateAction,
+  ArchivedAction,
   NotifiedAction,
   RegisterAction,
   DeclareAction,

@@ -9,19 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import React from 'react'
+import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import {
-  Button,
-  Checkbox,
-  ResponsiveModal,
-  Stack,
-  Text,
-  TextInput
-} from '@opencrvs/components'
+import { useSelector } from 'react-redux'
+import { v4 as uuid } from 'uuid'
 import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -30,84 +23,30 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import {
+  REJECT_ACTIONS,
+  RejectionState,
+  Review as ReviewComponent
+} from '@client/v2-events/features/events/components/Review'
+import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
-const messages = defineMessages({
-  reviewActionTitle: {
-    id: 'v2.reviewAction.title',
-    defaultMessage: 'Declare event',
-    description: 'The title for review action'
-  },
-  reviewActionDescription: {
-    id: 'v2.reviewAction.description',
-    defaultMessage:
-      'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
-    description: 'The description for review action'
-  },
-  reviewActionDeclare: {
-    id: 'v2.reviewAction.Declare',
-    defaultMessage: 'Declare',
-    description: 'The label for declare button of review action'
-  },
-  reviewActionReject: {
-    id: 'v2.reviewAction.reject',
-    defaultMessage: 'Reject',
-    description: 'The label for reject button of review action'
-  },
-  rejectModalCancel: {
-    id: 'v2.rejectModal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'The label for cancel button of reject modal'
-  },
-  rejectModalArchive: {
-    id: 'v2.rejectModal.archive',
-    defaultMessage: 'Archive',
-    description: 'The label for archive button of reject modal'
-  },
-  rejectModalSendForUpdate: {
-    id: 'v2.rejectModal.sendForUpdate',
-    defaultMessage: 'Send For Update',
-    description: 'The label for send For Update button of reject modal'
-  },
-  rejectModalTitle: {
-    id: 'v2.rejectModal.title',
-    defaultMessage: 'Reason for rejection?',
-    description: 'The title for reject modal'
-  },
-  rejectModalDescription: {
-    id: 'v2.rejectModal.description',
-    defaultMessage:
-      'Please describe the updates required to this record for follow up action.',
-    description: 'The description for reject modal'
-  },
-  rejectModalMarkAsDuplicate: {
-    id: 'v2.rejectModal.markAsDuplicate',
-    defaultMessage: 'Mark as a duplicate',
-    description: 'The label for mark as duplicate checkbox of reject modal'
-  }
-})
-
-// eslint-disable-next-line no-shadow
-enum REJECT_ACTIONS {
-  ARCHIVE,
-  SEND_FOR_UPDATE
-}
-
-interface RejectionState {
-  rejectAction: REJECT_ACTIONS
-  details: string
-  isDuplicate: boolean
-}
+// eslint-disable-next-line no-restricted-imports
+import { getScope } from '@client/profile/profileSelectors'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
+  const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
   const { goToHome } = useEventFormNavigation()
-  const declareMutation = events.actions.declare
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -118,9 +57,19 @@ export function Review() {
     throw new Error('No active form configuration found for declare action')
   }
 
-  const form = useEventFormData((state) => state.formValues)
+  const form = useEventFormData((state) => state.getFormValues())
+
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(eventId, {})
+  const metadata = getMetadata({})
+
+  const scopes = useSelector(getScope) ?? undefined
+
+  const reviewActionConfiguration = useReviewActionConfig({
+    formConfig,
+    form,
+    metadata,
+    scopes
+  })
 
   async function handleEdit({
     pageId,
@@ -144,7 +93,7 @@ export function Review() {
           {
             from: 'review'
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -154,52 +103,57 @@ export function Review() {
 
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal action="Declare" close={close} />
+      <ReviewComponent.ActionModal.Accept
+        action="Declare"
+        close={close}
+        copy={reviewActionConfiguration.messages.modal}
+      />
     ))
     if (confirmedDeclaration) {
-      declareMutation.mutate({
-        eventId: event.id,
-        data: form,
-        transactionId: uuid(),
-        metadata
-      })
+      reviewActionConfiguration.onConfirm(eventId)
+
       goToHome()
     }
   }
 
-  async function handleReject() {
-    const confirmedReject = await openModal<RejectionState | null>((close) => (
-      <RejectModal close={close}></RejectModal>
-    ))
-    if (confirmedReject) {
-      const { rejectAction, ...rest } = confirmedReject
-      switch (rejectAction) {
-        case REJECT_ACTIONS.ARCHIVE:
-          alert('Archived the registration ' + JSON.stringify(rest))
-          break
-        case REJECT_ACTIONS.SEND_FOR_UPDATE:
-          alert('Sent the registration for update ' + JSON.stringify(rest))
-          break
-        default:
-          break
+  async function handleRejection() {
+    const confirmedRejection = await openModal<RejectionState | null>(
+      (close) => <ReviewComponent.ActionModal.Reject close={close} />
+    )
+    if (confirmedRejection) {
+      const { rejectAction, message, isDuplicate } = confirmedRejection
+
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId,
+          data: {},
+          transactionId: uuid(),
+          metadata: { message }
+        })
       }
+
+      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
+        events.actions.archive.mutate({
+          eventId,
+          data: {},
+          transactionId: uuid(),
+          metadata: { message, isDuplicate }
+        })
+      }
+
+      goToHome()
     }
-    return
   }
 
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
-      onSaveAndExit={() => {
-        events.actions.declare.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          metadata,
-          draft: true
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          drafts.submitLocalDraft()
+          goToHome()
         })
-        goToHome()
-      }}
+      }
     >
       <ReviewComponent.Body
         eventConfig={config}
@@ -214,106 +168,23 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
         metadata={metadata}
-        onMetadataChange={(values) => setMetadata(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
+          action={ActionType.DECLARE}
           form={form}
           formConfig={formConfig}
-          messages={{
-            title: messages.reviewActionTitle,
-            description: messages.reviewActionDescription,
-            onConfirm: messages.reviewActionDeclare
-          }}
+          messages={reviewActionConfiguration.messages}
           metadata={metadata}
+          primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
-          onReject={handleReject}
+          onReject={handleRejection}
         />
       </ReviewComponent.Body>
       {modal}
+      {saveAndExitModal}
     </FormLayout>
   )
 }
 
-function RejectModal({
-  close
-}: {
-  close: (result: RejectionState | null) => void
-}) {
-  const [state, setState] = useState<RejectionState>({
-    rejectAction: REJECT_ACTIONS.ARCHIVE,
-    details: '',
-    isDuplicate: false
-  })
-
-  const intl = useIntl()
-
-  return (
-    <ResponsiveModal
-      autoHeight
-      actions={[
-        <Button
-          key="cancel_reject"
-          id="cancel_reject"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(messages.rejectModalCancel)}
-        </Button>,
-        <Button
-          key="confirm_reject_with_archive"
-          id="confirm_reject_with_archive"
-          type="secondaryNegative"
-          onClick={() => {
-            close({
-              ...state,
-              rejectAction: REJECT_ACTIONS.ARCHIVE
-            })
-          }}
-        >
-          {intl.formatMessage(messages.rejectModalArchive)}
-        </Button>,
-        <Button
-          key="confirm_reject_with_update"
-          id="confirm_reject_with_update"
-          type="negative"
-          onClick={() => {
-            close({
-              ...state,
-              rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
-            })
-          }}
-        >
-          {intl.formatMessage(messages.rejectModalSendForUpdate)}
-        </Button>
-      ]}
-      handleClose={() => close(null)}
-      responsive={false}
-      show={true}
-      title={intl.formatMessage(messages.rejectModalTitle)}
-    >
-      <Stack alignItems="left" direction="column">
-        <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(messages.rejectModalDescription)}
-        </Text>
-        <TextInput
-          required={true}
-          value={state.details}
-          onChange={(e) =>
-            setState((prev) => ({ ...prev, details: e.target.value }))
-          }
-        />
-        <Checkbox
-          label={intl.formatMessage(messages.rejectModalMarkAsDuplicate)}
-          name={'markDUplicate'}
-          selected={state.isDuplicate}
-          value={''}
-          onChange={() =>
-            setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
-          }
-        />
-      </Stack>
-    </ResponsiveModal>
-  )
-}
+export const ReviewIndex = withSuspense(Review)

@@ -8,13 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { uniq, isString, get, mapKeys } from 'lodash'
 
-import { uniq, isString, get } from 'lodash'
+import { IntlShape } from 'react-intl'
+import { v4 as uuid } from 'uuid'
 import {
   ResolvedUser,
   ActionDocument,
-  EventConfig
+  EventConfig,
+  EventIndex,
+  getAllFields
 } from '@opencrvs/commons/client'
+import { setEmptyValuesForFields } from './components/forms/utils'
 
 /**
  *
@@ -72,4 +77,41 @@ export const getAllUniqueFields = (currentEvent: EventConfig) => {
       )
     ).values()
   ]
+}
+
+export function flattenEventIndex(
+  event: EventIndex
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Omit<EventIndex, 'data'> & { [key: string]: any } {
+  const { data, ...rest } = event
+  return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
+}
+
+export function getEventTitle({
+  event,
+  eventConfig,
+  intl
+}: {
+  event: EventIndex
+  eventConfig: EventConfig
+  intl: IntlShape
+}): string {
+  const allPropertiesWithEmptyValues = setEmptyValuesForFields(
+    getAllFields(eventConfig)
+  )
+
+  return intl.formatMessage(eventConfig.summary.title.label, {
+    ...allPropertiesWithEmptyValues,
+    ...flattenEventIndex(event)
+  })
+}
+
+export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+
+export function isTemporaryId(id: string) {
+  return id.startsWith('tmp-')
+}
+
+export function createTemporaryId() {
+  return `tmp-${uuid()}`
 }

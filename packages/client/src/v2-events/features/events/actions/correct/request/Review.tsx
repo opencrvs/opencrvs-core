@@ -28,7 +28,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 
 export function Review() {
@@ -51,7 +51,7 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const form = getFormValues(eventId)
+  const form = getFormValues()
 
   async function handleEdit({
     pageId,

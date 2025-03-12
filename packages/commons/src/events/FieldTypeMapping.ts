@@ -151,14 +151,18 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
         residentialArea: 'Example Residential Area',
         street: 'Example Street',
         number: '55',
-        zipCode: '123456',
-        village: 'Example Village'
+        zipCode: '123456'
       }
     case FieldType.DATE:
       return '2021-01-01'
     case FieldType.CHECKBOX:
       return true
     case FieldType.FILE:
+      return {
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+        originalFilename: 'abcd.png',
+        type: 'image/png'
+      } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return null
   }

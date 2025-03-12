@@ -11,18 +11,13 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { ROUTES } from '@client/v2-events/routes'
+import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import { router } from '@client/v2-events/features/events/actions/correct/request/router'
-import { OnboardingIndex } from './Onboarding'
 
-const meta: Meta<typeof OnboardingIndex> = {
-  title: 'CorrectionRequest',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+const meta: Meta<typeof Onboarding> = {
+  title: 'CorrectionRequest'
 }
 
 export default meta
@@ -40,7 +35,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 export const Onboarding: Story = {
   parameters: {
     reactRouter: {
-      router: router,
+      router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
         eventId: tennisClueMembershipEventDocument.id,
         pageId: 'corrector'

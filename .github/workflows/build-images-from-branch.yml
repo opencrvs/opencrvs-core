@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Publish images to Dockerhub from any branch
+name: Publish images from any branch
 
 on:
   workflow_call:
@@ -74,13 +74,12 @@ jobs:
           # Set the list of service names as an output variable
           echo "services=$services_json" >> $GITHUB_OUTPUT
           echo "services=$services_json"
-
-      - name: Login to DockerHub
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push base image
         uses: docker/build-push-action@v6
         with:
@@ -88,9 +87,9 @@ jobs:
           context: .
           push: true
           tags: |
-            opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}
-            opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
-          cache-from: type=registry,ref=opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
+            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}
+            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
+          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
           cache-to: type=inline
 
     outputs:
@@ -114,11 +113,12 @@ jobs:
       - uses: actions/checkout@v4
         if: github.event_name == 'push' || github.event_name == 'pull_request'
 
-      - name: Login to DockerHub
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -130,9 +130,9 @@ jobs:
           push: true
           context: .
           tags: |
-            opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}
-            opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
-          cache-from: type=registry,ref=opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
+            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}
+            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
+          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
           cache-to: type=inline
 
   security-scans-pr:
@@ -152,7 +152,7 @@ jobs:
       - name: Gather Trivy output from base branch image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
           trivy-config: trivy.yaml
           format: 'sarif'
           output: './trivy-results-base.sarif'
@@ -161,7 +161,7 @@ jobs:
       - name: Gather Trivy output from newly build image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
           format: 'sarif'
           output: './trivy-results-branch.sarif'
@@ -194,5 +194,5 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml

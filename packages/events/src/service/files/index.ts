@@ -38,9 +38,9 @@ function getFieldDefinitionForActionDataField(
   )
 
   if (!formConfiguration) {
-    logger.error('Failed to find active form configuration', {
-      actionType
-    })
+    logger.error(
+      `Failed to find active form configuration for action: ${actionType}`
+    )
 
     throw new Error('Failed to find active form configuration')
   }
@@ -63,9 +63,7 @@ export async function presignFilesInEvent(event: EventDocument, token: string) {
   )
 
   if (!configuration) {
-    logger.error('Failed to find configuration for event', {
-      event: event.type
-    })
+    logger.error(`Failed to find configuration for event: ${event.type}`)
 
     throw new Error('Failed to find configuration for event')
   }
@@ -128,17 +126,16 @@ export async function deleteFile(filename: string, token: string) {
   const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
     method: 'DELETE',
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: token
     }
   })
-
   return res.ok
 }
 export async function fileExists(filename: string, token: string) {
   const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
     method: 'HEAD',
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: token
     }
   })
 
@@ -154,7 +151,7 @@ async function presignFiles(
     body: JSON.stringify({ filenames }),
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      Authorization: token
     }
   })
 

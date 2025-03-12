@@ -10,19 +10,15 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React from 'react'
+import { TRPCProvider } from '@client/v2-events/trpc'
 import { FieldType } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { TRPCProvider } from '@client/v2-events/trpc'
+import React from 'react'
 import { Output } from './Output'
 
 const meta: Meta<typeof Output> = {
   title: 'Output',
   component: Output,
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -96,6 +92,38 @@ export const TextOutputWithPreviousValue: Story = {
         id: 'applicant.firstname',
         defaultMessage: 'First name',
         description: 'The first name of the applicant'
+      }
+    }
+  }
+}
+
+export const CheckboxOutput: Story = {
+  args: {
+    value: true,
+    previousValue: true,
+    field: {
+      type: FieldType.CHECKBOX,
+      id: 'recommender.none',
+      label: {
+        id: 'recommender.none',
+        defaultMessage: 'No recommender',
+        description: 'No recommender'
+      }
+    }
+  }
+}
+
+export const CheckboxOutputWithUndefinedPreviousValue: Story = {
+  args: {
+    value: true,
+    previousValue: undefined,
+    field: {
+      type: FieldType.CHECKBOX,
+      id: 'recommender.none',
+      label: {
+        id: 'recommender.none',
+        defaultMessage: 'No recommender',
+        description: 'No recommender'
       }
     }
   }

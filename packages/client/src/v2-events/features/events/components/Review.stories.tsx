@@ -11,20 +11,19 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 
+import { fireEvent, within } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
-import { fireEvent, within } from '@storybook/test'
-import { AddressFieldValue } from '@opencrvs/commons/client'
 import {
-  tennisClueMembershipEventDocument,
-  tennisClubMembershipEvent,
-  DEFAULT_FORM
-} from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+  AddressFieldValue,
+  TENNIS_CLUB_FORM,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { Review } from './Review'
+import { RejectionState, Review } from './Review'
 
 const mockFormData = {
   'applicant.firstname': 'John',
@@ -40,7 +39,8 @@ const mockFormData = {
     urbanOrRural: 'URBAN' as const,
     town: 'Tennisville',
     residentialArea: 'Example Residential Area'
-  }
+  },
+  'recommender.none': true
 }
 
 const meta: Meta<typeof Review.Body> = {
@@ -48,13 +48,10 @@ const meta: Meta<typeof Review.Body> = {
   component: Review.Body,
   args: {
     eventConfig: tennisClubMembershipEvent,
-    formConfig: DEFAULT_FORM,
+    formConfig: TENNIS_CLUB_FORM,
     form: mockFormData,
     onEdit: () => undefined,
     title: 'Member declaration for John Doe'
-  },
-  beforeEach: () => {
-    useEventFormData.getState().clear()
   },
   decorators: [
     (Story) => (
@@ -117,7 +114,13 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
 
     async function handleDeclaration() {
       await openModal<boolean | null>((close) => (
-        <Review.ActionModal action="Declare" close={close} />
+        <Review.ActionModal.Accept action="Declare" close={close} />
+      ))
+    }
+
+    async function handleRejection() {
+      await openModal<RejectionState | null>((close) => (
+        <Review.ActionModal.Reject close={close} />
       ))
     }
 
@@ -134,13 +137,13 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
         <Review.Body
           eventConfig={tennisClubMembershipEvent}
           form={mockFormData}
-          formConfig={DEFAULT_FORM}
+          formConfig={TENNIS_CLUB_FORM}
           title="My test action"
           onEdit={handleEdit}
         >
           <Review.Actions
             form={mockFormData}
-            formConfig={DEFAULT_FORM}
+            formConfig={TENNIS_CLUB_FORM}
             messages={{
               title: {
                 id: 'v2.changeModal.title',
@@ -156,9 +159,15 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
                 id: 'ourOnConfirm',
                 defaultMessage: 'Confirm test',
                 description: 'The title for review action'
+              },
+              onReject: {
+                id: 'ourOnReject',
+                defaultMessage: 'Reject test',
+                description: 'The title for review action'
               }
             }}
             onConfirm={handleDeclaration}
+            onReject={handleRejection}
           />
         </Review.Body>
         {modal}
@@ -196,17 +205,24 @@ export const ReviewWithValidationErrors: Story = {
     }
   },
   render: function Component() {
+    const [modal, openModal] = useModal()
+
+    async function handleRejection() {
+      await openModal<RejectionState | null>((close) => (
+        <Review.ActionModal.Reject close={close} />
+      ))
+    }
     return (
       <Review.Body
         eventConfig={tennisClubMembershipEvent}
         form={this.args?.form || {}}
-        formConfig={DEFAULT_FORM}
+        formConfig={TENNIS_CLUB_FORM}
         title="My test action"
         onEdit={() => undefined}
       >
         <Review.Actions
           form={this.args?.form || {}}
-          formConfig={DEFAULT_FORM}
+          formConfig={TENNIS_CLUB_FORM}
           messages={{
             title: {
               id: 'v2.changeModal.title',
@@ -222,10 +238,17 @@ export const ReviewWithValidationErrors: Story = {
               id: 'ourOnConfirm',
               defaultMessage: 'Confirm test',
               description: 'The title for review action'
+            },
+            onReject: {
+              id: 'ourOnReject',
+              defaultMessage: 'Reject test',
+              description: 'The title for review action'
             }
           }}
           onConfirm={() => undefined}
+          onReject={handleRejection}
         />
+        {modal}
       </Review.Body>
     )
   }

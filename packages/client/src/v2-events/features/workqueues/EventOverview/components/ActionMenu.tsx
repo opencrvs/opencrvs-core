@@ -69,7 +69,9 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                 key={action.type}
                 onClick={() => {
                   if (
-                    action.type === ActionType.CREATE ||
+                    action.type === ActionType.REJECT ||
+                    action.type === ActionType.ARCHIVED ||
+                    action.type === ActionType.MARKED_AS_DUPLICATE ||
                     action.type === ActionType.APPROVE_CORRECTION ||
                     action.type === ActionType.REJECT_CORRECTION ||
                     action.type === ActionType.CUSTOM
@@ -78,7 +80,17 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                     return
                   }
 
-                  navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
+                  if (action.type === ActionType.REGISTER) {
+                    navigate(
+                      ROUTES.V2.EVENTS[action.type].REVIEW.buildPath({
+                        eventId
+                      })
+                    )
+                  } else {
+                    navigate(
+                      ROUTES.V2.EVENTS[action.type].buildPath({ eventId })
+                    )
+                  }
                 }}
               >
                 {intl.formatMessage(action.label)}

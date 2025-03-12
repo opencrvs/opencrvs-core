@@ -13,19 +13,17 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { ROUTES } from '@client/v2-events/routes'
+// eslint-disable-next-line
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
-import { useCorrectionRequestData } from './useCorrectionRequestData'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'CorrectionRequest'
 }
 
 export default meta
@@ -41,18 +39,11 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 function FormClear() {
-  const form = useEventFormData()
-  const requestDetails = useCorrectionRequestData()
+  const drafts = useDrafts()
   useEffect(() => {
-    form.setFormValues(tennisClueMembershipEventDocument.id, {
-      'applicant.firstname': 'Max',
-      'applicant.surname': 'McLaren',
-      'applicant.dob': '2020-01-02'
-    })
-    requestDetails.setFormValues({
-      'correction.requester.relationship': 'ANOTHER_AGENT',
-      'correction.request.reason': "Child's name was incorrect"
-    })
+    drafts.setLocalDraft(
+      testDataGenerator().event.draft(tennisClueMembershipEventDocument.id)
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return <Outlet />

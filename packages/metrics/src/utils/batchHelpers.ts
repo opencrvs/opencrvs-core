@@ -8,17 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { EventDocument } from '@opencrvs/commons/events'
-
-export function getEventWithOnlyUserSpecificDrafts(
-  event: EventDocument,
-  userId: string
-): EventDocument {
-  return {
-    ...event,
-    actions: event.actions.filter((action) => {
-      return !action.draft || action.createdBy === userId
-    })
+export function createChunks<T>(array: T[], limit: number): T[][] {
+  const result = []
+  for (let i = 0; i < array.length; i += limit) {
+    result.push(array.slice(i, i + limit))
   }
+  return result
 }

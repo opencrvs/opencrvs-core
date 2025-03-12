@@ -27,7 +27,7 @@ type FormWizardProps = PropsWithChildren<{
   pageTitle: string
 
   showReviewButton?: boolean
-  submitButtonText?: string
+  continueButtonText?: string
 }>
 
 export const FormWizard = ({
@@ -38,7 +38,7 @@ export const FormWizard = ({
   pageTitle,
   onNextPage,
   onPreviousPage,
-  submitButtonText = 'Submit',
+  continueButtonText = 'Continue',
   showReviewButton
 }: FormWizardProps) => {
   return (
@@ -56,22 +56,17 @@ export const FormWizard = ({
           <Stack direction="column" gap={16} alignItems="stretch">
             {children}
 
-            {currentPage + 1 < totalPages ? (
-              <Button
-                size="large"
-                type="primary"
-                role="button"
-                onClick={onNextPage}
-              >
-                Continue
-              </Button>
-            ) : (
-              <Button size="large" type="primary" onClick={onSubmit}>
-                {submitButtonText}
-              </Button>
-            )}
+            <Button
+              size="large"
+              type="primary"
+              role="button"
+              onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
+            >
+              {continueButtonText}
+            </Button>
+
             {showReviewButton && (
-              <Button type="secondary" onClick={onSubmit}>
+              <Button size="large" type="secondary" onClick={onSubmit}>
                 Back to review
               </Button>
             )}
