@@ -22,4 +22,4 @@ export const PORT = env.DOCUMENTS_PORT
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const DEFAULT_TIMEOUT = env.DEFAULT_TIMEOUT
-export const PRODUCTION = process.env.NODE_ENV === 'production'
+export const PRODUCTION = env.isProd
