@@ -21,10 +21,6 @@ import {
 import { IDocumentViewerOptions } from '@opencrvs/components'
 import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
 
-/**
- * This hook is used to generate the options prop for the
- * document viewer (packages/components/src/DocumentViewer)
- */
 function getOptions(
   fieldConfig: FieldConfig,
   form: ActionFormData,
@@ -106,6 +102,22 @@ function extractViewerOptionsFromFieldConfig(
     { selectOptions: [], documentOptions: [] }
   )
 }
+
+/**
+ * Extracts file-related options from the form configuration and generates
+ * a structured list of selectable and viewable document options.
+ *
+ * This hook processes all file fields in the form and returns an object
+ * containing:
+ * - `selectOptions`: Options for dropdown selection of documents.
+ * - `documentOptions`: URLs of uploaded files for document preview.
+ *
+ * These options are used by the `DocumentViewer` component to:
+ * - Populate a dropdown for selecting available documents.
+ * - Display the selected document by retrieving its corresponding URL.
+ *
+ * @returns {IDocumentViewerOptions} Options prop for the `DocumentViewer` component.
+ */
 
 export function useFileOptions(
   form: ActionFormData,
