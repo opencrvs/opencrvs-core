@@ -185,7 +185,7 @@ const Paragraph = BaseField.extend({
         .optional()
     })
     .default({}),
-  hideOnReview: z.boolean().default(true).optional()
+  hideOnReview: z.boolean().default(true)
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
@@ -193,7 +193,7 @@ export type Paragraph = z.infer<typeof Paragraph>
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER),
   defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
-  hideOnReview: z.boolean().default(true).optional()
+  hideOnReview: z.boolean().default(true)
 }).describe('A read-only header component for form pages')
 
 export type PageHeader = z.infer<typeof PageHeader>
@@ -250,7 +250,7 @@ const BulletList = BaseField.extend({
         .optional()
     })
     .default({}),
-  hideOnReview: z.boolean().default(true).optional()
+  hideOnReview: z.boolean().default(true)
 }).describe('A list of bullet points')
 
 export type BulletList = z.infer<typeof BulletList>
@@ -358,29 +358,30 @@ export type AllFields =
   | typeof EmailField
   | typeof FileUploadWithOptions
 
+// TODO CIHAN: make another copy of Inferred, with the input type?
 /** @knipignore */
 export type Inferred =
-  | z.infer<typeof Address>
-  | z.infer<typeof TextField>
-  | z.infer<typeof NumberField>
-  | z.infer<typeof TextAreaField>
-  | z.infer<typeof DateField>
-  | z.infer<typeof Paragraph>
-  | z.infer<typeof RadioGroup>
-  | z.infer<typeof BulletList>
-  | z.infer<typeof PageHeader>
-  | z.infer<typeof Select>
-  | z.infer<typeof Checkbox>
-  | z.infer<typeof File>
-  | z.infer<typeof FileUploadWithOptions>
-  | z.infer<typeof Country>
-  | z.infer<typeof AdministrativeArea>
-  | z.infer<typeof Divider>
-  | z.infer<typeof Location>
-  | z.infer<typeof Facility>
-  | z.infer<typeof Office>
-  | z.infer<typeof SignatureField>
-  | z.infer<typeof EmailField>
+  | z.input<typeof Address>
+  | z.input<typeof TextField>
+  | z.input<typeof NumberField>
+  | z.input<typeof TextAreaField>
+  | z.input<typeof DateField>
+  | z.input<typeof Paragraph>
+  | z.input<typeof RadioGroup>
+  | z.input<typeof BulletList>
+  | z.input<typeof PageHeader>
+  | z.input<typeof Select>
+  | z.input<typeof Checkbox>
+  | z.input<typeof File>
+  | z.input<typeof FileUploadWithOptions>
+  | z.input<typeof Country>
+  | z.input<typeof AdministrativeArea>
+  | z.input<typeof Divider>
+  | z.input<typeof Location>
+  | z.input<typeof Facility>
+  | z.input<typeof Office>
+  | z.input<typeof SignatureField>
+  | z.input<typeof EmailField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
