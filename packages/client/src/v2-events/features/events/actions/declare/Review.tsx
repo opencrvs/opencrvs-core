@@ -64,11 +64,8 @@ export function Review() {
 
   const form = useEventFormData((state) => state.getFormValues())
 
-  const { setMetadataFormValues, getMetadataFormValues } = useEventMetadata()
-  const metadata = getMetadataFormValues(
-    eventId,
-    getActionsMetadata(event.actions)
-  )
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata({})
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -176,7 +173,7 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
         metadata={metadata}
-        onMetadataChange={(values) => setMetadataFormValues(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           action={ActionType.DECLARE}

@@ -101,26 +101,6 @@ function getData(actions: Array<ActionDocument>) {
   }, {})
 }
 
-export function getActionsMetadata(
-  actions: Array<ActionDocument>
-): ActionDocument['metadata'] {
-  // Types that are taken into the aggregate values (currently only declare and register)
-  const includedActions = [ActionType.DECLARE, ActionType.REGISTER]
-
-  return actions.reduce((status, action) => {
-    if (
-      !includedActions.some((excludedAction) => excludedAction === action.type)
-    ) {
-      return status
-    }
-
-    return {
-      ...status,
-      ...action.metadata
-    }
-  }, {})
-}
-
 export function isUndeclaredDraft(event: EventDocument): boolean {
   return event.actions.every(({ type }) => type === ActionType.CREATE)
 }

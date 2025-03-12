@@ -23,8 +23,7 @@ import {
   getCurrentEventState,
   Scope,
   SCOPES,
-  isFieldVisible,
-  getActionsMetadata
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -148,10 +147,7 @@ export function Summary() {
 
   const metadata = useEventMetadata()
 
-  const metadataForm = metadata.getMetadataFormValues(
-    event.id,
-    getActionsMetadata(event.actions)
-  )
+  const metadataForm = metadata.getMetadata()
 
   const stringiedRequestData = stringifyFormData(allFields, metadataForm)
 

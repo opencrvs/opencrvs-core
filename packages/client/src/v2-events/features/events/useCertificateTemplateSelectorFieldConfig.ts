@@ -21,7 +21,7 @@ export const useCertificateTemplateSelectorFieldConfig = (
     type: 'SELECT',
     required: true,
     label: {
-      defaultMessage: 'Select Certificate Template',
+      defaultMessage: 'Type',
       description: 'This is the label for the field',
       id: 'v2.event.default.action.certificate.form.section.who.field.surname.label'
     },
