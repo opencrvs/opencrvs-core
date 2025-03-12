@@ -49,7 +49,6 @@ export function Pages() {
     .find((action) => action.type === ActionType.DECLARE)
     ?.forms.find((f) => f.active)?.pages
 
-  console.log(formValues)
   if (!formPages) {
     throw new Error('Form configuration not found for type: ' + event.type)
   }
