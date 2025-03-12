@@ -21,7 +21,6 @@ import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getActionFormFields } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
-
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
 }
@@ -41,8 +40,6 @@ export function validateAction(actionType: ActionType) {
       ...(opts.input.metadata ?? {})
     }
 
-    console.log('data', data)
-
     const errors = formFields.reduce(
       (
         errorResults: {
@@ -54,7 +51,7 @@ export function validateAction(actionType: ActionType) {
       ) => {
         const fieldErrors = getFieldValidationErrors({
           field,
-          values: data as any
+          values: data
         }).errors
 
         if (fieldErrors.length === 0) {

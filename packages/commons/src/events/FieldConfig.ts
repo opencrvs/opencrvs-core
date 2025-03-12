@@ -14,13 +14,13 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
 import {
-  AddressFieldValue,
   CheckboxFieldValue,
   DateValue,
   NumberFieldValue,
   RequiredTextValue,
   TextValue
 } from './FieldValue'
+import { AddressFieldValue } from './CompositeFieldValue'
 
 const FieldId = z.string()
 

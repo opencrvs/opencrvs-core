@@ -36,20 +36,21 @@ import {
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
-  AddressFieldValue,
-  AddressFieldValueInput,
   CheckboxFieldValue,
   DateValue,
   EmailValue,
   FieldValue,
   FieldValueInputSchema,
-  FileFieldValue,
-  FileFieldWithOptionValue,
   NumberFieldValue,
-  OptionalNullableFieldValueSchema,
   RequiredTextValue,
   TextValue
 } from './FieldValue'
+import {
+  AddressFieldValue,
+  AddressFieldValueInput,
+  FileFieldValue,
+  FileFieldWithOptionValue
+} from './CompositeFieldValue'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -59,11 +60,19 @@ import {
  */
 
 /**
+ * Optionality of a field is defined in FieldConfig, not in FieldValue.
+ * Allows for nullishness of a field value during validations based on FieldConfig.
+ */
+type NullishFieldValueSchema = z.ZodOptional<
+  z.ZodNullable<FieldValueInputSchema>
+>
+
+/**
  * Mapping of field types to Zod schema.
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
-  let schema: FieldValueInputSchema
+  let schema: FieldValueInputSchema | NullishFieldValueSchema
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
@@ -105,14 +114,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       break
   }
 
-  return required ? schema : schema.nullable().optional()
+  return required ? schema : schema.nullish()
 }
 
 export function createValidationSchema(config: FieldConfig[]) {
-  const shape: Record<
-    string,
-    OptionalNullableFieldValueSchema | FieldValueInputSchema
-  > = {}
+  const shape: Record<string, NullishFieldValueSchema | FieldValueInputSchema> =
+    {}
 
   for (const field of config) {
     shape[field.id] = mapFieldTypeToZod(field.type, field.required)

@@ -10,7 +10,7 @@
  */
 
 import { ActionType } from '../ActionType'
-import { ActionDocument, ActionMetadata } from '../ActionDocument'
+import { ActionDocument } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
@@ -245,7 +245,7 @@ export function getMetadataForAction(
   event: EventDocument,
   actionType: ActionType,
   draftsForEvent: Draft[]
-): ActionMetadata {
+): ActionDocument['metadata'] {
   const action = event.actions.find((action) => actionType === action.type)
 
   const drafts = draftsForEvent.filter((draft) => draft.eventId === event.id)

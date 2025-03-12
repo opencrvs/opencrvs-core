@@ -18,7 +18,7 @@ import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
 import { ActionFormData } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { FieldValue } from '../events/FieldValue'
+import { FieldValueInput } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType } from '../events/Conditional'
 
@@ -233,7 +233,7 @@ export function validateFieldInput({
   value
 }: {
   field: FieldConfig
-  value: FieldValue
+  value: FieldValueInput
 }) {
   const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
     value,

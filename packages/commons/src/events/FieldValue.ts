@@ -9,6 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+import {
+  AddressFieldValue,
+  AddressFieldValueInput,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  RuralAddress,
+  RuralAddressInput,
+  UrbanAddress,
+  UrbanAddressInput
+} from './CompositeFieldValue'
+
+/**
+ * FieldValues defined in this file are primitive field values.
+ * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
+ *
+ * FieldValue is a union of primitive and composite field values.
+ * FieldValue can never be null.
+ *
+ * FieldInputValue accepts null values for primitive field values when they are optional.
+ * API is build assuming partial (PATCH) updates. In order to edit and remove optional value, we need to accept null values.
+ * Omitting a field value in partial updates leaves it untouched.
+ *
+ */
 
 export const TextValue = z.string()
 export const RequiredTextValue = TextValue.min(1)
@@ -20,72 +43,6 @@ export const DateValue = z
 
 export const EmailValue = z.string().email()
 
-export const FileFieldValue = z.object({
-  filename: z.string(),
-  originalFilename: z.string(),
-  type: z.string()
-})
-
-export type FileFieldValue = z.infer<typeof FileFieldValue>
-
-const AdminStructure = z.object({
-  country: z.string(),
-  province: z.string(),
-  district: z.string()
-})
-
-const UrbanAddress = AdminStructure.extend({
-  urbanOrRural: z.literal('URBAN'),
-  town: z.string().optional(),
-  residentialArea: z.string().optional(),
-  street: z.string().optional(),
-  number: z.string().optional(),
-  zipCode: z.string().optional()
-})
-
-const UrbanAddressInput = AdminStructure.extend({
-  urbanOrRural: z.literal('URBAN'),
-  town: z.string().optional().nullable(),
-  residentialArea: z.string().optional().nullable(),
-  street: z.string().optional().nullable(),
-  number: z.string().optional().nullable(),
-  zipCode: z.string().optional().nullable()
-})
-
-const RuralAddress = AdminStructure.extend({
-  urbanOrRural: z.literal('RURAL'),
-  village: z.string().optional()
-})
-
-const RuralAddressInput = AdminStructure.extend({
-  urbanOrRural: z.literal('RURAL'),
-  village: z.string().optional().nullable()
-})
-
-export const AddressFieldValue = z.discriminatedUnion('urbanOrRural', [
-  UrbanAddress,
-  RuralAddress
-])
-
-export const AddressFieldValueInput = z.discriminatedUnion('urbanOrRural', [
-  UrbanAddressInput,
-  RuralAddressInput
-])
-
-export type AddressFieldValue = z.infer<typeof AddressFieldValue>
-export const FileFieldValueWithOption = z.object({
-  filename: z.string(),
-  originalFilename: z.string(),
-  type: z.string(),
-  option: z.string()
-})
-
-export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
-
-export const FileFieldWithOptionValue = z.array(FileFieldValueWithOption)
-
-export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
-
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
@@ -94,10 +51,10 @@ export type NumberFieldValue = z.infer<typeof NumberFieldValue>
 export const FieldValue = z.union([
   TextValue,
   DateValue,
-  FileFieldValue,
-  FileFieldWithOptionValue,
   CheckboxFieldValue,
   NumberFieldValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
   UrbanAddress,
   RuralAddress
 ])
@@ -107,10 +64,10 @@ export type FieldValue = z.infer<typeof FieldValue>
 export const FieldValueInput = z.union([
   TextValue,
   DateValue,
-  FileFieldValue,
-  FileFieldWithOptionValue,
   CheckboxFieldValue,
   NumberFieldValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
   UrbanAddressInput,
   RuralAddressInput
 ])
@@ -140,7 +97,3 @@ export type FieldValueSchema =
   | typeof NumberFieldValue
   | z.ZodString
   | z.ZodBoolean
-
-export type OptionalNullableFieldValueSchema = z.ZodOptional<
-  z.ZodNullable<FieldValueInputSchema>
->

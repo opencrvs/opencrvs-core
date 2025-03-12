@@ -190,12 +190,12 @@ describe('address state transitions', () => {
     expect(state.data).toEqual(initialForm)
   })
 
-  const addressWithNullVillage = {
-    ...addressWithoutVillage,
-    village: null
-  }
-
   test('should remove optional "village" field in address when it is set to null', () => {
+    const addressWithNullVillage = {
+      ...addressWithoutVillage,
+      village: null
+    }
+
     const actions = [
       ...initialActions,
       {

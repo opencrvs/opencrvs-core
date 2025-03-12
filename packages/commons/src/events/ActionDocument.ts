@@ -9,18 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { FieldValue } from './FieldValue'
+import { FieldValueInput } from './FieldValue'
 import { ActionType } from './ActionType'
-
-export const ActionMetadata = z.record(z.string(), FieldValue)
-export type ActionMetadata = z.infer<typeof ActionMetadata>
 
 export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.record(z.string(), FieldValue),
-  metadata: ActionMetadata.optional(),
+  data: z.record(z.string(), FieldValueInput),
+  metadata: z.record(z.string(), FieldValueInput).optional(),
   createdAtLocation: z.string()
 })
 
