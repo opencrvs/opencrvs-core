@@ -29,7 +29,6 @@ export async function cacheFiles(
     acc[field.id] = field
     return acc
   }, {})
-
   const promises: Promise<void>[] = []
 
   eventDocument.actions.forEach((action) =>

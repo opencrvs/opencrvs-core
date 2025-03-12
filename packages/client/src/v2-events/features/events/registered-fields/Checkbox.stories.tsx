@@ -10,14 +10,13 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn } from '@storybook/test'
+import { expect, fn, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
+import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Review } from '@client/v2-events/features/events/components/Review'
-import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
-import { within } from '@storybook/test'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Checkbox',

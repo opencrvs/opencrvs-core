@@ -92,7 +92,7 @@ function getData(actions: Array<ActionDocument>) {
   }, {})
 }
 
-function deepDropNulls<T extends Record<string, any>>(obj: T) {
+export function deepDropNulls<T extends Record<string, any>>(obj: T) {
   if (!_.isObject(obj)) return obj
 
   return Object.entries(obj).reduce(
@@ -196,7 +196,6 @@ export function getCurrentEventStateWithDrafts(
     actions: actionWithDrafts
   }
 
-  console.log(withDrafts)
   return getCurrentEventState(withDrafts)
 }
 

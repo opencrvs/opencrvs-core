@@ -14,8 +14,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   getCurrentEventStateWithDrafts,
-  getMetadataForAction,
-  ActionFormData
+  getMetadataForAction
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -57,16 +56,7 @@ function ActionComponent({ children, type }: Props) {
    * Keep the local draft updated as per the form changes
    */
   const formValues = useEventFormData((state) => state.getFormValues())
-  const metadataValues = useEventMetadata((state) =>
-    state.getMetadataFormValues(
-      event.id,
-      getMetadataForAction({
-        event,
-        actionType: ActionType.DECLARE,
-        draftsForEvent: []
-      })
-    )
-  )
+  const metadataValues = useEventMetadata((state) => state.getMetadata())
 
   useEffect(() => {
     setLocalDraft({
@@ -90,7 +80,7 @@ function ActionComponent({ children, type }: Props) {
   )
 
   const setInitialMetadataValues = useEventMetadata(
-    (state) => state.setMetadataFormValues
+    (state) => state.setInitialMetadataValues
   )
 
   const eventDrafts = drafts
@@ -123,14 +113,13 @@ function ActionComponent({ children, type }: Props) {
     return getMetadataForAction({
       event,
       actionType: ActionType.DECLARE,
-      draftsForEvent: eventDrafts
+      drafts: eventDrafts
     })
   }, [eventDrafts, event])
 
   useEffect(() => {
     setInitialFormValues(eventDataWithDrafts.data)
-    // @TODO: Check this should not need casting
-    setInitialMetadataValues(event.id, declareMetadata as ActionFormData)
+    setInitialMetadataValues(declareMetadata)
 
     return () => {
       /*
