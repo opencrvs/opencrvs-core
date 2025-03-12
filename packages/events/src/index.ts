@@ -24,53 +24,6 @@ import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { getAnonymousToken } from './service/auth'
-const foo = {
-  type: 'tennis-club-membership',
-  id: '4d299f0a-2644-40a1-a556-ddfc937a5fa7',
-  createdAt: '2025-03-11T11:09:38.752Z',
-  updatedAt: '2025-03-11T11:11:05.413Z',
-  trackingId: '3S4VVM',
-  actions: [
-    {
-      type: 'CREATE',
-      createdAt: '2025-03-11T11:09:38.752Z',
-      createdBy: '677fb08630f3abfa33072718',
-      createdAtLocation: '657f43f7-4e85-40bf-a447-13d85de01084',
-      id: '1bee67f8-6d06-42fa-ad02-44d23c3e5bcd',
-      data: {}
-    },
-    {
-      data: {
-        'recommender.none': true,
-        'applicant.firstname': 'matti',
-        'applicant.surname': 'masaa',
-        'applicant.dob': '2024-02-22',
-        'applicant.image.label': '1231-123'
-      },
-      type: 'DECLARE',
-      createdBy: '677fb08630f3abfa33072718',
-      createdAt: '2025-03-11T11:11:05.413Z',
-      createdAtLocation: '657f43f7-4e85-40bf-a447-13d85de01084',
-      id: '0bdefbc8-207b-4b4b-b585-6f118ab4b1ef'
-    },
-    {
-      data: {
-        'recommender.none': true,
-        'applicant.firstname': 'matti',
-        'applicant.surname': 'masaa',
-        'applicant.dob': '2024-02-22',
-        'applicant.image.label': null
-      },
-      type: 'DECLARE',
-      createdBy: '677fb08630f3abfa33072718',
-      createdAt: '2025-03-11T11:11:05.413Z',
-      createdAtLocation: '657f43f7-4e85-40bf-a447-13d85de01084',
-      id: '0bdefbc8-207b-4b4b-b585-6f118ab4b1ef'
-    }
-  ]
-}
-
-getCurrentEventState(foo as any)
 
 const server = createHTTPServer({
   router: appRouter,
@@ -113,7 +66,6 @@ const server = createHTTPServer({
 
 export async function main() {
   try {
-    console.log(getCurrentEventState(foo as any))
     const configurations = await getEventConfigurations(
       await getAnonymousToken()
     )
