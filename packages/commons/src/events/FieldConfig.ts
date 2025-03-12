@@ -360,7 +360,6 @@ export type AllFields =
   | typeof EmailField
   | typeof FileUploadWithOptions
 
-// TODO CIHAN: make another copy of Inferred, with the input type?
 /** @knipignore */
 export type Inferred =
   | z.input<typeof Address>

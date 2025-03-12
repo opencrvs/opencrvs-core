@@ -491,7 +491,6 @@ function ReviewComponent({
                                   </ValidationError>
                                 ) : null
 
-                              // TODO CIHAN: hide paragraph etc. rows
                               const changeAction = (
                                 <Link
                                   data-testid={`change-button-${field.id}`}
