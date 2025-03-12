@@ -98,7 +98,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
               description: 'The title for the address input'
             },
             configuration: {
-              defaultsToUserPrimaryOfficeLocation: true
+              defaultToUserDistrict: true
             }
           }
         ]}

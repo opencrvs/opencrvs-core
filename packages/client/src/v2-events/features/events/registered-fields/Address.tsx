@@ -106,8 +106,7 @@ function AddressInput(props: Props) {
     userPrimaryOfficeLocation.province = provinceId
   }
 
-  const defaultValue = otherProps.configuration
-    ?.defaultsToUserPrimaryOfficeLocation
+  const defaultValue = otherProps.configuration?.defaultToUserDistrict
     ? userPrimaryOfficeLocation
     : initialDefaultValue
 

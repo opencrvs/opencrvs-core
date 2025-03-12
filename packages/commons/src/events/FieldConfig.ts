@@ -325,7 +325,7 @@ const Address = BaseField.extend({
   defaultValue: AddressFieldValue.optional(),
   configuration: z
     .object({
-      defaultsToUserPrimaryOfficeLocation: z.boolean()
+      defaultToUserDistrict: z.boolean()
     })
     .optional()
 }).describe('Address input field – a combination of location and text fields')
