@@ -38,5 +38,7 @@ function TextInput({
 
 export const Text = {
   Input: TextInput,
-  Output: null
+  Output: ({ value }: { value?: string }) => {
+    return <>{value?.toString() || ''}</>
+  }
 }

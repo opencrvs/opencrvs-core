@@ -45,8 +45,11 @@ import {
   RadioGroup,
   Select,
   SelectCountry,
-  Paragraph
+  Paragraph,
+  Number,
+  Text
 } from '@client/v2-events/features/events/registered-fields'
+import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -81,11 +84,11 @@ function ValueOutput(field: FieldWithValue) {
   }
 
   if (isNumberFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return <Number.Output value={field.value} />
   }
 
   if (isFileFieldType(field)) {
-    return null
+    return File.Output
   }
 
   if (isBulletListFieldType(field)) {
@@ -104,8 +107,8 @@ function ValueOutput(field: FieldWithValue) {
     return <Checkbox.Output value={field.value} />
   }
 
-  if (isEmailFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+  if (isEmailFieldType(field) || isTextFieldType(field)) {
+    return <Text.Output value={field.value} />
   }
 
   if (isAddressFieldType(field)) {
