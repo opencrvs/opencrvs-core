@@ -18,8 +18,7 @@ import { v4 as uuid } from 'uuid'
 import {
   ActionType,
   findActiveActionForm,
-  SCOPES,
-  getActionsMetadata
+  SCOPES
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
