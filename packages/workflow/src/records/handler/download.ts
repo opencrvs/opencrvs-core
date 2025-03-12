@@ -16,7 +16,7 @@ import * as Hapi from '@hapi/hapi'
 import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getValidRecordById } from '@workflow/records/index'
-import { getToken } from '@workflow/utils/auth-utils'
+import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { logger } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
@@ -24,6 +24,7 @@ import { indexBundleToRoute } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { getUserOrSystem } from '@workflow/records/user'
+import { getSystem, getUser } from '@workflow/features/user/utils'
 
 export async function downloadRecordHandler(
   request: Hapi.Request,
@@ -50,13 +51,34 @@ export async function downloadRecordHandler(
   const { downloadedBundleWithResources, downloadedRecord } =
     await toDownloaded(record, token)
 
-  const assignment = findAssignment(record)
-  if (assignment) {
-    const userOrSystem = await getUserOrSystem(token)
-    const practitionerId = userOrSystem.practitionerId
+  const tokenPayload = getTokenPayload(token)
 
-    if (assignment.practitioner.id !== practitionerId)
-      throw new Error('Record is assigned to a different user')
+  let user, system
+
+  try {
+    // in case we have a user
+    user = await getUser(tokenPayload.sub, {
+      Authorization: token
+    })
+  } catch (error) {
+    system = await getSystem(tokenPayload.sub, {
+      Authorization: token
+    })
+
+    if (!system) {
+      throw new Error(`System not found!`)
+    }
+  }
+
+  if (user) {
+    const assignment = findAssignment(record)
+    if (assignment) {
+      const userOrSystem = await getUserOrSystem(token)
+      const practitionerId = userOrSystem.practitionerId
+
+      if (assignment.practitioner.id !== practitionerId)
+        throw new Error('Record is assigned to a different user')
+    }
   }
 
   /*

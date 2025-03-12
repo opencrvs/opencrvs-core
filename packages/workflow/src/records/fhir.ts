@@ -73,6 +73,7 @@ import {
   getLoggedInPractitionerResource,
   getPractitionerOfficeId,
   getPractitionerRoleByPractitionerId,
+  getSystem,
   getUser
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
@@ -1180,8 +1181,29 @@ export async function getPractitionerRoleFromToken(
   token: string
 ): Promise<BundleEntry<PractitionerRole>> {
   const tokenPayload = getTokenPayload(token)
-  const userDetails = await getUser(tokenPayload.sub, { Authorization: token })
-  const practitionerId = userDetails.practitionerId
+
+  let userDetails
+  let system
+
+  try {
+    // in case we have a user
+    userDetails = await getUser(tokenPayload.sub, {
+      Authorization: token
+    })
+  } catch (error) {
+    system = await getSystem(tokenPayload.sub, {
+      Authorization: token
+    })
+
+    if (!system) {
+      throw new Error(`System not found!`)
+    }
+  }
+
+  const practitionerId = userDetails
+    ? userDetails.practitionerId
+    : system.practitionerId
+
   const practitionerRoleBundle = (await getPractitionerRoleByPractitionerId(
     practitionerId as UUID
   )) as Bundle<PractitionerRole>
