@@ -15,11 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { v4 as uuid } from 'uuid'
-import {
-  ActionType,
-  findActiveActionForm,
-  getActionsMetadata
-} from '@opencrvs/commons/client'
+import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -63,11 +59,8 @@ export function Review() {
 
   const form = useEventFormData((state) => state.getFormValues())
 
-  const { setMetadataFormValues, getMetadataFormValues } = useEventMetadata()
-  const metadata = getMetadataFormValues(
-    eventId,
-    getActionsMetadata(event.actions)
-  )
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata({})
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -175,7 +168,7 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
         metadata={metadata}
-        onMetadataChange={(values) => setMetadataFormValues(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           action={ActionType.DECLARE}
