@@ -133,19 +133,23 @@ function deepMerge(
   currentDocument: ActionDocument['data'],
   actionDocument: ActionDocument['data']
 ) {
-  return _.mergeWith(currentDocument, actionDocument, (objValue, srcValue) => {
-    if (srcValue === undefined) {
-      return objValue // Keep previous value
-    }
-    if (_.isArray(srcValue)) {
-      return srcValue // Replace arrays instead of merging
-    }
-    if (_.isObject(objValue) && _.isObject(srcValue)) {
-      return undefined // Continue deep merging objects
-    }
+  return _.mergeWith(
+    currentDocument,
+    actionDocument,
+    (previousValue, incomingValue) => {
+      if (incomingValue === undefined) {
+        return previousValue
+      }
+      if (_.isArray(incomingValue)) {
+        return incomingValue // Replace arrays instead of merging
+      }
+      if (_.isObject(previousValue) && _.isObject(incomingValue)) {
+        return undefined // Continue deep merging objects
+      }
 
-    return srcValue // Override with latest value
-  })
+      return incomingValue // Override with latest value
+    }
+  )
 }
 
 export function isUndeclaredDraft(event: EventDocument): boolean {
