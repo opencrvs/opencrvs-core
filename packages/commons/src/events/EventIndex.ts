@@ -11,12 +11,13 @@
 
 import { z } from 'zod'
 import { EventMetadata } from './EventMetadata'
+import { FieldValue } from './FieldValue'
 
 export const EventIndex = EventMetadata.extend({
-  data: z.record(z.string(), z.any())
+  data: z.record(z.string(), FieldValue)
 })
 
-export const EventSearchIndex = z.record(z.string(), z.any()).and(
+export const EventSearchIndex = z.record(z.string(), FieldValue).and(
   z.object({
     type: z.string() // Ensures "type" (event-id) exists and is a string
   })

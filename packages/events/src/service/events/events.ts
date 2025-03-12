@@ -328,5 +328,6 @@ export async function addAction(
   await indexEvent(updatedEvent)
   await notifyOnAction(input, updatedEvent, token)
   await deleteDraftsByEventId(eventId)
+
   return updatedEvent
 }

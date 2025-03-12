@@ -216,10 +216,12 @@ export const eventPayloadGenerator = {
 
 export function generateActionDocument({
   configuration,
-  action
+  action,
+  defaults = {}
 }: {
   configuration: EventConfig
   action: ActionType
+  defaults?: Partial<ActionDocument>
 }): ActionDocument {
   const actionBase = {
     createdAt: new Date().toISOString(),
@@ -227,7 +229,8 @@ export function generateActionDocument({
     id: getUUID(),
     createdAtLocation: 'TODO',
     data: generateActionInput(configuration, action),
-    metadata: {}
+    metadata: {},
+    ...defaults
   } satisfies ActionBase
 
   switch (action) {

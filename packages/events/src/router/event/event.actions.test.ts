@@ -77,7 +77,7 @@ test.only('Action data accepts partial changes', async () => {
 
   const firstDeclarationPayload = generator.event.actions.declare(
     originalEvent.id,
-    { data: { ...initialForm } }
+    { data: initialForm }
   )
   await client.event.actions.declare(firstDeclarationPayload)
 
@@ -86,9 +86,7 @@ test.only('Action data accepts partial changes', async () => {
     {
       data: {
         ...initialForm,
-        'applicant.address': {
-          ...addressWithoutVillage
-        }
+        'applicant.address': addressWithoutVillage
       }
     }
   )
@@ -97,13 +95,8 @@ test.only('Action data accepts partial changes', async () => {
 
   const updatedEvent = await client.event.get(originalEvent.id)
 
-  console.log('updatedEvent')
-  console.log(JSON.stringify(updatedEvent, null, 2))
-  const stateBeforeRemoval = getCurrentEventState(updatedEvent)
-
-  console.log('stateBeforeRemoval', stateBeforeRemoval)
-
-  expect(stateBeforeRemoval.data).toEqual(initialForm)
+  const eventStateBeforeVillageRemoval = getCurrentEventState(updatedEvent)
+  expect(eventStateBeforeVillageRemoval.data).toEqual(initialForm)
 
   const declarationWithVillageNull = generator.event.actions.declare(
     originalEvent.id,
@@ -119,19 +112,17 @@ test.only('Action data accepts partial changes', async () => {
   )
 
   await client.event.actions.declare(declarationWithVillageNull)
-  const eventAfterRemoval = await client.event.get(originalEvent.id)
-  const stateAfterRemoval = getCurrentEventState(eventAfterRemoval)
+  const eventAfterVillageRemoval = await client.event.get(originalEvent.id)
+  const stateAfterVillageRemoval = getCurrentEventState(
+    eventAfterVillageRemoval
+  )
 
-  console.log('eventAfterRemoval')
-  console.log(JSON.stringify(eventAfterRemoval, null, 2))
-  expect(stateAfterRemoval.data).toEqual({
+  expect(stateAfterVillageRemoval.data).toEqual({
     ...initialForm,
-    'applicant.address': { ...addressWithoutVillage, village: null }
+    'applicant.address': addressWithoutVillage
   })
 
   const events = await client.event.list()
 
-  console.log('events')
-  console.log(JSON.stringify(events, null, 2))
-  expect(events).toEqual(534)
+  expect(events).toEqual([stateAfterVillageRemoval])
 })

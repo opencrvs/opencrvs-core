@@ -252,13 +252,11 @@ export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
-  return esClient.update<EventIndex>({
+  return esClient.index<EventIndex>({
     index: indexName,
     id: event.id,
-    body: {
-      doc: eventToEventIndex(event),
-      doc_as_upsert: true
-    },
+    /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
+    document: eventToEventIndex(event),
     refresh: 'wait_for'
   })
 }

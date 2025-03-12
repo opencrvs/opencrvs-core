@@ -10,8 +10,10 @@
  */
 
 import { getCurrentEventState } from '.'
-import { ActionDocument } from '../ActionDocument'
+import { tennisClubMembershipEvent } from '../../fixtures'
+import { getUUID } from '../../uuid'
 import { ActionType } from '../ActionType'
+import { generateActionDocument } from '../test.utils'
 
 describe('correction requests', () => {
   test('proposed correction data is not applied before the correction request is approved', () => {
@@ -145,46 +147,40 @@ describe('address state transitions', () => {
   }
 
   const initialActions = [
-    {
-      type: ActionType.CREATE,
-      createdAt: '2025-03-11T13:46:37.365Z',
-      createdBy: '67d03ebdb8e6566a69a1e374',
-      createdAtLocation: 'f224e673-7695-466a-ab13-47d958e25264',
-      id: '1197ca20-d52f-4ad1-9723-caa02829d06d',
-      data: {} as any
-    },
-    {
-      data: initialForm,
-      type: ActionType.DECLARE,
-      createdBy: '67d03ebdb8e6566a69a1e374',
-      createdAt: '2025-03-11T13:46:38.176Z',
-      createdAtLocation: 'f224e673-7695-466a-ab13-47d958e25264',
-      id: '44991b1b-6d20-4196-93c0-964d4448e7d5'
-    }
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        data: initialForm
+      }
+    })
   ]
 
   test('should persist optional "village" field in address, even if it is not included in payload', () => {
     const actions = [
       ...initialActions,
-      {
-        data: {
-          'applicant.address': addressWithoutVillage
-        },
-        type: ActionType.DECLARE,
-        createdBy: '67d03ebdb8e6566a69a1e374',
-        createdAt: '2025-03-11T13:46:39.200Z',
-        createdAtLocation: 'f224e673-7695-466a-ab13-47d958e25264',
-        id: '70df47a2-6b79-49b9-b189-d1ab345facfc'
-      }
-    ] satisfies ActionDocument[]
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.DECLARE,
+        defaults: {
+          data: {
+            'applicant.address': addressWithoutVillage
+          }
+        }
+      })
+    ]
 
     const state = getCurrentEventState({
-      type: 'TENNIS_CLUB_MEMBERSHIP',
-      id: '1197ca20-d52f-4ad1-9723-caa02829d06d',
-      trackingId: 'TEST12',
-      createdAt: '2025-03-11T13:46:37.365Z',
-      updatedAt: '2025-03-11T13:46:39.200Z',
-      actions: actions
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date().toISOString(),
+      actions,
+      id: getUUID(),
+      updatedAt: new Date().toISOString()
     })
 
     expect(state.data).toEqual(initialForm)
@@ -198,30 +194,29 @@ describe('address state transitions', () => {
 
     const actions = [
       ...initialActions,
-      {
-        data: {
-          'applicant.address': addressWithNullVillage as any
-        },
-        type: ActionType.DECLARE,
-        createdBy: '67d03ebdb8e6566a69a1e374',
-        createdAt: '2025-03-11T13:46:39.200Z',
-        createdAtLocation: 'f224e673-7695-466a-ab13-47d958e25264',
-        id: '70df47a2-6b79-49b9-b189-d1ab345facfc'
-      }
-    ] satisfies ActionDocument[]
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.DECLARE,
+        defaults: {
+          data: {
+            'applicant.address': addressWithNullVillage
+          }
+        }
+      })
+    ]
 
     const state = getCurrentEventState({
-      type: 'TENNIS_CLUB_MEMBERSHIP',
-      id: '1197ca20-d52f-4ad1-9723-caa02829d06d',
-      trackingId: 'TEST12',
-      createdAt: '2025-03-11T13:46:37.365Z',
-      updatedAt: '2025-03-11T13:46:39.200Z',
-      actions: actions
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date().toISOString(),
+      actions,
+      id: getUUID(),
+      updatedAt: new Date().toISOString()
     })
 
     expect(state.data).toEqual({
       ...initialForm,
-      'applicant.address': addressWithNullVillage
+      'applicant.address': addressWithoutVillage
     })
   })
 })
