@@ -14,8 +14,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   getCurrentEventStateWithDrafts,
-  getMetadataForAction,
-  getActionsMetadata
+  getMetadataForAction
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -57,9 +56,7 @@ function ActionComponent({ children, type }: Props) {
    * Keep the local draft updated as per the form changes
    */
   const formValues = useEventFormData((state) => state.getFormValues())
-  const metadataValues = useEventMetadata((state) =>
-    state.getMetadataFormValues(event.id, getActionsMetadata(event.actions))
-  )
+  const metadataValues = useEventMetadata((state) => state.getMetadata())
 
   useEffect(() => {
     setLocalDraft({
@@ -83,7 +80,7 @@ function ActionComponent({ children, type }: Props) {
   )
 
   const setInitialMetadataValues = useEventMetadata(
-    (state) => state.setMetadataFormValues
+    (state) => state.setInitialMetadataValues
   )
 
   const draftsForThisEvent = drafts
@@ -118,7 +115,7 @@ function ActionComponent({ children, type }: Props) {
 
   useEffect(() => {
     setInitialFormValues(eventDataWithDrafts.data)
-    setInitialMetadataValues(event.id, declareMetadata)
+    setInitialMetadataValues(declareMetadata)
 
     return () => {
       /*

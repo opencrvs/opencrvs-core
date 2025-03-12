@@ -10,10 +10,10 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React from 'react'
+import { TRPCProvider } from '@client/v2-events/trpc'
 import { FieldType } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components'
-import { TRPCProvider } from '@client/v2-events/trpc'
+import React from 'react'
 import { Output } from './Output'
 
 const meta: Meta<typeof Output> = {
