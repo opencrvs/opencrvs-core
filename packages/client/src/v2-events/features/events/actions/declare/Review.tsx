@@ -15,7 +15,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { v4 as uuid } from 'uuid'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  findActiveActionForm,
+  getActionsMetadata
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -35,6 +39,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -58,8 +63,11 @@ export function Review() {
 
   const form = useEventFormData((state) => state.getFormValues())
 
-  const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata({})
+  const { setMetadataFormValues, getMetadataFormValues } = useEventMetadata()
+  const metadata = getMetadataFormValues(
+    eventId,
+    getActionsMetadata(event.actions)
+  )
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -92,7 +100,7 @@ export function Review() {
           {
             from: 'review'
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -167,7 +175,7 @@ export function Review() {
           surname: form['applicant.surname'] as string
         })}
         metadata={metadata}
-        onMetadataChange={(values) => setMetadata(values)}
+        onMetadataChange={(values) => setMetadataFormValues(eventId, values)}
       >
         <ReviewComponent.Actions
           action={ActionType.DECLARE}
