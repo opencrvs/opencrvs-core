@@ -362,6 +362,30 @@ export type AllFields =
 
 /** @knipignore */
 export type Inferred =
+  | z.infer<typeof Address>
+  | z.infer<typeof TextField>
+  | z.infer<typeof NumberField>
+  | z.infer<typeof TextAreaField>
+  | z.infer<typeof DateField>
+  | z.infer<typeof Paragraph>
+  | z.infer<typeof RadioGroup>
+  | z.infer<typeof BulletList>
+  | z.infer<typeof PageHeader>
+  | z.infer<typeof Select>
+  | z.infer<typeof Checkbox>
+  | z.infer<typeof File>
+  | z.infer<typeof FileUploadWithOptions>
+  | z.infer<typeof Country>
+  | z.infer<typeof AdministrativeArea>
+  | z.infer<typeof Divider>
+  | z.infer<typeof Location>
+  | z.infer<typeof Facility>
+  | z.infer<typeof Office>
+  | z.infer<typeof SignatureField>
+  | z.infer<typeof EmailField>
+
+/** @knipignore */
+export type InputInferred =
   | z.input<typeof Address>
   | z.input<typeof TextField>
   | z.input<typeof NumberField>
@@ -406,7 +430,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   SignatureField,
   EmailField,
   FileUploadWithOptions
-]) as unknown as z.ZodType<Inferred, any, Inferred>
+]) as unknown as z.ZodType<Inferred, any, InputInferred>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
