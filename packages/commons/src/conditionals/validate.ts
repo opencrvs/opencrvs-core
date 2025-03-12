@@ -15,7 +15,7 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { ActionFormData } from '../events/ActionDocument'
+import { ActionDocument, ActionFormData } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldValueInput } from '../events/FieldValue'
@@ -46,7 +46,7 @@ function getConditionalActionsForField(
 
 function isFieldConditionMet(
   field: FieldConfig,
-  form: ActionFormData,
+  form: ActionDocument['data'] | ActionFormData,
   conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
 ) {
   const hasRule = (field.conditionals ?? []).some(
@@ -67,11 +67,17 @@ function isFieldConditionMet(
   return validConditionals.includes(conditionalType)
 }
 
-export function isFieldVisible(field: FieldConfig, form: ActionFormData) {
+export function isFieldVisible(
+  field: FieldConfig,
+  form: ActionDocument['data'] | ActionFormData
+) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
-export function isFieldEnabled(field: FieldConfig, form: ActionFormData) {
+export function isFieldEnabled(
+  field: FieldConfig,
+  form: ActionDocument['data'] | ActionFormData
+) {
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
 
@@ -157,7 +163,7 @@ export function getFieldValidationErrors({
 }: {
   // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
   field: FieldConfig
-  values: ActionFormData
+  values: ActionDocument['data']
 }) {
   const conditionalParameters = {
     $form: values,

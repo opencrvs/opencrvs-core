@@ -10,7 +10,7 @@
  */
 
 import { ActionType } from '../ActionType'
-import { ActionDocument } from '../ActionDocument'
+import { ActionDocument, ActionFormData } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
@@ -92,26 +92,6 @@ function getData(actions: Array<ActionDocument>) {
   }, {})
 }
 
-export function getActionsMetadata(
-  actions: Array<ActionDocument>
-): ActionDocument['metadata'] {
-  // Types that are taken into the aggregate values (currently only declare and register)
-  const includedActions = [ActionType.DECLARE, ActionType.REGISTER]
-
-  return actions.reduce((status, action) => {
-    if (
-      !includedActions.some((excludedAction) => excludedAction === action.type)
-    ) {
-      return status
-    }
-
-    return {
-      ...status,
-      ...action.metadata
-    }
-  }, {})
-}
-
 function deepDropNulls<T extends Record<string, any>>(obj: T) {
   if (!_.isObject(obj)) return obj
 
@@ -167,21 +147,19 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const latestAction = event.actions[event.actions.length - 1]
 
-  return EventIndex.parse(
-    deepDropNulls({
-      id: event.id,
-      type: event.type,
-      status: getStatusFromActions(event.actions),
-      createdAt: event.createdAt,
-      createdBy: creationAction.createdBy,
-      createdAtLocation: creationAction.createdAtLocation,
-      modifiedAt: latestAction.createdAt,
-      assignedTo: getAssignedUserFromActions(event.actions),
-      updatedBy: latestAction.createdBy,
-      data: getData(event.actions),
-      trackingId: event.trackingId
-    })
-  )
+  return deepDropNulls({
+    id: event.id,
+    type: event.type,
+    status: getStatusFromActions(event.actions),
+    createdAt: event.createdAt,
+    createdBy: creationAction.createdBy,
+    createdAtLocation: creationAction.createdAtLocation,
+    modifiedAt: latestAction.createdAt,
+    assignedTo: getAssignedUserFromActions(event.actions),
+    updatedBy: latestAction.createdBy,
+    data: getData(event.actions),
+    trackingId: event.trackingId
+  }) as any
 }
 
 export function getCurrentEventStateWithDrafts(
@@ -218,6 +196,7 @@ export function getCurrentEventStateWithDrafts(
     actions: actionWithDrafts
   }
 
+  console.log(withDrafts)
   return getCurrentEventState(withDrafts)
 }
 
@@ -245,26 +224,27 @@ export function applyDraftsToEventIndex(
   }
 }
 
-export function getMetadataForAction(
-  event: EventDocument,
-  actionType: ActionType,
-  draftsForEvent: Draft[]
-): ActionDocument['metadata'] {
+export function getMetadataForAction({
+  event,
+  actionType,
+  drafts
+}: {
+  event: EventDocument
+  actionType: ActionType
+  drafts: Draft[]
+}): ActionFormData {
   const action = event.actions.find((action) => actionType === action.type)
 
-  const drafts = draftsForEvent.filter((draft) => draft.eventId === event.id)
+  const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
 
   const sorted = [
     ...(action ? [action] : []),
-    ...drafts.map((draft) => draft.action)
+    ...eventDrafts.map((draft) => draft.action)
   ].sort()
 
   const metadata = sorted.reduce((metadata, action) => {
-    return {
-      ...metadata,
-      ...action.metadata
-    }
+    return deepMerge(metadata, action.metadata ?? {})
   }, {})
 
-  return metadata
+  return deepDropNulls(metadata)
 }

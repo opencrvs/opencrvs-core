@@ -81,6 +81,7 @@ export async function getDraftsForAction(
     .find({ eventId, 'action.createdBy': createdBy, 'action.type': actionType })
     .toArray()
 
+  console.log('drafts', drafts)
   return drafts
 }
 

@@ -19,10 +19,10 @@ import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
 import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'
-import { getCurrentEventState, getUser, logger } from '@opencrvs/commons'
+import { getUser, logger } from '@opencrvs/commons'
 import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'
-import { ensureIndexExists } from './service/indexing/indexing'
+import { indexAllEvents } from './service/indexing/indexing'
 import { getAnonymousToken } from './service/auth'
 
 const server = createHTTPServer({
@@ -71,7 +71,8 @@ export async function main() {
     )
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
-      await ensureIndexExists(configuration)
+      await indexAllEvents(configuration)
+      // await ensureIndexExists(configuration)
     }
   } catch (error) {
     logger.error(error)

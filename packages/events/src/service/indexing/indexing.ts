@@ -293,14 +293,14 @@ export async function getIndexedEvents() {
     request_cache: false
   })
 
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map(decodeEventIndex)
-  )
+  const foo = response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map(decodeEventIndex)
 
-  return events
+  console.log(JSON.stringify(foo))
+
+  return foo
 }
 
 export async function getIndex(eventParams: EventSearchIndex) {

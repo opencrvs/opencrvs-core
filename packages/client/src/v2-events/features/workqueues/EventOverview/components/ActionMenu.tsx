@@ -81,10 +81,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                     return
                   }
 
-                  if (
-                    ActionType.VALIDATE === action.type ||
-                    ActionType.REGISTER === action.type
-                  ) {
+                  if (ActionType.REGISTER === action.type) {
                     navigate(
                       ROUTES.V2.EVENTS[action.type].REVIEW.buildPath({
                         eventId

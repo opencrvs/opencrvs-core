@@ -13,6 +13,7 @@ import {
   ActionFormData,
   FieldConfig,
   FieldValue,
+  FieldValueInput,
   isAddressFieldType,
   isAdministrativeAreaFieldType,
   isFacilityFieldType,

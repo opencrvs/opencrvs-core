@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { FieldValueInput } from './FieldValue'
+import { FieldValue, FieldValueInput } from './FieldValue'
 import { ActionType } from './ActionType'
 
 export const ActionBase = z.object({
@@ -156,4 +156,4 @@ export type ResolvedUser = z.infer<typeof ResolvedUser>
 
 export type CreatedAction = z.infer<typeof CreatedAction>
 
-export type ActionFormData = ActionDocument['data']
+export type ActionFormData = Record<string, FieldValue>

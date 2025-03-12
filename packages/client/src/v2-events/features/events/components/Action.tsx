@@ -15,7 +15,7 @@ import {
   ActionType,
   getCurrentEventStateWithDrafts,
   getMetadataForAction,
-  getActionsMetadata
+  ActionFormData
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -58,7 +58,14 @@ function ActionComponent({ children, type }: Props) {
    */
   const formValues = useEventFormData((state) => state.getFormValues())
   const metadataValues = useEventMetadata((state) =>
-    state.getMetadataFormValues(event.id, getActionsMetadata(event.actions))
+    state.getMetadataFormValues(
+      event.id,
+      getMetadataForAction({
+        event,
+        actionType: ActionType.DECLARE,
+        draftsForEvent: []
+      })
+    )
   )
 
   useEffect(() => {
@@ -86,7 +93,7 @@ function ActionComponent({ children, type }: Props) {
     (state) => state.setMetadataFormValues
   )
 
-  const draftsForThisEvent = drafts
+  const eventDrafts = drafts
     .filter((d) => d.eventId === event.id)
     .concat({
       ...localDraft,
@@ -108,17 +115,22 @@ function ActionComponent({ children, type }: Props) {
     })
 
   const eventDataWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, draftsForThisEvent),
-    [draftsForThisEvent, event]
+    () => getCurrentEventStateWithDrafts(event, eventDrafts),
+    [eventDrafts, event]
   )
 
   const declareMetadata = useMemo(() => {
-    return getMetadataForAction(event, ActionType.DECLARE, draftsForThisEvent)
-  }, [draftsForThisEvent, event])
+    return getMetadataForAction({
+      event,
+      actionType: ActionType.DECLARE,
+      draftsForEvent: eventDrafts
+    })
+  }, [eventDrafts, event])
 
   useEffect(() => {
     setInitialFormValues(eventDataWithDrafts.data)
-    setInitialMetadataValues(event.id, declareMetadata)
+    // @TODO: Check this should not need casting
+    setInitialMetadataValues(event.id, declareMetadata as ActionFormData)
 
     return () => {
       /*
