@@ -17,7 +17,8 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
-  findActiveActionForm
+  findActiveActionForm,
+  getActionsMetadata
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -76,9 +77,10 @@ export function Review() {
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(
-    event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
+  const { setMetadataFormValues, getMetadataFormValues } = useEventMetadata()
+  const metadata = getMetadataFormValues(
+    eventId,
+    getActionsMetadata(event.actions)
   )
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
@@ -185,7 +187,7 @@ export function Review() {
         previousFormValues={previousFormValues}
         title=""
         onEdit={handleEdit}
-        onMetadataChange={(values) => setMetadata(values)}
+        onMetadataChange={(values) => setMetadataFormValues(eventId, values)}
       >
         <ReviewComponent.Actions
           form={form}
