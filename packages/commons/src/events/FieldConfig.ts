@@ -184,14 +184,16 @@ const Paragraph = BaseField.extend({
         })
         .optional()
     })
-    .default({})
+    .default({}),
+  hideOnReview: z.boolean().default(true).optional()
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
 
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
+  hideOnReview: z.boolean().default(true).optional()
 }).describe('A read-only header component for form pages')
 
 export type PageHeader = z.infer<typeof PageHeader>
@@ -247,7 +249,8 @@ const BulletList = BaseField.extend({
         })
         .optional()
     })
-    .default({})
+    .default({}),
+  hideOnReview: z.boolean().default(true).optional()
 }).describe('A list of bullet points')
 
 export type BulletList = z.infer<typeof BulletList>
