@@ -60,7 +60,6 @@ export const transformData = (
       let brideName
       let dateOfEvent
       const assignedReg = reg
-      debugger
 
       if (reg.registration) {
         if (isBirthEvent(reg)) {
