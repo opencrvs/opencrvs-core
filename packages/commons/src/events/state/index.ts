@@ -92,21 +92,23 @@ function getData(actions: Array<ActionDocument>) {
   }, {})
 }
 
-export function deepDropNulls<T extends Record<string, any>>(obj: T) {
+export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
   if (!_.isObject(obj)) return obj
 
-  return Object.entries(obj).reduce(
-    (acc: Record<string, any>, [key, value]) => {
-      if (_.isObject(value)) {
-        value = deepDropNulls(value)
+  return Object.entries(obj).reduce((acc: T, [key, value]) => {
+    if (_.isObject(value)) {
+      value = deepDropNulls(value)
+    }
+
+    if (value !== null) {
+      return {
+        ...acc,
+        [key]: value
       }
-      if (value !== null) {
-        acc[key] = value
-      }
-      return acc
-    },
-    {} as T
-  )
+    }
+
+    return acc
+  }, {} as T)
 }
 
 function deepMerge(
