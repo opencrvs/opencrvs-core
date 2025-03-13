@@ -121,6 +121,8 @@ export function Review() {
   // The hasAnyKey -key is used to check if there are any of the mentioned keys in the title.
   function getFormattedTitle(translationConfig: TranslationConfig) {
     const titleBeforeFormat = intl.formatMessage(translationConfig)
+
+    // This is a bit of hack, which expects that the keys are in the form of '{key}' in the message.
     const titleKeys =
       titleBeforeFormat
         .match(/\{([^}\s]+)\}/g)
