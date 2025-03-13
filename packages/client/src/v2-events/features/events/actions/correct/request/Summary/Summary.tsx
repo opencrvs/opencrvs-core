@@ -17,14 +17,13 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   FieldConfig,
-  findActiveActionFields,
+  getActiveActionFields,
   findActiveActionForm,
   generateTransactionId,
   getCurrentEventState,
   Scope,
   SCOPES,
-  isFieldVisible,
-  getActionsMetadata
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -129,7 +128,7 @@ export function Summary() {
     )
   }
 
-  const fields = findActiveActionFields(
+  const fields = getActiveActionFields(
     eventConfiguration,
     ActionType.REQUEST_CORRECTION
   )
@@ -148,10 +147,7 @@ export function Summary() {
 
   const metadata = useEventMetadata()
 
-  const metadataForm = metadata.getMetadataFormValues(
-    event.id,
-    getActionsMetadata(event.actions)
-  )
+  const metadataForm = metadata.getMetadata()
 
   const stringiedRequestData = stringifyFormData(allFields, metadataForm)
 
