@@ -359,53 +359,17 @@ function ReviewComponent({
                         </ValidationError>
                       ) : null
 
-                    if (!valueDisplay && !errorDisplay) {
-                      return { fieldType: field.type, display: null }
-                    }
-
-                    return {
-                      fieldType: field.type,
-                      display: (
-                        <ListReview.Row
-                          key={field.id}
-                          actions={
-                            <Link
-                              data-testid={`change-button-${field.id}`}
-                              onClick={(e) => {
-                                e.stopPropagation()
-
-                                onEdit({
-                                  pageId: page.id,
-                                  fieldId: field.id
-                                })
-                              }}
-                            >
-                              {intl.formatMessage(reviewMessages.changeButton)}
-                            </Link>
-                          }
-                          id={field.id}
-                          label={intl.formatMessage(field.label)}
-                          value={
-                            error.errors.length > 0
-                              ? errorDisplay
-                              : valueDisplay
-                          }
-                        />
-                      )
-                    }
+                    return { ...field, valueDisplay, errorDisplay }
                   })
 
                 const shouldDisplayPage = fields.some(
                   // We want to display the page in any case if it has any file inputs
-                  ({ fieldType, display }) => {
-                    if (
-                      fieldType === 'FILE' ||
-                      fieldType === 'FILE_WITH_OPTIONS'
-                    ) {
+                  ({ type, valueDisplay, errorDisplay }) => {
+                    if (type === 'FILE' || type === 'FILE_WITH_OPTIONS') {
                       return true
                     }
 
-                    return display
+                    return valueDisplay || errorDisplay
                   }
                 )
 
@@ -413,9 +377,10 @@ function ReviewComponent({
                   return <></>
                 }
 
-                const displayedFields = fields
-                  .map((f) => f.display)
-                  .filter((f) => f !== null)
+                const displayedFields = fields.filter(
+                  ({ valueDisplay, errorDisplay }) =>
+                    valueDisplay || errorDisplay
+                )
 
                 return (
                   <DeclarationDataContainer
@@ -439,7 +404,33 @@ function ReviewComponent({
                       name={'Accordion_' + page.id}
                     >
                       <ListReview id={'Section_' + page.id}>
-                        {displayedFields}
+                        {displayedFields.map(
+                          ({ id, label, errorDisplay, valueDisplay }) => (
+                            <ListReview.Row
+                              key={id}
+                              actions={
+                                <Link
+                                  data-testid={`change-button-${id}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+
+                                    onEdit({
+                                      pageId: page.id,
+                                      fieldId: id
+                                    })
+                                  }}
+                                >
+                                  {intl.formatMessage(
+                                    reviewMessages.changeButton
+                                  )}
+                                </Link>
+                              }
+                              id={id}
+                              label={intl.formatMessage(label)}
+                              value={errorDisplay ? errorDisplay : valueDisplay}
+                            />
+                          )
+                        )}
                       </ListReview>
                     </Accordion>
                   </DeclarationDataContainer>
