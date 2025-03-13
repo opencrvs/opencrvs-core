@@ -172,12 +172,7 @@ export function getEventConfiguration(
 }
 
 function isOptionalUncheckedCheckbox(field: FieldConfig, form: ActionFormData) {
-  if (field.type !== 'CHECKBOX') {
-    return false
-  }
-
-  // For required checkbox fields, we want to display the field even if it is not checked
-  if (field.required) {
+  if (field.type !== 'CHECKBOX' || field.required) {
     return false
   }
 
