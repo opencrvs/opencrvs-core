@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  ActionFormData,
+  ActionState,
   FieldConfig,
   Inferred,
   FieldValue
@@ -27,10 +27,7 @@ export function makeFormFieldIdFormikCompatible(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_SEPARATOR)
 }
 
-export function handleDefaultValue(
-  field: FieldConfig,
-  formData: ActionFormData
-) {
+export function handleDefaultValue(field: FieldConfig, formData: ActionState) {
   const defaultValue = field.defaultValue
 
   if (hasDefaultValueDependencyInfo(defaultValue)) {
@@ -47,7 +44,7 @@ export function evalExpressionInFieldDefinition(
   /*
    * These are used in the eval expression
    */
-  { $form }: { $form: ActionFormData }
+  { $form }: { $form: ActionState }
 ) {
   // eslint-disable-next-line no-eval
   return eval(expression) as FieldValue

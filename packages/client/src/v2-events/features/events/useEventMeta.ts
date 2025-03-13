@@ -17,21 +17,21 @@
 
 import { create } from 'zustand'
 import {
-  ActionFormData,
+  ActionState,
   deepDropNulls,
   ActionDocument
 } from '@opencrvs/commons/client'
 
 interface EventMetadata {
-  metadata?: ActionFormData
-  setMetadata: (data: ActionFormData) => void
-  setInitialMetadataValues: (data: ActionFormData) => void
-  getMetadata: (initialValues?: ActionDocument['metadata']) => ActionFormData
+  metadata?: ActionState
+  setMetadata: (data: ActionState) => void
+  setInitialMetadataValues: (data: ActionState) => void
+  getMetadata: (initialValues?: ActionDocument['metadata']) => ActionState
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
 }
 
-function removeUndefinedKeys(data: ActionFormData) {
+function removeUndefinedKeys(data: ActionState) {
   return Object.fromEntries(
     Object.entries(data).filter(([_, value]) => value !== undefined)
   )
@@ -39,7 +39,7 @@ function removeUndefinedKeys(data: ActionFormData) {
 /**
  * Interface representing the form data and related operations for an event.
  *
- * @property {ActionFormData} metadata - The current form values.
+ * @property {ActionState} metadata - The current form values.
  * @property {function} setMetadata - Sets the form values.
  * @property {function} setInitialMetadataValues - Sets the form values only if they are empty.
  * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
@@ -51,11 +51,11 @@ function removeUndefinedKeys(data: ActionFormData) {
 export const useEventMetadata = create<EventMetadata>()((set, get) => ({
   getMetadata: (initialValues: ActionDocument['metadata']) =>
     get().metadata || deepDropNulls(initialValues ?? {}),
-  setMetadata: (data: ActionFormData) => {
+  setMetadata: (data: ActionState) => {
     const metadata = removeUndefinedKeys(data)
     return set(() => ({ metadata }))
   },
-  setInitialMetadataValues: (data: ActionFormData) => {
+  setInitialMetadataValues: (data: ActionState) => {
     const metadata = removeUndefinedKeys(data)
     return set(() => ({ metadata }))
   },

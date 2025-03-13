@@ -11,13 +11,13 @@
 import { z } from 'zod'
 import {
   AddressFieldValue,
-  AddressFieldValueInput,
+  AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  RuralAddress,
-  RuralAddressInput,
-  UrbanAddress,
-  UrbanAddressInput
+  RuralAddressValue,
+  RuralAddressUpdateValue,
+  UrbanAddressValue,
+  UrbanAddressUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -27,7 +27,7 @@ import {
  * FieldValue is a union of primitive and composite field values.
  * FieldValue can never be null.
  *
- * FieldValueInput accepts null values for primitive field values when they are optional.
+ * FieldUpdateValue accepts null values for primitive field values when they are optional.
  * API is build assuming partial (PATCH) updates. In order to edit and remove optional value, we need to accept null values.
  * Omitting a field value in partial updates leaves it untouched.
  *
@@ -55,24 +55,24 @@ export const FieldValue = z.union([
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  UrbanAddress,
-  RuralAddress
+  UrbanAddressValue,
+  RuralAddressValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
 
-export const FieldValueInput = z.union([
+export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  UrbanAddressInput,
-  RuralAddressInput
+  UrbanAddressUpdateValue,
+  RuralAddressUpdateValue
 ])
 
-export type FieldValueInput = z.infer<typeof FieldValueInput>
+export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
 
 /**
  * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
@@ -91,11 +91,11 @@ export type FieldValueSchema =
  *
  * FieldValueInputSchema uses Input types which have set optional values as nullish
  * */
-export type FieldValueInputSchema =
+export type FieldUpdateValueSchema =
   | typeof FileFieldValue
   | typeof FileFieldWithOptionValue
   | typeof CheckboxFieldValue
-  | typeof AddressFieldValueInput
+  | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
   | z.ZodString
   | z.ZodBoolean

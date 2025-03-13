@@ -9,15 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { FieldValue, FieldValueInput } from './FieldValue'
+import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType } from './ActionType'
+
+/**
+ * ActionUpdate is a record of a specific action that updated data fields.
+ */
+export const ActionUpdate = z.record(z.string(), FieldUpdateValue)
+export type ActionUpdate = z.infer<typeof ActionUpdate>
+/**
+ * ActionState is an aggregate of all the actions that have been applied to event data.
+ */
+export type ActionState = Record<string, FieldValue>
 
 export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.record(z.string(), FieldValueInput),
-  metadata: z.record(z.string(), FieldValueInput).optional(),
+  data: ActionUpdate,
+  metadata: ActionUpdate.optional(),
   createdAtLocation: z.string()
 })
 
@@ -155,5 +165,3 @@ export const ResolvedUser = z.object({
 export type ResolvedUser = z.infer<typeof ResolvedUser>
 
 export type CreatedAction = z.infer<typeof CreatedAction>
-
-export type ActionFormData = Record<string, FieldValue>

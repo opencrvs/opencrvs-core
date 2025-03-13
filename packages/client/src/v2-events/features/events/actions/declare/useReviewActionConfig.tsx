@@ -11,7 +11,7 @@
 
 import { v4 as uuid } from 'uuid'
 import {
-  ActionFormData,
+  ActionState,
   FormConfig,
   Scope,
   SCOPES
@@ -231,8 +231,8 @@ export function useReviewActionConfig({
   scopes
 }: {
   formConfig: FormConfig
-  form: ActionFormData
-  metadata?: ActionFormData
+  form: ActionState
+  metadata?: ActionState
   scopes?: Scope[]
 }) {
   const events = useEvents()

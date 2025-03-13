@@ -10,10 +10,9 @@
  */
 
 import {
-  ActionFormData,
+  ActionState,
   FieldConfig,
   FieldValue,
-  FieldValueInput,
   isAddressFieldType,
   isAdministrativeAreaFieldType,
   isFacilityFieldType,
@@ -66,7 +65,7 @@ export const useFormDataStringifier = () => {
   const stringifier = useFieldStringifier()
   return (
     formFields: FieldConfig[],
-    values: ActionFormData
+    values: ActionState
   ): RecursiveStringRecord => {
     const stringifiedValues: RecursiveStringRecord = {}
 

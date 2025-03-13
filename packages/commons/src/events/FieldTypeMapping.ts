@@ -40,14 +40,14 @@ import {
   DateValue,
   EmailValue,
   FieldValue,
-  FieldValueInputSchema,
+  FieldUpdateValueSchema,
   NumberFieldValue,
   RequiredTextValue,
   TextValue
 } from './FieldValue'
 import {
   AddressFieldValue,
-  AddressFieldValueInput,
+  AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue
 } from './CompositeFieldValue'
@@ -64,7 +64,7 @@ import {
  * Allows for nullishness of a field value during validations based on FieldConfig.
  */
 type NullishFieldValueSchema = z.ZodOptional<
-  z.ZodNullable<FieldValueInputSchema>
+  z.ZodNullable<FieldUpdateValueSchema>
 >
 
 /**
@@ -72,7 +72,7 @@ type NullishFieldValueSchema = z.ZodOptional<
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
-  let schema: FieldValueInputSchema | NullishFieldValueSchema
+  let schema: FieldUpdateValueSchema | NullishFieldValueSchema
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
@@ -110,7 +110,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = FileFieldWithOptionValue
       break
     case FieldType.ADDRESS:
-      schema = AddressFieldValueInput
+      schema = AddressFieldUpdateValue
       break
   }
 
@@ -118,8 +118,10 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
 }
 
 export function createValidationSchema(config: FieldConfig[]) {
-  const shape: Record<string, NullishFieldValueSchema | FieldValueInputSchema> =
-    {}
+  const shape: Record<
+    string,
+    NullishFieldValueSchema | FieldUpdateValueSchema
+  > = {}
 
   for (const field of config) {
     shape[field.id] = mapFieldTypeToZod(field.type, field.required)

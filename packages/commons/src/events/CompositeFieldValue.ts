@@ -33,7 +33,7 @@ const AdminStructure = z.object({
   district: z.string()
 })
 
-export const UrbanAddress = AdminStructure.extend({
+export const UrbanAddressValue = AdminStructure.extend({
   urbanOrRural: z.literal(GeographicalArea.URBAN),
   town: z.string().optional(),
   residentialArea: z.string().optional(),
@@ -42,12 +42,12 @@ export const UrbanAddress = AdminStructure.extend({
   zipCode: z.string().optional()
 })
 
-export const RuralAddress = AdminStructure.extend({
+export const RuralAddressValue = AdminStructure.extend({
   urbanOrRural: z.literal(GeographicalArea.RURAL),
   village: z.string().optional()
 })
 
-export const UrbanAddressInput = AdminStructure.extend({
+export const UrbanAddressUpdateValue = AdminStructure.extend({
   urbanOrRural: z.literal(GeographicalArea.URBAN),
   town: z.string().nullish(),
   residentialArea: z.string().nullish(),
@@ -56,19 +56,19 @@ export const UrbanAddressInput = AdminStructure.extend({
   zipCode: z.string().nullish()
 })
 
-export const RuralAddressInput = AdminStructure.extend({
+export const RuralAddressUpdateValue = AdminStructure.extend({
   urbanOrRural: z.literal(GeographicalArea.RURAL),
   village: z.string().nullish()
 })
 
 export const AddressFieldValue = z.discriminatedUnion('urbanOrRural', [
-  UrbanAddress,
-  RuralAddress
+  UrbanAddressValue,
+  RuralAddressValue
 ])
 
-export const AddressFieldValueInput = z.discriminatedUnion('urbanOrRural', [
-  UrbanAddressInput,
-  RuralAddressInput
+export const AddressFieldUpdateValue = z.discriminatedUnion('urbanOrRural', [
+  UrbanAddressUpdateValue,
+  RuralAddressUpdateValue
 ])
 
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>

@@ -15,10 +15,10 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { ActionDocument, ActionFormData } from '../events/ActionDocument'
+import { ActionState, ActionUpdate } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { FieldValueInput } from '../events/FieldValue'
+import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType } from '../events/Conditional'
 
@@ -46,7 +46,7 @@ function getConditionalActionsForField(
 
 function isFieldConditionMet(
   field: FieldConfig,
-  form: ActionDocument['data'] | ActionFormData,
+  form: ActionUpdate | ActionState,
   conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
 ) {
   const hasRule = (field.conditionals ?? []).some(
@@ -69,14 +69,14 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionDocument['data'] | ActionFormData
+  form: ActionUpdate | ActionState
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
 export function isFieldEnabled(
   field: FieldConfig,
-  form: ActionDocument['data'] | ActionFormData
+  form: ActionUpdate | ActionState
 ) {
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
@@ -163,7 +163,7 @@ export function getFieldValidationErrors({
 }: {
   // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
   field: FieldConfig
-  values: ActionDocument['data']
+  values: ActionUpdate
 }) {
   const conditionalParameters = {
     $form: values,
@@ -239,7 +239,7 @@ export function validateFieldInput({
   value
 }: {
   field: FieldConfig
-  value: FieldValueInput
+  value: FieldUpdateValue
 }) {
   const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
     value,

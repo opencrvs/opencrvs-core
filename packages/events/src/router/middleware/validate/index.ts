@@ -14,7 +14,7 @@ import {
   ActionInputWithType,
   ActionType,
   FieldConfig,
-  FieldValueInput,
+  FieldUpdateValue,
   getFieldValidationErrors
 } from '@opencrvs/commons'
 
@@ -46,7 +46,7 @@ export function validateAction(actionType: ActionType) {
         errorResults: {
           message: string
           id: string
-          value: FieldValueInput
+          value: FieldUpdateValue
         }[],
         field: FieldConfig
       ) => {

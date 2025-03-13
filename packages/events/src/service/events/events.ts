@@ -17,7 +17,7 @@ import {
   EventInput,
   FieldConfig,
   FieldType,
-  FieldValueInput,
+  FieldUpdateValue,
   FileFieldValue,
   isUndeclaredDraft
 } from '@opencrvs/commons/events'
@@ -188,7 +188,7 @@ export async function createEvent({
 
 function getValidFileValue(
   fieldKey: string,
-  fieldValue: FieldValueInput,
+  fieldValue: FieldUpdateValue,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ) {
   const isFileType =

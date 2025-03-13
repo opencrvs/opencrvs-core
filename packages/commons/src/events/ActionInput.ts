@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { ActionType } from './ActionType'
-import { FieldValueInput } from './FieldValue'
+import { ActionUpdate } from './ActionDocument'
 
 export const BaseActionInput = z.object({
   eventId: z.string(),
@@ -21,8 +21,8 @@ export const BaseActionInput = z.object({
     .optional()
     .default(false)
     .describe('Allows action with partial data to be saved'),
-  data: z.record(z.string(), FieldValueInput),
-  metadata: z.record(z.string(), FieldValueInput).optional()
+  data: ActionUpdate,
+  metadata: ActionUpdate.optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
