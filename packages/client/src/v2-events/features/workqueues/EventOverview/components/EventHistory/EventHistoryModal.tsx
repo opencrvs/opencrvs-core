@@ -13,7 +13,11 @@ import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
 import { Pill, ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
-import { ActionDocument, ActionType } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  ActionType,
+  ActionUpdate
+} from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
 export const eventHistoryStatusMessage = {
@@ -39,10 +43,7 @@ const messages = defineMessages({
   }
 })
 
-function prepareComments(
-  action: ActionType,
-  metadata: ActionDocument['metadata']
-) {
+function prepareComments(action: ActionType, metadata: ActionUpdate) {
   const comments: { comment: string }[] = []
 
   if (action === ActionType.REJECT && typeof metadata?.message === 'string') {

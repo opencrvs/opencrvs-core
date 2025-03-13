@@ -30,16 +30,16 @@ import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
 
+const declareEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE, ActionType.DECLARE]
+})
+
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Review/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(
-        generateEventDocument({
-          configuration: tennisClubMembershipEvent,
-          actions: [ActionType.CREATE, ActionType.DECLARE]
-        })
-      ).data
+      formValues: getCurrentEventState(declareEventDocument).data
     })
   }
 }
@@ -80,11 +80,6 @@ const callTracker = {
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE]
-})
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
 })
 
 const eventId = eventDocument.id
