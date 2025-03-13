@@ -32,12 +32,12 @@ import {
   ActionFormData,
   EventConfig,
   EventIndex,
+  FieldType,
   FormConfig,
   getFieldValidationErrors,
   isFieldVisible,
   SCOPES
 } from '@opencrvs/commons/client'
-import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 // eslint-disable-next-line no-restricted-imports
@@ -302,7 +302,10 @@ function ReviewComponent({
   const fileOptions = useFileOptions(form, formConfig, intl)
   const pagesWithFile = formConfig.pages
     .filter(({ fields }) =>
-      fields.some(({ type }) => type === 'FILE' || type === 'FILE_WITH_OPTIONS')
+      fields.some(
+        ({ type }) =>
+          type === FieldType.FILE || type === FieldType.FILE_WITH_OPTIONS
+      )
     )
     .map(({ id }) => id)
 
@@ -547,28 +550,17 @@ const ActionContainer = styled.div`
     margin-bottom: 8px;
   }
 `
-const incompleteFormWarning: MessageDescriptor = {
-  id: 'v2.reviewAction.incompleteForm',
-  defaultMessage:
-    'Please add mandatory information correctly before registering.',
-  description: 'The label for warning of incomplete form'
-}
 
 function ReviewActionComponent({
   onConfirm,
-  formConfig,
-  form,
-  metadata,
   onReject,
   messages,
   primaryButtonType,
-  action
+  isPrimaryActionDisabled
 }: {
+  isPrimaryActionDisabled: boolean
   onConfirm: () => void
   onReject?: () => void
-  formConfig: FormConfig
-  form: ActionFormData
-  metadata?: ActionFormData
   messages: {
     title: MessageDescriptor
     description: MessageDescriptor
@@ -576,28 +568,20 @@ function ReviewActionComponent({
     onReject?: MessageDescriptor
   }
   primaryButtonType?: 'positive' | 'primary'
-  action?: string
 }) {
   const intl = useIntl()
-  const hasValidationErrors = validationErrorsInActionFormExist(
-    formConfig,
-    form,
-    metadata
-  )
-  const background = hasValidationErrors ? 'error' : 'success'
-  const descriptionMessage = hasValidationErrors
-    ? incompleteFormWarning
-    : messages.description
+
+  const background = isPrimaryActionDisabled ? 'error' : 'success'
 
   return (
     <Container>
       <UnderLayBackground background={background}>
         <Content>
           <Title>{intl.formatMessage(messages.title)}</Title>
-          <Description>{intl.formatMessage(descriptionMessage)}</Description>
+          <Description>{intl.formatMessage(messages.description)}</Description>
           <ActionContainer>
             <Button
-              disabled={hasValidationErrors}
+              disabled={isPrimaryActionDisabled}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}
@@ -751,6 +735,7 @@ export const REJECT_ACTIONS = {
   ARCHIVE: 'ARCHIVE',
   SEND_FOR_UPDATE: 'SEND_FOR_UPDATE'
 } as const
+
 export interface RejectionState {
   rejectAction: keyof typeof REJECT_ACTIONS
 

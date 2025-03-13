@@ -11,18 +11,23 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import {
+  ActionType,
+  generateEventDocument,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { AppRouter } from '@client/v2-events/trpc'
-import * as Request from './index'
+import * as Validate from './index'
 
-const meta: Meta<typeof Request.Pages> = {
-  title: 'Register'
+const meta: Meta<typeof Validate.Pages> = {
+  title: 'Validate'
 }
 
 export default meta
 
-type Story = StoryObj<typeof Request.Pages>
+type Story = StoryObj<typeof Validate.Pages>
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -36,7 +41,7 @@ export const Page: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath({
         eventId: tennisClubMembershipEventDocument.id,
         pageId: 'applicant'
       })
@@ -46,17 +51,21 @@ export const Page: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
           })
         ]
       }
     }
   }
 }
-export const Review: Story = {
+
+export const ReviewIncomplete: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -65,6 +74,39 @@ export const Review: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const ReviewComplete: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                ActionType.CREATE,
+                ActionType.DECLARE,
+                ActionType.VALIDATE
+              ]
+            })
+          }),
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
           })
         ]
       }
