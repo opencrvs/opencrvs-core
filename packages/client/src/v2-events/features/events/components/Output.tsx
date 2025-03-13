@@ -54,17 +54,13 @@ const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
 
-interface FieldWithValue {
-  config: FieldConfig
-  value: FieldValue
-}
 /**
  *  Used for setting output/read (REVIEW) values for FORM input/write fields (string defaults based on FieldType).
  * For setting default fields for intl object @see setEmptyValuesForFields
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-function ValueOutput(field: FieldWithValue) {
+function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   /* eslint-disable react/destructuring-assignment */
   if (isEmailFieldType(field) || isTextFieldType(field)) {
     return Text.Output({ value: field.value })
@@ -174,7 +170,7 @@ export function Output({
     return (
       <>
         <Deleted>
-          <ValueOutput config={field} value="-" />
+          <ValueOutput config={{ ...field, required: true }} value="-" />
         </Deleted>
         <br />
         <ValueOutput config={field} value={value} />
