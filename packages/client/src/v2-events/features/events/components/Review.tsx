@@ -333,97 +333,118 @@ function ReviewComponent({
           </HeaderContainer>
           <FormData>
             <ReviewContainter>
-              {formConfig.pages
-                .filter(({ hideOnReview }) => !hideOnReview)
-                .map((page) => {
-                  return (
-                    <DeclarationDataContainer
-                      key={'Section_' + page.title.defaultMessage}
+              {formConfig.pages.map((page) => {
+                const fields = page.fields
+                  .filter((field) => isFieldVisible(field, form))
+                  .map((field) => {
+                    const value = form[field.id]
+                    const previousValue = previousForm[field.id]
+
+                    const valueDisplay = Output({
+                      field,
+                      previousValue,
+                      showPreviouslyMissingValuesAsChanged,
+                      value
+                    })
+
+                    const error = getFieldValidationErrors({
+                      field,
+                      values: form
+                    })
+
+                    const errorDisplay =
+                      error.errors.length > 0 ? (
+                        <ValidationError key={field.id}>
+                          {intl.formatMessage(error.errors[0].message)}
+                        </ValidationError>
+                      ) : null
+
+                    if (!valueDisplay && !errorDisplay) {
+                      return { fieldType: field.type, display: null }
+                    }
+
+                    return {
+                      fieldType: field.type,
+                      display: (
+                        <ListReview.Row
+                          key={field.id}
+                          actions={
+                            <Link
+                              data-testid={`change-button-${field.id}`}
+                              onClick={(e) => {
+                                e.stopPropagation()
+
+                                onEdit({
+                                  pageId: page.id,
+                                  fieldId: field.id
+                                })
+                              }}
+                            >
+                              {intl.formatMessage(reviewMessages.changeButton)}
+                            </Link>
+                          }
+                          id={field.id}
+                          label={intl.formatMessage(field.label)}
+                          value={
+                            error.errors.length > 0
+                              ? errorDisplay
+                              : valueDisplay
+                          }
+                        />
+                      )
+                    }
+                  })
+
+                const shouldDisplayPage = fields.some(
+                  // We want to display the page in any case if it has any file inputs
+                  ({ fieldType, display }) => {
+                    if (
+                      fieldType === 'FILE' ||
+                      fieldType === 'FILE_WITH_OPTIONS'
+                    ) {
+                      return true
+                    }
+
+                    return display
+                  }
+                )
+
+                if (!shouldDisplayPage) {
+                  return <></>
+                }
+
+                const displayedFields = fields
+                  .map((f) => f.display)
+                  .filter((f) => f !== null)
+
+                return (
+                  <DeclarationDataContainer
+                    key={'Section_' + page.title.defaultMessage}
+                  >
+                    <Accordion
+                      action={
+                        <Link
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onEdit({ pageId: page.id })
+                          }}
+                        >
+                          {intl.formatMessage(reviewMessages.changeAllButton)}
+                        </Link>
+                      }
+                      expand={true}
+                      label={intl.formatMessage(page.title)}
+                      labelForHideAction="Hide"
+                      labelForShowAction="Show"
+                      name={'Accordion_' + page.id}
                     >
-                      <Accordion
-                        action={
-                          <Link
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              onEdit({ pageId: page.id })
-                            }}
-                          >
-                            {intl.formatMessage(reviewMessages.changeAllButton)}
-                          </Link>
-                        }
-                        expand={true}
-                        label={intl.formatMessage(page.title)}
-                        labelForHideAction="Hide"
-                        labelForShowAction="Show"
-                        name={'Accordion_' + page.id}
-                      >
-                        <ListReview id={'Section_' + page.id}>
-                          {page.fields
-                            .filter((field) => isFieldVisible(field, form))
-                            .map((field) => {
-                              const value = form[field.id]
-                              const previousValue = previousForm[field.id]
-
-                              const valueDisplay = Output({
-                                field,
-                                previousValue,
-                                showPreviouslyMissingValuesAsChanged,
-                                value
-                              })
-
-                              const error = getFieldValidationErrors({
-                                field,
-                                values: form
-                              })
-
-                              const errorDisplay =
-                                error.errors.length > 0 ? (
-                                  <ValidationError key={field.id}>
-                                    {intl.formatMessage(
-                                      error.errors[0].message
-                                    )}
-                                  </ValidationError>
-                                ) : null
-
-                              if (!valueDisplay && !errorDisplay) {
-                                return <></>
-                              }
-
-                              return (
-                                <ListReview.Row
-                                  key={field.id}
-                                  actions={
-                                    <Link
-                                      data-testid={`change-button-${field.id}`}
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-
-                                        onEdit({
-                                          pageId: page.id,
-                                          fieldId: field.id
-                                        })
-                                      }}
-                                    >
-                                      {intl.formatMessage(
-                                        reviewMessages.changeButton
-                                      )}
-                                    </Link>
-                                  }
-                                  id={field.id}
-                                  label={intl.formatMessage(field.label)}
-                                  value={
-                                    error.errors.length > 0
-                                      ? errorDisplay
-                                      : valueDisplay
-                                  }
-                                />
-                              )
-                            })}
-                        </ListReview>
-                      </Accordion>
-                    </DeclarationDataContainer>
-                  )
-                })}
+                      <ListReview id={'Section_' + page.id}>
+                        {displayedFields}
+                      </ListReview>
+                    </Accordion>
+                  </DeclarationDataContainer>
+                )
+              })}
             </ReviewContainter>
           </FormData>
 

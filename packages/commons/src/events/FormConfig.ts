@@ -15,10 +15,7 @@ import { TranslationConfig } from './TranslationConfig'
 export const FormPage = z.object({
   id: z.string().describe('Unique identifier for the page'),
   title: TranslationConfig.describe('Header title of the page'),
-  fields: z.array(FieldConfig).describe('Fields to be rendered on the page'),
-  // At first we tried to hide pages on review if they have no fields to show.
-  // But in some cases, e.g. birth declaration supporting documents, we want to show the page even if no documents have been added.
-  hideOnReview: z.boolean().default(false).optional()
+  fields: z.array(FieldConfig).describe('Fields to be rendered on the page')
 })
 
 export const FormConfig = z.object({
