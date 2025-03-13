@@ -426,7 +426,7 @@ function ReviewComponent({
                               }
                               id={id}
                               label={intl.formatMessage(label)}
-                              value={errorDisplay ? errorDisplay : valueDisplay}
+                              value={errorDisplay || valueDisplay}
                             />
                           ))}
                       </ListReview>
