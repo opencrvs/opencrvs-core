@@ -37,62 +37,65 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 const messages = defineMessages({
-  registerActionTitle: {
-    id: 'v2.registerAction.title',
-    defaultMessage: 'Register member',
-    description: 'The title for register action'
+  validateActionTitle: {
+    id: 'v2.validateAction.title',
+    defaultMessage: 'Send for approval',
+    description: 'The title for validate action'
   },
-  registerActionDescription: {
-    id: 'v2.registerAction.description',
+  validateActionDescription: {
+    id: 'v2.validateAction.description',
     defaultMessage:
-      'By clicking register, you confirm that the information entered is correct and the member can be registered.',
-    description: 'The description for register action'
+      'The informant will receive an email with a registration number that they can use to collect the certificate',
+    description: 'The description for validate action'
   },
-  registerActionDeclare: {
-    id: 'v2.registerAction.Declare',
-    defaultMessage: 'Register',
-    description: 'The label for declare button of register action'
+  validateActionDeclare: {
+    id: 'v2.validateAction.Declare',
+    defaultMessage: 'Send for approval',
+    description: 'The label for declare button of validate action'
   },
-  registerActionReject: {
-    id: 'v2.registerAction.Reject',
+  validateActionReject: {
+    id: 'v2.validateAction.Reject',
     defaultMessage: 'Reject',
-    description: 'The label for reject button of register action'
+    description: 'The label for reject button of validate action'
   },
-  registerActionDescriptionIncomplete: {
-    id: 'v2.registerAction.incompleteForm',
+  validateActionDescriptionIncomplete: {
+    id: 'v2.validateAction.incompleteForm',
     defaultMessage:
-      'Please add mandatory information correctly before registering.',
-    description: 'The label for warning of incomplete form'
+      'Please add mandatory information before sending for approval',
+    description: 'The description for warning of incomplete form'
   }
 })
 
 /**
  *
- * Preview of event to be registered.
+ * Preview of event to be validated.
  */
 export function Review() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE)
   const events = useEvents()
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
-  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
-
-  const registerMutation = events.actions.register
+  const validateMutation = events.actions.validate
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { setMetadata, getMetadata } = useEventMetadata()
+
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+
   const metadata = getMetadata(
-    event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
+    event.actions.find((a) => a.type === ActionType.VALIDATE)?.metadata
   )
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const formConfig = findActiveActionForm(config, ActionType.REGISTER)
+  const formConfig = findActiveActionForm(config, ActionType.VALIDATE)
   if (!formConfig) {
-    throw new Error('No active form configuration found for declare action')
+    throw new Error(
+      `No active form configuration found for ${ActionType.VALIDATE} action`
+    )
   }
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
@@ -116,7 +119,7 @@ export function Review() {
 
     if (confirmedEdit) {
       navigate(
-        ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath(
+        ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath(
           { pageId, eventId },
           {
             from: 'review'
@@ -130,14 +133,15 @@ export function Review() {
 
   async function handleRegistration() {
     const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal.Accept action="Register" close={close} />
+      <ReviewComponent.ActionModal.Accept action="Validate" close={close} />
     ))
     if (confirmedRegistration) {
-      registerMutation.mutate({
+      validateMutation.mutate({
         eventId,
         data: form,
         transactionId: uuid(),
-        metadata
+        metadata,
+        duplicates: []
       })
 
       goToHome()
@@ -181,7 +185,7 @@ export function Review() {
 
   return (
     <FormLayout
-      route={ROUTES.V2.EVENTS.REGISTER}
+      route={ROUTES.V2.EVENTS.VALIDATE}
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
@@ -203,14 +207,14 @@ export function Review() {
         <ReviewComponent.Actions
           isPrimaryActionDisabled={hasValidationErrors}
           messages={{
-            title: messages.registerActionTitle,
+            title: messages.validateActionTitle,
             description: hasValidationErrors
-              ? messages.registerActionDescriptionIncomplete
-              : messages.registerActionDescription,
-            onConfirm: messages.registerActionDeclare,
-            onReject: messages.registerActionReject
+              ? messages.validateActionDescriptionIncomplete
+              : messages.validateActionDescription,
+            onConfirm: messages.validateActionDeclare,
+            onReject: messages.validateActionReject
           }}
-          primaryButtonType="positive"
+          primaryButtonType={'positive'}
           onConfirm={handleRegistration}
           onReject={handleRejection}
         />

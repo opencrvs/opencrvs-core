@@ -50,7 +50,7 @@ class EventNotFoundError extends TRPCError {
   }
 }
 
-export async function getEventById(id: string) {
+export async function getEventById(id: string): Promise<EventDocument> {
   const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')

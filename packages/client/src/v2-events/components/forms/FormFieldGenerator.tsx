@@ -60,14 +60,7 @@ import {
   isEmailFieldType,
   isFieldVisible
 } from '@opencrvs/commons/client'
-import {
-  Field,
-  FieldProps,
-  Formik,
-  FormikProps,
-  FormikTouched,
-  FormikValues
-} from 'formik'
+import { Field, FieldProps, Formik, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -90,7 +83,6 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 
 import { SubHeader } from '@opencrvs/components'
-import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
@@ -124,7 +116,6 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
-  setFieldTouched: (name: string, isTouched?: boolean) => void
 }
 
 const GeneratedInputField = React.memo(
@@ -133,16 +124,11 @@ const GeneratedInputField = React.memo(
     onChange,
     onBlur,
     setFieldValue,
-    resetDependentSelectValues,
     error,
     touched,
     value,
     formData,
-    disabled,
-    setFieldTouched,
-    requiredErrorMessage,
-    fields,
-    values
+    disabled
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
 
@@ -151,16 +137,8 @@ const GeneratedInputField = React.memo(
       label: fieldDefinition.hideLabel
         ? undefined
         : intl.formatMessage(fieldDefinition.label),
-      // helperText: fieldDefinition.helperText,
-      // tooltip: fieldDefinition.tooltip,
-      // description: fieldDefinition.description,
       required: fieldDefinition.required,
       disabled: fieldDefinition.disabled,
-      // prefix: fieldDefinition.prefix,
-      // postfix: fieldDefinition.postfix,
-      // unit: fieldDefinition.unit,
-      // hideAsterisk: fieldDefinition.hideAsterisk,
-      // hideInputHeader: fieldDefinition.hideHeader,
       error,
       touched
     }
@@ -490,8 +468,6 @@ const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
 
-type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
-
 interface ExposedProps {
   fields: FieldConfig[]
   id: string
@@ -499,7 +475,6 @@ interface ExposedProps {
   setAllFieldsDirty: boolean
   onChange: (values: EventState) => void
   formData: Record<string, FieldValue>
-  onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
   initialValues?: EventState
@@ -538,10 +513,6 @@ class FormSectionComponent extends React.Component<AllProps> {
       this.showValidationErrors(this.props.fields)
     }
 
-    if (this.props.onSetTouched) {
-      this.props.onSetTouched(this.props.setTouched)
-    }
-
     if (window.location.hash) {
       setTimeout(() => {
         const newScroll = document.documentElement.scrollTop - 100
@@ -571,10 +542,6 @@ class FormSectionComponent extends React.Component<AllProps> {
     }, {})
 
     this.props.setTouched(touched)
-  }
-
-  handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    this.props.setFieldTouched(e.target.name)
   }
 
   setFieldValuesWithDependency = (
@@ -621,11 +588,9 @@ class FormSectionComponent extends React.Component<AllProps> {
     const {
       values,
       fields: fieldsWithDotIds,
-      setFieldTouched,
       touched,
       intl,
-      className,
-      formData
+      className
     } = this.props
 
     const language = this.props.intl.locale
@@ -674,7 +639,6 @@ class FormSectionComponent extends React.Component<AllProps> {
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
-                      setFieldTouched={setFieldTouched}
                       setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
                       disabled={isDisabled}

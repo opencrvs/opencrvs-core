@@ -14,7 +14,7 @@ import superjson from 'superjson'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventIndex,
-  tennisClueMembershipEventDocument
+  tennisClubMembershipEventDocument
 } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -41,7 +41,7 @@ export const CollectorForm: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
+        eventId: tennisClubMembershipEventDocument.id,
         pageId: 'collector'
       })
     },
@@ -52,7 +52,7 @@ export const CollectorForm: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return tennisClubMembershipEventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]

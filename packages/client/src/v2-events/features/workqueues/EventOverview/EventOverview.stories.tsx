@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {
@@ -61,7 +61,7 @@ export const Overview: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
+        eventId: tennisClubMembershipEventDocument.id
       })
     },
     msw: {
@@ -69,8 +69,8 @@ export const Overview: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return {
-              ...tennisClueMembershipEventDocument,
-              actions: tennisClueMembershipEventDocument.actions.filter(
+              ...tennisClubMembershipEventDocument,
+              actions: tennisClubMembershipEventDocument.actions.filter(
                 (action) => action.type !== ActionType.REGISTER
               )
             }
@@ -80,7 +80,7 @@ export const Overview: Story = {
           tRPCMsw.event.draft.list.query(() => {
             return [
               generateEventDraftDocument(
-                tennisClueMembershipEventDocument.id,
+                tennisClubMembershipEventDocument.id,
                 ActionType.REGISTER,
                 {
                   'applicant.firstname': 'Riku',

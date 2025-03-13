@@ -67,7 +67,7 @@ export async function getActionFormFields({
     `No configuration found for event type: ${eventType}`
   )
 
-  return findActiveActionFields(configuration, action)
+  return findActiveActionFields(configuration, action) || []
 }
 
 export async function notifyOnAction(

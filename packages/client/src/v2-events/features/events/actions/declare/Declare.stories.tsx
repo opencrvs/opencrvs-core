@@ -19,7 +19,7 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {
@@ -40,8 +40,8 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 // Use an undeclared draft event for tests
 const undeclaredDraftEvent = {
-  ...tennisClueMembershipEventDocument,
-  actions: tennisClueMembershipEventDocument.actions.filter(
+  ...tennisClubMembershipEventDocument,
+  actions: tennisClubMembershipEventDocument.actions.filter(
     ({ type }) => type === 'CREATE'
   )
 }
