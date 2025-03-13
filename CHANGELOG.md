@@ -9,6 +9,12 @@
 - **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
 - **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
 
+## 1.7.1 Release candidate
+
+### New features
+
+- **TimeField component with AM/PM support**: The `TimeField` component now supports both 12-hour (AM/PM) and 24-hour formats through a new prop, `use12HourFormat: boolean`. The logic has been refactored into two separate components, `TimeInput24` and `TimeInput12`. The `TimeField` component automatically selects the appropriate component based on the prop. [#8336](https://github.com/opencrvs/opencrvs-core/issues/8336)
+
 ## 1.7.0 Release candidate
 
 ### Breaking changes
