@@ -127,10 +127,12 @@ export function Review() {
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         isUploadButtonVisible={true}
-        // @todo: Update to use dynamic title
         title={intl.formatMessage(formConfig.review.title, {
           firstname: form['applicant.firstname'] as string,
-          surname: form['applicant.surname'] as string
+          surname: form['applicant.surname'] as string,
+          hasName: Boolean(
+            form['applicant.firstname'] || form['applicant.surname']
+          ).toString()
         })}
         metadata={metadata}
         onMetadataChange={(values) => setMetadata(values)}

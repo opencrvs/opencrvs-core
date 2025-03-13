@@ -260,7 +260,6 @@ const reviewMessages = defineMessages({
  * User can review the data and take actions like declare, reject or edit the data.
  */
 function ReviewComponent({
-  eventConfig,
   formConfig,
   previousFormValues,
   form,
@@ -321,8 +320,7 @@ function ReviewComponent({
                 justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
-                  {intl.formatMessage(reviewMessages.govtName)} {' – '}
-                  {intl.formatMessage(eventConfig.label)}
+                  {intl.formatMessage(reviewMessages.govtName)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
                   {title}
