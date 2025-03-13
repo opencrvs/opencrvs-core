@@ -825,7 +825,7 @@ export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
 }
 
-export function isFieldLoader(field: IFormField): field is ILoaderFormField {
+function isFieldLoader(field: IFormField): field is ILoaderFormField {
   return field.type === LOADER
 }
 
