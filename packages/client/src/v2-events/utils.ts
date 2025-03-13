@@ -115,3 +115,23 @@ export function isTemporaryId(id: string) {
 export function createTemporaryId() {
   return `tmp-${uuid()}`
 }
+
+/**
+ * Flattens a nested object into a single-level object.
+ */
+export function flattenNestedObject(
+  obj: Record<string, any>,
+  prefix = ''
+): Record<string, any> {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    const newKey = prefix ? `${prefix}.${key}` : key
+
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      Object.assign(acc, flattenNestedObject(value, newKey))
+    } else {
+      acc[newKey] = value
+    }
+
+    return acc
+  }, {} as Record<string, any>)
+}
