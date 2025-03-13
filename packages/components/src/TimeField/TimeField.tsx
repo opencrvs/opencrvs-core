@@ -11,7 +11,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ITextInputProps, TextInput } from '../TextInput/TextInput'
-import { useIntl } from 'react-intl'
 import { ISelectProps, Select } from '../Select/Select'
 
 export interface IProps {
@@ -118,7 +117,6 @@ function TimeInput12(props: ITimeFieldProps) {
 
   const hh = React.useRef<HTMLInputElement>(null)
   const mm = React.useRef<HTMLInputElement>(null)
-  const intl = useIntl()
 
   function change(event: React.ChangeEvent<HTMLInputElement>) {
     const val = event.target.value
@@ -201,19 +199,11 @@ function TimeInput12(props: ITimeFieldProps) {
         placeholder={ignorePlaceHolder ? '' : 'mm'}
         options={[
           {
-            label: intl.formatMessage({
-              id: 'timeField.meridiem.am',
-              defaultMessage: 'AM',
-              description: 'Option label: AM'
-            }),
+            label: 'AM',
             value: 'AM'
           },
           {
-            label: intl.formatMessage({
-              id: 'timeField.meridiem.pm',
-              defaultMessage: 'PM',
-              description: 'Option label: PM'
-            }),
+            label: 'PM',
             value: 'PM'
           }
         ]}
