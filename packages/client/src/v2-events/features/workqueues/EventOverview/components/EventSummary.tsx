@@ -20,6 +20,9 @@ import { RecursiveStringRecord } from '@client/v2-events/hooks/useFormDataString
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
+/**
+ * @returns default fields for the event summary
+ */
 function getDefaultFields(): SummaryConfig['fields'] {
   return [
     {
