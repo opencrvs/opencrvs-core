@@ -29,7 +29,7 @@ docker_build("ghcr.io/opencrvs/ocrvs-gateway:local", "packages",
 
 apps = ['auth', 
               'config',
-              'dashboards', 
+              # 'dashboards', 
               'documents', 
               'events',
               'metrics', 
@@ -55,18 +55,17 @@ namespace_create('traefik')
 namespace_create('opencrvs-deps-dev')
 namespace_create('opencrvs-services-dev')
 
-# Create SSL keys
-# TODO: Document or automate
-# openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
-#     -subj "/C=GB/ST=London/L=London/O=OpenCRVS/OU=R&D Department/CN=opencrvs.org" \
-#     -keyout .secrets/_wildcard.opencrvs.localhost-key.pem  -out .secrets/_wildcard.opencrvs.localhost.
+
 def create_traefik_ssl():
+"""Create SSL certificate locally in .secrets"""
     local_resource(
       name="refresh_traefik_ssl",
       cmd='openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=OpenCRVS/OU=R&D Department/CN=opencrvs.org" -keyout .secrets/_wildcard.opencrvs.localhost-key.pem  -out .secrets/_wildcard.opencrvs.localhost.pem'
     )
+    secret_create_tls('localhost-cert', key='.secrets/_wildcard.opencrvs.localhost-key.pem', cert='.secrets/_wildcard.opencrvs.localhost.pem',namespace="traefik")
+
 create_traefik_ssl()
-secret_create_tls('localhost-cert', key='.secrets/_wildcard.opencrvs.localhost-key.pem', cert='.secrets/_wildcard.opencrvs.localhost.pem',namespace="traefik")
+
 # Install Traefik GW
 helm_repo('traefik-repo', 'https://traefik.github.io/charts')
 helm_resource('traefik', 'traefik-repo/traefik', namespace='traefik', resource_deps=['traefik-repo'], flags=['--values=kubernetes/traefik/values.yaml'])
