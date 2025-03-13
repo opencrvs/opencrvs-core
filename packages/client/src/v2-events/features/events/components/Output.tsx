@@ -176,7 +176,7 @@ export function Output({
     return (
       <>
         <Deleted>
-          <ValueOutput config={field} value="-'" />
+          <ValueOutput config={field} value="-" />
         </Deleted>
         <br />
         <ValueOutput config={field} value={value} />
