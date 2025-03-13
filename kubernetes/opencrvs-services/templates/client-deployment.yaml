@@ -47,10 +47,12 @@ spec:
         app: client
     spec:
       containers:
-        - image: "opencrvs/ocrvs-client:{{ .Values.image.tag }}"
+        - image: "ghcr.io/opencrvs/ocrvs-client:{{ .Values.image.tag }}"
           env:
             - name: COUNTRY_CONFIG_URL_INTERNAL
               value: http://countryconfig.opencrvs-services-dev.svc.cluster.local:3040 # FIXME: harcoded
+            - name: GATEWAY_URL_INTERNAL
+              value: http://gateway.opencrvs-services-dev.svc.cluster.local:7070 # FIXME: harcoded
           name: client
           ports:
             - containerPort: 80

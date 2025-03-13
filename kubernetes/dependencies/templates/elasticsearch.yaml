@@ -62,15 +62,15 @@ spec:
         - env:
             - name: ES_JAVA_OPTS
               value: -Xms1024m -Xmx1024m
-            - name: bootstrap.system_call_filter
-              value: 'false'
             - name: cluster.routing.allocation.disk.threshold_enabled
               value: 'false'
             - name: discovery.type
               value: single-node
             - name: path.repo
               value: /data/backups/elasticsearch
-          image: docker.elastic.co/elasticsearch/elasticsearch:7.17.19
+            - name: xpack.security.enabled
+              value: 'false'
+          image: docker.elastic.co/elasticsearch/elasticsearch:8.16.4
           name: elasticsearch
           ports:
             - containerPort: 9200

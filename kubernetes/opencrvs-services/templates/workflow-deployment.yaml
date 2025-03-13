@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: workflow
-          image: "opencrvs/ocrvs-workflow:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-workflow:{{ .Values.image.tag }}"
           env:
             - name: APPLICATION_CONFIG_URL
               value: http://config.opencrvs-services-dev.svc.cluster.local:2021 # FIXME: harcoded/

@@ -43,7 +43,7 @@ spec:
               value: "3535"
             - name: DOCUMENTS_PORT
               value: "4040"
-          image: "opencrvs/ocrvs-documents:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-documents:{{ .Values.image.tag }}"
           volumeMounts:
             - mountPath: /secrets/public-key.pem
               name: public-key

@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: search
-          image: "opencrvs/ocrvs-search:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-search:{{ .Values.image.tag }}"
           env:
             - name: APPLICATION_CONFIG_URL
               value: http://config.opencrvs-services-dev.svc.cluster.local:2021 # FIXME: harcoded/

@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
         - name: webhooks
-          image: "opencrvs/ocrvs-webhooks:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-webhooks:{{ .Values.image.tag }}"
           env:
             - name: NODE_ENV
               value: development

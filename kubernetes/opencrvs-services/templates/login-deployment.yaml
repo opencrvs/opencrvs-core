@@ -48,7 +48,7 @@ spec:
     spec:
       containers:
         - name: login
-          image: "opencrvs/ocrvs-login:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-login:{{ .Values.image.tag }}"
           ports:
             - containerPort: 80 #FIXME: non-low end port
               protocol: TCP

@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: notification
-          image: "opencrvs/ocrvs-notification:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-notification:{{ .Values.image.tag }}"
           env:
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem

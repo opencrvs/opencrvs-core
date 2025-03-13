@@ -29,7 +29,7 @@ spec:
         app: metrics
     spec:
       containers:
-        - image: "opencrvs/ocrvs-metrics:{{ .Values.image.tag }}"
+        - image: "ghcr.io/opencrvs/ocrvs-metrics:{{ .Values.image.tag }}"
           name: metrics
           env:
             - name: NODE_ENV

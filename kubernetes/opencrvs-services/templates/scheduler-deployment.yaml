@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: scheduler
-          image: "opencrvs/ocrvs-scheduler:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-scheduler:{{ .Values.image.tag }}"
           env:
             - name: METRICS_URL
               value: http://metrics.opencrvs-services-dev.svc.cluster.local:1050 # FIXME: harcoded

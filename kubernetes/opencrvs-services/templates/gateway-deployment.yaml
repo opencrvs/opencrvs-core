@@ -48,7 +48,7 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: "opencrvs/ocrvs-gateway:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-gateway:{{ .Values.image.tag }}"
           env:
             - name: APPLICATION_CONFIG_URL
               value: http://config.opencrvs-services-dev.svc.cluster.local:2021 # FIXME: harcoded/

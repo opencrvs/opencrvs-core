@@ -47,7 +47,7 @@ spec:
     spec:
       containers:
         - name: config
-          image: "opencrvs/ocrvs-config:{{ .Values.image.tag }}"
+          image: "ghcr.io/opencrvs/ocrvs-config:{{ .Values.image.tag }}"
           env:
             - name: HOST
               value: 0.0.0.0

@@ -12,21 +12,21 @@ allow_k8s_contexts('docker-desktop')
 
 
 # Build baseimage
-docker_build("opencrvs/ocrvs-base", ".",
+docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
               dockerfile="packages/Dockerfile.base", 
               only=["packages/commons","package.json","yarn.lock"], 
               network="host")
 
 # Build services
-docker_build("opencrvs/ocrvs-client:local", "packages", 
+docker_build("ghcr.io/opencrvs/ocrvs-client:local", "packages", 
               dockerfile="packages/client/Dockerfile", 
               only=["components","client","events","gateway"],
               network="host")
-docker_build("opencrvs/ocrvs-login:local", "packages", 
+docker_build("ghcr.io/opencrvs/ocrvs-login:local", "packages", 
               dockerfile="packages/login/Dockerfile", 
               only=["components","login"], 
               network="host")
-docker_build("opencrvs/ocrvs-gateway:local", "packages",
+docker_build("ghcr.io/opencrvs/ocrvs-gateway:local", "packages",
               dockerfile="packages/gateway/Dockerfile", 
               only=["components","gateway", "events"], 
               network="host")
@@ -47,7 +47,7 @@ apps = ['auth',
 
 def build_services():
   for app in apps:
-    docker_build("opencrvs/ocrvs-{}:local".format(app), "packages/{}".format(app), network="host")
+    docker_build("ghcr.io/opencrvs/ocrvs-{}:local".format(app), "packages/{}".format(app), network="host")
 
 build_services()
 
@@ -88,6 +88,6 @@ k8s_yaml(helm('kubernetes/opencrvs-services',
 #def wait_for_builds():
 #  for app in apps:
 #    resources_to_be_waited = 
-#    k8s_resource(app, resource_deps=["opencrvs/ocrvs-{}:local".format(app))
+#    k8s_resource(app, resource_deps=["ghcr.io/opencrvs/ocrvs-{}:local".format(app))
 
 #wait_for_builds()
