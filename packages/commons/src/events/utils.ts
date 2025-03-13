@@ -171,10 +171,7 @@ export function getEventConfiguration(
   return config
 }
 
-export function isOptionalUncheckedCheckbox(
-  field: FieldConfig,
-  form: ActionFormData
-) {
+function isOptionalUncheckedCheckbox(field: FieldConfig, form: ActionFormData) {
   if (field.type !== 'CHECKBOX') {
     return false
   }

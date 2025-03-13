@@ -35,7 +35,6 @@ import {
   FormConfig,
   getFieldValidationErrors,
   isFieldVisible,
-  isOptionalUncheckedCheckbox,
   SCOPES
 } from '@opencrvs/commons/client'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
