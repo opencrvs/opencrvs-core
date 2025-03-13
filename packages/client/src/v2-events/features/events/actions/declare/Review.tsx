@@ -14,7 +14,11 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  findActiveActionForm,
+  TranslationConfig
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -30,6 +34,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -39,6 +44,7 @@ export function Review() {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const intl = useIntl()
+  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
@@ -110,6 +116,30 @@ export function Review() {
     }
   }
 
+  // Format the title with values from the form. The title supports keys from the form, e.g. {applicant.firstname} for tennis form
+  // or {child.surname} for birth form. Here the keys are extracted and the values are substituted.
+  // The hasAnyKey -key is used to check if there are any of the mentioned keys in the title.
+  function getFormattedTitle(translationConfig: TranslationConfig) {
+    const titleBeforeFormat = intl.formatMessage(translationConfig)
+    const titleKeys =
+      titleBeforeFormat
+        .match(/\{([^}\s]+)\}/g)
+        ?.map((key) => key.slice(1, -1)) ?? []
+
+    const keyValues = titleKeys.reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: form[key] ? form[key].toString() : ''
+      }),
+      {}
+    )
+
+    return flattenedIntl.formatMessage(translationConfig, {
+      ...keyValues,
+      hasAnyKey: Object.values(keyValues).some((value) => value)
+    })
+  }
+
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
@@ -127,13 +157,7 @@ export function Review() {
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         isUploadButtonVisible={true}
-        title={intl.formatMessage(formConfig.review.title, {
-          firstname: form['applicant.firstname'] as string,
-          surname: form['applicant.surname'] as string,
-          hasName: Boolean(
-            form['applicant.firstname'] || form['applicant.surname']
-          ).toString()
-        })}
+        title={getFormattedTitle(formConfig.review.title)}
         metadata={metadata}
         onMetadataChange={(values) => setMetadata(values)}
       >
