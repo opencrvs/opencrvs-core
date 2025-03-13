@@ -177,7 +177,7 @@ describe('when in device of large viewport', () => {
       ).toBe('Government of the peoples republic of Bangladesh')
       expect(
         reviewSectionComponent.find('#review_header_subject').hostNodes().text()
-      ).toBe('Birth Declaration for John Doe')
+      ).toBe('Birth Declaration for Doe John')
     })
 
     it('typing additional comments input triggers onchange review form', async () => {
