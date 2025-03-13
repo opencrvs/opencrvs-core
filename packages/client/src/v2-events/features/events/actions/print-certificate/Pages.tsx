@@ -16,11 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import {
-  ActionType,
-  FormPage,
-  getCurrentEventState
-} from '@opencrvs/commons/client'
+import { ActionType, FormPage } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
