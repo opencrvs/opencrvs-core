@@ -1,0 +1,64 @@
+flowchart TD
+ subgraph subGraph0["Events service"]
+    direction TB
+        A["event.get()"]
+        B["event.list()"]
+        C["event.actions[action]"]
+  end
+    D["Client"] -- ActionInput --> C
+
+    N["ActionInput (simplified)"] -- Contains --- O["
+     eventId: string,
+     transactionId: string,
+     incomplete: boolean,
+     data: ActionUpdate,
+     metadata: ActionUpdate
+"]
+
+
+    X["EventIndex"] -- Contains --- Y["
+      id: string,
+      type: string,
+      status: EventStatuses,
+      createdAt: datetime,
+      createdBy: string,
+      createdAtLocation: string,
+      modifiedAt: datetime,
+      assignedTo?: string | null
+      updatedBy: string,
+      trackingId: string
+      data: ActionState
+    "]
+
+    A -- EventDocument --> D
+    B -- EventIndex --> D
+    E["EventDocument"] -- Contains --- F["
+        id: string,
+        type: string,
+        createdAt: datetime,
+        updatedAt: datetime,
+        actions: ActionDocument[],
+        trackingId: string
+"]
+    G["ActionDocument"] -- Contains --- H["
+    id: string,
+    createdAt: datetime,
+    createdBy: string,
+    createdAtLocation: string,
+    data: ActionUpdate,
+    metadata: ActionUpdate"
+    ]
+
+
+    J["ActionUpdate"] -- Contains --- I["
+        \[key\]: FieldUpdateValue
+    "]
+
+    K["ActionState"] -- Contains --- L["
+        \[key\]: FieldValue
+    "]
+
+
+    M["FieldValue"]
+    V["FieldUpdateValue"] --"same as FieldValue but allows nulls for optional fields"---M
+
