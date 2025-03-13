@@ -188,7 +188,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   })
 
   return {
-    getFullURL: getFullUrl,
+    getFullUrl,
     deleteFile: (filename: string) => {
       return del.mutate({ filename })
     },

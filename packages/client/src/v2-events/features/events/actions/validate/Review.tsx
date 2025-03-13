@@ -17,8 +17,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
-  findActiveActionForm,
-  getActionsMetadata
+  findActiveActionForm
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -82,13 +81,12 @@ export function Review() {
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const { setMetadataFormValues, getMetadataFormValues } = useEventMetadata()
+  const { setMetadata, getMetadata } = useEventMetadata()
 
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const metadata = getMetadataFormValues(
-    eventId,
-    getActionsMetadata(event.actions)
+  const metadata = getMetadata(
+    event.actions.find((a) => a.type === ActionType.VALIDATE)?.metadata
   )
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
@@ -204,7 +202,7 @@ export function Review() {
         previousFormValues={previousFormValues}
         title=""
         onEdit={handleEdit}
-        onMetadataChange={(values) => setMetadataFormValues(eventId, values)}
+        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           isPrimaryActionDisabled={hasValidationErrors}
