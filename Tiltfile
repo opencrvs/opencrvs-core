@@ -7,10 +7,6 @@ load('ext://helm_resource', 'helm_resource', 'helm_repo')
 # Tune parallel updates, default 3
 #update_settings(max_parallel_updates=2)
 
-# Only use for local dev with docker desktop
-allow_k8s_contexts('docker-desktop')
-
-
 # Build baseimage
 docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
               dockerfile="packages/Dockerfile.base", 
@@ -51,6 +47,8 @@ def build_services():
 
 build_services()
 
+# Only use for local dev with docker desktop
+allow_k8s_contexts('docker-desktop')
 
 # Create namespace
 namespace_create('traefik')
@@ -61,7 +59,13 @@ namespace_create('opencrvs-services-dev')
 # TODO: Document or automate
 # openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
 #     -subj "/C=GB/ST=London/L=London/O=OpenCRVS/OU=R&D Department/CN=opencrvs.org" \
-#     -keyout .secrets/_wildcard.opencrvs.localhost-key.pem  -out .secrets/_wildcard.opencrvs.localhost.pem
+#     -keyout .secrets/_wildcard.opencrvs.localhost-key.pem  -out .secrets/_wildcard.opencrvs.localhost.
+def create_traefik_ssl():
+    local_resource(
+      name="refresh_traefik_ssl",
+      cmd='openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=OpenCRVS/OU=R&D Department/CN=opencrvs.org" -keyout .secrets/_wildcard.opencrvs.localhost-key.pem  -out .secrets/_wildcard.opencrvs.localhost.pem'
+    )
+create_traefik_ssl()
 secret_create_tls('localhost-cert', key='.secrets/_wildcard.opencrvs.localhost-key.pem', cert='.secrets/_wildcard.opencrvs.localhost.pem',namespace="traefik")
 # Install Traefik GW
 helm_repo('traefik-repo', 'https://traefik.github.io/charts')

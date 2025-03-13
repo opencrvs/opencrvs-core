@@ -24,8 +24,8 @@ service:
   enabled: true
   single: false
   type: LoadBalancer
-  spec:
-    loadBalancerIP: "10.12.13.1"
+  # spec:
+  #   loadBalancerIP: "10.12.13.1"
 ports:
   traefik:
     hostPort: 8080

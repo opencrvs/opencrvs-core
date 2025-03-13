@@ -41,7 +41,7 @@ spec:
             - name: logger__level
               value: warn
             - name: mongodb__url
-              value: mongodb://mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local/hearth-dev
+              value: mongodb://mongodb.opencrvs-deps-dev.svc.cluster.local/hearth-dev
             - name: server__fhirVersion
               value: stu3
           image: opencrvs/hearth:1.1.0

@@ -72,6 +72,11 @@ spec:
               value: 'false'
           image: docker.elastic.co/elasticsearch/elasticsearch:8.16.4
           name: elasticsearch
+          resources:
+            requests:
+              memory: "2Gi"     # Memory request is 64 MiB (Optional)
+            limits:
+              memory: "2Gi"    # Memory limit is 128 MiB
           ports:
             - containerPort: 9200
               protocol: TCP
