@@ -34,10 +34,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import {
-  flattenNestedObject,
-  getUserIdsFromActions
-} from '@client/v2-events/utils'
+import { getUserIdsFromActions } from '@client/v2-events/utils'
 import {
   RecursiveStringRecord,
   useFormDataStringifier
@@ -121,9 +118,7 @@ function EventOverview({
     ...eventWithDefaults
   }
 
-  const flattenedObj = flattenNestedObject(flattenedEventIndex)
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
-
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
     : ''
@@ -135,7 +130,7 @@ function EventOverview({
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
-      <EventSummary event={flattenedObj} summary={summary} />
+      <EventSummary event={flattenedEventIndex} summary={summary} />
       <EventHistory history={history} />
     </Content>
   )
