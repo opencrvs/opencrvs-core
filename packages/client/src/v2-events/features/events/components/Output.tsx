@@ -32,7 +32,6 @@ import {
   isTextFieldType
 } from '@opencrvs/commons/client'
 
-import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
   Address,
   AdministrativeArea,
@@ -67,8 +66,12 @@ interface FieldWithValue {
  */
 function ValueOutput(field: FieldWithValue) {
   /* eslint-disable react/destructuring-assignment */
+  if (isEmailFieldType(field) || isTextFieldType(field)) {
+    return Text.Output({ value: field.value })
+  }
+
   if (isDateFieldType(field)) {
-    return <DateField.Output value={field.value} />
+    return DateField.Output({ value: field.value })
   }
 
   if (isPageHeaderFieldType(field)) {
@@ -79,12 +82,8 @@ function ValueOutput(field: FieldWithValue) {
     return Paragraph.Output
   }
 
-  if (isTextFieldType(field)) {
-    return <DefaultOutput value={field.value} />
-  }
-
   if (isNumberFieldType(field)) {
-    return <Number.Output value={field.value} />
+    return Number.Output({ value: field.value })
   }
 
   if (isFileFieldType(field)) {
@@ -96,33 +95,36 @@ function ValueOutput(field: FieldWithValue) {
   }
 
   if (isSelectFieldType(field)) {
-    return <Select.Output options={field.config.options} value={field.value} />
+    return Select.Output({
+      options: field.config.options,
+      value: field.value
+    })
   }
 
   if (isCountryFieldType(field)) {
-    return <SelectCountry.Output value={field.value} />
+    return SelectCountry.Output({ value: field.value })
   }
 
   if (isCheckboxFieldType(field)) {
-    return <Checkbox.Output value={field.value} />
-  }
-
-  if (isEmailFieldType(field) || isTextFieldType(field)) {
-    return <Text.Output value={field.value} />
+    return Checkbox.Output({
+      required: field.config.required,
+      value: field.value
+    })
   }
 
   if (isAddressFieldType(field)) {
-    return <Address.Output value={field.value} />
+    return Address.Output({ value: field.value })
   }
 
   if (isRadioGroupFieldType(field)) {
-    return (
-      <RadioGroup.Output options={field.config.options} value={field.value} />
-    )
+    return RadioGroup.Output({
+      options: field.config.options,
+      value: field.value
+    })
   }
 
   if (isAdministrativeAreaFieldType(field)) {
-    return <AdministrativeArea.Output value={field.value} />
+    return AdministrativeArea.Output({ value: field.value })
   }
 
   if (isDividerFieldType(field)) {
@@ -130,12 +132,8 @@ function ValueOutput(field: FieldWithValue) {
   }
 
   if (isFacilityFieldType(field)) {
-    return <LocationSearch.Output value={field.value} />
+    return LocationSearch.Output({ value: field.value })
   }
-}
-
-function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
-  return value?.toString() || ''
 }
 
 export function Output({

@@ -38,10 +38,21 @@ function CheckboxInput({
   )
 }
 
-function CheckboxOutput({ value }: { value?: boolean }) {
-  // We explicity check for boolean true, so that e.g. string values are not interpreted as true
-  // TODO CIHAN: 'No' to null?
-  return value === true ? 'Yes' : 'No'
+function CheckboxOutput({
+  value,
+  required
+}: {
+  value?: boolean
+  required?: boolean
+}) {
+  // If a checkbox is required, we always show it
+  if (required) {
+    // We explicity check for boolean true, so that e.g. string values are not interpreted as true.
+    return value === true ? 'Yes' : 'No'
+  }
+
+  // If a checkbox is not required, we only show it if it is true
+  return value === true ? 'Yes' : null
 }
 
 export const Checkbox = {

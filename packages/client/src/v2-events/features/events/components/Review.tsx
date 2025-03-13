@@ -160,6 +160,11 @@ const ReviewContainter = styled.div`
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
+  changeAllButton: {
+    id: 'v2.buttons.changeAll',
+    defaultMessage: 'Change all',
+    description: 'The label for the change all button'
+  },
   changeButton: {
     id: 'v2.buttons.change',
     defaultMessage: 'Change',
@@ -344,7 +349,7 @@ function ReviewComponent({
                               onEdit({ pageId: page.id })
                             }}
                           >
-                            {intl.formatMessage(reviewMessages.changeButton)}
+                            {intl.formatMessage(reviewMessages.changeAllButton)}
                           </Link>
                         }
                         expand={true}
@@ -356,10 +361,6 @@ function ReviewComponent({
                         <ListReview id={'Section_' + page.id}>
                           {page.fields
                             .filter((field) => isFieldVisible(field, form))
-                            .filter(
-                              (field) =>
-                                !isOptionalUncheckedCheckbox(field, form)
-                            )
                             .map((field) => {
                               const value = form[field.id]
                               const previousValue = previousForm[field.id]
