@@ -12,7 +12,7 @@
 import { useEffect, useState } from 'react'
 import { IntlShape } from 'react-intl'
 import {
-  ActionFormData,
+  EventState,
   FieldConfig,
   FormConfig,
   isFileFieldType,
@@ -23,7 +23,7 @@ import { getFullUrl } from '@client/v2-events/features/files/useFileUpload'
 
 function getOptions(
   fieldConfig: FieldConfig,
-  form: ActionFormData,
+  form: EventState,
   intl: IntlShape
 ): IDocumentViewerOptions {
   const value = form[fieldConfig.id]
@@ -84,7 +84,7 @@ function getOptions(
 
 function extractViewerOptionsFromFieldConfig(
   fieldConfigs: FieldConfig[],
-  form: ActionFormData,
+  form: EventState,
   intl: IntlShape
 ): IDocumentViewerOptions {
   return fieldConfigs.reduce<IDocumentViewerOptions>(
@@ -118,9 +118,8 @@ function extractViewerOptionsFromFieldConfig(
  *
  * @returns {IDocumentViewerOptions} Options prop for the `DocumentViewer` component.
  */
-
 export function useFileOptions(
-  form: ActionFormData,
+  form: EventState,
   formConfig: FormConfig,
   intl: IntlShape
 ) {

@@ -17,16 +17,16 @@
 
 import { create } from 'zustand'
 import {
+  ActionUpdate,
   EventState,
-  deepDropNulls,
-  ActionDocument
+  deepDropNulls
 } from '@opencrvs/commons/client'
 
 interface EventMetadata {
   metadata?: EventState
   setMetadata: (data: EventState) => void
   setInitialMetadataValues: (data: EventState) => void
-  getMetadata: (initialValues?: ActionDocument['metadata']) => EventState
+  getMetadata: (initialValues?: EventState) => EventState
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
 }
@@ -49,7 +49,7 @@ function removeUndefinedKeys(data: EventState) {
  */
 
 export const useEventMetadata = create<EventMetadata>()((set, get) => ({
-  getMetadata: (initialValues: ActionDocument['metadata']) =>
+  getMetadata: (initialValues?: EventState) =>
     get().metadata || deepDropNulls(initialValues ?? {}),
   setMetadata: (data: EventState) => {
     const metadata = removeUndefinedKeys(data)

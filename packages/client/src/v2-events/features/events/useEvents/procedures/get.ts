@@ -11,11 +11,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import {
-  EventConfig,
-  EventDocument,
-  getEventConfiguration
-} from '@opencrvs/commons/client'
+import { EventDocument } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -52,12 +48,7 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 
     const eventDocument = EventDocument.parse(response)
 
-    const eventConfig = getEventConfiguration(
-      meta.eventConfig as EventConfig[],
-      eventDocument.type
-    )
-
-    await cacheFiles(eventDocument, eventConfig)
+    await cacheFiles(eventDocument)
     return eventDocument
   }
 })
