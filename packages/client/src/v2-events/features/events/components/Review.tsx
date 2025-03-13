@@ -377,11 +377,6 @@ function ReviewComponent({
                   return <></>
                 }
 
-                const displayedFields = fields.filter(
-                  ({ valueDisplay, errorDisplay }) =>
-                    valueDisplay || errorDisplay
-                )
-
                 return (
                   <DeclarationDataContainer
                     key={'Section_' + page.title.defaultMessage}
@@ -404,8 +399,12 @@ function ReviewComponent({
                       name={'Accordion_' + page.id}
                     >
                       <ListReview id={'Section_' + page.id}>
-                        {displayedFields.map(
-                          ({ id, label, errorDisplay, valueDisplay }) => (
+                        {fields
+                          .filter(
+                            ({ valueDisplay, errorDisplay }) =>
+                              valueDisplay || errorDisplay
+                          )
+                          .map(({ id, label, errorDisplay, valueDisplay }) => (
                             <ListReview.Row
                               key={id}
                               actions={
@@ -429,8 +428,7 @@ function ReviewComponent({
                               label={intl.formatMessage(label)}
                               value={errorDisplay ? errorDisplay : valueDisplay}
                             />
-                          )
-                        )}
+                          ))}
                       </ListReview>
                     </Accordion>
                   </DeclarationDataContainer>
