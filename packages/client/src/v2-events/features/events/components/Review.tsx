@@ -363,12 +363,12 @@ function ReviewComponent({
                   })
 
                 const shouldDisplayPage = fields.some(
-                  // We want to display the page in any case if it has any file inputs
                   ({ type, valueDisplay, errorDisplay }) => {
                     if (type === 'FILE' || type === 'FILE_WITH_OPTIONS') {
                       return true
                     }
 
+                    // If page doesn't have any file inputs, we only want to display it if it has any fields with content
                     return valueDisplay || errorDisplay
                   }
                 )
