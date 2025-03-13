@@ -28,18 +28,18 @@ docker_build("ghcr.io/opencrvs/ocrvs-gateway:local", "packages",
               network="host")
 
 apps = ['auth', 
-              'config',
-              # 'dashboards', 
-              'documents', 
-              'events',
-              'metrics', 
-              'migration', 
-              'notification', 
-              'scheduler', 
-              'search', 
-              'user-mgnt', 
-              'webhooks', 
-              'workflow']
+        'config',
+        # 'dashboards', 
+        'documents', 
+        'events',
+        'metrics', 
+        'migration', 
+        'notification', 
+        'scheduler', 
+        'search', 
+        'user-mgnt', 
+        'webhooks', 
+        'workflow']
 
 def build_services():
   for app in apps:
