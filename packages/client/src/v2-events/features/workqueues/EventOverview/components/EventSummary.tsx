@@ -20,6 +20,55 @@ import { RecursiveStringRecord } from '@client/v2-events/hooks/useFormDataString
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
+function getDefaultFields(): SummaryConfig['fields'] {
+  return [
+    {
+      id: 'status',
+      label: {
+        id: 'v2.event.summary.status.label',
+        defaultMessage: 'Status',
+        description: 'Status of the event'
+      },
+      value: {
+        id: 'v2.event.summary.status.value',
+        defaultMessage: '',
+        description: 'Status of the event'
+      }
+    },
+    {
+      id: 'event',
+      label: {
+        id: 'v2.event.summary.event.label',
+        defaultMessage: 'Event',
+        description: 'Event label'
+      },
+      value: {
+        id: 'v2.event.summary.event.value',
+        defaultMessage: '',
+        description: 'Event value'
+      }
+    },
+    {
+      id: 'trackind-id',
+      label: {
+        id: 'v2.event.summary.trackindId.label',
+        defaultMessage: 'Tracking ID',
+        description: 'Tracking id label'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.trackindId.empty',
+        defaultMessage: 'No tracking ID',
+        description: 'No tracking ID message'
+      },
+      value: {
+        id: 'v2.event.summary.trackindId.value',
+        defaultMessage: '',
+        description: 'Tracking id value'
+      }
+    }
+  ]
+}
+
 export function EventSummary({
   event,
   summary
@@ -28,11 +77,13 @@ export function EventSummary({
   summary: SummaryConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
+  const defaultFields = getDefaultFields()
+  const summaryPageFields = [...defaultFields, ...summary.fields]
 
   return (
     <>
       <Summary id="summary">
-        {summary.fields.map((field) => {
+        {summaryPageFields.map((field) => {
           return (
             <Summary.Row
               key={field.id}
