@@ -11,14 +11,14 @@
 
 import { MessageDescriptor, useIntl } from 'react-intl'
 import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
-import { ActionState } from '@opencrvs/commons/client'
+import { EventState } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
 /**
  * Replaces dots with triple underscores in the object keys.
  * This is needed to support dot notation in the message variables.
  */
-function convertDotToTripleUnderscore(obj: ActionState, parentKey = '') {
+function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
   const result: Record<string, PrimitiveType> = {}
 
   for (const [key, value] of Object.entries(obj)) {

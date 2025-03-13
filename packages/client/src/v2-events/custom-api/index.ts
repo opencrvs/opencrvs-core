@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionState, getUUID } from '@opencrvs/commons/client'
+import { EventState, getUUID } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
 export interface OnDeclareParams {
   eventId: string
-  data: ActionState
-  metadata?: ActionState
+  data: EventState
+  metadata?: EventState
 }
 /**
  * Runs a sequence of actions from declare to register.
@@ -31,8 +31,8 @@ export async function registerOnDeclare({
   metadata
 }: {
   eventId: string
-  data: ActionState
-  metadata?: ActionState
+  data: EventState
+  metadata?: EventState
 }) {
   await trpcClient.event.actions.declare.mutate({
     data,
@@ -67,8 +67,8 @@ export async function registerOnDeclare({
  */
 export async function validateOnDeclare(variables: {
   eventId: string
-  data: ActionState
-  metadata?: ActionState
+  data: EventState
+  metadata?: EventState
 }) {
   const { eventId, data, metadata } = variables
   await trpcClient.event.actions.declare.mutate({

@@ -11,18 +11,18 @@
 
 import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
-import { ActionState } from '@opencrvs/commons/client'
+import { EventState } from '@opencrvs/commons/client'
 
 interface EventFormData {
-  formValues: null | ActionState
-  setFormValues: (data: ActionState) => void
-  setInitialFormValues: (data: ActionState) => void
-  getFormValues: (initialValues?: ActionState) => ActionState
+  formValues: null | EventState
+  setFormValues: (data: EventState) => void
+  setInitialFormValues: (data: EventState) => void
+  getFormValues: (initialValues?: EventState) => EventState
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
 }
 
-function removeUndefinedKeys(data: ActionState) {
+function removeUndefinedKeys(data: EventState) {
   return Object.fromEntries(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     Object.entries(data).filter(([_, value]) => value !== undefined)
@@ -31,7 +31,7 @@ function removeUndefinedKeys(data: ActionState) {
 /**
  * Interface representing the form data and related operations for an event.
  *
- * @property {ActionState} formValues - The current form values.
+ * @property {EventState} formValues - The current form values.
  * @property {function} setFormValues - Sets the form values. This method should only be used as directly connected to Formik's `onChange` hook.
  * @property {function} setFormValuesIfEmpty - Sets the form values only if they are empty.
  * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
@@ -41,13 +41,13 @@ function removeUndefinedKeys(data: ActionState) {
  */
 export const useEventFormData = create<EventFormData>()((set, get) => ({
   formValues: null,
-  getFormValues: (initialValues?: ActionState) =>
+  getFormValues: (initialValues?: EventState) =>
     get().formValues || initialValues || {},
-  setFormValues: (data: ActionState) => {
+  setFormValues: (data: EventState) => {
     const formValues = removeUndefinedKeys(data)
     return set(() => ({ formValues }))
   },
-  setInitialFormValues: (data: ActionState) => {
+  setInitialFormValues: (data: EventState) => {
     return set(() => ({ formValues: removeUndefinedKeys(data) }))
   },
   getTouchedFields: () =>

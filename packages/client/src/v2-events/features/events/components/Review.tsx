@@ -30,7 +30,7 @@ import {
   TextArea
 } from '@opencrvs/components'
 import {
-  ActionState,
+  EventState,
   EventConfig,
   EventIndex,
   FieldConfig,
@@ -278,8 +278,8 @@ function ReviewComponent({
   children: React.ReactNode
   eventConfig: EventConfig
   formConfig: FormConfig
-  form: ActionState
-  metadata?: ActionState
+  form: EventState
+  metadata?: EventState
   previousFormValues?: EventIndex['data']
   onEdit: ({
     pageId,
@@ -292,7 +292,7 @@ function ReviewComponent({
   }) => void
   title: string
   isUploadButtonVisible?: boolean
-  onMetadataChange?: (values: ActionState) => void
+  onMetadataChange?: (values: EventState) => void
 }) {
   const scopes = useSelector(getScope)
   const intl = useIntl()
@@ -648,8 +648,8 @@ function ReviewActionComponent({
   onConfirm: () => void
   onReject?: () => void
   formConfig: FormConfig
-  form: ActionState
-  metadata?: ActionState
+  form: EventState
+  metadata?: EventState
   messages: {
     title: MessageDescriptor
     description: MessageDescriptor

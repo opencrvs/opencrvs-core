@@ -27,7 +27,7 @@ flowchart TD
       assignedTo?: string | null
       updatedBy: string,
       trackingId: string
-      data: ActionState
+      data: EventState
     "]
 
     A -- EventDocument --> D
@@ -54,7 +54,7 @@ flowchart TD
         \[key\]: FieldUpdateValue
     "]
 
-    K["ActionState"] -- Contains --- L["
+    K["EventState"] -- Contains --- L["
         \[key\]: FieldValue
     "]
 

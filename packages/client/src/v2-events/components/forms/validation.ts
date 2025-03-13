@@ -12,7 +12,7 @@ import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
   getFieldValidationErrors,
-  ActionState,
+  EventState,
   FormConfig,
   stripHiddenFields,
   getFormFields
@@ -30,7 +30,7 @@ export interface Errors {
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: ActionState
+  values: EventState
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -50,8 +50,8 @@ export function getValidationErrorsForForm(
 
 export function validationErrorsInActionFormExist(
   formConfig: FormConfig,
-  form: ActionState,
-  metadata?: ActionState
+  form: EventState,
+  metadata?: EventState
 ): boolean {
   // We don't want to validate hidden fields
   const formWithoutHiddenFields = stripHiddenFields(

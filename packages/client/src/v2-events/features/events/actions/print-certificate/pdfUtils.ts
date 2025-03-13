@@ -25,7 +25,7 @@ import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
 import { LanguageConfig } from '@opencrvs/commons'
 import {
-  ActionState,
+  EventState,
   EventDocument,
   EventIndex,
   User
@@ -68,7 +68,7 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 }
 
 function formatAllNonStringValues(
-  templateData: ActionState,
+  templateData: EventState,
   intl: IntlShape
 ): Record<string, string> {
   const formattedData: Record<string, string> = {}
@@ -89,7 +89,7 @@ function formatAllNonStringValues(
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
       formattedData[key] = JSON.stringify(
-        formatAllNonStringValues(value as ActionState, intl)
+        formatAllNonStringValues(value as EventState, intl)
       )
     } else {
       formattedData[key] = String(value)

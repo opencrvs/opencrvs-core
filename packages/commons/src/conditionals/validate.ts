@@ -15,7 +15,7 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { ActionState, ActionUpdate } from '../events/ActionDocument'
+import { EventState, ActionUpdate } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
@@ -46,7 +46,7 @@ function getConditionalActionsForField(
 
 function isFieldConditionMet(
   field: FieldConfig,
-  form: ActionUpdate | ActionState,
+  form: ActionUpdate | EventState,
   conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
 ) {
   const hasRule = (field.conditionals ?? []).some(
@@ -69,14 +69,14 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionUpdate | ActionState
+  form: ActionUpdate | EventState
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
 export function isFieldEnabled(
   field: FieldConfig,
-  form: ActionUpdate | ActionState
+  form: ActionUpdate | EventState
 ) {
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }

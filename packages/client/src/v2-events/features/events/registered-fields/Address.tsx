@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import {
-  ActionState,
+  EventState,
   AddressFieldValue,
   and,
   ConditionalType,
@@ -334,7 +334,7 @@ function useStringifier() {
      * form data stringifier so location and other form fields can handle stringifying their own data
      */
     const stringifier = useFormDataStringifier()
-    return stringifier(ALL_ADDRESS_FIELDS, value as ActionState)
+    return stringifier(ALL_ADDRESS_FIELDS, value as EventState)
   }
 }
 

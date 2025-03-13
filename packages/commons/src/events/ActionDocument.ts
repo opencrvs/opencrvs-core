@@ -18,9 +18,9 @@ import { ActionType } from './ActionType'
 export const ActionUpdate = z.record(z.string(), FieldUpdateValue)
 export type ActionUpdate = z.infer<typeof ActionUpdate>
 /**
- * ActionState is an aggregate of all the actions that have been applied to event data.
+ * EventState is an aggregate of all the actions that have been applied to event data.
  */
-export type ActionState = Record<string, FieldValue>
+export type EventState = Record<string, FieldValue>
 
 export const ActionBase = z.object({
   id: z.string(),
