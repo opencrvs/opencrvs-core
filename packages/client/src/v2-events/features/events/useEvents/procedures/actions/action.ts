@@ -230,7 +230,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
          * Because NOTIFY action is just an incomplete DECLARE action,
          * notifyFields are decided by DECLARE action
          */
-        const notifyFields = findActiveActionFields(
+        const notifyFields = getActiveActionFields(
           eventConfiguration,
           ActionType.DECLARE
         )
