@@ -97,8 +97,11 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
               defaultMessage: 'Address',
               description: 'The title for the address input'
             },
-            configuration: {
-              defaultToUserDistrict: true
+            defaultValue: {
+              country: 'FAR',
+              province: '$user.province',
+              district: '$user.district',
+              urbanOrRural: 'URBAN'
             }
           }
         ]}
