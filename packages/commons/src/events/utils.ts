@@ -23,6 +23,7 @@ import { EventState } from './ActionDocument'
 import { FormConfig } from './FormConfig'
 import { isFieldVisible } from '../conditionals/validate'
 import { FieldType } from './FieldType'
+import { getOrThrow } from '../utils'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -188,6 +189,16 @@ export const findActiveActionFields = (
 
   /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
   return allFields
+}
+
+export const getActiveActionFormPages = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  return getOrThrow(
+    findActiveActionForm(configuration, action)?.pages,
+    'Form configuration not found for type: ' + configuration.id
+  )
 }
 
 /**

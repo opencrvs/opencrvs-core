@@ -279,7 +279,7 @@ function ReviewComponent({
   formConfig: FormConfig
   form: EventState
   metadata?: EventState
-  previousFormValues?: EventIndex['data']
+  previousFormValues?: EventState
   onEdit: ({
     pageId,
     fieldId,

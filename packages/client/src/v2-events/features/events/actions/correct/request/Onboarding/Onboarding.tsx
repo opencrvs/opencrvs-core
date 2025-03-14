@@ -50,7 +50,7 @@ export function Onboarding() {
   const metadata = useEventMetadata((state) => state.getMetadata())
   const setMetadata = useEventMetadata((state) => state.setMetadata)
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const intl = useIntl()
 

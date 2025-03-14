@@ -15,7 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -33,18 +33,16 @@ export function Pages() {
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = configuration.actions
-    .find((action) => action.type === ActionType.REQUEST_CORRECTION)
-    ?.forms.find((f) => f.active)?.pages
 
-  if (!formPages) {
-    throw new Error('Form configuration not found for type: ' + event.type)
-  }
+  const formPages = getActiveActionFormPages(
+    configuration,
+    ActionType.REQUEST_CORRECTION
+  )
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
