@@ -10,7 +10,8 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionType, generateActionInput, SCOPES } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -35,19 +36,149 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test('Action without form definition should accept empty payload', async () => {
+test('Validation error message contains all the offending fields', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.actions.declare(generator.event.actions.declare(event.id))
+
+  const data = generator.event.actions.validate(event.id, {
+    data: {
+      'applicant.dob': '02-02',
+      'recommender.none': true
+    }
+  })
+
+  await expect(client.event.actions.validate(data)).rejects.matchSnapshot()
+})
+
+test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.actions.declare(generator.event.actions.declare(event.id))
+
+  const data = generator.event.actions.validate(event.id, {
+    data: {
+      'applicant.dob': '02-1-2024',
+      'applicant.firstname': 'John',
+      'applicant.surname': 'Doe',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+
+  await expect(client.event.actions.validate(data)).rejects.matchSnapshot()
+})
+
+test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 
+  await client.event.actions.declare(generator.event.actions.declare(event.id))
+
+  const form = {
+    'applicant.dob': '2024-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
   const data = generator.event.actions.validate(event.id, {
-    data: {}
+    data: form
   })
 
-  const result = await client.event.actions.validate(data)
-  const lastAction = result.actions[result.actions.length - 1]
+  const response = await client.event.actions.validate(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.VALIDATE
+  )
+  expect(savedAction?.data).toEqual(form)
+})
 
-  expect(lastAction.type).toBe(ActionType.VALIDATE)
-  expect(lastAction.data).toEqual({})
+test('Prevents adding birth date in future', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare(generator.event.actions.declare(event.id))
+
+  const form = {
+    'applicant.dob': '2040-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  await expect(
+    client.event.actions.validate(
+      generator.event.actions.validate(event.id, { data: form })
+    )
+  ).rejects.matchSnapshot()
+})
+
+test('validation prevents including hidden fields', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.actions.declare(generator.event.actions.declare(event.id))
+
+  const data = generator.event.actions.validate(event.id, {
+    data: {
+      ...generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
+      'recommender.firstname': 'this should not be here'
+    }
+  })
+
+  await expect(client.event.actions.validate(data)).rejects.matchSnapshot()
+})
+
+test('valid action is appended to event actions', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare(generator.event.actions.declare(event.id))
+
+  await client.event.actions.validate(
+    generator.event.actions.validate(event.id)
+  )
+
+  const updatedEvent = await client.event.get(event.id)
+
+  expect(updatedEvent.actions).toEqual([
+    expect.objectContaining({ type: ActionType.CREATE }),
+    expect.objectContaining({
+      type: ActionType.DECLARE
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE
+    })
+  ])
 })

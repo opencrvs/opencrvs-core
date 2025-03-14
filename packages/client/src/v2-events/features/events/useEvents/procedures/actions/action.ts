@@ -16,7 +16,7 @@ import {
 } from '@trpc/tanstack-react-query'
 import {
   ActionType,
-  findActiveActionFields,
+  getActiveActionFields,
   stripHiddenFields
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
@@ -223,7 +223,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
       }
-      const fields = findActiveActionFields(eventConfiguration, actionType)
+      const fields = getActiveActionFields(eventConfiguration, actionType)
 
       if (actionType === ActionType.NOTIFY) {
         /**
@@ -269,7 +269,7 @@ export function useEventCustomAction(mutationKey: string[]) {
        * @TODO: In the future all of these forms should be the same 'primary' declare form.
        * When that is done, we can shouldn't need the action type explicitly here.
        */
-      const fields = findActiveActionFields(
+      const fields = getActiveActionFields(
         eventConfiguration,
         ActionType.DECLARE
       )

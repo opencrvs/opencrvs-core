@@ -941,7 +941,7 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   actions: [
     {
-      type: 'DECLARE',
+      type: ActionType.DECLARE,
       label: {
         defaultMessage: 'Send an application',
         description:
@@ -951,7 +951,17 @@ export const tennisClubMembershipEvent = defineConfig({
       forms: [TENNIS_CLUB_FORM]
     },
     {
-      type: 'REGISTER',
+      type: ActionType.VALIDATE,
+      label: {
+        defaultMessage: 'Validate',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.validate.label'
+      },
+      forms: [TENNIS_CLUB_FORM]
+    },
+    {
+      type: ActionType.REGISTER,
       label: {
         defaultMessage: 'Register',
         description:
@@ -961,17 +971,7 @@ export const tennisClubMembershipEvent = defineConfig({
       forms: [TENNIS_CLUB_FORM]
     },
     {
-      type: 'VALIDATE',
-      label: {
-        defaultMessage: 'Validate',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.validate.label'
-      },
-      forms: []
-    },
-    {
-      type: 'REQUEST_CORRECTION',
+      type: ActionType.REQUEST_CORRECTION,
       label: {
         defaultMessage: 'Request correction',
         description:
@@ -1178,7 +1178,7 @@ export const tennisClubMembershipEvent = defineConfig({
       ]
     },
     {
-      type: 'APPROVE_CORRECTION',
+      type: ActionType.APPROVE_CORRECTION,
       forms: [TENNIS_CLUB_FORM],
       label: {
         defaultMessage: 'Approve correction',

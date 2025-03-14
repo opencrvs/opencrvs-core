@@ -150,3 +150,22 @@ test('validation prevents including hidden fields', async () => {
 
   await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
 })
+
+test('valid action is appended to event actions', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const data = generator.event.actions.declare(event.id)
+
+  await client.event.actions.declare(data)
+  const updatedEvent = await client.event.get(event.id)
+
+  expect(updatedEvent.actions).toEqual([
+    expect.objectContaining({ type: ActionType.CREATE }),
+    expect.objectContaining({
+      type: ActionType.DECLARE
+    })
+  ])
+})
