@@ -39,7 +39,7 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
       return EventStatus.REJECTED
     }
 
-    if (action.type === ActionType.ARCHIVED) {
+    if (action.type === ActionType.ARCHIVE) {
       return EventStatus.ARCHIVED
     }
     return status

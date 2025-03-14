@@ -49,7 +49,7 @@ function prepareComments(action: ActionType, metadata: ActionUpdate) {
   if (action === ActionType.REJECT && typeof metadata.message === 'string') {
     comments.push({ comment: metadata.message })
   }
-  if (action === ActionType.ARCHIVED && typeof metadata.message === 'string') {
+  if (action === ActionType.ARCHIVE && typeof metadata.message === 'string') {
     comments.push({ comment: metadata.message })
   }
   return comments
@@ -113,16 +113,15 @@ export function EventHistoryModal({
       {content.length > 0 && (
         <Table columns={commentsColumn} content={content} noResultText=" " />
       )}
-      {history.type === ActionType.ARCHIVED &&
-        history.metadata?.isDuplicate && (
-          <p>
-            <Pill
-              label={intl.formatMessage(messages.markAsDuplicate)}
-              size="small"
-              type="inactive"
-            />
-          </p>
-        )}
+      {history.type === ActionType.ARCHIVE && history.metadata?.isDuplicate && (
+        <p>
+          <Pill
+            label={intl.formatMessage(messages.markAsDuplicate)}
+            size="small"
+            type="inactive"
+          />
+        </p>
+      )}
     </ResponsiveModal>
   )
 }
