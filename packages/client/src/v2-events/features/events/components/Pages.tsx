@@ -13,7 +13,6 @@ import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { EventState, FormPage } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
-import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 
@@ -59,9 +58,6 @@ export function Pages({
 
     if (pageChanged) {
       onFormPageChange(formPages[currentPage].id)
-
-      // We use the main content anchor id to scroll to the top of the frame when page changes
-      document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
     }
   }, [pageId, currentPage, formPages, onFormPageChange])
 
