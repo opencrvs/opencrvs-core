@@ -59,7 +59,7 @@ export function Review() {
   const form = useEventFormData((state) => state.getFormValues())
 
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata({})
+  const metadata = getMetadata()
 
   const scopes = useSelector(getScope) ?? undefined
 

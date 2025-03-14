@@ -17,7 +17,8 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
-  findActiveActionForm
+  findActiveActionForm,
+  getMetadataForAction
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -85,9 +86,13 @@ export function Review() {
 
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const metadata = getMetadata(
-    event.actions.find((a) => a.type === ActionType.VALIDATE)?.metadata
-  )
+  const previousMetadata = getMetadataForAction({
+    event,
+    actionType: ActionType.VALIDATE,
+    drafts: []
+  })
+
+  const metadata = getMetadata(previousMetadata)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
