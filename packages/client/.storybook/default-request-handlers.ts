@@ -18,7 +18,7 @@ import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
 import {
   tennisClubMembershipEventIndex,
-  tennisClueMembershipEventDocument
+  tennisClubMembershipEventDocument
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
@@ -343,6 +343,11 @@ export const handlers = {
     })
   ],
   files: [
+    http.get('/api/presigned-url/event-attachments/:filename', async (req) => {
+      return HttpResponse.json({
+        presignedURL: `http://localhost:3535/ocrvs/tree.svg`
+      })
+    }),
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 
@@ -1098,7 +1103,7 @@ export const handlers = {
   ],
   event: [
     tRPCMsw.event.get.query(() => {
-      return tennisClueMembershipEventDocument
+      return tennisClubMembershipEventDocument
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]

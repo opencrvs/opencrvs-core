@@ -10,7 +10,7 @@
  */
 /* eslint-disable */
 
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
 export const constantsMessages = defineMessages({
   action: {
@@ -74,7 +74,8 @@ export const constantsMessages = defineMessages({
     id: 'v2.constants.certificate.title'
   },
   certificationPaymentTitle: {
-    defaultMessage: 'Payment collected for {event, select, birth{birth} death{death} other{birth}} certificates',
+    defaultMessage:
+      'Payment collected for {event, select, birth{birth} death{death} other{birth}} certificates',
     description: 'Label for certification payment performance reports',
     id: 'v2.constants.certificationPaymentTitle'
   },
@@ -267,7 +268,8 @@ export const constantsMessages = defineMessages({
     id: 'v2.constants.emailSubject'
   },
   estimatedNumberOfEvents: {
-    defaultMessage: 'Estimated no. of {eventType, select, birth {birth} death {death} other {birth}}s',
+    defaultMessage:
+      'Estimated no. of {eventType, select, birth {birth} death {death} other {birth}}s',
     description: 'A label for Estimated number of events',
     id: 'v2.constants.estimatedNumberOfEvents'
   },
@@ -684,7 +686,8 @@ export const constantsMessages = defineMessages({
     id: 'v2.constants.submissionStatus'
   },
   timeFramesTitle: {
-    defaultMessage: '{event, select, birth{Birth} death{Death} other{Birth}} registered by time period, from date of occurrence',
+    defaultMessage:
+      '{event, select, birth{Birth} death{Death} other{Birth}} registered by time period, from date of occurrence',
     description: 'Header for tabel performance timeframs',
     id: 'v2.constants.timeFramesTitle'
   },
@@ -739,7 +742,8 @@ export const constantsMessages = defineMessages({
     id: 'v2.constants.total'
   },
   totalFileSizeExceed: {
-    defaultMessage: 'Total size of documents exceeds {fileSize}. Please reduce file size of your uploads',
+    defaultMessage:
+      'Total size of documents exceeds {fileSize}. Please reduce file size of your uploads',
     description: 'Accumulated File size exceed message',
     id: 'v2.constants.totalFileSizeExceed'
   },

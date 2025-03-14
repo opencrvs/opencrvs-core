@@ -12,7 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { AppRouter } from '@client/v2-events/trpc'
 import * as Request from './index'
 
@@ -37,7 +37,7 @@ export const Page: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
+        eventId: tennisClubMembershipEventDocument.id,
         pageId: 'applicant'
       })
     },
@@ -45,7 +45,7 @@ export const Page: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return tennisClubMembershipEventDocument
           })
         ]
       }
@@ -57,14 +57,14 @@ export const Review: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
+        eventId: tennisClubMembershipEventDocument.id
       })
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return tennisClubMembershipEventDocument
           })
         ]
       }

@@ -17,7 +17,8 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
-  findActiveActionForm
+  findActiveActionForm,
+  getMetadataForAction
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -33,6 +34,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 const messages = defineMessages({
@@ -56,6 +58,12 @@ const messages = defineMessages({
     id: 'v2.registerAction.Reject',
     defaultMessage: 'Reject',
     description: 'The label for reject button of register action'
+  },
+  registerActionDescriptionIncomplete: {
+    id: 'v2.registerAction.incompleteForm',
+    defaultMessage:
+      'Please add mandatory information correctly before registering.',
+    description: 'The label for warning of incomplete form'
   }
 })
 
@@ -76,10 +84,14 @@ export function Review() {
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
+  const previousMetadata = getMetadataForAction({
+    event,
+    actionType: ActionType.REGISTER,
+    drafts: []
+  })
+
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(
-    event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
-  )
+  const metadata = getMetadata(previousMetadata)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -166,6 +178,12 @@ export function Review() {
     }
   }
 
+  const hasValidationErrors = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.REGISTER}
@@ -188,15 +206,16 @@ export function Review() {
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
-          form={form}
-          formConfig={formConfig}
+          isPrimaryActionDisabled={hasValidationErrors}
           messages={{
             title: messages.registerActionTitle,
-            description: messages.registerActionDescription,
+            description: hasValidationErrors
+              ? messages.registerActionDescriptionIncomplete
+              : messages.registerActionDescription,
             onConfirm: messages.registerActionDeclare,
             onReject: messages.registerActionReject
           }}
-          metadata={metadata}
+          primaryButtonType="positive"
           onConfirm={handleRegistration}
           onReject={handleRejection}
         />
