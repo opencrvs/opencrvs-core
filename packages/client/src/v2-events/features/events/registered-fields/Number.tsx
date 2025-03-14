@@ -35,5 +35,7 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
 
 export const Number = {
   Input: NumberInput,
-  Output: null
+  Output: ({ value }: { value?: number }) => {
+    return <>{value?.toString() || ''}</>
+  }
 }

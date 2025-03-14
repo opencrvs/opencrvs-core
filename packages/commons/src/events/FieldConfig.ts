@@ -173,6 +173,8 @@ const HtmlFontVariant = z.enum([
   'h1'
 ])
 
+export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
