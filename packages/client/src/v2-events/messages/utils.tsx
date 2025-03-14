@@ -114,6 +114,7 @@ export function useIntlFormatMessageWithFlattenedParams() {
     const keysInMessage = availableKeys.filter(
       (key) =>
         // This is a bit of hack, which expects that the keys are in the form of '{key ' or '{key}' in the message.
+        // E.g.: '{child.firstname, select, __EMPTY__ {Hello!} other {Hello to {child.firstname}!}}'
         messageBeforeFormatting.includes(`{${key}}`) ||
         messageBeforeFormatting.includes(`{${key} `)
     )
