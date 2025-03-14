@@ -17,7 +17,8 @@ import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
-  generateEventDraftDocument
+  generateEventDraftDocument,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -29,11 +30,16 @@ import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
 
+const declareEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE, ActionType.DECLARE]
+})
+
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Review/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: generator.event.actions.declare(eventId).data
+      formValues: getCurrentEventState(declareEventDocument).data
     })
   }
 }
@@ -194,7 +200,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: generator.event.actions.declare(eventId).data
+      formValues: getCurrentEventState(declareEventDocument).data
     })
 
     window.localStorage.setItem(
@@ -206,7 +212,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
+        eventId: declareEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -315,7 +321,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 export const ReviewForFieldAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: generator.event.actions.declare(eventId).data
+      formValues: getCurrentEventState(declareEventDocument).data
     })
 
     window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
@@ -324,7 +330,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
+        eventId: declareEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -427,14 +433,14 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 export const ChangeFieldInReview: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: generator.event.actions.declare(eventId).data
+      formValues: getCurrentEventState(declareEventDocument).data
     })
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
+        eventId: declareEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },

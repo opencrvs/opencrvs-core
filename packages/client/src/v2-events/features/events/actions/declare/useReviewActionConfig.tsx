@@ -10,12 +10,7 @@
  */
 
 import { v4 as uuid } from 'uuid'
-import {
-  ActionFormData,
-  FormConfig,
-  Scope,
-  SCOPES
-} from '@opencrvs/commons/client'
+import { EventState, FormConfig, Scope, SCOPES } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 // eslint-disable-next-line no-restricted-imports
@@ -231,8 +226,8 @@ export function useReviewActionConfig({
   scopes
 }: {
   formConfig: FormConfig
-  form: ActionFormData
-  metadata?: ActionFormData
+  form: EventState
+  metadata?: EventState
   scopes?: Scope[]
 }) {
   const events = useEvents()
