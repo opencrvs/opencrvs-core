@@ -16,11 +16,7 @@
  */
 
 import { create } from 'zustand'
-import {
-  ActionUpdate,
-  EventState,
-  deepDropNulls
-} from '@opencrvs/commons/client'
+import { EventState, deepDropNulls } from '@opencrvs/commons/client'
 
 interface EventMetadata {
   metadata?: EventState

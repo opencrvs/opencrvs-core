@@ -148,7 +148,7 @@ export function Output({
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
   // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
-  const hasValue = value !== null && value !== undefined
+  const hasValue = value !== undefined
 
   if (!hasValue) {
     if (previousValue) {
@@ -170,7 +170,7 @@ export function Output({
     )
   }
 
-  if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
+  if (!previousValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
         <Deleted>

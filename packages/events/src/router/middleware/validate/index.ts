@@ -10,9 +10,9 @@
  */
 
 import {
-  ActionDocument,
   ActionInputWithType,
   ActionType,
+  ActionUpdate,
   FieldConfig,
   FieldUpdateValue,
   getFieldValidationErrors
@@ -39,7 +39,7 @@ export function validateAction(actionType: ActionType) {
     const data = {
       ...opts.input.data,
       ...(opts.input.metadata ?? {})
-    } satisfies ActionDocument['data']
+    } satisfies ActionUpdate
 
     const errors = formFields.reduce(
       (

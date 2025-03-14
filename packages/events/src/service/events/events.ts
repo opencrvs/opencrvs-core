@@ -12,6 +12,7 @@
 import {
   ActionDocument,
   ActionInputWithType,
+  ActionUpdate,
   Draft,
   EventDocument,
   EventInput,
@@ -201,7 +202,7 @@ function getValidFileValue(
 }
 
 function extractFileValues(
-  data: ActionDocument['data'],
+  data: ActionUpdate,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ): Array<{ fieldName: string; file: FileFieldValue }> {
   const fileValues: Array<{ fieldName: string; file: FileFieldValue }> = []

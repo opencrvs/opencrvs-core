@@ -46,10 +46,10 @@ const messages = defineMessages({
 function prepareComments(action: ActionType, metadata: ActionUpdate) {
   const comments: { comment: string }[] = []
 
-  if (action === ActionType.REJECT && typeof metadata?.message === 'string') {
+  if (action === ActionType.REJECT && typeof metadata.message === 'string') {
     comments.push({ comment: metadata.message })
   }
-  if (action === ActionType.ARCHIVED && typeof metadata?.message === 'string') {
+  if (action === ActionType.ARCHIVED && typeof metadata.message === 'string') {
     comments.push({ comment: metadata.message })
   }
   return comments

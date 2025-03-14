@@ -10,7 +10,7 @@
  */
 
 import { ActionType } from '../ActionType'
-import { ActionDocument, EventState } from '../ActionDocument'
+import { ActionDocument, ActionUpdate, EventState } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
@@ -92,6 +92,12 @@ function getData(actions: Array<ActionDocument>) {
   }, {})
 }
 
+/**
+ * @returns Given arbitrary object, recursively remove all keys with null values
+ *
+ * @example
+ * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
+ */
 export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
   if (!_.isObject(obj)) return obj
 
@@ -112,8 +118,8 @@ export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
 }
 
 function deepMerge(
-  currentDocument: ActionDocument['data'],
-  actionDocument: ActionDocument['data']
+  currentDocument: ActionUpdate,
+  actionDocument: ActionUpdate
 ) {
   return _.mergeWith(
     currentDocument,

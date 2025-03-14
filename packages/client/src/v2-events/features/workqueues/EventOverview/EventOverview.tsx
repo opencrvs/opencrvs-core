@@ -73,10 +73,6 @@ function EventOverviewContainer() {
     return null
   }
 
-  if (!event) {
-    return null
-  }
-
   return (
     <EventOverviewProvider locations={locations} users={users}>
       <EventOverview
