@@ -24,8 +24,6 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
-import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
-import { replacePlaceholders } from '@client/v2-events/utils'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -73,17 +71,7 @@ function addDefaultValue<T extends FieldConfigWithoutAddress>(
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  */
 function AddressInput(props: Props) {
-  const {
-    onChange,
-    defaultValue: initialDefaultValue,
-    value = {},
-    ...otherProps
-  } = props
-
-  const user = useUserDetails()
-
-  const defaultValue =
-    initialDefaultValue && replacePlaceholders(initialDefaultValue, { user })
+  const { onChange, defaultValue, value = {}, ...otherProps } = props
 
   const fields = [
     ...ADMIN_STRUCTURE,
@@ -96,7 +84,7 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
       formData={value}
-      initialValues={{ ...value, ...defaultValue }}
+      initialValues={{ ...defaultValue, ...value }}
       setAllFieldsDirty={false}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />

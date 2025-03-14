@@ -58,7 +58,8 @@ import {
   isTextFieldType,
   isNumberFieldType,
   isEmailFieldType,
-  isFieldVisible
+  isFieldVisible,
+  MetaFields
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -90,10 +91,10 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 
 import { SubHeader } from '@opencrvs/components'
-import { formatISO } from 'date-fns'
 import { Divider } from '@opencrvs/components'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
+import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -484,9 +485,13 @@ GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
 type FormData = Record<string, FieldValue>
 
-const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
+const mapFieldsToValues = (
+  fields: FieldConfig[],
+  formData: FormData,
+  meta: MetaFields
+) =>
   fields.reduce((memo, field) => {
-    const fieldInitialValue = handleDefaultValue(field, formData)
+    const fieldInitialValue = handleDefaultValue(field, formData, meta)
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
 
@@ -730,8 +735,10 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
+  const user = useUserAddress()
+
   const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
-    ...mapFieldsToValues(props.fields, nestedFormData),
+    ...mapFieldsToValues(props.fields, nestedFormData, { $user: user }),
     ...props.initialValues
   })
 

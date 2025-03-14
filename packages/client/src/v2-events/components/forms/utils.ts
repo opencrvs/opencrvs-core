@@ -12,9 +12,12 @@ import {
   ActionFormData,
   FieldConfig,
   Inferred,
-  FieldValue
+  FieldValue,
+  MetaFields,
+  isDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
+import { replacePlaceholders } from '@client/v2-events/utils'
 
 /*
  * Formik has a feature that automatically nests all form keys that have a dot in them.
@@ -29,7 +32,8 @@ export function makeFormFieldIdFormikCompatible(fieldId: string) {
 
 export function handleDefaultValue(
   field: FieldConfig,
-  formData: ActionFormData
+  formData: ActionFormData,
+  meta: MetaFields
 ) {
   const defaultValue = field.defaultValue
 
@@ -39,6 +43,13 @@ export function handleDefaultValue(
     })
   }
 
+  if (isDefaultValue(defaultValue)) {
+    return replacePlaceholders({
+      fieldType: field.type,
+      defaultValue,
+      meta: meta
+    })
+  }
   return defaultValue
 }
 

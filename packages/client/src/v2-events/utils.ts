@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { uniq, isString, get, mapKeys } from 'lodash'
+import _, { uniq, isString, get, mapKeys } from 'lodash'
 
 import { IntlShape } from 'react-intl'
 import { v4 as uuid } from 'uuid'
@@ -18,7 +18,13 @@ import {
   EventConfig,
   EventIndex,
   getAllFields,
-  AddressFieldValue
+  FieldValue,
+  FieldType,
+  DefaultValue,
+  MetaFields,
+  isTemplateVariable,
+  mapFieldTypeToZod,
+  isFieldValueWithoutTemplates
 } from '@opencrvs/commons/client'
 import { setEmptyValuesForFields } from './components/forms/utils'
 
@@ -117,24 +123,88 @@ export function createTemporaryId() {
   return `tmp-${uuid()}`
 }
 
-export function replacePlaceholders(
-  defaults: AddressFieldValue,
-  dataObjects: Record<string, Partial<AddressFieldValue>>
-): AddressFieldValue {
-  const result = { ...defaults }
+/**
+ *
+ * currentValue: The current value of the field.
+ * defaultValue: Configured default value from the country configuration.
+ * meta: Metadata fields such as 'user', 'event', and others.
+ */
 
-  for (const [key, value] of Object.entries(defaults)) {
-    if (typeof value === 'string' && value.startsWith('$')) {
-      const [objectName, property] = value.slice(1).split('.')
+export function replacePlaceholders({
+  fieldType,
+  currentValue,
+  defaultValue,
+  meta
+}: {
+  fieldType: FieldType
+  currentValue?: FieldValue
+  defaultValue?: DefaultValue
+  meta: MetaFields
+}): FieldValue | undefined {
+  if (currentValue) {
+    return currentValue
+  }
 
-      if (dataObjects[objectName][property as keyof AddressFieldValue]) {
-        if (key !== 'urbanOrRural') {
-          result[key as Exclude<keyof AddressFieldValue, 'urbanOrRural'>] =
-            dataObjects[objectName][property as keyof AddressFieldValue] ??
-            value
+  if (!defaultValue) {
+    return undefined
+  }
+
+  if (isTemplateVariable(defaultValue)) {
+    const resolvedValue = _.get(meta, defaultValue)
+    const validator = mapFieldTypeToZod(fieldType)
+
+    const parsedValue = validator.safeParse(resolvedValue)
+
+    if (parsedValue.success) {
+      return parsedValue.data
+    }
+    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
+  }
+
+  if (isFieldValueWithoutTemplates(defaultValue)) {
+    return defaultValue
+  }
+
+  const compositeFieldTypes = [
+    FieldType.ADDRESS,
+    FieldType.FILE,
+    FieldType.FILE_WITH_OPTIONS
+  ]
+  if (
+    compositeFieldTypes.some((ft) => ft === fieldType) &&
+    typeof defaultValue === 'object'
+  ) {
+    /**
+     * defaultValue is typically an ADDRESS, FILE, or FILE_WITH_OPTIONS.
+     * Some STRING values within the defaultValue object may contain template variables (prefixed with $).
+     */
+    const result = { ...defaultValue }
+
+    for (const [key, val] of _.toPairs(result)) {
+      if (isTemplateVariable(val)) {
+        const resolvedValue = _.get(meta, val)
+        const validator = mapFieldTypeToZod(FieldType.TEXT)
+        const parsedValue = validator.safeParse(resolvedValue)
+        if (parsedValue.success && parsedValue.data) {
+          result[key] = parsedValue.data
+        } else {
+          throw new Error(`Could not resolve ${key}: ${parsedValue.error}`)
         }
       }
     }
+
+    const resultValidator = mapFieldTypeToZod(fieldType)
+    const parsedResult = resultValidator.safeParse(result)
+    if (parsedResult.success) {
+      return parsedResult.data
+    }
+    throw new Error(
+      `Could not resolve ${fieldType}: ${JSON.stringify(
+        defaultValue
+      )}. Error: ${parsedResult.error}`
+    )
   }
-  return result
+  throw new Error(
+    `Could not resolve ${fieldType}: ${JSON.stringify(defaultValue)}`
+  )
 }
