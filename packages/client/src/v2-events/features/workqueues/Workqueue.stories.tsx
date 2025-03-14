@@ -17,7 +17,7 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import {
   tennisClubMembershipEventIndex,
-  tennisClueMembershipEventDocument
+  tennisClubMembershipEventDocument
 } from '@client/v2-events/features/events/fixtures'
 import { WorkqueueIndex } from './index'
 
@@ -55,7 +55,7 @@ export const Workqueue: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return tennisClubMembershipEventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
