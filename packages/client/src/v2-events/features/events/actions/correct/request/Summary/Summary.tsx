@@ -20,7 +20,6 @@ import {
   getActiveActionFields,
   findActiveActionForm,
   generateTransactionId,
-  getCurrentEventState,
   Scope,
   SCOPES,
   isFieldVisible

@@ -31,7 +31,6 @@ import {
 import {
   EventState,
   EventConfig,
-  EventIndex,
   FieldType,
   FormConfig,
   getFieldValidationErrors,
@@ -739,7 +738,6 @@ export const REJECT_ACTIONS = {
 
 export interface RejectionState {
   rejectAction: keyof typeof REJECT_ACTIONS
-
   message: string
   isDuplicate: boolean
 }
