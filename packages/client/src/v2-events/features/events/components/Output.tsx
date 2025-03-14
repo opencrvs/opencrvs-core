@@ -32,108 +32,104 @@ import {
   isSelectFieldType,
   isTextFieldType
 } from '@opencrvs/commons/client'
-import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
   Address,
   AdministrativeArea,
+  BulletList,
   Checkbox,
   DateField,
+  Divider,
   LocationSearch,
+  PageHeader,
   RadioGroup,
   Select,
-  SelectCountry
+  SelectCountry,
+  Paragraph,
+  Number,
+  Text
 } from '@client/v2-events/features/events/registered-fields'
+import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
 
-interface FieldWithValue {
-  config: FieldConfig
-  value: FieldValue
-}
 /**
  *  Used for setting output/read (REVIEW) values for FORM input/write fields (string defaults based on FieldType).
  * For setting default fields for intl object @see setEmptyValuesForFields
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-function ValueOutput(field: FieldWithValue) {
+function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   /* eslint-disable react/destructuring-assignment */
+  if (isEmailFieldType(field) || isTextFieldType(field)) {
+    return Text.Output({ value: field.value })
+  }
+
   if (isDateFieldType(field)) {
-    return <DateField.Output value={field.value} />
+    return DateField.Output({ value: field.value })
   }
 
   if (isPageHeaderFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return PageHeader.Output
   }
 
   if (isParagraphFieldType(field)) {
-    return <DefaultOutput value={field.value} />
-  }
-
-  if (isTextFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return Paragraph.Output
   }
 
   if (isNumberFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return Number.Output({ value: field.value })
   }
 
   if (isFileFieldType(field)) {
-    return null
+    return File.Output
   }
 
   if (isBulletListFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return BulletList.Output
   }
 
   if (isSelectFieldType(field)) {
-    return <Select.Output options={field.config.options} value={field.value} />
+    return Select.Output({
+      options: field.config.options,
+      value: field.value
+    })
   }
 
   if (isCountryFieldType(field)) {
-    return <SelectCountry.Output value={field.value} />
+    return SelectCountry.Output({ value: field.value })
   }
 
   if (isCheckboxFieldType(field)) {
-    return <Checkbox.Output value={field.value} />
-  }
-
-  if (isEmailFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return Checkbox.Output({
+      required: field.config.required,
+      value: field.value
+    })
   }
 
   if (isAddressFieldType(field)) {
-    return <Address.Output value={field.value} />
+    return Address.Output({ value: field.value })
   }
 
   if (isRadioGroupFieldType(field)) {
-    return (
-      <RadioGroup.Output options={field.config.options} value={field.value} />
-    )
+    return RadioGroup.Output({
+      options: field.config.options,
+      value: field.value
+    })
   }
 
   if (isAdministrativeAreaFieldType(field)) {
-    return <AdministrativeArea.Output value={field.value} />
+    return AdministrativeArea.Output({ value: field.value })
   }
 
   if (isDividerFieldType(field)) {
-    return <DefaultOutput value={field.value} />
+    return Divider.Output
   }
 
   if (isFacilityFieldType(field)) {
-    return <LocationSearch.Output value={field.value} />
+    return LocationSearch.Output({ value: field.value })
   }
-}
-
-function DefaultOutput<T extends Stringifiable>({ value }: { value?: T }) {
-  return value?.toString() || ''
-}
-
-// @TODO: This only works for text fields, each components output function should handle the case for undefined value
-function getEmptyValueForFieldType(field: FieldWithValue) {
-  return '-'
 }
 
 export function Output({
@@ -147,15 +143,15 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
-  // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
+  // Explicitly check for undefined, so that e.g. number 0 is considered a value
   const hasValue = value !== undefined
 
   if (!hasValue) {
     if (previousValue) {
-      return <ValueOutput config={field} value={previousValue} />
+      return ValueOutput({ config: field, value: previousValue })
     }
 
-    return ''
+    return ValueOutput({ config: field, value: '' })
   }
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
@@ -175,10 +171,7 @@ export function Output({
     return (
       <>
         <Deleted>
-          <ValueOutput
-            config={field}
-            value={getEmptyValueForFieldType({ config: field, value })}
-          />
+          <ValueOutput config={{ ...field, required: true }} value="-" />
         </Deleted>
         <br />
         <ValueOutput config={field} value={value} />
@@ -186,5 +179,5 @@ export function Output({
     )
   }
 
-  return <ValueOutput config={field} value={value} />
+  return ValueOutput({ config: field, value })
 }

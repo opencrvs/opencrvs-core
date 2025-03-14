@@ -79,11 +79,12 @@ import {
   SelectCountry,
   Text,
   Number,
-  AdministrativeArea
+  AdministrativeArea,
+  Divider,
+  PageHeader,
+  Paragraph
 } from '@client/v2-events/features/events/registered-fields'
 
-import { SubHeader } from '@opencrvs/components'
-import { Divider } from '@opencrvs/components'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
 
@@ -191,7 +192,11 @@ const GeneratedInputField = React.memo(
       )
     }
     if (isPageHeaderFieldType(field)) {
-      return <SubHeader>{intl.formatMessage(fieldDefinition.label)}</SubHeader>
+      return (
+        <PageHeader.Input>
+          {intl.formatMessage(fieldDefinition.label)}
+        </PageHeader.Input>
+      )
     }
 
     if (isParagraphFieldType(field)) {
@@ -206,12 +211,10 @@ const GeneratedInputField = React.memo(
       })
 
       return (
-        <TextComponent
-          element="p"
-          variant={field.config.configuration?.styles?.fontVariant ?? 'reg16'}
-        >
-          <span dangerouslySetInnerHTML={{ __html: message }} />
-        </TextComponent>
+        <Paragraph.Input
+          fontVariant={field.config.configuration?.styles?.fontVariant}
+          message={message}
+        />
       )
     }
 
@@ -314,7 +317,7 @@ const GeneratedInputField = React.memo(
     if (isBulletListFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <BulletList {...field.config} />
+          <BulletList.Input {...field.config} />
         </InputField>
       )
     }
@@ -439,7 +442,7 @@ const GeneratedInputField = React.memo(
       )
     }
     if (isDividerFieldType(field)) {
-      return <Divider />
+      return <Divider.Input />
     }
     if (isFileFieldWithOptionType(field)) {
       return (
