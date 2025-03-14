@@ -34,6 +34,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
