@@ -11,7 +11,7 @@
 
 import { MessageDescriptor, useIntl } from 'react-intl'
 import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
-import { EventState } from '@opencrvs/commons/client'
+import { EventState, TranslationConfig } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
 /**
@@ -51,12 +51,15 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
  * This is needed to support dot notation in the message variables.
  */
 function convertDotInCurlyBraces(str: string): string {
-  return str.replace(/{([^}]+)}/g, (match, content) => {
+  return str.replace(/{([^}]+)}/g, (_, content) => {
     // Replace dots with triple underscores within the curly braces
     const transformedContent = content.replace(/\./g, INTERNAL_SEPARATOR)
     return `{${transformedContent}}`
   })
 }
+
+// The __EMPTY__ is our common token for missing values, that can be used when configuring a message.
+const EMPTY_TOKEN = '__EMPTY__'
 
 /**
  * intl with formatMessage that supports "flat object" dot notation in the message.
@@ -100,8 +103,36 @@ export function useIntlFormatMessageWithFlattenedParams() {
     return formatted.trim()
   }
 
+  // Format the translation with values from data.
+  function formatMessageWithValues(
+    translationConfig: TranslationConfig,
+    availableKeys: string[],
+    data: Record<string, unknown>
+  ) {
+    const messageBeforeFormatting = intl.formatMessage(translationConfig)
+
+    const keysInMessage = availableKeys.filter(
+      (key) =>
+        // This is a bit of hack, which expects that the keys are in the form of '{key ' or '{key}' in the message.
+        // E.g.: '{child.firstname, select, __EMPTY__ {Hello!} other {Hello to {child.firstname}!}}'
+        messageBeforeFormatting.includes(`{${key}}`) ||
+        messageBeforeFormatting.includes(`{${key} `)
+    )
+
+    const keyValues = keysInMessage.reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: data[key] ? data[key].toString() : EMPTY_TOKEN
+      }),
+      {}
+    )
+
+    return formatMessage(translationConfig, keyValues)
+  }
+
   return {
     ...intl,
-    formatMessage
+    formatMessage,
+    formatMessageWithValues
   }
 }

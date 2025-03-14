@@ -29,6 +29,7 @@ import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { SearchResultIndex } from '@client/v2-events/features/events/AdvancedSearch/SearchResultIndex'
 import { Action } from '@client/v2-events/features/events/components/Action'
+import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
 import { ROUTES } from './routes'
 
 /**
@@ -40,12 +41,14 @@ import { ROUTES } from './routes'
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
-    <TRPCErrorBoundary>
-      <TRPCProvider>
-        <Outlet />
-        <Debug />
-      </TRPCProvider>
-    </TRPCErrorBoundary>
+    <NavigationHistoryProvider>
+      <TRPCErrorBoundary>
+        <TRPCProvider>
+          <Outlet />
+          <Debug />
+        </TRPCProvider>
+      </TRPCErrorBoundary>
+    </NavigationHistoryProvider>
   ),
   children: [
     workqueueRouter,
