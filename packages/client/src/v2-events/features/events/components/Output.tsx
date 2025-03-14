@@ -11,6 +11,7 @@
 
 import React from 'react'
 import styled from 'styled-components'
+import * as _ from 'lodash'
 import {
   FieldConfig,
   FieldValue,
@@ -31,7 +32,6 @@ import {
   isSelectFieldType,
   isTextFieldType
 } from '@opencrvs/commons/client'
-
 import {
   Address,
   AdministrativeArea,
@@ -154,7 +154,8 @@ export function Output({
     return ValueOutput({ config: field, value: '' })
   }
 
-  if (previousValue && previousValue !== value) {
+  // Note, checking for previousValue !== value is not enough, as we have composite fields.
+  if (previousValue && !_.isEqual(previousValue, value)) {
     return (
       <>
         <Deleted>

@@ -12,12 +12,13 @@
 import {
   ActionDocument,
   ActionInputWithType,
+  ActionUpdate,
   Draft,
   EventDocument,
   EventInput,
   FieldConfig,
   FieldType,
-  FieldValue,
+  FieldUpdateValue,
   FileFieldValue,
   isUndeclaredDraft
 } from '@opencrvs/commons/events'
@@ -188,7 +189,7 @@ export async function createEvent({
 
 function getValidFileValue(
   fieldKey: string,
-  fieldValue: FieldValue,
+  fieldValue: FieldUpdateValue,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ) {
   const isFileType =
@@ -201,7 +202,7 @@ function getValidFileValue(
 }
 
 function extractFileValues(
-  data: ActionDocument['data'],
+  data: ActionUpdate,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ): Array<{ fieldName: string; file: FileFieldValue }> {
   const fileValues: Array<{ fieldName: string; file: FileFieldValue }> = []
@@ -328,5 +329,6 @@ export async function addAction(
   await indexEvent(updatedEvent)
   await notifyOnAction(input, updatedEvent, token)
   await deleteDraftsByEventId(eventId)
+
   return updatedEvent
 }

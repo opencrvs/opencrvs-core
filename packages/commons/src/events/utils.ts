@@ -19,7 +19,7 @@ import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { ActionFormData } from './ActionDocument'
+import { EventState } from './ActionDocument'
 import { FormConfig } from './FormConfig'
 import { isFieldVisible } from '../conditionals/validate'
 import { FieldType } from './FieldType'
@@ -217,7 +217,7 @@ export function getEventConfiguration(
   return config
 }
 
-function isOptionalUncheckedCheckbox(field: FieldConfig, form: ActionFormData) {
+function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
   if (field.type !== FieldType.CHECKBOX || field.required) {
     return false
   }
@@ -225,7 +225,7 @@ function isOptionalUncheckedCheckbox(field: FieldConfig, form: ActionFormData) {
   return !form[field.id]
 }
 
-export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
+export function stripHiddenFields(fields: FieldConfig[], data: EventState) {
   return omitBy(data, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
 
