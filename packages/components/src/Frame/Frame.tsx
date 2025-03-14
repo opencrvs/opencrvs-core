@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { createContext, useContext } from 'react'
 import styled from 'styled-components'
 import { Layout, LayoutCentered, LayoutForm } from './components/Layout'
 import { Section, SectionFormBackAction } from './components/Section'
@@ -52,21 +52,32 @@ const FrameMainContent = styled.main`
   background: ${({ theme }) => theme.colors.background};
 `
 
+const FrameMainContentRefContext =
+  createContext<React.RefObject<HTMLDivElement> | null>(null)
+
+export function useFrameMainContentRef() {
+  return useContext(FrameMainContentRefContext)
+}
+
 export function Frame({
   header,
   navigation,
   skipToContentText,
   children
 }: FrameProps) {
+  const mainContentRef = React.useRef<HTMLDivElement | null>(null)
+
   return (
-    <FrameGrid>
-      <SkipToContent>{skipToContentText}</SkipToContent>
-      <FrameNavigation>{navigation}</FrameNavigation>
-      <FrameHeader id="page-title">{header}</FrameHeader>
-      <FrameMainContent id={MAIN_CONTENT_ANCHOR_ID}>
-        {children}
-      </FrameMainContent>
-    </FrameGrid>
+    <FrameMainContentRefContext.Provider value={mainContentRef}>
+      <FrameGrid>
+        <SkipToContent>{skipToContentText}</SkipToContent>
+        <FrameNavigation>{navigation}</FrameNavigation>
+        <FrameHeader id="page-title">{header}</FrameHeader>
+        <FrameMainContent id={MAIN_CONTENT_ANCHOR_ID} ref={mainContentRef}>
+          {children}
+        </FrameMainContent>
+      </FrameGrid>
+    </FrameMainContentRefContext.Provider>
   )
 }
 

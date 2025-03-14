@@ -13,6 +13,7 @@ import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { EventState, FormPage } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
+import { useFrameMainContentRef } from '@opencrvs/components/lib/Frame/Frame'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 
@@ -42,7 +43,7 @@ export function Pages({
   children?: (page: FormPage) => React.ReactNode
 }) {
   const intl = useIntl()
-
+  const mainContentRef = useFrameMainContentRef()
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
 
   const {
@@ -58,8 +59,10 @@ export function Pages({
 
     if (pageChanged) {
       onFormPageChange(formPages[currentPage].id)
+
+      mainContentRef?.current?.scrollTo({ top: 0 })
     }
-  }, [pageId, currentPage, formPages, onFormPageChange])
+  }, [pageId, currentPage, formPages, onFormPageChange, mainContentRef])
 
   return (
     <FormWizard
