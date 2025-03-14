@@ -10,12 +10,12 @@
  */
 
 /* eslint-disable */
+import React, { useCallback, useEffect } from 'react'
 import { InputField } from '@client/components/form/InputField'
 import { TEXT } from '@client/forms'
 import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
-import React, { useCallback } from 'react'
 
 import styled, { keyframes } from 'styled-components'
 import {
@@ -60,7 +60,7 @@ import {
   isEmailFieldType,
   isFieldVisible
 } from '@opencrvs/commons/client'
-import { Field, FieldProps, Formik, FormikProps } from 'formik'
+import { Field, FieldProps, Formik, FormikProps, FormikTouched } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -86,6 +86,7 @@ import { SubHeader } from '@opencrvs/components'
 import { Divider } from '@opencrvs/components'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -685,61 +686,59 @@ function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
   )
 }
 
-export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
-  const intl = useIntl()
+export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
+  (props) => {
+    const intl = useIntl()
+    const { setAllTouchedFields, touchedFields: initialTouchedFields } =
+      useEventFormData()
+    const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
 
-  const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
+    const onChange = (values: EventState) => {
+      props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
+    }
+    const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
+      ...mapFieldsToValues(props.fields, nestedFormData),
+      ...props.initialValues
+    })
 
-  const onChange = (values: EventState) => {
-    props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
-  }
-
-  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
-    ...mapFieldsToValues(props.fields, nestedFormData),
-    ...props.initialValues
-  })
-
-  const initialValidations = getValidationErrorsForForm(
-    props.fields,
-    props.formData
-  )
-  const initialTouchedFields = makeFormFieldIdsFormikCompatible(
-    Object.entries(initialValidations).reduce(
-      (acc: Record<string, boolean>, [key, value]) => {
-        if (value.errors.length > 0) {
-          acc[key] = true
+    return (
+      <Formik<EventState>
+        enableReinitialize={true}
+        initialValues={initialValues}
+        initialTouched={initialTouchedFields}
+        validateOnMount={true}
+        validate={(values) =>
+          getValidationErrorsForForm(
+            props.fields,
+            makeFormikFieldIdsOpenCRVSCompatible(values)
+          )
         }
-        return acc
-      },
-      {}
+        onSubmit={() => {}}
+      >
+        {(formikProps) => {
+          useEffect(() => {
+            if (
+              setAllTouchedFields &&
+              Object.keys(formikProps.touched).length > 0 &&
+              !isEqual(initialTouchedFields, formikProps.touched)
+            ) {
+              setAllTouchedFields({
+                ...initialTouchedFields,
+                ...formikProps.touched
+              })
+            }
+          }, [formikProps.touched, initialTouchedFields, setAllTouchedFields])
+          return (
+            <FormSectionComponent
+              {...props}
+              {...formikProps}
+              formData={nestedFormData}
+              intl={intl}
+              onChange={onChange}
+            />
+          )
+        }}
+      </Formik>
     )
-  )
-
-  return (
-    <Formik<EventState>
-      enableReinitialize={true}
-      initialValues={initialValues}
-      initialTouched={initialTouchedFields}
-      validateOnMount={true}
-      validate={(values) =>
-        getValidationErrorsForForm(
-          props.fields,
-          makeFormikFieldIdsOpenCRVSCompatible(values)
-        )
-      }
-      onSubmit={() => {}}
-    >
-      {(formikProps) => {
-        return (
-          <FormSectionComponent
-            {...props}
-            {...formikProps}
-            formData={nestedFormData}
-            intl={intl}
-            onChange={onChange}
-          />
-        )
-      }}
-    </Formik>
-  )
-}
+  }
+)
