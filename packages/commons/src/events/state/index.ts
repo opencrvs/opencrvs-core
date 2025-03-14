@@ -10,11 +10,12 @@
  */
 
 import { ActionType } from '../ActionType'
-import { ActionDocument, ActionMetadata } from '../ActionDocument'
+import { ActionDocument, ActionUpdate, EventState } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 import { Draft } from '../Draft'
+import * as _ from 'lodash'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
@@ -59,7 +60,7 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
 
 function getData(actions: Array<ActionDocument>) {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
-   * stop auto filling collector form with previous priint action data)
+   * stop auto filling collector form with previous print action data)
    */
   const excludedActions = [
     ActionType.REQUEST_CORRECTION,
@@ -84,17 +85,59 @@ function getData(actions: Array<ActionDocument>) {
       if (!requestAction) {
         return status
       }
+      return deepMerge(status, requestAction.data)
+    }
+
+    return deepMerge(status, action.data)
+  }, {})
+}
+
+/**
+ * @returns Given arbitrary object, recursively remove all keys with null values
+ *
+ * @example
+ * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
+ */
+export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
+  if (!_.isObject(obj)) return obj
+
+  return Object.entries(obj).reduce((acc: T, [key, value]) => {
+    if (_.isObject(value)) {
+      value = deepDropNulls(value)
+    }
+
+    if (value !== null) {
       return {
-        ...status,
-        ...requestAction.data
+        ...acc,
+        [key]: value
       }
     }
 
-    return {
-      ...status,
-      ...action.data
+    return acc
+  }, {} as T)
+}
+
+function deepMerge(
+  currentDocument: ActionUpdate,
+  actionDocument: ActionUpdate
+) {
+  return _.mergeWith(
+    currentDocument,
+    actionDocument,
+    (previousValue, incomingValue) => {
+      if (incomingValue === undefined) {
+        return previousValue
+      }
+      if (_.isArray(incomingValue)) {
+        return incomingValue // Replace arrays instead of merging
+      }
+      if (_.isObject(previousValue) && _.isObject(incomingValue)) {
+        return undefined // Continue deep merging objects
+      }
+
+      return incomingValue // Override with latest value
     }
-  }, {})
+  )
 }
 
 export function isUndeclaredDraft(event: EventDocument): boolean {
@@ -112,7 +155,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const latestAction = event.actions[event.actions.length - 1]
 
-  return {
+  return deepDropNulls({
     id: event.id,
     type: event.type,
     status: getStatusFromActions(event.actions),
@@ -124,7 +167,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     updatedBy: latestAction.createdBy,
     data: getData(event.actions),
     trackingId: event.trackingId
-  }
+  })
 }
 
 /**
@@ -139,9 +182,7 @@ export function getCurrentEventStateWithDrafts(
 
   const activeDrafts = drafts
     .filter(({ eventId }) => eventId === event.id)
-    .filter(
-      ({ createdAt }) => new Date(createdAt) > new Date(lastAction.createdAt)
-    )
+    .filter(({ createdAt }) => createdAt > lastAction.createdAt)
     .map((draft) => draft.action)
     .flatMap((action) => {
       /*
@@ -193,26 +234,27 @@ export function applyDraftsToEventIndex(
   }
 }
 
-export function getMetadataForAction(
-  event: EventDocument,
-  actionType: ActionType,
-  draftsForEvent: Draft[]
-): ActionMetadata {
+export function getMetadataForAction({
+  event,
+  actionType,
+  drafts
+}: {
+  event: EventDocument
+  actionType: ActionType
+  drafts: Draft[]
+}): EventState {
   const action = event.actions.find((action) => actionType === action.type)
 
-  const drafts = draftsForEvent.filter((draft) => draft.eventId === event.id)
+  const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
 
   const sorted = [
     ...(action ? [action] : []),
-    ...drafts.map((draft) => draft.action)
+    ...eventDrafts.map((draft) => draft.action)
   ].sort()
 
   const metadata = sorted.reduce((metadata, action) => {
-    return {
-      ...metadata,
-      ...action.metadata
-    }
+    return deepMerge(metadata, action.metadata ?? {})
   }, {})
 
-  return metadata
+  return deepDropNulls(metadata)
 }
