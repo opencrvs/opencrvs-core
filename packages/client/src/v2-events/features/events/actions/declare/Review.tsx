@@ -116,30 +116,35 @@ export function Review() {
     }
   }
 
+  const eventFieldKeys = formConfig.pages.flatMap((page) =>
+    page.fields.map((field) => field.id)
+  )
+
   // Format the title with values from the form. The title supports keys from the form, e.g. {applicant.firstname} for tennis form
   // or {child.surname} for birth form. Here the keys are extracted and the values are substituted.
-  // The hasAnyKey -key is used to check if there are any of the mentioned keys in the title.
-  function getFormattedTitle(translationConfig: TranslationConfig) {
+  function getFormattedTitle(
+    eventfieldKeys: string[],
+    translationConfig: TranslationConfig
+  ) {
     const titleBeforeFormat = intl.formatMessage(translationConfig)
 
-    // This is a bit of hack, which expects that the keys are in the form of '{key}' in the message.
-    const titleKeys =
-      titleBeforeFormat
-        .match(/\{([^}\s]+)\}/g)
-        ?.map((key) => key.slice(1, -1)) ?? []
+    const keysInTranslation = eventfieldKeys.filter(
+      (key) =>
+        // This is a bit of hack, which expects that the keys are in the form of '{key ' or '{key}' in the message.
+        titleBeforeFormat.includes(`{${key}}`) ||
+        titleBeforeFormat.includes(`{${key} `)
+    )
 
-    const keyValues = titleKeys.reduce(
+    const keyValues = keysInTranslation.reduce(
       (acc, key) => ({
         ...acc,
-        [key]: form[key] ? form[key].toString() : ''
+        // The __EMPTY__ is our common token for missing values, that can be used when configuring the title.
+        [key]: form[key] ? form[key].toString() : '__EMPTY__'
       }),
       {}
     )
 
-    return flattenedIntl.formatMessage(translationConfig, {
-      ...keyValues,
-      hasAnyKey: Object.values(keyValues).some((value) => value)
-    })
+    return flattenedIntl.formatMessage(translationConfig, keyValues)
   }
 
   return (
@@ -159,7 +164,7 @@ export function Review() {
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         isUploadButtonVisible={true}
-        title={getFormattedTitle(formConfig.review.title)}
+        title={getFormattedTitle(eventFieldKeys, formConfig.review.title)}
         metadata={metadata}
         onMetadataChange={(values) => setMetadata(values)}
       >
