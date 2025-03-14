@@ -52,7 +52,7 @@ export function FormHeader({
     throw new Error('Event id is required')
   }
   const events = useEvents()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const onExit = useCallback(async () => {
     await exit(event)
@@ -62,7 +62,7 @@ export function FormHeader({
     await deleteDeclaration(eventId)
   }, [eventId, deleteDeclaration])
 
-  const menuItems = isUndeclaredDraft(event)
+  const menuItems = isUndeclaredDraft(event.status)
     ? [
         {
           label: 'Delete declaration',

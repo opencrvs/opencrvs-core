@@ -140,8 +140,8 @@ function deepMerge(
   )
 }
 
-export function isUndeclaredDraft(event: EventDocument): boolean {
-  return event.actions.every(({ type }) => type === ActionType.CREATE)
+export function isUndeclaredDraft(status: EventStatus): boolean {
+  return status === EventStatus.CREATED
 }
 
 export function getCurrentEventState(event: EventDocument): EventIndex {

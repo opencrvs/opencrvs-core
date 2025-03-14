@@ -18,7 +18,9 @@ import {
   FieldConfig,
   FieldProps,
   FieldType,
-  not
+  not,
+  GeographicalArea,
+  AdministrativeAreas
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -206,12 +208,12 @@ const ADMIN_STRUCTURE = [
       defaultMessage: 'Province',
       description: 'This is the label for the field'
     },
-    type: 'ADMINISTRATIVE_AREA',
-    configuration: { type: 'ADMIN_STRUCTURE' }
+    type: FieldType.ADMINISTRATIVE_AREA,
+    configuration: { type: AdministrativeAreas.enum.ADMIN_STRUCTURE }
   },
   {
     id: 'district',
-    type: 'ADMINISTRATIVE_AREA',
+    type: FieldType.ADMINISTRATIVE_AREA,
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -225,7 +227,7 @@ const ADMIN_STRUCTURE = [
       description: 'This is the label for the field'
     },
     configuration: {
-      type: 'ADMIN_STRUCTURE',
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
       partOf: {
         $data: 'province'
       }
@@ -246,10 +248,10 @@ const ADMIN_STRUCTURE = [
       description: 'This is the label for the field'
     },
     hideLabel: true,
-    type: 'RADIO_GROUP',
+    type: FieldType.RADIO_GROUP,
     options: [
       {
-        value: 'URBAN',
+        value: GeographicalArea.URBAN,
         label: {
           id: 'v2.field.address.label.urban',
           defaultMessage: 'Urban',
@@ -257,7 +259,7 @@ const ADMIN_STRUCTURE = [
         }
       },
       {
-        value: 'RURAL',
+        value: GeographicalArea.RURAL,
         label: {
           id: 'v2.field.address.label.rural',
           defaultMessage: 'Rural',
@@ -265,7 +267,7 @@ const ADMIN_STRUCTURE = [
         }
       }
     ],
-    defaultValue: 'URBAN',
+    defaultValue: GeographicalArea.URBAN,
     configuration: {
       styles: { size: 'NORMAL' }
     }
