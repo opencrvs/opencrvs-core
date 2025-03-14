@@ -9,6 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+import {
+  AddressFieldValue,
+  AddressFieldUpdateValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  RuralAddressValue,
+  RuralAddressUpdateValue,
+  UrbanAddressValue,
+  UrbanAddressUpdateValue
+} from './CompositeFieldValue'
+
+/**
+ * FieldValues defined in this file are primitive field values.
+ * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
+ *
+ * FieldValue is a union of primitive and composite field values.
+ * FieldValue can never be null.
+ *
+ * FieldUpdateValue accepts null values for primitive field values when they are optional.
+ * API is build assuming partial (PATCH) updates. In order to edit and remove optional value, we need to accept null values.
+ * Omitting a field value in partial updates leaves it untouched.
+ *
+ */
 
 export const TextValue = z.string()
 export const RequiredTextValue = TextValue.min(1)
@@ -20,53 +43,6 @@ export const DateValue = z
 
 export const EmailValue = z.string().email()
 
-export const FileFieldValue = z.object({
-  filename: z.string(),
-  originalFilename: z.string(),
-  type: z.string()
-})
-
-export type FileFieldValue = z.infer<typeof FileFieldValue>
-
-const AdminStructure = z.object({
-  country: z.string(),
-  province: z.string(),
-  district: z.string()
-})
-
-const UrbanAddress = AdminStructure.extend({
-  urbanOrRural: z.literal('URBAN'),
-  town: z.string().optional(),
-  residentialArea: z.string().optional(),
-  street: z.string().optional(),
-  number: z.string().optional(),
-  zipCode: z.string().optional()
-})
-
-const RuralAddress = AdminStructure.extend({
-  urbanOrRural: z.literal('RURAL'),
-  village: z.string().optional()
-})
-
-export const AddressFieldValue = z.discriminatedUnion('urbanOrRural', [
-  UrbanAddress,
-  RuralAddress
-])
-
-export type AddressFieldValue = z.infer<typeof AddressFieldValue>
-export const FileFieldValueWithOption = z.object({
-  filename: z.string(),
-  originalFilename: z.string(),
-  type: z.string(),
-  option: z.string()
-})
-
-export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
-
-export const FileFieldWithOptionValue = z.array(FileFieldValueWithOption)
-
-export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
-
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
@@ -75,15 +51,28 @@ export type NumberFieldValue = z.infer<typeof NumberFieldValue>
 export const FieldValue = z.union([
   TextValue,
   DateValue,
-  FileFieldValue,
-  FileFieldWithOptionValue,
   CheckboxFieldValue,
   NumberFieldValue,
-  UrbanAddress,
-  RuralAddress
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  UrbanAddressValue,
+  RuralAddressValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
+
+export const FieldUpdateValue = z.union([
+  TextValue,
+  DateValue,
+  CheckboxFieldValue,
+  NumberFieldValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  UrbanAddressUpdateValue,
+  RuralAddressUpdateValue
+])
+
+export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
 
 /**
  * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
@@ -97,4 +86,16 @@ export type FieldValueSchema =
   | z.ZodString
   | z.ZodBoolean
 
-export type OptionalFieldValueSchema = z.ZodOptional<FieldValueSchema>
+/**
+ * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
+ *
+ * FieldValueInputSchema uses Input types which have set optional values as nullish
+ * */
+export type FieldUpdateValueSchema =
+  | typeof FileFieldValue
+  | typeof FileFieldWithOptionValue
+  | typeof CheckboxFieldValue
+  | typeof AddressFieldUpdateValue
+  | typeof NumberFieldValue
+  | z.ZodString
+  | z.ZodBoolean

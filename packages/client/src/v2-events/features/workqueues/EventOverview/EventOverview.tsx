@@ -63,17 +63,13 @@ function EventOverviewContainer() {
 
   const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
 
-  const config = configs.find((c) => c.id === event?.type)
+  const config = configs.find((c) => c.id === event.type)
 
   const userIds = getUserIdsFromActions(fullEvent.actions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
 
   if (!config) {
-    return null
-  }
-
-  if (!event) {
     return null
   }
 

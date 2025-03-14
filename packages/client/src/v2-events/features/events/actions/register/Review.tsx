@@ -17,7 +17,8 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
-  findActiveActionForm
+  findActiveActionForm,
+  getMetadataForAction
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -83,10 +84,14 @@ export function Review() {
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
+  const previousMetadata = getMetadataForAction({
+    event,
+    actionType: ActionType.REGISTER,
+    drafts: []
+  })
+
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(
-    event.actions.find((a) => a.type === ActionType.REGISTER)?.metadata
-  )
+  const metadata = getMetadata(previousMetadata)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
