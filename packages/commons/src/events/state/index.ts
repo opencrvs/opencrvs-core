@@ -127,6 +127,9 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
   }
 }
 
+/**
+ * @returns the future state of the event with drafts applied
+ */
 export function getCurrentEventStateWithDrafts(
   event: EventDocument,
   drafts: Draft[]
