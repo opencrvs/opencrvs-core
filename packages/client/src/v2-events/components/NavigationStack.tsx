@@ -22,7 +22,7 @@ import {
   useNavigate,
   useNavigationType
 } from 'react-router-dom'
-
+import { Action } from '@remix-run/router'
 const NavigationContext = createContext<Location[]>([])
 
 export const NavigationHistoryProvider = ({ children }: PropsWithChildren) => {
@@ -64,7 +64,7 @@ export function NavigationStack(props: PropsWithChildren) {
   useEffect(() => {
     const userAccessingViewDirectly = history.length === 0
     const userNavigatingBack =
-      !userAccessingViewDirectly && navigateType === 'POP'
+      !userAccessingViewDirectly && navigateType === Action.Pop
 
     if (userNavigatingBack) {
       navigate(history[history.length - 1], { replace: true })
