@@ -717,6 +717,12 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
       >
         {(formikProps) => {
           useEffect(() => {
+            /**
+             * Because 'enableReinitialize' prop is set to 'true' above, whenver initialValue changes,
+             * formik lose track of touched fields. This is a workaround to save all the fields that
+             * have been touched for once during the form manipulation. So that we can show validation
+             * errors for all fields that have been touched.
+             */
             if (
               setAllTouchedFields &&
               Object.keys(formikProps.touched).length > 0 &&
