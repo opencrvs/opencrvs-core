@@ -30,7 +30,7 @@ import {
 import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
-  ActionFormData,
+  EventState,
   FieldConfig,
   FieldType,
   FieldValue,
@@ -103,7 +103,7 @@ const FormItem = styled.div<{
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   fields: FieldConfig[]
-  values: ActionFormData
+  values: EventState
   setFieldValue: (name: string, value: FieldValue | undefined) => void
   onClick?: () => void
   onChange: (e: React.ChangeEvent) => void
@@ -112,7 +112,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   value: FieldValue
   touched: boolean
   error: string
-  formData: ActionFormData
+  formData: EventState
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
@@ -473,16 +473,16 @@ interface ExposedProps {
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
   setAllFieldsDirty: boolean
-  onChange: (values: ActionFormData) => void
+  onChange: (values: EventState) => void
   formData: Record<string, FieldValue>
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: ActionFormData
+  initialValues?: EventState
 }
 
 type AllProps = ExposedProps &
   IntlShapeProps &
-  FormikProps<ActionFormData> & {
+  FormikProps<EventState> & {
     className?: string
   }
 
@@ -690,7 +690,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
 
   const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
 
-  const onChange = (values: ActionFormData) => {
+  const onChange = (values: EventState) => {
     props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
@@ -716,7 +716,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
   )
 
   return (
-    <Formik<ActionFormData>
+    <Formik<EventState>
       enableReinitialize={true}
       initialValues={initialValues}
       initialTouched={initialTouchedFields}

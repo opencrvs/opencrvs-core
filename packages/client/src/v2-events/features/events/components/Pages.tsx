@@ -11,7 +11,7 @@
 
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
-import { ActionFormData, FormPage } from '@opencrvs/commons/client'
+import { EventState, FormPage } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
@@ -31,8 +31,8 @@ export function Pages({
   setFormData,
   children
 }: {
-  form: ActionFormData
-  setFormData: (data: ActionFormData) => void
+  form: EventState
+  setFormData: (data: EventState) => void
   pageId: string
   showReviewButton?: boolean
   formPages: FormPage[]

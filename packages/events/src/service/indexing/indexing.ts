@@ -252,13 +252,11 @@ export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
-  return esClient.update<EventIndex>({
+  return esClient.index<EventIndex>({
     index: indexName,
     id: event.id,
-    body: {
-      doc: eventToEventIndex(event),
-      doc_as_upsert: true
-    },
+    /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
+    document: eventToEventIndex(event),
     refresh: 'wait_for'
   })
 }
@@ -295,14 +293,10 @@ export async function getIndexedEvents() {
     request_cache: false
   })
 
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
-  )
-
-  return events
+  return response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map(decodeEventIndex)
 }
 
 export async function getIndex(eventParams: EventSearchIndex) {

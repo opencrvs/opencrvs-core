@@ -10,7 +10,7 @@
  */
 
 import { EventDocument } from '../events/EventDocument'
-import { ActionFormData } from '../events/ActionDocument'
+import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
@@ -29,7 +29,7 @@ export type EventConditionalParameters = { $now: string; $event: EventDocument }
 // @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
 export type FormConditionalParameters = {
   $now: string
-  $form: ActionFormData | Record<string, any>
+  $form: EventState | Record<string, any>
 }
 
 export type ConditionalParameters =

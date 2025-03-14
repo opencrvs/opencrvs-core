@@ -10,6 +10,10 @@
  */
 
 import { getCurrentEventState } from '.'
+import { tennisClubMembershipEvent } from '../../fixtures'
+import { getUUID } from '../../uuid'
+import { ActionType } from '../ActionType'
+import { generateActionDocument } from '../test.utils'
 
 describe('correction requests', () => {
   test('proposed correction data is not applied before the correction request is approved', () => {
@@ -118,5 +122,101 @@ describe('correction requests', () => {
     })
 
     expect(state.data.name).toBe('Doe John')
+  })
+})
+
+describe('address state transitions', () => {
+  const addressWithoutVillage = {
+    country: 'FAR',
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+    urbanOrRural: 'RURAL' as const
+  }
+
+  const initialAddress = {
+    ...addressWithoutVillage,
+    village: 'Small village'
+  }
+
+  const initialForm = {
+    'applicant.dob': '2000-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true,
+    'applicant.address': { ...initialAddress }
+  }
+
+  const initialActions = [
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        data: initialForm
+      }
+    })
+  ]
+
+  test('should persist optional "village" field in address, even if it is not included in payload', () => {
+    const actions = [
+      ...initialActions,
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.DECLARE,
+        defaults: {
+          data: {
+            'applicant.address': addressWithoutVillage
+          }
+        }
+      })
+    ]
+
+    const state = getCurrentEventState({
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date().toISOString(),
+      actions,
+      id: getUUID(),
+      updatedAt: new Date().toISOString()
+    })
+
+    expect(state.data).toEqual(initialForm)
+  })
+
+  test('should remove optional "village" field in address when it is set to null', () => {
+    const addressWithNullVillage = {
+      ...addressWithoutVillage,
+      village: null
+    }
+
+    const actions = [
+      ...initialActions,
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.DECLARE,
+        defaults: {
+          data: {
+            'applicant.address': addressWithNullVillage
+          }
+        }
+      })
+    ]
+
+    const state = getCurrentEventState({
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date().toISOString(),
+      actions,
+      id: getUUID(),
+      updatedAt: new Date().toISOString()
+    })
+
+    expect(state.data).toEqual({
+      ...initialForm,
+      'applicant.address': addressWithoutVillage
+    })
   })
 })
