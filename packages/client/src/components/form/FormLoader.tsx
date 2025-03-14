@@ -8,23 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import React from 'react'
+import { Box, Loader } from '@opencrvs/components'
 import styled from 'styled-components'
-import { Box } from '../Box'
-import { Stack } from '../Stack'
 
-export const MainContainer = styled(Box)`
-  background: ${({ theme }) => theme.colors.background};
+const Container = styled(Box)`
   border: none;
-  flex: 1;
+  background-color: ${({ theme }) => theme.colors.background};
 `
+interface FormLoaderProps {
+  loadingText: string
+  id: string
+}
 
-export const ReadersContainer = styled(Stack)`
-  width: 100%;
-
-  flex-direction: column;
-
-  & > * {
-    width: 100%;
-    flex: none;
-  }
-`
+export function FormLoader(props: FormLoaderProps) {
+  const { loadingText, id } = props
+  return (
+    <Container>
+      <Loader
+        id={id}
+        loadingText={loadingText}
+        marginPercent={5}
+        flexDirection="column-reverse"
+      />
+    </Container>
+  )
+}

@@ -136,7 +136,7 @@ export const positive = css`
   color: ${({ theme }) => theme.colors.white};
 
   svg {
-    color: ${({ theme }) => theme.colors.positive};
+    color: ${({ theme }) => theme.colors.white};
   }
 
   &:hover {
