@@ -43,7 +43,7 @@ export const EventMetadata = z.object({
   createdBy: z.string(),
   createdAtLocation: z.string(),
   modifiedAt: z.string().datetime(),
-  assignedTo: z.string().nullable(),
+  assignedTo: z.string().nullish(),
   updatedBy: z.string(),
   trackingId: z.string()
 })

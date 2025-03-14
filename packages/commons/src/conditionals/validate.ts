@@ -15,10 +15,10 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { ActionFormData } from '../events/ActionDocument'
+import { EventState, ActionUpdate } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { FieldValue } from '../events/FieldValue'
+import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType } from '../events/Conditional'
 
@@ -46,7 +46,7 @@ function getConditionalActionsForField(
 
 function isFieldConditionMet(
   field: FieldConfig,
-  form: ActionFormData,
+  form: ActionUpdate | EventState,
   conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
 ) {
   const hasRule = (field.conditionals ?? []).some(
@@ -67,11 +67,17 @@ function isFieldConditionMet(
   return validConditionals.includes(conditionalType)
 }
 
-export function isFieldVisible(field: FieldConfig, form: ActionFormData) {
+export function isFieldVisible(
+  field: FieldConfig,
+  form: ActionUpdate | EventState
+) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
-export function isFieldEnabled(field: FieldConfig, form: ActionFormData) {
+export function isFieldEnabled(
+  field: FieldConfig,
+  form: ActionUpdate | EventState
+) {
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
 
@@ -157,7 +163,7 @@ export function getFieldValidationErrors({
 }: {
   // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
   field: FieldConfig
-  values: ActionFormData
+  values: ActionUpdate
 }) {
   const conditionalParameters = {
     $form: values,
@@ -233,7 +239,7 @@ export function validateFieldInput({
   value
 }: {
   field: FieldConfig
-  value: FieldValue
+  value: FieldUpdateValue
 }) {
   const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
     value,

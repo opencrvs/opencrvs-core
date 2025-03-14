@@ -49,7 +49,9 @@
     "packages/dashboards/data/metabase/*.db",
     "packages/client/dev-dist",
     "packages/toolkit/.npmignore",
-    "packages/toolkit/tsconfig.tsbuildinfo"
+    "packages/toolkit/tsconfig.tsbuildinfo",
+    "packages/commons/src/events/EventConfig.mermaid",
+    "packages/commons/src/events/EventUpdateFlow.mermaid"
   ],
   "license": "license-header.txt",
   "licenseFormats": {

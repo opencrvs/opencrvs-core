@@ -84,7 +84,7 @@ function ActionComponent({ children, type }: Props) {
     (state) => state.setInitialMetadataValues
   )
 
-  const draftsForThisEvent = drafts
+  const eventDrafts = drafts
     .filter((d) => d.eventId === event.id)
     .concat({
       ...localDraft,
@@ -106,13 +106,17 @@ function ActionComponent({ children, type }: Props) {
     })
 
   const eventDataWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, draftsForThisEvent),
-    [draftsForThisEvent, event]
+    () => getCurrentEventStateWithDrafts(event, eventDrafts),
+    [eventDrafts, event]
   )
 
   const declareMetadata = useMemo(() => {
-    return getMetadataForAction(event, ActionType.DECLARE, draftsForThisEvent)
-  }, [draftsForThisEvent, event])
+    return getMetadataForAction({
+      event,
+      actionType: ActionType.DECLARE,
+      drafts: eventDrafts
+    })
+  }, [eventDrafts, event])
 
   useEffect(() => {
     setInitialFormValues(eventDataWithDrafts.data)
