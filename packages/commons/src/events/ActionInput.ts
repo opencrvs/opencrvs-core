@@ -16,11 +16,6 @@ import { FieldValue } from './FieldValue'
 export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  incomplete: z
-    .boolean()
-    .optional()
-    .default(false)
-    .describe('Allows action with partial data to be saved'),
   data: z.record(z.string(), FieldValue),
   metadata: z.record(z.string(), FieldValue).optional()
 })

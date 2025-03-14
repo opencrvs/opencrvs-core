@@ -212,13 +212,6 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     ...mutationOptions
   })
 
-  const notifyMutation = useMutation({
-    ...trpcOptionsProxy.event.actions.notify.mutationOptions(),
-    ...queryClient.getMutationDefaults(
-      trpcOptionsProxy.event.actions.notify.mutationKey()
-    )
-  })
-
   return {
     mutate: (params: inferInput<P>) => {
       const localEvent = findLocalEventData(params.eventId)
@@ -232,19 +225,26 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       }
       const fields = findActiveActionFields(eventConfiguration, actionType)
 
-      if (actionType === ActionType.DECLARE && params.metadata.incomplete) {
-        return notifyMutation.mutate({
-          ...params,
-          incomplete: true,
-          actionType: ActionType.NOTIFY,
-          data: stripHiddenFields(fields, params.data)
-        })
-      } else {
+      if (actionType === ActionType.NOTIFY) {
+        /**
+         * Because NOTIFY action is just an incomplete DECLARE action,
+         * notifyFields are decided by DECLARE action
+         */
+        const notifyFields = findActiveActionFields(
+          eventConfiguration,
+          ActionType.DECLARE
+        )
+
         return mutation.mutate({
           ...params,
-          data: stripHiddenFields(fields, params.data)
+          data: stripHiddenFields(notifyFields, params.data)
         })
       }
+
+      return mutation.mutate({
+        ...params,
+        data: stripHiddenFields(fields, params.data)
+      })
     }
   }
 }
