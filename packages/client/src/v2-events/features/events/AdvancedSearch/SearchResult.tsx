@@ -31,7 +31,7 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { SearchModifierComponent } from './SearchModifier'
 

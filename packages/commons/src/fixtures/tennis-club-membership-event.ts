@@ -669,7 +669,8 @@ export const TENNIS_CLUB_FORM = defineForm({
   review: {
     title: {
       id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
-      defaultMessage: 'Member declaration for {firstname} {surname}',
+      defaultMessage:
+        '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
       description: 'Title of the form to show in review page'
     },
     fields: [

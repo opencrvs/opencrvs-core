@@ -23,7 +23,7 @@ on:
       keep_e2e:
         description: 'Keep E2E environment after tests'
         required: true
-        type: bool
+        type: boolean
 
 concurrency:
   group: ${{ inputs.pr_number || github.ref }}
