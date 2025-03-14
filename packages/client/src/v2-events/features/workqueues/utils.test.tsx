@@ -12,7 +12,7 @@ import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { IntlProvider } from 'react-intl'
-import { useIntlFormatMessageWithFlattenedParams } from './utils'
+import { useIntlFormatMessageWithFlattenedParams } from '../../messages/utils'
 
 describe('useIntlFormatMessageWithFlattenedParams', () => {
   const messages = {

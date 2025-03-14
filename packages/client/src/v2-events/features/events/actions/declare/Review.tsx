@@ -10,15 +10,10 @@
  */
 
 import React from 'react'
-import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import {
-  ActionType,
-  findActiveActionForm,
-  TranslationConfig
-} from '@opencrvs/commons/client'
+import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -34,7 +29,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -43,8 +38,7 @@ export function Review() {
   const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
-  const intl = useIntl()
-  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
+  const { formatMessageWithValues } = useIntlFormatMessageWithFlattenedParams()
   const { goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
@@ -120,33 +114,6 @@ export function Review() {
     page.fields.map((field) => field.id)
   )
 
-  // Format the title with values from the form. The title supports keys from the form, e.g. {applicant.firstname} for tennis form
-  // or {child.surname} for birth form. Here the keys are extracted and the values are substituted.
-  function getFormattedTitle(
-    eventfieldKeys: string[],
-    translationConfig: TranslationConfig
-  ) {
-    const titleBeforeFormat = intl.formatMessage(translationConfig)
-
-    const keysInTranslation = eventfieldKeys.filter(
-      (key) =>
-        // This is a bit of hack, which expects that the keys are in the form of '{key ' or '{key}' in the message.
-        titleBeforeFormat.includes(`{${key}}`) ||
-        titleBeforeFormat.includes(`{${key} `)
-    )
-
-    const keyValues = keysInTranslation.reduce(
-      (acc, key) => ({
-        ...acc,
-        // The __EMPTY__ is our common token for missing values, that can be used when configuring the title.
-        [key]: form[key] ? form[key].toString() : '__EMPTY__'
-      }),
-      {}
-    )
-
-    return flattenedIntl.formatMessage(translationConfig, keyValues)
-  }
-
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
@@ -164,7 +131,11 @@ export function Review() {
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         isUploadButtonVisible={true}
-        title={getFormattedTitle(eventFieldKeys, formConfig.review.title)}
+        title={formatMessageWithValues(
+          formConfig.review.title,
+          eventFieldKeys,
+          form
+        )}
         metadata={metadata}
         onMetadataChange={(values) => setMetadata(values)}
       >

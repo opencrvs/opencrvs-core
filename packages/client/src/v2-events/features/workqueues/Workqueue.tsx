@@ -50,7 +50,7 @@ import { flattenEventIndex } from '@client/v2-events/utils'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { WQContentWrapper } from './components/ContentWrapper'
-import { useIntlFormatMessageWithFlattenedParams } from './utils'
+import { useIntlFormatMessageWithFlattenedParams } from '../../messages/utils'
 
 const messages = defineMessages({
   empty: {
