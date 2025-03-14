@@ -88,7 +88,7 @@ export function Review() {
 
   const previousMetadata = getMetadataForAction({
     event,
-    actionType: ActionType.REGISTER,
+    actionType: ActionType.VALIDATE,
     drafts: []
   })
 
