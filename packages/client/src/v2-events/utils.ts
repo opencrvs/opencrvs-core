@@ -156,7 +156,7 @@ export function replacePlaceholders({
     const parsedValue = validator.safeParse(resolvedValue)
 
     if (parsedValue.success) {
-      return parsedValue.data
+      return resolvedValue
     }
     throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
   }
@@ -186,7 +186,7 @@ export function replacePlaceholders({
         const validator = mapFieldTypeToZod(FieldType.TEXT)
         const parsedValue = validator.safeParse(resolvedValue)
         if (parsedValue.success && parsedValue.data) {
-          result[key] = parsedValue.data
+          result[key] = resolvedValue
         } else {
           throw new Error(`Could not resolve ${key}: ${parsedValue.error}`)
         }
@@ -196,7 +196,7 @@ export function replacePlaceholders({
     const resultValidator = mapFieldTypeToZod(fieldType)
     const parsedResult = resultValidator.safeParse(result)
     if (parsedResult.success) {
-      return parsedResult.data
+      return result as FieldValue
     }
     throw new Error(
       `Could not resolve ${fieldType}: ${JSON.stringify(
