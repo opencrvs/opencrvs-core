@@ -12,12 +12,13 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
-  EventIndex,
-  ActionDocument,
   getAllFields,
   SummaryConfig,
   FieldValue,
-  getCurrentEventStateWithDrafts
+  getCurrentEventStateWithDrafts,
+  EventDocument,
+  Draft,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -60,7 +61,6 @@ function EventOverviewContainer() {
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
   const drafts = getRemoteDrafts()
-
   const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
 
   const config = configs.find((c) => c.id === event.type)
@@ -80,12 +80,30 @@ function EventOverviewContainer() {
   return (
     <EventOverviewProvider locations={locations} users={users}>
       <EventOverview
-        event={event}
-        history={fullEvent.actions}
+        drafts={drafts}
+        event={fullEvent}
         summary={config.summary}
       />
     </EventOverviewProvider>
   )
+}
+
+function getDefaultFieldValues(
+  trackingId: string,
+  status:
+    | 'ARCHIVED'
+    | 'CREATED'
+    | 'NOTIFIED'
+    | 'DECLARED'
+    | 'VALIDATED'
+    | 'REGISTERED'
+    | 'CERTIFIED'
+    | 'REJECTED'
+) {
+  return {
+    'event.trackingId': trackingId,
+    'event.status': status
+  }
 }
 
 /**
@@ -93,29 +111,32 @@ function EventOverviewContainer() {
  */
 function EventOverview({
   event,
-  summary,
-  history
+  drafts,
+  summary
 }: {
-  event: EventIndex
+  drafts: Draft[]
+  event: EventDocument
   summary: SummaryConfig
-  history: ActionDocument[]
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const allFields = getAllFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
 
+  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
+  const eventIndex = getCurrentEventState(event)
+  const { trackingId, status } = eventIndex
+
   const stringifyFormData = useFormDataStringifier()
-
-  const eventWithDefaults = stringifyFormData(allFields, event.data)
-
   const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
+  const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
 
   const flattenedEventIndex: Record<
     string,
     FieldValue | null | RecursiveStringRecord
   > = {
     ...emptyEvent,
-    ...eventWithDefaults
+    ...eventWithDefaults,
+    ...getDefaultFieldValues(trackingId, status)
   }
 
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
@@ -124,14 +145,18 @@ function EventOverview({
     : ''
   return (
     <Content
-      icon={() => <IconWithName name={''} status={event.status} />}
+      icon={() => <IconWithName name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title || fallbackTitle}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
-      <EventSummary event={flattenedEventIndex} summary={summary} />
-      <EventHistory history={history} />
+      <EventSummary
+        event={flattenedEventIndex}
+        eventLabel={eventConfiguration.label}
+        summary={summary}
+      />
+      <EventHistory history={event.actions} />
     </Content>
   )
 }

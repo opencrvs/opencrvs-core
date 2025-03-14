@@ -12,7 +12,7 @@
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
-import { FieldValue } from '@opencrvs/commons/client'
+import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { RecursiveStringRecord } from '@client/v2-events/hooks/useFormDataStringifier'
 
@@ -23,7 +23,9 @@ import { RecursiveStringRecord } from '@client/v2-events/hooks/useFormDataString
 /**
  * @returns default fields for the event summary
  */
-function getDefaultFields(): SummaryConfig['fields'] {
+function getDefaultFields(
+  eventLabel: TranslationConfig
+): SummaryConfig['fields'] {
   return [
     {
       id: 'status',
@@ -34,7 +36,8 @@ function getDefaultFields(): SummaryConfig['fields'] {
       },
       value: {
         id: 'v2.event.summary.status.value',
-        defaultMessage: '',
+        defaultMessage:
+          '{event.status, select, CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
         description: 'Status of the event'
       }
     },
@@ -45,11 +48,7 @@ function getDefaultFields(): SummaryConfig['fields'] {
         defaultMessage: 'Event',
         description: 'Event label'
       },
-      value: {
-        id: 'v2.event.summary.event.value',
-        defaultMessage: '',
-        description: 'Event value'
-      }
+      value: eventLabel
     },
     {
       id: 'trackind-id',
@@ -65,7 +64,7 @@ function getDefaultFields(): SummaryConfig['fields'] {
       },
       value: {
         id: 'v2.event.summary.trackindId.value',
-        defaultMessage: '',
+        defaultMessage: '{event.trackingId}',
         description: 'Tracking id value'
       }
     }
@@ -74,13 +73,18 @@ function getDefaultFields(): SummaryConfig['fields'] {
 
 export function EventSummary({
   event,
-  summary
+  summary,
+  eventLabel
 }: {
   event: Record<string, FieldValue | null | RecursiveStringRecord>
   summary: SummaryConfig
+  /**
+   * Event label to be displayed in the summary page
+   */
+  eventLabel: TranslationConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const defaultFields = getDefaultFields()
+  const defaultFields = getDefaultFields(eventLabel)
   const summaryPageFields = [...defaultFields, ...summary.fields]
 
   return (
