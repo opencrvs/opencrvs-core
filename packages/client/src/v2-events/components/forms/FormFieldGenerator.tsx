@@ -699,10 +699,28 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     ...props.initialValues
   })
 
+  const initialValidations = getValidationErrorsForForm(
+    props.fields,
+    props.formData
+  )
+  const initialTouchedFields = makeFormFieldIdsFormikCompatible(
+    Object.entries(initialValidations).reduce(
+      (acc: Record<string, boolean>, [key, value]) => {
+        if (value.errors.length > 0) {
+          acc[key] = true
+        }
+        return acc
+      },
+      {}
+    )
+  )
+
   return (
     <Formik<ActionFormData>
       enableReinitialize={true}
       initialValues={initialValues}
+      initialTouched={initialTouchedFields}
+      validateOnMount={true}
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
