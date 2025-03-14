@@ -40,6 +40,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -105,12 +106,19 @@ export function Review() {
     return
   }
 
+  const hasValidationErrors = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
       <ReviewComponent.ActionModal.Accept
         action="Declare"
         close={close}
         copy={reviewActionConfiguration.messages.modal}
+        incomplete={hasValidationErrors}
       />
     ))
     if (confirmedDeclaration) {
