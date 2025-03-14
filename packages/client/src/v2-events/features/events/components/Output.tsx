@@ -11,6 +11,7 @@
 
 import React from 'react'
 import styled from 'styled-components'
+import * as _ from 'lodash'
 import {
   FieldConfig,
   FieldValue,
@@ -31,7 +32,6 @@ import {
   isSelectFieldType,
   isTextFieldType
 } from '@opencrvs/commons/client'
-
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import {
   Address,
@@ -148,7 +148,7 @@ export function Output({
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
   // Explicitly check for null and undefined, so that e.g. number 0 is considered a value
-  const hasValue = value !== null && value !== undefined
+  const hasValue = value !== undefined
 
   if (!hasValue) {
     if (previousValue) {
@@ -158,7 +158,8 @@ export function Output({
     return ''
   }
 
-  if (previousValue && previousValue !== value) {
+  // Note, checking for previousValue !== value is not enough, as we have composite fields.
+  if (previousValue && !_.isEqual(previousValue, value)) {
     return (
       <>
         <Deleted>
@@ -170,7 +171,7 @@ export function Output({
     )
   }
 
-  if (!previousValue && hasValue && showPreviouslyMissingValuesAsChanged) {
+  if (!previousValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
         <Deleted>
