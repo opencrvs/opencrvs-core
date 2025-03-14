@@ -49,7 +49,7 @@ function useFieldStringifier() {
       return stringifyRadioGroup(field.value, field.config)
     }
 
-    return value.toString()
+    return !value ? '' : value.toString()
   }
 }
 
