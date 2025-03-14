@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldType } from '@opencrvs/commons'
+import { FieldType } from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 export const useCertificateTemplateSelectorFieldConfig = (
