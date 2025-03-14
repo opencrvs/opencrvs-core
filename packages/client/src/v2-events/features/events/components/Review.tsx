@@ -367,7 +367,10 @@ function ReviewComponent({
 
                 const shouldDisplayPage = fields.some(
                   ({ type, valueDisplay, errorDisplay }) => {
-                    if (type === 'FILE' || type === 'FILE_WITH_OPTIONS') {
+                    if (
+                      type === FieldType.FILE ||
+                      type === FieldType.FILE_WITH_OPTIONS
+                    ) {
                       return true
                     }
 
