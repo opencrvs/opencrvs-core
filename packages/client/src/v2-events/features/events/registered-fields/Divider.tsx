@@ -8,17 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './Address'
-export * from './BulletList'
-export * from './Checkbox'
-export * from './DateField'
-export * from './AdministrativeArea'
-export * from './LocationSearch'
-export * from './RadioGroup'
-export * from './Select'
-export * from './SelectCountry'
-export * from './Text'
-export * from './Number'
-export * from './Divider'
-export * from './PageHeader'
-export * from './Paragraph'
+
+import { Divider as DividerComponent } from '@opencrvs/components'
+
+export const Divider = {
+  Input: DividerComponent,
+  Output: null
+}

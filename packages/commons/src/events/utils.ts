@@ -217,16 +217,8 @@ export function getEventConfiguration(
   return config
 }
 
-export function isOptionalUncheckedCheckbox(
-  field: FieldConfig,
-  form: EventState
-) {
-  if (field.type !== FieldType.CHECKBOX) {
-    return false
-  }
-
-  // For required checkbox fields, we want to display the field even if it is not checked
-  if (field.required) {
+function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
+  if (field.type !== FieldType.CHECKBOX || field.required) {
     return false
   }
 
