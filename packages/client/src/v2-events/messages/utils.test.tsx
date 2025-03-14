@@ -15,62 +15,118 @@ import { IntlProvider } from 'react-intl'
 import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
 describe('useIntlFormatMessageWithFlattenedParams', () => {
-  const messages = {
-    'test.message': 'Hello, {name} :)',
-    'test.nested': 'Your order {order.id} is confirmed.',
-    'test.missing': 'This should not be missing.'
-  }
+  describe('formatMessage()', () => {
+    const messages = {
+      'test.message': 'Hello, {name} :)',
+      'test.nested': 'Your order {order.id} is confirmed.',
+      'test.missing': 'This should not be missing.'
+    }
 
-  function renderUseIntlHook() {
-    return renderHook(() => useIntlFormatMessageWithFlattenedParams(), {
-      wrapper: ({ children }) => (
-        <IntlProvider locale="en" messages={messages}>
-          {children}
-        </IntlProvider>
+    function renderUseIntlHook() {
+      return renderHook(() => useIntlFormatMessageWithFlattenedParams(), {
+        wrapper: ({ children }) => (
+          <IntlProvider locale="en" messages={messages}>
+            {children}
+          </IntlProvider>
+        )
+      })
+    }
+
+    it('formats a simple message with a parameter', () => {
+      const { result } = renderUseIntlHook()
+      const formattedMessage = result.current.formatMessage(
+        { id: 'test.message', defaultMessage: 'Hello, {name}!' },
+        { name: 'John' }
       )
+      expect(formattedMessage).toBe('Hello, John :)')
     })
-  }
 
-  it('formats a simple message with a parameter', () => {
-    const { result } = renderUseIntlHook()
-    const formattedMessage = result.current.formatMessage(
-      { id: 'test.message', defaultMessage: 'Hello, {name}!' },
-      { name: 'John' }
-    )
-    expect(formattedMessage).toBe('Hello, John :)')
+    it('formats a message with flattened parameters', () => {
+      const { result } = renderUseIntlHook()
+      const formattedMessage = result.current.formatMessage(
+        {
+          id: 'test.nested',
+          defaultMessage: 'Your order {order.id} is confirmed.'
+        },
+        { 'order.id': '12345' }
+      )
+      expect(formattedMessage).toBe('Your order 12345 is confirmed.')
+    })
+
+    it('falls back to defaultMessage if id is not found', () => {
+      const { result } = renderUseIntlHook()
+      const formattedMessage = result.current.formatMessage(
+        { id: 'non.existent', defaultMessage: 'Fallback message for {value}.' },
+        { value: 'test' }
+      )
+      expect(formattedMessage).toBe('Fallback message for test.')
+    })
+
+    it('throws an error if message string has variables that are were provided', () => {
+      const { result } = renderUseIntlHook()
+      expect(() =>
+        result.current.formatMessage({ id: 'test.message' }, {})
+      ).toThrow()
+    })
+
+    it('does not throw if a variable is null', () => {
+      const { result } = renderUseIntlHook()
+      expect(
+        result.current.formatMessage({ id: 'test.message' }, { name: null })
+      ).toBe('Hello,  :)')
+    })
   })
 
-  it('formats a message with flattened parameters', () => {
-    const { result } = renderUseIntlHook()
-    const formattedMessage = result.current.formatMessage(
-      {
-        id: 'test.nested',
-        defaultMessage: 'Your order {order.id} is confirmed.'
-      },
-      { 'order.id': '12345' }
-    )
-    expect(formattedMessage).toBe('Your order 12345 is confirmed.')
-  })
+  describe('formatMessageWithValues()', () => {
+    const messages = {
+      'test.message':
+        '{applicant.firstname, select, __EMPTY__ {Hello} other {{applicant.surname, select, __EMPTY__ {Hello} other {Hello to {applicant.firstname} {applicant.surname}}}}}'
+    }
 
-  it('falls back to defaultMessage if id is not found', () => {
-    const { result } = renderUseIntlHook()
-    const formattedMessage = result.current.formatMessage(
-      { id: 'non.existent', defaultMessage: 'Fallback message for {value}.' },
-      { value: 'test' }
-    )
-    expect(formattedMessage).toBe('Fallback message for test.')
-  })
+    function renderUseIntlHook() {
+      return renderHook(() => useIntlFormatMessageWithFlattenedParams(), {
+        wrapper: ({ children }) => (
+          <IntlProvider locale="en" messages={messages}>
+            {children}
+          </IntlProvider>
+        )
+      })
+    }
 
-  it('throws an error if message string has variables that are were provided', () => {
-    const { result } = renderUseIntlHook()
-    expect(() =>
-      result.current.formatMessage({ id: 'test.message' }, {})
-    ).toThrow()
-  })
-  it('does not throw if a variable is null', () => {
-    const { result } = renderUseIntlHook()
-    expect(
-      result.current.formatMessage({ id: 'test.message' }, { name: null })
-    ).toBe('Hello,  :)')
+    it('correctly selects __EMPTY__ option if no values given', () => {
+      const message = {
+        id: 'test.message',
+        defaultMessage: 'Fallback message',
+        description: 'test'
+      }
+
+      const { result } = renderUseIntlHook()
+
+      const formattedMessage = result.current.formatMessageWithValues(
+        message,
+        ['applicant.firstname', 'applicant.surname', 'foo.bar'],
+        {}
+      )
+
+      expect(formattedMessage).toBe('Hello')
+    })
+
+    it('correctly selects option with values if values given', () => {
+      const message = {
+        id: 'test.message',
+        defaultMessage: 'Fallback message',
+        description: 'test'
+      }
+
+      const { result } = renderUseIntlHook()
+
+      const formattedMessage = result.current.formatMessageWithValues(
+        message,
+        ['applicant.firstname', 'applicant.surname', 'foo.bar'],
+        { 'applicant.firstname': 'John', 'applicant.surname': 'Doe' }
+      )
+
+      expect(formattedMessage).toBe('Hello to John Doe')
+    })
   })
 })
