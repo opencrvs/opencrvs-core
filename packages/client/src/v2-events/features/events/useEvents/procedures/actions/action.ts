@@ -102,7 +102,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive, {
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
   meta: {
-    actionType: ActionType.ARCHIVED
+    actionType: ActionType.ARCHIVE
   }
 })
 
