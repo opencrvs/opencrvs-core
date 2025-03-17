@@ -14,6 +14,7 @@ import {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
+import { TRPCClientErrorLike } from '@trpc/client'
 import {
   ActionType,
   getActiveActionFields,
@@ -213,7 +214,15 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   })
 
   return {
-    mutate: (params: inferInput<P>) => {
+    mutate: (
+      params: inferInput<P>,
+      onSuccess?: (params: any) => void,
+      onError?: (
+        error: TRPCClientErrorLike<any>,
+        variables: any,
+        context: unknown
+      ) => void
+    ) => {
       const localEvent = findLocalEventData(params.eventId)
 
       const eventConfiguration = eventConfigurations.find(
@@ -225,10 +234,16 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       }
       const fields = getActiveActionFields(eventConfiguration, actionType)
 
-      return mutation.mutate({
-        ...params,
-        data: stripHiddenFields(fields, params.data)
-      })
+      return mutation.mutate(
+        {
+          ...params,
+          data: stripHiddenFields(fields, params.data)
+        },
+        {
+          onSuccess,
+          onError
+        }
+      )
     }
   }
 }

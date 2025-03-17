@@ -110,6 +110,9 @@ export function Review() {
   const [{ templateId }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
+  if (!templateId) {
+    throw new Error('Please select a template from the previous step')
+  }
   const intl = useIntl()
   const navigate = useNavigate()
 
@@ -179,15 +182,22 @@ export function Review() {
     ))
 
     if (confirmed) {
-      handleCertify?.()
-      actions.printCertificate.mutate({
-        eventId: fullEvent.id,
-        data: form,
-        transactionId: uuid(),
-        type: ActionType.PRINT_CERTIFICATE
-      })
-      clear()
-      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+      actions.printCertificate.mutate(
+        {
+          eventId: fullEvent.id,
+          data: { ...form, templateId },
+          transactionId: uuid(),
+          type: ActionType.PRINT_CERTIFICATE
+        },
+        () => {
+          handleCertify?.()
+          clear()
+          navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+        },
+        (error) => {
+          throw new Error(error.message)
+        }
+      )
     }
   }
 
