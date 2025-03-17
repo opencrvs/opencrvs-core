@@ -9,16 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventDocument } from '@opencrvs/commons/client'
+import { EventDocument, FieldType } from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
+export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
   event: EventDocument
 ) => {
   const { certificateTemplates } = useAppConfig()
   return {
-    id: 'templateId',
-    type: 'SELECT',
+    id: CERT_TEMPLATE_ID,
+    type: FieldType.SELECT,
     required: true,
     label: {
       defaultMessage: 'Type',

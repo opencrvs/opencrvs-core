@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -33,7 +33,7 @@ import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useSubscribeEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
@@ -115,6 +115,7 @@ export function Review() {
   }
   const intl = useIntl()
   const navigate = useNavigate()
+  const [printingInProgress, setPrintingInProgress] = useState(false)
 
   const [modal, openModal] = useModal()
 
@@ -128,8 +129,7 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { getFormValues, clear } = useEventFormData()
-  const form = getFormValues()
+  const { formValues } = useSubscribeEventFormData()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
@@ -138,7 +138,7 @@ export function Review() {
 
   const { svgCode, handleCertify } = usePrintableCertificate(
     fullEvent,
-    form,
+    formValues,
     locations,
     users,
     certificateConfig,
@@ -182,26 +182,31 @@ export function Review() {
     ))
 
     if (confirmed) {
+      setPrintingInProgress(true)
       actions.printCertificate.mutate(
         {
           eventId: fullEvent.id,
-          data: { ...form, templateId },
+          data: { ...formValues, templateId },
           transactionId: uuid(),
           type: ActionType.PRINT_CERTIFICATE
         },
-        () => {
-          handleCertify?.()
-          clear()
-          navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-        },
-        (error) => {
-          throw new Error(error.message)
+        {
+          onSuccess: () => {
+            handleCertify?.()
+            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+          },
+          onError: (error) => {
+            throw new Error(error.message)
+          },
+          onSettled: () => {
+            setPrintingInProgress(false)
+          }
         }
       )
     }
   }
 
-  if (!svgCode || !templateId) {
+  if (!svgCode || !templateId || printingInProgress) {
     return <Spinner id="review-certificate-loading" />
   }
 

@@ -17,6 +17,7 @@ import {
 import { TRPCClientErrorLike } from '@trpc/client'
 import {
   ActionType,
+  EventDocument,
   getActiveActionFields,
   stripHiddenFields
 } from '@opencrvs/commons/client'
@@ -216,12 +217,24 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   return {
     mutate: (
       params: inferInput<P>,
-      onSuccess?: (params: any) => void,
-      onError?: (
-        error: TRPCClientErrorLike<any>,
-        variables: any,
-        context: unknown
-      ) => void
+      callBacks?: {
+        onSuccess?: (updatedDocument: EventDocument) => void
+        onError?: (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          error: TRPCClientErrorLike<any>,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          variables: any,
+          context: unknown
+        ) => void
+        onSettled?: (
+          updatedDocument: EventDocument,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          error: TRPCClientErrorLike<any>,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          variables: any,
+          context: unknown
+        ) => void
+      }
     ) => {
       const localEvent = findLocalEventData(params.eventId)
 
@@ -234,15 +247,31 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       }
       const fields = getActiveActionFields(eventConfiguration, actionType)
 
+      const options: Record<string, unknown> = {}
+
+      if (callBacks) {
+        if (callBacks.onSuccess) {
+          options.onSuccess = async (updatedDocument: EventDocument) => {
+            callBacks.onSuccess?.(updatedDocument)
+            return updateLocalEvent(updatedDocument)
+          }
+        }
+
+        if (callBacks.onError) {
+          options.onError = callBacks.onError
+        }
+
+        if (callBacks.onSettled) {
+          options.onSettled = callBacks.onSettled
+        }
+      }
+
       return mutation.mutate(
         {
           ...params,
           data: stripHiddenFields(fields, params.data)
         },
-        {
-          onSuccess,
-          onError
-        }
+        options
       )
     }
   }
