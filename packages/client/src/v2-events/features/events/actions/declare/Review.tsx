@@ -13,7 +13,11 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  findActiveActionForm,
+  SCOPES
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -30,6 +34,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -95,12 +100,19 @@ export function Review() {
     return
   }
 
+  const hasValidationErrors = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
       <ReviewComponent.ActionModal.Accept
         action="Declare"
         close={close}
         copy={reviewActionConfiguration.messages.modal}
+        incomplete={hasValidationErrors}
       />
     ))
     if (confirmedDeclaration) {
@@ -140,6 +152,7 @@ export function Review() {
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
+          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
           isPrimaryActionDisabled={reviewActionConfiguration.isDisabled}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}

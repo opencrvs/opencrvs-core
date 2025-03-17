@@ -42,6 +42,10 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.ARCHIVED) {
       return EventStatus.ARCHIVED
     }
+
+    if (action.type === ActionType.NOTIFY) {
+      return EventStatus.NOTIFIED
+    }
     return status
   }, EventStatus.CREATED)
 }
