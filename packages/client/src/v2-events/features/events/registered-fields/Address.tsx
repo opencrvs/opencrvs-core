@@ -18,6 +18,7 @@ import {
   FieldConfig,
   FieldProps,
   FieldType,
+  isFieldVisible,
   not
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -83,7 +84,7 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
       formData={value}
-      initialValues={value}
+      initialValues={{ ...defaultValue, ...value }}
       setAllFieldsDirty={false}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />
@@ -312,7 +313,11 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
         field,
         value: value[field.id as keyof typeof value]
       }))
-        .filter((field) => field.value)
+        .filter(
+          (field) =>
+            field.value &&
+            isFieldVisible(field.field satisfies FieldConfig, value)
+        )
         .map((field) => (
           <React.Fragment key={field.field.id}>
             <Output
