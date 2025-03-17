@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import _, { uniq, isString, get, mapKeys } from 'lodash'
+import { uniq, isString, get, mapKeys, toPairs } from 'lodash'
 
 import { IntlShape } from 'react-intl'
 import { v4 as uuid } from 'uuid'
@@ -159,7 +159,7 @@ export function replacePlaceholders({
   }
 
   if (isTemplateVariable(defaultValue)) {
-    const resolvedValue = _.get(meta, defaultValue)
+    const resolvedValue = get(meta, defaultValue)
     const validator = mapFieldTypeToZod(fieldType)
 
     const parsedValue = validator.safeParse(resolvedValue)
@@ -182,9 +182,9 @@ export function replacePlaceholders({
     const result = { ...defaultValue }
 
     // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
-    for (const [key, val] of _.toPairs(result)) {
+    for (const [key, val] of toPairs(result)) {
       if (isTemplateVariable(val)) {
-        const resolvedValue = _.get(meta, val)
+        const resolvedValue = get(meta, val)
         // For now, we only support resolving template variables for text fields.
         const validator = mapFieldTypeToZod(FieldType.TEXT)
         const parsedValue = validator.safeParse(resolvedValue)
