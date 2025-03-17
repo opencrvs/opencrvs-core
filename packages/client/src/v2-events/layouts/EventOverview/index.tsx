@@ -35,7 +35,7 @@ import {
 } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { getEventTitle } from '@client/v2-events/utils'
 /**
