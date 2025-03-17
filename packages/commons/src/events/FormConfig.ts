@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
 
+// TODO CIHAN: use this?
 export enum PageType {
   FORM = 'FORM',
   VERIFICATION = 'VERIFICATION'
@@ -74,3 +75,4 @@ export type FormPage = z.infer<typeof FormPage>
 export type FormPageInput = z.input<typeof FormPage>
 export type FormConfig = z.infer<typeof FormConfig>
 export type FormConfigInput = z.input<typeof FormConfig>
+export type Page = z.infer<typeof PageConfig>

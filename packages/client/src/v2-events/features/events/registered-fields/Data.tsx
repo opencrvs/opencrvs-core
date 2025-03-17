@@ -10,6 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 import {
   EventState,
   FieldProps,
@@ -19,8 +20,36 @@ import {
 import { useEventConfigurationContext } from '@client/v2-events/features/events/components/Action'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
+const Container = styled.div`
+  background-color: ${({ theme }) => theme.colors.background};
+  padding: 17px 20px 10px;
+  border-radius: 5px;
+
+  h4 {
+    ${({ theme }) => theme.fonts.reg19};
+    font-weight: bold;
+    margin: 0 0 0.5rem;
+  }
+
+  h5 {
+    ${({ theme }) => theme.fonts.reg16};
+    color: ${({ theme }) => theme.colors.grey500};
+    margin: 0 0 2rem;
+  }
+
+  label {
+    font-weight: bold;
+    margin-bottom: 0rem;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  p {
+    margin: 0 0 1.5rem;
+  }
+`
+
 function DataInput({
-  label,
   configuration,
   formData
 }: FieldProps<'DATA'> & { formData: EventState }) {
@@ -40,13 +69,14 @@ function DataInput({
     throw new Error('Declare form fields not found')
   }
 
-  // TODO CIHAN: styles
+  const { title, data, subtitle } = configuration
+
   return (
-    <div>
-      <h3>{intl.formatMessage(label)}</h3>
-      <h4>{intl.formatMessage(configuration.subtitle)}</h4>
+    <Container>
+      {title && <h4>{intl.formatMessage(title)}</h4>}
+      {subtitle && <h5>{intl.formatMessage(subtitle)}</h5>}
       <div>
-        {configuration.data.map((item) => {
+        {data.map((item) => {
           const field = declareFormFields.find((f) => f.id === item.fieldId)
 
           if (!field) {
@@ -55,17 +85,19 @@ function DataInput({
 
           return (
             <div key={item.fieldId}>
-              <p>{intl.formatMessage(field.label)}</p>
-              <Output
-                field={field}
-                showPreviouslyMissingValuesAsChanged={false}
-                value={formData[item.fieldId]}
-              />
+              <label>{intl.formatMessage(field.label)}</label>
+              <p>
+                <Output
+                  field={field}
+                  showPreviouslyMissingValuesAsChanged={false}
+                  value={formData[item.fieldId]}
+                />
+              </p>
             </div>
           )
         })}
       </div>
-    </div>
+    </Container>
   )
 }
 

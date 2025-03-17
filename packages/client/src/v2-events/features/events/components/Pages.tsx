@@ -36,11 +36,11 @@ export function Pages({
   setFormData: (data: EventState) => void
   pageId: string
   showReviewButton?: boolean
-  formPages: FormPage[]
+  formPages: Page[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
-  children?: (page: FormPage) => React.ReactNode
+  children?: (page: Page) => React.ReactNode
 }) {
   const intl = useIntl()
 

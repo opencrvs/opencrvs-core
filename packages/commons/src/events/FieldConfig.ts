@@ -327,11 +327,13 @@ const Address = BaseField.extend({
   defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
+// TODO CIHAN: labelist eroon?
 const Data = BaseField.extend({
   type: z.literal(FieldType.DATA),
   configuration: z.object({
-    subtitle: TranslationConfig,
-    data: z.array(z.object({ fieldId: z.string() })) // todo cihan: z.any to something real
+    title: TranslationConfig.optional(),
+    subtitle: TranslationConfig.optional(),
+    data: z.array(z.object({ fieldId: z.string() })) // todo cihan: can we make this type more specific?
   })
 })
 
@@ -392,6 +394,7 @@ export type Inferred =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof Data>
+
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
   TextField,
