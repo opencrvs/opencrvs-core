@@ -16,7 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { ActionType, FormPage } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -114,7 +114,7 @@ export function Pages() {
           }
         }}
       >
-        {(page: FormPage) => (
+        {(page) => (
           // hard coded certificate template selector form field
           <>
             {formPages[0].id === page.id && (

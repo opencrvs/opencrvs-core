@@ -79,21 +79,19 @@ function DataInput({
         {data.map((item) => {
           const field = declareFormFields.find((f) => f.id === item.fieldId)
 
-          if (!field) {
-            return null
-          }
-
           return (
-            <div key={item.fieldId}>
-              <label>{intl.formatMessage(field.label)}</label>
-              <p>
-                <Output
-                  field={field}
-                  showPreviouslyMissingValuesAsChanged={false}
-                  value={formData[item.fieldId]}
-                />
-              </p>
-            </div>
+            field && (
+              <div key={item.fieldId}>
+                <label>{intl.formatMessage(field.label)}</label>
+                <p>
+                  <Output
+                    field={field}
+                    showPreviouslyMissingValuesAsChanged={false}
+                    value={formData[item.fieldId]}
+                  />
+                </p>
+              </div>
+            )
           )
         })}
       </div>
