@@ -18,7 +18,8 @@ import {
   getCurrentEventStateWithDrafts,
   EventDocument,
   Draft,
-  getCurrentEventState
+  getCurrentEventState,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -84,18 +85,7 @@ function EventOverviewContainer() {
   )
 }
 
-function getDefaultFieldValues(
-  trackingId: string,
-  status:
-    | 'ARCHIVED'
-    | 'CREATED'
-    | 'NOTIFIED'
-    | 'DECLARED'
-    | 'VALIDATED'
-    | 'REGISTERED'
-    | 'CERTIFIED'
-    | 'REJECTED'
-) {
+function getDefaultFieldValues(trackingId: string, status: EventStatus) {
   return {
     'event.trackingId': trackingId,
     'event.status': status
