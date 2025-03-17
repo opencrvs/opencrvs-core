@@ -240,6 +240,27 @@ export function useReviewActionConfig({
   const isDisabled =
     incomplete && !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
 
+  if (
+    incomplete &&
+    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE) &&
+    scopes.includes(SCOPES.RECORD_DECLARE)
+  ) {
+    return {
+      buttonType: 'positive' as const,
+      incomplete,
+      isDisabled,
+      onConfirm: (eventId: string) => {
+        events.actions.notify.mutate({
+          eventId,
+          data: form,
+          metadata,
+          transactionId: uuid()
+        })
+      },
+      messages: reviewMessages.incomplete.declare
+    }
+  }
+
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
     return {
       buttonType: 'positive' as const,
