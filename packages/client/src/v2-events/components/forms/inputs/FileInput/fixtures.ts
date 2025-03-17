@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig, EventDocument } from '@opencrvs/commons/client'
+import { EventConfig, EventDocument, PageType } from '@opencrvs/commons/client'
 
 export const birthDocument: EventDocument = {
   type: 'birth',
@@ -74,6 +74,7 @@ export const birthEvent = {
           pages: [
             {
               id: 'documents',
+              type: PageType.FORM,
               title: {
                 id: 'form.section.documents.title',
                 defaultMessage: 'Upload supporting documents',

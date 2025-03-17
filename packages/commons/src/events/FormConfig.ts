@@ -18,18 +18,14 @@ export enum PageType {
   VERIFICATION = 'VERIFICATION'
 }
 
-export const PageBase = z.object({
+export const FormPage = z.object({
   id: z.string().describe('Unique identifier for the page'),
   title: TranslationConfig.describe('Header title of the page'),
   fields: z.array(FieldConfig).describe('Fields to be rendered on the page'),
-  type: z.enum(['FORM', 'VERIFICATION']).default('FORM')
+  type: z.literal('FORM').default('FORM')
 })
 
-export const FormPage = PageBase.extend({
-  type: z.literal('FORM').optional()
-})
-
-export const VerificationPage = PageBase.extend({
+export const VerificationPage = FormPage.extend({
   type: z.literal('VERIFICATION'),
   actions: z
     .object({
@@ -47,10 +43,18 @@ export const VerificationPage = PageBase.extend({
 
 export type AllPageConfigs = typeof FormPage | typeof VerificationPage
 
-export const PageConfig = z.discriminatedUnion('type', [
-  FormPage,
-  VerificationPage
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllPageConfigs[]>
+// export const PageConfig = z.discriminatedUnion('type', [
+//   FormPage,
+//   VerificationPage
+// ])
+
+export const PageConfig = z.preprocess(
+  (data: any) => ({
+    type: (data as any).type ?? 'FORM', // Default type to "FORM" if not provided
+    ...data
+  }),
+  z.discriminatedUnion('type', [FormPage, VerificationPage])
+) as unknown as z.ZodDiscriminatedUnion<'type', AllPageConfigs[]>
 
 export type PageInput = z.input<typeof PageConfig>
 export type Page = z.infer<typeof PageConfig>
