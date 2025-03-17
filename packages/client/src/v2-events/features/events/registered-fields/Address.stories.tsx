@@ -78,6 +78,46 @@ export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
+export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
+  typeof FormFieldGenerator
+> = {
+  name: 'Defaults to user primary office address',
+  parameters: {
+    layout: 'centered'
+  },
+  render: function Component(args) {
+    const [formData, setFormData] = React.useState({})
+    return (
+      <StyledFormFieldGenerator
+        fields={[
+          {
+            id: 'storybook.address',
+            type: 'ADDRESS',
+            label: {
+              id: 'storybook.address.label',
+              defaultMessage: 'Address',
+              description: 'The title for the address input'
+            },
+            defaultValue: {
+              country: 'FAR',
+              province: '$user.province',
+              district: '$user.district',
+              urbanOrRural: 'URBAN'
+            }
+          }
+        ]}
+        formData={formData}
+        id="my-form"
+        setAllFieldsDirty={false}
+        onChange={(data) => {
+          args.onChange(data)
+          setFormData(data)
+        }}
+      />
+    )
+  }
+}
+
 export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
   name: 'Interaction between fields',
   parameters: {
