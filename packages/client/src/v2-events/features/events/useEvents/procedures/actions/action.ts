@@ -266,6 +266,25 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         }
       }
 
+      if (actionType === ActionType.NOTIFY) {
+        /**
+         * Because NOTIFY action is just an incomplete DECLARE action,
+         * notifyFields are decided by DECLARE action
+         */
+        const notifyFields = getActiveActionFields(
+          eventConfiguration,
+          ActionType.DECLARE
+        )
+
+        return mutation.mutate(
+          {
+            ...params,
+            data: stripHiddenFields(notifyFields, params.data)
+          },
+          options
+        )
+      }
+
       return mutation.mutate(
         {
           ...params,
