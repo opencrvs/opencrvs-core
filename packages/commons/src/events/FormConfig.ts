@@ -69,6 +69,7 @@ export const FormConfig = z.object({
   })
 })
 
+// TODO CIHAN: this should probably be for PageConfig?
 export type FormPage = z.infer<typeof FormPage>
 export type FormPageInput = z.input<typeof FormPage>
 export type FormConfig = z.infer<typeof FormConfig>

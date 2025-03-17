@@ -195,6 +195,8 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           option: { type: 'keyword' }
         }
       }
+    case FieldType.DATA:
+      return {}
     default:
       const _exhaustiveCheck: never = field
       throw new Error(

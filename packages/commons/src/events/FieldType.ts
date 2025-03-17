@@ -31,7 +31,8 @@ export const FieldType = {
   ADMINISTRATIVE_AREA: 'ADMINISTRATIVE_AREA',
   FACILITY: 'FACILITY',
   OFFICE: 'OFFICE',
-  SIGNATURE: 'SIGNATURE'
+  SIGNATURE: 'SIGNATURE',
+  DATA: 'DATA'
 } as const
 
 export const fieldTypes = Object.values(FieldType)

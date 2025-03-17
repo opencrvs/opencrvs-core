@@ -58,7 +58,8 @@ import {
   isTextFieldType,
   isNumberFieldType,
   isEmailFieldType,
-  isFieldVisible
+  isFieldVisible,
+  isDataFieldType
 } from '@opencrvs/commons/client'
 import { Field, FieldProps, Formik, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
@@ -87,6 +88,7 @@ import {
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
+import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -455,6 +457,10 @@ const GeneratedInputField = React.memo(
           />
         </InputField>
       )
+    }
+
+    if (isDataFieldType(field)) {
+      return <Data.Input {...field.config} />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)

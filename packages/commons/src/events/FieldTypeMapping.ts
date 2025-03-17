@@ -32,7 +32,8 @@ import {
   SignatureField,
   TextAreaField,
   TextField,
-  NumberField
+  NumberField,
+  Data
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -112,6 +113,10 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.ADDRESS:
       schema = AddressFieldUpdateValue
       break
+    case FieldType.DATA:
+      // TODO CIHAN:
+      schema = z.string()
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -178,6 +183,8 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return null
+    case FieldType.DATA:
+      return {}
   }
 }
 
@@ -331,4 +338,12 @@ export const isOfficeFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: Office } => {
   return field.config.type === FieldType.OFFICE
+}
+
+export const isDataFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+  // TODO CIHAN: types
+}): field is { value: any; config: Data } => {
+  return field.config.type === FieldType.DATA
 }
