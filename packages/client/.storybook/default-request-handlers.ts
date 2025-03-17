@@ -18,7 +18,7 @@ import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
 import {
   tennisClubMembershipEventIndex,
-  tennisClueMembershipEventDocument
+  tennisClubMembershipEventDocument
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
@@ -343,6 +343,11 @@ export const handlers = {
     })
   ],
   files: [
+    http.get('/api/presigned-url/event-attachments/:filename', async (req) => {
+      return HttpResponse.json({
+        presignedURL: `http://localhost:3535/ocrvs/tree.svg`
+      })
+    }),
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 
@@ -1060,7 +1065,7 @@ export const handlers = {
               }
             ],
             primaryOffice: {
-              id: 'dfcd1cbc-30c7-41a4-afd2-020515b4d78b',
+              id: '028d2c85-ca31-426d-b5d1-2cef545a4902',
               name: 'Ibombo District Office',
               alias: ['Ibombo District Office'],
               status: 'active',
@@ -1098,7 +1103,7 @@ export const handlers = {
   ],
   event: [
     tRPCMsw.event.get.query(() => {
-      return tennisClueMembershipEventDocument
+      return tennisClubMembershipEventDocument
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]
@@ -1362,7 +1367,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/e76fbe62-bd35-44cf-ad0b-9242db1d3085'
+                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
               },
               type: {
                 coding: [

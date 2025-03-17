@@ -49,8 +49,8 @@ import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { WQContentWrapper } from './components/ContentWrapper'
-import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
 const messages = defineMessages({
   empty: {
@@ -242,7 +242,7 @@ function Workqueue({
           {
             id: `events.status`,
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} NOTIFIED {In progress} other {Unknown}}'
           },
           {
             status: getEventStatus()

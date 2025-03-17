@@ -17,7 +17,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   FieldConfig,
-  findActiveActionFields,
+  getActiveActionFields,
   findActiveActionForm,
   generateTransactionId,
   getCurrentEventState,
@@ -128,7 +128,7 @@ export function Summary() {
     )
   }
 
-  const fields = findActiveActionFields(
+  const fields = getActiveActionFields(
     eventConfiguration,
     ActionType.REQUEST_CORRECTION
   )

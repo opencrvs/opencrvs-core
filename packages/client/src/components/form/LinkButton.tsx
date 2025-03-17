@@ -19,7 +19,7 @@ import {
 import { evalExpressionInFieldDefinition } from '@client/forms/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHttp } from './http'
 import { Button, getTheme, Icon } from '@opencrvs/components'
@@ -56,10 +56,21 @@ export const LinkButtonField = ({
   const trigger = fields.find(
     (f) => f.name === fieldDefinition.options.callback.trigger
   )!
-  const onChange: Parameters<typeof useHttp>[1] = ({ data, error, loading }) =>
+  const onChange: Parameters<typeof useHttp>[1] = ({
+    data,
+    error,
+    loading
+  }) => {
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
-  const [hasCallbackRequestBeenMade, setCallbackRequestBeenMade] =
-    useState(false)
+    if (data || error) {
+      // remove query parameters from the URL after successful or failed callback request
+      const url = new URL(window.location.href)
+      url.search = '' // Remove all query parameters
+      window.history.replaceState({}, document.title, url)
+    }
+  }
+
+  const hasCallbackRequestBeenMade = useRef(false)
   const { declarationId = '' } = useParams()
   const declaration = useDeclaration(declarationId)
   const dispatch = useDispatch()
@@ -83,12 +94,12 @@ export const LinkButtonField = ({
       }
       return true
     }
-    if (checkParamsPresentInURL() && !hasCallbackRequestBeenMade) {
+    if (checkParamsPresentInURL() && !hasCallbackRequestBeenMade.current) {
       call({
         // forward params which are received after redirection to the callback request
         params: Object.fromEntries(urlParams)
       })
-      setCallbackRequestBeenMade(true)
+      hasCallbackRequestBeenMade.current = true
     }
   }, [call, params, form, trigger, hasCallbackRequestBeenMade])
   return (

@@ -27,14 +27,14 @@ import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
-import { findActiveActionFields, stripHiddenFields } from './utils'
+import { findActiveActionFormFields, stripHiddenFields } from './utils'
 import { FieldValue } from './FieldValue'
 
 export function generateActionInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const fields = findActiveActionFields(configuration, action) ?? []
+  const fields = findActiveActionFormFields(configuration, action) ?? []
 
   const data = fields.reduce(
     (acc, field, i) => ({
@@ -103,7 +103,9 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.VALIDATE,
       transactionId: input.transactionId ?? getUUID(),
-      data: input.data ?? {},
+      data:
+        input.data ??
+        generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
       duplicates: [],
       eventId
     }),
@@ -214,12 +216,14 @@ export const eventPayloadGenerator = {
   }
 }
 
-function generateActionDocument({
+export function generateActionDocument({
   configuration,
-  action
+  action,
+  defaults = {}
 }: {
   configuration: EventConfig
   action: ActionType
+  defaults?: Partial<ActionDocument>
 }): ActionDocument {
   const actionBase = {
     createdAt: new Date().toISOString(),
@@ -227,7 +231,8 @@ function generateActionDocument({
     id: getUUID(),
     createdAtLocation: 'TODO',
     data: generateActionInput(configuration, action),
-    metadata: {}
+    metadata: {},
+    ...defaults
   } satisfies ActionBase
 
   switch (action) {

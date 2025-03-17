@@ -14,13 +14,13 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
 import {
-  AddressFieldValue,
   CheckboxFieldValue,
   DateValue,
   NumberFieldValue,
   RequiredTextValue,
   TextValue
 } from './FieldValue'
+import { AddressFieldValue } from './CompositeFieldValue'
 
 const FieldId = z.string()
 
@@ -172,6 +172,8 @@ const HtmlFontVariant = z.enum([
   'h2',
   'h1'
 ])
+
+export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
 
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),

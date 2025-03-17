@@ -78,6 +78,7 @@ export const BUTTON = 'BUTTON'
 export const LINK_BUTTON = 'LINK_BUTTON'
 export const ID_READER = 'ID_READER'
 export const ID_VERIFICATION_BANNER = 'ID_VERIFICATION_BANNER'
+export const LOADER = 'LOADER'
 
 export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
@@ -776,6 +777,11 @@ interface IIDVerificationBannerFormField extends IFormFieldBase {
   idFieldName: string
 }
 
+export interface ILoaderFormField extends IFormFieldBase {
+  type: typeof LOADER
+  loadingText: MessageDescriptor
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -814,6 +820,7 @@ export type IFormField =
   | ILinkButtonFormField
   | IDReaderFormField
   | IIDVerificationBannerFormField
+  | ILoaderFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1311,6 +1318,11 @@ interface Ii18nIDVerificationBannerFormField extends Ii18nFormFieldBase {
   bannerType: BannerType
   idFieldName: string
 }
+
+export interface Ii18nLoaderFormField extends Ii18nFormFieldBase {
+  type: typeof LOADER
+  loadingText: string
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1347,6 +1359,7 @@ export type Ii18nFormField =
   | Ii18nLinkButtonFormField
   | Ii18nIDReaderFormField
   | Ii18nIDVerificationBannerFormField
+  | Ii18nLoaderFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

@@ -13,7 +13,7 @@ import { MessageDescriptor, useIntl } from 'react-intl'
 import { BulletList as BulletListComponent } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
 
-export function BulletList({
+function BulletListInput({
   id,
   items,
   configuration
@@ -29,4 +29,9 @@ export function BulletList({
       items={formattedItmes}
     />
   )
+}
+
+export const BulletList = {
+  Input: BulletListInput,
+  Output: null
 }

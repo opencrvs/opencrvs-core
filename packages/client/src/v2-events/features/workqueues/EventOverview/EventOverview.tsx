@@ -29,7 +29,7 @@ import {
 } from '@client/v2-events/features/events/useEventConfiguration'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
@@ -63,17 +63,13 @@ function EventOverviewContainer() {
 
   const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
 
-  const config = configs.find((c) => c.id === event?.type)
+  const config = configs.find((c) => c.id === event.type)
 
   const userIds = getUserIdsFromActions(fullEvent.actions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
 
   if (!config) {
-    return null
-  }
-
-  if (!event) {
     return null
   }
 

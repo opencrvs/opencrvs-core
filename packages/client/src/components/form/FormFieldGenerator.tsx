@@ -94,7 +94,8 @@ import {
   LINK_BUTTON,
   IDocumentUploaderWithOptionsFormField,
   ID_READER,
-  ID_VERIFICATION_BANNER
+  ID_VERIFICATION_BANNER,
+  LOADER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -145,6 +146,7 @@ import { getListOfLocations } from '@client/utils/validate'
 import { LinkButtonField } from '@client/components/form/LinkButton'
 import { ReaderGenerator } from './ReaderGenerator'
 import { IDVerificationBanner } from './IDVerification/Banner'
+import { FormLoader } from './FormLoader'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -295,6 +297,18 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </InputField>
       )
     }
+
+    if (fieldDefinition.type === LOADER) {
+      return (
+        <InputField {...inputFieldProps}>
+          <FormLoader
+            id={fieldDefinition.name}
+            loadingText={fieldDefinition.loadingText}
+          />
+        </InputField>
+      )
+    }
+
     if (fieldDefinition.type === ID_VERIFICATION_BANNER) {
       return (
         <IDVerificationBanner
