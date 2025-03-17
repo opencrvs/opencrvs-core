@@ -191,6 +191,11 @@ const reviewMessages = defineMessages({
       'The declarant will be notified of this action and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
+  actionModalIncompleteDescription: {
+    id: 'v2.actionModal.description.incomplete',
+    defaultMessage: 'This incomplete declaration will be sent for review.',
+    description: 'The description for action modal when incomplete'
+  },
   changeModalCancel: {
     id: 'v2.changeModal.cancel',
     defaultMessage: 'Cancel',
@@ -557,6 +562,7 @@ function ReviewActionComponent({
   onReject,
   messages,
   primaryButtonType,
+  canSendIncomplete,
   isPrimaryActionDisabled
 }: {
   isPrimaryActionDisabled: boolean
@@ -569,6 +575,8 @@ function ReviewActionComponent({
     onReject?: MessageDescriptor
   }
   primaryButtonType?: 'positive' | 'primary'
+  action?: string
+  canSendIncomplete?: boolean
 }) {
   const intl = useIntl()
 
@@ -582,7 +590,7 @@ function ReviewActionComponent({
           <Description>{intl.formatMessage(messages.description)}</Description>
           <ActionContainer>
             <Button
-              disabled={isPrimaryActionDisabled}
+              disabled={isPrimaryActionDisabled && !canSendIncomplete}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}
@@ -669,7 +677,8 @@ function EditModal({
 function AcceptActionModal({
   copy,
   close,
-  action
+  action,
+  incomplete
 }: {
   copy?: {
     onCancel?: MessageDescriptor
@@ -679,6 +688,7 @@ function AcceptActionModal({
   }
   close: (result: boolean | null) => void
   action: string
+  incomplete?: boolean
 }) {
   const intl = useIntl()
   return (
@@ -724,7 +734,9 @@ function AcceptActionModal({
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(
-            copy?.description || reviewMessages.actionModalDescription
+            incomplete
+              ? reviewMessages.actionModalIncompleteDescription
+              : copy?.description || reviewMessages.actionModalDescription
           )}
         </Text>
       </Stack>
