@@ -9,15 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Button } from '../Button'
-import { Content } from '../Content'
-import { Frame } from '../Frame'
-import { Icon } from '../Icon'
-import { Stack } from '../Stack'
-import { FormWizardProps } from './FormWizard'
-import { VerificationPageConfig } from '@opencrvs/commons'
 import { useIntl } from 'react-intl'
+import { Button } from '@opencrvs/components/src/Button'
+import { Content } from '@opencrvs/components/src/Content'
+import { Frame } from '@opencrvs/components/src/Frame'
+import { Icon } from '@opencrvs/components/src/Icon'
+import { Stack } from '@opencrvs/components/src/Stack'
+import { FormWizardProps } from '@opencrvs/components/src/FormWizard/FormWizard'
+import { VerificationPageConfig } from '@opencrvs/commons'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
+import { useModal } from '@client/v2-events/hooks/useModal'
 
 export const VerificationWizard = ({
   children,
@@ -31,27 +32,28 @@ export const VerificationWizard = ({
   pageConfig
 }: FormWizardProps & { pageConfig: VerificationPageConfig }) => {
   const intl = useIntl()
+  const [cancelModal, openCancelModal] = useModal()
 
   // TODO CIHAN: save accepted value
   return (
     <Frame.LayoutForm>
       <Frame.SectionFormBackAction>
         {currentPage > 0 && (
-          <Button type="tertiary" size="small" onClick={onPreviousPage}>
+          <Button size="small" type="tertiary" onClick={onPreviousPage}>
             <Icon name="ArrowLeft" size="medium" />
             Back
           </Button>
         )}
       </Frame.SectionFormBackAction>
       <Frame.Section>
-        <Content title={pageTitle} showTitleOnMobile={true}>
-          <Stack direction="column" gap={16} alignItems="stretch">
+        <Content showTitleOnMobile={true} title={pageTitle}>
+          <Stack alignItems="stretch" direction="column" gap={16}>
             {children}
 
             <Button
+              role="button"
               size="large"
               type="negative"
-              role="button"
               onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
             >
               <Cross color="white" />
@@ -59,9 +61,9 @@ export const VerificationWizard = ({
             </Button>
 
             <Button
+              role="button"
               size="large"
               type="positive"
-              role="button"
               onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
             >
               <Check color="white" />
