@@ -242,7 +242,7 @@ export const SearchResult = ({
             {
               id: `v2.events.status`,
               defaultMessage:
-                '{status, select, OUTBOX {Syncing..} CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}","{status, select, CREATE {Brouillon} VALIDATE {Déclaration envoyée pour approbation} DRAFT {Brouillon} DECLARE {Déclaration initiée} REGISTER {Enregistré} PRINT_CERTIFICATE {Certifié} REJECT {Rejeté} ARCHIVED {archivé} MARKED_AS_DUPLICATE {Marqué comme doublon} other {Inconnu}}'
+                '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
             },
             {
               status: getEventStatus()
