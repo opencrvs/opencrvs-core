@@ -11,7 +11,7 @@
 
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
-import { EventState, FormPage } from '@opencrvs/commons/client'
+import { EventState, Page } from '@opencrvs/commons/client'
 import { FormWizard } from '@opencrvs/components'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'

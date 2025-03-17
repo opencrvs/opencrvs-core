@@ -12,7 +12,6 @@
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
 import { TEXT } from '@client/forms'
-import { Text as TextComponent } from '@opencrvs/components/lib/Text'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
 import React, { useCallback } from 'react'

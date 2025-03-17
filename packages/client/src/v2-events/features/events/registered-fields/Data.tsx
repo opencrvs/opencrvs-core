@@ -14,15 +14,10 @@ import {
   EventState,
   FieldProps,
   ActionType,
-  FormConfig
+  findActiveActionFormFields
 } from '@opencrvs/commons/client'
 import { useEventConfigurationContext } from '@client/v2-events/features/events/components/Action'
 import { Output } from '@client/v2-events/features/events/components/Output'
-
-// TODO CIHAN: move this somewhere else
-function getForm(forms: FormConfig[]) {
-  return forms.find((f) => f.active)
-}
 
 function DataInput({
   label,
@@ -32,22 +27,20 @@ function DataInput({
   const intl = useIntl()
   const eventConfiguration = useEventConfigurationContext()
 
-  const declareFormConfig = eventConfiguration?.actions.find(
-    (action) => action.type === ActionType.DECLARE
-  )
-
-  if (!declareFormConfig) {
-    throw new Error('Declare form configuration not found')
+  if (!eventConfiguration) {
+    throw new Error('Event configuration not found')
   }
 
-  const declareFormFields = getForm(declareFormConfig.forms)?.pages.flatMap(
-    (page) => page.fields
+  const declareFormFields = findActiveActionFormFields(
+    eventConfiguration,
+    ActionType.DECLARE
   )
 
   if (!declareFormFields) {
     throw new Error('Declare form fields not found')
   }
 
+  // TODO CIHAN: styles
   return (
     <div>
       <h3>{intl.formatMessage(label)}</h3>
