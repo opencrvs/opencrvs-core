@@ -124,8 +124,6 @@ const zodToIntlErrorMap = (
   issue: ZodIssueOptionalMessage,
   _ctx: ErrorMapCtx
 ) => {
-  console.log('issue', issue)
-  console.log('_ctx', _ctx)
   switch (issue.code) {
     case 'invalid_string': {
       if (_ctx.data === '') {
