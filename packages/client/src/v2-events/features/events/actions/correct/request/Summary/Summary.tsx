@@ -20,7 +20,6 @@ import {
   getActiveActionFields,
   findActiveActionForm,
   generateTransactionId,
-  getCurrentEventState,
   Scope,
   SCOPES,
   isFieldVisible
@@ -101,9 +100,9 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const previousFormValues = getCurrentEventState(event).data
+  const previousFormValues = event.data
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const stringifyFormData = useFormDataStringifier()
 

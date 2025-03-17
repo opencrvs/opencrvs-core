@@ -80,9 +80,9 @@ const MarkAsDuplicateAction = ActionBase.merge(
   })
 )
 
-const ArchivedAction = ActionBase.merge(
+const ArchiveAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVED)
+    type: z.literal(ActionType.ARCHIVE)
   })
 )
 
@@ -135,7 +135,7 @@ export const ActionDocument = z.discriminatedUnion('type', [
   ValidateAction,
   RejectAction,
   MarkAsDuplicateAction,
-  ArchivedAction,
+  ArchiveAction,
   NotifiedAction,
   RegisterAction,
   DeclareAction,
