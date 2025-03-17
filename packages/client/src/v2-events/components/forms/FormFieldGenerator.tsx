@@ -460,7 +460,7 @@ const GeneratedInputField = React.memo(
     }
 
     if (isDataFieldType(field)) {
-      return <Data.Input {...field.config} />
+      return <Data.Input {...field.config} formData={formData} />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)

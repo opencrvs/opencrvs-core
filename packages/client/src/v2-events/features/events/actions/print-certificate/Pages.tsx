@@ -51,9 +51,11 @@ export function Pages() {
   const { setFormValues, getFormValues } = useEventFormData()
   const form = getFormValues()
 
+  // TODO CIHAN: use this from react context
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+
   const formPages = configuration.actions
     .find((action) => action.type === ActionType.PRINT_CERTIFICATE)
     ?.forms.find((f) => f.active)?.pages

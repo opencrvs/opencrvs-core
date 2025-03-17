@@ -9,21 +9,68 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-
 import { useIntl } from 'react-intl'
-import { FieldProps } from '@opencrvs/commons/client'
+import {
+  EventState,
+  FieldProps,
+  ActionType,
+  FormConfig
+} from '@opencrvs/commons/client'
+import { useEventConfigurationContext } from '@client/v2-events/features/events/components/Action'
+import { Output } from '@client/v2-events/features/events/components/Output'
 
-function DataInput({ label, configuration }: FieldProps<'DATA'>) {
+// TODO CIHAN: move this somewhere else
+function getForm(forms: FormConfig[]) {
+  return forms.find((f) => f.active)
+}
+
+function DataInput({
+  label,
+  configuration,
+  formData
+}: FieldProps<'DATA'> & { formData: EventState }) {
   const intl = useIntl()
-  console.log(label, configuration)
+  const eventConfiguration = useEventConfigurationContext()
+
+  const declareFormConfig = eventConfiguration?.actions.find(
+    (action) => action.type === ActionType.DECLARE
+  )
+
+  if (!declareFormConfig) {
+    throw new Error('Declare form configuration not found')
+  }
+
+  const declareFormFields = getForm(declareFormConfig.forms)?.pages.flatMap(
+    (page) => page.fields
+  )
+
+  if (!declareFormFields) {
+    throw new Error('Declare form fields not found')
+  }
 
   return (
     <div>
       <h3>{intl.formatMessage(label)}</h3>
+      <h4>{intl.formatMessage(configuration.subtitle)}</h4>
       <div>
-        {configuration.data.map((item) => (
-          <div key={item.fieldId}>{item.fieldId}</div>
-        ))}
+        {configuration.data.map((item) => {
+          const field = declareFormFields.find((f) => f.id === item.fieldId)
+
+          if (!field) {
+            return null
+          }
+
+          return (
+            <div key={item.fieldId}>
+              <p>{intl.formatMessage(field.label)}</p>
+              <Output
+                field={field}
+                showPreviouslyMissingValuesAsChanged={false}
+                value={formData[item.fieldId]}
+              />
+            </div>
+          )
+        })}
       </div>
     </div>
   )

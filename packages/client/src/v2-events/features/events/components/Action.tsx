@@ -9,10 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { PropsWithChildren, useEffect, useMemo } from 'react'
+import React, {
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+  createContext,
+  useContext
+} from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
+  EventConfig,
   getCurrentEventStateWithDrafts,
   getMetadataForAction
 } from '@opencrvs/commons/client'
@@ -25,6 +32,14 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+
+const EventConfigurationContext = createContext<EventConfig | null>(null)
+
+// Custom hook for easier access
+export const useEventConfigurationContext = () => {
+  return useContext(EventConfigurationContext)
+}
 
 type Props = PropsWithChildren<{ type: ActionType }>
 function ActionComponent({ children, type }: Props) {
@@ -37,6 +52,7 @@ function ActionComponent({ children, type }: Props) {
   const drafts = getRemoteDrafts()
 
   const [event] = getEvent.useSuspenseQuery(params.eventId)
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const localDraft = getLocalDraftOrDefault({
     id: createTemporaryId(),
@@ -138,7 +154,11 @@ function ActionComponent({ children, type }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <NavigationStack>{children}</NavigationStack>
+  return (
+    <EventConfigurationContext.Provider value={eventConfiguration}>
+      <NavigationStack>{children}</NavigationStack>
+    </EventConfigurationContext.Provider>
+  )
 }
 
 export const Action = withSuspense(ActionComponent)
