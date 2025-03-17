@@ -20,11 +20,12 @@ import {
   getAllFields,
   FieldValue,
   FieldType,
-  DefaultValue,
+  FieldConfigDefaultValue,
   MetaFields,
   isTemplateVariable,
   mapFieldTypeToZod,
-  isFieldValueWithoutTemplates
+  isFieldValueWithoutTemplates,
+  compositeFieldTypes
 } from '@opencrvs/commons/client'
 import { setEmptyValuesForFields } from './components/forms/utils'
 
@@ -125,11 +126,15 @@ export function createTemporaryId() {
 
 /**
  *
- * currentValue: The current value of the field.
- * defaultValue: Configured default value from the country configuration.
- * meta: Metadata fields such as 'user', 'event', and others.
- */
+ * @param fieldType: The type of the field.
+ * @param currentValue: The current value of the field.
+ * @param defaultValue: Configured default value from the country configuration.
+ * @param meta: Metadata fields such as '$user', '$event', and others.
+ *
+ * @returns Resolves template variables in the default value and returns the resolved value.
+ *
 
+ */
 export function replacePlaceholders({
   fieldType,
   currentValue,
@@ -138,7 +143,7 @@ export function replacePlaceholders({
 }: {
   fieldType: FieldType
   currentValue?: FieldValue
-  defaultValue?: DefaultValue
+  defaultValue?: FieldConfigDefaultValue
   meta: MetaFields
 }): FieldValue | undefined {
   if (currentValue) {
@@ -149,6 +154,10 @@ export function replacePlaceholders({
     return undefined
   }
 
+  if (isFieldValueWithoutTemplates(defaultValue)) {
+    return defaultValue
+  }
+
   if (isTemplateVariable(defaultValue)) {
     const resolvedValue = _.get(meta, defaultValue)
     const validator = mapFieldTypeToZod(fieldType)
@@ -156,20 +165,12 @@ export function replacePlaceholders({
     const parsedValue = validator.safeParse(resolvedValue)
 
     if (parsedValue.success) {
-      return resolvedValue
+      return parsedValue.data as FieldValue
     }
+
     throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
   }
 
-  if (isFieldValueWithoutTemplates(defaultValue)) {
-    return defaultValue
-  }
-
-  const compositeFieldTypes = [
-    FieldType.ADDRESS,
-    FieldType.FILE,
-    FieldType.FILE_WITH_OPTIONS
-  ]
   if (
     compositeFieldTypes.some((ft) => ft === fieldType) &&
     typeof defaultValue === 'object'
@@ -180,9 +181,11 @@ export function replacePlaceholders({
      */
     const result = { ...defaultValue }
 
+    // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
     for (const [key, val] of _.toPairs(result)) {
       if (isTemplateVariable(val)) {
         const resolvedValue = _.get(meta, val)
+        // For now, we only support resolving template variables for text fields.
         const validator = mapFieldTypeToZod(FieldType.TEXT)
         const parsedValue = validator.safeParse(resolvedValue)
         if (parsedValue.success && parsedValue.data) {

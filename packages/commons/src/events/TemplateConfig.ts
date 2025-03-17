@@ -9,25 +9,63 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/**
+ * TemplateConfig defines configuration rules for system-based variables (e.g. $user.province).
+ * They are currently used for providing default values in FieldConfig.
+ */
+
 import { FieldValue } from './FieldValue'
 
-export type DefaultValue =
+/**
+ * Available system variables for configuration.
+ */
+export interface MetaFields {
+  $user: {
+    province: string
+    district: string
+  }
+}
+
+/**
+ * Recursively flatten the keys of an object. Used to limit types when configuring default values in country config.
+ * @example
+ * type Test = FlattenedKeyStrings<{ a: { b: string, c: { d: string } } }>
+ * // 'a.b' | 'a.c.d' but not 'a' or 'a.c'
+ */
+type FlattenedKeyStrings<T, Prefix extends string = ''> = {
+  [K in keyof T]: T[K] extends Record<string, any>
+    ? FlattenedKeyStrings<T[K], `${Prefix}${K & string}.`>
+    : `${Prefix}${K & string}`
+}[keyof T]
+
+export type FlattenedMetaFields = FlattenedKeyStrings<MetaFields>
+
+/**
+ * Default value for a field when configuring a form.
+ */
+export type FieldConfigDefaultValue =
   | FieldValue
-  | MetaFieldsDotted
-  | Record<string, MetaFieldsDotted | FieldValue>
+  | FlattenedMetaFields
+  | Record<string, FlattenedMetaFields | FieldValue>
 
 export function isTemplateVariable(
-  value: DefaultValue
-): value is MetaFieldsDotted {
+  value: FieldConfigDefaultValue
+): value is FlattenedMetaFields {
   return typeof value === 'string' && (value as string).startsWith('$')
 }
 
-export function isFieldValue(value: DefaultValue): value is FieldValue {
+export function isFieldValue(
+  value: FieldConfigDefaultValue
+): value is FieldValue {
   return FieldValue.safeParse(value).success
 }
 
+/**
+ * Checks if given value is valid for a field, and known template variables are already resolved.
+ * @todo: Extend functionality to arbitrary depth objects. Currently only checks first level since our compoosite fields are only 1 level deep.
+ */
 export function isFieldValueWithoutTemplates(
-  value: DefaultValue
+  value: FieldConfigDefaultValue
 ): value is FieldValue {
   if (isTemplateVariable(value)) {
     return false
@@ -43,7 +81,9 @@ export function isFieldValueWithoutTemplates(
   return true
 }
 
-export function isDefaultValue(value: any): value is DefaultValue {
+export function isFieldConfigDefaultValue(
+  value: any
+): value is FieldConfigDefaultValue {
   if (!value) return false
 
   if (isFieldValue(value)) {
@@ -58,23 +98,8 @@ export function isDefaultValue(value: any): value is DefaultValue {
     typeof value === 'object' &&
     Object.values(value).every((v) => typeof v === 'object' && v !== null)
   ) {
-    return Object.values(value).every((v) => isDefaultValue(v))
+    return Object.values(value).every((v) => isFieldConfigDefaultValue(v))
   }
 
   return false
 }
-
-export interface MetaFields {
-  $user: {
-    province: string
-    district: string
-  }
-}
-
-type DottedKeys<T, Prefix extends string = ''> = {
-  [K in keyof T]: T[K] extends Record<string, string>
-    ? DottedKeys<T[K], `${Prefix}${K & string}.`>
-    : `${Prefix}${K & string}`
-}[keyof T]
-
-export type MetaFieldsDotted = DottedKeys<MetaFields>
