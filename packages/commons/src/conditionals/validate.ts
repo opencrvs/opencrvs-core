@@ -81,6 +81,41 @@ export function isFieldEnabled(
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
 
+export const errorMessages = {
+  hiddenField: {
+    id: 'v2.error.hidden',
+    defaultMessage: 'Hidden or disabled field should not receive a value',
+    description:
+      'Error message when field is hidden or disabled, but a value was received'
+  },
+  invalidDate: {
+    defaultMessage: 'Invalid date field',
+    description: 'Error message when date field is invalid',
+    id: 'v2.error.invalidDate'
+  },
+  invalidEmail: {
+    defaultMessage: 'Invalid email address',
+    description: 'Error message when email address is invalid',
+    id: 'v2.error.invalidEmail'
+  },
+  requiredField: {
+    defaultMessage: 'Required for registration',
+    description: 'Error message when required field is missing',
+    id: 'v2.error.required'
+  },
+  invalidInput: {
+    defaultMessage: 'Invalid input',
+    description: 'Error message when generic field is invalid',
+    id: 'v2.error.invalid'
+  }
+}
+
+const createIntlError = (message: TranslationConfig) => ({
+  message: {
+    message
+  }
+})
+
 /**
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
@@ -89,56 +124,42 @@ const zodToIntlErrorMap = (
   issue: ZodIssueOptionalMessage,
   _ctx: ErrorMapCtx
 ) => {
-  if (issue.code === 'invalid_string' && issue.validation === 'date') {
-    return {
-      message: {
-        message: {
-          defaultMessage: 'Invalid date. Please use the format YYYY-MM-DD',
-          description: 'This is the error message for invalid date fields',
-          id: 'v2.error.invalidDate'
-        }
+  console.log('issue', issue)
+  console.log('_ctx', _ctx)
+  switch (issue.code) {
+    case 'invalid_string': {
+      if (_ctx.data === '') {
+        return createIntlError(errorMessages.requiredField)
       }
+
+      if (issue.validation === 'date') {
+        return createIntlError(errorMessages.invalidDate)
+      }
+
+      if (issue.validation === 'email') {
+        return createIntlError(errorMessages.invalidEmail)
+      }
+
+      break
+    }
+
+    case 'invalid_type': {
+      if (issue.expected !== issue.received && issue.received === 'undefined') {
+        return createIntlError(errorMessages.requiredField)
+      }
+
+      break
+    }
+    case 'too_small': {
+      if (issue.message === undefined) {
+        return createIntlError(errorMessages.requiredField)
+      }
+
+      break
     }
   }
 
-  if (issue.code === 'invalid_string' && issue.validation === 'email') {
-    return {
-      message: {
-        message: {
-          defaultMessage: 'Invalid email address',
-          description: 'This is the error message for invalid email fields',
-          id: 'v2.error.invalidEmail'
-        }
-      }
-    }
-  }
-
-  if (
-    (issue.code === 'invalid_type' &&
-      issue.expected !== issue.received &&
-      issue.received === 'undefined') ||
-    (issue.code === 'too_small' && issue.message === undefined)
-  ) {
-    return {
-      message: {
-        message: {
-          defaultMessage: 'Required for registration',
-          description: 'This is the error message for required fields',
-          id: 'v2.error.required'
-        }
-      }
-    }
-  }
-
-  return {
-    message: {
-      message: {
-        defaultMessage: 'Invalid input',
-        description: 'This is the error message for invalid field value',
-        id: 'v2.error.invalid'
-      }
-    }
-  }
+  return createIntlError(errorMessages.invalidInput)
 }
 
 /**
@@ -175,13 +196,7 @@ export function getFieldValidationErrors({
       return {
         errors: [
           {
-            message: {
-              id: 'v2.error.hidden',
-              defaultMessage:
-                'Hidden or disabled field should not receive a value',
-              description:
-                'Error message when field is hidden or disabled, but a value was received'
-            }
+            message: errorMessages.hiddenField
           }
         ]
       }
@@ -203,8 +218,8 @@ export function getFieldValidationErrors({
   })
 
   return {
-    // Assumes that custom validation errors are more important than field validation errors
-    errors: [...customValidationResults, ...fieldValidationResult]
+    // Assumes that custom validation errors are based on the field type, and extend the validation.
+    errors: [...fieldValidationResult, ...customValidationResults]
   }
 }
 
