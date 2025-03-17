@@ -58,7 +58,7 @@ import {
   isNumberFieldType,
   isEmailFieldType,
   isFieldVisible,
-  isDataFieldType
+  isDataFieldType,
   MetaFields
 } from '@opencrvs/commons/client'
 import { Field, FieldProps, Formik, FormikProps } from 'formik'
