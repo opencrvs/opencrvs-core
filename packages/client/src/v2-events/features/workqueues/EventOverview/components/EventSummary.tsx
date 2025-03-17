@@ -79,7 +79,8 @@ export function EventSummary({
   event: Record<string, FieldValue | null | RecursiveStringRecord>
   summary: SummaryConfig
   /**
-   * Event label to be displayed in the summary page
+   * Event label to be displayed in the summary page.
+   * This label is used for translation purposes and should not be stored in the event data.
    */
   eventLabel: TranslationConfig
 }) {
