@@ -14,7 +14,7 @@ import {
   Inferred,
   FieldValue,
   MetaFields,
-  isDefaultValue
+  isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 import { replacePlaceholders } from '@client/v2-events/utils'
@@ -43,7 +43,7 @@ export function handleDefaultValue(
     })
   }
 
-  if (isDefaultValue(defaultValue)) {
+  if (isFieldConfigDefaultValue(defaultValue)) {
     return replacePlaceholders({
       fieldType: field.type,
       defaultValue,
