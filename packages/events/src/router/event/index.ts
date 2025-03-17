@@ -146,7 +146,6 @@ export const eventRouter = router({
     notify: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))
       .input(NotifyActionInput)
-      .use(middleware.validateAction(ActionType.NOTIFY))
       .mutation(async (options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,

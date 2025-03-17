@@ -16,11 +16,6 @@ import { ActionUpdate } from './ActionDocument'
 export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  incomplete: z
-    .boolean()
-    .optional()
-    .default(false)
-    .describe('Allows action with partial data to be saved'),
   data: ActionUpdate,
   metadata: ActionUpdate.optional()
 })
@@ -55,8 +50,7 @@ export type ValidateActionInput = z.infer<typeof ValidateActionInput>
 
 export const NotifyActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
   })
 )
 
