@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { uniq, isString, get, mapKeys, toPairs } from 'lodash'
+import { uniq, isString, get, mapKeys } from 'lodash'
 
 import { IntlShape } from 'react-intl'
 import { v4 as uuid } from 'uuid'
@@ -182,7 +182,7 @@ export function replacePlaceholders({
     const result = { ...defaultValue }
 
     // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
-    for (const [key, val] of toPairs(result)) {
+    for (const [key, val] of Object.entries(result)) {
       if (isTemplateVariable(val)) {
         const resolvedValue = get(meta, val)
         // For now, we only support resolving template variables for text fields.

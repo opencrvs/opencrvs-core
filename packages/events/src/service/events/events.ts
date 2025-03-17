@@ -85,6 +85,9 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
+  /**
+   * Once an event is declared, it cannot be removed anymore.
+   */
   const hasNonDeletableActions = event.actions.some(
     (action) => action.type !== ActionType.CREATE
   )
