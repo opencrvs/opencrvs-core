@@ -8,28 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { PropsWithChildren } from 'react'
+import React from 'react'
 import { Button } from '../Button'
 import { Content } from '../Content'
 import { Frame } from '../Frame'
 import { Icon } from '../Icon'
 import { Stack } from '../Stack'
+import { FormWizardProps } from './FormWizard'
+import { VerificationPageConfig } from '@opencrvs/commons'
+import { useIntl } from 'react-intl'
+import { Check, Cross } from '@opencrvs/components/lib/icons'
 
-export type FormWizardProps = PropsWithChildren<{
-  currentPage: number
-  totalPages: number
-  /** Callback when the user clicks the "Continue" button */
-  onNextPage?: () => void
-  onPreviousPage?: () => void
-
-  /** Callback when the user submits the form wizard */
-  onSubmit: () => void
-  pageTitle: string
-
-  showReviewButton?: boolean
-}>
-
-export const FormWizard = ({
+export const VerificationWizard = ({
   children,
   currentPage,
   totalPages,
@@ -37,9 +27,12 @@ export const FormWizard = ({
   pageTitle,
   onNextPage,
   onPreviousPage,
-  continueButtonText = 'Continue',
-  showReviewButton
-}: FormWizardProps & { continueButtonText?: string }) => {
+  showReviewButton,
+  pageConfig
+}: FormWizardProps & { pageConfig: VerificationPageConfig }) => {
+  const intl = useIntl()
+
+  // TODO CIHAN: save accepted value
   return (
     <Frame.LayoutForm>
       <Frame.SectionFormBackAction>
@@ -57,11 +50,22 @@ export const FormWizard = ({
 
             <Button
               size="large"
-              type="primary"
+              type="negative"
               role="button"
               onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
             >
-              {continueButtonText}
+              <Cross color="white" />
+              {intl.formatMessage(pageConfig.cancel.label)}
+            </Button>
+
+            <Button
+              size="large"
+              type="positive"
+              role="button"
+              onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
+            >
+              <Check color="white" />
+              {intl.formatMessage(pageConfig.verify.label)}
             </Button>
 
             {showReviewButton && (

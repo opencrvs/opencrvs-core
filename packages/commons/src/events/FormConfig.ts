@@ -25,21 +25,25 @@ export const FormPage = z.object({
   type: z.literal('FORM').default('FORM')
 })
 
-export const VerificationPage = FormPage.extend({
-  type: z.literal('VERIFICATION'),
-  actions: z
-    .object({
-      verify: z.object({ label: TranslationConfig }),
-      cancel: z.object({
-        label: TranslationConfig,
-        confirmation: z.object({
-          title: TranslationConfig,
-          body: TranslationConfig
-        })
+export const VerificationPageConfig = z
+  .object({
+    verify: z.object({ label: TranslationConfig }),
+    cancel: z.object({
+      label: TranslationConfig,
+      confirmation: z.object({
+        title: TranslationConfig,
+        body: TranslationConfig
       })
     })
-    .describe('Actions available on the verification page')
+  })
+  .describe('Actions available on the verification page')
+
+export const VerificationPage = FormPage.extend({
+  type: z.literal('VERIFICATION'),
+  actions: VerificationPageConfig
 })
+
+export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
 
 export type AllPageConfigs = typeof FormPage | typeof VerificationPage
 

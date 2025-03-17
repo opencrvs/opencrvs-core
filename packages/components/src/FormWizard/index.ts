@@ -9,5 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './FormWizard'
+export * from './VerificationWizard'
 export * from './FormFieldRenderer'
 export { useFormContext, FieldValues, get } from 'react-hook-form'

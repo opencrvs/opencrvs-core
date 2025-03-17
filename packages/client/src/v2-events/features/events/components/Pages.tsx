@@ -12,7 +12,7 @@
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { EventState, Page, PageType } from '@opencrvs/commons/client'
-import { FormWizard } from '@opencrvs/components'
+import { FormWizard, VerificationWizard } from '@opencrvs/components'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
@@ -65,29 +65,42 @@ export function Pages({
     }
   }, [pageId, currentPage, formPages, onFormPageChange])
 
+  console.log('page', page)
+
+  const wizardProps = {
+    currentPage,
+    pageTitle: intl.formatMessage(page.title),
+    showReviewButton,
+    totalPages: total,
+    onNextPage: next,
+    onPreviousPage: previous,
+    onSubmit
+  }
+
+  const fields = children ? (
+    children(page)
+  ) : (
+    <FormFieldGenerator
+      fields={page.fields}
+      formData={form}
+      id="locationForm"
+      initialValues={form}
+      setAllFieldsDirty={false}
+      onChange={(values) => setFormData(values)}
+    />
+  )
+
+  if (page.type === PageType.VERIFICATION) {
+    return (
+      <VerificationWizard {...wizardProps} pageConfig={page.actions}>
+        {fields}
+      </VerificationWizard>
+    )
+  }
+
   return (
-    <FormWizard
-      continueButtonText={continueButtonText}
-      currentPage={currentPage}
-      pageTitle={intl.formatMessage(page.title)}
-      showReviewButton={showReviewButton}
-      totalPages={total}
-      onNextPage={next}
-      onPreviousPage={previous}
-      onSubmit={onSubmit}
-    >
-      {children ? (
-        children(page)
-      ) : (
-        <FormFieldGenerator
-          fields={page.fields}
-          formData={form}
-          id="locationForm"
-          initialValues={form}
-          setAllFieldsDirty={false}
-          onChange={(values) => setFormData(values)}
-        />
-      )}
+    <FormWizard continueButtonText={continueButtonText} {...wizardProps}>
+      {fields}
     </FormWizard>
   )
 }
