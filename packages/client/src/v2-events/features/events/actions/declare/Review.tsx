@@ -10,11 +10,14 @@
  */
 
 import React from 'react'
-import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  findActiveActionForm,
+  SCOPES
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -30,6 +33,8 @@ import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -38,7 +43,7 @@ export function Review() {
   const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
-  const intl = useIntl()
+  const { formatMessageWithValues } = useIntlFormatMessageWithFlattenedParams()
   const { goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
@@ -95,12 +100,19 @@ export function Review() {
     return
   }
 
+  const hasValidationErrors = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
       <ReviewComponent.ActionModal.Accept
         action="Declare"
         close={close}
         copy={reviewActionConfiguration.messages.modal}
+        incomplete={hasValidationErrors}
       />
     ))
     if (confirmedDeclaration) {
@@ -109,6 +121,10 @@ export function Review() {
       goToHome()
     }
   }
+
+  const eventFieldKeys = formConfig.pages.flatMap((page) =>
+    page.fields.map((field) => field.id)
+  )
 
   return (
     <FormLayout
@@ -127,15 +143,16 @@ export function Review() {
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         isUploadButtonVisible={true}
-        // @todo: Update to use dynamic title
-        title={intl.formatMessage(formConfig.review.title, {
-          firstname: form['applicant.firstname'] as string,
-          surname: form['applicant.surname'] as string
-        })}
+        title={formatMessageWithValues(
+          formConfig.review.title,
+          eventFieldKeys,
+          form
+        )}
         metadata={metadata}
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
+          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
           isPrimaryActionDisabled={reviewActionConfiguration.isDisabled}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}

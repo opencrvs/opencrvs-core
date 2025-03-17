@@ -36,7 +36,6 @@ import {
   FormConfig,
   getFieldValidationErrors,
   isFieldVisible,
-  isOptionalUncheckedCheckbox,
   SCOPES
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -160,6 +159,11 @@ const ReviewContainter = styled.div`
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
+  changeAllButton: {
+    id: 'v2.buttons.changeAll',
+    defaultMessage: 'Change all',
+    description: 'The label for the change all button'
+  },
   changeButton: {
     id: 'v2.buttons.change',
     defaultMessage: 'Change',
@@ -186,6 +190,11 @@ const reviewMessages = defineMessages({
     defaultMessage:
       'The declarant will be notified of this action and a record of this decision will be recorded',
     description: 'The description for action modal'
+  },
+  actionModalIncompleteDescription: {
+    id: 'v2.actionModal.description.incomplete',
+    defaultMessage: 'This incomplete declaration will be sent for review.',
+    description: 'The description for action modal when incomplete'
   },
   changeModalCancel: {
     id: 'v2.changeModal.cancel',
@@ -260,7 +269,6 @@ const reviewMessages = defineMessages({
  * User can review the data and take actions like declare, reject or edit the data.
  */
 function ReviewComponent({
-  eventConfig,
   formConfig,
   previousFormValues,
   form,
@@ -321,8 +329,7 @@ function ReviewComponent({
                 justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
-                  {intl.formatMessage(reviewMessages.govtName)} {' – '}
-                  {intl.formatMessage(eventConfig.label)}
+                  {intl.formatMessage(reviewMessages.govtName)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
                   {title}
@@ -333,6 +340,52 @@ function ReviewComponent({
           <FormData>
             <ReviewContainter>
               {formConfig.pages.map((page) => {
+                const fields = page.fields
+                  .filter((field) => isFieldVisible(field, form))
+                  .map((field) => {
+                    const value = form[field.id]
+                    const previousValue = previousForm[field.id]
+
+                    const valueDisplay = Output({
+                      field,
+                      previousValue,
+                      showPreviouslyMissingValuesAsChanged,
+                      value
+                    })
+
+                    const error = getFieldValidationErrors({
+                      field,
+                      values: form
+                    })
+
+                    const errorDisplay =
+                      error.errors.length > 0 ? (
+                        <ValidationError key={field.id}>
+                          {intl.formatMessage(error.errors[0].message)}
+                        </ValidationError>
+                      ) : null
+
+                    return { ...field, valueDisplay, errorDisplay }
+                  })
+
+                const shouldDisplayPage = fields.some(
+                  ({ type, valueDisplay, errorDisplay }) => {
+                    if (
+                      type === FieldType.FILE ||
+                      type === FieldType.FILE_WITH_OPTIONS
+                    ) {
+                      return true
+                    }
+
+                    // If page doesn't have any file inputs, we only want to display it if it has any fields with content
+                    return valueDisplay || errorDisplay
+                  }
+                )
+
+                if (!shouldDisplayPage) {
+                  return <></>
+                }
+
                 return (
                   <DeclarationDataContainer
                     key={'Section_' + page.title.defaultMessage}
@@ -345,7 +398,7 @@ function ReviewComponent({
                             onEdit({ pageId: page.id })
                           }}
                         >
-                          {intl.formatMessage(reviewMessages.changeButton)}
+                          {intl.formatMessage(reviewMessages.changeAllButton)}
                         </Link>
                       }
                       expand={true}
@@ -355,68 +408,36 @@ function ReviewComponent({
                       name={'Accordion_' + page.id}
                     >
                       <ListReview id={'Section_' + page.id}>
-                        {page.fields
-                          .filter((field) => isFieldVisible(field, form))
+                        {fields
                           .filter(
-                            (field) => !isOptionalUncheckedCheckbox(field, form)
+                            ({ valueDisplay, errorDisplay }) =>
+                              valueDisplay || errorDisplay
                           )
-                          .map((field) => {
-                            const value = form[field.id]
-                            const previousValue = previousForm[field.id]
+                          .map(({ id, label, errorDisplay, valueDisplay }) => (
+                            <ListReview.Row
+                              key={id}
+                              actions={
+                                <Link
+                                  data-testid={`change-button-${id}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
 
-                            const valueDisplay = (
-                              <Output
-                                field={field}
-                                previousValue={previousValue}
-                                showPreviouslyMissingValuesAsChanged={
-                                  showPreviouslyMissingValuesAsChanged
-                                }
-                                value={value}
-                              />
-                            )
-
-                            const error = getFieldValidationErrors({
-                              field,
-                              values: form
-                            })
-
-                            const errorDisplay =
-                              error.errors.length > 0 ? (
-                                <ValidationError key={field.id}>
-                                  {intl.formatMessage(error.errors[0].message)}
-                                </ValidationError>
-                              ) : null
-
-                            return (
-                              <ListReview.Row
-                                key={field.id}
-                                actions={
-                                  <Link
-                                    data-testid={`change-button-${field.id}`}
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-
-                                      onEdit({
-                                        pageId: page.id,
-                                        fieldId: field.id
-                                      })
-                                    }}
-                                  >
-                                    {intl.formatMessage(
-                                      reviewMessages.changeButton
-                                    )}
-                                  </Link>
-                                }
-                                id={field.id}
-                                label={intl.formatMessage(field.label)}
-                                value={
-                                  error.errors.length > 0
-                                    ? errorDisplay
-                                    : valueDisplay
-                                }
-                              />
-                            )
-                          })}
+                                    onEdit({
+                                      pageId: page.id,
+                                      fieldId: id
+                                    })
+                                  }}
+                                >
+                                  {intl.formatMessage(
+                                    reviewMessages.changeButton
+                                  )}
+                                </Link>
+                              }
+                              id={id}
+                              label={intl.formatMessage(label)}
+                              value={errorDisplay || valueDisplay}
+                            />
+                          ))}
                       </ListReview>
                     </Accordion>
                   </DeclarationDataContainer>
@@ -541,6 +562,7 @@ function ReviewActionComponent({
   onReject,
   messages,
   primaryButtonType,
+  canSendIncomplete,
   isPrimaryActionDisabled
 }: {
   isPrimaryActionDisabled: boolean
@@ -553,6 +575,8 @@ function ReviewActionComponent({
     onReject?: MessageDescriptor
   }
   primaryButtonType?: 'positive' | 'primary'
+  action?: string
+  canSendIncomplete?: boolean
 }) {
   const intl = useIntl()
 
@@ -566,7 +590,7 @@ function ReviewActionComponent({
           <Description>{intl.formatMessage(messages.description)}</Description>
           <ActionContainer>
             <Button
-              disabled={isPrimaryActionDisabled}
+              disabled={isPrimaryActionDisabled && !canSendIncomplete}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}
@@ -653,7 +677,8 @@ function EditModal({
 function AcceptActionModal({
   copy,
   close,
-  action
+  action,
+  incomplete
 }: {
   copy?: {
     onCancel?: MessageDescriptor
@@ -663,6 +688,7 @@ function AcceptActionModal({
   }
   close: (result: boolean | null) => void
   action: string
+  incomplete?: boolean
 }) {
   const intl = useIntl()
   return (
@@ -708,7 +734,9 @@ function AcceptActionModal({
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(
-            copy?.description || reviewMessages.actionModalDescription
+            incomplete
+              ? reviewMessages.actionModalIncompleteDescription
+              : copy?.description || reviewMessages.actionModalDescription
           )}
         </Text>
       </Stack>
