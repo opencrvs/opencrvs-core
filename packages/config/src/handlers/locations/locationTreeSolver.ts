@@ -18,7 +18,10 @@ import { logger, UUID } from '@opencrvs/commons'
 import { fetchFromHearth } from '@config/services/hearth'
 import client from '@config/config/hearthClient'
 
-export const resolveLocationChildren = async (id: UUID) => {
+export const resolveLocationChildren = async (
+  id: UUID,
+  type: string | undefined
+) => {
   const db = client.db()
 
   const childQuery = [
@@ -35,6 +38,25 @@ export const resolveLocationChildren = async (id: UUID) => {
       }
     },
     {
+      $set: {
+        children: {
+          $cond: {
+            if: { $gt: [type, undefined] },
+            then: {
+              $filter: {
+                input: '$children',
+                as: 'child',
+                cond: {
+                  $eq: [{ $arrayElemAt: ['$$child.type.coding.code', 0] }, type]
+                }
+              }
+            },
+            else: '$children'
+          }
+        }
+      }
+    },
+    {
       $project: {
         children: {
           id: 1,
@@ -44,6 +66,7 @@ export const resolveLocationChildren = async (id: UUID) => {
       }
     }
   ]
+
   try {
     const result = await db
       .collection<Location>('Location_view_with_plain_ids')

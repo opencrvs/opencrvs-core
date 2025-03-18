@@ -13,7 +13,6 @@ import { CONFIG_API_URL } from '@metrics/constants'
 import { Document } from 'mongoose'
 import { UUID } from '@opencrvs/commons'
 import {
-  getLocationType,
   Location,
   ResourceIdentifier,
   SavedLocation
@@ -75,6 +74,8 @@ export interface IApplicationConfig {
   LOGIN_BACKGROUND: ILoginBackground
 }
 
+type LocationType = 'CRVS_OFFICE' | 'HEALTH_FACILITY' | 'ADMIN_STRUCTURE'
+
 export async function getApplicationConfig(
   authorization: string
 ): Promise<IApplicationConfig> {
@@ -118,11 +119,13 @@ export async function getDashboardQueries(): Promise<
     })
 }
 
-const FETCH_ALL_LOCATION_CHILDREN = (id: UUID) =>
-  new URL(`/locations/${id}/children`, CONFIG_API_URL)
+const FETCH_ALL_LOCATION_CHILDREN = (id: UUID, type?: LocationType) => {
+  const typeQuery = type ? `?type=${type}` : ''
+  return new URL(`/locations/${id}/children${typeQuery}`, CONFIG_API_URL)
+}
 
-export const fetchLocationChildren = async (id: UUID) => {
-  const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(id))
+export const fetchLocationChildren = async (id: UUID, type?: LocationType) => {
+  const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(id, type))
 
   if (!response.ok) {
     throw new Error(
@@ -135,13 +138,12 @@ export const fetchLocationChildren = async (id: UUID) => {
 
 export const fetchLocationChildrenIds = async (
   id: ResourceIdentifier<Location>,
-  typeFilter?: 'CRVS_OFFICE' | 'HEALTH_FACILITY' | 'ADMIN_STRUCTURE'
+  typeFilter?: LocationType
 ) => {
   // TODO: Migrate InfluxDB to use UUID's instead of the "Location/" prefix
   const locations = await fetchLocationChildren(
-    id.replace('Location/', '') as UUID
+    id.replace('Location/', '') as UUID,
+    typeFilter
   )
-  return locations
-    .filter((x) => (typeFilter ? getLocationType(x) === typeFilter : true))
-    .map(({ id }) => `Location/${id}`)
+  return locations.map(({ id }) => `Location/${id}`)
 }
