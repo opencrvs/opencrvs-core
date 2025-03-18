@@ -8,25 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig, EventDocument, PageType } from '@opencrvs/commons/client'
-
-export const birthDocument: EventDocument = {
-  type: 'birth',
-  id: 'e1e9ff08-ae5d-490a-b76a-74722269ff4a',
-  trackingId: 'TEST12',
-  createdAt: '2025-02-06T06:15:39.922Z',
-  updatedAt: '2025-02-06T06:15:39.922Z',
-  actions: [
-    {
-      type: 'CREATE',
-      createdAt: '2025-02-06T06:15:39.922Z',
-      createdBy: '67810ec1d9bb658e54f4f319',
-      createdAtLocation: '7ec76333-d533-4743-b810-5c8ed32169a8',
-      id: '148ed352-9daf-401c-bf3e-4d13abbb808d',
-      data: {}
-    }
-  ]
-}
+import { EventConfig } from '@opencrvs/commons/client'
 
 export const birthEvent = {
   id: 'birth',

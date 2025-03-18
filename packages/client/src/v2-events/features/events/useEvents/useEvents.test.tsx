@@ -18,6 +18,7 @@ import { setupServer } from 'msw/node'
 import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
 import {
+  ActionType,
   EventDocument,
   EventInput,
   tennisClubMembershipEvent
@@ -62,7 +63,7 @@ const createHandler = trpcHandler(async ({ request }) => {
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
       {
-        type: 'CREATE',
+        type: ActionType.CREATE,
         id: '_REAL_ACTION_UUID_',
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
         createdBy: '6733309827b97e6483877188',

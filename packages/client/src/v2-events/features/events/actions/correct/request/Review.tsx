@@ -16,8 +16,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   findActiveActionForm,
-  getAllFields,
-  getCurrentEventState
+  getAllFields
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -38,7 +37,7 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
   const formConfig = findActiveActionForm(config, ActionType.REQUEST_CORRECTION)
@@ -82,7 +81,7 @@ export function Review() {
     return
   }
 
-  const previousFormValues = getCurrentEventState(event).data
+  const previousFormValues = event.data
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => previousFormValues[key] !== value
   )

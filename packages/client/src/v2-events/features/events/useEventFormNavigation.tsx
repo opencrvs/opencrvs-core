@@ -12,8 +12,7 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
-import { EventDocument } from '@opencrvs/commons'
-import { isUndeclaredDraft } from '@opencrvs/commons/client'
+import { EventIndex, isUndeclaredDraft } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -64,11 +63,7 @@ export function useEventFormNavigation() {
     navigate(ROUTES.V2.path)
   }
 
-  function goToReview(eventId: string) {
-    navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
-  }
-
-  async function exit(event: EventDocument) {
+  async function exit(event: EventIndex) {
     const exitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
@@ -111,9 +106,10 @@ export function useEventFormNavigation() {
       return
     }
     const hasDrafts = remoteDrafts.find((draft) => draft.eventId === event.id)
-    if (isUndeclaredDraft(event) && !hasDrafts) {
+    if (isUndeclaredDraft(event.status) && !hasDrafts) {
       deleteEvent.mutate({ eventId: event.id })
     }
+
     goToHome()
   }
 
@@ -162,5 +158,5 @@ export function useEventFormNavigation() {
     }
   }
 
-  return { exit, modal, goToHome, goToReview, deleteDeclaration }
+  return { exit, modal, goToHome, deleteDeclaration }
 }
