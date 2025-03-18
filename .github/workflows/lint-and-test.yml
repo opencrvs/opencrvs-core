@@ -362,9 +362,13 @@ jobs:
         working-directory: packages/client
         run: yarn run build-storybook
 
-      - name: Run Storybook tests
+      - name: Serve Storybook and run tests
         working-directory: packages/client
-        run: yarn run test-storybook
+        # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "npx http-server storybook-static --port 6006 --silent" \
+            "npx wait-on tcp:127.0.0.1:6006 && yarn test-storybook"
 
   test-client:
     name: Test client
