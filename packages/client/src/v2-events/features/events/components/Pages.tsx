@@ -109,8 +109,8 @@ export function Pages({
 
   return (
     <FormWizard
-      continueButtonText={continueButtonText}
       {...wizardProps}
+      continueButtonText={continueButtonText}
       disableContinue={disableContinue}
     >
       {fields}

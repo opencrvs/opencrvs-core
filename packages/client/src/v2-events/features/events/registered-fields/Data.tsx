@@ -70,9 +70,11 @@ function DataInput({
 
   const { data, subtitle } = configuration
 
+  const labelMessage = intl.formatMessage(label)
+
   return (
     <Container>
-      {label && <h4>{intl.formatMessage(label)}</h4>}
+      {labelMessage && <h4>{labelMessage}</h4>}
       {subtitle && <h5>{intl.formatMessage(subtitle)}</h5>}
       <div>
         {data.map((item) => {
