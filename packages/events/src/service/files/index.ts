@@ -10,7 +10,7 @@
  */
 import { env } from '@events/environment'
 import {
-  ActionDocument,
+  ActionType,
   EventConfig,
   logger,
   EventDocument,
@@ -24,7 +24,7 @@ import { z } from 'zod'
 
 function getFieldDefinitionForActionDataField(
   configuration: EventConfig,
-  actionType: ActionDocument['type'],
+  actionType: ActionType,
   fieldId: string
 ) {
   const actionFields = findActiveActionFields(configuration, actionType)

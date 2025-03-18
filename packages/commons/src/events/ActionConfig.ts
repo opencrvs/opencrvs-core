@@ -58,9 +58,9 @@ const MarkedAsDuplicateConfig = ActionConfigBase.merge(
   })
 )
 
-const ArchivedConfig = ActionConfigBase.merge(
+const ArchiveConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVED),
+    type: z.literal(ActionType.ARCHIVE),
     comment: z.string(),
     isDuplicate: z.boolean()
   })
@@ -122,7 +122,7 @@ export type AllActionConfigFields =
   | typeof ValidateConfig
   | typeof RejectDeclarationConfig
   | typeof MarkedAsDuplicateConfig
-  | typeof ArchivedConfig
+  | typeof ArchiveConfig
   | typeof RegisterConfig
   | typeof DeleteConfig
   | typeof PrintCertificateActionConfig
@@ -137,7 +137,7 @@ export type InferredActionConfig =
   | z.infer<typeof ValidateConfig>
   | z.infer<typeof RejectDeclarationConfig>
   | z.infer<typeof MarkedAsDuplicateConfig>
-  | z.infer<typeof ArchivedConfig>
+  | z.infer<typeof ArchiveConfig>
   | z.infer<typeof RegisterConfig>
   | z.infer<typeof DeleteConfig>
   | z.infer<typeof PrintCertificateActionConfig>
@@ -151,7 +151,7 @@ export const ActionConfig = z.discriminatedUnion('type', [
   ValidateConfig,
   RejectDeclarationConfig,
   MarkedAsDuplicateConfig,
-  ArchivedConfig,
+  ArchiveConfig,
   RegisterConfig,
   DeleteConfig,
   PrintCertificateActionConfig,

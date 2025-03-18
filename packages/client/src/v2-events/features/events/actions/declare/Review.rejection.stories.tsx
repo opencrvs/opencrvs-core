@@ -116,7 +116,7 @@ export const Archive: Story = {
                 ActionType.CREATE,
                 ActionType.DECLARE,
                 ActionType.VALIDATE,
-                ActionType.ARCHIVED
+                ActionType.ARCHIVE
               ]
             })
           }),

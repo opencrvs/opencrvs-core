@@ -35,7 +35,7 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`should contain both MARKED_AS_DUPLICATE and ARCHIVED action if marked as duplicate`, async () => {
+test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} actions when marked as duplicate`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -51,11 +51,11 @@ test(`should contain both MARKED_AS_DUPLICATE and ARCHIVED action if marked as d
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVED)
+  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVE)
   expect(actions.at(-2)).toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
 })
 
-test(`should only contain ARCHIVED action if not marked as duplicate`, async () => {
+test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicate`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -71,6 +71,6 @@ test(`should only contain ARCHIVED action if not marked as duplicate`, async () 
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVED)
+  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVE)
   expect(actions.at(-2)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
 })
