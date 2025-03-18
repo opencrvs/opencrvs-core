@@ -78,7 +78,8 @@ function AddressInput(props: Props) {
   const fields = [
     ...ADMIN_STRUCTURE,
     ...URBAN_FIELDS,
-    ...RURAL_FIELDS
+    ...RURAL_FIELDS,
+    ...GENERIC_ADDRESS_FIELDS
   ] satisfies Array<FieldConfigWithoutAddress>
 
   return (
@@ -97,6 +98,7 @@ const displayWhenDistrictUrbanSelected = [
   {
     type: ConditionalType.SHOW,
     conditional: and(
+      isFarajaland(),
       createFieldCondition('urbanOrRural').isEqualTo(AddressType.URBAN),
       not(createFieldCondition('district').isUndefined())
     )
@@ -161,6 +163,10 @@ const URBAN_FIELDS = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
+function isFarajaland() {
+  return createFieldCondition('country').isEqualTo('FAR')
+}
+
 const RURAL_FIELDS = [
   {
     id: 'village',
@@ -168,6 +174,7 @@ const RURAL_FIELDS = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
+          isFarajaland(),
           createFieldCondition('urbanOrRural').isEqualTo(AddressType.RURAL),
           not(createFieldCondition('district').isUndefined())
         )
@@ -200,7 +207,7 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(createFieldCondition('country').isUndefined())
+        conditional: isFarajaland()
       }
     ],
     required: true,
@@ -218,7 +225,10 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(createFieldCondition('province').isUndefined())
+        conditional: and(
+          isFarajaland(),
+          not(createFieldCondition('province').isUndefined())
+        )
       }
     ],
     required: true,
@@ -239,7 +249,10 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(createFieldCondition('district').isUndefined())
+        conditional: and(
+          isFarajaland(),
+          not(createFieldCondition('district').isUndefined())
+        )
       }
     ],
     required: false,
@@ -275,10 +288,126 @@ const ADMIN_STRUCTURE = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
+const GENERIC_ADDRESS_FIELDS = [
+  {
+    id: 'state',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(isFarajaland())
+      }
+    ],
+    required: true,
+    label: {
+      id: 'v2.field.address.state.label',
+      defaultMessage: 'State',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'district2',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(isFarajaland())
+      }
+    ],
+    required: true,
+    label: {
+      id: 'v2.field.address.district2.label',
+      defaultMessage: 'District',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'cityOrTown',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(isFarajaland())
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.cityOrTown.label',
+      defaultMessage: 'City / Town',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine1',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(isFarajaland())
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine1.label',
+      defaultMessage: 'Address Line 1',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine2',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(isFarajaland())
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine2.label',
+      defaultMessage: 'Address Line 2',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine3',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(isFarajaland())
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine3.label',
+      defaultMessage: 'Address Line 3',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'postcodeOrZip',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(isFarajaland())
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.postcodeOrZip.label',
+      defaultMessage: 'Postcode / Zip',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  }
+] as const satisfies FieldConfigWithoutAddress[]
+
 const ALL_ADDRESS_FIELDS = [
   ...ADMIN_STRUCTURE,
   ...URBAN_FIELDS,
-  ...RURAL_FIELDS
+  ...RURAL_FIELDS,
+  ...GENERIC_ADDRESS_FIELDS
 ]
 
 type AllKeys<T> = T extends unknown ? keyof T : never
