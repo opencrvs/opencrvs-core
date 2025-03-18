@@ -135,5 +135,25 @@ export const IDVerificationBanner = ({
         {modal}
       </Banner.Container>
     )
+  } else if (type === 'failedFetchIdDetails') {
+    return (
+      <Banner.Container>
+        <Banner.Header type="inactive">
+          <VerificationPill type={type} />
+          <StatusIcon type={type} />
+        </Banner.Header>
+        <Banner.Body>
+          <Text variant="reg16" element="span">
+            {intl.formatMessage(messages.failedFetchIdDetails.description)}
+          </Text>
+        </Banner.Body>
+        <Banner.Footer justifyContent="flex-end">
+          <Button type="secondary" onClick={handleReset}>
+            {intl.formatMessage(messages.actions.reset)}
+          </Button>
+        </Banner.Footer>
+        {modal}
+      </Banner.Container>
+    )
   } else return null
 }
