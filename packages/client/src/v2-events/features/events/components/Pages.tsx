@@ -16,7 +16,7 @@ import { FormWizard } from '@opencrvs/components'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-import { VerificationWizard } from '@client/v2-events/components/forms/VerificationWizard'
+import { VerificationWizard } from './VerificationWizard'
 
 /**
  *

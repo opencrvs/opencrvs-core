@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { PropsWithChildren } from 'react'
-import { Button } from '../Button'
-import { Content } from '../Content'
-import { Frame } from '../Frame'
-import { Icon } from '../Icon'
-import { Stack } from '../Stack'
+import { Button } from '@opencrvs/components/src/Button'
+import { Content } from '@opencrvs/components/src/Content'
+import { Frame } from '@opencrvs/components/src/Frame'
+import { Icon } from '@opencrvs/components/src/Icon'
+import { Stack } from '@opencrvs/components/src/Stack'
 
 export type FormWizardProps = PropsWithChildren<{
   currentPage: number
@@ -48,22 +48,22 @@ export const FormWizard = ({
     <Frame.LayoutForm>
       <Frame.SectionFormBackAction>
         {currentPage > 0 && (
-          <Button type="tertiary" size="small" onClick={onPreviousPage}>
+          <Button size="small" type="tertiary" onClick={onPreviousPage}>
             <Icon name="ArrowLeft" size="medium" />
             Back
           </Button>
         )}
       </Frame.SectionFormBackAction>
       <Frame.Section>
-        <Content title={pageTitle} showTitleOnMobile={true}>
-          <Stack direction="column" gap={16} alignItems="stretch">
+        <Content showTitleOnMobile={true} title={pageTitle}>
+          <Stack alignItems="stretch" direction="column" gap={16}>
             {children}
 
             <Button
+              disabled={disableContinue}
+              role="button"
               size="large"
               type="primary"
-              role="button"
-              disabled={disableContinue}
               onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
             >
               {continueButtonText}

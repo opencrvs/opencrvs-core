@@ -19,11 +19,10 @@ import {
   Icon,
   Stack,
   Content,
-  Button,
-  FormWizardProps
+  Button
 } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
-
+import { FormWizardProps } from './FormWizard'
 const messages = defineMessages({
   back: {
     defaultMessage: 'Back',
