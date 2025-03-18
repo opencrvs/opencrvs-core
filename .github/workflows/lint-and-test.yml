@@ -328,6 +328,45 @@ jobs:
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
+  test-storybook:
+    name: Run storybook interaction tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Storybook
+        run: yarn build-storybook
+
+      - name: Run Storybook tests
+        run: yarn run test-storybook
+
   test-client:
     name: Test client
     needs: prepare-client-tests
