@@ -15,11 +15,15 @@ import {
   ActionUpdate,
   FieldConfig,
   FieldUpdateValue,
-  getFieldValidationErrors
+  findActiveActionFields,
+  getFieldValidationErrors,
+  getOrThrow
 } from '@opencrvs/commons'
-
 import { MiddlewareOptions } from '@events/router/middleware/utils'
-import { getActionFormFields } from '@events/service/config/config'
+import {
+  findEventConfigurationById,
+  findActiveActionVerificationPageIds
+} from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
@@ -30,11 +34,20 @@ export function validateAction(actionType: ActionType) {
   return async (opts: ActionMiddlewareOptions) => {
     const eventType = await getEventTypeId(opts.input.eventId)
 
-    const formFields = await getActionFormFields({
-      token: opts.ctx.token,
-      action: actionType,
-      eventType
-    })
+    const configuration = getOrThrow(
+      await findEventConfigurationById({
+        token: opts.ctx.token,
+        eventType
+      }),
+      `No configuration found for event type: ${eventType}`
+    )
+
+    const verificationPageIds = findActiveActionVerificationPageIds(
+      configuration,
+      actionType
+    )
+
+    const formFields = findActiveActionFields(configuration, actionType) || []
 
     const data = {
       ...opts.input.data,
@@ -71,10 +84,41 @@ export function validateAction(actionType: ActionType) {
       []
     )
 
-    if (errors.length > 0) {
+    const metadata = opts.input.metadata
+
+    const verificationPageErrors = verificationPageIds.reduce(
+      (
+        errorResults: {
+          message: string
+          id: string
+          value: FieldUpdateValue
+        }[],
+        field: string
+      ) => {
+        if (
+          !metadata ||
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          metadata[field] === null ||
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          metadata[field] === undefined
+        ) {
+          return [
+            ...errorResults,
+            { message: 'Field is required', id: field, value: data[field] }
+          ]
+        }
+
+        return errorResults
+      },
+      []
+    )
+
+    const allErrors = [...errors, ...verificationPageErrors]
+
+    if (allErrors.length > 0) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: JSON.stringify(errors)
+        message: JSON.stringify(allErrors)
       })
     }
 

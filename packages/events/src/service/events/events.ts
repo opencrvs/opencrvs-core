@@ -19,16 +19,17 @@ import {
   FieldConfig,
   FieldType,
   FieldUpdateValue,
-  FileFieldValue
+  FileFieldValue,
+  findActiveActionFields
 } from '@opencrvs/commons/events'
 import {
-  getActionFormFields,
+  findEventConfigurationById,
   notifyOnAction
 } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
-import { ActionType, getUUID } from '@opencrvs/commons'
+import { ActionType, getOrThrow, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
@@ -109,12 +110,17 @@ export async function deleteEvent(
 }
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
-  for (const ac of event.actions) {
-    const fieldConfigs = await getActionFormFields({
+  const configuration = getOrThrow(
+    await findEventConfigurationById({
       token,
-      eventType: event.type,
-      action: ac.type
-    })
+      eventType: event.type
+    }),
+    `No configuration found for event type: ${event.type}`
+  )
+
+  for (const ac of event.actions) {
+    const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
+
     for (const [key, value] of Object.entries(ac.data)) {
       const fileValue = getValidFileValue(key, value, fieldConfigs)
 
@@ -266,11 +272,15 @@ export async function addAction(
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
-  const fieldConfigs = await getActionFormFields({
-    token,
-    eventType: event.type,
-    action: input.type
-  })
+  const configuration = getOrThrow(
+    await findEventConfigurationById({
+      token,
+      eventType: event.type
+    }),
+    `No configuration found for event type: ${event.type}`
+  )
+
+  const fieldConfigs = findActiveActionFields(configuration, input.type) || []
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
 
   for (const file of fileValuesInCurrentAction) {

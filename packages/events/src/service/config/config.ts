@@ -15,10 +15,9 @@ import {
   ActionType,
   EventConfig,
   EventDocument,
-  FieldConfig,
-  findActiveActionFields,
-  getOrThrow,
-  logger
+  findActiveActionFormPages,
+  logger,
+  PageType
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { array } from 'zod'
@@ -38,7 +37,7 @@ export async function getEventConfigurations(token: string) {
   return array(EventConfig).parse(await res.json())
 }
 
-async function findEventConfigurationById({
+export async function findEventConfigurationById({
   token,
   eventType
 }: {
@@ -46,28 +45,22 @@ async function findEventConfigurationById({
   eventType: string
 }) {
   const configurations = await getEventConfigurations(token)
-
   return configurations.find((config) => config.id === eventType)
 }
 
-export async function getActionFormFields({
-  token,
-  eventType,
-  action
-}: {
-  token: string
-  eventType: string
+export function findActiveActionVerificationPageIds(
+  configuration: EventConfig,
   action: ActionType
-}): Promise<FieldConfig[]> {
-  const configuration = getOrThrow(
-    await findEventConfigurationById({
-      token,
-      eventType
-    }),
-    `No configuration found for event type: ${eventType}`
-  )
+): string[] {
+  const pages = findActiveActionFormPages(configuration, action)
 
-  return findActiveActionFields(configuration, action) || []
+  if (!pages) {
+    return []
+  }
+
+  return pages
+    .filter((page) => page.type === PageType.VERIFICATION)
+    .map((page) => page.id)
 }
 
 export async function notifyOnAction(
