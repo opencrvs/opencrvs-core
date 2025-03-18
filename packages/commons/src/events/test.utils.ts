@@ -116,7 +116,9 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.ARCHIVE,
       transactionId: input.transactionId ?? getUUID(),
-      data: input.data ?? {},
+      data:
+        input.data ??
+        generateActionInput(tennisClubMembershipEvent, ActionType.ARCHIVE),
       metadata: { isDuplicate: isDuplicate ?? false },
       duplicates: [],
       eventId
@@ -129,7 +131,9 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.REJECT,
       transactionId: input.transactionId ?? getUUID(),
-      data: input.data ?? {},
+      data:
+        input.data ??
+        generateActionInput(tennisClubMembershipEvent, ActionType.REJECT),
       duplicates: [],
       eventId
     }),
