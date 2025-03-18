@@ -20,10 +20,9 @@ import { buttonMessages } from '@client/i18n/messages'
 import { generateGoToHomeTabUrl } from '@client/navigation'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 
 const messages = defineMessages({
   title: {
@@ -34,13 +33,6 @@ const messages = defineMessages({
 })
 
 export function Onboarding() {
-  const resetMetadata = useEventMetadata((state) => state.clear)
-  const resetFormData = useEventFormData((state) => state.clear)
-  React.useEffect(() => {
-    resetMetadata()
-    resetFormData()
-  }, [resetFormData, resetMetadata])
-
   const navigate = useNavigate()
 
   const { eventId, pageId } = useTypedParams(
@@ -50,7 +42,7 @@ export function Onboarding() {
   const metadata = useEventMetadata((state) => state.getMetadata())
   const setMetadata = useEventMetadata((state) => state.setMetadata)
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const intl = useIntl()
 

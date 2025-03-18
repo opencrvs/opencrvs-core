@@ -13,7 +13,7 @@ import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import { ActionBase, ActionDocument } from './ActionDocument'
 import {
-  ArchivedActionInput,
+  ArchiveActionInput,
   DeclareActionInput,
   RegisterActionInput,
   RejectDeclarationActionInput,
@@ -27,14 +27,14 @@ import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
-import { findActiveActionFields, stripHiddenFields } from './utils'
+import { findActiveActionFormFields, stripHiddenFields } from './utils'
 import { FieldValue } from './FieldValue'
 
 export function generateActionInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const fields = findActiveActionFields(configuration, action) ?? []
+  const fields = findActiveActionFormFields(configuration, action) ?? []
 
   const data = fields.reduce(
     (acc, field, i) => ({
@@ -103,16 +103,18 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.VALIDATE,
       transactionId: input.transactionId ?? getUUID(),
-      data: input.data ?? {},
+      data:
+        input.data ??
+        generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
       duplicates: [],
       eventId
     }),
     archive: (
       eventId: string,
-      input: Partial<Pick<ArchivedActionInput, 'transactionId' | 'data'>> = {},
+      input: Partial<Pick<ArchiveActionInput, 'transactionId' | 'data'>> = {},
       isDuplicate?: boolean
     ) => ({
-      type: ActionType.ARCHIVED,
+      type: ActionType.ARCHIVE,
       transactionId: input.transactionId ?? getUUID(),
       data: input.data ?? {},
       metadata: { isDuplicate: isDuplicate ?? false },
@@ -214,12 +216,14 @@ export const eventPayloadGenerator = {
   }
 }
 
-function generateActionDocument({
+export function generateActionDocument({
   configuration,
-  action
+  action,
+  defaults = {}
 }: {
   configuration: EventConfig
   action: ActionType
+  defaults?: Partial<ActionDocument>
 }): ActionDocument {
   const actionBase = {
     createdAt: new Date().toISOString(),
@@ -227,7 +231,8 @@ function generateActionDocument({
     id: getUUID(),
     createdAtLocation: 'TODO',
     data: generateActionInput(configuration, action),
-    metadata: {}
+    metadata: {},
+    ...defaults
   } satisfies ActionBase
 
   switch (action) {
@@ -239,7 +244,7 @@ function generateActionDocument({
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
-    case ActionType.ARCHIVED:
+    case ActionType.ARCHIVE:
       return { ...actionBase, type: action }
     case ActionType.REJECT:
       return { ...actionBase, type: action }

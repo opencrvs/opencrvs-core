@@ -72,9 +72,7 @@ function FileInput(
   )
 }
 
-const FileOutput = null
-
 export const File = {
   Input: FileInput,
-  Output: FileOutput
+  Output: null
 }

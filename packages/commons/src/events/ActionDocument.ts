@@ -9,18 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { FieldValue } from './FieldValue'
+import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType } from './ActionType'
 
-export const ActionMetadata = z.record(z.string(), FieldValue)
-export type ActionMetadata = z.infer<typeof ActionMetadata>
+/**
+ * ActionUpdate is a record of a specific action that updated data fields.
+ */
+export const ActionUpdate = z.record(z.string(), FieldUpdateValue)
+export type ActionUpdate = z.infer<typeof ActionUpdate>
+/**
+ * EventState is an aggregate of all the actions that have been applied to event data.
+ */
+export type EventState = Record<string, FieldValue>
 
 export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.record(z.string(), FieldValue),
-  metadata: ActionMetadata.optional(),
+  data: ActionUpdate,
+  metadata: ActionUpdate.optional(),
   createdAtLocation: z.string()
 })
 
@@ -73,9 +80,9 @@ const MarkAsDuplicateAction = ActionBase.merge(
   })
 )
 
-const ArchivedAction = ActionBase.merge(
+const ArchiveAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVED)
+    type: z.literal(ActionType.ARCHIVE)
   })
 )
 
@@ -128,7 +135,7 @@ export const ActionDocument = z.discriminatedUnion('type', [
   ValidateAction,
   RejectAction,
   MarkAsDuplicateAction,
-  ArchivedAction,
+  ArchiveAction,
   NotifiedAction,
   RegisterAction,
   DeclareAction,
@@ -158,5 +165,3 @@ export const ResolvedUser = z.object({
 export type ResolvedUser = z.infer<typeof ResolvedUser>
 
 export type CreatedAction = z.infer<typeof CreatedAction>
-
-export type ActionFormData = ActionDocument['data']

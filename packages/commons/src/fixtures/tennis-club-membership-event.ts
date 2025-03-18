@@ -669,7 +669,8 @@ export const TENNIS_CLUB_FORM = defineForm({
   review: {
     title: {
       id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
-      defaultMessage: 'Member declaration for {firstname} {surname}',
+      defaultMessage:
+        '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
       description: 'Title of the form to show in review page'
     },
     fields: [
@@ -941,7 +942,7 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   actions: [
     {
-      type: 'DECLARE',
+      type: ActionType.DECLARE,
       label: {
         defaultMessage: 'Send an application',
         description:
@@ -951,7 +952,17 @@ export const tennisClubMembershipEvent = defineConfig({
       forms: [TENNIS_CLUB_FORM]
     },
     {
-      type: 'REGISTER',
+      type: ActionType.VALIDATE,
+      label: {
+        defaultMessage: 'Validate',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.validate.label'
+      },
+      forms: [TENNIS_CLUB_FORM]
+    },
+    {
+      type: ActionType.REGISTER,
       label: {
         defaultMessage: 'Register',
         description:
@@ -961,17 +972,7 @@ export const tennisClubMembershipEvent = defineConfig({
       forms: [TENNIS_CLUB_FORM]
     },
     {
-      type: 'VALIDATE',
-      label: {
-        defaultMessage: 'Validate',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.validate.label'
-      },
-      forms: []
-    },
-    {
-      type: 'REQUEST_CORRECTION',
+      type: ActionType.REQUEST_CORRECTION,
       label: {
         defaultMessage: 'Request correction',
         description:
@@ -1178,7 +1179,7 @@ export const tennisClubMembershipEvent = defineConfig({
       ]
     },
     {
-      type: 'APPROVE_CORRECTION',
+      type: ActionType.APPROVE_CORRECTION,
       forms: [TENNIS_CLUB_FORM],
       label: {
         defaultMessage: 'Approve correction',

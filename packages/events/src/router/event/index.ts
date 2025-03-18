@@ -35,7 +35,7 @@ import {
 } from '@opencrvs/commons'
 import {
   ActionType,
-  ArchivedActionInput,
+  ArchiveActionInput,
   DeclareActionInput,
   Draft,
   DraftInput,
@@ -146,7 +146,6 @@ export const eventRouter = router({
     notify: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))
       .input(NotifyActionInput)
-      .use(middleware.validateAction(ActionType.NOTIFY))
       .mutation(async (options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
@@ -208,8 +207,8 @@ export const eventRouter = router({
       }),
     archive: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARATION_ARCHIVE]))
-      .input(ArchivedActionInput)
-      .use(middleware.validateAction(ActionType.ARCHIVED))
+      .input(ArchiveActionInput)
+      .use(middleware.validateAction(ActionType.ARCHIVE))
       .mutation(async (options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,

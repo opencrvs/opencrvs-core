@@ -31,6 +31,7 @@ import {
 import { ThemeProvider } from 'styled-components'
 import WebFont from 'webfontloader'
 import { handlers } from './default-request-handlers'
+import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -77,7 +78,9 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
                       path: '/',
                       element: (
                         <Page>
-                          <Outlet />
+                          <NavigationHistoryProvider>
+                            <Outlet />
+                          </NavigationHistoryProvider>
                         </Page>
                       ),
                       children: [

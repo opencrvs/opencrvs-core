@@ -19,7 +19,7 @@ import { useIntl } from 'react-intl'
 import {
   ActionType,
   FormPage,
-  getCurrentEventState
+  getActiveActionFormPages
 } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -47,10 +47,11 @@ export function Pages() {
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
-  const certTemplateFieldConfig =
-    useCertificateTemplateSelectorFieldConfig(event)
+  const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
+    event.type
+  )
 
   const { setFormValues, getFormValues } = useEventFormData()
   const form = getFormValues()
@@ -58,13 +59,11 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = configuration.actions
-    .find((action) => action.type === ActionType.PRINT_CERTIFICATE)
-    ?.forms.find((f) => f.active)?.pages
 
-  if (!formPages) {
-    throw new Error('Form configuration not found for type: ' + event.type)
-  }
+  const formPages = getActiveActionFormPages(
+    configuration,
+    ActionType.PRINT_CERTIFICATE
+  )
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id

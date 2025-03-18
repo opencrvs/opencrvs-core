@@ -16,14 +16,14 @@ import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
   ActionType,
-  FieldValue
+  ActionUpdate
 } from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
-    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}'
+    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFY {Sent incomplete} other {Unknown}}'
 }
 
 const messages = defineMessages({
@@ -43,16 +43,13 @@ const messages = defineMessages({
   }
 })
 
-function prepareComments(
-  action: ActionType,
-  metadata: Record<string, FieldValue>
-) {
+function prepareComments(action: ActionType, metadata: ActionUpdate) {
   const comments: { comment: string }[] = []
 
   if (action === ActionType.REJECT && typeof metadata.message === 'string') {
     comments.push({ comment: metadata.message })
   }
-  if (action === ActionType.ARCHIVED && typeof metadata.message === 'string') {
+  if (action === ActionType.ARCHIVE && typeof metadata.message === 'string') {
     comments.push({ comment: metadata.message })
   }
   return comments
@@ -116,16 +113,15 @@ export function EventHistoryModal({
       {content.length > 0 && (
         <Table columns={commentsColumn} content={content} noResultText=" " />
       )}
-      {history.type === ActionType.ARCHIVED &&
-        history.metadata?.isDuplicate && (
-          <p>
-            <Pill
-              label={intl.formatMessage(messages.markAsDuplicate)}
-              size="small"
-              type="inactive"
-            />
-          </p>
-        )}
+      {history.type === ActionType.ARCHIVE && history.metadata?.isDuplicate && (
+        <p>
+          <Pill
+            label={intl.formatMessage(messages.markAsDuplicate)}
+            size="small"
+            type="inactive"
+          />
+        </p>
+      )}
     </ResponsiveModal>
   )
 }

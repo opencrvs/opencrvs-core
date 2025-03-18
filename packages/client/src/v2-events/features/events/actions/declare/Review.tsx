@@ -10,12 +10,14 @@
  */
 
 import React from 'react'
-import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import { v4 as uuid } from 'uuid'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  findActiveActionForm,
+  SCOPES
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -23,18 +25,16 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  REJECT_ACTIONS,
-  RejectionState,
-  Review as ReviewComponent
-} from '@client/v2-events/features/events/components/Review'
+import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -43,11 +43,11 @@ export function Review() {
   const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
-  const intl = useIntl()
+  const { formatMessageWithValues } = useIntlFormatMessageWithFlattenedParams()
   const { goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -59,7 +59,7 @@ export function Review() {
   const form = useEventFormData((state) => state.getFormValues())
 
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata({})
+  const metadata = getMetadata()
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -92,7 +92,7 @@ export function Review() {
           {
             from: 'review'
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -100,12 +100,19 @@ export function Review() {
     return
   }
 
+  const hasValidationErrors = validationErrorsInActionFormExist(
+    formConfig,
+    form,
+    metadata
+  )
+
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
       <ReviewComponent.ActionModal.Accept
         action="Declare"
         close={close}
         copy={reviewActionConfiguration.messages.modal}
+        incomplete={hasValidationErrors}
       />
     ))
     if (confirmedDeclaration) {
@@ -115,34 +122,9 @@ export function Review() {
     }
   }
 
-  async function handleRejection() {
-    const confirmedRejection = await openModal<RejectionState | null>(
-      (close) => <ReviewComponent.ActionModal.Reject close={close} />
-    )
-    if (confirmedRejection) {
-      const { rejectAction, message, isDuplicate } = confirmedRejection
-
-      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
-        events.actions.reject.mutate({
-          eventId,
-          data: {},
-          transactionId: uuid(),
-          metadata: { message }
-        })
-      }
-
-      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        events.actions.archive.mutate({
-          eventId,
-          data: {},
-          transactionId: uuid(),
-          metadata: { message, isDuplicate }
-        })
-      }
-
-      goToHome()
-    }
-  }
+  const eventFieldKeys = formConfig.pages.flatMap((page) =>
+    page.fields.map((field) => field.id)
+  )
 
   return (
     <FormLayout
@@ -161,23 +143,20 @@ export function Review() {
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         isUploadButtonVisible={true}
-        // @todo: Update to use dynamic title
-        title={intl.formatMessage(formConfig.review.title, {
-          firstname: form['applicant.firstname'] as string,
-          surname: form['applicant.surname'] as string
-        })}
+        title={formatMessageWithValues(
+          formConfig.review.title,
+          eventFieldKeys,
+          form
+        )}
         metadata={metadata}
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
-          action={ActionType.DECLARE}
-          form={form}
-          formConfig={formConfig}
+          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
+          isPrimaryActionDisabled={reviewActionConfiguration.isDisabled}
           messages={reviewActionConfiguration.messages}
-          metadata={metadata}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
-          onReject={handleRejection}
         />
       </ReviewComponent.Body>
       {modal}

@@ -12,14 +12,14 @@
 import {
   ActionDocument,
   ActionInputWithType,
+  ActionUpdate,
   Draft,
   EventDocument,
   EventInput,
   FieldConfig,
   FieldType,
-  FieldValue,
-  FileFieldValue,
-  isUndeclaredDraft
+  FieldUpdateValue,
+  FileFieldValue
 } from '@opencrvs/commons/events'
 import {
   getActionFormFields,
@@ -50,7 +50,7 @@ class EventNotFoundError extends TRPCError {
   }
 }
 
-export async function getEventById(id: string) {
+export async function getEventById(id: string): Promise<EventDocument> {
   const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')
@@ -85,7 +85,12 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  const hasNonDeletableActions = !isUndeclaredDraft(event)
+  /**
+   * Once an event is declared, it cannot be removed anymore.
+   */
+  const hasNonDeletableActions = event.actions.some(
+    (action) => action.type !== ActionType.CREATE
+  )
 
   if (hasNonDeletableActions) {
     throw new TRPCError({
@@ -188,7 +193,7 @@ export async function createEvent({
 
 function getValidFileValue(
   fieldKey: string,
-  fieldValue: FieldValue,
+  fieldValue: FieldUpdateValue,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ) {
   const isFileType =
@@ -201,7 +206,7 @@ function getValidFileValue(
 }
 
 function extractFileValues(
-  data: ActionDocument['data'],
+  data: ActionUpdate,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ): Array<{ fieldName: string; file: FileFieldValue }> {
   const fileValues: Array<{ fieldName: string; file: FileFieldValue }> = []
@@ -274,7 +279,7 @@ export async function addAction(
     }
   }
 
-  if (input.type === ActionType.ARCHIVED && input.metadata?.isDuplicate) {
+  if (input.type === ActionType.ARCHIVE && input.metadata?.isDuplicate) {
     input.transactionId = getUUID()
     await db.collection<EventDocument>('events').updateOne(
       {
@@ -328,5 +333,6 @@ export async function addAction(
   await indexEvent(updatedEvent)
   await notifyOnAction(input, updatedEvent, token)
   await deleteDraftsByEventId(eventId)
+
   return updatedEvent
 }
