@@ -85,8 +85,7 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId])
 
-  // We want to allow the user to continue from the current page
-  // only if they have filled all the visible required fields on the current page.
+  // Allow the user to continue from the current page only if they have filled all the visible required fields.
   const currentPage = formPages.find((p) => p.id === currentPageId)
   const currentlyRequiredFields = currentPage?.fields.filter(
     (field) => isFieldVisible(field, metadata) && field.required
@@ -153,7 +152,7 @@ export function Pages() {
               id="locationForm"
               initialValues={metadata}
               setAllFieldsDirty={false}
-              onChange={(values) => setMetadata(values)}
+              onChange={setMetadata}
             />
           </>
         )}
