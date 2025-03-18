@@ -13,6 +13,8 @@ import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
+  createEmptyDraft,
+  findActiveDrafts,
   getCurrentEventStateWithDrafts,
   getMetadataForAction
 } from '@opencrvs/commons/client'
@@ -37,27 +39,10 @@ function ActionComponent({ children, type }: Props) {
   const drafts = getRemoteDrafts()
   const [event] = getEvent.useSuspenseQuery(params.eventId)
 
-  const lastAction = event.actions[event.actions.length - 1]
-
-  const activeDraft = drafts
-    .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
-    .filter(({ eventId }) => eventId === event.id)[0]
+  const activeDraft = findActiveDrafts(event, drafts)[0]
 
   const localDraft = getLocalDraftOrDefault(
-    activeDraft || {
-      id: createTemporaryId(),
-      eventId: params.eventId,
-      createdAt: new Date().toISOString(),
-      transactionId: createTemporaryId(),
-      action: {
-        type,
-        data: {},
-        metadata: {},
-        createdAt: new Date().toISOString(),
-        createdBy: '@todo',
-        createdAtLocation: '@todo'
-      }
-    }
+    activeDraft || createEmptyDraft(params.eventId, createTemporaryId(), type)
   )
 
   /*
@@ -67,6 +52,10 @@ function ActionComponent({ children, type }: Props) {
   const metadataValues = useEventMetadata((state) => state.metadata)
 
   useEffect(() => {
+    if (!formValues || !metadataValues) {
+      return
+    }
+
     setLocalDraft({
       ...localDraft,
       eventId: event.id,
