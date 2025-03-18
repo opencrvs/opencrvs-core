@@ -22,18 +22,9 @@ import {
   Button
 } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { FormWizardProps } from './FormWizard'
+import { FormWizardProps, messages as formWizardMessages } from './FormWizard'
+
 const messages = defineMessages({
-  back: {
-    defaultMessage: 'Back',
-    description: 'Back button text',
-    id: 'v2.buttons.back'
-  },
-  backToReview: {
-    defaultMessage: 'Back to review',
-    description: 'Back to review button text',
-    id: 'v2.buttons.backToReview'
-  },
   cancel: {
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal',
@@ -115,7 +106,7 @@ export const VerificationWizard = ({
         {currentPage > 0 && (
           <Button size="small" type="tertiary" onClick={onPreviousPage}>
             <Icon name="ArrowLeft" size="medium" />
-            {intl.formatMessage(messages.back)}
+            {intl.formatMessage(formWizardMessages.back)}
           </Button>
         )}
       </Frame.SectionFormBackAction>
@@ -149,7 +140,7 @@ export const VerificationWizard = ({
 
             {showReviewButton && (
               <Button size="large" type="secondary" onClick={onSubmit}>
-                {intl.formatMessage(messages.backToReview)}
+                {intl.formatMessage(formWizardMessages.backToReview)}
               </Button>
             )}
           </Stack>

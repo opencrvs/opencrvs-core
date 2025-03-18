@@ -9,11 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { PropsWithChildren } from 'react'
+import { defineMessages, useIntl } from 'react-intl'
 import { Button } from '@opencrvs/components/src/Button'
 import { Content } from '@opencrvs/components/src/Content'
 import { Frame } from '@opencrvs/components/src/Frame'
 import { Icon } from '@opencrvs/components/src/Icon'
 import { Stack } from '@opencrvs/components/src/Stack'
+
+const messages = defineMessages({
+  back: {
+    defaultMessage: 'Back',
+    description: 'Back button text',
+    id: 'v2.buttons.back'
+  },
+  backToReview: {
+    defaultMessage: 'Back to review',
+    description: 'Back to review button text',
+    id: 'v2.buttons.backToReview'
+  }
+})
 
 export type FormWizardProps = PropsWithChildren<{
   currentPage: number
@@ -44,13 +58,15 @@ export const FormWizard = ({
   continueButtonText?: string
   disableContinue?: boolean
 }) => {
+  const intl = useIntl()
+
   return (
     <Frame.LayoutForm>
       <Frame.SectionFormBackAction>
         {currentPage > 0 && (
           <Button size="small" type="tertiary" onClick={onPreviousPage}>
             <Icon name="ArrowLeft" size="medium" />
-            Back
+            {intl.formatMessage(messages.back)}
           </Button>
         )}
       </Frame.SectionFormBackAction>
@@ -71,7 +87,7 @@ export const FormWizard = ({
 
             {showReviewButton && (
               <Button size="large" type="secondary" onClick={onSubmit}>
-                Back to review
+                {intl.formatMessage(messages.backToReview)}
               </Button>
             )}
           </Stack>
