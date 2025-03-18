@@ -358,13 +358,12 @@ jobs:
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Build Storybook
+        working-directory: packages/client
         run: yarn run build-storybook
 
       - name: Run Storybook tests
+        working-directory: packages/client
         run: yarn run test-storybook
 
   test-client:
