@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMutation } from '@tanstack/react-query'
+import { MutationObserverOptions, useMutation } from '@tanstack/react-query'
 import {
   DecorateMutationProcedure,
   inferInput
@@ -112,8 +112,6 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.printCertificate
   ),
-  retry: true,
-  retryDelay: 10000,
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.PRINT_CERTIFICATE
@@ -217,7 +215,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   return {
     mutate: (
       params: inferInput<P>,
-      callBacks?: {
+      options?: {
         onSuccess?: (updatedDocument: EventDocument) => void
         onError?: (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -247,22 +245,20 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       }
       const fields = getActiveActionFields(eventConfiguration, actionType)
 
-      const options: Record<string, unknown> = {}
-
-      if (callBacks) {
-        if (callBacks.onSuccess) {
-          options.onSuccess = async (updatedDocument: EventDocument) => {
-            callBacks.onSuccess?.(updatedDocument)
-            return updateLocalEvent(updatedDocument)
-          }
-        }
-
-        if (callBacks.onError) {
-          options.onError = callBacks.onError
-        }
-
-        if (callBacks.onSettled) {
-          options.onSettled = callBacks.onSettled
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const overridenOptions: MutationObserverOptions<any, any, any, any> = {
+        ...allOptions,
+        onSuccess: async (data, variables, context) => {
+          await allOptions.onSuccess?.(data, variables, context)
+          options?.onSuccess?.(data)
+        },
+        onError: async (error, variables, context) => {
+          await allOptions.onError?.(error, variables, context)
+          options?.onError?.(error, variables, context)
+        },
+        onSettled: async (data, error, variables, context) => {
+          await allOptions.onSettled?.(data, error, variables, context)
+          options?.onSettled?.(data, error, variables, context)
         }
       }
 
@@ -281,7 +277,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
             ...params,
             data: stripHiddenFields(notifyFields, params.data)
           },
-          options
+          overridenOptions
         )
       }
 
@@ -290,7 +286,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
           ...params,
           data: stripHiddenFields(fields, params.data)
         },
-        options
+        overridenOptions
       )
     }
   }

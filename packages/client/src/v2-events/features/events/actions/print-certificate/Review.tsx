@@ -11,13 +11,14 @@
 
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import styled from 'styled-components'
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
+import ReactTooltip from 'react-tooltip'
 import { ActionType, SCOPES } from '@opencrvs/commons/client'
 import {
   Box,
@@ -41,6 +42,9 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useOnlineStatus } from '@client/utils'
 
 const CertificateContainer = styled.div`
   svg {
@@ -49,6 +53,9 @@ const CertificateContainer = styled.div`
   }
 `
 
+const TooltipContainer = styled.div`
+  width: 100%;
+`
 const messages = defineMessages({
   printTitle: {
     id: 'v2.printAction.title',
@@ -102,6 +109,12 @@ const messages = defineMessages({
     id: 'v2.buttons.print',
     defaultMessage: 'Print',
     description: 'Print button text'
+  },
+  onlineOnly: {
+    id: 'v2.print.certificate.onlineOnly',
+    defaultMessage:
+      'Print certificate is an online only action. Please go online to print the certificate',
+    description: 'Print certificate online only message'
   }
 })
 
@@ -115,6 +128,7 @@ export function Review() {
   }
   const intl = useIntl()
   const navigate = useNavigate()
+  const isOnline = useOnlineStatus()
   const [printingInProgress, setPrintingInProgress] = useState(false)
 
   const [modal, openModal] = useModal()
@@ -144,6 +158,29 @@ export function Review() {
     certificateConfig,
     language
   )
+
+  /**
+   * If there are validation errors in the form, redirect to the
+   * print certificate form page, since the user should not be able to
+   * review/print the certificate if there are validation errors.
+   */
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const formConfig = eventConfiguration.actions
+    .find((action) => action.type === ActionType.PRINT_CERTIFICATE)
+    ?.forms.find((form) => form.active)
+
+  if (!formConfig) {
+    throw new Error('Form configuration not found for print certificate action')
+  }
+
+  const validation = validationErrorsInActionFormExist(formConfig, formValues)
+  if (validation) {
+    return (
+      <Navigate
+        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
+      />
+    )
+  }
 
   const handleCorrection = () =>
     navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
@@ -223,6 +260,13 @@ export function Review() {
               id="print"
             />
           </Box>
+
+          {!isOnline && (
+            <ReactTooltip effect="solid" id="no-connection" place="top">
+              {intl.formatMessage(messages.onlineOnly)}
+            </ReactTooltip>
+          )}
+
           <Content
             bottomActionButtons={[
               <ProtectedComponent
@@ -242,17 +286,23 @@ export function Review() {
                   {intl.formatMessage(messages.makeCorrection)}
                 </Button>
               </ProtectedComponent>,
-              <Button
+              <TooltipContainer
                 key="confirm-and-print"
-                fullWidth
-                id="confirm-print"
-                size="large"
-                type="positive"
-                onClick={handlePrint}
+                data-tip
+                data-for="no-connection"
               >
-                <Icon name="Check" size="medium" />
-                {intl.formatMessage(messages.confirmPrint)}
-              </Button>
+                <Button
+                  fullWidth
+                  disabled={!isOnline}
+                  id="confirm-print"
+                  size="large"
+                  type="positive"
+                  onClick={handlePrint}
+                >
+                  <Icon name="Check" size="medium" />
+                  {intl.formatMessage(messages.confirmPrint)}
+                </Button>
+              </TooltipContainer>
             ]}
             bottomActionDirection="row"
             title={intl.formatMessage(messages.printTitle)}
