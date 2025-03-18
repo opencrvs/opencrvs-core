@@ -142,9 +142,6 @@ export function Review() {
     language
   )
 
-  console.log('CIHAN TEST')
-  console.log(metadata)
-
   const handleCorrection = () =>
     navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
 

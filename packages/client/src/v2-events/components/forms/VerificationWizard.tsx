@@ -110,7 +110,6 @@ export const VerificationWizard = ({
     ))
   }
 
-  // TODO CIHAN: save accepted value
   return (
     <Frame.LayoutForm>
       <Frame.SectionFormBackAction>

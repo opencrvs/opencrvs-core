@@ -42,11 +42,6 @@ export function validateAction(actionType: ActionType) {
       `No configuration found for event type: ${eventType}`
     )
 
-    const verificationPageIds = findActiveActionVerificationPageIds(
-      configuration,
-      actionType
-    )
-
     const formFields = findActiveActionFields(configuration, actionType) || []
 
     const data = {
@@ -82,6 +77,11 @@ export function validateAction(actionType: ActionType) {
         return [...errorResults, ...errormessageWithId]
       },
       []
+    )
+
+    const verificationPageIds = findActiveActionVerificationPageIds(
+      configuration,
+      actionType
     )
 
     const verificationPageErrors = verificationPageIds.reduce(
