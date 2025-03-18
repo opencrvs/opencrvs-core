@@ -130,6 +130,37 @@ const zodToIntlErrorMap = (
     }
   }
 
+  if (issue.code === 'invalid_union') {
+    for (const { issues } of issue.unionErrors) {
+      for (const e of issues) {
+        if (
+          zodToIntlErrorMap(e, _ctx).message.message.id !== 'v2.error.required'
+        ) {
+          return {
+            message: {
+              message: {
+                defaultMessage: 'Invalid input',
+                description:
+                  'This is the error message for invalid field value',
+                id: 'v2.error.invalid'
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      message: {
+        message: {
+          defaultMessage: 'Required for registration',
+          description: 'This is the error message for required fields',
+          id: 'v2.error.required'
+        }
+      }
+    }
+  }
+
   return {
     message: {
       message: {
