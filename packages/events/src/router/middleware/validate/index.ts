@@ -84,8 +84,6 @@ export function validateAction(actionType: ActionType) {
       []
     )
 
-    const metadata = opts.input.metadata
-
     const verificationPageErrors = verificationPageIds.reduce(
       (
         errorResults: {
@@ -96,11 +94,11 @@ export function validateAction(actionType: ActionType) {
         field: string
       ) => {
         if (
-          !metadata ||
+          !data ||
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          metadata[field] === null ||
+          data[field] === null ||
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          metadata[field] === undefined
+          data[field] === undefined
         ) {
           return [
             ...errorResults,

@@ -56,8 +56,12 @@ export const VerificationWizard = ({
   onNextPage,
   onPreviousPage,
   showReviewButton,
-  pageConfig
-}: FormWizardProps & { pageConfig: VerificationPageConfig }) => {
+  pageConfig,
+  onVerifyAction
+}: FormWizardProps & {
+  pageConfig: VerificationPageConfig
+  onVerifyAction: (val: boolean) => void
+}) => {
   const intl = useIntl()
   // TODO CIHAN: move formwizard component closer here?
   const [cancelModal, openCancelModal] = useModal()
@@ -84,6 +88,7 @@ export const VerificationWizard = ({
             key="confirm"
             type="primary"
             onClick={() => {
+              onVerifyAction(false)
               close()
               return onContinue()
             }}
@@ -135,7 +140,10 @@ export const VerificationWizard = ({
               role="button"
               size="large"
               type="positive"
-              onClick={onContinue}
+              onClick={() => {
+                onVerifyAction(true)
+                onContinue()
+              }}
             >
               <Check color="white" />
               {intl.formatMessage(pageConfig.verify.label)}

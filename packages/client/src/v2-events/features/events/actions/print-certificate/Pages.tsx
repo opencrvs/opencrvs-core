@@ -28,11 +28,11 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { InputField } from '@client/components/form/InputField'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -53,8 +53,8 @@ export function Pages() {
     event.type
   )
 
-  const { setFormValues, getFormValues } = useEventFormData()
-  const form = getFormValues()
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata()
 
   // TODO CIHAN: use this from react context
   const { eventConfiguration: configuration } = useEventConfiguration(
@@ -89,11 +89,11 @@ export function Pages() {
   // only if they have filled all the visible required fields on the current page.
   const currentPage = formPages.find((p) => p.id === currentPageId)
   const currentlyRequiredFields = currentPage?.fields.filter(
-    (field) => isFieldVisible(field, form) && field.required
+    (field) => isFieldVisible(field, metadata) && field.required
   )
 
   const isAllRequiredFieldsFilled = currentlyRequiredFields?.every((field) =>
-    Boolean(form[field.id])
+    Boolean(metadata[field.id])
   )
 
   const isTemplateSelected = Boolean(templateId)
@@ -105,10 +105,10 @@ export function Pages() {
       {modal}
       <PagesComponent
         disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
-        form={form}
+        form={metadata}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={(data) => setFormValues(data)}
+        setFormData={(data) => setMetadata(data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
@@ -149,11 +149,11 @@ export function Pages() {
             )}
             <FormFieldGenerator
               fields={page.fields}
-              formData={form}
+              formData={metadata}
               id="locationForm"
-              initialValues={form}
+              initialValues={metadata}
               setAllFieldsDirty={false}
-              onChange={(values) => setFormValues(values)}
+              onChange={(values) => setMetadata(values)}
             />
           </>
         )}

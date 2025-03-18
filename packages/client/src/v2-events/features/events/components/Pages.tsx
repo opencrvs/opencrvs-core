@@ -93,7 +93,16 @@ export function Pages({
 
   if (page.type === PageType.VERIFICATION) {
     return (
-      <VerificationWizard {...wizardProps} pageConfig={page.actions}>
+      <VerificationWizard
+        {...wizardProps}
+        pageConfig={page.actions}
+        onVerifyAction={(val: boolean) => {
+          setFormData({
+            ...form,
+            [page.id]: val
+          })
+        }}
+      >
         {fields}
       </VerificationWizard>
     )

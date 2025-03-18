@@ -14,6 +14,7 @@ import {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
+import { findActiveActionVerificationPageIds } from '@events/service/config/config'
 import {
   ActionType,
   getActiveActionFields,

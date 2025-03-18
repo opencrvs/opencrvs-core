@@ -33,7 +33,6 @@ import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
@@ -41,6 +40,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 
 const CertificateContainer = styled.div`
   svg {
@@ -125,8 +125,8 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { getFormValues, clear } = useEventFormData()
-  const form = getFormValues()
+  const { getMetadata, clear } = useEventMetadata()
+  const metadata = getMetadata()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
@@ -135,12 +135,15 @@ export function Review() {
 
   const { svgCode, handleCertify } = usePrintableCertificate(
     fullEvent,
-    form,
+    metadata,
     locations,
     users,
     certificateConfig,
     language
   )
+
+  console.log('CIHAN TEST')
+  console.log(metadata)
 
   const handleCorrection = () =>
     navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
@@ -182,7 +185,8 @@ export function Review() {
       handleCertify?.()
       actions.printCertificate.mutate({
         eventId: fullEvent.id,
-        data: form,
+        metadata,
+        data: {},
         transactionId: uuid(),
         type: ActionType.PRINT_CERTIFICATE
       })
