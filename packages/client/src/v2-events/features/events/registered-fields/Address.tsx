@@ -167,6 +167,13 @@ function isFarajaland() {
   return createFieldCondition('country').isEqualTo('FAR')
 }
 
+function otherThanFarajaland() {
+  return and(
+    not(createFieldCondition('country').isUndefined()),
+    not(isFarajaland())
+  )
+}
+
 const RURAL_FIELDS = [
   {
     id: 'village',
@@ -294,7 +301,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(isFarajaland())
+        conditional: otherThanFarajaland()
       }
     ],
     required: true,
@@ -310,7 +317,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(isFarajaland())
+        conditional: otherThanFarajaland()
       }
     ],
     required: true,
@@ -326,7 +333,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(isFarajaland())
+        conditional: otherThanFarajaland()
       }
     ],
     required: false,
@@ -342,7 +349,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(isFarajaland())
+        conditional: otherThanFarajaland()
       }
     ],
     required: false,
@@ -358,7 +365,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(isFarajaland())
+        conditional: otherThanFarajaland()
       }
     ],
     required: false,
@@ -374,7 +381,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(isFarajaland())
+        conditional: otherThanFarajaland()
       }
     ],
     required: false,
@@ -390,7 +397,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(isFarajaland())
+        conditional: otherThanFarajaland()
       }
     ],
     required: false,
