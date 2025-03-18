@@ -26,9 +26,8 @@ const Container = styled.div`
   border-radius: 5px;
 
   h4 {
-    ${({ theme }) => theme.fonts.reg19};
-    font-weight: bold;
-    margin: 0 0 0.5rem;
+    ${({ theme }) => theme.fonts.bold18};
+    margin: 0 0 0.3rem;
   }
 
   h5 {
@@ -38,8 +37,7 @@ const Container = styled.div`
   }
 
   label {
-    font-weight: bold;
-    margin-bottom: 0rem;
+    ${({ theme }) => theme.fonts.bold16};
     display: block;
     margin-bottom: 0.4rem;
   }
