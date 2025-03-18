@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -19,7 +19,11 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
-import { ActionType, SCOPES } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  findActiveActionForm,
+  SCOPES
+} from '@opencrvs/commons/client'
 import {
   Box,
   Button,
@@ -59,6 +63,7 @@ const TooltipContainer = styled.div`
 
 const TooltipMessage = styled.p`
   ${({ theme }) => theme.fonts.reg19};
+  max-width: 200px;
 `
 const messages = defineMessages({
   printTitle: {
@@ -133,8 +138,6 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const isOnline = useOnlineStatus()
-  const [printingInProgress, setPrintingInProgress] = useState(false)
-
   const [modal, openModal] = useModal()
 
   const { getEvent, actions } = useEvents()
@@ -169,16 +172,20 @@ export function Review() {
    * review/print the certificate if there are validation errors.
    */
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const formConfig = eventConfiguration.actions
-    .find((action) => action.type === ActionType.PRINT_CERTIFICATE)
-    ?.forms.find((form) => form.active)
+  const formConfig = findActiveActionForm(
+    eventConfiguration,
+    ActionType.PRINT_CERTIFICATE
+  )
 
   if (!formConfig) {
     throw new Error('Form configuration not found for print certificate action')
   }
 
-  const validation = validationErrorsInActionFormExist(formConfig, formValues)
-  if (validation) {
+  const validationErrorExist = validationErrorsInActionFormExist(
+    formConfig,
+    formValues
+  )
+  if (validationErrorExist) {
     return (
       <Navigate
         to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
@@ -223,7 +230,6 @@ export function Review() {
     ))
 
     if (confirmed) {
-      setPrintingInProgress(true)
       actions.printCertificate.mutate(
         {
           eventId: fullEvent.id,
@@ -240,16 +246,13 @@ export function Review() {
             // TODO: add notification alert
             // eslint-disable-next-line no-console
             console.error(error.message)
-          },
-          onSettled: () => {
-            setPrintingInProgress(false)
           }
         }
       )
     }
   }
 
-  if (!svgCode || !templateId || printingInProgress) {
+  if (!svgCode || !templateId) {
     return <Spinner id="review-certificate-loading" />
   }
 
@@ -269,7 +272,7 @@ export function Review() {
 
           {!isOnline && (
             <ReactTooltip effect="solid" id="no-connection" place="top">
-              <TooltipMessage style={{ maxWidth: '200px' }}>
+              <TooltipMessage>
                 {intl.formatMessage(messages.onlineOnly)}
               </TooltipMessage>
             </ReactTooltip>
