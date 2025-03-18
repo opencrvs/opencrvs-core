@@ -1245,7 +1245,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      forms: [PRINT_CERTIFICATE_FORM]
+      forms: [TENNIS_CLUB_FORM]
     },
     {
       type: ActionType.REJECT,
@@ -1255,7 +1255,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      forms: [PRINT_CERTIFICATE_FORM]
+      forms: [TENNIS_CLUB_FORM]
     }
   ],
   advancedSearch: [
