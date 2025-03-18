@@ -181,6 +181,9 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
   }
 }
 
+/**
+ * Maps complex or nested field types, such as Address fields, to their corresponding empty values.
+ */
 export function mapFieldTypeToEmptyValue(field: FieldConfig) {
   switch (field.type) {
     case FieldType.DIVIDER:
