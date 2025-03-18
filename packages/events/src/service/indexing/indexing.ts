@@ -156,6 +156,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
+    case FieldType.DATA:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
@@ -195,8 +196,6 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           option: { type: 'keyword' }
         }
       }
-    case FieldType.DATA:
-      return {}
     default:
       const _exhaustiveCheck: never = field
       throw new Error(

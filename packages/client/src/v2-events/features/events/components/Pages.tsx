@@ -66,8 +66,6 @@ export function Pages({
     }
   }, [pageId, currentPage, formPages, onFormPageChange])
 
-  console.log('page', page)
-
   const wizardProps = {
     currentPage,
     pageTitle: intl.formatMessage(page.title),

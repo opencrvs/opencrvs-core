@@ -9,16 +9,43 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
-import { Button } from '@opencrvs/components/src/Button'
-import { Content } from '@opencrvs/components/src/Content'
-import { Frame } from '@opencrvs/components/src/Frame'
-import { Icon } from '@opencrvs/components/src/Icon'
-import { Stack } from '@opencrvs/components/src/Stack'
-import { FormWizardProps } from '@opencrvs/components/src/FormWizard/FormWizard'
+import { defineMessages, useIntl } from 'react-intl'
 import { VerificationPageConfig } from '@opencrvs/commons'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
+import {
+  ResponsiveModal,
+  Text,
+  Frame,
+  Icon,
+  Stack,
+  Content,
+  Button,
+  FormWizardProps
+} from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
+
+export const messages = defineMessages({
+  back: {
+    defaultMessage: 'Back',
+    description: 'Back button text',
+    id: 'v2.buttons.back'
+  },
+  backToReview: {
+    defaultMessage: 'Back to review',
+    description: 'Back to review button text',
+    id: 'v2.buttons.backToReview'
+  },
+  cancel: {
+    defaultMessage: 'Cancel',
+    description: 'Cancel button text in the modal',
+    id: 'v2.buttons.cancel'
+  },
+  confirm: {
+    defaultMessage: 'Confirm',
+    description: 'Confirm button text',
+    id: 'v2.buttons.confirm'
+  }
+})
 
 export const VerificationWizard = ({
   children,
@@ -32,7 +59,56 @@ export const VerificationWizard = ({
   pageConfig
 }: FormWizardProps & { pageConfig: VerificationPageConfig }) => {
   const intl = useIntl()
+  // TODO CIHAN: move formwizard component closer here?
   const [cancelModal, openCancelModal] = useModal()
+
+  // TODO CIHAN: next page not working?
+  console.log('functions')
+  console.log(onNextPage)
+  console.log(onSubmit)
+
+  const onCancelButtonClick = () => {
+    void openCancelModal<void>((close) => (
+      <ResponsiveModal
+        autoHeight
+        actions={[
+          <Button
+            key="cancel"
+            id="cancel"
+            type="tertiary"
+            onClick={() => {
+              close()
+            }}
+          >
+            {intl.formatMessage(messages.cancel)}
+          </Button>,
+          <Button
+            key="confirm"
+            type="primary"
+            onClick={() => {
+              close()
+              if (currentPage + 1 < totalPages && onNextPage) {
+                return onNextPage()
+              }
+              return onSubmit()
+            }}
+          >
+            {intl.formatMessage(messages.confirm)}
+          </Button>
+        ]}
+        handleClose={() => close()}
+        responsive={false}
+        show={true}
+        title={intl.formatMessage(pageConfig.cancel.confirmation.title)}
+      >
+        <Stack>
+          <Text color="grey500" element="p" variant="reg16">
+            {intl.formatMessage(pageConfig.cancel.confirmation.body)}
+          </Text>
+        </Stack>
+      </ResponsiveModal>
+    ))
+  }
 
   // TODO CIHAN: save accepted value
   return (
@@ -41,7 +117,7 @@ export const VerificationWizard = ({
         {currentPage > 0 && (
           <Button size="small" type="tertiary" onClick={onPreviousPage}>
             <Icon name="ArrowLeft" size="medium" />
-            Back
+            {intl.formatMessage(messages.back)}
           </Button>
         )}
       </Frame.SectionFormBackAction>
@@ -54,7 +130,7 @@ export const VerificationWizard = ({
               role="button"
               size="large"
               type="negative"
-              onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
+              onClick={onCancelButtonClick}
             >
               <Cross color="white" />
               {intl.formatMessage(pageConfig.cancel.label)}
@@ -72,12 +148,13 @@ export const VerificationWizard = ({
 
             {showReviewButton && (
               <Button size="large" type="secondary" onClick={onSubmit}>
-                Back to review
+                {intl.formatMessage(messages.backToReview)}
               </Button>
             )}
           </Stack>
         </Content>
       </Frame.Section>
+      {cancelModal}
     </Frame.LayoutForm>
   )
 }

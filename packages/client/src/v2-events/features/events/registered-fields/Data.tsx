@@ -51,7 +51,8 @@ const Container = styled.div`
 
 function DataInput({
   configuration,
-  formData
+  formData,
+  label
 }: FieldProps<'DATA'> & { formData: EventState }) {
   const intl = useIntl()
   const eventConfiguration = useEventConfigurationContext()
@@ -69,11 +70,11 @@ function DataInput({
     throw new Error('Declare form fields not found')
   }
 
-  const { title, data, subtitle } = configuration
+  const { data, subtitle } = configuration
 
   return (
     <Container>
-      {title && <h4>{intl.formatMessage(title)}</h4>}
+      {label && <h4>{intl.formatMessage(label)}</h4>}
       {subtitle && <h5>{intl.formatMessage(subtitle)}</h5>}
       <div>
         {data.map((item) => {

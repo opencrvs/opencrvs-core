@@ -327,15 +327,13 @@ const Address = BaseField.extend({
   defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
-// TODO CIHAN: labelist eroon?
 const Data = BaseField.extend({
   type: z.literal(FieldType.DATA),
   configuration: z.object({
-    title: TranslationConfig.optional(),
     subtitle: TranslationConfig.optional(),
     data: z.array(z.object({ fieldId: z.string() })) // todo cihan: can we make this type more specific?
   })
-})
+}).describe('Data field for displaying read-only data')
 
 export type Data = z.infer<typeof Data>
 
