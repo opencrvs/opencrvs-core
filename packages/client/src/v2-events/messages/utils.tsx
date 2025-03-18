@@ -11,7 +11,7 @@
 
 import { MessageDescriptor, useIntl } from 'react-intl'
 import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
-import { EventState, TranslationConfig } from '@opencrvs/commons/client'
+import { EventState } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
 /**
