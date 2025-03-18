@@ -143,10 +143,7 @@ export function Review() {
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         isUploadButtonVisible={true}
-        title={formatMessage(formConfig.review.title, {
-          ...setEmptyValuesForFields(getAllFields(config)),
-          ...form
-        })}
+        title={formatMessage(formConfig.review.title, form)}
         metadata={metadata}
         onMetadataChange={(values) => setMetadata(values)}
       >
