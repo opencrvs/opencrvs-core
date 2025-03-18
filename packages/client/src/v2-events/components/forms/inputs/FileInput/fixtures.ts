@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig } from '@opencrvs/commons/client'
+import { EventConfig, PageType } from '@opencrvs/commons/client'
 
 export const birthEvent = {
   id: 'birth',
