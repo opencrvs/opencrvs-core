@@ -103,7 +103,10 @@ function EventOverview({
 
   const stringifyFormData = useFormDataStringifier()
   const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
-  const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
+  const eventWithDefaults = stringifyFormData(allFields, {
+    ...emptyEvent,
+    ...eventWithDrafts.data
+  })
 
   const flattenedEventIndex: Record<
     string,

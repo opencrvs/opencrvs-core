@@ -54,7 +54,7 @@ function useFieldStringifier() {
 }
 
 export interface RecursiveStringRecord {
-  [key: string]: string | RecursiveStringRecord
+  [key: string]: string | undefined | RecursiveStringRecord
 }
 
 /**

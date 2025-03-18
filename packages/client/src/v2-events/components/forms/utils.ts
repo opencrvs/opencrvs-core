@@ -14,7 +14,8 @@ import {
   Inferred,
   FieldValue,
   MetaFields,
-  isFieldConfigDefaultValue
+  isFieldConfigDefaultValue,
+  mapFieldTypeToEmptyValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 import { replacePlaceholders } from '@client/v2-events/utils'
@@ -92,10 +93,10 @@ export function getDependentFields(
  * @returns object based on the fields given with null values.
  */
 export function setEmptyValuesForFields(fields: FieldConfig[]) {
-  return fields.reduce((initialValues: Record<string, null>, field) => {
+  return fields.reduce((initialValues: Record<string, unknown>, field) => {
     return {
       ...initialValues,
-      [field.id]: null
+      [field.id]: mapFieldTypeToEmptyValue(field)
     }
   }, {})
 }
