@@ -24,7 +24,7 @@
     "build-storybook": "storybook build",
     "test-storybook": "test-storybook",
     "test-storybook:watch": "test-storybook --watch",
-    "chromatic": "chromatic --onlyChanged --exitZeroOnChanged"
+    "chromatic": "chromatic --exit-zero-on-changes --only-changed"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
