@@ -12,12 +12,11 @@
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { EventState, Page, PageType } from '@opencrvs/commons/client'
-import { FormWizard } from '@opencrvs/components'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 import { VerificationWizard } from './VerificationWizard'
-
+import { FormWizard } from './FormWizard'
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
