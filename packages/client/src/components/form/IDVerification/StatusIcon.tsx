@@ -41,7 +41,7 @@ export const StatusIcon = ({ type }: { type: BannerType }) => {
         <Icon name="Check" size="small" weight="bold" color="primaryDark" />
       </IconWrapper>
     )
-  } else if (type === 'failed') {
+  } else if (type === 'failed' || type === 'failedFetchIdDetails') {
     return (
       <IconWrapper type={type}>
         <Icon name="X" size="small" weight="bold" color="redDarker" />
