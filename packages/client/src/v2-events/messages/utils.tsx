@@ -11,6 +11,7 @@
 
 import { MessageDescriptor, useIntl } from 'react-intl'
 import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
+import { isArgumentElement, parse } from '@formatjs/icu-messageformat-parser'
 import { EventState } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
@@ -92,8 +93,13 @@ export function useIntlFormatMessageWithFlattenedParams() {
     }
 
     const defaultMessage = convertDotInCurlyBraces(originalMessage)
+    const variablesInMessage = parse(defaultMessage).filter(isArgumentElement)
+    const variablesWithEmptyValues = Object.fromEntries(
+      variablesInMessage.map((variable) => [variable.value, EMPTY_TOKEN])
+    )
+
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
-      variables
+      { ...variablesWithEmptyValues, ...variables }
     )
     if (!formatted || typeof formatted !== 'string') {
       return ''
