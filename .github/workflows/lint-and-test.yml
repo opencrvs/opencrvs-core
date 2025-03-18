@@ -358,6 +358,10 @@ jobs:
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
 
+      - name: Install Playwright
+        # Playwright is required since @storybook/test-runner depends on it
+        run: npx playwright install --with-deps
+
       - name: Build Storybook
         working-directory: packages/client
         run: yarn run build-storybook
