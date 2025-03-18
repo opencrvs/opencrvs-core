@@ -303,7 +303,7 @@ export const CanSubmitValidlyFilledForm: Story = {
       )
 
       await userEvent.click(await canvas.findByText('Select...'))
-      await userEvent.click(await canvas.findByText('Albania'))
+      await userEvent.click(await canvas.findByText('Farajaland'))
       await userEvent.click(await canvas.findByText('Select...'))
       await userEvent.click(await canvas.findByText('Central'))
       await userEvent.click(await canvas.findByText('Select...'))
