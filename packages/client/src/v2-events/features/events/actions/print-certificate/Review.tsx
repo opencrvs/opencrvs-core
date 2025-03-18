@@ -56,6 +56,10 @@ const CertificateContainer = styled.div`
 const TooltipContainer = styled.div`
   width: 100%;
 `
+
+const TooltipMessage = styled.p`
+  ${({ theme }) => theme.fonts.reg19};
+`
 const messages = defineMessages({
   printTitle: {
     id: 'v2.printAction.title',
@@ -233,7 +237,9 @@ export function Review() {
             navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
           },
           onError: (error) => {
-            throw new Error(error.message)
+            // TODO: add notification alert
+            // eslint-disable-next-line no-console
+            console.error(error.message)
           },
           onSettled: () => {
             setPrintingInProgress(false)
@@ -263,7 +269,9 @@ export function Review() {
 
           {!isOnline && (
             <ReactTooltip effect="solid" id="no-connection" place="top">
-              {intl.formatMessage(messages.onlineOnly)}
+              <TooltipMessage style={{ maxWidth: '200px' }}>
+                {intl.formatMessage(messages.onlineOnly)}
+              </TooltipMessage>
             </ReactTooltip>
           )}
 
