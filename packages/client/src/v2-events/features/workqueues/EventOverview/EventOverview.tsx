@@ -31,7 +31,10 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getUserIdsFromActions } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUserIdsFromActions
+} from '@client/v2-events/utils'
 import {
   RecursiveStringRecord,
   useFormDataStringifier
@@ -101,7 +104,8 @@ function EventOverview({
     FieldValue | null | RecursiveStringRecord
   > = {
     ...emptyEvent,
-    ...eventWithDefaults
+    ...eventWithDefaults,
+    ...flattenEventIndex(event)
   }
 
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
