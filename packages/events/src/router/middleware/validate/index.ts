@@ -93,16 +93,13 @@ export function validateAction(actionType: ActionType) {
         }[],
         field: string
       ) => {
-        if (
-          !data ||
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          data[field] === null ||
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          data[field] === undefined
-        ) {
+        const value = data[field]
+
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (value === null || value === undefined) {
           return [
             ...errorResults,
-            { message: 'Field is required', id: field, value: data[field] }
+            { message: 'Field is required', id: field, value }
           ]
         }
 
