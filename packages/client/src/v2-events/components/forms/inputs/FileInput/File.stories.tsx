@@ -13,6 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
+import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Review } from '@client/v2-events/features/events/components/Review'
@@ -49,7 +50,7 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
         fields={[
           {
             id: 'storybook.file',
-            type: 'FILE_WITH_OPTIONS',
+            type: FieldType.FILE_WITH_OPTIONS,
             label: {
               id: 'storybook.file.label',
               defaultMessage: 'Upload your captured photo',
@@ -127,7 +128,7 @@ export const FileInputWithoutOption: StoryObj<
         fields={[
           {
             id: 'storybook.file2',
-            type: 'FILE',
+            type: FieldType.FILE,
             label: {
               id: 'storybook.file2.label',
               defaultMessage: 'Upload your photo',

@@ -11,7 +11,11 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { EventDocument } from '@opencrvs/commons/client'
+import {
+  EventDocument,
+  EventIndex,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -83,6 +87,33 @@ export function useGetEvent() {
           }
         }).data
       ]
+    }
+  }
+}
+
+/**
+ * When full history of an event is not needed, this hook can be used to get the current state of an event.
+ * @returns convenience hooks for getting EventState from EventDocument.
+ */
+export function useGetEventState() {
+  const getEvent = useGetEvent()
+
+  return {
+    useQuery: (id: string) => {
+      const response = getEvent.useQuery(id)
+      const eventState = response.data
+        ? getCurrentEventState(response.data)
+        : undefined
+
+      return {
+        ...response,
+        data: eventState
+      }
+    },
+    useSuspenseQuery: (id: string): EventIndex => {
+      const [eventDocument] = getEvent.useSuspenseQuery(id)
+
+      return getCurrentEventState(eventDocument)
     }
   }
 }

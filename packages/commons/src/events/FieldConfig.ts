@@ -274,6 +274,12 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
+export const AdministrativeAreas = z.enum([
+  'ADMIN_STRUCTURE',
+  'HEALTH_FACILITY',
+  'CRVS_OFFICE'
+])
+
 const AdministrativeAreaConfiguration = z
   .object({
     partOf: z
@@ -282,7 +288,7 @@ const AdministrativeAreaConfiguration = z
       })
       .optional()
       .describe('Parent location'),
-    type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
+    type: AdministrativeAreas
   })
   .describe('Administrative area options')
 

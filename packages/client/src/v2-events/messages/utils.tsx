@@ -131,7 +131,9 @@ export function useIntlFormatMessageWithFlattenedParams() {
     availableKeys: string[],
     data: Record<string, unknown>
   ) {
-    const messageBeforeFormatting = intl.formatMessage(translationConfig)
+    const message = intl.messages[translationConfig.id]
+    const messageBeforeFormatting =
+      typeof message === 'string' ? message : translationConfig.defaultMessage
 
     const keysInMessage = availableKeys.filter(
       (key) =>

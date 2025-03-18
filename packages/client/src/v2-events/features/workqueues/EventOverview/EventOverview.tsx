@@ -25,10 +25,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
-import {
-  useEventConfiguration,
-  useEventConfigurations
-} from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -58,21 +55,13 @@ function EventOverviewContainer() {
   const { getRemoteDrafts } = useDrafts()
   const { getUsers } = useUsers()
 
-  const configs = useEventConfigurations()
-
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
   const drafts = getRemoteDrafts()
-  const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
-
-  const config = configs.find((c) => c.id === event.type)
+  const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
 
   const userIds = getUserIdsFromActions(fullEvent.actions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
-
-  if (!config) {
-    return null
-  }
 
   return (
     <EventOverviewProvider locations={locations} users={users}>

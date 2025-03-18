@@ -39,7 +39,7 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
       return EventStatus.REJECTED
     }
 
-    if (action.type === ActionType.ARCHIVED) {
+    if (action.type === ActionType.ARCHIVE) {
       return EventStatus.ARCHIVED
     }
 
@@ -144,8 +144,8 @@ function deepMerge(
   )
 }
 
-export function isUndeclaredDraft(event: EventDocument): boolean {
-  return event.actions.every(({ type }) => type === ActionType.CREATE)
+export function isUndeclaredDraft(status: EventStatus): boolean {
+  return status === EventStatus.CREATED
 }
 
 export function getCurrentEventState(event: EventDocument): EventIndex {
