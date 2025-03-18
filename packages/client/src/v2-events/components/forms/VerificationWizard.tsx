@@ -62,10 +62,8 @@ export const VerificationWizard = ({
   // TODO CIHAN: move formwizard component closer here?
   const [cancelModal, openCancelModal] = useModal()
 
-  // TODO CIHAN: next page not working?
-  console.log('functions')
-  console.log(onNextPage)
-  console.log(onSubmit)
+  const onContinue =
+    currentPage + 1 < totalPages && onNextPage ? onNextPage : onSubmit
 
   const onCancelButtonClick = () => {
     void openCancelModal<void>((close) => (
@@ -87,10 +85,7 @@ export const VerificationWizard = ({
             type="primary"
             onClick={() => {
               close()
-              if (currentPage + 1 < totalPages && onNextPage) {
-                return onNextPage()
-              }
-              return onSubmit()
+              return onContinue()
             }}
           >
             {intl.formatMessage(messages.confirm)}
@@ -140,7 +135,7 @@ export const VerificationWizard = ({
               role="button"
               size="large"
               type="positive"
-              onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
+              onClick={onContinue}
             >
               <Check color="white" />
               {intl.formatMessage(pageConfig.verify.label)}
