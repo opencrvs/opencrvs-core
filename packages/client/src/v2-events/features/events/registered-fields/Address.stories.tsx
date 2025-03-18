@@ -384,3 +384,71 @@ export const AddressInCopy: StoryObj<typeof Review> = {
     )
   }
 }
+
+export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Country is other than Farajaland',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Verify that Farajaland specific fields are not visible
+    await expect(canvas.queryByTestId('location__province')).toBeNull()
+    await expect(canvas.queryByTestId('location__district')).toBeNull()
+
+    await userEvent.type(await canvas.findByTestId('text__state'), 'Dhaka')
+    await userEvent.type(
+      await canvas.findByTestId('text__district2'),
+      'Dhaka North'
+    )
+    await userEvent.type(
+      await canvas.findByTestId('text__cityOrTown'),
+      'Mohakhali'
+    )
+    await userEvent.type(
+      await canvas.findByTestId('text__addressLine1'),
+      'DOHS'
+    )
+    await userEvent.type(
+      await canvas.findByTestId('text__addressLine2'),
+      'Road 4'
+    )
+    await userEvent.type(
+      await canvas.findByTestId('text__addressLine3'),
+      'House 142'
+    )
+    await userEvent.type(
+      await canvas.findByTestId('text__postcodeOrZip'),
+      '3300'
+    )
+  },
+  render: function Component(args) {
+    const [formData, setFormData] = React.useState({})
+    return (
+      <StyledFormFieldGenerator
+        fields={[
+          {
+            id: 'storybook.address',
+            type: FieldType.ADDRESS,
+            label: {
+              id: 'storybook.address.label',
+              defaultMessage: 'Address',
+              description: 'The title for the address input'
+            },
+            defaultValue: {
+              country: 'BGD'
+            } as AddressFieldValue
+          }
+        ]}
+        formData={formData}
+        id="my-form"
+        setAllFieldsDirty={false}
+        onChange={(data) => {
+          args.onChange(data)
+          setFormData(data)
+        }}
+      />
+    )
+  }
+}
