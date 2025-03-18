@@ -16,7 +16,11 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  getActiveActionFormPages,
+  isFieldVisible
+} from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -81,6 +85,18 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId])
 
+  // We want to allow the user to continue from the current page
+  // only if they have filled all the visible required fields on the current page.
+  const currentPage = formPages.find((p) => p.id === currentPageId)
+  const currentlyRequiredFields = currentPage?.fields.filter(
+    (field) => isFieldVisible(field, form) && field.required
+  )
+
+  const isAllRequiredFieldsFilled = currentlyRequiredFields?.every((field) =>
+    Boolean(form[field.id])
+  )
+
+  const isTemplateSelected = Boolean(templateId)
   return (
     <FormLayout
       appbarIcon={<Print />}
@@ -88,6 +104,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
         form={form}
         formPages={formPages}
         pageId={currentPageId}
@@ -102,20 +119,18 @@ export function Pages() {
           )
         }
         onSubmit={() => {
-          if (templateId) {
-            navigate(
-              ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
-                { eventId },
-                { templateId }
-              )
+          navigate(
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
+              { eventId },
+              { templateId }
             )
-          }
+          )
         }}
       >
         {(page) => (
           // hard coded certificate template selector form field
           <>
-            {formPages[0].id === page.id && (
+            {formPages[0].id === currentPageId && (
               <InputField
                 id={certTemplateFieldConfig.id}
                 label={intl.formatMessage(certTemplateFieldConfig.label)}

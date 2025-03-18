@@ -38,8 +38,12 @@ export const FormWizard = ({
   onNextPage,
   onPreviousPage,
   continueButtonText = 'Continue',
-  showReviewButton
-}: FormWizardProps & { continueButtonText?: string }) => {
+  showReviewButton,
+  disableContinue = false
+}: FormWizardProps & {
+  continueButtonText?: string
+  disableContinue?: boolean
+}) => {
   return (
     <Frame.LayoutForm>
       <Frame.SectionFormBackAction>
@@ -59,6 +63,7 @@ export const FormWizard = ({
               size="large"
               type="primary"
               role="button"
+              disabled={disableContinue}
               onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
             >
               {continueButtonText}

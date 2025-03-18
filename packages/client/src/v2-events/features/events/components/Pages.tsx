@@ -31,7 +31,8 @@ export function Pages({
   onSubmit,
   continueButtonText,
   setFormData,
-  children
+  children,
+  disableContinue = false
 }: {
   form: EventState
   setFormData: (data: EventState) => void
@@ -42,6 +43,7 @@ export function Pages({
   onSubmit: () => void
   continueButtonText?: string
   children?: (page: Page) => React.ReactNode
+  disableContinue?: boolean
 }) {
   const intl = useIntl()
 
@@ -98,7 +100,11 @@ export function Pages({
   }
 
   return (
-    <FormWizard continueButtonText={continueButtonText} {...wizardProps}>
+    <FormWizard
+      continueButtonText={continueButtonText}
+      {...wizardProps}
+      disableContinue={disableContinue}
+    >
       {fields}
     </FormWizard>
   )
