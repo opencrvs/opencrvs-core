@@ -19,7 +19,9 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
     const messages = {
       'test.message': 'Hello, {name} :)',
       'test.nested': 'Your order {order.id} is confirmed.',
-      'test.missing': 'This should not be missing.'
+      'test.missing': 'This should not be missing.',
+      'test.select':
+        '{applicant.firstname, select, __EMPTY__ {Hello} other {{applicant.surname, select, __EMPTY__ {Hello} other {Hello to {applicant.firstname} {applicant.surname}}}}}'
     }
 
     function renderUseIntlHook() {
@@ -75,58 +77,41 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
         result.current.formatMessage({ id: 'test.message' }, { name: null })
       ).toBe('Hello,  :)')
     })
-  })
 
-  describe('formatMessageWithValues()', () => {
-    const messages = {
-      'test.message':
-        '{applicant.firstname, select, __EMPTY__ {Hello} other {{applicant.surname, select, __EMPTY__ {Hello} other {Hello to {applicant.firstname} {applicant.surname}}}}}'
-    }
+    describe('__EMPTY__ token functionality', () => {
+      it('correctly selects __EMPTY__ option if no values given', () => {
+        const message = {
+          id: 'test.select',
+          defaultMessage: 'Fallback message',
+          description: 'test'
+        }
 
-    function renderUseIntlHook() {
-      return renderHook(() => useIntlFormatMessageWithFlattenedParams(), {
-        wrapper: ({ children }) => (
-          <IntlProvider locale="en" messages={messages}>
-            {children}
-          </IntlProvider>
-        )
+        const { result } = renderUseIntlHook()
+
+        const formattedMessage = result.current.formatMessage(message, {
+          'applicant.firstname': null,
+          'applicant.surname': null
+        })
+
+        expect(formattedMessage).toBe('Hello')
       })
-    }
 
-    it('correctly selects __EMPTY__ option if no values given', () => {
-      const message = {
-        id: 'test.message',
-        defaultMessage: 'Fallback message',
-        description: 'test'
-      }
+      it('correctly selects option with values if values given', () => {
+        const message = {
+          id: 'test.select',
+          defaultMessage: 'Fallback message',
+          description: 'test'
+        }
 
-      const { result } = renderUseIntlHook()
+        const { result } = renderUseIntlHook()
 
-      const formattedMessage = result.current.formatMessageWithValues(
-        message,
-        ['applicant.firstname', 'applicant.surname', 'foo.bar'],
-        {}
-      )
+        const formattedMessage = result.current.formatMessage(message, {
+          'applicant.firstname': 'John',
+          'applicant.surname': 'Doe'
+        })
 
-      expect(formattedMessage).toBe('Hello')
-    })
-
-    it('correctly selects option with values if values given', () => {
-      const message = {
-        id: 'test.message',
-        defaultMessage: 'Fallback message',
-        description: 'test'
-      }
-
-      const { result } = renderUseIntlHook()
-
-      const formattedMessage = result.current.formatMessageWithValues(
-        message,
-        ['applicant.firstname', 'applicant.surname', 'foo.bar'],
-        { 'applicant.firstname': 'John', 'applicant.surname': 'Doe' }
-      )
-
-      expect(formattedMessage).toBe('Hello to John Doe')
+        expect(formattedMessage).toBe('Hello to John Doe')
+      })
     })
   })
 })
