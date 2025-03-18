@@ -53,7 +53,6 @@ export const VerificationWizard = ({
   onVerifyAction: (val: boolean) => void
 }) => {
   const intl = useIntl()
-  // TODO CIHAN: move formwizard component closer here?
   const [cancelModal, openCancelModal] = useModal()
 
   const onContinue =
