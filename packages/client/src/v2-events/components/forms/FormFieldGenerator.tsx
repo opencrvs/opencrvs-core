@@ -737,6 +737,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
             if (
               setAllTouchedFields &&
               Object.keys(formikProps.touched).length > 0 &&
+              !isEqual(formikProps.touched, initialTouchedFields) &&
               Object.keys(formikProps.touched).some(
                 (key) => !(key in initialTouchedFields)
               )
