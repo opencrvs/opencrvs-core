@@ -29,7 +29,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -227,10 +226,7 @@ export const SearchResult = ({
 
         const title = flattenedIntl.formatMessage(
           currentEvent.summary.title.label,
-          {
-            ...setEmptyValuesForFields(getAllFields(currentEvent)),
-            ...doc
-          }
+          doc
         )
 
         return {

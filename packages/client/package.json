@@ -38,7 +38,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.0",
     "@craco/craco": "^6.4.3",
-    "@formatjs/icu-messageformat-parser": "^2.11.1",
+    "@formatjs/icu-messageformat-parser": "2.1.0",
     "@opencrvs/commons": "^1.7.0",
     "@opencrvs/components": "^1.7.0",
     "@opencrvs/gateway": "^1.7.0",

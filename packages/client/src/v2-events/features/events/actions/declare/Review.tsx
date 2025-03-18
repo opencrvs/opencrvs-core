@@ -16,8 +16,7 @@ import { useSelector } from 'react-redux'
 import {
   ActionType,
   findActiveActionForm,
-  SCOPES,
-  getAllFields
+  SCOPES
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -28,10 +27,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
-import {
-  makeFormFieldIdFormikCompatible,
-  setEmptyValuesForFields
-} from '@client/v2-events/components/forms/utils'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
