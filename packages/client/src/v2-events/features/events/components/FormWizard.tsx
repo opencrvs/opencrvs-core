@@ -16,7 +16,7 @@ import { Frame } from '@opencrvs/components/src/Frame'
 import { Icon } from '@opencrvs/components/src/Icon'
 import { Stack } from '@opencrvs/components/src/Stack'
 
-const messages = defineMessages({
+export const messages = defineMessages({
   back: {
     defaultMessage: 'Back',
     description: 'Back button text',
