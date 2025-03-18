@@ -12,7 +12,7 @@
 import { Location } from '@events/service/locations/locations'
 import {
   EventDocument,
-  EventIndex,
+  EventState,
   isMinioUrl,
   User
 } from '@opencrvs/commons/client'
@@ -57,7 +57,7 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
 
 export const usePrintableCertificate = (
   event: EventDocument,
-  form: EventIndex['data'],
+  form: EventState,
   locations: Location[],
   users: User[],
   certificateConfig?: CertificateTemplateConfig,

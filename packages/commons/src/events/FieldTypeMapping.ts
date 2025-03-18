@@ -36,19 +36,21 @@ import {
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
-  AddressFieldValue,
   CheckboxFieldValue,
   DateValue,
   EmailValue,
   FieldValue,
-  FieldValueSchema,
-  FileFieldValue,
-  FileFieldWithOptionValue,
+  FieldUpdateValueSchema,
   NumberFieldValue,
-  OptionalFieldValueSchema,
   RequiredTextValue,
   TextValue
 } from './FieldValue'
+import {
+  AddressFieldValue,
+  AddressFieldUpdateValue,
+  FileFieldValue,
+  FileFieldWithOptionValue
+} from './CompositeFieldValue'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -58,11 +60,19 @@ import {
  */
 
 /**
+ * Optionality of a field is defined in FieldConfig, not in FieldValue.
+ * Allows for nullishness of a field value during validations based on FieldConfig.
+ */
+type NullishFieldValueSchema = z.ZodOptional<
+  z.ZodNullable<FieldUpdateValueSchema>
+>
+
+/**
  * Mapping of field types to Zod schema.
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
-  let schema: FieldValueSchema
+  let schema: FieldUpdateValueSchema | NullishFieldValueSchema
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
@@ -100,15 +110,18 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = FileFieldWithOptionValue
       break
     case FieldType.ADDRESS:
-      schema = AddressFieldValue
+      schema = AddressFieldUpdateValue
       break
   }
 
-  return required ? schema : schema.optional()
+  return required ? schema : schema.nullish()
 }
 
 export function createValidationSchema(config: FieldConfig[]) {
-  const shape: Record<string, FieldValueSchema | OptionalFieldValueSchema> = {}
+  const shape: Record<
+    string,
+    NullishFieldValueSchema | FieldUpdateValueSchema
+  > = {}
 
   for (const field of config) {
     shape[field.id] = mapFieldTypeToZod(field.type, field.required)
@@ -158,6 +171,11 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
     case FieldType.CHECKBOX:
       return true
     case FieldType.FILE:
+      return {
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+        originalFilename: 'abcd.png',
+        type: 'image/png'
+      } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return null
   }

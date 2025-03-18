@@ -12,20 +12,16 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import {
   tennisClubMembershipEventIndex,
-  tennisClueMembershipEventDocument
+  tennisClubMembershipEventDocument
 } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Pages> = {
-  title: 'Print Certificate',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'Print Certificate'
 }
 
 export default meta
@@ -45,7 +41,7 @@ export const CollectorForm: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
+        eventId: tennisClubMembershipEventDocument.id,
         pageId: 'collector'
       })
     },
@@ -56,7 +52,7 @@ export const CollectorForm: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return tennisClubMembershipEventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]

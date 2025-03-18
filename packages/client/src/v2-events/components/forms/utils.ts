@@ -8,15 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { formatISO } from 'date-fns'
 import {
-  ActionFormData,
+  EventState,
   FieldConfig,
   Inferred,
   FieldValue,
-  isFieldHidden
+  MetaFields,
+  isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
+import { replacePlaceholders } from '@client/v2-events/utils'
 
 /*
  * Formik has a feature that automatically nests all form keys that have a dot in them.
@@ -25,9 +26,14 @@ import { DependencyInfo } from '@client/forms'
  */
 export const FIELD_SEPARATOR = '____'
 
+export function makeFormFieldIdFormikCompatible(fieldId: string) {
+  return fieldId.replaceAll('.', FIELD_SEPARATOR)
+}
+
 export function handleDefaultValue(
   field: FieldConfig,
-  formData: ActionFormData
+  formData: EventState,
+  meta: MetaFields
 ) {
   const defaultValue = field.defaultValue
 
@@ -37,16 +43,14 @@ export function handleDefaultValue(
     })
   }
 
-  return defaultValue
-}
-
-export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return !isFieldHidden(field, {
-    $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
+  if (isFieldConfigDefaultValue(defaultValue)) {
+    return replacePlaceholders({
+      fieldType: field.type,
+      defaultValue,
+      meta: meta
     })
-  })
+  }
+  return defaultValue
 }
 
 export function evalExpressionInFieldDefinition(
@@ -54,7 +58,7 @@ export function evalExpressionInFieldDefinition(
   /*
    * These are used in the eval expression
    */
-  { $form }: { $form: ActionFormData }
+  { $form }: { $form: EventState }
 ) {
   // eslint-disable-next-line no-eval
   return eval(expression) as FieldValue

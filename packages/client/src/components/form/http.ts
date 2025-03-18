@@ -142,14 +142,17 @@ export function useHttp<T = unknown>(
       onChange(updatedState)
       return updatedState
     })
-    transformHttpFieldIntoRequest(
-      {
-        ...field,
-        options: merge(field.options, additionalOptions)
-      },
-      ...evalParams
-    )
-      .then((res) => {
+    Promise.all([
+      transformHttpFieldIntoRequest(
+        {
+          ...field,
+          options: merge(field.options, additionalOptions)
+        },
+        ...evalParams
+      ),
+      new Promise((resolve) => setTimeout(resolve, 1000))
+    ])
+      .then(([res]) => {
         if (res.ok) {
           return res.json()
         }

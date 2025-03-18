@@ -669,7 +669,8 @@ export const TENNIS_CLUB_FORM = defineForm({
   review: {
     title: {
       id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
-      defaultMessage: 'Member declaration for {firstname} {surname}',
+      defaultMessage:
+        '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
       description: 'Title of the form to show in review page'
     },
     fields: [
@@ -759,6 +760,16 @@ export const TENNIS_CLUB_FORM = defineForm({
             defaultMessage: "Applicant's date of birth",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
+          }
+        },
+        {
+          id: 'applicant.image',
+          type: 'FILE',
+          required: false,
+          label: {
+            defaultMessage: "Applicant's profile picture",
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.image.label'
           }
         },
         {
@@ -886,6 +897,24 @@ export const tennisClubMembershipEvent = defineConfig({
           description: 'This is the message to show when the field is empty',
           id: 'event.tennis-club-membership.summary.field.firstname.empty'
         }
+      },
+      {
+        id: 'applicant.surname',
+        label: {
+          defaultMessage: "Applicant's last name",
+          description: 'This is the label for the field',
+          id: 'event.tennis-club-membership.summary.field.surname.label'
+        },
+        value: {
+          defaultMessage: '{applicant.surname}',
+          description: 'This is the value to show in the summary',
+          id: 'event.tennis-club-membership.summary.field.surname'
+        },
+        emptyValueMessage: {
+          defaultMessage: 'Last name is not provided',
+          description: 'This is the message to show when the field is empty',
+          id: 'event.tennis-club-membership.summary.field.surname.empty'
+        }
       }
     ]
   },
@@ -913,7 +942,7 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   actions: [
     {
-      type: 'DECLARE',
+      type: ActionType.DECLARE,
       label: {
         defaultMessage: 'Send an application',
         description:
@@ -923,27 +952,27 @@ export const tennisClubMembershipEvent = defineConfig({
       forms: [TENNIS_CLUB_FORM]
     },
     {
-      type: 'REGISTER',
-      label: {
-        defaultMessage: 'Send an application',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.declare.label'
-      },
-      forms: [TENNIS_CLUB_FORM]
-    },
-    {
-      type: 'VALIDATE',
+      type: ActionType.VALIDATE,
       label: {
         defaultMessage: 'Validate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.validate.label'
       },
-      forms: []
+      forms: [TENNIS_CLUB_FORM]
     },
     {
-      type: 'REQUEST_CORRECTION',
+      type: ActionType.REGISTER,
+      label: {
+        defaultMessage: 'Register',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.register.label'
+      },
+      forms: [TENNIS_CLUB_FORM]
+    },
+    {
+      type: ActionType.REQUEST_CORRECTION,
       label: {
         defaultMessage: 'Request correction',
         description:
@@ -1150,7 +1179,7 @@ export const tennisClubMembershipEvent = defineConfig({
       ]
     },
     {
-      type: 'APPROVE_CORRECTION',
+      type: ActionType.APPROVE_CORRECTION,
       forms: [TENNIS_CLUB_FORM],
       label: {
         defaultMessage: 'Approve correction',
@@ -1211,7 +1240,6 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   advancedSearch: [
     {
-      id: 'RANDOM',
       title: {
         defaultMessage: 'Tennis club registration search',
         description: 'This is what this event is referred as in the system',

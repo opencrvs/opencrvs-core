@@ -17,12 +17,12 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   FieldConfig,
-  findActiveActionFields,
+  getActiveActionFields,
   findActiveActionForm,
   generateTransactionId,
-  getCurrentEventState,
   Scope,
-  SCOPES
+  SCOPES,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -39,17 +39,14 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 
-import {
-  isFormFieldVisible,
-  setEmptyValuesForFields
-} from '@client/v2-events/components/forms/utils'
-import { useCorrectionRequestData } from '@client/v2-events/features/events/actions/correct/request/useCorrectionRequestData'
+import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 
 function shouldBeShownAsAValue(field: FieldConfig) {
   if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
@@ -103,13 +100,13 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const previousFormValues = getCurrentEventState(event).data
+  const previousFormValues = event.data
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const stringifyFormData = useFormDataStringifier()
 
-  const form = getFormValues(eventId)
+  const form = getFormValues()
   const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
@@ -130,16 +127,10 @@ export function Summary() {
     )
   }
 
-  const fields = findActiveActionFields(
+  const fields = getActiveActionFields(
     eventConfiguration,
     ActionType.REQUEST_CORRECTION
   )
-
-  if (!fields) {
-    throw new Error(
-      `No active form found for ${ActionType.REQUEST_CORRECTION}. This should never happen`
-    )
-  }
 
   const allFields = [
     ...fields,
@@ -153,11 +144,11 @@ export function Summary() {
     previousFormValues
   )
 
-  const correctionRequestData = useCorrectionRequestData()
-  const stringiedRequestData = stringifyFormData(
-    allFields,
-    correctionRequestData.getFormValues()
-  )
+  const metadata = useEventMetadata()
+
+  const metadataForm = metadata.getMetadata()
+
+  const stringiedRequestData = stringifyFormData(allFields, metadataForm)
 
   const onboardingFormPages =
     eventConfiguration.actions.find(
@@ -181,8 +172,8 @@ export function Summary() {
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFormFieldVisible(field, previousFormValues)
-      const isHidden = !isFormFieldVisible(field, form)
+      const wasVisible = isFieldVisible(field, previousFormValues)
+      const isHidden = !isFieldVisible(field, form)
 
       return wasVisible && isHidden
     })
@@ -198,7 +189,7 @@ export function Summary() {
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      metadata: correctionRequestData.getFormValues()
+      metadata: metadataForm
     })
     eventFormNavigation.goToHome()
   }, [
@@ -206,7 +197,7 @@ export function Summary() {
     fields,
     events.actions.correction.request,
     eventId,
-    correctionRequestData,
+    metadataForm,
     eventFormNavigation,
     previousFormValues
   ])
@@ -287,8 +278,8 @@ export function Summary() {
             const content = page.fields
               .filter((field) => {
                 const visibilityChanged =
-                  isFormFieldVisible(field, previousFormValues) !==
-                  isFormFieldVisible(field, form)
+                  isFieldVisible(field, previousFormValues) !==
+                  isFieldVisible(field, form)
 
                 return (
                   stringifiedPreviousForm[field.id] !==
@@ -296,7 +287,7 @@ export function Summary() {
                 )
               })
               .map((field) => {
-                const wasHidden = !isFormFieldVisible(field, form)
+                const wasHidden = !isFieldVisible(field, form)
                 return {
                   item: intl.formatMessage(field.label),
                   original: stringifiedPreviousForm[field.id] || '-',

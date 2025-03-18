@@ -10,41 +10,38 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
-import styled from 'styled-components'
 import { useSelector } from 'react-redux'
-import {
-  ActionFormData,
-  FieldConfig,
-  FormConfig,
-  getFieldValidationErrors,
-  isFileFieldType,
-  isFileFieldWithOptionType,
-  SCOPES,
-  EventConfig,
-  EventIndex
-} from '@opencrvs/commons/client'
+import styled from 'styled-components'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import {
   Accordion,
   Button,
+  Checkbox,
   DocumentViewer,
   Icon,
-  IDocumentViewerOptions,
   Link,
   ListReview,
   ResponsiveModal,
   Stack,
-  Text
+  Text,
+  TextArea
 } from '@opencrvs/components'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { isFormFieldVisible } from '@client/v2-events/components/forms/utils'
+import {
+  EventState,
+  EventConfig,
+  FieldType,
+  FormConfig,
+  getFieldValidationErrors,
+  isFieldVisible,
+  SCOPES
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
-import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
-import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
+import { useFileOptions } from '@client/v2-events/hooks/useFileOptions'
 import { Output } from './Output'
 
 const ValidationError = styled.span`
@@ -161,6 +158,11 @@ const ReviewContainter = styled.div`
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
+  changeAllButton: {
+    id: 'v2.buttons.changeAll',
+    defaultMessage: 'Change all',
+    description: 'The label for the change all button'
+  },
   changeButton: {
     id: 'v2.buttons.change',
     defaultMessage: 'Change',
@@ -187,6 +189,11 @@ const reviewMessages = defineMessages({
     defaultMessage:
       'The declarant will be notified of this action and a record of this decision will be recorded',
     description: 'The description for action modal'
+  },
+  actionModalIncompleteDescription: {
+    id: 'v2.actionModal.description.incomplete',
+    defaultMessage: 'This incomplete declaration will be sent for review.',
+    description: 'The description for action modal when incomplete'
   },
   changeModalCancel: {
     id: 'v2.changeModal.cancel',
@@ -222,6 +229,37 @@ const reviewMessages = defineMessages({
     defaultMessage: 'Add attachement',
     description: 'Edit documents text',
     id: 'review.documents.editDocuments'
+  },
+  rejectModalCancel: {
+    id: 'v2.rejectModal.cancel',
+    defaultMessage: 'Cancel',
+    description: 'The label for cancel button of reject modal'
+  },
+  rejectModalArchive: {
+    id: 'v2.rejectModal.archive',
+    defaultMessage: 'Archive',
+    description: 'The label for archive button of reject modal'
+  },
+  rejectModalSendForUpdate: {
+    id: 'v2.rejectModal.sendForUpdate',
+    defaultMessage: 'Send For Update',
+    description: 'The label for send For Update button of reject modal'
+  },
+  rejectModalTitle: {
+    id: 'v2.rejectModal.title',
+    defaultMessage: 'Reason for rejection?',
+    description: 'The title for reject modal'
+  },
+  rejectModalDescription: {
+    id: 'v2.rejectModal.description',
+    defaultMessage:
+      'Please describe the updates required to this record for follow up action.',
+    description: 'The description for reject modal'
+  },
+  rejectModalMarkAsDuplicate: {
+    id: 'v2.rejectModal.markAsDuplicate',
+    defaultMessage: 'Mark as a duplicate',
+    description: 'The label for mark as duplicate checkbox of reject modal'
   }
 })
 
@@ -230,7 +268,6 @@ const reviewMessages = defineMessages({
  * User can review the data and take actions like declare, reject or edit the data.
  */
 function ReviewComponent({
-  eventConfig,
   formConfig,
   previousFormValues,
   form,
@@ -244,9 +281,9 @@ function ReviewComponent({
   children: React.ReactNode
   eventConfig: EventConfig
   formConfig: FormConfig
-  form: ActionFormData
-  metadata?: ActionFormData
-  previousFormValues?: EventIndex['data']
+  form: EventState
+  metadata?: EventState
+  previousFormValues?: EventState
   onEdit: ({
     pageId,
     fieldId,
@@ -258,111 +295,22 @@ function ReviewComponent({
   }) => void
   title: string
   isUploadButtonVisible?: boolean
-  onMetadataChange?: (values: ActionFormData) => void
+  onMetadataChange?: (values: EventState) => void
 }) {
   const scopes = useSelector(getScope)
   const intl = useIntl()
   const countryLogoFile = useSelector(getCountryLogoFile)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
-
+  const fileOptions = useFileOptions(form, formConfig, intl)
   const pagesWithFile = formConfig.pages
     .filter(({ fields }) =>
-      fields.some(({ type }) => type === 'FILE' || type === 'FILE_WITH_OPTIONS')
+      fields.some(
+        ({ type }) =>
+          type === FieldType.FILE || type === FieldType.FILE_WITH_OPTIONS
+      )
     )
     .map(({ id }) => id)
-
-  function getOptions(fieldConfig: FieldConfig): IDocumentViewerOptions {
-    const value = form[fieldConfig.id]
-    if (!value) {
-      return {
-        selectOptions: [],
-        documentOptions: []
-      }
-    }
-
-    const fieldObj = {
-      config: fieldConfig,
-      value
-    }
-    if (isFileFieldType(fieldObj)) {
-      return {
-        selectOptions: [
-          {
-            value: fieldObj.config.id,
-            label: intl.formatMessage(fieldObj.config.label)
-          }
-        ],
-        documentOptions: [
-          {
-            value: getFullURL(fieldObj.value.filename),
-            label: fieldObj.config.id
-          }
-        ]
-      }
-    }
-
-    if (isFileFieldWithOptionType(fieldObj)) {
-      const labelPrefix = intl.formatMessage(fieldObj.config.label)
-
-      return fieldObj.config.options.reduce<IDocumentViewerOptions>(
-        (acc, { value: val, label }) => {
-          const specificValue = fieldObj.value.find(
-            ({ option }) => val === option
-          )
-          if (specificValue) {
-            return {
-              documentOptions: [
-                ...acc.documentOptions,
-                { value: getFullURL(specificValue.filename), label: val }
-              ],
-              selectOptions: [
-                ...acc.selectOptions,
-                {
-                  value: val,
-                  label: `${labelPrefix} (${intl.formatMessage(label)})`
-                }
-              ]
-            }
-          }
-          return acc
-        },
-        {
-          selectOptions: [],
-          documentOptions: []
-        }
-      )
-    }
-
-    return {
-      selectOptions: [],
-      documentOptions: []
-    }
-  }
-
-  function reduceFields(fieldConfigs: FieldConfig[]): IDocumentViewerOptions {
-    return fieldConfigs.reduce<IDocumentViewerOptions>(
-      (acc, fieldConfig) => {
-        const { selectOptions, documentOptions } = getOptions(fieldConfig)
-        return {
-          documentOptions: [...acc.documentOptions, ...documentOptions],
-          selectOptions: [...acc.selectOptions, ...selectOptions]
-        }
-      },
-      { selectOptions: [], documentOptions: [] }
-    )
-  }
-
-  const fileOptions = formConfig.pages.reduce<IDocumentViewerOptions>(
-    (acc, page) => {
-      const { selectOptions, documentOptions } = reduceFields(page.fields)
-      return {
-        documentOptions: [...acc.documentOptions, ...documentOptions],
-        selectOptions: [...acc.selectOptions, ...selectOptions]
-      }
-    },
-    { selectOptions: [], documentOptions: [] }
-  )
 
   return (
     <Row>
@@ -380,8 +328,7 @@ function ReviewComponent({
                 justify-content="flex-start"
               >
                 <TitleContainer id={`header_title`}>
-                  {intl.formatMessage(reviewMessages.govtName)} {' – '}
-                  {intl.formatMessage(eventConfig.label)}
+                  {intl.formatMessage(reviewMessages.govtName)}
                 </TitleContainer>
                 <SubjectContainer id={`header_subject`}>
                   {title}
@@ -392,6 +339,52 @@ function ReviewComponent({
           <FormData>
             <ReviewContainter>
               {formConfig.pages.map((page) => {
+                const fields = page.fields
+                  .filter((field) => isFieldVisible(field, form))
+                  .map((field) => {
+                    const value = form[field.id]
+                    const previousValue = previousForm[field.id]
+
+                    const valueDisplay = Output({
+                      field,
+                      previousValue,
+                      showPreviouslyMissingValuesAsChanged,
+                      value
+                    })
+
+                    const error = getFieldValidationErrors({
+                      field,
+                      values: form
+                    })
+
+                    const errorDisplay =
+                      error.errors.length > 0 ? (
+                        <ValidationError key={field.id}>
+                          {intl.formatMessage(error.errors[0].message)}
+                        </ValidationError>
+                      ) : null
+
+                    return { ...field, valueDisplay, errorDisplay }
+                  })
+
+                const shouldDisplayPage = fields.some(
+                  ({ type, valueDisplay, errorDisplay }) => {
+                    if (
+                      type === FieldType.FILE ||
+                      type === FieldType.FILE_WITH_OPTIONS
+                    ) {
+                      return true
+                    }
+
+                    // If page doesn't have any file inputs, we only want to display it if it has any fields with content
+                    return valueDisplay || errorDisplay
+                  }
+                )
+
+                if (!shouldDisplayPage) {
+                  return <></>
+                }
+
                 return (
                   <DeclarationDataContainer
                     key={'Section_' + page.title.defaultMessage}
@@ -404,7 +397,7 @@ function ReviewComponent({
                             onEdit({ pageId: page.id })
                           }}
                         >
-                          {intl.formatMessage(reviewMessages.changeButton)}
+                          {intl.formatMessage(reviewMessages.changeAllButton)}
                         </Link>
                       }
                       expand={true}
@@ -414,64 +407,36 @@ function ReviewComponent({
                       name={'Accordion_' + page.id}
                     >
                       <ListReview id={'Section_' + page.id}>
-                        {page.fields
-                          .filter((field) => isFormFieldVisible(field, form))
-                          .map((field) => {
-                            const value = form[field.id]
-                            const previousValue = previousForm[field.id]
+                        {fields
+                          .filter(
+                            ({ valueDisplay, errorDisplay }) =>
+                              valueDisplay || errorDisplay
+                          )
+                          .map(({ id, label, errorDisplay, valueDisplay }) => (
+                            <ListReview.Row
+                              key={id}
+                              actions={
+                                <Link
+                                  data-testid={`change-button-${id}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
 
-                            const valueDisplay = (
-                              <Output
-                                field={field}
-                                previousValue={previousValue}
-                                showPreviouslyMissingValuesAsChanged={
-                                  showPreviouslyMissingValuesAsChanged
-                                }
-                                value={value}
-                              />
-                            )
-
-                            const error = getFieldValidationErrors({
-                              field,
-                              values: form
-                            })
-
-                            const errorDisplay =
-                              error.errors.length > 0 ? (
-                                <ValidationError key={field.id}>
-                                  {intl.formatMessage(error.errors[0].message)}
-                                </ValidationError>
-                              ) : null
-
-                            return (
-                              <ListReview.Row
-                                key={field.id}
-                                actions={
-                                  <Link
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-
-                                      onEdit({
-                                        pageId: page.id,
-                                        fieldId: field.id
-                                      })
-                                    }}
-                                  >
-                                    {intl.formatMessage(
-                                      reviewMessages.changeButton
-                                    )}
-                                  </Link>
-                                }
-                                id={field.id}
-                                label={intl.formatMessage(field.label)}
-                                value={
-                                  error.errors.length > 0
-                                    ? errorDisplay
-                                    : valueDisplay
-                                }
-                              />
-                            )
-                          })}
+                                    onEdit({
+                                      pageId: page.id,
+                                      fieldId: id
+                                    })
+                                  }}
+                                >
+                                  {intl.formatMessage(
+                                    reviewMessages.changeButton
+                                  )}
+                                </Link>
+                              }
+                              id={id}
+                              label={intl.formatMessage(label)}
+                              value={errorDisplay || valueDisplay}
+                            />
+                          ))}
                       </ListReview>
                     </Accordion>
                   </DeclarationDataContainer>
@@ -590,54 +555,41 @@ const ActionContainer = styled.div`
     margin-bottom: 8px;
   }
 `
-const incompleteFormWarning: MessageDescriptor = {
-  id: 'v2.reviewAction.incompleteForm',
-  defaultMessage:
-    'Please add mandatory information correctly before registering.',
-  description: 'The label for warning of incomplete form'
-}
 
 function ReviewActionComponent({
   onConfirm,
-  formConfig,
-  form,
-  metadata,
   onReject,
   messages,
-  primaryButtonType
+  primaryButtonType,
+  canSendIncomplete,
+  isPrimaryActionDisabled
 }: {
+  isPrimaryActionDisabled: boolean
   onConfirm: () => void
   onReject?: () => void
-  formConfig: FormConfig
-  form: ActionFormData
-  metadata?: ActionFormData
   messages: {
     title: MessageDescriptor
     description: MessageDescriptor
     onConfirm: MessageDescriptor
+    onReject?: MessageDescriptor
   }
   primaryButtonType?: 'positive' | 'primary'
+  action?: string
+  canSendIncomplete?: boolean
 }) {
   const intl = useIntl()
-  const errorExist = validationErrorsInActionFormExist(
-    formConfig,
-    form,
-    metadata
-  )
-  const background = errorExist ? 'error' : 'success'
-  const descriptionMessage = errorExist
-    ? incompleteFormWarning
-    : messages.description
+
+  const background = isPrimaryActionDisabled ? 'error' : 'success'
 
   return (
     <Container>
       <UnderLayBackground background={background}>
         <Content>
           <Title>{intl.formatMessage(messages.title)}</Title>
-          <Description>{intl.formatMessage(descriptionMessage)}</Description>
+          <Description>{intl.formatMessage(messages.description)}</Description>
           <ActionContainer>
             <Button
-              disabled={errorExist}
+              disabled={isPrimaryActionDisabled && !canSendIncomplete}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}
@@ -646,6 +598,17 @@ function ReviewActionComponent({
               <Icon color="white" name="Check" />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
+            {onReject && messages.onReject && (
+              <Button
+                id="review-reject"
+                size="large"
+                type={'negative'}
+                onClick={onReject}
+              >
+                <Icon name="X" />
+                {intl.formatMessage(messages.onReject)}
+              </Button>
+            )}
           </ActionContainer>
         </Content>
       </UnderLayBackground>
@@ -669,6 +632,7 @@ function EditModal({
   return (
     <ResponsiveModal
       autoHeight
+      showHeaderBorder
       actions={[
         <Button
           key="cancel_edit"
@@ -709,10 +673,11 @@ function EditModal({
   )
 }
 
-function ActionModal({
+function AcceptActionModal({
   copy,
   close,
-  action
+  action,
+  incomplete
 }: {
   copy?: {
     onCancel?: MessageDescriptor
@@ -722,11 +687,13 @@ function ActionModal({
   }
   close: (result: boolean | null) => void
   action: string
+  incomplete?: boolean
 }) {
   const intl = useIntl()
   return (
     <ResponsiveModal
       autoHeight
+      showHeaderBorder
       actions={[
         <Button
           key={'cancel_' + action}
@@ -757,7 +724,6 @@ function ActionModal({
         </Button>
       ]}
       handleClose={() => close(null)}
-      responsive={false}
       show={true}
       title={intl.formatMessage(
         copy?.title || reviewMessages.actionModalTitle,
@@ -767,9 +733,108 @@ function ActionModal({
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(
-            copy?.description || reviewMessages.actionModalDescription
+            incomplete
+              ? reviewMessages.actionModalIncompleteDescription
+              : copy?.description || reviewMessages.actionModalDescription
           )}
         </Text>
+      </Stack>
+    </ResponsiveModal>
+  )
+}
+
+export const REJECT_ACTIONS = {
+  ARCHIVE: 'ARCHIVE',
+  SEND_FOR_UPDATE: 'SEND_FOR_UPDATE'
+} as const
+
+export interface RejectionState {
+  rejectAction: keyof typeof REJECT_ACTIONS
+  message: string
+  isDuplicate: boolean
+}
+
+function RejectActionModal({
+  close
+}: {
+  close: (result: RejectionState | null) => void
+}) {
+  const [state, setState] = useState<RejectionState>({
+    rejectAction: REJECT_ACTIONS.ARCHIVE,
+    message: '',
+    isDuplicate: false
+  })
+
+  const intl = useIntl()
+  return (
+    <ResponsiveModal
+      showHeaderBorder
+      actions={[
+        <Button
+          key="cancel_reject"
+          id="cancel_reject"
+          type="tertiary"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          {intl.formatMessage(reviewMessages.rejectModalCancel)}
+        </Button>,
+        <Button
+          key="confirm_reject_with_archive"
+          disabled={!state.message}
+          id="confirm_reject_with_archive"
+          type="secondaryNegative"
+          onClick={() => {
+            close({
+              ...state,
+              rejectAction: REJECT_ACTIONS.ARCHIVE
+            })
+          }}
+        >
+          {intl.formatMessage(reviewMessages.rejectModalArchive)}
+        </Button>,
+        <Button
+          key="confirm_reject_with_update"
+          disabled={!state.message || state.isDuplicate}
+          id="confirm_reject_with_update"
+          type="negative"
+          onClick={() => {
+            close({
+              ...state,
+              rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
+            })
+          }}
+        >
+          {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
+        </Button>
+      ]}
+      contentHeight={270}
+      handleClose={() => close(null)}
+      show={true}
+      title={intl.formatMessage(reviewMessages.rejectModalTitle)}
+      width={918}
+    >
+      <Stack alignItems="left" direction="column">
+        <Text color="grey500" element="p" variant="reg16">
+          {intl.formatMessage(reviewMessages.rejectModalDescription)}
+        </Text>
+        <TextArea
+          required={true}
+          value={state.message}
+          onChange={(e) =>
+            setState((prev) => ({ ...prev, message: e.target.value }))
+          }
+        />
+        <Checkbox
+          label={intl.formatMessage(reviewMessages.rejectModalMarkAsDuplicate)}
+          name={'markDuplicate'}
+          selected={state.isDuplicate}
+          value={''}
+          onChange={() =>
+            setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
+          }
+        />
       </Stack>
     </ResponsiveModal>
   )
@@ -779,5 +844,8 @@ export const Review = {
   Body: ReviewComponent,
   Actions: ReviewActionComponent,
   EditModal: EditModal,
-  ActionModal: ActionModal
+  ActionModal: {
+    Accept: AcceptActionModal,
+    Reject: RejectActionModal
+  }
 }

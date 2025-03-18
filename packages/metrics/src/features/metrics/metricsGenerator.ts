@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { INFLUXDB_URL, INFLUX_DB } from '@metrics/influxdb/constants'
 import {
   FEMALE,
@@ -37,7 +38,9 @@ import {
   ResourceIdentifier,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
-import { UUID } from '@opencrvs/commons'
+import { UUID, logger } from '@opencrvs/commons'
+import { createChunks } from '@metrics/utils/batchHelpers'
+
 interface IGroupedByGender {
   total: number
   gender: string
@@ -1035,26 +1038,39 @@ export async function getTotalMetricsByLocation(
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const locationIds = await fetchLocationChildrenIds(locationId)
-  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
-    locationIds,
-    'officeLocation'
-  )
 
-  const totalMetrics: IMetricsTotalGroup[] = await query(
-    `SELECT COUNT(${column}) AS total
-    FROM ${measurement}
-  WHERE time > $timeFrom
-    AND time <= $timeTo
-    AND (${officeLocationInChildren})
-  GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
-    {
-      placeholders: {
-        timeFrom,
-        timeTo,
-        ...locationPlaceholders
-      }
+  const batchquery = async (locationIds: string[]) => {
+    const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+      locationIds,
+      'officeLocation'
+    )
+    try {
+      return await query(
+        `SELECT COUNT(${column}) AS total
+          FROM ${measurement}
+        WHERE time > $timeFrom
+          AND time <= $timeTo
+          AND (${officeLocationInChildren})
+        GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
+        {
+          placeholders: {
+            timeFrom,
+            timeTo,
+            ...locationPlaceholders
+          }
+        }
+      )
+    } catch (error) {
+      logger.error(`Error fetching total metrics by location: ${error.message}`)
+      throw error
     }
-  )
+  }
+
+  const locationBatches = createChunks(locationIds, 1000)
+
+  const totalMetrics: IMetricsTotalGroup[] = await Promise.all(
+    locationBatches.map(batchquery)
+  ).then((res) => res.flat())
 
   const estimationOfTimeRange: IEstimation =
     await fetchEstimateForTargetDaysByLocationId(

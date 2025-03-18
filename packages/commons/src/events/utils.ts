@@ -19,10 +19,11 @@ import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { ActionFormData } from './ActionDocument'
-import { formatISO } from 'date-fns'
+import { EventState } from './ActionDocument'
 import { FormConfig } from './FormConfig'
-import { isFieldHidden } from '../conditionals/validate'
+import { isFieldVisible } from '../conditionals/validate'
+import { FieldType } from './FieldType'
+import { getOrThrow } from '../utils'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -111,7 +112,10 @@ export const resolveLabelsFromKnownFields = ({
 export function getAllFields(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => form.pages.flatMap((page) => page.fields))
+    .flatMap((form) => [
+      ...form.review.fields,
+      ...form.pages.flatMap((page) => page.fields)
+    ])
 }
 
 export function getAllPages(configuration: EventConfig) {
@@ -140,22 +144,77 @@ export const findActiveActionForm = (
   const actionConfig = configuration.actions.find((a) => a.type === action)
   const form = actionConfig?.forms.find((f) => f.active)
 
-  /** Let caller decide whether to throw or default to empty array */
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
   return form
+}
+
+export const findActiveActionFormPages = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  return findActiveActionForm(configuration, action)?.pages
 }
 
 export const getFormFields = (formConfig: FormConfig) => {
   return formConfig.pages.flatMap((p) => p.fields)
 }
 
+/**
+ * Returns only form fields for the action type, if any, excluding review fields.
+ */
+export const findActiveActionFormFields = (
+  configuration: EventConfig,
+  action: ActionType
+): FieldConfig[] | undefined => {
+  const form = findActiveActionForm(configuration, action)
+
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
+  return form ? getFormFields(form) : undefined
+}
+
+/**
+ * Returns all fields for the action type, including review fields, if any.
+ */
 export const findActiveActionFields = (
   configuration: EventConfig,
   action: ActionType
-): FieldConfig[] => {
+): FieldConfig[] | undefined => {
   const form = findActiveActionForm(configuration, action)
+  const reviewFields = form?.review.fields
 
-  /** Let caller decide whether to throw or default to empty array */
-  return form ? getFormFields(form) : []
+  const formFields = form ? getFormFields(form) : undefined
+  const allFields = formFields
+    ? formFields.concat(reviewFields ?? [])
+    : reviewFields
+
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
+  return allFields
+}
+
+export const getActiveActionFormPages = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  return getOrThrow(
+    findActiveActionForm(configuration, action)?.pages,
+    'Form configuration not found for type: ' + configuration.id
+  )
+}
+
+/**
+ * Returns all fields for the action type, including review fields, or throws
+ */
+export function getActiveActionFields(
+  configuration: EventConfig,
+  action: ActionType
+): FieldConfig[] {
+  const fields = findActiveActionFields(configuration, action)
+
+  if (!fields) {
+    throw new Error(`No active field config found for action type ${action}`)
+  }
+
+  return fields
 }
 
 export function getEventConfiguration(
@@ -169,18 +228,26 @@ export function getEventConfiguration(
   return config
 }
 
-export function stripHiddenFields(fields: FieldConfig[], data: ActionFormData) {
-  const now = formatISO(new Date(), { representation: 'date' })
+function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
+  if (field.type !== FieldType.CHECKBOX || field.required) {
+    return false
+  }
 
+  return !form[field.id]
+}
+
+export function stripHiddenFields(fields: FieldConfig[], data: EventState) {
   return omitBy(data, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
 
-    return (
-      !field ||
-      isFieldHidden(field, {
-        $form: data,
-        $now: now
-      })
-    )
+    if (!field) {
+      return true
+    }
+
+    if (isOptionalUncheckedCheckbox(field, data)) {
+      return true
+    }
+
+    return !isFieldVisible(field, data)
   })
 }

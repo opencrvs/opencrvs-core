@@ -1,0 +1,158 @@
+classDiagram
+    class EventConfig {
+        id: string
+        summary: SummaryConfig
+        label: TranslationConfig
+        actions: ActionConfig[]
+        workqueues: WorkqueueConfig[]
+        deduplication?: DeduplicationConfig[]
+        advancedSearch?: AdvancedSearchConfig[]
+    }
+
+    class SummaryConfig {
+        title: Title
+        fields: Field[]
+    }
+
+    class Title {
+        id: string
+        label: TranslationConfig
+        emptyValueMessage?: TranslationConfig
+    }
+
+    class Field {
+        id: string
+        value: TranslationConfig
+        label: TranslationConfig
+        emptyValueMessage?: TranslationConfig
+    }
+
+    class TranslationConfig {
+        id: string
+        defaultMessage: string
+        description: string
+    }
+
+    class ActionConfig {
+        label: TranslationConfig
+        conditionals?: ActionConditional[]
+        draft: boolean
+        forms: FormConfig[]
+    }
+
+    class ActionConditional {
+        <<discriminated union>>
+    }
+
+    class ShowConditional {
+        type: "SHOW"
+        conditional: Conditional
+    }
+
+    class EnableConditional {
+        type: "ENABLE"
+        conditional: Conditional
+    }
+
+    class FormConfig {
+        label: TranslationConfig
+        version: FormVersion
+        active: boolean
+        pages: FormPage[]
+        review: FormReview
+    }
+
+    class FormVersion {
+        id: string
+        label: TranslationConfig
+    }
+
+    class FormPage {
+        id: string
+        title: TranslationConfig
+        fields: FieldConfig[]
+    }
+
+    class FormReview {
+        title: TranslationConfig
+        fields: FieldConfig[]
+    }
+
+    class FieldConfig {
+
+    }
+
+    class Address
+    class TextField
+    class NumberField
+    class TextAreaField
+    class DateField
+    class Paragraph
+    class RadioGroup
+    class BulletList
+    class PageHeader
+    class Select
+    class Checkbox
+    class File
+    class Country
+    class AdministrativeArea
+    class Divider
+    class Location
+    class Facility
+    class Office
+    class SignatureField
+    class EmailField
+    class FileUploadWithOptions
+
+    EventConfig "1" --> "1" SummaryConfig
+    EventConfig "1" --> "1" TranslationConfig
+    EventConfig "1" --> "*" ActionConfig
+    EventConfig "1" --> "*" WorkqueueConfig
+    EventConfig "1" --> "*" DeduplicationConfig
+    EventConfig "1" --> "*" AdvancedSearchConfig
+
+    SummaryConfig "1" --> "1" Title
+    SummaryConfig "1" --> "*" Field
+
+    Title "1" --> "1" TranslationConfig
+    Field "1" --> "1" TranslationConfig
+    Field "1" --> "1" TranslationConfig
+    Field "1" --> "1" TranslationConfig
+
+    ActionConfig "1" --> "*" ActionConditional
+    ActionConfig "1" --> "*" FormConfig
+
+    ActionConditional <|-- ShowConditional
+    ActionConditional <|-- EnableConditional
+
+    ShowConditional "1" --> "1" Conditional
+    EnableConditional "1" --> "1" Conditional
+
+    FormConfig "1" --> "1" FormVersion
+    FormConfig "1" --> "*" FormPage
+    FormConfig "1" --> "1" FormReview
+
+    FormPage "1" --> "*" FieldConfig
+    FormReview "1" --> "*" FieldConfig
+
+    FieldConfig <|-- Address
+    FieldConfig <|-- TextField
+    FieldConfig <|-- NumberField
+    FieldConfig <|-- TextAreaField
+    FieldConfig <|-- DateField
+    FieldConfig <|-- Paragraph
+    FieldConfig <|-- RadioGroup
+    FieldConfig <|-- BulletList
+    FieldConfig <|-- PageHeader
+    FieldConfig <|-- Select
+    FieldConfig <|-- Checkbox
+    FieldConfig <|-- File
+    FieldConfig <|-- Country
+    FieldConfig <|-- AdministrativeArea
+    FieldConfig <|-- Divider
+    FieldConfig <|-- Location
+    FieldConfig <|-- Facility
+    FieldConfig <|-- Office
+    FieldConfig <|-- SignatureField
+    FieldConfig <|-- EmailField
+    FieldConfig <|-- FileUploadWithOptions

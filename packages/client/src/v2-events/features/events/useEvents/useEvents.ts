@@ -9,34 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { EventDocument } from '@opencrvs/commons/client'
-import { queryClient, useTRPC } from '@client/v2-events/trpc'
-import { OnDeclareParams } from '@client/v2-events/custom-api'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+
+import { useTRPC } from '@client/v2-events/trpc'
+import { useGetEvent, useGetEventState } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
-import { useGetEvent } from './procedures/get'
-import { customMutationKeys, useEventAction } from './procedures/actions/action'
+import {
+  customMutationKeys,
+  useEventAction,
+  useEventCustomAction
+} from './procedures/actions/action'
 
 export function useEvents() {
   const trpc = useTRPC()
-
-  function getDrafts(): EventDocument[] {
-    const queries = queryClient.getQueriesData<EventDocument>({
-      queryKey: trpc.event.get.queryKey(undefined)
-    })
-
-    return queries
-      .map((query) => query[1])
-      .filter((event): event is EventDocument =>
-        Boolean(event && event.actions[event.actions.length - 1].draft)
-      )
-  }
-
+  const getEvent = useGetEvent()
   return {
     createEvent: useCreateEvent,
-    getEvent: useGetEvent(),
+    /** Returns an event with full history. If you only need the state of the event, use getEventState. */
+    getEvent,
     getEvents: {
       useQuery: useQuery({
         ...trpc.event.list.queryOptions(),
@@ -49,13 +41,40 @@ export function useEvents() {
         }).data
       ]
     },
+    /** Returns an event with aggregated history. If you need the history of the event, use getEvent. */
+    getEventState: useGetEventState(),
     deleteEvent: {
       useMutation: useDeleteEvent
     },
     getOutbox: useOutbox,
-    getDrafts,
+    searchEvent: {
+      useQuery: (type: string, searchParams: Record<string, string>) =>
+        useQuery({
+          ...trpc.event.search.queryOptions({
+            ...searchParams,
+            type
+          }),
+          queryKey: trpc.event.search.queryKey({
+            ...searchParams,
+            type
+          })
+        }),
+      useSuspenseQuery: (type: string, searchParams: Record<string, string>) =>
+        useSuspenseQuery({
+          ...trpc.event.search.queryOptions({
+            ...searchParams,
+            type
+          }),
+          queryKey: trpc.event.search.queryKey({
+            ...searchParams,
+            type
+          })
+        }).data
+    },
     actions: {
       validate: useEventAction(trpc.event.actions.validate),
+      reject: useEventAction(trpc.event.actions.reject),
+      archive: useEventAction(trpc.event.actions.archive),
       notify: useEventAction(trpc.event.actions.notify),
       declare: useEventAction(trpc.event.actions.declare),
       register: useEventAction(trpc.event.actions.register),
@@ -67,12 +86,12 @@ export function useEvents() {
       }
     },
     customActions: {
-      registerOnDeclare: useMutation<unknown, Error, OnDeclareParams>({
-        mutationKey: customMutationKeys.registerOnDeclare
-      }),
-      validateOnDeclare: useMutation<unknown, Error, OnDeclareParams>({
-        mutationKey: customMutationKeys.validateOnDeclare
-      })
+      registerOnDeclare: useEventCustomAction([
+        ...customMutationKeys.registerOnDeclare
+      ]),
+      validateOnDeclare: useEventCustomAction([
+        ...customMutationKeys.validateOnDeclare
+      ])
     }
   }
 }

@@ -14,13 +14,13 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
 import {
-  AddressFieldValue,
   CheckboxFieldValue,
   DateValue,
   NumberFieldValue,
   RequiredTextValue,
   TextValue
 } from './FieldValue'
+import { AddressFieldValue } from './CompositeFieldValue'
 
 const FieldId = z.string()
 
@@ -173,6 +173,8 @@ const HtmlFontVariant = z.enum([
   'h1'
 ])
 
+export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
@@ -272,6 +274,12 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
+export const AdministrativeAreas = z.enum([
+  'ADMIN_STRUCTURE',
+  'HEALTH_FACILITY',
+  'CRVS_OFFICE'
+])
+
 const AdministrativeAreaConfiguration = z
   .object({
     partOf: z
@@ -280,7 +288,7 @@ const AdministrativeAreaConfiguration = z
       })
       .optional()
       .describe('Parent location'),
-    type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
+    type: AdministrativeAreas
   })
   .describe('Administrative area options')
 

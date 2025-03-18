@@ -13,7 +13,7 @@ import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
 import { FieldValue } from '@opencrvs/commons/client'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { RecursiveStringRecord } from '@client/v2-events/hooks/useFormDataStringifier'
 
 /**

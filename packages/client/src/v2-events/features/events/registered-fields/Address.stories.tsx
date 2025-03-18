@@ -18,12 +18,13 @@ import styled from 'styled-components'
 import {
   ActionType,
   EventConfig,
+  FieldType,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AddressFieldValue } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { TRPCProvider } from '@client/v2-events/trpc'
 
@@ -57,11 +58,51 @@ export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
         fields={[
           {
             id: 'storybook.address',
+            type: FieldType.ADDRESS,
+            label: {
+              id: 'storybook.address.label',
+              defaultMessage: 'Address',
+              description: 'The title for the address input'
+            }
+          }
+        ]}
+        formData={formData}
+        id="my-form"
+        setAllFieldsDirty={false}
+        onChange={(data) => {
+          args.onChange(data)
+          setFormData(data)
+        }}
+      />
+    )
+  }
+}
+
+export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
+  typeof FormFieldGenerator
+> = {
+  name: 'Defaults to user primary office address',
+  parameters: {
+    layout: 'centered'
+  },
+  render: function Component(args) {
+    const [formData, setFormData] = React.useState({})
+    return (
+      <StyledFormFieldGenerator
+        fields={[
+          {
+            id: 'storybook.address',
             type: 'ADDRESS',
             label: {
               id: 'storybook.address.label',
               defaultMessage: 'Address',
               description: 'The title for the address input'
+            },
+            defaultValue: {
+              country: 'FAR',
+              province: '$user.province',
+              district: '$user.district',
+              urbanOrRural: 'URBAN'
             }
           }
         ]}
@@ -128,7 +169,7 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
         fields={[
           {
             id: 'storybook.address',
-            type: 'ADDRESS',
+            type: FieldType.ADDRESS,
             label: {
               id: 'storybook.address.label',
               defaultMessage: 'Address',

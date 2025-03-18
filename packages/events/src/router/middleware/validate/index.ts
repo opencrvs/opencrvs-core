@@ -12,8 +12,9 @@
 import {
   ActionInputWithType,
   ActionType,
+  ActionUpdate,
   FieldConfig,
-  FieldValue,
+  FieldUpdateValue,
   getFieldValidationErrors
 } from '@opencrvs/commons'
 
@@ -21,7 +22,6 @@ import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getActionFormFields } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
-
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
 }
@@ -36,14 +36,23 @@ export function validateAction(actionType: ActionType) {
       eventType
     })
 
+    const data = {
+      ...opts.input.data,
+      ...(opts.input.metadata ?? {})
+    } satisfies ActionUpdate
+
     const errors = formFields.reduce(
       (
-        errorResults: { message: string; id: string; value: FieldValue }[],
+        errorResults: {
+          message: string
+          id: string
+          value: FieldUpdateValue
+        }[],
         field: FieldConfig
       ) => {
         const fieldErrors = getFieldValidationErrors({
           field,
-          values: opts.input.data
+          values: data
         }).errors
 
         if (fieldErrors.length === 0) {
@@ -54,7 +63,7 @@ export function validateAction(actionType: ActionType) {
         const errormessageWithId = fieldErrors.map((error) => ({
           message: error.message.defaultMessage,
           id: field.id,
-          value: opts.input.data[field.id]
+          value: data[field.id as keyof typeof data]
         }))
 
         return [...errorResults, ...errormessageWithId]

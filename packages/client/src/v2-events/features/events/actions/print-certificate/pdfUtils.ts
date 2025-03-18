@@ -23,13 +23,8 @@ import {
 } from 'pdfmake/interfaces'
 import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
-import { LanguageConfig } from '@opencrvs/commons'
-import {
-  ActionFormData,
-  EventDocument,
-  EventIndex,
-  User
-} from '@opencrvs/commons/client'
+import { ActionDocument, LanguageConfig } from '@opencrvs/commons'
+import { EventState, User } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
@@ -68,7 +63,7 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 }
 
 function formatAllNonStringValues(
-  templateData: ActionFormData,
+  templateData: EventState,
   intl: IntlShape
 ): Record<string, string> {
   const formattedData: Record<string, string> = {}
@@ -89,7 +84,7 @@ function formatAllNonStringValues(
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
       formattedData[key] = JSON.stringify(
-        formatAllNonStringValues(value as ActionFormData, intl)
+        formatAllNonStringValues(value as EventState, intl)
       )
     } else {
       formattedData[key] = String(value)
@@ -103,8 +98,8 @@ const cache = createIntlCache()
 
 export function compileSvg(
   templateString: string,
-  $actions: EventDocument['actions'],
-  $data: EventIndex['data'],
+  $actions: ActionDocument[],
+  $data: EventState,
   locations: Location[],
   users: User[],
   language: LanguageConfig

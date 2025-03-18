@@ -19,7 +19,7 @@ import { useIntl } from 'react-intl'
 import {
   ActionType,
   FormPage,
-  getCurrentEventState
+  getActiveActionFormPages
 } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -42,37 +42,28 @@ export function Pages() {
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES
   )
   const [templateId, setTemplateId] = useState<string>()
-  const formEventId = useEventFormData((state) => state.eventId)
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
-  const certTemplateFieldConfig =
-    useCertificateTemplateSelectorFieldConfig(event)
-  const currentState = getCurrentEventState(event)
+  const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
+    event.type
+  )
 
   const { setFormValues, getFormValues } = useEventFormData()
-  const form = getFormValues(eventId)
-
-  useEffect(() => {
-    if (formEventId !== event.id) {
-      setFormValues(event.id, currentState.data)
-    }
-  }, [currentState.data, event.id, formEventId, setFormValues])
+  const form = getFormValues()
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = configuration.actions
-    .find((action) => action.type === ActionType.PRINT_CERTIFICATE)
-    ?.forms.find((f) => f.active)?.pages
 
-  if (!formPages) {
-    throw new Error('Form configuration not found for type: ' + event.type)
-  }
+  const formPages = getActiveActionFormPages(
+    configuration,
+    ActionType.PRINT_CERTIFICATE
+  )
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -103,7 +94,7 @@ export function Pages() {
         form={form}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={(data) => setFormValues(eventId, data)}
+        setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
@@ -150,7 +141,7 @@ export function Pages() {
               id="locationForm"
               initialValues={form}
               setAllFieldsDirty={false}
-              onChange={(values) => setFormValues(eventId, values)}
+              onChange={(values) => setFormValues(values)}
             />
           </>
         )}

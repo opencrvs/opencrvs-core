@@ -11,21 +11,22 @@
 import { renderHook, RenderHookResult, waitFor } from '@testing-library/react'
 import React, { PropsWithChildren } from 'react'
 
+import { TRPCError } from '@trpc/server'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
 import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
-import { TRPCError } from '@trpc/server'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
+  ActionType,
   EventDocument,
   EventInput,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { storage } from '@client/storage'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
-import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
+import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
+import { storage } from '@client/storage'
 import { useEvents } from './useEvents'
 
 const serverSpy = vi.fn()
@@ -62,12 +63,11 @@ const createHandler = trpcHandler(async ({ request }) => {
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
       {
-        type: 'CREATE',
+        type: ActionType.CREATE,
         id: '_REAL_ACTION_UUID_',
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
         createdBy: '6733309827b97e6483877188',
         createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
-        draft: false,
         data: {}
       }
     ]
