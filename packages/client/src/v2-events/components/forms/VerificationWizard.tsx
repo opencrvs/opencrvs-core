@@ -24,7 +24,7 @@ import {
 } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 
-export const messages = defineMessages({
+const messages = defineMessages({
   back: {
     defaultMessage: 'Back',
     description: 'Back button text',
