@@ -15,15 +15,10 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  ActionType,
-  FormPage,
-  getActiveActionFormPages
-} from '@opencrvs/commons/client'
+import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
@@ -90,7 +85,19 @@ export function Pages() {
       {modal}
       <PagesComponent
         form={form}
-        formPages={formPages}
+        formPages={formPages.map((page) => {
+          if (formPages[0].id === page.id) {
+            page = {
+              ...page,
+              fields: [
+                // hard coded certificate template selector form field
+                certTemplateFieldConfig,
+                ...page.fields
+              ]
+            }
+          }
+          return page
+        })}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
@@ -112,26 +119,7 @@ export function Pages() {
             )
           }
         }}
-      >
-        {(page: FormPage) => (
-          <>
-            <FormFieldGenerator
-              fields={[
-                // hard coded certificate template selector form field
-                ...(formPages[0].id === page.id
-                  ? [certTemplateFieldConfig]
-                  : []),
-                ...page.fields
-              ]}
-              formData={form}
-              id="locationForm"
-              initialValues={form}
-              setAllFieldsDirty={false}
-              onChange={(values) => setFormValues(values)}
-            />
-          </>
-        )}
-      </PagesComponent>
+      />
     </FormLayout>
   )
 }
