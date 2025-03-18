@@ -35,29 +35,36 @@ function ActionComponent({ children, type }: Props) {
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
   const drafts = getRemoteDrafts()
-
   const [event] = getEvent.useSuspenseQuery(params.eventId)
 
-  const localDraft = getLocalDraftOrDefault({
-    id: createTemporaryId(),
-    eventId: params.eventId,
-    createdAt: new Date().toISOString(),
-    transactionId: createTemporaryId(),
-    action: {
-      type,
-      data: {},
-      metadata: {},
+  const lastAction = event.actions[event.actions.length - 1]
+
+  const activeDraft = drafts
+    .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
+    .filter(({ eventId }) => eventId === event.id)[0]
+
+  const localDraft = getLocalDraftOrDefault(
+    activeDraft || {
+      id: createTemporaryId(),
+      eventId: params.eventId,
       createdAt: new Date().toISOString(),
-      createdBy: '@todo',
-      createdAtLocation: '@todo'
+      transactionId: createTemporaryId(),
+      action: {
+        type,
+        data: {},
+        metadata: {},
+        createdAt: new Date().toISOString(),
+        createdBy: '@todo',
+        createdAtLocation: '@todo'
+      }
     }
-  })
+  )
 
   /*
    * Keep the local draft updated as per the form changes
    */
-  const formValues = useEventFormData((state) => state.getFormValues())
-  const metadataValues = useEventMetadata((state) => state.getMetadata())
+  const formValues = useEventFormData((state) => state.formValues)
+  const metadataValues = useEventMetadata((state) => state.metadata)
 
   useEffect(() => {
     setLocalDraft({

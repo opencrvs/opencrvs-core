@@ -226,7 +226,7 @@ export function generateActionDocument({
   defaults?: Partial<ActionDocument>
 }): ActionDocument {
   const actionBase = {
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
     id: getUUID(),
     createdAtLocation: 'TODO',
@@ -287,9 +287,9 @@ export function generateEventDocument({
     actions: actions.map((action) =>
       generateActionDocument({ configuration, action })
     ),
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(Date.now() - 1000).toISOString(),
     id: getUUID(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date(Date.now() - 1000).toISOString()
   }
 }
 
