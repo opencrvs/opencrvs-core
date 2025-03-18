@@ -103,37 +103,8 @@ export function useIntlFormatMessageWithFlattenedParams() {
     return formatted.trim().replaceAll(EMPTY_TOKEN, '')
   }
 
-  // Format the translation with values from data.
-  function formatMessageWithValues(
-    translationConfig: TranslationConfig,
-    availableKeys: string[],
-    data: Record<string, unknown>
-  ) {
-    const message = intl.messages[translationConfig.id]
-    const messageBeforeFormatting =
-      typeof message === 'string' ? message : translationConfig.defaultMessage
-
-    const keysInMessage = availableKeys.filter(
-      (key) =>
-        // This is a bit of hack, which expects that the keys are in the form of '{key ' or '{key}' in the message.
-        // E.g.: '{child.firstname, select, __EMPTY__ {Hello!} other {Hello to {child.firstname}!}}'
-        messageBeforeFormatting.includes(`{${key}}`) ||
-        messageBeforeFormatting.includes(`{${key} `)
-    )
-
-    const keyValues = keysInMessage.reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: data[key] ? data[key].toString() : EMPTY_TOKEN
-      }),
-      {}
-    )
-    return formatMessage(translationConfig, keyValues)
-  }
-
   return {
     ...intl,
-    formatMessage,
-    formatMessageWithValues
+    formatMessage
   }
 }
