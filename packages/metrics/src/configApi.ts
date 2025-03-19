@@ -13,6 +13,7 @@ import { CONFIG_API_URL } from '@metrics/constants'
 import { Document } from 'mongoose'
 import { UUID } from '@opencrvs/commons'
 import {
+  getLocationType,
   Location,
   ResourceIdentifier,
   SavedLocation
@@ -133,11 +134,14 @@ export const fetchLocationChildren = async (id: UUID) => {
 }
 
 export const fetchLocationChildrenIds = async (
-  id: ResourceIdentifier<Location>
+  id: ResourceIdentifier<Location>,
+  typeFilter?: 'CRVS_OFFICE' | 'HEALTH_FACILITY' | 'ADMIN_STRUCTURE'
 ) => {
   // TODO: Migrate InfluxDB to use UUID's instead of the "Location/" prefix
   const locations = await fetchLocationChildren(
     id.replace('Location/', '') as UUID
   )
-  return locations.map(({ id }) => `Location/${id}`)
+  return locations
+    .filter((x) => (typeFilter ? getLocationType(x) === typeFilter : true))
+    .map(({ id }) => `Location/${id}`)
 }

@@ -14,7 +14,7 @@ import {
   resourceIdentifierToUUID,
   SavedLocation
 } from '@opencrvs/commons/types'
-import { UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import { fetchFromHearth } from '@config/services/hearth'
 import client from '@config/config/hearthClient'
 
@@ -44,13 +44,17 @@ export const resolveLocationChildren = async (id: UUID) => {
       }
     }
   ]
+  try {
+    const result = await db
+      .collection<Location>('Location_view_with_plain_ids')
+      .aggregate(childQuery)
+      .toArray()
 
-  const result = await db
-    .collection<Location>('Location_view_with_plain_ids')
-    .aggregate(childQuery)
-    .toArray()
-
-  return result.length ? result[0].children : []
+    return result.length ? result[0].children : []
+  } catch (error) {
+    logger.error(error)
+    throw error
+  }
 }
 
 /** Resolves any given location's parents multi-level up to the root node */

@@ -24,7 +24,7 @@ export async function fetchLocationWiseDeclarationsStarted(
   timeTo: string,
   locationId: ResourceIdentifier<Location>
 ) {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
@@ -98,7 +98,7 @@ export async function getNumberOfAppStartedByPractitioners(
     totalStarted: number
   }[]
 > {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
@@ -142,7 +142,7 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
     totalStarted: number
   }[]
 > {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
@@ -185,7 +185,7 @@ export async function getAvgTimeSpentOnAppByPractitioners(
     totalTimeSpent: number
   }[]
 > {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
