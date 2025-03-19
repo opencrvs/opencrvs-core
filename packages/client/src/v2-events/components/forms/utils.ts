@@ -14,8 +14,7 @@ import {
   Inferred,
   FieldValue,
   MetaFields,
-  isFieldConfigDefaultValue,
-  mapFieldTypeToEmptyValue
+  isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 import { replacePlaceholders } from '@client/v2-events/utils'
