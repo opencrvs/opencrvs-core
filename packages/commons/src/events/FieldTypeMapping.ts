@@ -44,7 +44,8 @@ import {
   FieldUpdateValueSchema,
   NumberFieldValue,
   RequiredTextValue,
-  TextValue
+  TextValue,
+  DataFieldValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -52,6 +53,7 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue
 } from './CompositeFieldValue'
+import { EventState } from './ActionDocument'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -114,8 +116,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = AddressFieldUpdateValue
       break
     case FieldType.DATA:
-      // TODO CIHAN:
-      schema = z.string()
+      schema = DataFieldValue
       break
   }
 
@@ -343,7 +344,6 @@ export const isOfficeFieldType = (field: {
 export const isDataFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-  // TODO CIHAN: types
 }): field is { value: any; config: Data } => {
   return field.config.type === FieldType.DATA
 }

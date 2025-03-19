@@ -49,8 +49,8 @@ const Container = styled.div`
 
 function DataInput({
   configuration,
-  formData
-}: FieldProps<'DATA'> & { formData: EventState }) {
+  value
+}: FieldProps<'DATA'> & { value: EventState }) {
   const intl = useIntl()
   const { config } = useCurrentEventContext()
 
@@ -85,7 +85,7 @@ function DataInput({
                   <Output
                     field={field}
                     showPreviouslyMissingValuesAsChanged={false}
-                    value={formData[item.fieldId]}
+                    value={value[item.fieldId]}
                   />
                 </p>
               </div>
