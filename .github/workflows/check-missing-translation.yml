@@ -53,6 +53,7 @@ jobs:
           acting_branch=${{github.head_ref}}
           echo "Acting Branch: $acting_branch"
           export COUNTRY_CONFIG_PATH=${{steps.set_branch.outputs.countryconfig_path}}
+          echo "Country Config Path: $COUNTRY_CONFIG_PATH"
           git clone  https://github.com/opencrvs/opencrvs-core.git
           cd ./opencrvs-core
           git checkout $acting_branch
