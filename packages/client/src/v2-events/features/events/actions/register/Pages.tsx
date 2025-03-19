@@ -16,9 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
-import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import {
@@ -29,24 +27,24 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
+import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
+
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const { formValues: form } = useSubscribeEventFormData()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
-
   const navigate = useNavigate()
-  const events = useEvents()
   const drafts = useDrafts()
   const { modal, goToHome } = useEventFormNavigation()
+  const { config, event } = useCurrentEventContext()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  if (!config || !event) {
+    throw new Error('Event not found.')
+  }
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
-  const formPages = getActiveActionFormPages(configuration, ActionType.REGISTER)
+  const formPages = getActiveActionFormPages(config, ActionType.REGISTER)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id

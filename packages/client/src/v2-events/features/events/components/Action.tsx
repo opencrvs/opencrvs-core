@@ -159,7 +159,10 @@ function ActionComponent({ children, type }: Props) {
 
   return (
     <CurrentEventContext.Provider
-      value={{ config: eventConfiguration, event: eventDataWithDrafts }}
+      value={{
+        config: eventConfiguration,
+        event: eventDataWithDrafts
+      }}
     >
       <NavigationStack>{children}</NavigationStack>
     </CurrentEventContext.Provider>

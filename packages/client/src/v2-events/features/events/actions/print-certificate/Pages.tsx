@@ -22,10 +22,9 @@ import {
   isFieldVisible
 } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormLayout } from '@client/v2-events/layouts'
@@ -33,6 +32,7 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { InputField } from '@client/components/form/InputField'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -44,26 +44,21 @@ export function Pages() {
   const [templateId, setTemplateId] = useState<string>()
   const intl = useIntl()
   const navigate = useNavigate()
-  const events = useEvents()
   const { modal } = useEventFormNavigation()
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata()
+  const { config, event } = useCurrentEventContext()
 
-  // TODO CIHAN: use this from react context?
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  if (!config || !event) {
+    throw new Error('Event not found.')
+  }
 
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type
   )
 
-  const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata()
-
-  // TODO CIHAN: use this from react context
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
-
   const formPages = getActiveActionFormPages(
-    configuration,
+    config,
     ActionType.PRINT_CERTIFICATE
   )
 
