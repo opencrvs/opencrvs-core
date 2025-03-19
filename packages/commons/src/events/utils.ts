@@ -131,7 +131,7 @@ export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
     )
     if (!rootWorkqueue) {
       throw new Error(
-        `Invalid workqueue configuration: workqueue not found with id:  ${workqueue.id}`
+        `Invalid workqueue configuration: workqueue not found with id: ${workqueue.id}`
       )
     }
   })
