@@ -17,6 +17,7 @@ import { resolveLocationChildren } from './locationTreeSolver'
 
 export const resolveChildren: ServerRoute['handler'] = async (req) => {
   const { locationId } = req.params as { locationId: UUID }
+  const { type } = req.query || { type: undefined }
 
   const location = await fetchFromHearth<SavedLocation>(
     `Location/${locationId}`
@@ -25,7 +26,7 @@ export const resolveChildren: ServerRoute['handler'] = async (req) => {
     return [location]
   }
 
-  const children = await resolveLocationChildren(locationId)
+  const children = await resolveLocationChildren(locationId, type)
 
   return [location, ...children]
 }
