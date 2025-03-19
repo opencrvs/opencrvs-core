@@ -695,70 +695,68 @@ function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
   )
 }
 
-export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
-  (props) => {
-    const intl = useIntl()
-    const { setAllTouchedFields, touchedFields: initialTouchedFields } =
-      useEventFormData()
-    const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
+export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
+  const intl = useIntl()
+  const { setAllTouchedFields, touchedFields: initialTouchedFields } =
+    useEventFormData()
+  const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
 
-    const onChange = (values: EventState) => {
-      props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
-    }
-    const user = useUserAddress()
-
-    const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
-      ...mapFieldsToValues(props.fields, nestedFormData, { $user: user }),
-      ...props.initialValues
-    })
-
-    return (
-      <Formik<EventState>
-        enableReinitialize={true}
-        initialValues={initialValues}
-        initialTouched={initialTouchedFields}
-        validateOnMount={true}
-        validate={(values) =>
-          getValidationErrorsForForm(
-            props.fields,
-            makeFormikFieldIdsOpenCRVSCompatible(values)
-          )
-        }
-        onSubmit={() => {}}
-      >
-        {(formikProps) => {
-          useEffect(() => {
-            /**
-             * Because 'enableReinitialize' prop is set to 'true' above, whenver initialValue changes,
-             * formik lose track of touched fields. This is a workaround to save all the fields that
-             * have been touched for once during the form manipulation. So that we can show validation
-             * errors for all fields that have been touched.
-             */
-            if (
-              setAllTouchedFields &&
-              Object.keys(formikProps.touched).length > 0 &&
-              !isEqual(formikProps.touched, initialTouchedFields) &&
-              Object.keys(formikProps.touched).some(
-                (key) => !(key in initialTouchedFields)
-              )
-            ) {
-              setAllTouchedFields({
-                ...initialTouchedFields,
-                ...formikProps.touched
-              })
-            }
-          }, [formikProps.touched, initialTouchedFields, setAllTouchedFields])
-          return (
-            <FormSectionComponent
-              {...props}
-              {...formikProps}
-              formData={nestedFormData}
-              intl={intl}
-              onChange={onChange}
-            />
-          )
-        }}
-      </Formik>
-    )
+  const onChange = (values: EventState) => {
+    props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
-)
+  const user = useUserAddress()
+
+  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
+    ...mapFieldsToValues(props.fields, nestedFormData, { $user: user }),
+    ...props.initialValues
+  })
+
+  return (
+    <Formik<EventState>
+      enableReinitialize={true}
+      initialValues={initialValues}
+      initialTouched={initialTouchedFields}
+      validateOnMount={true}
+      validate={(values) =>
+        getValidationErrorsForForm(
+          props.fields,
+          makeFormikFieldIdsOpenCRVSCompatible(values)
+        )
+      }
+      onSubmit={() => {}}
+    >
+      {(formikProps) => {
+        useEffect(() => {
+          /**
+           * Because 'enableReinitialize' prop is set to 'true' above, whenver initialValue changes,
+           * formik lose track of touched fields. This is a workaround to save all the fields that
+           * have been touched for once during the form manipulation. So that we can show validation
+           * errors for all fields that have been touched.
+           */
+          if (
+            setAllTouchedFields &&
+            Object.keys(formikProps.touched).length > 0 &&
+            !isEqual(formikProps.touched, initialTouchedFields) &&
+            Object.keys(formikProps.touched).some(
+              (key) => !(key in initialTouchedFields)
+            )
+          ) {
+            setAllTouchedFields({
+              ...initialTouchedFields,
+              ...formikProps.touched
+            })
+          }
+        }, [formikProps.touched, initialTouchedFields, setAllTouchedFields])
+        return (
+          <FormSectionComponent
+            {...props}
+            {...formikProps}
+            formData={nestedFormData}
+            intl={intl}
+            onChange={onChange}
+          />
+        )
+      }}
+    </Formik>
+  )
+}
