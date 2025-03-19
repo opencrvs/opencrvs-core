@@ -17,7 +17,7 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { Output } from './Output'
 
 const meta: Meta<typeof Output> = {
-  title: 'Output',
+  title: 'Components/Output',
   component: Output,
   decorators: [
     (Story) => (

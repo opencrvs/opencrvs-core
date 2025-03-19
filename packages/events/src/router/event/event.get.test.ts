@@ -60,6 +60,13 @@ test('Returns event with all actions', async () => {
 
   await client.event.actions.declare(generator.event.actions.declare(event.id))
 
+  await client.event.actions.validate(
+    generator.event.actions.validate(event.id)
+  )
+
+  await client.event.actions.reject(generator.event.actions.reject(event.id))
+  await client.event.actions.archive(generator.event.actions.archive(event.id))
+
   await client.event.actions.register(
     generator.event.actions.register(event.id)
   )
@@ -76,9 +83,6 @@ test('Returns event with all actions', async () => {
       correctionRequest.id,
       correctionRequest.actions[correctionRequest.actions.length - 1].id
     )
-  )
-  await client.event.actions.validate(
-    generator.event.actions.validate(event.id)
   )
 
   const fetchedEvent = await client.event.get(event.id)
