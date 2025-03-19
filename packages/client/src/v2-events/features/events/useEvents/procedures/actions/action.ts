@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MutationObserverOptions, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
-import { TRPCClientErrorLike } from '@trpc/client'
 import {
   ActionType,
-  EventDocument,
   getActiveActionFields,
   stripHiddenFields
 } from '@opencrvs/commons/client'
@@ -213,27 +211,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   })
 
   return {
-    mutate: (
-      params: inferInput<P>,
-      options?: {
-        onSuccess?: (updatedDocument: EventDocument) => void
-        onError?: (
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          error: TRPCClientErrorLike<any>,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          variables: any,
-          context: unknown
-        ) => void
-        onSettled?: (
-          updatedDocument: EventDocument,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          error: TRPCClientErrorLike<any>,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          variables: any,
-          context: unknown
-        ) => void
-      }
-    ) => {
+    mutate: (params: inferInput<P>) => {
       const localEvent = findLocalEventData(params.eventId)
 
       const eventConfiguration = eventConfigurations.find(
@@ -244,24 +222,6 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         throw new Error('Event configuration not found')
       }
       const fields = getActiveActionFields(eventConfiguration, actionType)
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const overridenOptions: MutationObserverOptions<any, any, any, any> = {
-        ...allOptions,
-        onSuccess: async (data, variables, context) => {
-          await allOptions.onSuccess?.(data, variables, context)
-          options?.onSuccess?.(data)
-        },
-        onError: async (error, variables, context) => {
-          await allOptions.onError?.(error, variables, context)
-          options?.onError?.(error, variables, context)
-        },
-        onSettled: async (data, error, variables, context) => {
-          await allOptions.onSettled?.(data, error, variables, context)
-          options?.onSettled?.(data, error, variables, context)
-        }
-      }
-
       if (actionType === ActionType.NOTIFY) {
         /**
          * Because NOTIFY action is just an incomplete DECLARE action,
@@ -272,22 +232,16 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
           ActionType.DECLARE
         )
 
-        return mutation.mutate(
-          {
-            ...params,
-            data: stripHiddenFields(notifyFields, params.data)
-          },
-          overridenOptions
-        )
+        return mutation.mutate({
+          ...params,
+          data: stripHiddenFields(notifyFields, params.data)
+        })
       }
 
-      return mutation.mutate(
-        {
-          ...params,
-          data: stripHiddenFields(fields, params.data)
-        },
-        overridenOptions
-      )
+      return mutation.mutate({
+        ...params,
+        data: stripHiddenFields(fields, params.data)
+      })
     }
   }
 }
