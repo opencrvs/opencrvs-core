@@ -63,7 +63,7 @@ const testCases = [
   {
     currentValue: undefined,
     defaultValue: {
-      country: 'Farajaland',
+      country: 'FAR' as const,
       district: '$user.district',
       province: '$user.province',
       urbanOrRural: 'URBAN'
@@ -75,7 +75,7 @@ const testCases = [
       }
     },
     expected: {
-      country: 'Farajaland',
+      country: 'FAR' as const,
       district: 'Ibombo',
       province: 'Central',
       urbanOrRural: 'URBAN'
