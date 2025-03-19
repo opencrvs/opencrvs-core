@@ -99,7 +99,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
               description: 'The title for the address input'
             },
             defaultValue: {
-              country: 'FAR',
+              country: 'FAR' as const,
               province: '$user.province',
               district: '$user.district',
               urbanOrRural: 'URBAN'
@@ -210,7 +210,7 @@ export const AddressReviewUrban: StoryObj<typeof Review> = {
         eventConfig={eventConfig}
         form={{
           'applicant.address': {
-            country: 'FAR',
+            country: 'FAR' as const,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
             district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
             urbanOrRural: 'URBAN',
@@ -242,7 +242,7 @@ export const AddressReviewRural: StoryObj<typeof Review> = {
         eventConfig={eventConfig}
         form={{
           'applicant.address': {
-            country: 'FAR',
+            country: 'FAR' as const,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
             district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
             urbanOrRural: 'RURAL',
@@ -270,7 +270,7 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
         eventConfig={eventConfig}
         form={{
           'applicant.address': {
-            country: 'FAR',
+            country: 'FAR' as const,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
           } as AddressFieldValue
         }}
@@ -315,7 +315,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
         eventConfig={eventConfig}
         form={{
           'applicant.address': {
-            country: 'FAR',
+            country: 'FAR' as const,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
             district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
             urbanOrRural: 'URBAN',
@@ -329,7 +329,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
         formConfig={declarationForm}
         previousFormValues={{
           'applicant.address': {
-            country: 'FAR',
+            country: 'FAR' as const,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
             district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
             urbanOrRural: 'RURAL',
@@ -356,7 +356,7 @@ export const AddressInCopy: StoryObj<typeof Review> = {
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
     const FORM_DATA = {
       'applicant.address': {
-        country: 'FAR',
+        country: 'FAR' as const,
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
         urbanOrRural: 'URBAN' as const,

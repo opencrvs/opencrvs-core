@@ -21,7 +21,7 @@ test('Returns empty list when no events match search criteria', async () => {
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -56,7 +56,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -70,7 +70,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -84,7 +84,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -133,7 +133,7 @@ test('Returns events that match date of birth of applicant', async () => {
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -147,7 +147,7 @@ test('Returns events that match date of birth of applicant', async () => {
     'applicant.dob': '2000-01-12', // different dob
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -189,7 +189,7 @@ test('Does not return events when searching with a similar but different date of
     'applicant.dob': '2024-11-11',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -203,7 +203,7 @@ test('Does not return events when searching with a similar but different date of
     'applicant.dob': '2024-12-12',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,

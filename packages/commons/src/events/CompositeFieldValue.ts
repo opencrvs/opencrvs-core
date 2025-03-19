@@ -77,7 +77,7 @@ export const AddressFieldValue = z
   .or(GenericAddressValue)
 
 export const GenericAddressUpdateValue = z.object({
-  country: z.string(),
+  country: z.string().refine((value) => value !== 'FAR'),
   state: z.string(),
   district2: z.string(),
   cityOrTown: z.string().optional().nullish(),

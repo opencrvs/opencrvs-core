@@ -64,7 +64,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
       'applicant.surname': 'Doe',
       'recommender.none': true,
       'applicant.address': {
-        country: 'FAR',
+        country: 'FAR' as const,
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
         urbanOrRural: 'RURAL' as const,
@@ -88,7 +88,7 @@ test('Skips required field validation when they are conditionally hidden', async
     'applicant.surname': 'Doe',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -119,7 +119,7 @@ test('Prevents adding birth date in future', async () => {
     'applicant.surname': 'Doe',
     'recommender.none': true,
     'applicant.address': {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,

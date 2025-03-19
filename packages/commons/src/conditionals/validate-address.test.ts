@@ -22,7 +22,7 @@ const testCases = [
   {
     title: 'Valid FAR address',
     address: {
-      country: 'FAR',
+      country: 'FAR' as const,
       province: 'sadsad-sadsad-sadsadsd-sdsdsd',
       district: 'gdgfhdfg-wwqret-dfgfgsd-ewrew',
       urbanOrRural: 'URBAN'
