@@ -32,7 +32,7 @@ const messages = {
  * @param acceptedFileTypes Array of accepted file types
  * @param onComplete Callback function to be called when file upload is complete
  * @param onUploadingStateChanged @todo: ask what this is
- * @maxFileSize Maximum file size in bytes
+ * @param maxFileSize Maximum file size in bytes
  *
  * @returns Given configuration for file upload, returns a function that handles file change with possible error
  */
