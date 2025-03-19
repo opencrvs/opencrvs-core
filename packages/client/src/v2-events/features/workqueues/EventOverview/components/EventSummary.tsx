@@ -53,17 +53,17 @@ function getDefaultFields(
     {
       id: 'trackind-id',
       label: {
-        id: 'v2.event.summary.trackindId.label',
+        id: 'v2.event.summary.trackingId.label',
         defaultMessage: 'Tracking ID',
         description: 'Tracking id label'
       },
       emptyValueMessage: {
-        id: 'v2.event.summary.trackindId.empty',
+        id: 'v2.event.summary.trackingId.empty',
         defaultMessage: 'No tracking ID',
         description: 'No tracking ID message'
       },
       value: {
-        id: 'v2.event.summary.trackindId.value',
+        id: 'v2.event.summary.trackingId.value',
         defaultMessage: '{event.trackingId}',
         description: 'Tracking id value'
       }
