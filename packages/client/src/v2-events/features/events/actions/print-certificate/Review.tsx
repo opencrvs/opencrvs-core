@@ -140,7 +140,7 @@ export function Review() {
   const isOnline = useOnlineStatus()
   const [modal, openModal] = useModal()
 
-  const { getEvent, actions } = useEvents()
+  const { getEvent, onlineActions } = useEvents()
   const [fullEvent] = getEvent.useSuspenseQuery(eventId)
 
   const userIds = getUserIdsFromActions(fullEvent.actions)
@@ -230,25 +230,22 @@ export function Review() {
     ))
 
     if (confirmed) {
-      actions.printCertificate.mutate(
-        {
+      try {
+        const response = await onlineActions.printCertificate.mutateAsync({
           eventId: fullEvent.id,
           data: { ...formValues, templateId },
           transactionId: uuid(),
           type: ActionType.PRINT_CERTIFICATE
-        },
-        {
-          onSuccess: () => {
-            handleCertify?.()
-            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-          },
-          onError: (error) => {
-            // TODO: add notification alert
-            // eslint-disable-next-line no-console
-            console.error(error.message)
-          }
+        })
+        if (response) {
+          handleCertify?.()
+          navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
         }
-      )
+      } catch (error) {
+        // TODO: add notification alert
+        // eslint-disable-next-line no-console
+        console.error(error)
+      }
     }
   }
 

@@ -19,6 +19,7 @@ import { useDeleteEvent } from './procedures/delete'
 import {
   customMutationKeys,
   useEventAction,
+  useEventAsyncAction,
   useEventCustomAction
 } from './procedures/actions/action'
 
@@ -78,12 +79,14 @@ export function useEvents() {
       notify: useEventAction(trpc.event.actions.notify),
       declare: useEventAction(trpc.event.actions.declare),
       register: useEventAction(trpc.event.actions.register),
-      printCertificate: useEventAction(trpc.event.actions.printCertificate),
       correction: {
         request: useEventAction(trpc.event.actions.correction.request),
         approve: useEventAction(trpc.event.actions.correction.approve),
         reject: useEventAction(trpc.event.actions.correction.reject)
       }
+    },
+    onlineActions: {
+      printCertificate: useEventAsyncAction(trpc.event.actions.printCertificate)
     },
     customActions: {
       registerOnDeclare: useEventCustomAction([
