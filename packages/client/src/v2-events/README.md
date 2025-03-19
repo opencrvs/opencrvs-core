@@ -40,6 +40,17 @@ By default, Events V2 is accessible via the /v2 route, allowing the applicationâ
 - Use constants through object pattern. e.g.`ActionType.DECLARE` over `'DECLARE'`. In most situations, it does not matter. However, changing the names will get much easier.
 - When building new features, prefer to import them through `index.ts`. Managing imports will be cleaner and easier that way. See (`/layouts`)
 
+## Writing tests using Storybook and Chromatic
+
+- Chromatic does visual testing against the storybook library. Each view should have a visual test attached to it.
+- When building more elaborate test cases, use [storybook interaction tests](https://storybook.js.org/docs/writing-tests/component-testing#write-a-component-test)
+
+Example 1, visual regression test without interactions: `features/events/actions/declare/Review.stories.tsx`
+Example 2, testing interactions in view: `features/events/actions/declare/Review.interaction.stories.tsx`
+
+Interaction tests should be excluded from chromatic test cases. They are run on a separate CI step.
+Exclude test by adding `parameters.chromatic.disableSnapshot: true` property to story until we come up with proper process.
+
 ### Fetching data from backend
 
 - All data should be fetched using useMutation or useSuspenseQuery from TanStack Query. If you define a completely new (non-tRPC) query or mutation, use `queryClient.setMutationDefaults({ mutationFn: <operation> })` or `queryClient.setQueryDefaults({ queryFn: <operation> })` to define the data fetcher method. This ensures that TanStack Query knows how to call your function even when the request is first serialized into the local cache and executed later.

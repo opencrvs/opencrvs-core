@@ -13,6 +13,7 @@ import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
+  ActionType,
   Draft,
   getCurrentEventState,
   tennisClubMembershipEvent
@@ -23,7 +24,7 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {
-  title: 'Declare'
+  title: 'Declare/Interaction'
 }
 
 export default meta
@@ -42,30 +43,10 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const undeclaredDraftEvent = {
   ...tennisClubMembershipEventDocument,
   actions: tennisClubMembershipEventDocument.actions.filter(
-    ({ type }) => type === 'CREATE'
+    ({ type }) => type === ActionType.CREATE
   )
 }
 
-export const Page: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-        eventId: undeclaredDraftEvent.id,
-        pageId: 'applicant'
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return undeclaredDraftEvent
-          })
-        ]
-      }
-    }
-  }
-}
 const spy = fn()
 export const SaveAndExit: Story = {
   parameters: {
@@ -168,6 +149,7 @@ export const DraftShownInForm: Story = {
         pageId: 'applicant'
       })
     },
+    chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
         drafts: createDraftHandlers(),
@@ -271,7 +253,8 @@ export const FilledPagesVisibleInReview: Story = {
           })
         ]
       }
-    }
+    },
+    chromatic: { disableSnapshot: true }
   }
 }
 
@@ -357,6 +340,7 @@ export const CanSubmitValidlyFilledForm: Story = {
           })
         ]
       }
-    }
+    },
+    chromatic: { disableSnapshot: true }
   }
 }
