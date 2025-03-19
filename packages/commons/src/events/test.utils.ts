@@ -230,6 +230,8 @@ export function generateActionDocument({
   defaults?: Partial<ActionDocument>
 }): ActionDocument {
   const actionBase = {
+    // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
+    // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
     id: getUUID(),
@@ -291,8 +293,12 @@ export function generateEventDocument({
     actions: actions.map((action) =>
       generateActionDocument({ configuration, action })
     ),
+    // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
+    // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 1000).toISOString(),
     id: getUUID(),
+    // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
+    // @TODO: This should be fixed in the future.
     updatedAt: new Date(Date.now() - 1000).toISOString()
   }
 }

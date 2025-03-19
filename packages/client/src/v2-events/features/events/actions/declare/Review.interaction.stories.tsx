@@ -36,7 +36,7 @@ const declareEventDocument = generateEventDocument({
 })
 
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Declare/Review/Interaction',
+  title: 'Declare/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
       formValues: getCurrentEventState(declareEventDocument).data

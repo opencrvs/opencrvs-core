@@ -261,9 +261,13 @@ export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
   const lastAction = actions[actions.length - 1]
-  return drafts
-    .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
-    .filter(({ eventId }) => eventId === event.id)
+  return (
+    drafts
+      // Temporally allows equal timestamps as the generated demo data is not perfect yet
+      // should be > rather than >=
+      .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
+      .filter(({ eventId }) => eventId === event.id)
+  )
 }
 
 export function createEmptyDraft(
