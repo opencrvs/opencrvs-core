@@ -20,6 +20,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   EventConfig,
+  EventIndex,
   getCurrentEventStateWithDrafts,
   getMetadataForAction
 } from '@opencrvs/commons/client'
@@ -34,11 +35,13 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
-const EventConfigurationContext = createContext<EventConfig | null>(null)
+const CurrentEventContext = createContext<{
+  config: EventConfig | null
+  event: EventIndex | null
+}>({ config: null, event: null })
 
-// Custom hook for easier access
-export const useEventConfigurationContext = () => {
-  return useContext(EventConfigurationContext)
+export function useCurrentEventContext() {
+  return useContext(CurrentEventContext)
 }
 
 type Props = PropsWithChildren<{ type: ActionType }>
@@ -155,9 +158,11 @@ function ActionComponent({ children, type }: Props) {
   }, [])
 
   return (
-    <EventConfigurationContext.Provider value={eventConfiguration}>
+    <CurrentEventContext.Provider
+      value={{ config: eventConfiguration, event: eventDataWithDrafts }}
+    >
       <NavigationStack>{children}</NavigationStack>
-    </EventConfigurationContext.Provider>
+    </CurrentEventContext.Provider>
   )
 }
 

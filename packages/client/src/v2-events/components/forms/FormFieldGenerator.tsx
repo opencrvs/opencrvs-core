@@ -90,7 +90,7 @@ import { Address } from '@client/v2-events/features/events/registered-fields/Add
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
-
+import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -498,6 +498,7 @@ type AllProps = ExposedProps &
   IntlShapeProps &
   FormikProps<EventState> & {
     className?: string
+    eventData: EventState
   }
 
 class FormSectionComponent extends React.Component<AllProps> {
@@ -604,7 +605,8 @@ class FormSectionComponent extends React.Component<AllProps> {
       fields: fieldsWithDotIds,
       touched,
       intl,
-      className
+      className,
+      eventData
     } = this.props
 
     const language = this.props.intl.locale
@@ -634,11 +636,13 @@ class FormSectionComponent extends React.Component<AllProps> {
             valuesWithFormattedDate
           )
 
-          if (!isFieldVisible(field, formData)) {
+          const allData = { ...formData, ...eventData }
+
+          if (!isFieldVisible(field, allData)) {
             return null
           }
 
-          const isDisabled = !isFieldEnabled(field, formData)
+          const isDisabled = !isFieldEnabled(field, allData)
 
           return (
             <FormItem
@@ -658,7 +662,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                       disabled={isDisabled}
                       error={isDisabled ? '' : error}
                       fields={fields}
-                      formData={formData}
+                      formData={allData}
                       touched={touched[field.id] ?? false}
                       values={values}
                       onUploadingStateChanged={
@@ -715,6 +719,8 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     ...props.initialValues
   })
 
+  const { event } = useCurrentEventContext()
+
   return (
     <Formik<EventState>
       enableReinitialize={true}
@@ -735,6 +741,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
             formData={nestedFormData}
             intl={intl}
             onChange={onChange}
+            eventData={event?.data ?? {}}
           />
         )
       }}

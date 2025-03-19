@@ -17,7 +17,7 @@ import {
   ActionType,
   findActiveActionFormFields
 } from '@opencrvs/commons/client'
-import { useEventConfigurationContext } from '@client/v2-events/features/events/components/Action'
+import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
 const Container = styled.div`
@@ -49,18 +49,17 @@ const Container = styled.div`
 
 function DataInput({
   configuration,
-  formData,
-  label
+  formData
 }: FieldProps<'DATA'> & { formData: EventState }) {
   const intl = useIntl()
-  const eventConfiguration = useEventConfigurationContext()
+  const { config } = useCurrentEventContext()
 
-  if (!eventConfiguration) {
+  if (!config) {
     throw new Error('Event configuration not found')
   }
 
   const declareFormFields = findActiveActionFormFields(
-    eventConfiguration,
+    config,
     ActionType.DECLARE
   )
 
@@ -68,13 +67,14 @@ function DataInput({
     throw new Error('Declare form fields not found')
   }
 
-  const { data, subtitle } = configuration
+  const { title, data, subtitle } = configuration
 
-  const labelMessage = intl.formatMessage(label)
+  console.log('data', data)
+  console.log('formData', formData)
 
   return (
     <Container>
-      {labelMessage && <h4>{labelMessage}</h4>}
+      {title && <h4>{intl.formatMessage(title)}</h4>}
       {subtitle && <h5>{intl.formatMessage(subtitle)}</h5>}
       <div>
         {data.map((item) => {

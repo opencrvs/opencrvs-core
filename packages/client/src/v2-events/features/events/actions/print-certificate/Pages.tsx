@@ -47,6 +47,7 @@ export function Pages() {
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
+  // TODO CIHAN: use this from react context?
   const event = events.getEventState.useSuspenseQuery(eventId)
 
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
