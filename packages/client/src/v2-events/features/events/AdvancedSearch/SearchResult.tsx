@@ -14,7 +14,6 @@ import styled, { useTheme } from 'styled-components'
 import { Link } from 'react-router-dom'
 import { mapKeys } from 'lodash'
 import {
-  getAllFields,
   defaultColumns,
   EventIndex,
   EventConfig,

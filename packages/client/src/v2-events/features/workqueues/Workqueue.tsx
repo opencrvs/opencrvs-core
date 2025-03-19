@@ -23,7 +23,6 @@ import {
   defaultColumns,
   EventConfig,
   EventIndex,
-  getAllFields,
   getOrThrow,
   RootWorkqueueConfig,
   workqueues
