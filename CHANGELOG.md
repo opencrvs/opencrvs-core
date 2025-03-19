@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.7.1 Release candidate
+
 ## 1.7.0 Release candidate
 
 ### Breaking changes
@@ -197,7 +199,7 @@
 - **Check your Metabase map file.** For Metabase configuration, we renamed `farajaland-map.geojson` to `map.geojson` to not tie implementations into example country naming conventions.
 - **Feature flags** In order to make application config settings more readable, we re-organised `src/api/application/application-config-default.ts` with a clear feature flag block like so. These are then used across the front and back end of the application to control configurable functionality. New feature flags DEATH_REGISTRATION allow you to optionally run off death registration if your country doesnt want to run its first pilot including death and PRINT_DECLARATION (see New Features) have been added.
   `FEATURES: {
-  DEATH_REGISTRATION: true, 
+  DEATH_REGISTRATION: true,
   MARRIAGE_REGISTRATION: false,
   ...
 } `
