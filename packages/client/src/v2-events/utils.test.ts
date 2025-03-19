@@ -63,7 +63,7 @@ const testCases = [
   {
     currentValue: undefined,
     defaultValue: {
-      country: window.config.COUNTRY || ('FAR' as const),
+      country: window.config.COUNTRY || ('BGD' as const),
       district: '$user.district',
       province: '$user.province',
       urbanOrRural: 'URBAN'
@@ -75,7 +75,7 @@ const testCases = [
       }
     },
     expected: {
-      country: window.config.COUNTRY || ('FAR' as const),
+      country: window.config.COUNTRY || ('BGD' as const),
       district: 'Ibombo',
       province: 'Central',
       urbanOrRural: 'URBAN'
