@@ -12,10 +12,10 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
-  EventState,
   FieldProps,
   ActionType,
-  findActiveActionFormFields
+  findActiveActionFormFields,
+  FieldValue
 } from '@opencrvs/commons/client'
 import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -50,7 +50,7 @@ const Container = styled.div`
 function DataInput({
   configuration,
   value
-}: FieldProps<'DATA'> & { value: EventState }) {
+}: FieldProps<'DATA'> & { value: Record<string, FieldValue> }) {
   const intl = useIntl()
   const { config } = useCurrentEventContext()
 

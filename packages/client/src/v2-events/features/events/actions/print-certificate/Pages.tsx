@@ -9,30 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { useIntl } from 'react-intl'
 import {
   ActionType,
   getActiveActionFormPages,
   isFieldVisible
 } from '@opencrvs/commons/client'
+
 import { Print } from '@opencrvs/components/lib/icons'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormLayout } from '@client/v2-events/layouts'
-import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { InputField } from '@client/components/form/InputField'
-import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
+import {
+  CERT_TEMPLATE_ID,
+  useCertificateTemplateSelectorFieldConfig
+} from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -41,8 +40,6 @@ export function Pages() {
   const [searchParams] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES
   )
-  const [templateId, setTemplateId] = useState<string>()
-  const intl = useIntl()
   const navigate = useNavigate()
   const { modal } = useEventFormNavigation()
   const { setMetadata, getMetadata } = useEventMetadata()
@@ -91,7 +88,8 @@ export function Pages() {
     Boolean(metadata[field.id])
   )
 
-  const isTemplateSelected = Boolean(templateId)
+  const isTemplateSelected = Boolean(metadata[CERT_TEMPLATE_ID])
+
   return (
     <FormLayout
       appbarIcon={<Print />}
@@ -101,7 +99,19 @@ export function Pages() {
       <PagesComponent
         disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
         form={metadata}
-        formPages={formPages}
+        formPages={formPages.map((page) => {
+          if (formPages[0].id === page.id) {
+            page = {
+              ...page,
+              fields: [
+                // hard coded certificate template selector form field
+                certTemplateFieldConfig,
+                ...page.fields
+              ]
+            }
+          }
+          return page
+        })}
         pageId={currentPageId}
         setFormData={(data) => setMetadata(data)}
         showReviewButton={searchParams.from === 'review'}
@@ -117,42 +127,11 @@ export function Pages() {
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
               { eventId },
-              { templateId }
+              { templateId: String(metadata[CERT_TEMPLATE_ID]) }
             )
           )
         }}
-      >
-        {(page) => (
-          // hard coded certificate template selector form field
-          <>
-            {formPages[0].id === currentPageId && (
-              <InputField
-                id={certTemplateFieldConfig.id}
-                label={intl.formatMessage(certTemplateFieldConfig.label)}
-                required={true}
-                touched={false}
-              >
-                <Select.Input
-                  id={certTemplateFieldConfig.id}
-                  label={certTemplateFieldConfig.label}
-                  options={certTemplateFieldConfig.options}
-                  type="SELECT"
-                  value={templateId}
-                  onChange={(val: string) => setTemplateId(val)}
-                />
-              </InputField>
-            )}
-            <FormFieldGenerator
-              fields={page.fields}
-              formData={metadata}
-              id="locationForm"
-              initialValues={metadata}
-              setAllFieldsDirty={false}
-              onChange={setMetadata}
-            />
-          </>
-        )}
-      </PagesComponent>
+      />
     </FormLayout>
   )
 }

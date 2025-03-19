@@ -23,7 +23,6 @@ import {
   defaultColumns,
   EventConfig,
   EventIndex,
-  getAllFields,
   getOrThrow,
   RootWorkqueueConfig,
   workqueues
@@ -47,7 +46,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { WQContentWrapper } from './components/ContentWrapper'
@@ -215,10 +213,7 @@ function Workqueue({
 
       const title = flattenedIntl.formatMessage(
         eventConfig.summary.title.label,
-        {
-          ...setEmptyValuesForFields(getAllFields(eventConfig)),
-          ...flattenEventIndex(event)
-        }
+        flattenEventIndex(event)
       )
 
       const TitleColumn =

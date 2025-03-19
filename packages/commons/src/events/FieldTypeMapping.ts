@@ -53,7 +53,6 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue
 } from './CompositeFieldValue'
-import { EventState } from './ActionDocument'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -186,6 +185,54 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
       return null
     case FieldType.DATA:
       return {}
+  }
+}
+
+/**
+ * Maps complex or nested field types, such as Address fields, to their corresponding empty values.
+ */
+export function mapFieldTypeToEmptyValue(field: FieldConfig) {
+  switch (field.type) {
+    case FieldType.DIVIDER:
+    case FieldType.TEXT:
+    case FieldType.TEXTAREA:
+    case FieldType.BULLET_LIST:
+    case FieldType.PAGE_HEADER:
+    case FieldType.LOCATION:
+    case FieldType.SELECT:
+    case FieldType.COUNTRY:
+    case FieldType.RADIO_GROUP:
+    case FieldType.SIGNATURE:
+    case FieldType.PARAGRAPH:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
+    case FieldType.NUMBER:
+    case FieldType.EMAIL:
+    case FieldType.DATE:
+    case FieldType.CHECKBOX:
+    case FieldType.DATA:
+      return null
+    case FieldType.ADDRESS:
+      return {
+        country: null,
+        province: null,
+        district: null,
+        urbanOrRural: 'URBAN', // Default to urban needed for validation
+        town: null,
+        residentialArea: null,
+        street: null,
+        number: null,
+        zipCode: null
+      }
+    case FieldType.FILE:
+      return {
+        filename: '',
+        originalFilename: '',
+        type: ''
+      } satisfies FileFieldValue
+    case FieldType.FILE_WITH_OPTIONS:
+      return [] satisfies FileFieldWithOptionValue
   }
 }
 
