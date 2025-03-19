@@ -1236,6 +1236,26 @@ export const tennisClubMembershipEvent = defineConfig({
           })
         }
       ]
+    },
+    {
+      type: ActionType.ARCHIVE,
+      label: {
+        id: 'v2.event.tennis-club-membership.action.archive.label',
+        defaultMessage: 'Archive',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      forms: [TENNIS_CLUB_FORM]
+    },
+    {
+      type: ActionType.REJECT,
+      label: {
+        id: 'v2.event.tennis-club-membership.action.reject.label',
+        defaultMessage: 'Reject',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      forms: [TENNIS_CLUB_FORM]
     }
   ],
   advancedSearch: [
