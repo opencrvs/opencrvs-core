@@ -39,7 +39,6 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -82,6 +81,21 @@ function ContinueButton({
         : intl.formatMessage(buttonMessages.sendForApproval)}
     </Button>
   )
+}
+
+/**
+ * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
+ * For setting default fields for form values @see setFormValueToOutputFormat
+ *
+ * @returns object based on the fields given with null values.
+ */
+function setEmptyValuesForFields(fields: FieldConfig[]) {
+  return fields.reduce((initialValues: Record<string, null>, field) => {
+    return {
+      ...initialValues,
+      [field.id]: null
+    }
+  }, {})
 }
 
 export function Summary() {

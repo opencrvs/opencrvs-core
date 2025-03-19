@@ -44,7 +44,7 @@ const mockFormData = {
 }
 
 const meta: Meta<typeof Review.Body> = {
-  title: 'Review',
+  title: 'Components/Review',
   component: Review.Body,
   args: {
     eventConfig: tennisClubMembershipEvent,

@@ -12,12 +12,13 @@
 import { FieldType } from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
+export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
   eventType: string
 ) => {
   const { certificateTemplates } = useAppConfig()
   return {
-    id: 'templateId',
+    id: CERT_TEMPLATE_ID,
     type: FieldType.SELECT,
     required: true,
     label: {

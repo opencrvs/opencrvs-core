@@ -24,7 +24,7 @@
     "build-storybook": "storybook build",
     "test-storybook": "test-storybook",
     "test-storybook:watch": "test-storybook --watch",
-    "chromatic": "chromatic --onlyChanged --exitZeroOnChanged"
+    "chromatic": "chromatic --exit-zero-on-changes --only-changed"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -38,6 +38,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.0",
     "@craco/craco": "^6.4.3",
+    "@formatjs/icu-messageformat-parser": "2.1.0",
     "@opencrvs/commons": "^1.7.0",
     "@opencrvs/components": "^1.7.0",
     "@opencrvs/gateway": "^1.7.0",

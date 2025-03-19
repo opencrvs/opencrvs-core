@@ -19,7 +19,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
 
   await expect(
     client.event.actions.reject(
-      generator.event.actions.reject('event-test-id-12345', {})
+      generator.event.actions.reject('event-test-id-12345')
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
@@ -30,7 +30,7 @@ test(`allows access if required scope is present`, async () => {
 
   await expect(
     client.event.actions.reject(
-      generator.event.actions.reject('event-test-id-12345', {})
+      generator.event.actions.reject('event-test-id-12345')
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
