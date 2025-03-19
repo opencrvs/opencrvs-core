@@ -95,8 +95,7 @@ export function validateAction(actionType: ActionType) {
       ) => {
         const value = data[field]
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (value === null || value === undefined) {
+        if (typeof value !== 'boolean') {
           return [
             ...errorResults,
             { message: 'Field is required', id: field, value }
