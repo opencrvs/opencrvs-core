@@ -62,6 +62,26 @@ function convertDotInCurlyBraces(str: string): string {
 const EMPTY_TOKEN = '__EMPTY__'
 
 /**
+ * Flattens a nested object into a single-level object.
+ */
+function flattenNestedObject(
+  obj: Record<string, string>,
+  prefix = ''
+): Record<string, string> {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    const newKey = prefix ? `${prefix}.${key}` : key
+
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      Object.assign(acc, flattenNestedObject(value, newKey))
+    } else {
+      acc[newKey] = value
+    }
+
+    return acc
+  }, {} as Record<string, string>)
+}
+
+/**
  * intl with formatMessage that supports "flat object" dot notation in the message.
  *
  * @example intl.formatMessage(`string {with.nested.value}`, {
@@ -74,7 +94,9 @@ export function useIntlFormatMessageWithFlattenedParams() {
     message: MessageDescriptor,
     params?: T
   ): string {
-    const variables = convertDotToTripleUnderscore(params ?? {})
+    // Flatten the params to ensure all nested properties are accessible with dot notation
+    const flattenedParams = flattenNestedObject(params ?? {})
+    const variables = convertDotToTripleUnderscore(flattenedParams)
 
     const originalMessage =
       intl.messages[message.id as keyof typeof intl.messages] ||
