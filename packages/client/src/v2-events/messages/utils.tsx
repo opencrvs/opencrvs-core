@@ -39,7 +39,7 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
     } else if (typeof value === 'object' && value !== null) {
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {
-      result[newKey] = value
+      result[newKey] = !value ? EMPTY_TOKEN : value
     }
   }
 
@@ -122,7 +122,7 @@ export function useIntlFormatMessageWithFlattenedParams() {
     }
     // When multiple variables are provided, we trim to ensure empty content in case both are missing.
     // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
-    return formatted.trim()
+    return formatted.trim().replaceAll(EMPTY_TOKEN, '')
   }
 
   // Format the translation with values from data.
@@ -150,7 +150,6 @@ export function useIntlFormatMessageWithFlattenedParams() {
       }),
       {}
     )
-
     return formatMessage(translationConfig, keyValues)
   }
 
