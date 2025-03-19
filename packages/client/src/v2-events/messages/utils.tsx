@@ -9,9 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { MessageDescriptor, MessageFormatElement, useIntl } from 'react-intl'
 import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
-import { isArgumentElement, parse } from '@formatjs/icu-messageformat-parser'
+import {
+  isArgumentElement,
+  isSelectElement,
+  parse
+} from '@formatjs/icu-messageformat-parser'
 import { EventState } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
@@ -62,6 +66,20 @@ function convertDotInCurlyBraces(str: string): string {
 // The __EMPTY__ is our common token for missing values, that can be used when configuring a message.
 const EMPTY_TOKEN = '__EMPTY__'
 
+function getVariablesFromElement(element: MessageFormatElement): string[] {
+  if (isArgumentElement(element)) {
+    return [element.value]
+  }
+  if (isSelectElement(element)) {
+    return [element.value].concat(
+      Object.values(element.options)
+        .flatMap((el) => el.value)
+        .flatMap((el) => getVariablesFromElement(el))
+    )
+  }
+  return []
+}
+
 /**
  * intl with formatMessage that supports "flat object" dot notation in the message.
  *
@@ -93,9 +111,11 @@ export function useIntlFormatMessageWithFlattenedParams() {
     }
 
     const defaultMessage = convertDotInCurlyBraces(originalMessage)
-    const variablesInMessage = parse(defaultMessage).filter(isArgumentElement)
+    const variablesInMessage = parse(defaultMessage).flatMap(
+      getVariablesFromElement
+    )
     const variablesWithEmptyValues = Object.fromEntries(
-      variablesInMessage.map((variable) => [variable.value, EMPTY_TOKEN])
+      variablesInMessage.map((variable) => [variable, EMPTY_TOKEN])
     )
 
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
