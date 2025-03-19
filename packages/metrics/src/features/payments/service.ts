@@ -49,7 +49,7 @@ export async function getTotalPaymentsByLocation(
   locationId: ResourceIdentifier<Location>,
   eventType: EVENT_TYPE
 ) {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
 
   const batchQuery = async (locationIds: string[]) => {
     const [officeLocationInChildren, locationPlaceholders] = helpers.in(
