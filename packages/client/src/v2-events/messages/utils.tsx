@@ -14,6 +14,7 @@ import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
 import {
   isArgumentElement,
   isSelectElement,
+  isPluralElement,
   parse
 } from '@formatjs/icu-messageformat-parser'
 import { EventState } from '@opencrvs/commons/client'
@@ -76,6 +77,12 @@ function getVariablesFromElement(element: MessageFormatElement): string[] {
         .flatMap((el) => el.value)
         .flatMap((el) => getVariablesFromElement(el))
     )
+  }
+
+  if (isPluralElement(element)) {
+    return Object.values(element.options)
+      .flatMap((el) => el.value)
+      .flatMap((el) => getVariablesFromElement(el))
   }
   return []
 }
