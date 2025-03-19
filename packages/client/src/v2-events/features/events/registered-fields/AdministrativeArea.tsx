@@ -72,7 +72,7 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
 
 function useStringifier() {
   const locations = useSelector(getLocations)
-  return (value: string) => (value ? locations[value].name : undefined)
+  return (value: string) => (value ? locations[value].name : '__EMPTY__')
 }
 
 export const AdministrativeArea = {
