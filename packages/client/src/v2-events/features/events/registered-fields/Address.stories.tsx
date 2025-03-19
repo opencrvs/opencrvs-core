@@ -18,6 +18,7 @@ import styled from 'styled-components'
 import {
   ActionType,
   EventConfig,
+  FieldType,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AddressFieldValue } from '@opencrvs/commons'
@@ -57,7 +58,7 @@ export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
         fields={[
           {
             id: 'storybook.address',
-            type: 'ADDRESS',
+            type: FieldType.ADDRESS,
             label: {
               id: 'storybook.address.label',
               defaultMessage: 'Address',
@@ -168,7 +169,7 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
         fields={[
           {
             id: 'storybook.address',
-            type: 'ADDRESS',
+            type: FieldType.ADDRESS,
             label: {
               id: 'storybook.address.label',
               defaultMessage: 'Address',

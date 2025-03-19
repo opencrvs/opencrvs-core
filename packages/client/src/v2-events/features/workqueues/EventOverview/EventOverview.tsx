@@ -23,10 +23,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
-import {
-  useEventConfiguration,
-  useEventConfigurations
-} from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -34,7 +31,10 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getUserIdsFromActions } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUserIdsFromActions
+} from '@client/v2-events/utils'
 import {
   RecursiveStringRecord,
   useFormDataStringifier
@@ -56,22 +56,15 @@ function EventOverviewContainer() {
   const { getRemoteDrafts } = useDrafts()
   const { getUsers } = useUsers()
 
-  const configs = useEventConfigurations()
-
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
   const drafts = getRemoteDrafts()
 
+  const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
   const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
-
-  const config = configs.find((c) => c.id === event.type)
 
   const userIds = getUserIdsFromActions(fullEvent.actions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
-
-  if (!config) {
-    return null
-  }
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
@@ -111,7 +104,8 @@ function EventOverview({
     FieldValue | null | RecursiveStringRecord
   > = {
     ...emptyEvent,
-    ...eventWithDefaults
+    ...eventWithDefaults,
+    ...flattenEventIndex(event)
   }
 
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)

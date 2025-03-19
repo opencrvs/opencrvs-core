@@ -19,8 +19,7 @@ import {
   FieldConfig,
   FieldType,
   FieldUpdateValue,
-  FileFieldValue,
-  isUndeclaredDraft
+  FileFieldValue
 } from '@opencrvs/commons/events'
 import {
   getActionFormFields,
@@ -86,7 +85,12 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  const hasNonDeletableActions = !isUndeclaredDraft(event)
+  /**
+   * Once an event is declared, it cannot be removed anymore.
+   */
+  const hasNonDeletableActions = event.actions.some(
+    (action) => action.type !== ActionType.CREATE
+  )
 
   if (hasNonDeletableActions) {
     throw new TRPCError({
@@ -275,7 +279,7 @@ export async function addAction(
     }
   }
 
-  if (input.type === ActionType.ARCHIVED && input.metadata?.isDuplicate) {
+  if (input.type === ActionType.ARCHIVE && input.metadata?.isDuplicate) {
     input.transactionId = getUUID()
     await db.collection<EventDocument>('events').updateOne(
       {

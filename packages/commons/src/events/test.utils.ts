@@ -13,7 +13,7 @@ import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import { ActionBase, ActionDocument } from './ActionDocument'
 import {
-  ArchivedActionInput,
+  ArchiveActionInput,
   DeclareActionInput,
   RegisterActionInput,
   RejectDeclarationActionInput,
@@ -111,10 +111,10 @@ export const eventPayloadGenerator = {
     }),
     archive: (
       eventId: string,
-      input: Partial<Pick<ArchivedActionInput, 'transactionId' | 'data'>> = {},
+      input: Partial<Pick<ArchiveActionInput, 'transactionId' | 'data'>> = {},
       isDuplicate?: boolean
     ) => ({
-      type: ActionType.ARCHIVED,
+      type: ActionType.ARCHIVE,
       transactionId: input.transactionId ?? getUUID(),
       data: input.data ?? {},
       metadata: { isDuplicate: isDuplicate ?? false },
@@ -244,7 +244,7 @@ export function generateActionDocument({
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
-    case ActionType.ARCHIVED:
+    case ActionType.ARCHIVE:
       return { ...actionBase, type: action }
     case ActionType.REJECT:
       return { ...actionBase, type: action }
