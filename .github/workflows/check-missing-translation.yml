@@ -50,7 +50,7 @@ jobs:
       - name: Clone the Core repository and Check for missing translation
         run: |
           cd $HOME/core
-          acting_branch=${{steps.set_branch.outputs.working_branch}}
+          acting_branch=${{github.head_ref}}
           echo "Acting Branch: $acting_branch"
           export COUNTRY_CONFIG_PATH=${{steps.set_branch.outputs.countryconfig_path}}
           git clone  https://github.com/opencrvs/opencrvs-core.git
