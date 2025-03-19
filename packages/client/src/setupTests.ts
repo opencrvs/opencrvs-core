@@ -41,7 +41,7 @@ const config = {
     LATE_REGISTRATION_TARGET: 365,
     PRINT_IN_ADVANCE: true
   },
-  COUNTRY: 'BGD',
+  COUNTRY: 'FAR',
   CURRENCY: {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
