@@ -310,9 +310,12 @@ const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <File.Input
             {...inputProps}
+            error={inputFieldProps.error}
+            acceptedFileTypes={field.config.configuration?.acceptedFileTypes}
+            maxFileSize={field.config.configuration.maxFileSize}
             value={field.value}
             onChange={handleFileChange}
-            fullWidth={field.config.options?.style.fullWidth}
+            width={field.config.configuration?.style?.width}
           />
         </InputField>
       )
@@ -452,6 +455,9 @@ const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <FileWithOption.Input
             {...inputProps}
+            error={inputFieldProps.error}
+            maxFileSize={field.config.configuration.maxFileSize}
+            acceptedFileTypes={field.config.configuration?.acceptedFileTypes}
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
             options={field.config.options}

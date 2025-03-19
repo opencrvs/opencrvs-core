@@ -134,7 +134,7 @@ export const FileInputWithoutOption: StoryObj<
               defaultMessage: 'Upload your photo',
               description: 'The title for the file input'
             },
-            options: { style: { fullWidth: Boolean(args.fullWidth) } }
+            configuration: { style: { fullWidth: Boolean(args.fullWidth) } }
           }
         ]}
         formData={formData}
