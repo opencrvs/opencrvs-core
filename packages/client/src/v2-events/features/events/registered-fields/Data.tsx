@@ -69,9 +69,6 @@ function DataInput({
 
   const { title, data, subtitle } = configuration
 
-  console.log('data', data)
-  console.log('formData', formData)
-
   return (
     <Container>
       {title && <h4>{intl.formatMessage(title)}</h4>}
