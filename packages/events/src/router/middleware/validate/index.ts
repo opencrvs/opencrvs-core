@@ -84,28 +84,14 @@ export function validateAction(actionType: ActionType) {
       actionType
     )
 
-    const verificationPageErrors = verificationPageIds.reduce(
-      (
-        errorResults: {
-          message: string
-          id: string
-          value: FieldUpdateValue
-        }[],
-        field: string
-      ) => {
+    const verificationPageErrors = verificationPageIds
+      .map((field) => {
         const value = data[field]
-
-        if (typeof value !== 'boolean') {
-          return [
-            ...errorResults,
-            { message: 'Field is required', id: field, value }
-          ]
-        }
-
-        return errorResults
-      },
-      []
-    )
+        return typeof value !== 'boolean'
+          ? { message: 'Field is required', id: field, value }
+          : null
+      })
+      .filter((error) => error !== null)
 
     const allErrors = [...errors, ...verificationPageErrors]
 
