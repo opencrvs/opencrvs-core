@@ -150,7 +150,7 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { getMetadata, clear } = useEventMetadata()
+  const { getMetadata } = useEventMetadata()
   const metadata = getMetadata()
 
   const { certificateTemplates, language } = useAppConfig()

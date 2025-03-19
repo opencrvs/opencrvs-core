@@ -51,7 +51,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   parameters: {
     layout: 'centered'
   },
-  render: function Component(args) {
+  render: function Component() {
     return (
       <CurrentEventContext.Provider
         value={{
@@ -104,6 +104,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
           formData={{}}
           id="my-form"
           setAllFieldsDirty={false}
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           onChange={() => {}}
         />
       </CurrentEventContext.Provider>

@@ -20,7 +20,7 @@ export const VerificationWizardModal: Story = {
   parameters: {
     chromatic: { disableSnapshot: true }
   },
-  render: function Component(args) {
+  render: function Component() {
     return (
       <VerificationWizard
         currentPage={0}
@@ -56,6 +56,7 @@ export const VerificationWizardModal: Story = {
         showReviewButton={false}
         totalPages={1}
         onNextPage={onNextPageSpy}
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         onPreviousPage={() => {}}
         onSubmit={onSubmitSpy}
         onVerifyAction={onVerifyActionSpy}
