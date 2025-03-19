@@ -131,7 +131,8 @@ async function validateTask(bundle: Bundle) {
   }
 
   // check if the office id is valid and it is part of the provided office location
-  const office = await fetchFromHearth(`/${regLastOfficeIdRef}`)
+  const office = await fetchFromHearth(`${regLastOfficeIdRef}`)
+
   if (
     !office ||
     !office.type ||
@@ -147,11 +148,16 @@ export async function eventNotificationHandler(
   req: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  console.log('Starting Event Notification ------->')
   let bundle: Bundle
   try {
     bundle = req.payload as Bundle
+
+    console.log('bundle :>>>>>>> ', bundle)
     await validateTask(bundle)
     await validateAddressesOfTask(bundle)
+
+    console.log('finalized the event notification ------->')
   } catch (e) {
     if (e.isBoom) {
       return h
@@ -190,6 +196,8 @@ export async function validateAddressesOfTask(bundle: Bundle) {
     }
   }
 
+  console.log('validateAddressesOfTask >>>>>> bundle :>> ', bundle)
+
   // validate event encounter
   const encounter = getResourceByType<Encounter>(bundle, 'Encounter')
   if (!encounter) {
@@ -218,6 +226,8 @@ export function getResourceByType<T = Resource>(
   bundle: Bundle,
   type: string
 ): T | undefined {
+  console.log('getResourceByType >>>>>>> bundle :>> ', JSON.stringify(bundle))
+  console.log('getResourceByType >>>>>>> type :>> ', type)
   const bundleEntry =
     bundle &&
     bundle.entry &&
@@ -228,6 +238,11 @@ export function getResourceByType<T = Resource>(
         return entry.resource.resourceType === type
       }
     })
+
+  console.log(
+    ' bundleEntry && (bundleEntry.resource as T) :>> ',
+    bundleEntry && (bundleEntry.resource as T)
+  )
   return bundleEntry && (bundleEntry.resource as T)
 }
 
