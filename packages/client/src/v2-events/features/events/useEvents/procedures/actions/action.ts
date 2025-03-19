@@ -242,49 +242,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         ...params,
         data: stripHiddenFields(fields, params.data)
       })
-    }
-  }
-}
-
-/**
- * A custom hook that wraps a tRPC mutation procedure for event async actions.
- *
- * This hook performs two main operations:
- * 1. Ensures the event the action is for is actually created and not just a local copy before the action is sent.
- * 2. Strips away all fields that should not be part of the payload based on the conditions in the form fields.
- *
- * @template P - The type of the tRPC mutation procedure.
- * @param {P} trpcProcedure - The tRPC mutation procedure to be wrapped.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useEventAsyncAction<P extends DecorateMutationProcedure<any>>(
-  trpcProcedure: P
-) {
-  const eventConfigurations = useEventConfigurations()
-  const allOptions = {
-    ...trpcProcedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
-  }
-  // mutationFn will be removed at this stage to ensure it has been specified in a serializable manner under /procedures. This ensures early error detection
-  // without explicitly testing offline functionality.
-  const { mutationFn, ...mutationOptions } = allOptions
-
-  const actionType = allOptions.meta?.actionType as ActionType | undefined
-
-  if (!actionType) {
-    throw new Error(
-      `No event action type found. This should never happen, ${JSON.stringify(
-        mutationOptions
-      )}`
-    )
-  }
-
-  const mutation = useMutation({
-    mutationFn,
-    ...mutationOptions // Only pass them once here
-  })
-
-  return {
+    },
     mutateAsync: async (params: inferInput<P>) => {
       const localEvent = findLocalEventData(params.eventId)
       const eventConfiguration = eventConfigurations.find(
