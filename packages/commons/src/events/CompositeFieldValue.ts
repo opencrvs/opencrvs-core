@@ -28,7 +28,7 @@ export const FileFieldValue = z.object({
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 
 const AdminStructure = z.object({
-  country: z.literal('FAR'),
+  country: z.literal(process.env.country || 'FAR'),
   province: z.string(),
   district: z.string()
 })
@@ -60,9 +60,8 @@ export const RuralAddressUpdateValue = AdminStructure.extend({
   urbanOrRural: z.literal(GeographicalArea.RURAL),
   village: z.string().nullish()
 })
-
 export const GenericAddressValue = z.object({
-  country: z.string().refine((value) => value !== 'FAR'),
+  country: z.string().refine((value) => value !== process.env.country || 'FAR'),
   state: z.string(),
   district2: z.string(),
   cityOrTown: z.string().optional(),
@@ -77,7 +76,7 @@ export const AddressFieldValue = z
   .or(GenericAddressValue)
 
 export const GenericAddressUpdateValue = z.object({
-  country: z.string().refine((value) => value !== 'FAR'),
+  country: z.string().refine((value) => value !== process.env.country || 'FAR'),
   state: z.string(),
   district2: z.string(),
   cityOrTown: z.string().nullish(),

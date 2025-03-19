@@ -98,7 +98,7 @@ const displayWhenDistrictUrbanSelected = [
   {
     type: ConditionalType.SHOW,
     conditional: and(
-      isFarajaland(),
+      isDefaultCountry(),
       createFieldCondition('urbanOrRural').isEqualTo(AddressType.URBAN),
       not(createFieldCondition('district').isUndefined())
     )
@@ -163,14 +163,14 @@ const URBAN_FIELDS = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-function isFarajaland() {
-  return createFieldCondition('country').isEqualTo('FAR')
+function isDefaultCountry() {
+  return createFieldCondition('country').isEqualTo(window.config.COUNTRY)
 }
 
-function otherThanFarajaland() {
+function isOtherThanDefaultCountry() {
   return and(
     not(createFieldCondition('country').isUndefined()),
-    not(isFarajaland())
+    not(isDefaultCountry())
   )
 }
 
@@ -181,7 +181,7 @@ const RURAL_FIELDS = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          isFarajaland(),
+          isDefaultCountry(),
           createFieldCondition('urbanOrRural').isEqualTo(AddressType.RURAL),
           not(createFieldCondition('district').isUndefined())
         )
@@ -214,7 +214,7 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isFarajaland()
+        conditional: isDefaultCountry()
       }
     ],
     required: true,
@@ -233,7 +233,7 @@ const ADMIN_STRUCTURE = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          isFarajaland(),
+          isDefaultCountry(),
           not(createFieldCondition('province').isUndefined())
         )
       }
@@ -257,7 +257,7 @@ const ADMIN_STRUCTURE = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          isFarajaland(),
+          isDefaultCountry(),
           not(createFieldCondition('district').isUndefined())
         )
       }
@@ -301,7 +301,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: otherThanFarajaland()
+        conditional: isOtherThanDefaultCountry()
       }
     ],
     required: true,
@@ -317,7 +317,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: otherThanFarajaland()
+        conditional: isOtherThanDefaultCountry()
       }
     ],
     required: true,
@@ -333,7 +333,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: otherThanFarajaland()
+        conditional: isOtherThanDefaultCountry()
       }
     ],
     required: false,
@@ -349,7 +349,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: otherThanFarajaland()
+        conditional: isOtherThanDefaultCountry()
       }
     ],
     required: false,
@@ -365,7 +365,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: otherThanFarajaland()
+        conditional: isOtherThanDefaultCountry()
       }
     ],
     required: false,
@@ -381,7 +381,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: otherThanFarajaland()
+        conditional: isOtherThanDefaultCountry()
       }
     ],
     required: false,
@@ -397,7 +397,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: otherThanFarajaland()
+        conditional: isOtherThanDefaultCountry()
       }
     ],
     required: false,

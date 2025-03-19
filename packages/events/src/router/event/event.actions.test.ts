@@ -62,7 +62,7 @@ test('Action data accepts partial changes', async () => {
   const originalEvent = await client.event.create(generator.event.create())
 
   const addressWithoutVillage = {
-    country: 'FAR' as const,
+    country: process.env.COUNTRY || ('FAR' as const),
     province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
     urbanOrRural: 'RURAL' as const

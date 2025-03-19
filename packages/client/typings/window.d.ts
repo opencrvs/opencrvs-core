@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { countryCode } from '@client/utils/countries'
+
 interface Window {
   config: {
     APPLICATION_NAME: string
@@ -19,7 +21,7 @@ interface Window {
       PRINT_IN_ADVANCE: boolean
     }
     CONFIG_API_URL: string
-    COUNTRY: string
+    COUNTRY: countryCode
     COUNTRY_LOGO: {
       fileName: string
       file: string
