@@ -26,7 +26,6 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -105,19 +104,14 @@ function EventOverview({
   const { trackingId, status } = eventIndex
 
   const stringifyFormData = useFormDataStringifier()
-  const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
-  const eventWithDefaults = stringifyFormData(allFields, {
-    ...emptyEvent,
-    ...eventWithDrafts.data
-  })
+  const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
 
   const flattenedEventIndex: Record<
     string,
     FieldValue | null | RecursiveStringRecord
   > = {
-    ...emptyEvent,
     ...eventWithDefaults,
-    ...flattenEventIndex(eventIndex),
+    ...flattenEventIndex({ ...eventIndex, data: eventWithDrafts.data }),
     ...getDefaultFieldValues(trackingId, status)
   }
 
