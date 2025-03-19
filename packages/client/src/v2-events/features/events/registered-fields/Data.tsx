@@ -15,7 +15,7 @@ import {
   FieldProps,
   ActionType,
   findActiveActionFormFields,
-  FieldValue
+  DataFieldValue
 } from '@opencrvs/commons/client'
 import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -50,7 +50,7 @@ const Container = styled.div`
 function DataInput({
   configuration,
   value
-}: FieldProps<'DATA'> & { value: Record<string, FieldValue> }) {
+}: FieldProps<'DATA'> & { value: DataFieldValue }) {
   const intl = useIntl()
   const { config } = useCurrentEventContext()
 

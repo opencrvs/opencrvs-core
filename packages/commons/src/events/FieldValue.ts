@@ -59,6 +59,8 @@ export const FieldValue = z.union([
 ])
 
 export const DataFieldValue = z.record(z.string(), FieldValue)
+export type DataFieldValue = z.infer<typeof DataFieldValue>
+
 export type FieldValue = z.infer<typeof FieldValue>
 
 export const FieldUpdateValue = z.union([
