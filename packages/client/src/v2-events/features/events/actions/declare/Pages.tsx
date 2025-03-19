@@ -25,8 +25,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { isTemporaryId } from '@client/v2-events/utils'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
-
-import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
+import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -38,7 +37,7 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
-  const { config, event } = useCurrentEventContext()
+  const { config, event } = useCurrentEvent()
 
   if (!config || !event) {
     throw new Error('Event not found.')

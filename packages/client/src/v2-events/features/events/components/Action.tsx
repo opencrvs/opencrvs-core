@@ -9,19 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, {
-  PropsWithChildren,
-  useEffect,
-  useMemo,
-  createContext,
-  useContext
-} from 'react'
+import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   createEmptyDraft,
-  EventIndex,
-  EventConfig,
   findActiveDrafts,
   getCurrentEventStateWithDrafts,
   getMetadataForAction
@@ -36,15 +28,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-
-const CurrentEventContext = createContext<{
-  config: EventConfig | null
-  event: EventIndex | null
-}>({ config: null, event: null })
-
-export function useCurrentEventContext() {
-  return useContext(CurrentEventContext)
-}
+import { CurrentEventContext } from '@client/v2-events/features/events/components/useCurrentEvent'
 
 type Props = PropsWithChildren<{ type: ActionType }>
 function ActionComponent({ children, type }: Props) {

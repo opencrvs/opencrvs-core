@@ -17,7 +17,7 @@ import {
   findActiveActionFormFields,
   DataFieldValue
 } from '@opencrvs/commons/client'
-import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
+import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
 const Container = styled.div`
@@ -52,7 +52,7 @@ function DataInput({
   value
 }: FieldProps<'DATA'> & { value: DataFieldValue }) {
   const intl = useIntl()
-  const { config } = useCurrentEventContext()
+  const { config } = useCurrentEvent()
 
   if (!config) {
     throw new Error('Event configuration not found')

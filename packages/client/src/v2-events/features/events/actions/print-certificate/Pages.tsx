@@ -27,7 +27,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { ROUTES } from '@client/v2-events/routes'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
-import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
+import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
 import {
   CERT_TEMPLATE_ID,
   useCertificateTemplateSelectorFieldConfig
@@ -44,7 +44,7 @@ export function Pages() {
   const { modal } = useEventFormNavigation()
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata()
-  const { config, event } = useCurrentEventContext()
+  const { config, event } = useCurrentEvent()
 
   if (!config || !event) {
     throw new Error('Event not found.')

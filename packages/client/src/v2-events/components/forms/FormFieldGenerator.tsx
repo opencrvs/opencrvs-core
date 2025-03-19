@@ -91,7 +91,7 @@ import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
-import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
+import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -722,7 +722,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
       ...props.initialValues
     })
 
-    const { event } = useCurrentEventContext()
+    const { event } = useCurrentEvent()
 
     return (
       <Formik<EventState>

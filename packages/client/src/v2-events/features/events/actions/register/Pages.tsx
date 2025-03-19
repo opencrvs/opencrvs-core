@@ -27,7 +27,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
-import { useCurrentEventContext } from '@client/v2-events/features/events/components/Action'
+import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
@@ -38,7 +38,7 @@ export function Pages() {
   const navigate = useNavigate()
   const drafts = useDrafts()
   const { modal, goToHome } = useEventFormNavigation()
-  const { config, event } = useCurrentEventContext()
+  const { config, event } = useCurrentEvent()
 
   if (!config || !event) {
     throw new Error('Event not found.')
