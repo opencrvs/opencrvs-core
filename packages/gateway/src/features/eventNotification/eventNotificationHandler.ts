@@ -153,7 +153,6 @@ export async function eventNotificationHandler(
   try {
     bundle = req.payload as Bundle
 
-    console.log('bundle :>>>>>>> ', bundle)
     await validateTask(bundle)
     await validateAddressesOfTask(bundle)
 
@@ -196,8 +195,6 @@ export async function validateAddressesOfTask(bundle: Bundle) {
     }
   }
 
-  console.log('validateAddressesOfTask >>>>>> bundle :>> ', bundle)
-
   // validate event encounter
   const encounter = getResourceByType<Encounter>(bundle, 'Encounter')
   if (!encounter) {
@@ -209,7 +206,7 @@ export async function validateAddressesOfTask(bundle: Bundle) {
     throw BoomErrorWithCustomMessage('Encounter location not found! in bundle!')
   }
 
-  const location = await fetchFromHearth(`/${locationId}`)
+  const location = await fetchFromHearth(`${locationId}`)
 
   if (!location || !location.type) {
     throw BoomErrorWithCustomMessage(
@@ -226,8 +223,6 @@ export function getResourceByType<T = Resource>(
   bundle: Bundle,
   type: string
 ): T | undefined {
-  console.log('getResourceByType >>>>>>> bundle :>> ', JSON.stringify(bundle))
-  console.log('getResourceByType >>>>>>> type :>> ', type)
   const bundleEntry =
     bundle &&
     bundle.entry &&
@@ -239,10 +234,6 @@ export function getResourceByType<T = Resource>(
       }
     })
 
-  console.log(
-    ' bundleEntry && (bundleEntry.resource as T) :>> ',
-    bundleEntry && (bundleEntry.resource as T)
-  )
   return bundleEntry && (bundleEntry.resource as T)
 }
 
