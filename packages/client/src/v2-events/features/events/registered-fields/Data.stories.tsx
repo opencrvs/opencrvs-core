@@ -42,6 +42,11 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
     return (
       <StyledFormFieldGenerator
         eventConfig={tennisClubMembershipEvent}
+        eventDeclarationData={{
+          'applicant.firstname': 'Tanya',
+          'applicant.surname': 'McQuaid',
+          'applicant.dob': '1975-01-02'
+        }}
         fields={[
           {
             id: 'storybook.data',
