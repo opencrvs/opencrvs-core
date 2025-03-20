@@ -14,6 +14,10 @@
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 - Fix stale validations showing for document uploader with options form field
 
+### Bug fixes
+
+- Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations , the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
+
 ### Improvements
 
 - Support for 6th administrative level
