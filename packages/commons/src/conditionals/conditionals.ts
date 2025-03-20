@@ -315,6 +315,26 @@ export function field(fieldId: string) {
           }
         },
         required: ['$form']
+      }),
+    isValidName: () =>
+      defineConditional({
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                type: 'string',
+                pattern:
+                  "^[\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*( [\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*)*$",
+                description:
+                  "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
+              }
+            },
+            required: [fieldId]
+          }
+        },
+        required: ['$form']
       })
   }
 }
