@@ -391,6 +391,6 @@ export const isOfficeFieldType = (field: {
 export const isDataFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: any; config: Data } => {
+}): field is { value: undefined; config: Data } => {
   return field.config.type === FieldType.DATA
 }

@@ -15,7 +15,7 @@ import {
   FieldProps,
   ActionType,
   findActiveActionFormFields,
-  DataFieldValue
+  FieldValue
 } from '@opencrvs/commons/client'
 import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -51,7 +51,7 @@ function DataInput({
   configuration,
   value,
   label
-}: FieldProps<'DATA'> & { value: DataFieldValue }) {
+}: FieldProps<'DATA'> & { value: Record<string, FieldValue> }) {
   const intl = useIntl()
   const { config } = useCurrentEvent()
 

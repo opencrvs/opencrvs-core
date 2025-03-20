@@ -46,6 +46,8 @@ export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
+export const DataFieldValue = z.undefined()
+export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export const FieldValue = z.union([
   TextValue,
@@ -55,11 +57,9 @@ export const FieldValue = z.union([
   FileFieldValue,
   FileFieldWithOptionValue,
   UrbanAddressValue,
-  RuralAddressValue
+  RuralAddressValue,
+  DataFieldValue
 ])
-
-export const DataFieldValue = z.record(z.string(), FieldValue)
-export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export type FieldValue = z.infer<typeof FieldValue>
 
@@ -71,7 +71,8 @@ export const FieldUpdateValue = z.union([
   FileFieldValue,
   FileFieldWithOptionValue,
   UrbanAddressUpdateValue,
-  RuralAddressUpdateValue
+  RuralAddressUpdateValue,
+  DataFieldValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
