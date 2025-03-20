@@ -336,7 +336,6 @@ const Address = BaseField.extend({
 const Data = BaseField.extend({
   type: z.literal(FieldType.DATA),
   configuration: z.object({
-    title: TranslationConfig.optional(),
     subtitle: TranslationConfig.optional(),
     data: z.array(z.object({ fieldId: z.string() }))
   })

@@ -643,6 +643,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
     },
     {
       id: 'collector.identity.verify',
+      type: PageType.VERIFICATION,
       title: {
         id: 'event.birth.action.print.verifyIdentity',
         defaultMessage: 'Verify their identity',
@@ -875,7 +876,6 @@ const PRINT_CERTIFICATE_FORM = defineForm({
           }
         }
       ],
-      type: PageType.VERIFICATION,
       actions: {
         verify: {
           label: {
