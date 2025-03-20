@@ -75,16 +75,26 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
   })
 
   if (!hasEventsIndex) {
+    logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getAllFields(eventConfiguration))
+  } else {
+    logger.info(`Index ${indexName} already exists`)
+    logger.info(JSON.stringify(hasEventsIndex))
   }
   return ensureAlias(indexName)
 }
 export async function ensureAlias(indexName: string) {
   const client = getOrCreateClient()
-  return client.indices.putAlias({
+  logger.info(`Ensuring alias for index ${indexName}`)
+  const res = await client.indices.putAlias({
     index: indexName,
     name: getEventAliasName()
   })
+
+  logger.info(`Alias ${getEventAliasName()} created for index ${indexName}`)
+  logger.info(JSON.stringify(res))
+
+  return res
 }
 
 export async function createIndex(

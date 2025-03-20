@@ -31,5 +31,7 @@ export function getEventAliasName() {
 }
 
 export function getEventIndexName(eventType: string) {
-  return `${env.ES_INDEX_PREFIX}_${eventType}`.toLowerCase()
+  return `${env.ES_INDEX_PREFIX}_${eventType}`
+    .toLowerCase()
+    .replaceAll('.', '___')
 }
