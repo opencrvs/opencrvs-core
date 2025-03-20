@@ -140,9 +140,11 @@ const GeneratedInputField = React.memo(
 
     const inputFieldProps = {
       id: fieldDefinition.id,
-      label: fieldDefinition.hideLabel
-        ? undefined
-        : intl.formatMessage(fieldDefinition.label),
+      // If label is hidden or default message is empty, we don't need to render label
+      label:
+        fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
+          ? undefined
+          : intl.formatMessage(fieldDefinition.label),
       required: fieldDefinition.required,
       disabled: fieldDefinition.disabled,
       error,
