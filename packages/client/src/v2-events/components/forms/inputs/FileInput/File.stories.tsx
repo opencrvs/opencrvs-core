@@ -13,11 +13,10 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType } from '@opencrvs/commons/client'
+import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Review } from '@client/v2-events/features/events/components/Review'
-import { birthEvent } from './fixtures'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/File',
@@ -51,6 +50,10 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
           {
             id: 'storybook.file',
             type: FieldType.FILE_WITH_OPTIONS,
+            configuration: {
+              maxFileSize: 5 * 1024 * 1024,
+              acceptedFileTypes: ['image/jpeg']
+            },
             label: {
               id: 'storybook.file.label',
               defaultMessage: 'Upload your captured photo',
@@ -112,49 +115,49 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const FileInputWithoutOption: StoryObj<
-  typeof StyledFormFieldGenerator
-> & {
-  fullWidth?: boolean
-} = {
-  name: 'File input without option',
-  parameters: {
-    layout: 'centered'
-  },
-  render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
-    return (
-      <StyledFormFieldGenerator
-        fields={[
-          {
-            id: 'storybook.file2',
-            type: FieldType.FILE,
-            label: {
-              id: 'storybook.file2.label',
-              defaultMessage: 'Upload your photo',
-              description: 'The title for the file input'
-            },
-            configuration: { style: { fullWidth: Boolean(args.fullWidth) } }
-          }
-        ]}
-        formData={formData}
-        id="my-form"
-        setAllFieldsDirty={false}
-        onChange={(data) => {
-          args.onChange(data)
-          setFormData(data)
-        }}
-      />
-    )
-  },
-  argTypes: {
-    fullWidth: {
-      control: 'boolean',
-      description: 'Toggle to make the input full width'
-    }
-  },
-  args: { fullWidth: false }
-}
+export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
+  {
+    name: 'File input without option',
+    parameters: {
+      layout: 'centered'
+    },
+    render: function Component(args) {
+      const [formData, setFormData] = React.useState({})
+      return (
+        <StyledFormFieldGenerator
+          fields={[
+            {
+              id: 'storybook.file2',
+              type: FieldType.FILE,
+              label: {
+                id: 'storybook.file2.label',
+                defaultMessage: 'Upload your photo',
+                description: 'The title for the file input'
+              },
+              configuration: {
+                style: { width: args.width },
+                maxFileSize: 5 * 1024 * 1024
+              }
+            }
+          ]}
+          formData={formData}
+          id="my-form"
+          setAllFieldsDirty={false}
+          onChange={(data) => {
+            args.onChange(data)
+            setFormData(data)
+          }}
+        />
+      )
+    },
+    argTypes: {
+      fullWidth: {
+        control: 'boolean',
+        description: 'Toggle to make the input full width'
+      }
+    },
+    args: { fullWidth: false }
+  }
 
 export const FileReview: StoryObj<typeof Review> = {
   name: 'Review output',
@@ -165,7 +168,7 @@ export const FileReview: StoryObj<typeof Review> = {
     return (
       <div>
         <Review.Body
-          eventConfig={birthEvent}
+          eventConfig={tennisClubMembershipEvent}
           form={{
             'documents.proofOfBirth': {
               filename: 'tree.svg',
@@ -204,7 +207,7 @@ export const FileReview: StoryObj<typeof Review> = {
               type: 'image/svg+xml'
             }
           }}
-          formConfig={birthEvent.actions[0].forms[0]}
+          formConfig={tennisClubMembershipEvent.actions[0].forms[0]}
           title="File explorer"
           // eslint-disable-next-line no-console
           onEdit={(values) => console.log(values)}

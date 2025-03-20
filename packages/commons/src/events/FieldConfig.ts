@@ -219,7 +219,7 @@ const File = BaseField.extend({
     .object({
       maxFileSize: z
         .number()
-        .describe('Maximum file size in MB')
+        .describe('Maximum file size in bytes')
         .default(DEFAULT_MAX_FILE_SIZE_BYTES),
       acceptedFileTypes: MimeType.array()
         .optional()
@@ -341,7 +341,7 @@ const FileUploadWithOptions = BaseField.extend({
     .object({
       maxFileSize: z
         .number()
-        .describe('Maximum file size in MB')
+        .describe('Maximum file size in bytes')
         .default(DEFAULT_MAX_FILE_SIZE_BYTES),
       acceptedFileTypes: MimeType.array()
         .optional()
