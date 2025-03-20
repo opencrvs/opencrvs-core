@@ -644,6 +644,8 @@ const PRINT_CERTIFICATE_FORM = defineForm({
     {
       id: 'collector.identity.verify',
       type: PageType.VERIFICATION,
+      // TODO CIHAN: make sure this works
+      conditional: field('collector.requesterId').isEqualTo('INFORMANT'),
       title: {
         id: 'event.birth.action.print.verifyIdentity',
         defaultMessage: 'Verify their identity',

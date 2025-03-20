@@ -11,6 +11,7 @@
 import { z } from 'zod'
 import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { Conditional } from './Conditional'
 
 export enum PageType {
   FORM = 'FORM',
@@ -21,7 +22,12 @@ export const FormPage = z.object({
   id: z.string().describe('Unique identifier for the page'),
   title: TranslationConfig.describe('Header title of the page'),
   fields: z.array(FieldConfig).describe('Fields to be rendered on the page'),
-  type: z.literal(PageType.FORM).default(PageType.FORM)
+  type: z.literal(PageType.FORM).default(PageType.FORM),
+  conditional: Conditional()
+    .optional()
+    .describe(
+      'Page will be shown if condition is met. If conditional is not defined, the page will be always shown.'
+    )
 })
 
 export const VerificationPageConfig = z
