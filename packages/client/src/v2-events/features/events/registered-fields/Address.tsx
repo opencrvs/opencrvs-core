@@ -166,7 +166,7 @@ const URBAN_FIELDS = [
 function isDomesticAddress() {
   return and(
     not(createFieldCondition('country').isUndefined()),
-    not(isInternationalAddress())
+    createFieldCondition('addressType').isEqualTo('Domestic')
   )
 }
 
