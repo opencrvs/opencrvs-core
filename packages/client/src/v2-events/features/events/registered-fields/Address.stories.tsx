@@ -19,9 +19,10 @@ import {
   ActionType,
   EventConfig,
   FieldType,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  AddressFieldValue,
+  AddressType
 } from '@opencrvs/commons/client'
-import { AddressFieldValue, AddressType } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'

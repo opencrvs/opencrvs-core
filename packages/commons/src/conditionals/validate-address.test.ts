@@ -33,8 +33,8 @@ const testCases = [
   {
     title: 'Invalid other address',
     address: {
-      country: 'ABC',
-      addressType: AddressType.DOMESTIC,
+      country: 'BGD',
+      addressType: AddressType.INTERNATIONAL,
       province: 'sadsad-sadsad-sadsadsd-sdsdsd',
       district: 'gdgfhdfg-wwqret-dfgfgsd-ewrew',
       urbanOrRural: 'URBAN'
@@ -44,7 +44,7 @@ const testCases = [
   {
     title: 'Valid other address',
     address: {
-      country: 'ABC',
+      country: 'BGD',
       addressType: AddressType.INTERNATIONAL,
       state: 'sadsad-sadsad-sadsadsd-sdsdsd',
       district2: 'gdgfhdfg-wwqret-dfgfgsd-ewrew'
