@@ -58,14 +58,17 @@ export function Pages() {
   useEffect(() => {
     if (pageId !== currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-          eventId,
-          pageId: currentPageId
-        }),
+        ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
+          {
+            eventId,
+            pageId: currentPageId
+          },
+          searchParams
+        ),
         { replace: true }
       )
     }
-  }, [pageId, currentPageId, navigate, eventId])
+  }, [pageId, currentPageId, navigate, eventId, searchParams])
 
   /*
    * If the event had a temporary ID and the record got persisted while the user
@@ -77,12 +80,16 @@ export function Pages() {
 
     if (eventId !== event.id && !hasTemporaryId) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.buildPath({
-          eventId: event.id
-        })
+        ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
+          {
+            eventId: event.id,
+            pageId: currentPageId
+          },
+          searchParams
+        )
       )
     }
-  }, [event.id, eventId, navigate])
+  }, [currentPageId, event.id, eventId, navigate, searchParams])
 
   return (
     <FormLayout
@@ -103,10 +110,13 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-              eventId,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              searchParams
+            )
           )
         }
         onSubmit={() =>

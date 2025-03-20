@@ -24,6 +24,9 @@ import { FormConfig } from './FormConfig'
 import { isFieldVisible } from '../conditionals/validate'
 import { FieldType } from './FieldType'
 import { getOrThrow } from '../utils'
+import { Draft } from './Draft'
+import { EventDocument } from './EventDocument'
+import { getUUID } from '../uuid'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -131,7 +134,7 @@ export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
     )
     if (!rootWorkqueue) {
       throw new Error(
-        `Invalid workqueue configuration: workqueue not found with id:  ${workqueue.id}`
+        `Invalid workqueue configuration: workqueue not found with id: ${workqueue.id}`
       )
     }
   })
@@ -250,4 +253,40 @@ export function stripHiddenFields(fields: FieldConfig[], data: EventState) {
 
     return !isFieldVisible(field, data)
   })
+}
+
+export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
+  const actions = event.actions
+    .slice()
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  const lastAction = actions[actions.length - 1]
+  return (
+    drafts
+      // Temporally allows equal timestamps as the generated demo data is not perfect yet
+      // should be > rather than >=
+      .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
+      .filter(({ eventId }) => eventId === event.id)
+  )
+}
+
+export function createEmptyDraft(
+  eventId: string,
+  draftId: string,
+  actionType: ActionType
+) {
+  return {
+    id: draftId,
+    eventId,
+    createdAt: new Date().toISOString(),
+    transactionId: getUUID(),
+    action: {
+      type: actionType,
+      data: {},
+      metadata: {},
+      createdAt: new Date().toISOString(),
+      createdBy: '@todo',
+      createdAtLocation: '@todo'
+    }
+  }
 }

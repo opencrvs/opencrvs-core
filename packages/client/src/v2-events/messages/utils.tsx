@@ -9,9 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { MessageDescriptor, MessageFormatElement, useIntl } from 'react-intl'
 import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
-import { EventState, TranslationConfig } from '@opencrvs/commons/client'
+import {
+  isArgumentElement,
+  isSelectElement,
+  isPluralElement,
+  parse
+} from '@formatjs/icu-messageformat-parser'
+import { EventState } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
 /**
@@ -61,6 +67,46 @@ function convertDotInCurlyBraces(str: string): string {
 // The __EMPTY__ is our common token for missing values, that can be used when configuring a message.
 const EMPTY_TOKEN = '__EMPTY__'
 
+function getVariablesFromElement(element: MessageFormatElement): string[] {
+  if (isArgumentElement(element)) {
+    return [element.value]
+  }
+  if (isSelectElement(element)) {
+    return [element.value].concat(
+      Object.values(element.options)
+        .flatMap((el) => el.value)
+        .flatMap((el) => getVariablesFromElement(el))
+    )
+  }
+
+  if (isPluralElement(element)) {
+    return Object.values(element.options)
+      .flatMap((el) => el.value)
+      .flatMap((el) => getVariablesFromElement(el))
+  }
+  return []
+}
+
+/**
+ * Flattens a nested object into a single-level object.
+ */
+function flattenNestedObject(
+  obj: Record<string, string>,
+  prefix = ''
+): Record<string, string> {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    const newKey = prefix ? `${prefix}.${key}` : key
+
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      Object.assign(acc, flattenNestedObject(value, newKey))
+    } else {
+      acc[newKey] = value
+    }
+
+    return acc
+  }, {} as Record<string, string>)
+}
+
 /**
  * intl with formatMessage that supports "flat object" dot notation in the message.
  *
@@ -74,7 +120,9 @@ export function useIntlFormatMessageWithFlattenedParams() {
     message: MessageDescriptor,
     params?: T
   ): string {
-    const variables = convertDotToTripleUnderscore(params ?? {})
+    // Flatten the params to ensure all nested properties are accessible with dot notation
+    const flattenedParams = flattenNestedObject(params ?? {})
+    const variables = convertDotToTripleUnderscore(flattenedParams)
 
     const originalMessage =
       intl.messages[message.id as keyof typeof intl.messages] ||
@@ -92,8 +140,15 @@ export function useIntlFormatMessageWithFlattenedParams() {
     }
 
     const defaultMessage = convertDotInCurlyBraces(originalMessage)
+    const variablesInMessage = parse(defaultMessage).flatMap(
+      getVariablesFromElement
+    )
+    const variablesWithEmptyValues = Object.fromEntries(
+      variablesInMessage.map((variable) => [variable, EMPTY_TOKEN])
+    )
+
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
-      variables
+      { ...variablesWithEmptyValues, ...variables }
     )
     if (!formatted || typeof formatted !== 'string') {
       return ''
@@ -103,37 +158,8 @@ export function useIntlFormatMessageWithFlattenedParams() {
     return formatted.trim().replaceAll(EMPTY_TOKEN, '')
   }
 
-  // Format the translation with values from data.
-  function formatMessageWithValues(
-    translationConfig: TranslationConfig,
-    availableKeys: string[],
-    data: Record<string, unknown>
-  ) {
-    const message = intl.messages[translationConfig.id]
-    const messageBeforeFormatting =
-      typeof message === 'string' ? message : translationConfig.defaultMessage
-
-    const keysInMessage = availableKeys.filter(
-      (key) =>
-        // This is a bit of hack, which expects that the keys are in the form of '{key ' or '{key}' in the message.
-        // E.g.: '{child.firstname, select, __EMPTY__ {Hello!} other {Hello to {child.firstname}!}}'
-        messageBeforeFormatting.includes(`{${key}}`) ||
-        messageBeforeFormatting.includes(`{${key} `)
-    )
-
-    const keyValues = keysInMessage.reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: data[key] ? data[key].toString() : EMPTY_TOKEN
-      }),
-      {}
-    )
-    return formatMessage(translationConfig, keyValues)
-  }
-
   return {
     ...intl,
-    formatMessage,
-    formatMessageWithValues
+    formatMessage
   }
 }

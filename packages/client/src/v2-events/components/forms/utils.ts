@@ -85,21 +85,6 @@ export function getDependentFields(
   })
 }
 
-/**
- * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
- * For setting default fields for form values @see setFormValueToOutputFormat
- *
- * @returns object based on the fields given with null values.
- */
-export function setEmptyValuesForFields(fields: FieldConfig[]) {
-  return fields.reduce((initialValues: Record<string, null>, field) => {
-    return {
-      ...initialValues,
-      [field.id]: null
-    }
-  }, {})
-}
-
 export interface Stringifiable {
   toString(): string
 }
