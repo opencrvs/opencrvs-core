@@ -13,10 +13,9 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { Review } from '@client/v2-events/features/events/components/Review'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/File',
@@ -158,63 +157,3 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
     },
     args: { fullWidth: false }
   }
-
-export const FileReview: StoryObj<typeof Review> = {
-  name: 'Review output',
-  parameters: {
-    layout: 'center'
-  },
-  render: function Component() {
-    return (
-      <div>
-        <Review.Body
-          eventConfig={tennisClubMembershipEvent}
-          form={{
-            'documents.proofOfBirth': {
-              filename: 'tree.svg',
-              originalFilename: 'tree.svg',
-              type: 'image/svg+xml'
-            },
-            'documents.proofOfMother': [
-              {
-                filename: 'fish.svg',
-                originalFilename: 'fish.svg',
-                type: 'image/svg+xml',
-                option: 'NATIONAL_ID'
-              },
-              {
-                filename: 'mountain.svg',
-                originalFilename: 'mountain.svg',
-                type: 'image/svg+xml',
-                option: 'PASSPORT'
-              },
-              {
-                filename: 'tree.svg',
-                originalFilename: 'tree.svg',
-                type: 'image/svg+xml',
-                option: 'BIRTH_REGISTRATION_NUMBER'
-              },
-              {
-                filename: 'fish.svg',
-                originalFilename: 'fish.svg',
-                type: 'image/svg+xml',
-                option: 'NONE'
-              }
-            ],
-            'documents.proofOther': {
-              filename: 'tree.svg',
-              originalFilename: 'tree.svg',
-              type: 'image/svg+xml'
-            }
-          }}
-          formConfig={tennisClubMembershipEvent.actions[0].forms[0]}
-          title="File explorer"
-          // eslint-disable-next-line no-console
-          onEdit={(values) => console.log(values)}
-        >
-          <div />
-        </Review.Body>
-      </div>
-    )
-  }
-}
