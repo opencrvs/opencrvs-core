@@ -142,7 +142,6 @@ export function Review() {
         // eslint-disable-next-line
         onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
-        isUploadButtonVisible={true}
         title={formatMessageWithValues(
           formConfig.review.title,
           eventFieldKeys,

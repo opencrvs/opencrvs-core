@@ -17,14 +17,13 @@ const messages = {
   fileSizeError: {
     id: 'v2.file.upload.fileSize.error',
     defaultMessage: 'File size must be less than {maxSize}mb',
-    description: 'Show error message if the selected file is too large'
+    description: 'Error message when the selected file is too large'
   },
   fileTypeError: {
     id: 'v2.file.upload.fileType.error',
     defaultMessage:
       'File format not supported. Please attach {types} (max {maxSize}mb)',
-    description:
-      'Show error message if the selected image type is not supported'
+    description: 'Error message when the selected file type is not supported'
   }
 }
 
