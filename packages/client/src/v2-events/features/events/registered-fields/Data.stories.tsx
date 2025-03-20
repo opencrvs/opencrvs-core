@@ -73,15 +73,10 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
               type: FieldType.DATA,
               label: {
                 id: 'storybook.data.label',
-                defaultMessage: '',
+                defaultMessage: 'Applicant details',
                 description: ''
               },
               configuration: {
-                title: {
-                  id: 'storybook.data.title',
-                  defaultMessage: 'Applicant details',
-                  description: ''
-                },
                 subtitle: {
                   id: 'storybook.data.subtitle',
                   defaultMessage: 'Some subtitle',
