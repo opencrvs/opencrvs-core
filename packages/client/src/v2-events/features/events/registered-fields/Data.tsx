@@ -70,7 +70,7 @@ function DataInput({
 
   const { data, subtitle } = configuration
 
-  const title = intl.formatMessage(label)
+  const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
   return (
     <Container>
