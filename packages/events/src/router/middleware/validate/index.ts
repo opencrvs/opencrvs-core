@@ -16,14 +16,12 @@ import {
   FieldConfig,
   FieldUpdateValue,
   findActiveActionFields,
+  findActiveActionVerificationPageIds,
   getFieldValidationErrors,
   getOrThrow
 } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
-import {
-  findEventConfigurationById,
-  findActiveActionVerificationPageIds
-} from '@events/service/config/config'
+import { findEventConfigurationById } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
@@ -79,6 +77,7 @@ export function validateAction(actionType: ActionType) {
       []
     )
 
+    // For each verification page on the form, we expect a boolean field with the page id as key in the metadata.
     const verificationPageIds = findActiveActionVerificationPageIds(
       configuration,
       actionType

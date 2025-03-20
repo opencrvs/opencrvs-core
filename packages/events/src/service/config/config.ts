@@ -48,21 +48,6 @@ export async function findEventConfigurationById({
   return configurations.find((config) => config.id === eventType)
 }
 
-export function findActiveActionVerificationPageIds(
-  configuration: EventConfig,
-  action: ActionType
-): string[] {
-  const pages = findActiveActionFormPages(configuration, action)
-
-  if (!pages) {
-    return []
-  }
-
-  return pages
-    .filter((page) => page.type === PageType.VERIFICATION)
-    .map((page) => page.id)
-}
-
 export async function notifyOnAction(
   action: ActionInput,
   event: EventDocument,

@@ -13,6 +13,7 @@ import { defineConfig } from '../events/defineConfig'
 import { defineForm } from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
+import { PageType } from '../events/FormConfig'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineForm({
@@ -639,6 +640,274 @@ const PRINT_CERTIFICATE_FORM = defineForm({
           type: 'FILE'
         }
       ]
+    },
+    {
+      id: 'collector.identity.verify',
+      title: {
+        id: 'event.birth.action.print.verifyIdentity',
+        defaultMessage: 'Verify their identity',
+        description: 'This is the title of the section'
+      },
+      fields: [
+        {
+          id: 'collector.identity.verify.data.mother',
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: defineConditional({
+                type: 'object',
+                properties: {
+                  $form: {
+                    type: 'object',
+                    properties: {
+                      'informant.relation': {
+                        oneOf: [
+                          {
+                            type: 'string',
+                            const: 'MOTHER'
+                          },
+                          {
+                            type: 'boolean',
+                            const: 'MOTHER'
+                          }
+                        ],
+                        const: 'MOTHER'
+                      }
+                    },
+                    required: ['informant.relation']
+                  }
+                },
+                required: ['$form']
+              })
+            }
+          ],
+          label: {
+            id: 'v2.event.birth.action.certificate.form.section.verifyIdentity.data.label',
+            defaultMessage: '',
+            description: 'Title for the data section'
+          },
+          type: 'DATA',
+          configuration: {
+            data: [
+              {
+                fieldId: 'mother.idType'
+              },
+              {
+                fieldId: 'mother.nid'
+              },
+              {
+                fieldId: 'mother.firstname'
+              },
+              {
+                fieldId: 'mother.surname'
+              },
+              {
+                fieldId: 'mother.dob'
+              },
+              {
+                fieldId: 'mother.nationality'
+              }
+            ]
+          }
+        },
+        {
+          id: 'collector.identity.verify.data.father',
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: defineConditional({
+                type: 'object',
+                properties: {
+                  $form: {
+                    type: 'object',
+                    properties: {
+                      'informant.relation': {
+                        oneOf: [
+                          {
+                            type: 'string',
+                            const: 'FATHER'
+                          },
+                          {
+                            type: 'boolean',
+                            const: 'FATHER'
+                          }
+                        ],
+                        const: 'FATHER'
+                      }
+                    },
+                    required: ['informant.relation']
+                  }
+                },
+                required: ['$form']
+              })
+            }
+          ],
+          label: {
+            id: 'v2.event.birth.action.certificate.form.section.verifyIdentity.data.label',
+            defaultMessage: '',
+            description: 'Title for the data section'
+          },
+          type: 'DATA',
+          configuration: {
+            data: [
+              {
+                fieldId: 'father.idType'
+              },
+              {
+                fieldId: 'father.nid'
+              },
+              {
+                fieldId: 'father.firstname'
+              },
+              {
+                fieldId: 'father.surname'
+              },
+              {
+                fieldId: 'father.dob'
+              },
+              {
+                fieldId: 'father.nationality'
+              }
+            ]
+          }
+        },
+        {
+          id: 'collector.identity.verify.data.other',
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: defineConditional({
+                type: 'object',
+                allOf: [
+                  {
+                    type: 'object',
+                    not: {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'informant.relation': {
+                              type: 'string',
+                              enum: ['MOTHER', 'FATHER']
+                            }
+                          },
+                          required: ['informant.relation']
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    required: []
+                  },
+                  {
+                    type: 'object',
+                    not: {
+                      type: 'object',
+                      properties: {
+                        $form: {
+                          type: 'object',
+                          properties: {
+                            'informant.relation': {
+                              anyOf: [
+                                {
+                                  const: 'undefined'
+                                },
+                                {
+                                  const: false
+                                },
+                                {
+                                  const: null
+                                },
+                                {
+                                  const: ''
+                                }
+                              ]
+                            }
+                          },
+                          anyOf: [
+                            {
+                              required: ['informant.relation']
+                            },
+                            {
+                              not: {
+                                required: ['informant.relation']
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      required: ['$form']
+                    },
+                    required: []
+                  }
+                ],
+                required: []
+              })
+            }
+          ],
+          label: {
+            id: 'v2.event.birth.action.certificate.form.section.verifyIdentity.data.label',
+            defaultMessage: '',
+            description: 'Title for the data section'
+          },
+          type: 'DATA',
+          configuration: {
+            data: [
+              {
+                fieldId: 'informant.idType'
+              },
+              {
+                fieldId: 'informant.nid'
+              },
+              {
+                fieldId: 'informant.firstname'
+              },
+              {
+                fieldId: 'informant.surname'
+              },
+              {
+                fieldId: 'informant.dob'
+              },
+              {
+                fieldId: 'informant.nationality'
+              }
+            ]
+          }
+        }
+      ],
+      type: PageType.VERIFICATION,
+      actions: {
+        verify: {
+          label: {
+            id: 'v2.event.birth.action.certificate.form.verify',
+            defaultMessage: 'Verified',
+            description: 'This is the label for the verification button'
+          }
+        },
+        cancel: {
+          label: {
+            id: 'v2.event.birth.action.certificate.form.cancel',
+            defaultMessage: 'Identity does not match',
+            description:
+              'This is the label for the verification cancellation button'
+          },
+          confirmation: {
+            title: {
+              id: 'v2.event.birth.action.certificate.form.cancel.confirmation.title',
+              defaultMessage: 'Print without proof of ID?',
+              description:
+                'This is the title for the verification cancellation modal'
+            },
+            body: {
+              id: 'v2.event.birth.action.certificate.form.cancel.confirmation.body',
+              defaultMessage:
+                'Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector',
+              description:
+                'This is the body for the verification cancellation modal'
+            }
+          }
+        }
+      }
     }
   ],
   review: {
