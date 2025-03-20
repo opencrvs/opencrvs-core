@@ -15,12 +15,12 @@ import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
 import * as selectEvent from 'react-select-event'
 import styled from 'styled-components'
-import { FieldType, AddressFieldValue } from '@opencrvs/commons/client'
+import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 
 const meta: Meta<typeof FormFieldGenerator> = {
-  title: 'Inputs/Address',
+  title: 'Inputs/Address/Interaction',
   args: { onChange: fn() },
   decorators: [
     (Story) => (
@@ -38,7 +38,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 `
 
 export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
-  name: 'Interaction between fields',
+  name: 'Domestic',
   parameters: {
     layout: 'centered'
   },
@@ -46,6 +46,12 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await canvas.findByText(/Address/)
+
+    await step('Select domestic country: Bangladesh', async () => {
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Bangladesh')
+    })
 
     await step(
       'Admin structure dropdowns are shown gradually as the inputs are filled',
@@ -93,10 +99,7 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
               id: 'storybook.address.label',
               defaultMessage: 'Address',
               description: 'The title for the address input'
-            },
-            defaultValue: {
-              country: 'FAR'
-            } as AddressFieldValue
+            }
           }
         ]}
         formData={formData}
@@ -112,42 +115,51 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
 }
 
 export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
-  name: 'Country is other than Farajaland',
+  name: 'International',
   parameters: {
     layout: 'centered'
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    // Verify that Farajaland specific fields are not visible
-    await expect(canvas.queryByTestId('location__province')).toBeNull()
-    await expect(canvas.queryByTestId('location__district')).toBeNull()
+    await step('Select International country: Finland', async () => {
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Finland')
+    })
 
-    await userEvent.type(await canvas.findByTestId('text__state'), 'Dhaka')
-    await userEvent.type(
-      await canvas.findByTestId('text__district2'),
-      'Dhaka North'
-    )
-    await userEvent.type(
-      await canvas.findByTestId('text__cityOrTown'),
-      'Mohakhali'
-    )
-    await userEvent.type(
-      await canvas.findByTestId('text__addressLine1'),
-      'DOHS'
-    )
-    await userEvent.type(
-      await canvas.findByTestId('text__addressLine2'),
-      'Road 4'
-    )
-    await userEvent.type(
-      await canvas.findByTestId('text__addressLine3'),
-      'House 142'
-    )
-    await userEvent.type(
-      await canvas.findByTestId('text__postcodeOrZip'),
-      '3300'
-    )
+    await step('Domestic fields are not visible', async () => {
+      await expect(canvas.queryByTestId('location__province')).toBeNull()
+      await expect(canvas.queryByTestId('location__district')).toBeNull()
+    })
+
+    await step('Fill up international fields', async () => {
+      await userEvent.type(await canvas.findByTestId('text__state'), 'Dhaka')
+      await userEvent.type(
+        await canvas.findByTestId('text__district2'),
+        'Dhaka North'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__cityOrTown'),
+        'Mohakhali'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__addressLine1'),
+        'DOHS'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__addressLine2'),
+        'Road 4'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__addressLine3'),
+        'House 142'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__postcodeOrZip'),
+        '3300'
+      )
+    })
   },
   render: function Component(args) {
     const [formData, setFormData] = React.useState({})
@@ -161,10 +173,7 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
               id: 'storybook.address.label',
               defaultMessage: 'Address',
               description: 'The title for the address input'
-            },
-            defaultValue: {
-              country: 'BGD'
-            } as AddressFieldValue
+            }
           }
         ]}
         formData={formData}

@@ -561,12 +561,15 @@ class FormSectionComponent extends React.Component<AllProps> {
   ) => {
     const updatedValues = cloneDeep(this.props.values)
     set(updatedValues, fieldName, value)
-    if (fieldName === 'country')
+    if (fieldName === 'country') {
       set(
         updatedValues,
         'addressType',
-        value === window.config.COUNTRY ? AddressType.DOMESTIC : 'International'
+        value === (window.config.COUNTRY || 'FAR')
+          ? AddressType.DOMESTIC
+          : AddressType.INTERNATIONAL
       )
+    }
     const updateDependentFields = (fieldName: string) => {
       const dependentFields = getDependentFields(this.props.fields, fieldName)
       for (const field of dependentFields) {

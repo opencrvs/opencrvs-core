@@ -21,7 +21,8 @@ import {
   not,
   GeographicalArea,
   AdministrativeAreas,
-  isFieldVisible
+  isFieldVisible,
+  alwaysTrue
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -105,6 +106,22 @@ const displayWhenDistrictUrbanSelected = [
   }
 ]
 
+const addressTypeField = {
+  id: 'addressType',
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: not(alwaysTrue())
+    }
+  ],
+  label: {
+    defaultMessage: '',
+    description: 'empty string',
+    id: 'v2.messages.emptyString'
+  },
+  type: FieldType.TEXT
+} as const satisfies FieldConfigWithoutAddress
+
 const URBAN_FIELDS = [
   {
     id: 'town',
@@ -166,14 +183,14 @@ const URBAN_FIELDS = [
 function isDomesticAddress() {
   return and(
     not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo('Domestic')
+    createFieldCondition('addressType').isEqualTo('DOMESTIC')
   )
 }
 
 function isInternationalAddress() {
   return and(
     not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo('International')
+    createFieldCondition('addressType').isEqualTo('INTERNATIONAL')
   )
 }
 
@@ -417,14 +434,12 @@ const ALL_ADDRESS_FIELDS = [
   ...ADMIN_STRUCTURE,
   ...URBAN_FIELDS,
   ...RURAL_FIELDS,
-  ...GENERIC_ADDRESS_FIELDS
+  ...GENERIC_ADDRESS_FIELDS,
+  addressTypeField
 ]
 
 type AllKeys<T> = T extends unknown ? keyof T : never
-type RequiredKeysFromFieldValue = Exclude<
-  AllKeys<AddressFieldValue>,
-  'addressType'
->
+type RequiredKeysFromFieldValue = AllKeys<AddressFieldValue>
 type EnsureSameUnion<A, B> = [A] extends [B]
   ? [B] extends [A]
     ? true
