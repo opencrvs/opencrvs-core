@@ -59,7 +59,9 @@ import {
   isEmailFieldType,
   isFieldVisible,
   isDataFieldType,
-  MetaFields
+  MetaFields,
+  EventConfig,
+  EventIndex
 } from '@opencrvs/commons/client'
 import { Field, FieldProps, Formik, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
@@ -91,7 +93,6 @@ import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
-import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -122,6 +123,8 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
+  eventConfig?: EventConfig
+  event?: EventIndex
 }
 
 const GeneratedInputField = React.memo(
@@ -134,7 +137,8 @@ const GeneratedInputField = React.memo(
     touched,
     value,
     formData,
-    disabled
+    disabled,
+    eventConfig
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
 
@@ -465,7 +469,17 @@ const GeneratedInputField = React.memo(
     }
 
     if (isDataFieldType(field)) {
-      return <Data.Input {...field.config} formData={formData} />
+      if (!eventConfig) {
+        throw new Error('Event configuration is required for data field')
+      }
+
+      return (
+        <Data.Input
+          {...field.config}
+          formData={formData}
+          eventConfig={eventConfig}
+        />
+      )
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
@@ -496,13 +510,14 @@ interface ExposedProps {
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
   initialValues?: EventState
+  eventConfig?: EventConfig
+  eventDeclarationData?: EventState
 }
 
 type AllProps = ExposedProps &
   IntlShapeProps &
   FormikProps<EventState> & {
     className?: string
-    eventData: EventState
   }
 
 class FormSectionComponent extends React.Component<AllProps> {
@@ -610,7 +625,7 @@ class FormSectionComponent extends React.Component<AllProps> {
       touched,
       intl,
       className,
-      eventData
+      eventDeclarationData
     } = this.props
 
     const language = this.props.intl.locale
@@ -640,7 +655,7 @@ class FormSectionComponent extends React.Component<AllProps> {
             valuesWithFormattedDate
           )
 
-          const allData = { ...formData, ...eventData }
+          const allData = { ...formData, ...eventDeclarationData }
 
           if (!isFieldVisible(field, allData)) {
             return null
@@ -672,6 +687,8 @@ class FormSectionComponent extends React.Component<AllProps> {
                       onUploadingStateChanged={
                         this.props.onUploadingStateChanged
                       }
+                      eventConfig={this.props.eventConfig}
+                      // event={undefined}
                     />
                   )
                 }}
@@ -709,10 +726,12 @@ function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
 
 export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
   (props) => {
+    const { eventConfig, formData, fields, eventDeclarationData } = props
+
     const intl = useIntl()
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
-    const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
+    const nestedFormData = makeFormFieldIdsFormikCompatible(formData)
 
     const onChange = (values: EventState) => {
       props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
@@ -724,8 +743,6 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
       ...props.initialValues
     })
 
-    const { event } = useCurrentEvent()
-
     return (
       <Formik<EventState>
         enableReinitialize={true}
@@ -734,13 +751,15 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
         validateOnMount={true}
         validate={(values) =>
           getValidationErrorsForForm(
-            props.fields,
+            fields,
             makeFormikFieldIdsOpenCRVSCompatible(values)
           )
         }
         onSubmit={() => {}}
       >
         {(formikProps) => {
+          const { touched } = formikProps
+
           useEffect(() => {
             /**
              * Because 'enableReinitialize' prop is set to 'true' above, whenver initialValue changes,
@@ -750,18 +769,16 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
              */
             if (
               setAllTouchedFields &&
-              Object.keys(formikProps.touched).length > 0 &&
-              !isEqual(formikProps.touched, initialTouchedFields) &&
-              Object.keys(formikProps.touched).some(
-                (key) => !(key in initialTouchedFields)
-              )
+              Object.keys(touched).length > 0 &&
+              !isEqual(touched, initialTouchedFields) &&
+              Object.keys(touched).some((key) => !(key in initialTouchedFields))
             ) {
               setAllTouchedFields({
                 ...initialTouchedFields,
-                ...formikProps.touched
+                ...touched
               })
             }
-          }, [formikProps.touched, initialTouchedFields, setAllTouchedFields])
+          }, [touched, initialTouchedFields, setAllTouchedFields])
           return (
             <FormSectionComponent
               {...props}
@@ -769,7 +786,8 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
               formData={nestedFormData}
               intl={intl}
               onChange={onChange}
-              eventData={event?.data ?? {}}
+              eventDeclarationData={eventDeclarationData}
+              eventConfig={eventConfig}
             />
           )
         }}
