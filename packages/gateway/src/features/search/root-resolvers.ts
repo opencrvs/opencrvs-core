@@ -103,6 +103,7 @@ export const resolvers: GQLResolver = {
           results: []
         }
 
+      // TODO: refactor this concept to avoid calling the dataSource.usersAPI
       const userIdentifier = getTokenPayload(authHeader.Authorization).sub
       let user
       let system

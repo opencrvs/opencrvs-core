@@ -259,7 +259,8 @@ export async function validateLocationLevelsAndCountry(address: Address) {
 
     for (let i = 0; i < locationLevels.length - 1; i++) {
       if (locationLevels[i]) {
-        const location = await fetchFromHearth(`/Location/${locationLevels[i]}`)
+        const location = await fetchFromHearth(`Location/${locationLevels[i]}`)
+
         if (!location || !location.type) {
           throw BoomErrorWithCustomMessage(
             `Could not process the Event Notification, as the location with id ${locationLevels[i]} not found!`
