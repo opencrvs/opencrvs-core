@@ -87,7 +87,11 @@ export function validateAction(actionType: ActionType) {
       .map((field) => {
         const value = data[field]
         return typeof value !== 'boolean'
-          ? { message: 'Field is required', id: field, value }
+          ? {
+              message: 'Verification page result is required',
+              id: field,
+              value
+            }
           : null
       })
       .filter((error) => error !== null)
