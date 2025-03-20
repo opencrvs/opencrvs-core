@@ -61,6 +61,10 @@
 
 ## 1.6.3 Release candidate
 
+### Bug fixes
+
+- Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations , the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
+
 ### Improvements
 
 - For countries where local phone numbers start with 0, we now ensure the prefix remains unchanged when converting to and from the international format.
