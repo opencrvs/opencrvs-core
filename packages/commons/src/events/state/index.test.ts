@@ -13,6 +13,7 @@ import { getCurrentEventState } from '.'
 import { tennisClubMembershipEvent } from '../../fixtures'
 import { getUUID } from '../../uuid'
 import { ActionType } from '../ActionType'
+import { AddressType } from '../CompositeFieldValue'
 import { generateActionDocument } from '../test.utils'
 
 describe('correction requests', () => {
@@ -127,7 +128,8 @@ describe('correction requests', () => {
 
 describe('address state transitions', () => {
   const addressWithoutVillage = {
-    country: process.env.COUNTRY || ('FAR' as const),
+    country: 'FAR',
+    addressType: AddressType.DOMESTIC,
     province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
     urbanOrRural: 'RURAL' as const

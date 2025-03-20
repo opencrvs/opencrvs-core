@@ -160,6 +160,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.ADDRESS:
       const addressProperties = {
         country: { type: 'keyword' },
+        addressType: { type: 'keyword' },
         province: { type: 'keyword' },
         district: { type: 'keyword' },
         urbanOrRural: { type: 'keyword' },

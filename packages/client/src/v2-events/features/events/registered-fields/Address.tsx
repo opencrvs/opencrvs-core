@@ -98,7 +98,7 @@ const displayWhenDistrictUrbanSelected = [
   {
     type: ConditionalType.SHOW,
     conditional: and(
-      isDefaultCountry(),
+      isDomesticAddress(),
       createFieldCondition('urbanOrRural').isEqualTo(AddressType.URBAN),
       not(createFieldCondition('district').isUndefined())
     )
@@ -163,14 +163,17 @@ const URBAN_FIELDS = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-function isDefaultCountry() {
-  return createFieldCondition('country').isEqualTo(window.config.COUNTRY)
-}
-
-function isOtherThanDefaultCountry() {
+function isDomesticAddress() {
   return and(
     not(createFieldCondition('country').isUndefined()),
-    not(isDefaultCountry())
+    not(isInternationalAddress())
+  )
+}
+
+function isInternationalAddress() {
+  return and(
+    not(createFieldCondition('country').isUndefined()),
+    createFieldCondition('addressType').isEqualTo('International')
   )
 }
 
@@ -181,7 +184,7 @@ const RURAL_FIELDS = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          isDefaultCountry(),
+          isDomesticAddress(),
           createFieldCondition('urbanOrRural').isEqualTo(AddressType.RURAL),
           not(createFieldCondition('district').isUndefined())
         )
@@ -214,7 +217,7 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isDefaultCountry()
+        conditional: isDomesticAddress()
       }
     ],
     required: true,
@@ -233,7 +236,7 @@ const ADMIN_STRUCTURE = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          isDefaultCountry(),
+          isDomesticAddress(),
           not(createFieldCondition('province').isUndefined())
         )
       }
@@ -257,7 +260,7 @@ const ADMIN_STRUCTURE = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          isDefaultCountry(),
+          isDomesticAddress(),
           not(createFieldCondition('district').isUndefined())
         )
       }
@@ -301,7 +304,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isOtherThanDefaultCountry()
+        conditional: isInternationalAddress()
       }
     ],
     required: true,
@@ -317,7 +320,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isOtherThanDefaultCountry()
+        conditional: isInternationalAddress()
       }
     ],
     required: true,
@@ -333,7 +336,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isOtherThanDefaultCountry()
+        conditional: isInternationalAddress()
       }
     ],
     required: false,
@@ -349,7 +352,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isOtherThanDefaultCountry()
+        conditional: isInternationalAddress()
       }
     ],
     required: false,
@@ -365,7 +368,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isOtherThanDefaultCountry()
+        conditional: isInternationalAddress()
       }
     ],
     required: false,
@@ -381,7 +384,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isOtherThanDefaultCountry()
+        conditional: isInternationalAddress()
       }
     ],
     required: false,
@@ -397,7 +400,7 @@ const GENERIC_ADDRESS_FIELDS = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: isOtherThanDefaultCountry()
+        conditional: isInternationalAddress()
       }
     ],
     required: false,
@@ -418,7 +421,10 @@ const ALL_ADDRESS_FIELDS = [
 ]
 
 type AllKeys<T> = T extends unknown ? keyof T : never
-type RequiredKeysFromFieldValue = AllKeys<AddressFieldValue>
+type RequiredKeysFromFieldValue = Exclude<
+  AllKeys<AddressFieldValue>,
+  'addressType'
+>
 type EnsureSameUnion<A, B> = [A] extends [B]
   ? [B] extends [A]
     ? true

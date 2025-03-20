@@ -16,6 +16,7 @@ import React from 'react'
 import superjson from 'superjson'
 import {
   AddressFieldValue,
+  AddressType,
   TENNIS_CLUB_FORM,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -30,7 +31,8 @@ const mockFormData = {
   'applicant.surname': 'Doe',
   'applicant.dob': '1990-01-01',
   'applicant.address': {
-    country: window.config.COUNTRY || ('FAR' as const),
+    country: 'FAR',
+    addressType: AddressType.DOMESTIC,
     province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
     street: '123 Tennis Club Avenue',
@@ -196,7 +198,8 @@ export const ReviewWithValidationErrors: Story = {
       'applicant.dob': undefined,
       'applicant.email': 'mia@',
       'applicant.address': {
-        country: window.config.COUNTRY || ('FAR' as const),
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         urbanOrRural: 'RURAL',
         village: 'Tennisville'

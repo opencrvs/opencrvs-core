@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldType, mapFieldTypeToZod } from '../events'
+import { AddressType, FieldType, mapFieldTypeToZod } from '../events'
 
 const testCases = [
   {
@@ -22,7 +22,8 @@ const testCases = [
   {
     title: 'Valid FAR address',
     address: {
-      country: process.env.COUNTRY || ('FAR' as const),
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'sadsad-sadsad-sadsadsd-sdsdsd',
       district: 'gdgfhdfg-wwqret-dfgfgsd-ewrew',
       urbanOrRural: 'URBAN'
@@ -33,6 +34,7 @@ const testCases = [
     title: 'Invalid other address',
     address: {
       country: 'ABC',
+      addressType: AddressType.DOMESTIC,
       province: 'sadsad-sadsad-sadsadsd-sdsdsd',
       district: 'gdgfhdfg-wwqret-dfgfgsd-ewrew',
       urbanOrRural: 'URBAN'
@@ -43,6 +45,7 @@ const testCases = [
     title: 'Valid other address',
     address: {
       country: 'ABC',
+      addressType: AddressType.INTERNATIONAL,
       state: 'sadsad-sadsad-sadsadsd-sdsdsd',
       district2: 'gdgfhdfg-wwqret-dfgfgsd-ewrew'
     },

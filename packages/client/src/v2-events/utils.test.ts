@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FieldType } from '@opencrvs/commons/client'
+import { AddressType, FieldType } from '@opencrvs/commons/client'
 import { replacePlaceholders } from './utils'
 
 const testCases = [
@@ -63,7 +63,8 @@ const testCases = [
   {
     currentValue: undefined,
     defaultValue: {
-      country: window.config.COUNTRY || ('BGD' as const),
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       district: '$user.district',
       province: '$user.province',
       urbanOrRural: 'URBAN'
@@ -75,7 +76,8 @@ const testCases = [
       }
     },
     expected: {
-      country: window.config.COUNTRY || ('BGD' as const),
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       district: 'Ibombo',
       province: 'Central',
       urbanOrRural: 'URBAN'
