@@ -23,7 +23,8 @@ function FileInput({
   acceptedFileTypes,
   maxFileSize,
   label,
-  error
+  error,
+  touched
 }: {
   width?: 'full' | 'auto'
   acceptedFileTypes?: MimeType[]
@@ -34,6 +35,7 @@ function FileInput({
   description?: string
   error?: string
   label?: string
+  touched?: boolean
 }) {
   const [file, setFile] = React.useState(value)
 
@@ -61,6 +63,7 @@ function FileInput({
       label={label ?? file?.originalFilename}
       maxFileSize={maxFileSize}
       name={name}
+      touched={touched}
       width={width}
       onComplete={(newFile) => {
         if (newFile) {
