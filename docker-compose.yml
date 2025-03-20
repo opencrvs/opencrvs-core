@@ -297,9 +297,10 @@ services:
     build:
       context: .
       dockerfile: ./packages/data-seeder/Dockerfile
-    restart: unless-stopped
     depends_on:
       - base
+    deploy:
+      replicas: 0
     environment:
       - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
       - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config
