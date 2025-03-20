@@ -77,6 +77,14 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
   if (!hasEventsIndex) {
     await createIndex(indexName, getAllFields(eventConfiguration))
   }
+  return ensureAlias(indexName)
+}
+export async function ensureAlias(indexName: string) {
+  const client = getOrCreateClient()
+  return client.indices.putAlias({
+    index: indexName,
+    name: getEventAliasName()
+  })
 }
 
 export async function createIndex(
@@ -109,10 +117,7 @@ export async function createIndex(
     }
   })
 
-  return client.indices.putAlias({
-    index: indexName,
-    name: getEventAliasName()
-  })
+  return ensureAlias(indexName)
 }
 
 const SEPARATOR = '____'
