@@ -281,13 +281,13 @@ export async function deleteEventIndex(event: EventDocument) {
 export async function getIndexedEvents() {
   const esClient = getOrCreateClient()
 
-  const hasEventsIndex = await esClient.indices.exists({
-    index: getEventAliasName()
+  const hasEventsIndex = await esClient.indices.existsAlias({
+    name: getEventAliasName()
   })
 
   if (!hasEventsIndex) {
     logger.error(
-      'Event index not created. Sending empty array. Ensure indexing is running.'
+      `Event alias ${getEventAliasName()} not created. Sending empty array. Ensure indexing is running.`
     )
     return []
   }
