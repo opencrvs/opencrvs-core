@@ -469,8 +469,9 @@ const GeneratedInputField = React.memo(
     }
 
     if (isDataFieldType(field)) {
+      // If no event config found, don't render the data field. This should never actually happen, but didn't want to throw an error either.
       if (!eventConfig) {
-        throw new Error('Event configuration is required for data field')
+        return null
       }
 
       return (
