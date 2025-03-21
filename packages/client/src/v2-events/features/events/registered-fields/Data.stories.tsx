@@ -12,14 +12,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import {
-  EventIndex,
-  FieldType,
-  tennisClubMembershipEvent
-} from '@opencrvs/commons/client'
+import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { CurrentEventContext } from '@client/v2-events/features/events/components/useCurrentEvent'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Data',
@@ -38,14 +33,6 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-const eventIndex = {
-  type: 'tennis-club-membership',
-  status: 'DECLARED',
-  id: 'test-id',
-  createdAt: new Date().toISOString(),
-  createdBy: 'test-user'
-} as EventIndex
-
 export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   name: 'Data display field',
   parameters: {
@@ -53,56 +40,48 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   },
   render: function Component() {
     return (
-      <CurrentEventContext.Provider
-        value={{
-          config: tennisClubMembershipEvent,
-          event: {
-            ...eventIndex,
-            data: {
-              'applicant.firstname': 'Tanya',
-              'applicant.surname': 'McQuaid',
-              'applicant.dob': '1975-01-02'
-            }
-          }
+      <StyledFormFieldGenerator
+        eventConfig={tennisClubMembershipEvent}
+        eventDeclarationData={{
+          'applicant.firstname': 'Tanya',
+          'applicant.surname': 'McQuaid',
+          'applicant.dob': '1975-01-02'
         }}
-      >
-        <StyledFormFieldGenerator
-          fields={[
-            {
-              id: 'storybook.data',
-              type: FieldType.DATA,
-              label: {
-                id: 'storybook.data.label',
-                defaultMessage: 'Applicant details',
+        fields={[
+          {
+            id: 'storybook.data',
+            type: FieldType.DATA,
+            label: {
+              id: 'storybook.data.label',
+              defaultMessage: 'Applicant details',
+              description: ''
+            },
+            configuration: {
+              subtitle: {
+                id: 'storybook.data.subtitle',
+                defaultMessage: 'Some subtitle',
                 description: ''
               },
-              configuration: {
-                subtitle: {
-                  id: 'storybook.data.subtitle',
-                  defaultMessage: 'Some subtitle',
-                  description: ''
+              data: [
+                {
+                  fieldId: 'applicant.firstname'
                 },
-                data: [
-                  {
-                    fieldId: 'applicant.firstname'
-                  },
-                  {
-                    fieldId: 'applicant.surname'
-                  },
-                  {
-                    fieldId: 'applicant.dob'
-                  }
-                ]
-              }
+                {
+                  fieldId: 'applicant.surname'
+                },
+                {
+                  fieldId: 'applicant.dob'
+                }
+              ]
             }
-          ]}
-          formData={{}}
-          id="my-form"
-          setAllFieldsDirty={false}
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          onChange={() => {}}
-        />
-      </CurrentEventContext.Provider>
+          }
+        ]}
+        formData={{}}
+        id="my-form"
+        setAllFieldsDirty={false}
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onChange={() => {}}
+      />
     )
   }
 }

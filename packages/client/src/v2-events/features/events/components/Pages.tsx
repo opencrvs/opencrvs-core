@@ -11,7 +11,12 @@
 
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
-import { EventState, Page, PageType } from '@opencrvs/commons/client'
+import {
+  EventState,
+  Page,
+  PageType,
+  EventConfig
+} from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
@@ -30,8 +35,9 @@ export function Pages({
   onSubmit,
   continueButtonText,
   setFormData,
-  children,
-  disableContinue = false
+  disableContinue = false,
+  eventConfig,
+  eventDeclarationData
 }: {
   form: EventState
   setFormData: (data: EventState) => void
@@ -41,8 +47,9 @@ export function Pages({
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
-  children?: (page: Page) => React.ReactNode
   disableContinue?: boolean
+  eventConfig?: EventConfig
+  eventDeclarationData?: EventState
 }) {
   const intl = useIntl()
 
@@ -77,10 +84,10 @@ export function Pages({
     onSubmit
   }
 
-  const fields = children ? (
-    children(page)
-  ) : (
+  const fields = (
     <FormFieldGenerator
+      eventConfig={eventConfig}
+      eventDeclarationData={eventDeclarationData}
       fields={page.fields}
       formData={form}
       id="locationForm"

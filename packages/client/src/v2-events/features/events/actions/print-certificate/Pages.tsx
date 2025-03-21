@@ -27,11 +27,12 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { ROUTES } from '@client/v2-events/routes'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
-import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
 import {
   CERT_TEMPLATE_ID,
   useCertificateTemplateSelectorFieldConfig
 } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -44,18 +45,17 @@ export function Pages() {
   const { modal } = useEventFormNavigation()
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata()
-  const { config, event } = useCurrentEvent()
-
-  if (!config || !event) {
-    throw new Error('Event not found.')
-  }
-
+  const events = useEvents()
+  const event = events.getEventState.useSuspenseQuery(eventId)
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type
   )
 
   const formPages = getActiveActionFormPages(
-    config,
+    configuration,
     ActionType.PRINT_CERTIFICATE
   )
 
@@ -98,6 +98,8 @@ export function Pages() {
       {modal}
       <PagesComponent
         disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
+        eventConfig={configuration}
+        eventDeclarationData={event.data}
         form={metadata}
         formPages={formPages.map((page) => {
           if (formPages[0].id === page.id) {

@@ -27,9 +27,11 @@ import {
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
-import { useCurrentEvent } from '@client/v2-events/features/events/components/useCurrentEvent'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 export function Pages() {
+  const events = useEvents()
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.VALIDATE.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
@@ -39,13 +41,12 @@ export function Pages() {
   const { modal, goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const { config, event } = useCurrentEvent()
+  const event = events.getEventState.useSuspenseQuery(eventId)
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
 
-  if (!config || !event) {
-    throw new Error('Event not found.')
-  }
-
-  const formPages = getActiveActionFormPages(config, ActionType.VALIDATE)
+  const formPages = getActiveActionFormPages(configuration, ActionType.VALIDATE)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -78,6 +79,8 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        eventConfig={configuration}
+        eventDeclarationData={event.data}
         form={form}
         formPages={formPages}
         pageId={currentPageId}
