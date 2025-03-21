@@ -15,7 +15,6 @@ import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/auth-utils'
 import { toRetrieved } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { auditEvent } from '@workflow/records/audit'
 
 export async function retrieveRecordHandler(
   request: Hapi.Request,
@@ -36,7 +35,6 @@ export async function retrieveRecordHandler(
 
   // Here the sent bundle is saved with task only
   await sendBundleToHearth(changedResources)
-  await auditEvent('downloaded', retrievedRecord, token)
 
   return retrievedRecord
 }
