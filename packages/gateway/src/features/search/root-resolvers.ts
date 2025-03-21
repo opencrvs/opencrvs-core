@@ -179,9 +179,11 @@ export const resolvers: GQLResolver = {
           throw new Error(errMsg.message)
         }
 
-        ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await retrieveRecord(hit._id, authHeader)
-        })
+        await Promise.all(
+          (searchResult.body.hits.hits || []).map((hit) =>
+            retrieveRecord(hit._id, authHeader)
+          )
+        )
 
         if (searchResult.body.hits.total.value) {
           await postMetrics('/advancedSearch', {}, authHeader)
