@@ -49,6 +49,7 @@ export function validateAction(actionType: ActionType) {
       ...(opts.input.metadata ?? {})
     } satisfies ActionUpdate
 
+    // TODO CIHAN: dont expect required fields from hidden pages?
     const errors = formFields.reduce(
       (
         errorResults: {
