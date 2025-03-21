@@ -316,7 +316,7 @@ export function field(fieldId: string) {
         },
         required: ['$form']
       }),
-    isValidName: () =>
+    isValidEnglishName: () =>
       defineConditional({
         type: 'object',
         properties: {

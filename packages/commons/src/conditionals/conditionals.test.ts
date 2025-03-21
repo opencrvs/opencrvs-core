@@ -269,9 +269,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass for a two-word name', () => {
@@ -280,9 +280,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass for a hyphenated name', () => {
@@ -291,9 +291,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass when name is enclosed in brackets', () => {
@@ -302,9 +302,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass when brackets are around part of the name', () => {
@@ -313,9 +313,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass when brackets enclose the middle name', () => {
@@ -324,9 +324,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass when brackets enclose the last name', () => {
@@ -335,9 +335,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass when name contains an underscore', () => {
@@ -346,9 +346,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass when name contains a number', () => {
@@ -357,9 +357,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass when name starts with a number', () => {
@@ -368,9 +368,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
 
     it('should pass when name contains an apostrophe', () => {
@@ -379,9 +379,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        true
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
     })
   })
 
@@ -392,9 +392,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        false
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
     })
 
     it('should fail when brackets are wrongly placed at the end', () => {
@@ -403,9 +403,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        false
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
     })
 
     it('should fail when brackets are not properly closed', () => {
@@ -414,9 +414,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        false
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
     })
 
     it('should fail when brackets are improperly nested', () => {
@@ -425,9 +425,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        false
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
     })
 
     it('should fail when name contains a Bengali digit', () => {
@@ -436,9 +436,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        false
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
     })
 
     it('should fail when name contains non-Latin characters', () => {
@@ -447,9 +447,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        false
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
     })
 
     it('should fail when name contains commas', () => {
@@ -458,9 +458,9 @@ describe('"valid name" conditionals', () => {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
-      expect(validate(field('child.firstName').isValidName(), params)).toBe(
-        false
-      )
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
     })
   })
 })
