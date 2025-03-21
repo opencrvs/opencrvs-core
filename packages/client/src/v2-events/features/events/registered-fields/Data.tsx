@@ -50,9 +50,7 @@ function DataInput({
   fields: { value: FieldValue; config?: Inferred }[]
 }) {
   const intl = useIntl()
-
   const { data, subtitle } = configuration
-
   const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
   return (
@@ -68,7 +66,7 @@ function DataInput({
           }
 
           return (
-            <>
+            <React.Fragment key={field.config.id}>
               <dt>{intl.formatMessage(field.config.label)}</dt>
               <dd>
                 <Output
@@ -77,7 +75,7 @@ function DataInput({
                   value={field.value}
                 />
               </dd>
-            </>
+            </React.Fragment>
           )
         })}
       </dl>
