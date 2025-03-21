@@ -19,7 +19,7 @@ import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { EventState } from './ActionDocument'
+import { ActionUpdate, EventState } from './ActionDocument'
 import { FormConfig, Page, PageType } from './FormConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
 import { FieldType } from './FieldType'
@@ -296,8 +296,7 @@ export function isVerificationPage(page: Page) {
   return page.type === PageType.VERIFICATION
 }
 
-// TODO CIHAN: type
-export function isPageVisible(page: Page, eventData: any) {
+export function isPageVisible(page: Page, eventData: ActionUpdate) {
   if (!page.conditional) {
     return true
   }

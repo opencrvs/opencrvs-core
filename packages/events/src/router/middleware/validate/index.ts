@@ -80,12 +80,11 @@ export function validateAction(actionType: ActionType) {
     )
 
     const event = await getEventById(opts.input.eventId)
-    const eventDeclarationData = event.actions.find(
-      (action) => action.type === ActionType.DECLARE
-    )?.data
+    const eventDeclarationData =
+      event.actions.find((action) => action.type === ActionType.DECLARE)
+        ?.data ?? {}
 
-    // For each verification page on the form, where conditional is met
-    // we expect a boolean field with the page id as key in the metadata.
+    // For each visible verification page on the form, we expect the metadata to include a field with boolean value and the page id as key.
     const visibleVerificationPageIds = getActiveActionFormPages(
       configuration,
       actionType
