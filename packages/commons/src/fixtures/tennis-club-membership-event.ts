@@ -14,7 +14,7 @@ import { defineForm } from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
 import { FormPageType } from '../events/FormConfig'
-import { FieldType } from 'src/events'
+import { FieldType } from '../events/FieldType'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineForm({
