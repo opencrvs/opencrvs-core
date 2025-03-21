@@ -148,15 +148,12 @@ export async function eventNotificationHandler(
   req: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  console.log('Starting Event Notification ------->')
   let bundle: Bundle
   try {
     bundle = req.payload as Bundle
 
     await validateTask(bundle)
     await validateAddressesOfTask(bundle)
-
-    console.log('finalized the event notification ------->')
   } catch (e) {
     if (e.isBoom) {
       return h

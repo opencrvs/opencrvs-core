@@ -108,15 +108,12 @@ export const resolvers: GQLResolver = {
       let user
       let system
 
-      try {
-        user = await dataSources.usersAPI.getUserById(userIdentifier!)
-      } catch (error) {
-        //user not found, attempting to find the system
-        system = await getSystem({ systemId: userIdentifier }, authHeader)
+      const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
 
-        if (!system) {
-          throw new Error('API client system not found')
-        }
+      if (isExternalAPI) {
+        system = await getSystem({ systemId: userIdentifier }, authHeader)
+      } else {
+        user = await dataSources.usersAPI.getUserById(userIdentifier!)
       }
 
       const office = user
@@ -134,7 +131,7 @@ export const resolvers: GQLResolver = {
       const transformedSearchParams = transformSearchParams(
         getTokenPayload(authHeader.Authorization).scope,
         advancedSearchParameters,
-        ''
+        officeLocationId ?? ''
       )
 
       const searchCriteria: ISearchCriteria = {
@@ -160,7 +157,6 @@ export const resolvers: GQLResolver = {
         }))
       }
 
-      const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
       if (isExternalAPI && system) {
         const getTotalRequest = await getMetrics(
           '/advancedSearch',

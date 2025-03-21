@@ -58,7 +58,7 @@ import {
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { getTokenPayload, getUUID, UUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
@@ -72,9 +72,7 @@ import { getUserOrSystem, isSystem } from './user'
 import {
   getLoggedInPractitionerResource,
   getPractitionerOfficeId,
-  getPractitionerRoleByPractitionerId,
-  getSystem,
-  getUser
+  getPractitionerRoleByPractitionerId
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
 import { fetchLocationHierarchy } from '@workflow/utils/location'
@@ -1186,29 +1184,13 @@ export async function sendBundleToHearth(
 export async function getPractitionerRoleFromToken(
   token: string
 ): Promise<BundleEntry<PractitionerRole>> {
-  const tokenPayload = getTokenPayload(token)
+  const userOrSystem = await getUserOrSystem(token)
 
-  let userDetails
-  let system
+  const practitionerId = userOrSystem ? userOrSystem.practitionerId : null
 
-  try {
-    // in case we have a user
-    userDetails = await getUser(tokenPayload.sub, {
-      Authorization: token
-    })
-  } catch (error) {
-    system = await getSystem(tokenPayload.sub, {
-      Authorization: token
-    })
-
-    if (!system) {
-      throw new Error(`System not found!`)
-    }
+  if (!practitionerId) {
+    throw new Error(`Practitioner ID not found!`)
   }
-
-  const practitionerId = userDetails
-    ? userDetails.practitionerId
-    : system.practitionerId
 
   const practitionerRoleBundle = (await getPractitionerRoleByPractitionerId(
     practitionerId as UUID
