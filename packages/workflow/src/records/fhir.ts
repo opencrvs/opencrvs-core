@@ -700,6 +700,12 @@ export function createDownloadTask(previousTask: SavedTask) {
   ])
 }
 
+export function createRetrieveTask(previousTask: SavedTask) {
+  return createNewTaskResource(previousTask, [
+    { url: 'http://opencrvs.org/specs/extension/regDownloaded' }
+  ])
+}
+
 export function createRejectTask(
   previousTask: SavedTask,
   comment: fhir3.CodeableConcept,

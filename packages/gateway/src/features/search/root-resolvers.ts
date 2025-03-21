@@ -22,7 +22,7 @@ import {
   ISearchCriteria,
   postAdvancedSearch
 } from './utils'
-import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
+import { retrieveRecord } from '@gateway/workflow/index'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { RateLimitError } from '@gateway/rate-limit'
 import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
@@ -180,7 +180,7 @@ export const resolvers: GQLResolver = {
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await fetchRegistrationForDownloading(hit._id, authHeader)
+          await retrieveRecord(hit._id, authHeader)
         })
 
         if (searchResult.body.hits.total.value) {
