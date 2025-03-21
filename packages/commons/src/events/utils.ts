@@ -20,7 +20,7 @@ import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { EventState } from './ActionDocument'
-import { FormConfig, PageType } from './FormConfig'
+import { FormConfig, FormPageType } from './FormConfig'
 import { isFieldVisible } from '../conditionals/validate'
 import { FieldType } from './FieldType'
 import { getOrThrow } from '../utils'
@@ -302,6 +302,6 @@ export function findActiveActionVerificationPageIds(
   }
 
   return pages
-    .filter((page) => page.type === PageType.VERIFICATION)
+    .filter((page) => page.type === FormPageType.VERIFICATION)
     .map((page) => page.id)
 }

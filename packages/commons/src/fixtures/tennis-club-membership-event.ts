@@ -13,7 +13,7 @@ import { defineConfig } from '../events/defineConfig'
 import { defineForm } from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
-import { PageType } from '../events/FormConfig'
+import { FormPageType } from '../events/FormConfig'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineForm({
@@ -643,7 +643,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
     },
     {
       id: 'collector.identity.verify',
-      type: PageType.VERIFICATION,
+      type: FormPageType.VERIFICATION,
       title: {
         id: 'event.birth.action.print.verifyIdentity',
         defaultMessage: 'Verify their identity',

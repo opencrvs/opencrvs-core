@@ -12,16 +12,16 @@ import { z } from 'zod'
 import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
 
-export enum PageType {
-  FORM = 'FORM',
-  VERIFICATION = 'VERIFICATION'
-}
+export const FormPageType = {
+  FORM: 'FORM',
+  VERIFICATION: 'VERIFICATION'
+} as const
 
 export const FormPage = z.object({
   id: z.string().describe('Unique identifier for the page'),
   title: TranslationConfig.describe('Header title of the page'),
   fields: z.array(FieldConfig).describe('Fields to be rendered on the page'),
-  type: z.literal(PageType.FORM).default(PageType.FORM)
+  type: z.literal(FormPageType.FORM).default(FormPageType.FORM)
 })
 
 export const VerificationPageConfig = z
@@ -38,7 +38,7 @@ export const VerificationPageConfig = z
   .describe('Actions available on the verification page')
 
 export const VerificationPage = FormPage.extend({
-  type: z.literal(PageType.VERIFICATION),
+  type: z.literal(FormPageType.VERIFICATION),
   actions: VerificationPageConfig
 })
 
@@ -48,7 +48,7 @@ type AllPageConfigs = typeof FormPage | typeof VerificationPage
 export const PageConfig = z.preprocess(
   (pageConfig: z.infer<AllPageConfigs>) => ({
     ...pageConfig,
-    type: pageConfig.type ?? PageType.FORM // Default type to "FORM" if not provided
+    type: pageConfig.type ?? FormPageType.FORM // Default type to "FORM" if not provided
   }),
   z.discriminatedUnion('type', [FormPage, VerificationPage])
 ) as unknown as z.ZodDiscriminatedUnion<'type', AllPageConfigs[]>

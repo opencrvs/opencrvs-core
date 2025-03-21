@@ -14,7 +14,7 @@ import { useIntl } from 'react-intl'
 import {
   EventState,
   Page,
-  PageType,
+  FormPageType,
   EventConfig
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
@@ -97,7 +97,7 @@ export function Pages({
     />
   )
 
-  if (page.type === PageType.VERIFICATION) {
+  if (page.type === FormPageType.VERIFICATION) {
     return (
       <VerificationWizard
         {...wizardProps}
