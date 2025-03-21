@@ -20,13 +20,14 @@ import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { EventState } from './ActionDocument'
-import { FormConfig, PageType } from './FormConfig'
-import { isFieldVisible } from '../conditionals/validate'
+import { FormConfig, Page, PageType } from './FormConfig'
+import { isFieldVisible, validate } from '../conditionals/validate'
 import { FieldType } from './FieldType'
 import { getOrThrow } from '../utils'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID } from '../uuid'
+import { formatISO } from 'date-fns'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -291,17 +292,18 @@ export function createEmptyDraft(
   }
 }
 
-export function findActiveActionVerificationPageIds(
-  configuration: EventConfig,
-  action: ActionType
-): string[] {
-  const pages = findActiveActionFormPages(configuration, action)
+export function isVerificationPage(page: Page) {
+  return page.type === PageType.VERIFICATION
+}
 
-  if (!pages) {
-    return []
+// TODO CIHAN: type
+export function isPageVisible(page: Page, eventData: any) {
+  if (!page.conditional) {
+    return true
   }
 
-  return pages
-    .filter((page) => page.type === PageType.VERIFICATION)
-    .map((page) => page.id)
+  return validate(page.conditional, {
+    $form: eventData,
+    $now: formatISO(new Date(), { representation: 'date' })
+  })
 }

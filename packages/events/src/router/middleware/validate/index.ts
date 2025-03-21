@@ -16,13 +16,15 @@ import {
   FieldConfig,
   FieldUpdateValue,
   findActiveActionFields,
-  findActiveActionVerificationPageIds,
+  getActiveActionFormPages,
   getFieldValidationErrors,
-  getOrThrow
+  getOrThrow,
+  isPageVisible,
+  isVerificationPage
 } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { findEventConfigurationById } from '@events/service/config/config'
-import { getEventTypeId } from '@events/service/events/events'
+import { getEventTypeId, getEventById } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
@@ -77,13 +79,24 @@ export function validateAction(actionType: ActionType) {
       []
     )
 
-    // For each verification page on the form, we expect a boolean field with the page id as key in the metadata.
-    const verificationPageIds = findActiveActionVerificationPageIds(
+    const event = await getEventById(opts.input.eventId)
+    const eventDeclarationData = event.actions.find(
+      (action) => action.type === ActionType.DECLARE
+    )?.data
+
+    // For each verification page on the form, where conditional is met
+    // we expect a boolean field with the page id as key in the metadata.
+    const visibleVerificationPageIds = getActiveActionFormPages(
       configuration,
       actionType
     )
+      .filter((page) => isVerificationPage(page))
+      .filter((page) =>
+        isPageVisible(page, { ...eventDeclarationData, ...data })
+      )
+      .map((page) => page.id)
 
-    const verificationPageErrors = verificationPageIds
+    const verificationPageErrors = visibleVerificationPageIds
       .map((field) => {
         const value = data[field]
         return typeof value !== 'boolean'

@@ -11,7 +11,7 @@
 import { merge } from 'lodash'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
-import { ActionBase, ActionDocument } from './ActionDocument'
+import { ActionBase, ActionDocument, EventState } from './ActionDocument'
 import {
   ArchiveActionInput,
   DeclareActionInput,
@@ -29,8 +29,10 @@ import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
   findActiveActionFormFields,
-  stripHiddenFields,
-  findActiveActionVerificationPageIds
+  getActiveActionFormPages,
+  isPageVisible,
+  isVerificationPage,
+  stripHiddenFields
 } from './utils'
 import { FieldValue } from './FieldValue'
 
@@ -57,12 +59,15 @@ export function generateActionMetadataInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const verificationPageIds = findActiveActionVerificationPageIds(
+  const visibleVerificationPageIds = getActiveActionFormPages(
     configuration,
     action
   )
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, {}))
+    .map((page) => page.id)
 
-  return verificationPageIds.reduce(
+  return visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
       ...acc,
       [pageId]: true

@@ -11,13 +11,12 @@
 
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
-import { formatISO } from 'date-fns'
 import {
   EventState,
   Page,
   PageType,
   EventConfig,
-  validate
+  isPageVisible
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -57,20 +56,9 @@ export function Pages({
 
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
 
-  const pages = formPages.filter((p) => {
-    if (!p.conditional) {
-      return true
-    }
-
-    // TODO CIHAN: add main form data?
-    return validate(p.conditional, {
-      $form: form,
-      $now: formatISO(new Date(), { representation: 'date' })
-    })
-  })
-
-  console.log('CIHAN TEST')
-  console.log(pages)
+  const pages = formPages.filter((page) =>
+    isPageVisible(page, { ...form, ...eventDeclarationData })
+  )
 
   const {
     page: currentPage,
