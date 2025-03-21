@@ -31,11 +31,10 @@ const meta: Meta<typeof FormFieldGenerator> = {
 
 export default meta
 
-const StyledFormFieldGenerator = styled(FormFieldGenerator)<{
-  fullWidth?: boolean
-}>`
+const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
 `
+
 export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
   name: 'File input with option',
   parameters: {
@@ -148,12 +147,5 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
           }}
         />
       )
-    },
-    argTypes: {
-      fullWidth: {
-        control: 'boolean',
-        description: 'Toggle to make the input full width'
-      }
-    },
-    args: { fullWidth: false }
+    }
   }
