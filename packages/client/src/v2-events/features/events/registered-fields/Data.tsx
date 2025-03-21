@@ -25,26 +25,26 @@ const Container = styled.div`
   padding: 17px 20px 10px;
   border-radius: 5px;
 
-  h4 {
+  label {
     ${({ theme }) => theme.fonts.bold18};
     margin: 0 0 0.3rem;
   }
 
-  h5 {
-    ${({ theme }) => theme.fonts.reg16};
-    color: ${({ theme }) => theme.colors.grey500};
-    margin: 0 0 2rem;
-  }
-
-  label {
+  dt {
     ${({ theme }) => theme.fonts.bold16};
     display: block;
     margin-bottom: 0.4rem;
   }
 
-  p {
+  dd {
     margin: 0 0 1.5rem;
   }
+`
+
+const Subtitle = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.grey500};
+  margin: 0 0 2rem;
 `
 
 function DataInput({
@@ -73,24 +73,24 @@ function DataInput({
 
   return (
     <Container>
-      {title && <h4>{title}</h4>}
-      {subtitle && <h5>{intl.formatMessage(subtitle)}</h5>}
+      {title && <label>{title}</label>}
+      {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
       <div>
         {data.map((item) => {
           const field = declareFormFields.find((f) => f.id === item.fieldId)
 
           return (
             field && (
-              <div key={item.fieldId}>
-                <label>{intl.formatMessage(field.label)}</label>
-                <p>
+              <dl>
+                <dt>{intl.formatMessage(field.label)}</dt>
+                <dd>
                   <Output
                     field={field}
                     showPreviouslyMissingValuesAsChanged={false}
                     value={formData[item.fieldId]}
                   />
-                </p>
-              </div>
+                </dd>
+              </dl>
             )
           )
         })}
