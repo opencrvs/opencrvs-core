@@ -21,6 +21,7 @@ import {
 import ReactTooltip from 'react-tooltip'
 import {
   ActionType,
+  EventDocument,
   findActiveActionForm,
   SCOPES
 } from '@opencrvs/commons/client'
@@ -181,6 +182,10 @@ export function Review() {
     throw new Error('Form configuration not found for print certificate action')
   }
 
+  if (!svgCode) {
+    return <Spinner id="review-certificate-loading" />
+  }
+
   const validationErrorExist = validationErrorsInActionFormExist(
     formConfig,
     formValues
@@ -231,15 +236,22 @@ export function Review() {
 
     if (confirmed) {
       try {
-        const response = await onlineActions.printCertificate.mutateAsync({
-          eventId: fullEvent.id,
-          data: { ...formValues, templateId },
-          transactionId: uuid(),
-          type: ActionType.PRINT_CERTIFICATE
-        })
-        if (response) {
-          handleCertify?.()
+        const response: EventDocument =
+          await onlineActions.printCertificate.mutateAsync({
+            eventId: fullEvent.id,
+            data: { ...formValues, templateId },
+            transactionId: uuid(),
+            type: ActionType.PRINT_CERTIFICATE
+          })
+        const printAction = response.actions
+          .reverse()
+          .find((a) => a.type === ActionType.PRINT_CERTIFICATE)
+
+        if (printAction) {
+          await handleCertify(printAction)
           navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+        } else {
+          throw new Error('Print action not found in the response')
         }
       } catch (error) {
         // TODO: add notification alert
@@ -247,10 +259,6 @@ export function Review() {
         console.error(error)
       }
     }
-  }
-
-  if (!svgCode || !templateId) {
-    return <Spinner id="review-certificate-loading" />
   }
 
   return (

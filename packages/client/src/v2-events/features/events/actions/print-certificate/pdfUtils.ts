@@ -23,6 +23,7 @@ import {
 } from 'pdfmake/interfaces'
 import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
+import { format, isValid } from 'date-fns'
 import { ActionDocument, LanguageConfig } from '@opencrvs/commons'
 import { EventState, User } from '@opencrvs/commons/client'
 
@@ -98,7 +99,7 @@ const cache = createIntlCache()
 
 export function compileSvg(
   templateString: string,
-  $actions: ActionDocument[],
+  $action: ActionDocument,
   $data: EventState,
   locations: Location[],
   users: User[],
@@ -126,11 +127,20 @@ export function compileSvg(
     Handlebars.registerHelper(helperName, helper)
   }
 
+  Handlebars.registerHelper(
+    'formatDate',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function (this: any, dateString: string, formatString: string) {
+      const date = new Date(dateString)
+      return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
   const template = Handlebars.compile(templateString)
   $data = formatAllNonStringValues($data, intl)
   const output = template({
     $data,
-    $actions,
+    $action,
     $references: {
       locations,
       users

@@ -11,6 +11,8 @@
 
 import { Location } from '@events/service/locations/locations'
 import {
+  ActionDocument,
+  ActionType,
   EventDocument,
   EventState,
   isMinioUrl,
@@ -63,6 +65,28 @@ export const usePrintableCertificate = (
   certificateConfig?: CertificateTemplateConfig,
   language?: LanguageConfig
 ) => {
+  const lastActionWithData = event.actions
+    .reverse()
+    .find(
+      (a) =>
+        a.type === ActionType.REGISTER ||
+        a.type === ActionType.APPROVE_CORRECTION ||
+        a.type === ActionType.PRINT_CERTIFICATE
+    )
+  if (!lastActionWithData) {
+    throw new Error('No valid action with data found')
+  }
+
+  // Temporarily add `createdAt` to the last action's data to display
+  // the current certification date in the certificate preview on the review page.
+  const modifiedLastActionWithData = {
+    ...lastActionWithData,
+    data: {
+      ...lastActionWithData.data,
+      createdAt: new Date().toISOString()
+    }
+  }
+
   if (!language || !certificateConfig) {
     return { svgCode: null }
   }
@@ -70,7 +94,7 @@ export const usePrintableCertificate = (
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg(
     certificateConfig.svg,
-    event.actions,
+    modifiedLastActionWithData,
     form,
     locations,
     users,
@@ -78,11 +102,11 @@ export const usePrintableCertificate = (
   )
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
-  const handleCertify = async () => {
+  const handleCertify = async (printActionDocument: ActionDocument) => {
     const base64ReplacedTemplate = await replaceMinioUrlWithBase64(form)
     const compiledSvg = compileSvg(
       certificateConfig.svg,
-      event.actions,
+      printActionDocument,
       {
         ...base64ReplacedTemplate,
         preview: false
