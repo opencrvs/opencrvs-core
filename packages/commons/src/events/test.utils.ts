@@ -11,7 +11,7 @@
 import { merge } from 'lodash'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
-import { ActionBase, ActionDocument, EventState } from './ActionDocument'
+import { ActionBase, ActionDocument } from './ActionDocument'
 import {
   ArchiveActionInput,
   DeclareActionInput,
