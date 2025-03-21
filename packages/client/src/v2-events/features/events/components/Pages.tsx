@@ -13,7 +13,7 @@ import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
-  Page,
+  FormPageConfig,
   FormPageType,
   EventConfig
 } from '@opencrvs/commons/client'
@@ -43,7 +43,7 @@ export function Pages({
   setFormData: (data: EventState) => void
   pageId: string
   showReviewButton?: boolean
-  formPages: Page[]
+  formPages: FormPageConfig[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
