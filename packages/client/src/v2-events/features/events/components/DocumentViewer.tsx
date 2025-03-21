@@ -24,7 +24,6 @@ import {
   isFileFieldType,
   isFileFieldWithOptionType
 } from '@opencrvs/commons/client'
-// eslint-disable-next-line no-restricted-imports
 import { getFullUrl } from '@client/v2-events/features/files/useFileUpload'
 
 interface DocumentViewerOptions {
@@ -120,11 +119,11 @@ function extractViewerOptionsFromFieldConfig(
  *
  * @returns {DocumentViewerOptions} Options for the document viewer.
  *
- *  * These options are used to:
+ * Options are used to:
  * - Populate a dropdown for selecting available documents.
  * - Display the selected document by retrieving its corresponding URL.
  */
-export function getFileOptions(
+function getFileOptions(
   form: EventState,
   formConfig: FormConfig,
   intl: IntlShape
