@@ -13,14 +13,13 @@ import { EventConfig } from './EventConfig'
 import {
   FormConfig,
   FormConfigInput,
-  Page,
-  PageConfig,
-  PageInput
+  FormPageConfig,
+  FormPageConfigInput
 } from './FormConfig'
 export type EventConfigInput = z.input<typeof EventConfig>
 
 export const defineForm = (form: FormConfigInput): FormConfig =>
   FormConfig.parse(form)
 
-export const definePage = (formPage: PageInput): Page =>
-  PageConfig.parse(formPage)
+export const defineFormPage = (formPage: FormPageConfigInput): FormPageConfig =>
+  FormPageConfig.parse(formPage)

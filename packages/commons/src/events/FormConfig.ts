@@ -45,7 +45,7 @@ export const VerificationPage = FormPage.extend({
 export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
 type AllPageConfigs = typeof FormPage | typeof VerificationPage
 
-export const PageConfig = z.preprocess(
+export const FormPageConfig = z.preprocess(
   (pageConfig: z.infer<AllPageConfigs>) => ({
     ...pageConfig,
     type: pageConfig.type ?? FormPageType.FORM // Default type to "FORM" if not provided
@@ -53,8 +53,8 @@ export const PageConfig = z.preprocess(
   z.discriminatedUnion('type', [FormPage, VerificationPage])
 ) as unknown as z.ZodDiscriminatedUnion<'type', AllPageConfigs[]>
 
-export type PageInput = z.input<typeof PageConfig>
-export type Page = z.infer<typeof PageConfig>
+export type FormPageConfigInput = z.input<typeof FormPageConfig>
+export type FormPageConfig = z.infer<typeof FormPageConfig>
 
 export const FormConfig = z.object({
   label: TranslationConfig.describe('Human readable description of the form'),
@@ -69,7 +69,7 @@ export const FormConfig = z.object({
     )
   }),
   active: z.boolean().default(false).describe('Whether the form is active'),
-  pages: z.array(PageConfig),
+  pages: z.array(FormPageConfig),
   review: z.object({
     title: TranslationConfig.describe(
       'Title of the form to show in review page'
