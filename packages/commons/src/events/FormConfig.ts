@@ -49,12 +49,12 @@ export const VerificationPage = FormPage.extend({
 })
 
 export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
-export type AllPageConfigs = typeof FormPage | typeof VerificationPage
+type AllPageConfigs = typeof FormPage | typeof VerificationPage
 
 export const PageConfig = z.preprocess(
-  (data: any) => ({
-    type: (data as any).type ?? PageType.FORM, // Default type to "FORM" if not provided
-    ...data
+  (pageConfig: z.infer<AllPageConfigs>) => ({
+    ...pageConfig,
+    type: pageConfig.type ?? PageType.FORM // Default type to "FORM" if not provided
   }),
   z.discriminatedUnion('type', [FormPage, VerificationPage])
 ) as unknown as z.ZodDiscriminatedUnion<'type', AllPageConfigs[]>

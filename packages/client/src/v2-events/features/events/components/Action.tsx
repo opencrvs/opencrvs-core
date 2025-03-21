@@ -27,8 +27,6 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { CurrentEventContext } from '@client/v2-events/features/events/components/useCurrentEvent'
 
 type Props = PropsWithChildren<{ type: ActionType }>
 function ActionComponent({ children, type }: Props) {
@@ -40,7 +38,6 @@ function ActionComponent({ children, type }: Props) {
 
   const drafts = getRemoteDrafts()
   const [event] = getEvent.useSuspenseQuery(params.eventId)
-  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const activeDraft = findActiveDrafts(event, drafts)[0]
 
@@ -137,16 +134,7 @@ function ActionComponent({ children, type }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return (
-    <CurrentEventContext.Provider
-      value={{
-        config: eventConfiguration,
-        event: eventDataWithDrafts
-      }}
-    >
-      <NavigationStack>{children}</NavigationStack>
-    </CurrentEventContext.Provider>
-  )
+  return <NavigationStack>{children}</NavigationStack>
 }
 
 export const Action = withSuspense(ActionComponent)
