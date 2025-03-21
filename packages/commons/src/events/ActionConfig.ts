@@ -45,24 +45,19 @@ const ValidateConfig = ActionConfigBase.merge(
 
 const RejectDeclarationConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.REJECT),
-    comment: z.string(),
-    isDuplicate: z.boolean()
+    type: z.literal(ActionType.REJECT)
   })
 )
+
 const MarkedAsDuplicateConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.MARKED_AS_DUPLICATE),
-    comment: z.string(),
-    duplicates: z.array(z.string()).describe('UUIDs of duplicate records')
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
   })
 )
 
 const ArchiveConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVE),
-    comment: z.string(),
-    isDuplicate: z.boolean()
+    type: z.literal(ActionType.ARCHIVE)
   })
 )
 

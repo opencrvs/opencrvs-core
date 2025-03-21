@@ -14,8 +14,7 @@ import {
   Inferred,
   FieldValue,
   MetaFields,
-  isFieldConfigDefaultValue,
-  mapFieldTypeToEmptyValue
+  isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 import { replacePlaceholders } from '@client/v2-events/utils'
@@ -84,21 +83,6 @@ export function getDependentFields(
     }
     return field.defaultValue.dependsOn.includes(fieldName)
   })
-}
-
-/**
- * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
- * For setting default fields for form values @see setFormValueToOutputFormat
- *
- * @returns object based on the fields given with null values.
- */
-export function setEmptyValuesForFields(fields: FieldConfig[]) {
-  return fields.reduce((initialValues: Record<string, unknown>, field) => {
-    return {
-      ...initialValues,
-      [field.id]: mapFieldTypeToEmptyValue(field)
-    }
-  }, {})
 }
 
 export interface Stringifiable {

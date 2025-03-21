@@ -28,7 +28,7 @@ import { ReviewIndex } from './Review'
 const generator = testDataGenerator()
 
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Review'
+  title: 'Declare'
 }
 
 export default meta

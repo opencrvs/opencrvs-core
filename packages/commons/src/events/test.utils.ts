@@ -117,7 +117,9 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.ARCHIVE,
       transactionId: input.transactionId ?? getUUID(),
-      data: input.data ?? {},
+      data:
+        input.data ??
+        generateActionInput(tennisClubMembershipEvent, ActionType.ARCHIVE),
       metadata: { isDuplicate: isDuplicate ?? false },
       duplicates: [],
       eventId
@@ -130,7 +132,9 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.REJECT,
       transactionId: input.transactionId ?? getUUID(),
-      data: input.data ?? {},
+      data:
+        input.data ??
+        generateActionInput(tennisClubMembershipEvent, ActionType.REJECT),
       duplicates: [],
       eventId
     }),
@@ -227,7 +231,9 @@ export function generateActionDocument({
   defaults?: Partial<ActionDocument>
 }): ActionDocument {
   const actionBase = {
-    createdAt: new Date().toISOString(),
+    // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
+    // @TODO: This should be fixed in the future.
+    createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
     id: getUUID(),
     createdAtLocation: 'TODO',
@@ -288,9 +294,13 @@ export function generateEventDocument({
     actions: actions.map((action) =>
       generateActionDocument({ configuration, action })
     ),
-    createdAt: new Date().toISOString(),
+    // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
+    // @TODO: This should be fixed in the future.
+    createdAt: new Date(Date.now() - 1000).toISOString(),
     id: getUUID(),
-    updatedAt: new Date().toISOString()
+    // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
+    // @TODO: This should be fixed in the future.
+    updatedAt: new Date(Date.now() - 1000).toISOString()
   }
 }
 
