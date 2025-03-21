@@ -23,14 +23,13 @@ import {
   findActiveActionFields
 } from '@opencrvs/commons/events'
 import {
-  findEventConfigurationById,
   getEventConfigurationById,
   notifyOnAction
 } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
-import { ActionType, getOrThrow, getUUID } from '@opencrvs/commons'
+import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
