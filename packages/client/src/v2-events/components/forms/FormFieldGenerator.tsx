@@ -471,7 +471,8 @@ const GeneratedInputField = React.memo(
     }
 
     if (isDataFieldType(field)) {
-      // If no event config found, don't render the data field. This should never actually happen, but didn't want to throw an error either.
+      // If no event config or declare form fields found, don't render the data field.
+      // This should never actually happen, but we don't want to throw an error either.
       if (!eventConfig) {
         return null
       }
@@ -699,7 +700,6 @@ class FormSectionComponent extends React.Component<AllProps> {
                         this.props.onUploadingStateChanged
                       }
                       eventConfig={this.props.eventConfig}
-                      // event={undefined}
                     />
                   )
                 }}
