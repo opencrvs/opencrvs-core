@@ -44,7 +44,7 @@ const LockedBox = styled.div`
   }
 `
 
-interface ISummaryRowProps
+export interface ISummaryRowProps
   extends Omit<React.HTMLAttributes<HTMLTableRowElement>, 'placeholder'> {
   /** Data row label */
   label: string
