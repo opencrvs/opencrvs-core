@@ -22,7 +22,8 @@ import {
   GeographicalArea,
   AdministrativeAreas,
   isFieldVisible,
-  alwaysTrue
+  alwaysTrue,
+  AddressType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -38,11 +39,6 @@ type Props = FieldProps<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
 }
-
-const AddressType = {
-  URBAN: 'URBAN',
-  RURAL: 'RURAL'
-} as const
 
 function addDefaultValue<T extends FieldConfigWithoutAddress>(
   defaultValues?: AddressFieldValue
@@ -100,7 +96,7 @@ const displayWhenDistrictUrbanSelected = [
     type: ConditionalType.SHOW,
     conditional: and(
       isDomesticAddress(),
-      createFieldCondition('urbanOrRural').isEqualTo(AddressType.URBAN),
+      createFieldCondition('urbanOrRural').isEqualTo(GeographicalArea.URBAN),
       not(createFieldCondition('district').isUndefined())
     )
   }
@@ -183,14 +179,14 @@ const URBAN_FIELDS = [
 function isDomesticAddress() {
   return and(
     not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo('DOMESTIC')
+    createFieldCondition('addressType').isEqualTo(AddressType.DOMESTIC)
   )
 }
 
 function isInternationalAddress() {
   return and(
     not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo('INTERNATIONAL')
+    createFieldCondition('addressType').isEqualTo(AddressType.INTERNATIONAL)
   )
 }
 
@@ -202,7 +198,9 @@ const RURAL_FIELDS = [
         type: ConditionalType.SHOW,
         conditional: and(
           isDomesticAddress(),
-          createFieldCondition('urbanOrRural').isEqualTo(AddressType.RURAL),
+          createFieldCondition('urbanOrRural').isEqualTo(
+            GeographicalArea.RURAL
+          ),
           not(createFieldCondition('district').isUndefined())
         )
       }
