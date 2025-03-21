@@ -42,11 +42,15 @@ const Subtitle = styled.div`
   margin: 0 0 2rem;
 `
 
+/**
+ * This is a read-only form field, that is used to display a collection of form fields from the main 'declaration' form data.
+ */
 function DataInput({
   configuration,
   label,
   fields
 }: FieldProps<'DATA'> & {
+  // Unfortunately we need to include the field config in the field object, since it is required by <Output />
   fields: { value: FieldValue; config?: Inferred }[]
 }) {
   const intl = useIntl()

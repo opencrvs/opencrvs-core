@@ -477,6 +477,7 @@ const GeneratedInputField = React.memo(
         return null
       }
 
+      // Data input requires field configs
       const declareFormFields = findActiveActionFormFields(
         eventConfig,
         ActionType.DECLARE
