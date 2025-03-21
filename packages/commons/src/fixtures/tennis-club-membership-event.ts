@@ -14,6 +14,7 @@ import { defineForm } from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
 import { FormPageType } from '../events/FormConfig'
+import { FieldType } from 'src/events'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineForm({
@@ -687,7 +688,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: '',
             description: 'Title for the data section'
           },
-          type: 'DATA',
+          type: FieldType.DATA,
           configuration: {
             data: [
               {
@@ -748,7 +749,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: '',
             description: 'Title for the data section'
           },
-          type: 'DATA',
+          type: FieldType.DATA,
           configuration: {
             data: [
               {
@@ -851,7 +852,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: '',
             description: 'Title for the data section'
           },
-          type: 'DATA',
+          type: FieldType.DATA,
           configuration: {
             data: [
               {

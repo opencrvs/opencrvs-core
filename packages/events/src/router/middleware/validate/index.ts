@@ -17,11 +17,10 @@ import {
   FieldUpdateValue,
   findActiveActionFields,
   findActiveActionVerificationPageIds,
-  getFieldValidationErrors,
-  getOrThrow
+  getFieldValidationErrors
 } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
-import { findEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
@@ -32,13 +31,10 @@ export function validateAction(actionType: ActionType) {
   return async (opts: ActionMiddlewareOptions) => {
     const eventType = await getEventTypeId(opts.input.eventId)
 
-    const configuration = getOrThrow(
-      await findEventConfigurationById({
-        token: opts.ctx.token,
-        eventType
-      }),
-      `No configuration found for event type: ${eventType}`
-    )
+    const configuration = await getEventConfigurationById({
+      token: opts.ctx.token,
+      eventType
+    })
 
     const formFields = findActiveActionFields(configuration, actionType) || []
 

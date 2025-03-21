@@ -24,6 +24,7 @@ import {
 } from '@opencrvs/commons/events'
 import {
   findEventConfigurationById,
+  getEventConfigurationById,
   notifyOnAction
 } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
@@ -110,13 +111,10 @@ export async function deleteEvent(
 }
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
-  const configuration = getOrThrow(
-    await findEventConfigurationById({
-      token,
-      eventType: event.type
-    }),
-    `No configuration found for event type: ${event.type}`
-  )
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
 
   for (const ac of event.actions) {
     const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
@@ -272,13 +270,10 @@ export async function addAction(
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
-  const configuration = getOrThrow(
-    await findEventConfigurationById({
-      token,
-      eventType: event.type
-    }),
-    `No configuration found for event type: ${event.type}`
-  )
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
 
   const fieldConfigs = findActiveActionFields(configuration, input.type) || []
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
