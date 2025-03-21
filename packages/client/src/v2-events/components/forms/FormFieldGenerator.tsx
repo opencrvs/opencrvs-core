@@ -61,7 +61,9 @@ import {
   isDataFieldType,
   MetaFields,
   EventConfig,
-  EventIndex
+  EventIndex,
+  ActionType,
+  findActiveActionFormFields
 } from '@opencrvs/commons/client'
 import { Field, FieldProps, Formik, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
@@ -474,13 +476,21 @@ const GeneratedInputField = React.memo(
         return null
       }
 
-      return (
-        <Data.Input
-          {...field.config}
-          formData={formData}
-          eventConfig={eventConfig}
-        />
+      const declareFormFields = findActiveActionFormFields(
+        eventConfig,
+        ActionType.DECLARE
       )
+
+      if (!declareFormFields) {
+        return null
+      }
+
+      const fields = field.config.configuration.data.map(({ fieldId }) => ({
+        value: formData[fieldId],
+        config: declareFormFields.find((f) => f.id === fieldId)
+      }))
+
+      return <Data.Input {...field.config} fields={fields} />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)

@@ -11,13 +11,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import {
-  FieldProps,
-  ActionType,
-  findActiveActionFormFields,
-  FieldValue,
-  EventConfig
-} from '@opencrvs/commons/client'
+import { FieldProps, FieldValue, Inferred } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
 const Container = styled.div`
@@ -26,8 +20,9 @@ const Container = styled.div`
   border-radius: 5px;
 
   label {
-    ${({ theme }) => theme.fonts.bold18};
-    margin: 0 0 0.3rem;
+    ${({ theme }) => theme.fonts.h3};
+    margin-bottom: 0.3rem;
+    display: block;
   }
 
   dt {
@@ -49,23 +44,12 @@ const Subtitle = styled.div`
 
 function DataInput({
   configuration,
-  formData,
   label,
-  eventConfig
+  fields
 }: FieldProps<'DATA'> & {
-  formData: Record<string, FieldValue>
-  eventConfig: EventConfig
+  fields: { value: FieldValue; config?: Inferred }[]
 }) {
   const intl = useIntl()
-
-  const declareFormFields = findActiveActionFormFields(
-    eventConfig,
-    ActionType.DECLARE
-  )
-
-  if (!declareFormFields) {
-    throw new Error('Declare form fields not found')
-  }
 
   const { data, subtitle } = configuration
 
@@ -75,26 +59,28 @@ function DataInput({
     <Container>
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
-      <div>
-        {data.map((item) => {
-          const field = declareFormFields.find((f) => f.id === item.fieldId)
+      <dl>
+        {data.map(({ fieldId }) => {
+          const field = fields.find((f) => f.config?.id === fieldId)
+
+          if (!field || !field.config) {
+            return null
+          }
 
           return (
-            field && (
-              <dl>
-                <dt>{intl.formatMessage(field.label)}</dt>
-                <dd>
-                  <Output
-                    field={field}
-                    showPreviouslyMissingValuesAsChanged={false}
-                    value={formData[item.fieldId]}
-                  />
-                </dd>
-              </dl>
-            )
+            <>
+              <dt>{intl.formatMessage(field.config.label)}</dt>
+              <dd>
+                <Output
+                  field={field.config}
+                  showPreviouslyMissingValuesAsChanged={false}
+                  value={field.value}
+                />
+              </dd>
+            </>
           )
         })}
-      </div>
+      </dl>
     </Container>
   )
 }
