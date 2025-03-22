@@ -59,11 +59,12 @@ import {
   isEmailFieldType,
   isFieldVisible,
   isDataFieldType,
-  MetaFields,
   EventConfig,
   EventIndex,
   ActionType,
-  findActiveActionFormFields
+  findActiveActionFormFields,
+  MetaFields,
+  AddressType
 } from '@opencrvs/commons/client'
 import { Field, FieldProps, Formik, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
@@ -597,6 +598,15 @@ class FormSectionComponent extends React.Component<AllProps> {
   ) => {
     const updatedValues = cloneDeep(this.props.values)
     set(updatedValues, fieldName, value)
+    if (fieldName === 'country') {
+      set(
+        updatedValues,
+        'addressType',
+        value === (window.config.COUNTRY || 'FAR')
+          ? AddressType.DOMESTIC
+          : AddressType.INTERNATIONAL
+      )
+    }
     const updateDependentFields = (fieldName: string) => {
       const dependentFields = getDependentFields(this.props.fields, fieldName)
       for (const field of dependentFields) {

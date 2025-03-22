@@ -19,6 +19,11 @@ export const GeographicalArea = {
   RURAL: 'RURAL'
 } as const
 
+export const AddressType = {
+  DOMESTIC: 'DOMESTIC',
+  INTERNATIONAL: 'INTERNATIONAL'
+} as const
+
 export const FileFieldValue = z.object({
   filename: z.string(),
   originalFilename: z.string(),
@@ -29,6 +34,7 @@ export type FileFieldValue = z.infer<typeof FileFieldValue>
 
 const AdminStructure = z.object({
   country: z.string(),
+  addressType: z.literal(AddressType.DOMESTIC),
   province: z.string(),
   district: z.string()
 })
@@ -60,16 +66,40 @@ export const RuralAddressUpdateValue = AdminStructure.extend({
   urbanOrRural: z.literal(GeographicalArea.RURAL),
   village: z.string().nullish()
 })
+export const GenericAddressValue = z.object({
+  country: z.string(),
+  addressType: z.literal(AddressType.INTERNATIONAL),
+  state: z.string(),
+  district2: z.string(),
+  cityOrTown: z.string().optional(),
+  addressLine1: z.string().optional(),
+  addressLine2: z.string().optional(),
+  addressLine3: z.string().optional(),
+  postcodeOrZip: z.string().optional()
+})
 
-export const AddressFieldValue = z.discriminatedUnion('urbanOrRural', [
-  UrbanAddressValue,
-  RuralAddressValue
-])
+export const AddressFieldValue = z
+  .discriminatedUnion('urbanOrRural', [UrbanAddressValue, RuralAddressValue])
+  .or(GenericAddressValue)
 
-export const AddressFieldUpdateValue = z.discriminatedUnion('urbanOrRural', [
-  UrbanAddressUpdateValue,
-  RuralAddressUpdateValue
-])
+export const GenericAddressUpdateValue = z.object({
+  country: z.string(),
+  addressType: z.literal(AddressType.INTERNATIONAL),
+  state: z.string(),
+  district2: z.string(),
+  cityOrTown: z.string().nullish(),
+  addressLine1: z.string().nullish(),
+  addressLine2: z.string().nullish(),
+  addressLine3: z.string().nullish(),
+  postcodeOrZip: z.string().nullish()
+})
+
+export const AddressFieldUpdateValue = z
+  .discriminatedUnion('urbanOrRural', [
+    UrbanAddressUpdateValue,
+    RuralAddressUpdateValue
+  ])
+  .or(GenericAddressUpdateValue)
 
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>
 
