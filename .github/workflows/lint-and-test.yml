@@ -449,6 +449,9 @@ jobs:
           TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
           echo "Total $TOTAL issue(s) on base branch."
           echo "total=${TOTAL}" >> $GITHUB_OUTPUT
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          cat knip_report.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         working-directory: base
 
       - name: Run knip on PR branch
@@ -458,13 +461,20 @@ jobs:
           TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
           echo "Total $TOTAL issue(s) on PR branch."
           echo "total=${TOTAL}" >> $GITHUB_OUTPUT
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          cat knip_report.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         working-directory: pr
 
       - name: Compare base and PR totals
         if: ${{ steps.knip_pr.outputs.total > steps.knip_base.outputs.total }}
         run: |
           echo "## ⚠️ Total issues have increased in the PR branch." >> $GITHUB_STEP_SUMMARY
-          echo "Differences:" >> $GITHUB_STEP_SUMMARY
+          echo "### Base branch report:" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.knip_base.outputs.report }}" >> $GITHUB_STEP_SUMMARY
+          echo "### PR branch report:" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.knip_pr.outputs.report }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Differences:" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`diff" >> $GITHUB_STEP_SUMMARY
           diff base/knip_report.md pr/knip_report.md >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
