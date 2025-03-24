@@ -148,7 +148,10 @@ export const IDVerificationBanner = ({
           </Text>
         </Banner.Body>
         <Banner.Footer justifyContent="flex-end">
-          <Button type="secondary" onClick={handleReset}>
+          <Button
+            type="secondary"
+            onClick={() => setFieldValue(idFieldName, '')}
+          >
             {intl.formatMessage(messages.actions.reset)}
           </Button>
         </Banner.Footer>
