@@ -16,7 +16,7 @@ import {
 } from 'react-intl'
 import * as Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
-import {
+import type {
   Content,
   TDocumentDefinitions,
   TFontFamilyTypes

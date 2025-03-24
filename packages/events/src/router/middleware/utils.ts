@@ -10,19 +10,15 @@
  */
 
 import { TokenWithBearer } from '@opencrvs/commons'
-import { AnyTRPCMiddlewareFunction } from '@trpc/server'
+import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
 
-import { z } from 'zod'
-
-const ContextSchema = z.object({
-  user: z.object({
-    id: z.string(),
-    primaryOfficeId: z.string()
-  }),
-  token: z.string() as z.ZodType<TokenWithBearer>
-})
-
-export type Context = z.infer<typeof ContextSchema>
+export type Context = {
+  user: {
+    id: string
+    primaryOfficeId: string
+  }
+  token: TokenWithBearer
+}
 
 /**
  * TRPC Middleware options with correct context.

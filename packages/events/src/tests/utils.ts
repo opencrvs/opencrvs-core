@@ -15,10 +15,9 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
-import { CreatedUser, payloadGenerator } from './generators'
+import { CreatedUser, payloadGenerator, seeder } from './generators'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
-import { seeder } from '@events/tests/generators'
 
 const { createCallerFactory } = t
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,6 +27,7 @@ module.exports = [
     'plugin:import/recommended'
   ),
   {
+    ignores: ['eslint*.js'],
     languageOptions: {
       parser: tsParser,
       globals: {
@@ -60,7 +62,6 @@ module.exports = [
           semi: false
         }
       ],
-
       'no-console': 'warn',
       'arrow-parens': 'off',
       'no-return-assign': 'off',

@@ -33,6 +33,7 @@ function removeUndefinedKeys(data: EventState) {
     Object.entries(data).filter(([, value]) => value !== undefined)
   )
 }
+
 /**
  * Interface representing the form data and related operations for an event.
  *

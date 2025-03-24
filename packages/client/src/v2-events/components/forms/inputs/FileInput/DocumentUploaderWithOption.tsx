@@ -98,6 +98,28 @@ function DocumentUploaderWithOption({
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
 
+  const { uploadFile, deleteFile: deleteFileFromBackend } = useFileUpload(
+    name,
+    {
+      onSuccess: ({ type, originalFilename, filename, id }) => {
+        const newFile = {
+          filename,
+          originalFilename: originalFilename,
+          type: type,
+          option: id
+        }
+
+        setFilesBeingProcessed((prev) =>
+          prev.filter(({ label }) => label !== id)
+        )
+
+        setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
+        onChange(getUpdatedFiles(files, newFile))
+        setSelectedOption(undefined)
+      }
+    }
+  )
+
   const getLabelForDocumentOption = (docType: string) => {
     const label = options.find(({ value: val }) => val === docType)?.label
     return label && intl.formatMessage(label)
@@ -120,28 +142,6 @@ function DocumentUploaderWithOption({
     onComplete,
     maxFileSize
   })
-
-  const { uploadFile, deleteFile: deleteFileFromBackend } = useFileUpload(
-    name,
-    {
-      onSuccess: ({ type, originalFilename, filename, id }) => {
-        const newFile = {
-          filename,
-          originalFilename: originalFilename,
-          type: type,
-          option: id
-        }
-
-        setFilesBeingProcessed((prev) =>
-          prev.filter(({ label }) => label !== id)
-        )
-
-        setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
-        onChange(getUpdatedFiles(files, newFile))
-        setSelectedOption(undefined)
-      }
-    }
-  )
 
   const onDeleteFile = (fileName: string) => {
     deleteFileFromBackend(fileName)

@@ -29,7 +29,6 @@ function getFieldDefinitionForActionDataField(
 ) {
   const actionFields = findActiveActionFields(configuration, actionType)
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const fieldConfig = actionFields?.find((field) => field.id === fieldId)
   if (!fieldConfig) {
     logger.error(
@@ -74,7 +73,6 @@ export async function presignFilesInEvent(
           ).type === FieldType.FILE
       )
       .filter((value): value is [string, Exclude<FileFieldValue, null>] => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         return value[1] !== null
       })
       .map(([fieldId, value]) => {
@@ -84,7 +82,7 @@ export async function presignFilesInEvent(
 
   const urls = (
     await presignFiles(
-      actionFileFields.map(([_, __, file]) => file.filename),
+      actionFileFields.map(([, , file]) => file.filename),
       token
     )
   ).map(getFileNameAndSignature)

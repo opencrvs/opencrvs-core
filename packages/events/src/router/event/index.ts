@@ -222,7 +222,7 @@ export const eventRouter = router({
       .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
       // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
       .input(RegisterActionInput.omit({ identifiers: true }))
-      // @ts-expect-error
+      // @ts-expect-error - Register type is not inferred properly
       .use(middleware.validateAction(ActionType.REGISTER))
       .mutation(async (options) => {
         return addAction(
@@ -310,15 +310,13 @@ export const eventRouter = router({
           data: z.record(z.string(), FieldValue)
         })
       )
-      .mutation(async ({ input, ctx }) => {
+      .mutation(async ({ input }) => {
         logger.info('Registration confirmed', { eventId: input.eventId })
         logger.info(input.data)
         return getEventById(input.eventId)
       })
   }),
-  search: publicProcedure
-    .input(EventSearchIndex)
-    .query(async ({ input, ctx }) => {
-      return getIndex(input)
-    })
+  search: publicProcedure.input(EventSearchIndex).query(async ({ input }) => {
+    return getIndex(input)
+  })
 })

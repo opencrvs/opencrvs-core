@@ -10,7 +10,7 @@
  */
 import pdfMake from 'pdfmake/build/pdfmake'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
+import type { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
 
 export interface IPDFTemplate {
   definition: TDocumentDefinitions

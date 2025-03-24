@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,12 +9,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 const { FlatCompat } = require('@eslint/eslintrc')
 const globals = require('globals')
-const js = require('@eslint/js')
 const path = require('path')
-const eventsConfig = require('../../eslintrc.events.config.js')
-const legacyConfig = require('../../eslint.config.cjs')
+const eventsConfig = require('../../eslint.events.config.js')
+const legacyConfig = require('../../eslint.config.js')
 const tsParser = require('@typescript-eslint/parser')
 
 const compat = new FlatCompat({
@@ -32,7 +33,7 @@ module.exports = [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: [path.resolve(__dirname, './tsconfig.json')] // Ensure the correct tsconfig is used
+        project: [path.resolve(__dirname, './tsconfig.json')]
       },
       globals: {
         ...globals.commonjs,
@@ -42,7 +43,7 @@ module.exports = [
         it: 'readonly',
         describe: 'readonly',
         expect: 'readonly',
-        vi: 'readonly', // Vitest mock functions
+        vi: 'readonly',
         beforeEach: 'readonly',
         afterEach: 'readonly',
         beforeAll: 'readonly',
@@ -52,7 +53,7 @@ module.exports = [
     settings: {
       'import/resolver': {
         typescript: {
-          project: path.resolve(__dirname, './tsconfig.json') // Enable path alias resolution
+          project: path.resolve(__dirname, './tsconfig.json')
         }
       },
       react: {
@@ -73,6 +74,12 @@ module.exports = [
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        {
+          checksVoidReturn: false
+        }
+      ],
       'import/no-unassigned-import': 'error',
       'no-restricted-imports': [
         'error',
@@ -117,9 +124,8 @@ module.exports = [
   },
   {
     languageOptions: {
-      parser: tsParser,
       parserOptions: {
-        project: [path.resolve(__dirname, './tsconfig.json')] // Ensure the correct tsconfig is used
+        project: [path.resolve(__dirname, './tsconfig.json')]
       }
     },
     // Override for files in src/legacy-code

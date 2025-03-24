@@ -24,7 +24,7 @@ vi.mock('@events/storage/elasticsearch')
 
 async function resetESServer() {
   const { getEventIndexName, getEventAliasName } = await import(
-    // @ts-ignore "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+    // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
   )
   const index = 'events_tennis_club_membership' + Date.now() + Math.random()
@@ -48,7 +48,6 @@ beforeAll(() =>
         req.method === 'DELETE' && req.url.includes(inject('ELASTICSEARCH_URI'))
 
       if (!isElasticResetCall) {
-        // eslint-disable-next-line no-console
         console.warn(`Unmocked request: ${req.method} ${req.url}`)
       }
     }

@@ -9,11 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// eslint-disable-next-line import/no-unassigned-import
 import '@opencrvs/commons/monitoring'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('app-module-path').addPath(require('path').join(__dirname, '../'))
+/* eslint-disable @typescript-eslint/no-require-imports */
+const path = require('path')
+/* eslint-disable @typescript-eslint/no-require-imports */
+const appModulePath = require('app-module-path')
+
+appModulePath.addPath(path.join(__dirname, '../'))
 
 import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
@@ -63,7 +66,6 @@ const server = createHTTPServer({
     }
   }
 })
-
 export async function main() {
   try {
     const configurations = await getEventConfigurations(

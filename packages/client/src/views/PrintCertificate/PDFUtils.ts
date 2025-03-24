@@ -28,7 +28,7 @@ import {
   FontFamilyTypes
 } from '@client/utils/referenceApi'
 import htmlToPdfmake from 'html-to-pdfmake'
-import { Content } from 'pdfmake/interfaces'
+import type { Content } from 'pdfmake/interfaces'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(

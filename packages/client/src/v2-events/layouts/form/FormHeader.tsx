@@ -131,7 +131,6 @@ export function FormHeader({
               >
                 <Icon name="DownloadSimple" />
               </Button>
-
               <Button size="small" type="icon" onClick={onExit}>
                 <Icon name="X" />
               </Button>

@@ -25,18 +25,18 @@ const handlers = [
       return HttpResponse.json(filenames)
     }
   ),
-  http.get(`${env.COUNTRY_CONFIG_URL}/events`, (info) => {
+  http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEvent,
       { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
     ])
   }),
   // event.delete.test.ts
-  http.head(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
+  http.head(`${env.DOCUMENTS_URL}/files/:fileName`, () => {
     return HttpResponse.json({ ok: true })
   }),
   // event.delete.test.ts
-  http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
+  http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, () => {
     return HttpResponse.json({ ok: true })
   })
 ]
