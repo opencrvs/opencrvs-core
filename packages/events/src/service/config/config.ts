@@ -14,6 +14,7 @@ import {
   ActionInput,
   EventConfig,
   EventDocument,
+  getOrThrow,
   logger
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
@@ -34,7 +35,7 @@ export async function getEventConfigurations(token: string) {
   return array(EventConfig).parse(await res.json())
 }
 
-export async function findEventConfigurationById({
+async function findEventConfigurationById({
   token,
   eventType
 }: {
@@ -43,6 +44,22 @@ export async function findEventConfigurationById({
 }) {
   const configurations = await getEventConfigurations(token)
   return configurations.find((config) => config.id === eventType)
+}
+
+export async function getEventConfigurationById({
+  token,
+  eventType
+}: {
+  token: string
+  eventType: string
+}) {
+  return getOrThrow(
+    await findEventConfigurationById({
+      token,
+      eventType
+    }),
+    `No configuration found for event type: ${eventType}`
+  )
 }
 
 export async function notifyOnAction(

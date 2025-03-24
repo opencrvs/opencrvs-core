@@ -67,9 +67,7 @@ export const VerificationWizard = ({
             key="cancel"
             id="cancel"
             type="tertiary"
-            onClick={() => {
-              close()
-            }}
+            onClick={() => close()}
           >
             {intl.formatMessage(messages.cancel)}
           </Button>,

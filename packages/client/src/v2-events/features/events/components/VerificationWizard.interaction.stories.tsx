@@ -13,6 +13,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
 import { expect, fn } from '@storybook/test'
+import { noop } from 'lodash'
 import { VerificationWizard } from './VerificationWizard'
 
 const meta: Meta<typeof VerificationWizard> = {
@@ -67,8 +68,7 @@ export const VerificationWizardModal: Story = {
         showReviewButton={false}
         totalPages={1}
         onNextPage={onNextPageSpy}
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onPreviousPage={() => {}}
+        onPreviousPage={noop}
         onSubmit={onSubmitSpy}
         onVerifyAction={onVerifyActionSpy}
       />

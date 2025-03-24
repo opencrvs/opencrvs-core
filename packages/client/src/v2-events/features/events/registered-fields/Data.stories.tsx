@@ -12,6 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
+import { noop } from 'lodash'
 import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -79,8 +80,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
         formData={{}}
         id="my-form"
         setAllFieldsDirty={false}
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onChange={() => {}}
+        onChange={noop}
       />
     )
   }

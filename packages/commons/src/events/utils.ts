@@ -20,7 +20,7 @@ import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionUpdate, EventState } from './ActionDocument'
-import { FormConfig, Page, PageType } from './FormConfig'
+import { FormConfig, FormPageType, FormPageConfig } from './FormConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
 import { FieldType } from './FieldType'
 import { getOrThrow } from '../utils'
@@ -292,11 +292,11 @@ export function createEmptyDraft(
   }
 }
 
-export function isVerificationPage(page: Page) {
-  return page.type === PageType.VERIFICATION
+export function isVerificationPage(page: FormPageConfig) {
+  return page.type === FormPageType.VERIFICATION
 }
 
-export function isPageVisible(page: Page, eventData: ActionUpdate) {
+export function isPageVisible(page: FormPageConfig, eventData: ActionUpdate) {
   if (!page.conditional) {
     return true
   }

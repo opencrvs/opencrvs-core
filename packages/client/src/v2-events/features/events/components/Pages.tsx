@@ -13,10 +13,10 @@ import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
-  Page,
-  PageType,
   EventConfig,
-  isPageVisible
+  isPageVisible,
+  FormPageConfig,
+  FormPageType
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -44,7 +44,7 @@ export function Pages({
   setFormData: (data: EventState) => void
   pageId: string
   showReviewButton?: boolean
-  formPages: Page[]
+  formPages: FormPageConfig[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
@@ -102,7 +102,7 @@ export function Pages({
     />
   )
 
-  if (page.type === PageType.VERIFICATION) {
+  if (page.type === FormPageType.VERIFICATION) {
     return (
       <VerificationWizard
         {...wizardProps}

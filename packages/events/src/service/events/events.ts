@@ -23,13 +23,13 @@ import {
   findActiveActionFields
 } from '@opencrvs/commons/events'
 import {
-  findEventConfigurationById,
+  getEventConfigurationById,
   notifyOnAction
 } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
-import { ActionType, getOrThrow, getUUID } from '@opencrvs/commons'
+import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
@@ -110,13 +110,10 @@ export async function deleteEvent(
 }
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
-  const configuration = getOrThrow(
-    await findEventConfigurationById({
-      token,
-      eventType: event.type
-    }),
-    `No configuration found for event type: ${event.type}`
-  )
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
 
   for (const ac of event.actions) {
     const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
@@ -272,13 +269,10 @@ export async function addAction(
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
-  const configuration = getOrThrow(
-    await findEventConfigurationById({
-      token,
-      eventType: event.type
-    }),
-    `No configuration found for event type: ${event.type}`
-  )
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
 
   const fieldConfigs = findActiveActionFields(configuration, input.type) || []
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)

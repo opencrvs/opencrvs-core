@@ -59,9 +59,12 @@ import {
   isEmailFieldType,
   isFieldVisible,
   isDataFieldType,
-  MetaFields,
   EventConfig,
-  EventIndex
+  EventIndex,
+  ActionType,
+  findActiveActionFormFields,
+  MetaFields,
+  AddressType
 } from '@opencrvs/commons/client'
 import { Field, FieldProps, Formik, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
@@ -469,18 +472,28 @@ const GeneratedInputField = React.memo(
     }
 
     if (isDataFieldType(field)) {
-      // If no event config found, don't render the data field. This should never actually happen, but didn't want to throw an error either.
+      // If no event config or declare form fields found, don't render the data field.
+      // This should never actually happen, but we don't want to throw an error either.
       if (!eventConfig) {
         return null
       }
 
-      return (
-        <Data.Input
-          {...field.config}
-          formData={formData}
-          eventConfig={eventConfig}
-        />
+      // Data input requires field configs
+      const declareFormFields = findActiveActionFormFields(
+        eventConfig,
+        ActionType.DECLARE
       )
+
+      if (!declareFormFields) {
+        return null
+      }
+
+      const fields = field.config.configuration.data.map(({ fieldId }) => ({
+        value: formData[fieldId],
+        config: declareFormFields.find((f) => f.id === fieldId)
+      }))
+
+      return <Data.Input {...field.config} fields={fields} />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
@@ -585,6 +598,15 @@ class FormSectionComponent extends React.Component<AllProps> {
   ) => {
     const updatedValues = cloneDeep(this.props.values)
     set(updatedValues, fieldName, value)
+    if (fieldName === 'country') {
+      set(
+        updatedValues,
+        'addressType',
+        value === (window.config.COUNTRY || 'FAR')
+          ? AddressType.DOMESTIC
+          : AddressType.INTERNATIONAL
+      )
+    }
     const updateDependentFields = (fieldName: string) => {
       const dependentFields = getDependentFields(this.props.fields, fieldName)
       for (const field of dependentFields) {
@@ -689,7 +711,6 @@ class FormSectionComponent extends React.Component<AllProps> {
                         this.props.onUploadingStateChanged
                       }
                       eventConfig={this.props.eventConfig}
-                      // event={undefined}
                     />
                   )
                 }}

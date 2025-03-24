@@ -11,13 +11,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import {
-  FieldProps,
-  ActionType,
-  findActiveActionFormFields,
-  FieldValue,
-  EventConfig
-} from '@opencrvs/commons/client'
+import { FieldProps, FieldValue, Inferred } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
 const Container = styled.div`
@@ -25,76 +19,70 @@ const Container = styled.div`
   padding: 17px 20px 10px;
   border-radius: 5px;
 
-  h4 {
-    ${({ theme }) => theme.fonts.bold18};
-    margin: 0 0 0.3rem;
-  }
-
-  h5 {
-    ${({ theme }) => theme.fonts.reg16};
-    color: ${({ theme }) => theme.colors.grey500};
-    margin: 0 0 2rem;
-  }
-
   label {
+    ${({ theme }) => theme.fonts.h3};
+    margin-bottom: 0.3rem;
+    display: block;
+  }
+
+  dt {
     ${({ theme }) => theme.fonts.bold16};
     display: block;
     margin-bottom: 0.4rem;
   }
 
-  p {
+  dd {
     margin: 0 0 1.5rem;
   }
 `
 
+const Subtitle = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.grey500};
+  margin: 0 0 2rem;
+`
+
+/**
+ * This is a read-only form field, that is used to display a collection of form fields from the main 'declaration' form data.
+ */
 function DataInput({
   configuration,
-  formData,
   label,
-  eventConfig
+  fields
 }: FieldProps<'DATA'> & {
-  formData: Record<string, FieldValue>
-  eventConfig: EventConfig
+  // Unfortunately we need to include the field config in the field object, since it is required by <Output />
+  fields: { value: FieldValue; config?: Inferred }[]
 }) {
   const intl = useIntl()
-
-  const declareFormFields = findActiveActionFormFields(
-    eventConfig,
-    ActionType.DECLARE
-  )
-
-  if (!declareFormFields) {
-    throw new Error('Declare form fields not found')
-  }
-
   const { data, subtitle } = configuration
-
   const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
   return (
     <Container>
-      {title && <h4>{title}</h4>}
-      {subtitle && <h5>{intl.formatMessage(subtitle)}</h5>}
-      <div>
-        {data.map((item) => {
-          const field = declareFormFields.find((f) => f.id === item.fieldId)
+      {title && <label>{title}</label>}
+      {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
+      <dl>
+        {data.map(({ fieldId }) => {
+          const field = fields.find((f) => f.config?.id === fieldId)
+
+          if (!field || !field.config) {
+            return null
+          }
 
           return (
-            field && (
-              <div key={item.fieldId}>
-                <label>{intl.formatMessage(field.label)}</label>
-                <p>
-                  <Output
-                    field={field}
-                    showPreviouslyMissingValuesAsChanged={false}
-                    value={formData[item.fieldId]}
-                  />
-                </p>
-              </div>
-            )
+            <React.Fragment key={field.config.id}>
+              <dt>{intl.formatMessage(field.config.label)}</dt>
+              <dd>
+                <Output
+                  field={field.config}
+                  showPreviouslyMissingValuesAsChanged={false}
+                  value={field.value}
+                />
+              </dd>
+            </React.Fragment>
           )
         })}
-      </div>
+      </dl>
     </Container>
   )
 }

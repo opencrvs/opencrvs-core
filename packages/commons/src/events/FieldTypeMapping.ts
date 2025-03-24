@@ -33,7 +33,7 @@ import {
   TextAreaField,
   TextField,
   NumberField,
-  Data
+  DataField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -51,7 +51,8 @@ import {
   AddressFieldValue,
   AddressFieldUpdateValue,
   FileFieldValue,
-  FileFieldWithOptionValue
+  FileFieldWithOptionValue,
+  AddressType
 } from './CompositeFieldValue'
 
 /**
@@ -162,6 +163,7 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
     case FieldType.ADDRESS:
       return {
         country: 'FAR',
+        addressType: AddressType.DOMESTIC,
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
         urbanOrRural: 'URBAN',
@@ -216,6 +218,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.ADDRESS:
       return {
         country: null,
+        addressType: AddressType.DOMESTIC,
         province: null,
         district: null,
         urbanOrRural: 'URBAN', // Default to urban needed for validation
@@ -391,6 +394,6 @@ export const isOfficeFieldType = (field: {
 export const isDataFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: undefined; config: Data } => {
+}): field is { value: undefined; config: DataField } => {
   return field.config.type === FieldType.DATA
 }
