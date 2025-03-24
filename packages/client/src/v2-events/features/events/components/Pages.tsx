@@ -119,46 +119,6 @@ export function Pages({
     )
   }
 
-  const wizardProps = {
-    currentPage,
-    pageTitle: intl.formatMessage(page.title),
-    showReviewButton,
-    totalPages: total,
-    onNextPage: next,
-    onPreviousPage: previous,
-    onSubmit
-  }
-
-  const fields = (
-    <FormFieldGenerator
-      eventConfig={eventConfig}
-      eventDeclarationData={eventDeclarationData}
-      fields={page.fields}
-      formData={form}
-      id="locationForm"
-      initialValues={form}
-      setAllFieldsDirty={false}
-      onChange={(values) => setFormData(values)}
-    />
-  )
-
-  if (page.type === FormPageType.VERIFICATION) {
-    return (
-      <VerificationWizard
-        {...wizardProps}
-        pageConfig={page.actions}
-        onVerifyAction={(val: boolean) => {
-          setFormData({
-            ...form,
-            [page.id]: val
-          })
-        }}
-      >
-        {fields}
-      </VerificationWizard>
-    )
-  }
-
   return (
     <FormWizard
       {...wizardProps}
