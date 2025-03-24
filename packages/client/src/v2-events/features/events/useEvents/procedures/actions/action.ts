@@ -222,7 +222,6 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
       }
-      const fields = getActiveActionFields(eventConfiguration, actionType)
       if (actionType === ActionType.NOTIFY) {
         /**
          * Because NOTIFY action is just an incomplete DECLARE action,
@@ -238,6 +237,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
           data: stripHiddenFields(notifyFields, params.data)
         })
       }
+      const fields = getActiveActionFields(eventConfiguration, actionType)
 
       return mutation.mutate({
         ...params,

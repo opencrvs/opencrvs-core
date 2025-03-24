@@ -15,11 +15,12 @@ import {
   ActionUpdate,
   FieldConfig,
   FieldUpdateValue,
+  findActiveActionFields,
+  findActiveActionVerificationPageIds,
   getFieldValidationErrors
 } from '@opencrvs/commons'
-
 import { MiddlewareOptions } from '@events/router/middleware/utils'
-import { getActionFormFields } from '@events/service/config/config'
+import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
@@ -30,11 +31,12 @@ export function validateAction(actionType: ActionType) {
   return async (opts: ActionMiddlewareOptions) => {
     const eventType = await getEventTypeId(opts.input.eventId)
 
-    const formFields = await getActionFormFields({
+    const configuration = await getEventConfigurationById({
       token: opts.ctx.token,
-      action: actionType,
       eventType
     })
+
+    const formFields = findActiveActionFields(configuration, actionType) || []
 
     const data = {
       ...opts.input.data,
@@ -71,10 +73,31 @@ export function validateAction(actionType: ActionType) {
       []
     )
 
-    if (errors.length > 0) {
+    // For each verification page on the form, we expect a boolean field with the page id as key in the metadata.
+    const verificationPageIds = findActiveActionVerificationPageIds(
+      configuration,
+      actionType
+    )
+
+    const verificationPageErrors = verificationPageIds
+      .map((field) => {
+        const value = data[field]
+        return typeof value !== 'boolean'
+          ? {
+              message: 'Verification page result is required',
+              id: field,
+              value
+            }
+          : null
+      })
+      .filter((error) => error !== null)
+
+    const allErrors = [...errors, ...verificationPageErrors]
+
+    if (allErrors.length > 0) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: JSON.stringify(errors)
+        message: JSON.stringify(allErrors)
       })
     }
 

@@ -58,7 +58,7 @@ classDiagram
         label: TranslationConfig
         version: FormVersion
         active: boolean
-        pages: FormPage[]
+        pages: FormPageConfig[]
         review: FormReview
     }
 
@@ -67,7 +67,7 @@ classDiagram
         label: TranslationConfig
     }
 
-    class FormPage {
+    class FormPageConfig {
         id: string
         title: TranslationConfig
         fields: FieldConfig[]
@@ -129,10 +129,10 @@ classDiagram
     EnableConditional "1" --> "1" Conditional
 
     FormConfig "1" --> "1" FormVersion
-    FormConfig "1" --> "*" FormPage
+    FormConfig "1" --> "*" FormPageConfig
     FormConfig "1" --> "1" FormReview
 
-    FormPage "1" --> "*" FieldConfig
+    FormPageConfig "1" --> "*" FieldConfig
     FormReview "1" --> "*" FieldConfig
 
     FieldConfig <|-- Address
