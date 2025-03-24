@@ -13,15 +13,21 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { flattenDeep, omitBy } from 'lodash'
 import { workqueues } from '../workqueues'
-import { ActionType } from './ActionType'
+import { ActionType, LatentActions } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
+<<<<<<< HEAD
 import { ActionUpdate, EventState } from './ActionDocument'
 import { FormConfig, FormPageType, FormPageConfig } from './FormConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
+=======
+import { EventState } from './ActionDocument'
+import { FormConfig, FormPageType } from './FormConfig'
+import { isFieldVisible } from '../conditionals/validate'
+>>>>>>> develop
 import { FieldType } from './FieldType'
 import { getOrThrow } from '../utils'
 import { Draft } from './Draft'
@@ -212,6 +218,9 @@ export function getActiveActionFields(
   configuration: EventConfig,
   action: ActionType
 ): FieldConfig[] {
+  if (LatentActions.some((latentAction) => latentAction === action)) {
+    return getActiveActionFields(configuration, ActionType.DECLARE)
+  }
   const fields = findActiveActionFields(configuration, action)
 
   if (!fields) {
