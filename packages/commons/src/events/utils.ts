@@ -13,7 +13,7 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { flattenDeep, omitBy } from 'lodash'
 import { workqueues } from '../workqueues'
-import { ActionType } from './ActionType'
+import { ActionType, LatentActions } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
@@ -211,6 +211,9 @@ export function getActiveActionFields(
   configuration: EventConfig,
   action: ActionType
 ): FieldConfig[] {
+  if (LatentActions.some((latentAction) => latentAction === action)) {
+    return getActiveActionFields(configuration, ActionType.DECLARE)
+  }
   const fields = findActiveActionFields(configuration, action)
 
   if (!fields) {
