@@ -465,6 +465,7 @@ export type InferredInput =
   | z.input<typeof Office>
   | z.input<typeof SignatureField>
   | z.input<typeof EmailField>
+  | z.input<typeof DataField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
