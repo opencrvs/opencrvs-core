@@ -15,19 +15,24 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  getActiveActionFormPages,
+  isFieldVisible
+} from '@opencrvs/commons/client'
+
 import { Print } from '@opencrvs/components/lib/icons'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import {
   CERT_TEMPLATE_ID,
   useCertificateTemplateSelectorFieldConfig
 } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -37,19 +42,15 @@ export function Pages() {
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES
   )
   const navigate = useNavigate()
-  const events = useEvents()
   const { modal } = useEventFormNavigation()
-
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata()
+  const events = useEvents()
   const event = events.getEventState.useSuspenseQuery(eventId)
-
-  const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
+  const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-
-  const { setFormValues, getFormValues } = useEventFormData()
-  const form = getFormValues()
-
-  const { eventConfiguration: configuration } = useEventConfiguration(
+  const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type
   )
 
@@ -77,6 +78,18 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId])
 
+  // Allow the user to continue from the current page only if they have filled all the visible required fields.
+  const currentPage = formPages.find((p) => p.id === currentPageId)
+  const currentlyRequiredFields = currentPage?.fields.filter(
+    (field) => isFieldVisible(field, metadata) && field.required
+  )
+
+  const isAllRequiredFieldsFilled = currentlyRequiredFields?.every((field) =>
+    Boolean(metadata[field.id])
+  )
+
+  const isTemplateSelected = Boolean(metadata[CERT_TEMPLATE_ID])
+
   return (
     <FormLayout
       appbarIcon={<Print />}
@@ -84,7 +97,10 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        form={form}
+        disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
+        eventConfig={configuration}
+        eventDeclarationData={event.data}
+        form={metadata}
         formPages={formPages.map((page) => {
           if (formPages[0].id === page.id) {
             page = {
@@ -99,7 +115,7 @@ export function Pages() {
           return page
         })}
         pageId={currentPageId}
-        setFormData={(data) => setFormValues(data)}
+        setFormData={(data) => setMetadata(data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
@@ -110,14 +126,12 @@ export function Pages() {
           )
         }
         onSubmit={() => {
-          if (form[CERT_TEMPLATE_ID]) {
-            navigate(
-              ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
-                { eventId },
-                { templateId: String(form[CERT_TEMPLATE_ID]) }
-              )
+          navigate(
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
+              { eventId },
+              { templateId: String(metadata[CERT_TEMPLATE_ID]) }
             )
-          }
+          )
         }}
       />
     </FormLayout>

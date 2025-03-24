@@ -333,6 +333,16 @@ const Address = BaseField.extend({
   defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
+const DataField = BaseField.extend({
+  type: z.literal(FieldType.DATA),
+  configuration: z.object({
+    subtitle: TranslationConfig.optional(),
+    data: z.array(z.object({ fieldId: z.string() }))
+  })
+}).describe('Data field for displaying read-only data')
+
+export type DataField = z.infer<typeof DataField>
+
 /*
  * This needs to be exported so that Typescript can refer to the type in
  * the declaration output type. If it can't do that, you might start encountering
@@ -362,6 +372,7 @@ export type AllFields =
   | typeof SignatureField
   | typeof EmailField
   | typeof FileUploadWithOptions
+  | typeof DataField
 
 /** @knipignore */
 export type Inferred =
@@ -386,6 +397,7 @@ export type Inferred =
   | z.infer<typeof Office>
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
+  | z.infer<typeof DataField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
@@ -408,7 +420,8 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Office,
   SignatureField,
   EmailField,
-  FileUploadWithOptions
+  FileUploadWithOptions,
+  DataField
 ]) as unknown as z.ZodType<Inferred, any, Inferred>
 
 export type SelectField = z.infer<typeof Select>

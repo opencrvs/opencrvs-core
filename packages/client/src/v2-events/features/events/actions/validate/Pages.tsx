@@ -16,9 +16,8 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
-import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
+
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import {
@@ -28,22 +27,21 @@ import {
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 export function Pages() {
+  const events = useEvents()
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.VALIDATE.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const { formValues: form } = useSubscribeEventFormData()
-
   const navigate = useNavigate()
-  const events = useEvents()
   const drafts = useDrafts()
   const { modal, goToHome } = useEventFormNavigation()
-
-  const event = events.getEventState.useSuspenseQuery(eventId)
-
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
+  const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -81,6 +79,8 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        eventConfig={configuration}
+        eventDeclarationData={event.data}
         form={form}
         formPages={formPages}
         pageId={currentPageId}

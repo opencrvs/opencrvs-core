@@ -11,12 +11,17 @@
 
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
-import { EventState, FormPage } from '@opencrvs/commons/client'
-import { FormWizard } from '@opencrvs/components'
+import {
+  EventState,
+  FormPageConfig,
+  FormPageType,
+  EventConfig
+} from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-
+import { VerificationWizard } from './VerificationWizard'
+import { FormWizard } from './FormWizard'
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
@@ -30,17 +35,21 @@ export function Pages({
   onSubmit,
   continueButtonText,
   setFormData,
-  children
+  disableContinue = false,
+  eventConfig,
+  eventDeclarationData
 }: {
   form: EventState
   setFormData: (data: EventState) => void
   pageId: string
   showReviewButton?: boolean
-  formPages: FormPage[]
+  formPages: FormPageConfig[]
   onFormPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
-  children?: (page: FormPage) => React.ReactNode
+  disableContinue?: boolean
+  eventConfig?: EventConfig
+  eventDeclarationData?: EventState
 }) {
   const intl = useIntl()
 
@@ -65,29 +74,53 @@ export function Pages({
     }
   }, [pageId, currentPage, formPages, onFormPageChange])
 
+  const wizardProps = {
+    currentPage,
+    pageTitle: intl.formatMessage(page.title),
+    showReviewButton,
+    totalPages: total,
+    onNextPage: next,
+    onPreviousPage: previous,
+    onSubmit
+  }
+
+  const fields = (
+    <FormFieldGenerator
+      eventConfig={eventConfig}
+      eventDeclarationData={eventDeclarationData}
+      fields={page.fields}
+      formData={form}
+      id="locationForm"
+      initialValues={form}
+      setAllFieldsDirty={false}
+      onChange={(values) => setFormData(values)}
+    />
+  )
+
+  if (page.type === FormPageType.VERIFICATION) {
+    return (
+      <VerificationWizard
+        {...wizardProps}
+        pageConfig={page.actions}
+        onVerifyAction={(val: boolean) => {
+          setFormData({
+            ...form,
+            [page.id]: val
+          })
+        }}
+      >
+        {fields}
+      </VerificationWizard>
+    )
+  }
+
   return (
     <FormWizard
+      {...wizardProps}
       continueButtonText={continueButtonText}
-      currentPage={currentPage}
-      pageTitle={intl.formatMessage(page.title)}
-      showReviewButton={showReviewButton}
-      totalPages={total}
-      onNextPage={next}
-      onPreviousPage={previous}
-      onSubmit={onSubmit}
+      disableContinue={disableContinue}
     >
-      {children ? (
-        children(page)
-      ) : (
-        <FormFieldGenerator
-          fields={page.fields}
-          formData={form}
-          id="locationForm"
-          initialValues={form}
-          setAllFieldsDirty={false}
-          onChange={(values) => setFormData(values)}
-        />
-      )}
+      {fields}
     </FormWizard>
   )
 }

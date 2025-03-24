@@ -39,7 +39,6 @@ import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useSubscribeEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
@@ -47,6 +46,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
@@ -151,7 +151,8 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { formValues } = useSubscribeEventFormData()
+  const { getMetadata } = useEventMetadata()
+  const metadata = getMetadata()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
@@ -160,7 +161,7 @@ export function Review() {
 
   const { svgCode, handleCertify } = usePrintableCertificate(
     fullEvent,
-    formValues,
+    metadata,
     locations,
     users,
     certificateConfig,
@@ -188,7 +189,7 @@ export function Review() {
 
   const validationErrorExist = validationErrorsInActionFormExist(
     formConfig,
-    formValues
+    metadata
   )
   if (validationErrorExist) {
     return (
@@ -239,7 +240,8 @@ export function Review() {
         const response: EventDocument =
           await onlineActions.printCertificate.mutateAsync({
             eventId: fullEvent.id,
-            data: { ...formValues, templateId },
+            data: {},
+            metadata: { ...metadata, templateId },
             transactionId: uuid(),
             type: ActionType.PRINT_CERTIFICATE
           })
