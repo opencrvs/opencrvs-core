@@ -19,15 +19,9 @@ import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-<<<<<<< HEAD
 import { ActionUpdate, EventState } from './ActionDocument'
 import { FormConfig, FormPageType, FormPageConfig } from './FormConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
-=======
-import { EventState } from './ActionDocument'
-import { FormConfig, FormPageType } from './FormConfig'
-import { isFieldVisible } from '../conditionals/validate'
->>>>>>> develop
 import { FieldType } from './FieldType'
 import { getOrThrow } from '../utils'
 import { Draft } from './Draft'
