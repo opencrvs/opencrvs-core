@@ -40,6 +40,7 @@ WebFont.load({
 
 // Initialize MSW
 initialize({
+  quiet: true,
   onUnhandledRequest(req, print) {
     if (
       new URL(req.url).pathname.startsWith('/src/') ||

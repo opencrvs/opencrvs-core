@@ -16,6 +16,7 @@ import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
+import { findActiveDrafts } from '../utils'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
@@ -174,16 +175,18 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
   })
 }
 
+/**
+ * @returns the future state of the event with drafts applied
+ */
 export function getCurrentEventStateWithDrafts(
   event: EventDocument,
   drafts: Draft[]
 ): EventIndex {
-  const actions = event.actions.slice().sort()
-  const lastAction = actions[actions.length - 1]
+  const actions = event.actions
+    .slice()
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const activeDrafts = drafts
-    .filter(({ eventId }) => eventId === event.id)
-    .filter(({ createdAt }) => createdAt > lastAction.createdAt)
+  const activeDrafts = findActiveDrafts(event, drafts)
     .map((draft) => draft.action)
     .flatMap((action) => {
       /*

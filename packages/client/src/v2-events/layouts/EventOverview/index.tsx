@@ -37,7 +37,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { getEventTitle } from '@client/v2-events/utils'
+import { flattenEventIndex } from '@client/v2-events/utils'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -124,11 +124,10 @@ export function EventOverviewLayout({
             </Button>
           }
           mobileRight={<ActionMenu eventId={eventId} />}
-          mobileTitle={getEventTitle({
-            event: getCurrentEventStateWithDrafts(event, drafts),
-            eventConfig: eventConfiguration,
-            intl: flattenedIntl
-          })}
+          mobileTitle={flattenedIntl.formatMessage(
+            eventConfiguration.summary.title.label,
+            flattenEventIndex(getCurrentEventStateWithDrafts(event, drafts))
+          )}
         />
       }
       skipToContentText="skip"

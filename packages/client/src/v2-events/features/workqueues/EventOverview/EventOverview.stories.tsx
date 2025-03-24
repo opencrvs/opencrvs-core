@@ -24,7 +24,7 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {
-  title: 'Views/Event/Overview',
+  title: 'EventOverview',
   component: EventOverviewIndex,
   decorators: [
     (Story) => (
