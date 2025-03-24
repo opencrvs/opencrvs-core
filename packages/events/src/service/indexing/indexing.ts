@@ -160,6 +160,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.ADDRESS:
       const addressProperties = {
         country: { type: 'keyword' },
+        addressType: { type: 'keyword' },
         province: { type: 'keyword' },
         district: { type: 'keyword' },
         urbanOrRural: { type: 'keyword' },
@@ -168,7 +169,14 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         street: { type: 'keyword' },
         number: { type: 'keyword' },
         zipCode: { type: 'keyword' },
-        village: { type: 'keyword' }
+        village: { type: 'keyword' },
+        state: { type: 'keyword' },
+        district2: { type: 'keyword' },
+        cityOrTown: { type: 'keyword' },
+        addressLine1: { type: 'keyword' },
+        addressLine2: { type: 'keyword' },
+        addressLine3: { type: 'keyword' },
+        postcodeOrZip: { type: 'keyword' }
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
