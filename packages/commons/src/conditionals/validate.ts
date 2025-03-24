@@ -155,6 +155,19 @@ const zodToIntlErrorMap = (
 
       break
     }
+    case 'invalid_union': {
+      for (const { issues } of issue.unionErrors) {
+        for (const e of issues) {
+          if (
+            zodToIntlErrorMap(e, _ctx).message.message.id !==
+            'v2.error.required'
+          ) {
+            return createIntlError(errorMessages.invalidInput)
+          }
+        }
+      }
+      return createIntlError(errorMessages.requiredField)
+    }
   }
 
   return createIntlError(errorMessages.invalidInput)

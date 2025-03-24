@@ -26,6 +26,7 @@ function SelectCountryInput({
     <Select.Input
       {...props}
       // @Todo ensure countries are of the same type
+      data-testid={`location__${props.id}`}
       options={countries as SelectOption[]}
       type="SELECT"
       value={value}
