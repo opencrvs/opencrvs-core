@@ -17,9 +17,10 @@ import {
   RuralAddressValue,
   RuralAddressUpdateValue,
   UrbanAddressValue,
-  UrbanAddressUpdateValue
+  UrbanAddressUpdateValue,
+  GenericAddressValue,
+  GenericAddressUpdateValue
 } from './CompositeFieldValue'
-
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
@@ -47,6 +48,8 @@ export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
+export const DataFieldValue = z.undefined()
+export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export const FieldValue = z.union([
   TextValue,
@@ -56,7 +59,9 @@ export const FieldValue = z.union([
   FileFieldValue,
   FileFieldWithOptionValue,
   UrbanAddressValue,
-  RuralAddressValue
+  RuralAddressValue,
+  DataFieldValue,
+  GenericAddressValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
@@ -69,7 +74,9 @@ export const FieldUpdateValue = z.union([
   FileFieldValue,
   FileFieldWithOptionValue,
   UrbanAddressUpdateValue,
-  RuralAddressUpdateValue
+  RuralAddressUpdateValue,
+  DataFieldValue,
+  GenericAddressUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
@@ -83,9 +90,9 @@ export type FieldValueSchema =
   | typeof CheckboxFieldValue
   | typeof AddressFieldValue
   | typeof NumberFieldValue
+  | typeof DataFieldValue
   | z.ZodString
   | z.ZodBoolean
-
 /**
  * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
  *
@@ -97,5 +104,6 @@ export type FieldUpdateValueSchema =
   | typeof CheckboxFieldValue
   | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
+  | typeof DataFieldValue
   | z.ZodString
   | z.ZodBoolean
