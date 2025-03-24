@@ -24,8 +24,8 @@ import {
 import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
 import { format, isValid } from 'date-fns'
-import { ActionDocument, LanguageConfig } from '@opencrvs/commons'
-import { EventState, User } from '@opencrvs/commons/client'
+import { LanguageConfig } from '@opencrvs/commons'
+import { EventIndex, EventState, User } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
@@ -97,14 +97,21 @@ function formatAllNonStringValues(
 
 const cache = createIntlCache()
 
-export function compileSvg(
-  templateString: string,
-  $action: ActionDocument,
-  $data: EventState,
-  locations: Location[],
-  users: User[],
+export function compileSvg({
+  templateString,
+  $state,
+  $data,
+  locations,
+  users,
+  language
+}: {
+  templateString: string
+  $state: EventIndex
+  $data: EventState
+  locations: Location[]
+  users: User[]
   language: LanguageConfig
-): string {
+}): string {
   const intl: IntlShape = createIntl(
     {
       locale: language.lang,
@@ -140,7 +147,7 @@ export function compileSvg(
   $data = formatAllNonStringValues($data, intl)
   const output = template({
     $data,
-    $action,
+    $state,
     $references: {
       locations,
       users

@@ -248,7 +248,10 @@ export function Review() {
           .find((a) => a.type === ActionType.PRINT_CERTIFICATE)
 
         if (printAction) {
-          await handleCertify(printAction)
+          await handleCertify({
+            ...fullEvent,
+            actions: [...fullEvent.actions, printAction]
+          })
           navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
         } else {
           throw new Error('Print action not found in the response')

@@ -11,10 +11,9 @@
 
 import { Location } from '@events/service/locations/locations'
 import {
-  ActionDocument,
-  ActionType,
   EventDocument,
   EventState,
+  getCurrentEventState,
   isMinioUrl,
   User
 } from '@opencrvs/commons/client'
@@ -65,26 +64,14 @@ export const usePrintableCertificate = (
   certificateConfig?: CertificateTemplateConfig,
   language?: LanguageConfig
 ) => {
-  const lastActionWithData = event.actions
-    .reverse()
-    .find(
-      (a) =>
-        a.type === ActionType.REGISTER ||
-        a.type === ActionType.APPROVE_CORRECTION ||
-        a.type === ActionType.PRINT_CERTIFICATE
-    )
-  if (!lastActionWithData) {
-    throw new Error('No valid action with data found')
-  }
-
-  // Temporarily add `createdAt` to the last action's data to display
-  // the current certification date in the certificate preview on the review page.
-  const modifiedLastActionWithData = {
-    ...lastActionWithData,
-    data: {
-      ...lastActionWithData.data,
-      createdAt: new Date().toISOString()
-    }
+  const currentState = getCurrentEventState(event)
+  const modifiedState = {
+    ...currentState,
+    // Temporarily add `modifiedAt` to the last action's data to display
+    // the current certification date in the certificate preview on the review page.
+    modifiedAt: new Date().toISOString()
+    // Since 'modifiedDate' represents the last action's 'createdAt' date, and when
+    // we actually print certificate, in this particular case, last action is PRINT_CERTIFICATE
   }
 
   if (!language || !certificateConfig) {
@@ -92,29 +79,30 @@ export const usePrintableCertificate = (
   }
 
   const certificateFonts = certificateConfig.fonts ?? {}
-  const svgWithoutFonts = compileSvg(
-    certificateConfig.svg,
-    modifiedLastActionWithData,
-    form,
+  const svgWithoutFonts = compileSvg({
+    templateString: certificateConfig.svg,
+    $state: modifiedState,
+    $data: form,
     locations,
     users,
     language
-  )
+  })
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
-  const handleCertify = async (printActionDocument: ActionDocument) => {
+  const handleCertify = async (updatedEvent: EventDocument) => {
+    const currentEventState = getCurrentEventState(updatedEvent)
     const base64ReplacedTemplate = await replaceMinioUrlWithBase64(form)
-    const compiledSvg = compileSvg(
-      certificateConfig.svg,
-      printActionDocument,
-      {
+    const compiledSvg = compileSvg({
+      templateString: certificateConfig.svg,
+      $state: currentEventState,
+      $data: {
         ...base64ReplacedTemplate,
         preview: false
       },
       locations,
       users,
       language
-    )
+    })
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
     const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
     printAndDownloadPdf(pdfTemplate, event.id)
