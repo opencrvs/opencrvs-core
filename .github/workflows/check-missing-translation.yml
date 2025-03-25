@@ -51,6 +51,7 @@ jobs:
               if git merge origin/develop --no-commit --no-ff; then
                 echo "Successfully synced countryconfig branch '$working_branch' with 'develop'"
               else
+                # If there are merge conflicts in the translation file, abort the merge
                 if git diff --name-only --diff-filter=U | grep -q "src/translations/client.csv"; then
                   echo "Found merge conflicts in src/translations/client.csv, aborting merge"
                   git merge --abort
