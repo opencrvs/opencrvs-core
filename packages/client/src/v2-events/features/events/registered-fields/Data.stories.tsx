@@ -75,15 +75,12 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
                   fieldId: 'applicant.dob'
                 },
                 {
-                  fieldId: 'applicant.idVerification',
-                  customValue: {
-                    label: {
-                      defaultMessage: 'ID',
-                      description: 'This is the label for the field',
-                      id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
-                    },
-                    value: 'National ID | {applicant.id}'
-                  }
+                  label: {
+                    defaultMessage: 'ID',
+                    description: 'This is the label for the field',
+                    id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
+                  },
+                  value: 'National ID | {applicant.id}'
                 }
               ]
             }

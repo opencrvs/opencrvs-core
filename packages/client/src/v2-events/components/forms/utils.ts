@@ -132,15 +132,15 @@ export function getFieldFromDataEntry({
   dataEntry: DataEntry
   declareFormFields: Inferred[]
 }): { value: FieldValue; config?: Inferred } {
-  const { customValue, fieldId } = dataEntry
-  if (!customValue) {
+  if ('fieldId' in dataEntry) {
     return {
-      value: formData[fieldId],
-      config: declareFormFields.find((f) => f.id === fieldId)
+      value: formData[dataEntry.fieldId],
+      config: declareFormFields.find((f) => f.id === dataEntry.fieldId)
     }
   }
-  const template = customValue.value
-  let resolvedValue = customValue.value
+  const { value, label } = dataEntry
+  const template = value
+  let resolvedValue = value
   const keys = template.match(/{([^}]+)}/g)
   if (keys) {
     keys.forEach((key) => {
@@ -156,8 +156,8 @@ export function getFieldFromDataEntry({
     value: resolvedValue,
     config: {
       type: FieldType.TEXT,
-      id: fieldId,
-      label: customValue.label
+      id: label.id,
+      label: label
     }
   }
 }

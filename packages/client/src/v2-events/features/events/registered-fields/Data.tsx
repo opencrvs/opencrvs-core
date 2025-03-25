@@ -62,7 +62,9 @@ function DataInput({
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
       <dl>
-        {data.map(({ fieldId }) => {
+        {data.map((dataEntry) => {
+          const fieldId =
+            'fieldId' in dataEntry ? dataEntry.fieldId : dataEntry.label.id
           const field = fields.find((f) => f.config?.id === fieldId)
 
           if (!field || !field.config) {

@@ -373,12 +373,15 @@ const Address = BaseField.extend({
   defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
-export const DataEntry = z.object({
-  fieldId: z.string(),
-  customValue: z
-    .object({ label: TranslationConfig, value: z.string() })
-    .optional()
-})
+export const DataEntry = z.union([
+  z.object({
+    label: TranslationConfig,
+    value: z.string()
+  }),
+  z.object({
+    fieldId: z.string()
+  })
+])
 export type DataEntry = z.infer<typeof DataEntry>
 
 const DataField = BaseField.extend({
