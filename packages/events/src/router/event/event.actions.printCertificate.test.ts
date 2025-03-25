@@ -55,6 +55,21 @@ test('Validation error message contains all the offending fields', async () => {
   ).rejects.matchSnapshot()
 })
 
+test('Has validation errors when required VERIFICATION page metadata is missing', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await expect(
+    client.event.actions.printCertificate(
+      generator.event.actions.printCertificate(event.id, {
+        metadata: {}
+      })
+    )
+  ).rejects.matchSnapshot()
+})
+
 test('print certificate action can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
