@@ -27,6 +27,8 @@ const messages = defineMessages({
   }
 })
 
+const EMPTY_DATE = '--'
+
 function DateInput({
   onChange,
   value = '',
@@ -35,11 +37,19 @@ function DateInput({
   onChange: (newValue: string) => void
   value: string
 }) {
+  /**
+   * Component library returns '--' for empty dates when input has been touched.
+   * We limit the behavior to this component, while still allowing partial values. (e.g. '2021-01-')
+   */
+  const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
+  const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
+
   return (
     <DateFieldComponent
       {...props}
-      value={value ?? ''}
-      onChange={onChange}
+      value={value}
+      onChange={cleanOnChange}
+      data-testid={`${props.id}`}
       onBlur={(e) => {
         const segmentType = String(e.target.id.split('-').pop())
         const val = e.target.value
@@ -47,11 +57,11 @@ function DateInput({
 
         // Add possibly missing leading 0 for days and months
         if (segmentType === 'dd' && val.length === 1) {
-          onChange(`${dateSegmentVals[0]}-${dateSegmentVals[1]}-0${val}`)
+          cleanOnChange(`${dateSegmentVals[0]}-${dateSegmentVals[1]}-0${val}`)
         }
 
         if (segmentType === 'mm' && val.length === 1) {
-          onChange(`${dateSegmentVals[0]}-0${val}-${dateSegmentVals[2]}`)
+          cleanOnChange(`${dateSegmentVals[0]}-0${val}-${dateSegmentVals[2]}`)
         }
 
         return props.onBlur && props?.onBlur(e)

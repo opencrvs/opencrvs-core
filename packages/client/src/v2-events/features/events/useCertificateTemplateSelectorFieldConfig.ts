@@ -9,15 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldType } from '@opencrvs/commons/client'
+import { FieldConfig, FieldType } from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
+export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
   eventType: string
-) => {
+): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
   return {
-    id: 'templateId',
+    id: CERT_TEMPLATE_ID,
     type: FieldType.SELECT,
     required: true,
     label: {
@@ -25,6 +26,9 @@ export const useCertificateTemplateSelectorFieldConfig = (
       description: 'This is the label for the field',
       id: 'v2.event.default.action.certificate.form.section.who.field.surname.label'
     },
+    defaultValue: certificateTemplates.find(
+      (x) => x.event === eventType && x.isDefault
+    )?.id,
     options: certificateTemplates
       .filter((x) => x.event === eventType)
       .map((x) => ({ label: x.label, value: x.id }))

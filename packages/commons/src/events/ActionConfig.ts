@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { EnableConditional, ShowConditional } from './Conditional'
-import { FormConfig, FormPage } from './FormConfig'
+import { FormConfig, FormPageConfig } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 
@@ -45,24 +45,19 @@ const ValidateConfig = ActionConfigBase.merge(
 
 const RejectDeclarationConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.REJECT),
-    comment: z.string(),
-    isDuplicate: z.boolean()
+    type: z.literal(ActionType.REJECT)
   })
 )
+
 const MarkedAsDuplicateConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.MARKED_AS_DUPLICATE),
-    comment: z.string(),
-    duplicates: z.array(z.string()).describe('UUIDs of duplicate records')
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
   })
 )
 
 const ArchiveConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVE),
-    comment: z.string(),
-    isDuplicate: z.boolean()
+    type: z.literal(ActionType.ARCHIVE)
   })
 )
 
@@ -87,8 +82,8 @@ const PrintCertificateActionConfig = ActionConfigBase.merge(
 const RequestCorrectionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
-    onboardingForm: z.array(FormPage),
-    additionalDetailsForm: z.array(FormPage)
+    onboardingForm: z.array(FormPageConfig),
+    additionalDetailsForm: z.array(FormPageConfig)
   })
 )
 

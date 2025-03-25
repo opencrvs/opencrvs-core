@@ -202,7 +202,6 @@ export function Review() {
         eventConfig={config}
         form={form}
         formConfig={formConfig}
-        isUploadButtonVisible={true}
         metadata={metadata}
         previousFormValues={previousFormValues}
         title=""

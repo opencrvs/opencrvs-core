@@ -9,24 +9,34 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { ComponentProps } from 'react'
-import { FileFieldValue } from '@opencrvs/commons/client'
+import React from 'react'
+import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 
-function FileInput(
-  props: Omit<
-    ComponentProps<typeof SimpleDocumentUploader>,
-    'onComplete' | 'label' | 'error'
-  > & {
-    value: FileFieldValue | undefined
-    onChange: (value?: FileFieldValue) => void
-    error?: boolean
-    label?: string
-  }
-) {
-  const { value, onChange, name, description, allowedDocType, label } = props
-
+function FileInput({
+  width,
+  value,
+  onChange,
+  name,
+  description,
+  acceptedFileTypes,
+  maxFileSize,
+  label,
+  error,
+  touched
+}: {
+  width?: 'full' | 'auto'
+  acceptedFileTypes?: MimeType[]
+  maxFileSize: number
+  value: FileFieldValue | undefined
+  onChange: (file?: FileFieldValue) => void
+  name: string
+  description?: string
+  error?: string
+  label?: string
+  touched?: boolean
+}) {
   const [file, setFile] = React.useState(value)
 
   const { uploadFile } = useFileUpload(name, {
@@ -46,13 +56,15 @@ function FileInput(
 
   return (
     <SimpleDocumentUploader
-      {...props}
-      allowedDocType={allowedDocType}
+      acceptedFileTypes={acceptedFileTypes}
       description={description}
-      error={''}
+      error={error}
       file={file}
       label={label ?? file?.originalFilename}
+      maxFileSize={maxFileSize}
       name={name}
+      touched={touched}
+      width={width}
       onComplete={(newFile) => {
         if (newFile) {
           setFile({
