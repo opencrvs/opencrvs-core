@@ -57,11 +57,13 @@ jobs:
           git checkout $acting_branch
 
           # Sync acting branch with develop, so we get both the newest changes from develop and the changes from acting branch
-          if git merge origin/develop --no-commit --no-ff; then
-            git merge --continue
-          else
-            git merge --abort
-            echo "Could not merge origin/develop due to conflicts"
+          if [ "$acting_branch" != "develop" ]; then
+            if git merge origin/develop --no-commit --no-ff; then
+              git merge --continue
+            else
+              git merge --abort
+              echo "Could not merge origin/develop due to conflicts"
+            fi
           fi
 
           yarn install
