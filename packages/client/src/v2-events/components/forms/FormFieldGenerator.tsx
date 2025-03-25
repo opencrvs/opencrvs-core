@@ -21,6 +21,7 @@ import {
   evalExpressionInFieldDefinition,
   FIELD_SEPARATOR,
   getDependentFields,
+  getFieldFromDataEntry,
   handleDefaultValue,
   hasDefaultValueDependencyInfo,
   makeDatesFormatted,
@@ -494,10 +495,9 @@ const GeneratedInputField = React.memo(
         return null
       }
 
-      const fields = field.config.configuration.data.map(({ fieldId }) => ({
-        value: formData[fieldId],
-        config: declareFormFields.find((f) => f.id === fieldId)
-      }))
+      const fields = field.config.configuration.data.map((entry) =>
+        getFieldFromDataEntry({ dataEntry: entry, declareFormFields, formData })
+      )
 
       return <Data.Input {...field.config} fields={fields} />
     }
