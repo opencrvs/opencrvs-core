@@ -39,9 +39,12 @@ export async function upsertRegistrationHandler(
     true
   )
 
-  const upsertedRecord = toIdentifierUpserted(savedRecord, identifiers)
+  const [upsertedRecord, changedResources] = toIdentifierUpserted(
+    savedRecord,
+    identifiers
+  )
 
-  await sendBundleToHearth(upsertedRecord)
+  await sendBundleToHearth(changedResources)
   await indexBundle(upsertedRecord, token)
 
   return h.response(upsertedRecord).code(200)
