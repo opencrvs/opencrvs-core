@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionType, SCOPES, REQUESTER_TYPE } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { TRPCError } from '@trpc/server'
 
@@ -69,7 +69,7 @@ test('Has validation errors when required VERIFICATION page metadata is missing'
       generator.event.actions.printCertificate(declaredEvent.id, {
         // The tennis club membership print certificate form has a verification page with conditional 'field('collector.requesterId').isEqualTo('INFORMANT')'
         // Thus if the requester is set as INFORMANT and verification page result is not set, we should see a validation error.
-        metadata: { 'collector.requesterId': 'INFORMANT' }
+        metadata: { 'collector.requesterId': REQUESTER_TYPE.INFORMANT }
       })
     )
   ).rejects.matchSnapshot()
@@ -88,7 +88,7 @@ test('Has no validation errors when required VERIFICATION page metadata is set',
     client.event.actions.printCertificate(
       generator.event.actions.printCertificate(declaredEvent.id, {
         metadata: {
-          'collector.requesterId': 'INFORMANT',
+          'collector.requesterId': REQUESTER_TYPE.INFORMANT,
           'collector.identity.verify': true
         }
       })
