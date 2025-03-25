@@ -58,8 +58,9 @@ jobs:
 
           # Sync acting branch with develop, so we get both the newest changes from develop and the changes from acting branch
           if [ "$acting_branch" != "develop" ]; then
+            echo "Syncing $acting_branch with develop"
             if git merge origin/develop --no-commit --no-ff; then
-              git merge --continue
+              echo "Successfully synced $acting_branch with develop"
             else
               git merge --abort
               echo "Could not merge origin/develop due to conflicts"
