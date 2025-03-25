@@ -644,6 +644,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
     {
       id: 'collector.identity.verify',
       type: FormPageType.VERIFICATION,
+      conditional: field('collector.requesterId').isEqualTo('INFORMANT'),
       title: {
         id: 'event.tennis-club-membership.action.print.verifyIdentity',
         defaultMessage: 'Verify their identity',
@@ -824,6 +825,27 @@ export const TENNIS_CLUB_FORM = defineForm({
             defaultMessage: "Applicant's address",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.address.label'
+          }
+        }
+      ]
+    },
+    {
+      id: 'senior-pass',
+      conditional: field('applicant.dob').isBefore().date('1950-01-01'),
+      title: {
+        id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.title',
+        defaultMessage: 'Assign senior pass for applicant',
+        description: 'This is the title of the section'
+      },
+      fields: [
+        {
+          id: 'senior-pass.id',
+          type: 'TEXT',
+          required: true,
+          label: {
+            defaultMessage: 'Senior pass ID',
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label'
           }
         }
       ]

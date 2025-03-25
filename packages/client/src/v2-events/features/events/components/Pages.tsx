@@ -13,9 +13,10 @@ import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
+  EventConfig,
+  isPageVisible,
   FormPageConfig,
-  FormPageType,
-  EventConfig
+  FormPageType
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -54,25 +55,26 @@ export function Pages({
   const intl = useIntl()
 
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
+  const pages = formPages.filter((page) => isPageVisible(page, form))
 
   const {
     page: currentPage,
     next,
     previous,
     total
-  } = usePagination(formPages.length, Math.max(pageIdx, 0))
-  const page = formPages[currentPage]
+  } = usePagination(pages.length, Math.max(pageIdx, 0))
+  const page = pages[currentPage]
 
   useEffect(() => {
-    const pageChanged = formPages[currentPage].id !== pageId
+    const pageChanged = pages[currentPage].id !== pageId
 
     if (pageChanged) {
-      onFormPageChange(formPages[currentPage].id)
+      onFormPageChange(pages[currentPage].id)
 
       // We use the main content anchor id to scroll to the top of the frame when page changes
       document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
     }
-  }, [pageId, currentPage, formPages, onFormPageChange])
+  }, [pageId, currentPage, pages, onFormPageChange])
 
   const wizardProps = {
     currentPage,

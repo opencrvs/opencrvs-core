@@ -274,7 +274,8 @@ export async function addAction(
     eventType: event.type
   })
 
-  const fieldConfigs = findActiveActionFields(configuration, input.type) || []
+  const fieldConfigs =
+    findActiveActionFields(configuration, input.type, input.data) || []
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
 
   for (const file of fileValuesInCurrentAction) {
