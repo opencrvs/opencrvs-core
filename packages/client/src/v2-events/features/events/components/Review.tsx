@@ -19,7 +19,6 @@ import {
   Accordion,
   Button,
   Checkbox,
-  DocumentViewer,
   Icon,
   Link,
   ListReview,
@@ -42,8 +41,8 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { getCountryLogoFile } from '@client/offline/selectors'
 // eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
-import { useFileOptions } from '@client/v2-events/hooks/useFileOptions'
 import { Output } from './Output'
+import { DocumentViewer } from './DocumentViewer'
 
 const ValidationError = styled.span`
   color: ${({ theme }) => theme.colors.negative};
@@ -107,24 +106,6 @@ const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
   overflow: hidden;
-`
-const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
-  position: fixed;
-  width: calc(40% - 24px);
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
-    margin-bottom: 11px;
-  }
-`
-
-const ZeroDocument = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  height: 700px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 `
 
 const Card = styled.div`
@@ -264,8 +245,163 @@ const reviewMessages = defineMessages({
   }
 })
 
+function ReviewHeader({ title }: { title: string }) {
+  const countryLogoFile = useSelector(getCountryLogoFile)
+  const intl = useIntl()
+
+  return (
+    <HeaderContainer>
+      <HeaderContent>
+        {countryLogoFile && <CountryLogo size="small" src={countryLogoFile} />}
+        <Stack
+          alignItems="flex-start"
+          direction="column"
+          gap={6}
+          justify-content="flex-start"
+        >
+          <TitleContainer id={`header_title`}>
+            {intl.formatMessage(reviewMessages.govtName)}
+          </TitleContainer>
+          <SubjectContainer id={`header_subject`}>{title}</SubjectContainer>
+        </Stack>
+      </HeaderContent>
+    </HeaderContainer>
+  )
+}
+
 /**
- * Review component, used to display the "read" version of the form.
+ *  Renders review of form data, with the ability to edit the data.
+ */
+function FormReview({
+  formConfig,
+  form,
+  previousForm,
+  onEdit,
+  showPreviouslyMissingValuesAsChanged
+}: {
+  formConfig: FormConfig
+  form: EventState
+  previousForm: EventState
+  onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
+  showPreviouslyMissingValuesAsChanged: boolean
+}) {
+  const intl = useIntl()
+  const visiblePages = formConfig.pages.filter((page) =>
+    isPageVisible(page, form)
+  )
+
+  return (
+    <FormData>
+      <ReviewContainter>
+        {visiblePages.map((page) => {
+          const fields = page.fields
+            .filter((field) => isFieldVisible(field, form))
+            .map((field) => {
+              const value = form[field.id]
+              const previousValue = previousForm[field.id]
+
+              const valueDisplay = Output({
+                field,
+                previousValue,
+                showPreviouslyMissingValuesAsChanged,
+                value
+              })
+
+              const error = getFieldValidationErrors({
+                field,
+                values: form
+              })
+
+              const errorDisplay =
+                error.errors.length > 0 ? (
+                  <ValidationError key={field.id}>
+                    {intl.formatMessage(error.errors[0].message)}
+                  </ValidationError>
+                ) : null
+
+              return { ...field, valueDisplay, errorDisplay }
+            })
+
+          const shouldDisplayPage = fields.some(
+            ({ type, valueDisplay, errorDisplay }) => {
+              if (
+                type === FieldType.FILE ||
+                type === FieldType.FILE_WITH_OPTIONS
+              ) {
+                return true
+              }
+
+              // If page doesn't have any file inputs, we only want to display it if it has any fields with content
+              return valueDisplay || errorDisplay
+            }
+          )
+
+          if (!shouldDisplayPage) {
+            return <></>
+          }
+
+          return (
+            <DeclarationDataContainer
+              key={'Section_' + page.title.defaultMessage}
+            >
+              <Accordion
+                action={
+                  <Link
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onEdit({ pageId: page.id })
+                    }}
+                  >
+                    {intl.formatMessage(reviewMessages.changeAllButton)}
+                  </Link>
+                }
+                expand={true}
+                label={intl.formatMessage(page.title)}
+                labelForHideAction="Hide"
+                labelForShowAction="Show"
+                name={'Accordion_' + page.id}
+              >
+                <ListReview id={'Section_' + page.id}>
+                  {fields
+                    .filter(
+                      ({ valueDisplay, errorDisplay }) =>
+                        valueDisplay || errorDisplay
+                    )
+                    .map(({ id, label, errorDisplay, valueDisplay }) => (
+                      <ListReview.Row
+                        key={id}
+                        actions={
+                          <Link
+                            data-testid={`change-button-${id}`}
+                            onClick={(e) => {
+                              e.stopPropagation()
+
+                              onEdit({
+                                pageId: page.id,
+                                fieldId: id
+                              })
+                            }}
+                          >
+                            {intl.formatMessage(reviewMessages.changeButton)}
+                          </Link>
+                        }
+                        id={id}
+                        label={intl.formatMessage(label)}
+                        value={errorDisplay || valueDisplay}
+                      />
+                    ))}
+                </ListReview>
+              </Accordion>
+            </DeclarationDataContainer>
+          )
+        })}
+      </ReviewContainter>
+    </FormData>
+  )
+}
+
+/**
+ * Review component, used to display the "read" version of the form with metadata input fields for the user (signatures etc.)
  * User can review the data and take actions like declare, reject or edit the data.
  */
 function ReviewComponent({
@@ -276,7 +412,6 @@ function ReviewComponent({
   onEdit,
   children,
   title,
-  isUploadButtonVisible,
   onMetadataChange
 }: {
   children: React.ReactNode
@@ -295,21 +430,13 @@ function ReviewComponent({
     confirmation?: boolean
   }) => void
   title: string
-  isUploadButtonVisible?: boolean
   onMetadataChange?: (values: EventState) => void
 }) {
   const scopes = useSelector(getScope)
-  const intl = useIntl()
-  const countryLogoFile = useSelector(getCountryLogoFile)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
-  const fileOptions = useFileOptions(form, formConfig, intl)
 
-  const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form)
-  )
-
-  const pagesWithFile = formConfig.pages
+  const pageIdsWithFile = formConfig.pages
     .filter(({ fields }) =>
       fields.some(
         ({ type }) =>
@@ -318,189 +445,54 @@ function ReviewComponent({
     )
     .map(({ id }) => id)
 
+  const hasReviewFieldsToUpdate =
+    metadata && onMetadataChange && formConfig.review.fields.length > 0
+
   return (
     <Row>
       <LeftColumn>
         <Card>
-          <HeaderContainer>
-            <HeaderContent>
-              {countryLogoFile && (
-                <CountryLogo size="small" src={countryLogoFile} />
-              )}
-              <Stack
-                alignItems="flex-start"
-                direction="column"
-                gap={6}
-                justify-content="flex-start"
-              >
-                <TitleContainer id={`header_title`}>
-                  {intl.formatMessage(reviewMessages.govtName)}
-                </TitleContainer>
-                <SubjectContainer id={`header_subject`}>
-                  {title}
-                </SubjectContainer>
-              </Stack>
-            </HeaderContent>
-          </HeaderContainer>
-          <FormData>
-            <ReviewContainter>
-              {visiblePages.map((page) => {
-                const fields = page.fields
-                  .filter((field) => isFieldVisible(field, form))
-                  .map((field) => {
-                    const value = form[field.id]
-                    const previousValue = previousForm[field.id]
+          <ReviewHeader title={title} />
+          <FormReview
+            form={form}
+            formConfig={formConfig}
+            previousForm={previousForm}
+            showPreviouslyMissingValuesAsChanged={
+              showPreviouslyMissingValuesAsChanged
+            }
+            onEdit={onEdit}
+          />
 
-                    const valueDisplay = Output({
-                      field,
-                      previousValue,
-                      showPreviouslyMissingValuesAsChanged,
-                      value
-                    })
-
-                    const error = getFieldValidationErrors({
-                      field,
-                      values: form
-                    })
-
-                    const errorDisplay =
-                      error.errors.length > 0 ? (
-                        <ValidationError key={field.id}>
-                          {intl.formatMessage(error.errors[0].message)}
-                        </ValidationError>
-                      ) : null
-
-                    return { ...field, valueDisplay, errorDisplay }
-                  })
-
-                const shouldDisplayPage = fields.some(
-                  ({ type, valueDisplay, errorDisplay }) => {
-                    if (
-                      type === FieldType.FILE ||
-                      type === FieldType.FILE_WITH_OPTIONS
-                    ) {
-                      return true
-                    }
-
-                    // If page doesn't have any file inputs, we only want to display it if it has any fields with content
-                    return valueDisplay || errorDisplay
-                  }
-                )
-
-                if (!shouldDisplayPage) {
-                  return <></>
-                }
-
-                return (
-                  <DeclarationDataContainer
-                    key={'Section_' + page.title.defaultMessage}
-                  >
-                    <Accordion
-                      action={
-                        <Link
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            onEdit({ pageId: page.id })
-                          }}
-                        >
-                          {intl.formatMessage(reviewMessages.changeAllButton)}
-                        </Link>
-                      }
-                      expand={true}
-                      label={intl.formatMessage(page.title)}
-                      labelForHideAction="Hide"
-                      labelForShowAction="Show"
-                      name={'Accordion_' + page.id}
-                    >
-                      <ListReview id={'Section_' + page.id}>
-                        {fields
-                          .filter(
-                            ({ valueDisplay, errorDisplay }) =>
-                              valueDisplay || errorDisplay
-                          )
-                          .map(({ id, label, errorDisplay, valueDisplay }) => (
-                            <ListReview.Row
-                              key={id}
-                              actions={
-                                <Link
-                                  data-testid={`change-button-${id}`}
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-
-                                    onEdit({
-                                      pageId: page.id,
-                                      fieldId: id
-                                    })
-                                  }}
-                                >
-                                  {intl.formatMessage(
-                                    reviewMessages.changeButton
-                                  )}
-                                </Link>
-                              }
-                              id={id}
-                              label={intl.formatMessage(label)}
-                              value={errorDisplay || valueDisplay}
-                            />
-                          ))}
-                      </ListReview>
-                    </Accordion>
-                  </DeclarationDataContainer>
-                )
-              })}
-            </ReviewContainter>
-          </FormData>
-
-          {metadata &&
-            onMetadataChange &&
-            formConfig.review.fields.length > 0 && (
-              <FormData>
-                <ReviewContainter>
-                  <FormFieldGenerator
-                    fields={formConfig.review.fields}
-                    formData={metadata}
-                    id={'review'}
-                    initialValues={metadata}
-                    setAllFieldsDirty={false}
-                    onChange={onMetadataChange}
-                  />
-                </ReviewContainter>
-              </FormData>
-            )}
+          {hasReviewFieldsToUpdate && (
+            <FormData>
+              <ReviewContainter>
+                <FormFieldGenerator
+                  fields={formConfig.review.fields}
+                  formData={metadata}
+                  id={'review'}
+                  initialValues={metadata}
+                  setAllFieldsDirty={false}
+                  onChange={onMetadataChange}
+                />
+              </ReviewContainter>
+            </FormData>
+          )}
         </Card>
         {children}
       </LeftColumn>
-      {pagesWithFile.length > 0 && (
+      {pageIdsWithFile.length > 0 && (
         <RightColumn>
-          <ResponsiveDocumentViewer
-            isRegisterScope={
+          <DocumentViewer
+            form={form}
+            formConfig={formConfig}
+            // @todo: ask about this rule
+            showInMobile={
               scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT) ?? false
             }
-          >
-            <DocumentViewer id="document_section" options={fileOptions}>
-              {fileOptions.documentOptions.length === 0 && (
-                <ZeroDocument id={`zero_document`}>
-                  {intl.formatMessage(
-                    reviewMessages.zeroDocumentsTextForAnySection
-                  )}
-                  {isUploadButtonVisible && (
-                    <Link
-                      id="edit-document"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onEdit({
-                          pageId: pagesWithFile[0],
-                          confirmation: true
-                        })
-                      }}
-                    >
-                      {intl.formatMessage(reviewMessages.editDocuments)}
-                    </Link>
-                  )}
-                </ZeroDocument>
-              )}
-            </DocumentViewer>
-          </ResponsiveDocumentViewer>
+            onEdit={() =>
+              onEdit({ pageId: pageIdsWithFile[0], confirmation: true })
+            }
+          />
         </RightColumn>
       )}
     </Row>

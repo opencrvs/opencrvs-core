@@ -35,6 +35,7 @@ import {
   stripHiddenFields
 } from './utils'
 import { FieldValue } from './FieldValue'
+import { TranslationConfig } from './TranslationConfig'
 
 export function generateActionInput(
   configuration: EventConfig,
@@ -381,4 +382,12 @@ export const eventQueryDataGenerator = (
     'applicant.dob': '1999-11-11'
   },
   trackingId: overrides.trackingId ?? 'M3F8YQ'
+})
+
+export const generateTranslationConfig = (
+  message: string
+): TranslationConfig => ({
+  defaultMessage: message,
+  description: 'Description for ${message}',
+  id: message
 })
