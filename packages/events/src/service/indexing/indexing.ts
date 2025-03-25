@@ -130,14 +130,14 @@ export async function createIndex(
   return ensureAlias(indexName)
 }
 
-const SEPARATOR = '____'
+export const FIELD_ID_SEPARATOR = '____'
 
 export function encodeFieldId(fieldId: string) {
-  return fieldId.replaceAll('.', SEPARATOR)
+  return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
 }
 
 function decodeFieldId(fieldId: string) {
-  return fieldId.replaceAll(SEPARATOR, '.')
+  return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
 type _Combine<
