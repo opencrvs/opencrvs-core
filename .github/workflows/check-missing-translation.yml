@@ -38,6 +38,7 @@ jobs:
             echo "Branch ${{ github.head_ref }} exists in countryconfig"
             working_branch='${{ github.head_ref }}'
             echo "working_branch='${{ github.head_ref }}'" >> $GITHUB_OUTPUT
+            git checkout $working_branch
 
             # Sync countryconfig with develop, so we get both the newest changes from develop and the changes from working branch
             if [ "$working_branch" != "develop" ]; then
@@ -53,7 +54,6 @@ jobs:
 
           fi
           echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
-          git checkout $working_branch
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
