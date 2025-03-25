@@ -13,14 +13,14 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { flattenDeep, omitBy } from 'lodash'
 import { workqueues } from '../workqueues'
-import { ActionType } from './ActionType'
+import { ActionType, LatentActions } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { EventState } from './ActionDocument'
-import { FormConfig } from './FormConfig'
+import { FormConfig, FormPageType } from './FormConfig'
 import { isFieldVisible } from '../conditionals/validate'
 import { FieldType } from './FieldType'
 import { getOrThrow } from '../utils'
@@ -211,6 +211,9 @@ export function getActiveActionFields(
   configuration: EventConfig,
   action: ActionType
 ): FieldConfig[] {
+  if (LatentActions.some((latentAction) => latentAction === action)) {
+    return getActiveActionFields(configuration, ActionType.DECLARE)
+  }
   const fields = findActiveActionFields(configuration, action)
 
   if (!fields) {
@@ -289,4 +292,19 @@ export function createEmptyDraft(
       createdAtLocation: '@todo'
     }
   }
+}
+
+export function findActiveActionVerificationPageIds(
+  configuration: EventConfig,
+  action: ActionType
+): string[] {
+  const pages = findActiveActionFormPages(configuration, action)
+
+  if (!pages) {
+    return []
+  }
+
+  return pages
+    .filter((page) => page.type === FormPageType.VERIFICATION)
+    .map((page) => page.id)
 }
