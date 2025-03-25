@@ -2,6 +2,10 @@
 
 ## [1.6.3](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.3)
 
+### Bug fixes
+
+- Fix rendering of Custom Date fields [#8885](https://github.com/opencrvs/opencrvs-core/issues/8885)
+
 ## [1.6.2](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.2)
 
 ### Bug fixes
