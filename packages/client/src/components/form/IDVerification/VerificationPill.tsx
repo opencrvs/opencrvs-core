@@ -68,6 +68,23 @@ function Failed() {
   )
 }
 
+function FailedFetchIdDetails() {
+  const intl = useIntl()
+  return (
+    <Pill
+      type="inactive"
+      size="small"
+      pillTheme="dark"
+      label={
+        <>
+          <StyledIcon name="X" size="small" />
+          {intl.formatMessage(messages.failedFetchIdDetails.title)}
+        </>
+      }
+    />
+  )
+}
+
 export function VerificationPill({ type }: { type: string }) {
   if (type === 'authenticated') {
     return <Authenticated />
@@ -75,6 +92,8 @@ export function VerificationPill({ type }: { type: string }) {
     return <Verified />
   } else if (type === 'failed') {
     return <Failed />
+  } else if (type === 'failedFetchIdDetails') {
+    return <FailedFetchIdDetails />
   }
   return null
 }

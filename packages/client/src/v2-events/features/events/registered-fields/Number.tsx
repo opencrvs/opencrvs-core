@@ -33,6 +33,7 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
       value={inputValue}
       onBlur={(e) => {
         props.onChange?.(e)
+        props.onBlur?.(e)
       }}
       onChange={(e) => setInputValue(e.target.value)}
     />

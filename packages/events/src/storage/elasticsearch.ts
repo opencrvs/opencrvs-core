@@ -10,6 +10,7 @@
  */
 import * as elasticsearch from '@elastic/elasticsearch'
 import { env } from '@events/environment'
+import { FIELD_ID_SEPARATOR } from '@events/service/indexing/indexing'
 
 let client: elasticsearch.Client | undefined
 
@@ -31,5 +32,7 @@ export function getEventAliasName() {
 }
 
 export function getEventIndexName(eventType: string) {
-  return `${env.ES_INDEX_PREFIX}_${eventType}`.toLowerCase()
+  return `${env.ES_INDEX_PREFIX}_${eventType}`
+    .toLowerCase()
+    .replaceAll('.', FIELD_ID_SEPARATOR)
 }

@@ -34,6 +34,7 @@ import {
   FormConfig,
   getFieldValidationErrors,
   isFieldVisible,
+  isPageVisible,
   SCOPES
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -285,10 +286,14 @@ function FormReview({
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
   const intl = useIntl()
+  const visiblePages = formConfig.pages.filter((page) =>
+    isPageVisible(page, form)
+  )
+
   return (
     <FormData>
       <ReviewContainter>
-        {formConfig.pages.map((page) => {
+        {visiblePages.map((page) => {
           const fields = page.fields
             .filter((field) => isFieldVisible(field, form))
             .map((field) => {
