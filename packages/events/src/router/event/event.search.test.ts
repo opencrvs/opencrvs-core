@@ -10,6 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { AddressType } from '@opencrvs/commons'
 
 test('Returns empty list when no events match search criteria', async () => {
   const { user, generator } = await setupTestCase()
@@ -22,6 +23,7 @@ test('Returns empty list when no events match search criteria', async () => {
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -57,6 +59,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -71,6 +74,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -85,6 +89,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -134,6 +139,7 @@ test('Returns events that match date of birth of applicant', async () => {
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -148,6 +154,7 @@ test('Returns events that match date of birth of applicant', async () => {
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -190,6 +197,7 @@ test('Does not return events when searching with a similar but different date of
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -204,6 +212,7 @@ test('Does not return events when searching with a similar but different date of
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,

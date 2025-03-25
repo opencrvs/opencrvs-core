@@ -22,7 +22,7 @@ function TextInput({
   type,
   ...props
 }: TextInputProps) {
-  const inputValue = value ?? ''
+  const [inputValue, setInputValue] = React.useState(value ?? '')
 
   return (
     <TextInputComponent
@@ -32,6 +32,10 @@ function TextInput({
       isDisabled={disabled}
       maxLength={maxLength}
       value={inputValue}
+      onBlur={(e) => {
+        props.onChange?.(e)
+      }}
+      onChange={(e) => setInputValue(e.target.value)}
     />
   )
 }
