@@ -1,0 +1,18 @@
+hostname: opencrvs.localhost
+
+env:
+  FOO: bar
+
+image:
+  tag: local
+
+countryconfig:
+  image:
+    # name: opencrvs/ocrvs-farajaland
+    name: opencrvs/ocrvs-countryconfig
+    tag: develop
+    # tag: 21225b8
+
+
+data_seeder:
+  enabled: true
