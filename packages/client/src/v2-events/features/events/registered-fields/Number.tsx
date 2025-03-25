@@ -20,7 +20,9 @@ interface NumberInputProps extends Omit<TextInputProps, 'type' | 'maxLength'> {
 }
 
 function NumberInput({ value, disabled, ...props }: NumberInputProps) {
-  const inputValue = isNaN(value) ? '' : value.toString()
+  const [inputValue, setInputValue] = React.useState(
+    isNaN(value) ? '' : value.toString()
+  )
 
   return (
     <TextInputComponent
@@ -29,6 +31,10 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
       data-testid={`number__${props.id}`}
       isDisabled={disabled}
       value={inputValue}
+      onBlur={(e) => {
+        props.onChange?.(e)
+      }}
+      onChange={(e) => setInputValue(e.target.value)}
     />
   )
 }

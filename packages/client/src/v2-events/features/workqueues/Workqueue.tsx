@@ -218,12 +218,12 @@ function Workqueue({
 
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
-          <IconWithName name={title} status={'OUTBOX'} />
+          <IconWithName name={title} status={getEventStatus()} />
         ) : (
           <IconWithNameEvent
             event={intl.formatMessage(eventConfig.label)}
             name={title}
-            status={'OUTBOX'}
+            status={getEventStatus()}
           />
         )
 
