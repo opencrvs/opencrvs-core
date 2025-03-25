@@ -1,13 +1,17 @@
+# Access OpenCRVS services at https://opencrvs.localhost
+# You need to accept SSL Certificate for the first time for
+# the browser to trust the certificate.
 hostname: opencrvs.localhost
 
-env:
-  FOO: bar
+# Define the environment variables for the OpenCRVS services.
+env: {}
 
 image:
   tag: local
 
 countryconfig:
   image:
+    # Replace countryconfig with farajaland to test data
     # name: opencrvs/ocrvs-farajaland
     name: opencrvs/ocrvs-countryconfig
     tag: develop
@@ -15,4 +19,5 @@ countryconfig:
 
 
 data_seeder:
-  enabled: true
+  # Change to true to enable data seeder
+  enabled: false

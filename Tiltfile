@@ -3,6 +3,7 @@ load('ext://configmap', 'configmap_create')
 load('ext://secret', 'secret_create_generic', 'secret_from_dict', 'secret_create_tls')
 load('ext://namespace', 'namespace_create', 'namespace_inject')
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
+
 # Tune parallel updates, default 3
 #update_settings(max_parallel_updates=2)
 
@@ -15,11 +16,11 @@ docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
 # Build services
 docker_build("ghcr.io/opencrvs/ocrvs-client:local", ".", 
               dockerfile="packages/client/Dockerfile", 
-              # only=["packages/components","packages/client","packages/events","packages/gateway"],
+              only=["packages/components","packages/client","packages/events","packages/gateway"],
               network="host")
 docker_build("ghcr.io/opencrvs/ocrvs-login:local", ".", 
               dockerfile="packages/login/Dockerfile", 
-              # only=["packages/components","packages/login"], 
+              only=["packages/components","packages/login"], 
               network="host")
 docker_build("ghcr.io/opencrvs/ocrvs-gateway:local", ".",
               dockerfile="packages/gateway/Dockerfile", 
@@ -49,9 +50,6 @@ def build_services():
     docker_build("ghcr.io/opencrvs/ocrvs-{}:local".format(app), ".", dockerfile="packages/{}/Dockerfile".format(app), network="host")
 
 build_services()
-
-# Only use for local dev with docker desktop
-# allow_k8s_contexts('docker-desktop')
 
 # Create namespace
 opencrvs_namespace = 'opencrvs-dev'
@@ -94,3 +92,13 @@ k8s_yaml(helm('../infrastructure/charts/opencrvs-services',
 #     resources_to_be_waited = k8s_resource(app, resource_deps=images)
 
 # wait_for_builds()
+
+# TODO: Check the way how to get tilt build image tag
+# data_seed_command = """
+# helm template ../infrastructure/charts/opencrvs-services --set data_seeder.enabled=true --namespace={} -s templates/data-seeder.yaml -f kubernetes/opencrvs-services/values-dev.yaml |\
+#  kubectl apply -f -""".format(opencrvs_namespace)
+# local_resource(
+#     'Seed data',
+#     cmd=data_seed_command,
+#     trigger_mode=TRIGGER_MODE_MANUAL,
+# )
