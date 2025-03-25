@@ -163,13 +163,13 @@ export const getFormFields = (formConfig: FormConfig) => {
   return formConfig.pages.flatMap((p) => p.fields)
 }
 
-export function isPageVisible(page: FormPageConfig, eventData: ActionUpdate) {
+export function isPageVisible(page: FormPageConfig, formValues: ActionUpdate) {
   if (!page.conditional) {
     return true
   }
 
   return validate(page.conditional, {
-    $form: eventData,
+    $form: formValues,
     $now: formatISO(new Date(), { representation: 'date' })
   })
 }
