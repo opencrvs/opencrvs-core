@@ -44,7 +44,11 @@ jobs:
             if [ "$working_branch" != "develop" ]; then
               echo "Syncing countryconfig branch '$working_branch' with 'develop'"
 
-              if git merge origin/develop --no-commit --no-ff --no-edit; then
+              # Unfortunately the merge requires user.name and email to be set here
+              git config --local user.name "OpenCRVS Bot"
+              git config --local user.email "bot@opencrvs.org"
+
+              if git merge origin/develop --no-commit --no-ff; then
                 echo "Successfully synced countryconfig branch '$working_branch' with 'develop'"
               else
                 echo "Could not merge origin/develop due to conflicts"
