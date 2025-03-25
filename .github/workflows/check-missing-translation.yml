@@ -42,6 +42,7 @@ jobs:
             # Sync countryconfig with develop, so we get both the newest changes from develop and the changes from working branch
             if [ "$working_branch" != "develop" ]; then
               echo "Syncing countryconfig branch '$working_branch' with 'develop'"
+              git fetch origin
               if git merge origin/develop --no-commit --no-ff; then
                 echo "Successfully synced countryconfig branch '$working_branch' with 'develop'"
               else
