@@ -15,12 +15,6 @@ import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
 import { FormPageType } from '../events/FormConfig'
 
-export const REQUESTER_TYPE = {
-  INFORMANT: 'INFORMANT',
-  OTHER: 'OTHER',
-  PRINT_IN_ADVANCE: 'PRINT_IN_ADVANCE'
-} as const
-
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineForm({
   label: {
@@ -57,7 +51,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
           type: 'SELECT',
           options: [
             {
-              value: REQUESTER_TYPE.INFORMANT,
+              value: 'INFORMANT',
               label: {
                 id: 'v2.event.tennis-club-membership.action.certificate.form.section.requester.informant.label',
                 defaultMessage: 'Print and issue Informant',
@@ -65,7 +59,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
               }
             },
             {
-              value: REQUESTER_TYPE.OTHER,
+              value: 'OTHER',
               label: {
                 id: 'v2.event.tennis-club-membership.action.certificate.form.section.requester.other.label',
                 defaultMessage: 'Print and issue someone else',
@@ -73,7 +67,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
               }
             },
             {
-              value: REQUESTER_TYPE.PRINT_IN_ADVANCE,
+              value: 'PRINT_IN_ADVANCE',
               label: {
                 id: 'v2.event.tennis-club-membership.action.certificate.form.section.requester.printInAdvance.label',
                 defaultMessage: 'Print in advance',
