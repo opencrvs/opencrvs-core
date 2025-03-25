@@ -68,6 +68,10 @@
 
 - For countries where local phone numbers start with 0, we now ensure the prefix remains unchanged when converting to and from the international format.
 
+### Bug fixes
+
+- Fix rendering of Custom Date fields [#8885](https://github.com/opencrvs/opencrvs-core/issues/8885)
+
 ## 1.6.2 Release candidate
 
 ### Deprecated

@@ -116,6 +116,18 @@ const TextAreaField = BaseField.extend({
 
 export type TextAreaField = z.infer<typeof TextAreaField>
 
+export const ImageMimeType = z.enum([
+  'image/png',
+  'image/jpg',
+  'image/jpeg',
+  'image/svg+xml'
+])
+
+export const MimeType = ImageMimeType
+export type MimeType = z.infer<typeof MimeType>
+
+const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
+
 const SignatureField = BaseField.extend({
   type: z.literal(FieldType.SIGNATURE),
   signaturePromptLabel: TranslationConfig.describe(
@@ -123,14 +135,17 @@ const SignatureField = BaseField.extend({
   ),
   configuration: z
     .object({
-      maxSizeMb: z.number().optional().describe('Maximum file size in MB'),
-      allowedFileFormats: z
-        .array(z.string())
+      maxFileSize: z
+        .number()
+        .describe('Maximum file size in bytes')
+        .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      acceptedFileTypes: MimeType.array()
         .optional()
         .describe('List of allowed file formats for the signature')
     })
-    .default({})
-    .optional()
+    .default({
+      maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
+    })
 }).describe('Signature input field')
 
 export type SignatureField = z.infer<typeof SignatureField>
@@ -200,17 +215,29 @@ export type PageHeader = z.infer<typeof PageHeader>
 
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE),
-  options: z
+  configuration: z
     .object({
-      style: z.object({
-        fullWidth: z
-          .boolean()
-          .describe(
-            'Whether the file upload button should take the full width of the container or not'
-          )
-      })
+      maxFileSize: z
+        .number()
+        .describe('Maximum file size in bytes')
+        .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      acceptedFileTypes: MimeType.array()
+        .optional()
+        .describe('List of allowed file formats for the signature'),
+      style: z
+        .object({
+          width: z
+            .enum(['full', 'auto'])
+            .optional()
+            .describe(
+              'Whether the file upload button should take the full width of the container or not'
+            )
+        })
+        .optional()
     })
-    .optional()
+    .default({
+      maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
+    })
 }).describe('File upload')
 
 export type File = z.infer<typeof File>
@@ -309,8 +336,21 @@ export type Location = z.infer<typeof Location>
 
 const FileUploadWithOptions = BaseField.extend({
   type: z.literal(FieldType.FILE_WITH_OPTIONS),
-  options: z.array(SelectOption).describe('A list of options')
-}).describe('Select input')
+  options: z.array(SelectOption).describe('A list of options'),
+  configuration: z
+    .object({
+      maxFileSize: z
+        .number()
+        .describe('Maximum file size in bytes')
+        .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      acceptedFileTypes: MimeType.array()
+        .optional()
+        .describe('List of allowed file formats for the signature')
+    })
+    .default({
+      maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
+    })
+})
 
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
@@ -399,6 +439,34 @@ export type Inferred =
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
 
+/** @knipignore */
+/**
+ * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
+ */
+export type InferredInput =
+  | z.input<typeof Address>
+  | z.input<typeof TextField>
+  | z.input<typeof NumberField>
+  | z.input<typeof TextAreaField>
+  | z.input<typeof DateField>
+  | z.input<typeof Paragraph>
+  | z.input<typeof RadioGroup>
+  | z.input<typeof BulletList>
+  | z.input<typeof PageHeader>
+  | z.input<typeof Select>
+  | z.input<typeof Checkbox>
+  | z.input<typeof File>
+  | z.input<typeof FileUploadWithOptions>
+  | z.input<typeof Country>
+  | z.input<typeof AdministrativeArea>
+  | z.input<typeof Divider>
+  | z.input<typeof Location>
+  | z.input<typeof Facility>
+  | z.input<typeof Office>
+  | z.input<typeof SignatureField>
+  | z.input<typeof EmailField>
+  | z.input<typeof DataField>
+
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
   TextField,
@@ -422,7 +490,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   EmailField,
   FileUploadWithOptions,
   DataField
-]) as unknown as z.ZodType<Inferred, any, Inferred>
+]) as unknown as z.ZodType<Inferred, any, InferredInput>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>

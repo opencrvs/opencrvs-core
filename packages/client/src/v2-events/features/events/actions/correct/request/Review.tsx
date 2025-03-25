@@ -98,7 +98,6 @@ export function Review() {
         eventConfig={config}
         form={form}
         formConfig={formConfig}
-        isUploadButtonVisible={true}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,

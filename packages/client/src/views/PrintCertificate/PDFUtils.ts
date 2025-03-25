@@ -29,6 +29,10 @@ import {
 } from '@client/utils/referenceApi'
 import htmlToPdfmake from 'html-to-pdfmake'
 import { Content } from 'pdfmake/interfaces'
+import {
+  formatPlainDate,
+  isValidPlainDate
+} from '@client/utils/date-formatting'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -163,6 +167,9 @@ export function compileSvg(
   Handlebars.registerHelper(
     'formatDate',
     function (this: any, dateString: string, formatString: string) {
+      if (isValidPlainDate(dateString)) {
+        return formatPlainDate(dateString, formatString)
+      }
       const date = new Date(dateString)
       return isValid(date) ? format(date, formatString) : ''
     }
