@@ -163,6 +163,26 @@ export const getFormFields = (formConfig: FormConfig) => {
   return formConfig.pages.flatMap((p) => p.fields)
 }
 
+export function isPageVisible(page: FormPageConfig, eventData: ActionUpdate) {
+  if (!page.conditional) {
+    return true
+  }
+
+  return validate(page.conditional, {
+    $form: eventData,
+    $now: formatISO(new Date(), { representation: 'date' })
+  })
+}
+
+export const getVisiblePagesFormFields = (
+  formConfig: FormConfig,
+  formData: ActionUpdate
+) => {
+  return formConfig.pages
+    .filter((p) => isPageVisible(p, formData))
+    .flatMap((p) => p.fields)
+}
+
 /**
  * Returns only form fields for the action type, if any, excluding review fields.
  */
@@ -181,12 +201,20 @@ export const findActiveActionFormFields = (
  */
 export const findActiveActionFields = (
   configuration: EventConfig,
-  action: ActionType
+  action: ActionType,
+  formData?: ActionUpdate
 ): FieldConfig[] | undefined => {
   const form = findActiveActionForm(configuration, action)
   const reviewFields = form?.review.fields
 
-  const formFields = form ? getFormFields(form) : undefined
+  let formFields: FieldConfig[] | undefined = undefined
+
+  if (form) {
+    formFields = formData
+      ? getVisiblePagesFormFields(form, formData)
+      : getFormFields(form)
+  }
+
   const allFields = formFields
     ? formFields.concat(reviewFields ?? [])
     : reviewFields
@@ -297,15 +325,4 @@ export function createEmptyDraft(
 
 export function isVerificationPage(page: FormPageConfig) {
   return page.type === FormPageType.VERIFICATION
-}
-
-export function isPageVisible(page: FormPageConfig, eventData: ActionUpdate) {
-  if (!page.conditional) {
-    return true
-  }
-
-  return validate(page.conditional, {
-    $form: eventData,
-    $now: formatISO(new Date(), { representation: 'date' })
-  })
 }

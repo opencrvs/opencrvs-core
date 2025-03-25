@@ -35,6 +35,7 @@ import {
   FormConfig,
   getFieldValidationErrors,
   isFieldVisible,
+  isPageVisible,
   SCOPES
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -303,6 +304,11 @@ function ReviewComponent({
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
   const fileOptions = useFileOptions(form, formConfig, intl)
+
+  const visiblePages = formConfig.pages.filter((page) =>
+    isPageVisible(page, form)
+  )
+
   const pagesWithFile = formConfig.pages
     .filter(({ fields }) =>
       fields.some(
@@ -338,7 +344,7 @@ function ReviewComponent({
           </HeaderContainer>
           <FormData>
             <ReviewContainter>
-              {formConfig.pages.map((page) => {
+              {visiblePages.map((page) => {
                 const fields = page.fields
                   .filter((field) => isFieldVisible(field, form))
                   .map((field) => {

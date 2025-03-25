@@ -55,10 +55,7 @@ export function Pages({
   const intl = useIntl()
 
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
-
-  const pages = formPages.filter((page) =>
-    isPageVisible(page, { ...form, ...eventDeclarationData })
-  )
+  const pages = formPages.filter((page) => isPageVisible(page, form))
 
   const {
     page: currentPage,

@@ -18,6 +18,7 @@ import {
   findActiveActionFields,
   getActiveActionFormPages,
   getFieldValidationErrors,
+  Inferred,
   isPageVisible,
   isVerificationPage
 } from '@opencrvs/commons'
@@ -26,65 +27,84 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventTypeId, getEventById } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
 
+function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
+  return formFields.reduce(
+    (
+      errorResults: {
+        message: string
+        id: string
+        value: FieldUpdateValue
+      }[],
+      field: FieldConfig
+    ) => {
+      const fieldErrors = getFieldValidationErrors({
+        field,
+        values: data
+      }).errors
+
+      if (fieldErrors.length === 0) {
+        return errorResults
+      }
+
+      // For backend, use the default message without translations.
+      const errormessageWithId = fieldErrors.map((error) => ({
+        message: error.message.defaultMessage,
+        id: field.id,
+        value: data[field.id as keyof typeof data]
+      }))
+
+      return [...errorResults, ...errormessageWithId]
+    },
+    []
+  )
+}
+
+function getVerificationPageErrors(
+  verificationPageIds: string[],
+  data: ActionUpdate
+) {
+  return verificationPageIds
+    .map((pageId) => {
+      const value = data[pageId]
+      return typeof value !== 'boolean'
+        ? {
+            message: 'Verification page result is required',
+            id: pageId,
+            value
+          }
+        : null
+    })
+    .filter((error) => error !== null)
+}
+
 type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
 }
 
 export function validateAction(actionType: ActionType) {
-  return async (opts: ActionMiddlewareOptions) => {
-    const eventType = await getEventTypeId(opts.input.eventId)
-
-    const configuration = await getEventConfigurationById({
-      token: opts.ctx.token,
+  return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
+    const eventType = await getEventTypeId(input.eventId)
+    const eventConfig = await getEventConfigurationById({
+      token: ctx.token,
       eventType
     })
 
-    const formFields = findActiveActionFields(configuration, actionType) || []
+    const formFields =
+      findActiveActionFields(eventConfig, actionType, input.data) || []
 
     const data = {
-      ...opts.input.data,
-      ...(opts.input.metadata ?? {})
+      ...input.data,
+      ...(input.metadata ?? {})
     } satisfies ActionUpdate
 
-    // TODO CIHAN: dont expect required fields from hidden pages?
-    const errors = formFields.reduce(
-      (
-        errorResults: {
-          message: string
-          id: string
-          value: FieldUpdateValue
-        }[],
-        field: FieldConfig
-      ) => {
-        const fieldErrors = getFieldValidationErrors({
-          field,
-          values: data
-        }).errors
-
-        if (fieldErrors.length === 0) {
-          return errorResults
-        }
-
-        // For backend, use the default message without translations.
-        const errormessageWithId = fieldErrors.map((error) => ({
-          message: error.message.defaultMessage,
-          id: field.id,
-          value: data[field.id as keyof typeof data]
-        }))
-
-        return [...errorResults, ...errormessageWithId]
-      },
-      []
-    )
-
-    const event = await getEventById(opts.input.eventId)
+    const event = await getEventById(input.eventId)
     const eventDeclarationData =
       event.actions.find((action) => action.type === ActionType.DECLARE)
         ?.data ?? {}
 
     // For each visible verification page on the form, we expect the metadata to include a field with boolean value and the page id as key.
     const visibleVerificationPageIds = getActiveActionFormPages(
-      configuration,
+      eventConfig,
       actionType
     )
       .filter((page) => isVerificationPage(page))
@@ -93,28 +113,18 @@ export function validateAction(actionType: ActionType) {
       )
       .map((page) => page.id)
 
-    const verificationPageErrors = visibleVerificationPageIds
-      .map((field) => {
-        const value = data[field]
-        return typeof value !== 'boolean'
-          ? {
-              message: 'Verification page result is required',
-              id: field,
-              value
-            }
-          : null
-      })
-      .filter((error) => error !== null)
+    const errors = [
+      ...getFormFieldErrors(formFields, data),
+      ...getVerificationPageErrors(visibleVerificationPageIds, data)
+    ]
 
-    const allErrors = [...errors, ...verificationPageErrors]
-
-    if (allErrors.length > 0) {
+    if (errors.length > 0) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: JSON.stringify(allErrors)
+        message: JSON.stringify(errors)
       })
     }
 
-    return opts.next()
+    return next()
   }
 }
