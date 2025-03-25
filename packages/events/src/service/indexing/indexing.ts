@@ -83,7 +83,7 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
   }
   return ensureAlias(indexName)
 }
-export async function ensureAlias(indexName: string) {
+async function ensureAlias(indexName: string) {
   const client = getOrCreateClient()
   logger.info(`Ensuring alias for index ${indexName}`)
   const res = await client.indices.putAlias({
