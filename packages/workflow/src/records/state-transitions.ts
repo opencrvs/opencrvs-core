@@ -51,7 +51,8 @@ import {
   TaskHistory,
   RejectedRecord,
   SupportedPatientIdentifierCode,
-  PractitionerRole
+  PractitionerRole,
+  Saved
 } from '@opencrvs/commons/types'
 import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
@@ -352,7 +353,7 @@ export function toIdentifierUpserted<T extends ValidRecord>(
     type: SupportedPatientIdentifierCode
     value: string
   }[]
-): T {
+): [T, Bundle<Saved<Patient>>] {
   const task = getTaskFromSavedBundle(record)
   const event = getTaskEventType(task)
   const composition = getComposition(record)
@@ -368,16 +369,27 @@ export function toIdentifierUpserted<T extends ValidRecord>(
         .map((patient) => patient.id)
         .includes(e.resource.id)
   )
-  return {
-    ...record,
-    entry: [
-      ...filteredEntry,
-      ...patientWithUpsertedIdentifier.map((resource) => ({
-        ...record.entry.find((e) => e.resource.id === resource.id),
-        resource
-      }))
-    ]
-  }
+  return [
+    {
+      ...record,
+      entry: [
+        ...filteredEntry,
+        ...patientWithUpsertedIdentifier.map((resource) => ({
+          ...record.entry.find((e) => e.resource.id === resource.id),
+          resource
+        }))
+      ]
+    },
+    {
+      ...record,
+      entry: [
+        ...patientWithUpsertedIdentifier.map((resource) => ({
+          ...record.entry.find((e) => e.resource.id === resource.id),
+          resource
+        }))
+      ]
+    }
+  ]
 }
 
 export async function toDownloaded(
