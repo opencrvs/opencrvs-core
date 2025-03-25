@@ -55,7 +55,8 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.DECLARE }),
     expect.objectContaining({ type: ActionType.VALIDATE }),
-    expect.objectContaining({ type: ActionType.REGISTER })
+    expect.objectContaining({ type: ActionType.REGISTER }),
+    expect.objectContaining({ type: ActionType.READ })
   ])
 })
 
