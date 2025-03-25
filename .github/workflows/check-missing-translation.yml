@@ -38,6 +38,18 @@ jobs:
             echo "Branch ${{ github.head_ref }} exists in countryconfig"
             working_branch='${{ github.head_ref }}'
             echo "working_branch='${{ github.head_ref }}'" >> $GITHUB_OUTPUT
+
+            # Sync countryconfig with develop, so we get both the newest changes from develop and the changes from working branch
+            if [ "$working_branch" != "develop" ]; then
+              echo "Syncing countryconfig branch '$working_branch' with 'develop'"
+              if git merge origin/develop --no-commit --no-ff; then
+                echo "Successfully synced countryconfig branch '$working_branch' with 'develop'"
+              else
+                echo "Could not merge origin/develop due to conflicts"
+                git merge --abort
+              fi
+            fi
+
           fi
           echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
           git checkout $working_branch
@@ -55,18 +67,6 @@ jobs:
           git clone  https://github.com/opencrvs/opencrvs-core.git
           cd ./opencrvs-core
           git checkout $acting_branch
-
-          # Sync acting branch with develop, so we get both the newest changes from develop and the changes from acting branch
-          if [ "$acting_branch" != "develop" ]; then
-            echo "Syncing $acting_branch with develop"
-            if git merge origin/develop --no-commit --no-ff; then
-              echo "Successfully synced $acting_branch with develop"
-            else
-              git merge --abort
-              echo "Could not merge origin/develop due to conflicts"
-            fi
-          fi
-
           yarn install
           cd ./packages/client
           CI=true yarn extract:translations 2>&1 | tee output.txt
