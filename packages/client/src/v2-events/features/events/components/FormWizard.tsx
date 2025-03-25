@@ -9,13 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { PropsWithChildren } from 'react'
-import { Button } from '../Button'
-import { Content } from '../Content'
-import { Frame } from '../Frame'
-import { Icon } from '../Icon'
-import { Stack } from '../Stack'
+import { defineMessages, useIntl } from 'react-intl'
+import { Button } from '@opencrvs/components/src/Button'
+import { Content } from '@opencrvs/components/src/Content'
+import { Frame } from '@opencrvs/components/src/Frame'
+import { Icon } from '@opencrvs/components/src/Icon'
+import { Stack } from '@opencrvs/components/src/Stack'
 
-type FormWizardProps = PropsWithChildren<{
+export const messages = defineMessages({
+  back: {
+    defaultMessage: 'Back',
+    description: 'Back button text',
+    id: 'v2.buttons.back'
+  },
+  backToReview: {
+    defaultMessage: 'Back to review',
+    description: 'Back to review button text',
+    id: 'v2.buttons.backToReview'
+  }
+})
+
+export type FormWizardProps = PropsWithChildren<{
   currentPage: number
   totalPages: number
   /** Callback when the user clicks the "Continue" button */
@@ -27,7 +41,6 @@ type FormWizardProps = PropsWithChildren<{
   pageTitle: string
 
   showReviewButton?: boolean
-  continueButtonText?: string
 }>
 
 export const FormWizard = ({
@@ -39,27 +52,34 @@ export const FormWizard = ({
   onNextPage,
   onPreviousPage,
   continueButtonText = 'Continue',
-  showReviewButton
-}: FormWizardProps) => {
+  showReviewButton,
+  disableContinue = false
+}: FormWizardProps & {
+  continueButtonText?: string
+  disableContinue?: boolean
+}) => {
+  const intl = useIntl()
+
   return (
     <Frame.LayoutForm>
       <Frame.SectionFormBackAction>
         {currentPage > 0 && (
-          <Button type="tertiary" size="small" onClick={onPreviousPage}>
+          <Button size="small" type="tertiary" onClick={onPreviousPage}>
             <Icon name="ArrowLeft" size="medium" />
-            Back
+            {intl.formatMessage(messages.back)}
           </Button>
         )}
       </Frame.SectionFormBackAction>
       <Frame.Section>
-        <Content title={pageTitle} showTitleOnMobile={true}>
-          <Stack direction="column" gap={16} alignItems="stretch">
+        <Content showTitleOnMobile={true} title={pageTitle}>
+          <Stack alignItems="stretch" direction="column" gap={16}>
             {children}
 
             <Button
+              disabled={disableContinue}
+              role="button"
               size="large"
               type="primary"
-              role="button"
               onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
             >
               {continueButtonText}
@@ -67,7 +87,7 @@ export const FormWizard = ({
 
             {showReviewButton && (
               <Button size="large" type="secondary" onClick={onSubmit}>
-                Back to review
+                {intl.formatMessage(messages.backToReview)}
               </Button>
             )}
           </Stack>

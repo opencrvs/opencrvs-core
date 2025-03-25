@@ -27,8 +27,15 @@ import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
-import { findActiveActionFormFields, stripHiddenFields } from './utils'
+import {
+  findActiveActionFormFields,
+  getActiveActionFormPages,
+  isPageVisible,
+  isVerificationPage,
+  stripHiddenFields
+} from './utils'
 import { FieldValue } from './FieldValue'
+import { TranslationConfig } from './TranslationConfig'
 
 export function generateActionInput(
   configuration: EventConfig,
@@ -47,6 +54,27 @@ export function generateActionInput(
   // Strip away hidden or disabled fields from mock action data
   // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
   return stripHiddenFields(fields, data)
+}
+
+export function generateActionMetadataInput(
+  configuration: EventConfig,
+  action: ActionType
+) {
+  const visibleVerificationPageIds = getActiveActionFormPages(
+    configuration,
+    action
+  )
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, {}))
+    .map((page) => page.id)
+
+  return visibleVerificationPageIds.reduce(
+    (acc, pageId) => ({
+      ...acc,
+      [pageId]: true
+    }),
+    {}
+  )
 }
 
 export const eventPayloadGenerator = {
@@ -150,13 +178,21 @@ export const eventPayloadGenerator = {
     }),
     printCertificate: (
       eventId: string,
-      input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      input: Partial<
+        Pick<RegisterActionInput, 'transactionId' | 'data' | 'metadata'>
+      > = {}
     ) => ({
       type: ActionType.PRINT_CERTIFICATE,
       transactionId: input.transactionId ?? getUUID(),
       data:
         input.data ??
         generateActionInput(
+          tennisClubMembershipEvent,
+          ActionType.PRINT_CERTIFICATE
+        ),
+      metadata:
+        input.metadata ??
+        generateActionMetadataInput(
           tennisClubMembershipEvent,
           ActionType.PRINT_CERTIFICATE
         ),
@@ -346,4 +382,12 @@ export const eventQueryDataGenerator = (
     'applicant.dob': '1999-11-11'
   },
   trackingId: overrides.trackingId ?? 'M3F8YQ'
+})
+
+export const generateTranslationConfig = (
+  message: string
+): TranslationConfig => ({
+  defaultMessage: message,
+  description: 'Description for ${message}',
+  id: message
 })
