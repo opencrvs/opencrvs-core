@@ -110,8 +110,7 @@ function EventOverview({
     string,
     FieldValue | null | RecursiveStringRecord
   > = {
-    ...eventWithDefaults,
-    ...flattenEventIndex({ ...eventIndex, data: eventWithDrafts.data }),
+    ...flattenEventIndex({ ...eventIndex, data: eventWithDefaults }),
     ...getDefaultFieldValues(trackingId, status)
   }
 
