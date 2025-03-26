@@ -12,26 +12,26 @@
 import { useMutation } from '@tanstack/react-query'
 import {
   DecorateMutationProcedure,
-  inferInput,
-  inferOutput
+  inferInput
 } from '@trpc/tanstack-react-query'
 import {
   ActionType,
-  findActiveActionFields,
+  getActiveActionFields,
   stripHiddenFields
 } from '@opencrvs/commons/client'
+import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   findLocalEventData,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
-import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
-import * as customApi from '@client/v2-events/custom-api'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
-  waitUntilEventIsCreated,
-  setMutationDefaults
+  createEventActionMutationFn,
+  setMutationDefaults,
+  waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
+import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare, {
   mutationFn: createEventActionMutationFn(
@@ -82,12 +82,34 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate, {
   }
 })
 
+setMutationDefaults(trpcOptionsProxy.event.actions.reject, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.reject
+  ),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.REJECT
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.archive, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.archive
+  ),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.ARCHIVE
+  }
+})
+
 setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.printCertificate
   ),
-  retry: true,
-  retryDelay: 10000,
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.PRINT_CERTIFICATE
@@ -149,36 +171,6 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   onSuccess: updateLocalEvent
 })
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createEventActionMutationFn<P extends DecorateMutationProcedure<any>>(
-  trpcProcedure: P
-) {
-  /*
-   * Merge default tRPC mutationOptions with the ones provided above
-   */
-  const mutationOptions = {
-    ...trpcProcedure.mutationOptions(),
-    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
-  }
-
-  if (!mutationOptions.mutationFn) {
-    throw new Error(
-      'No mutation fn found for operation. This should never happen'
-    )
-  }
-
-  const defaultMutationFn = mutationOptions.mutationFn
-
-  return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
-    async ({ eventType, ...params }) => {
-      return defaultMutationFn({
-        ...params,
-        data: params.data
-      })
-    }
-  )
-}
-
 /**
  * A custom hook that wraps a tRPC mutation procedure for event actions.
  *
@@ -229,9 +221,41 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
       }
-      const fields = findActiveActionFields(eventConfiguration, actionType)
+      if (actionType === ActionType.NOTIFY) {
+        /**
+         * Because NOTIFY action is just an incomplete DECLARE action,
+         * notifyFields are decided by DECLARE action
+         */
+        const notifyFields = getActiveActionFields(
+          eventConfiguration,
+          ActionType.DECLARE
+        )
+
+        return mutation.mutate({
+          ...params,
+          data: stripHiddenFields(notifyFields, params.data)
+        })
+      }
+      const fields = getActiveActionFields(eventConfiguration, actionType)
 
       return mutation.mutate({
+        ...params,
+        data: stripHiddenFields(fields, params.data)
+      })
+    },
+    mutateAsync: async (params: inferInput<P>) => {
+      const localEvent = findLocalEventData(params.eventId)
+      const eventConfiguration = eventConfigurations.find(
+        (event) => event.id === localEvent?.type
+      )
+
+      if (!eventConfiguration) {
+        throw new Error('Event configuration not found')
+      }
+
+      const fields = getActiveActionFields(eventConfiguration, actionType)
+
+      return mutation.mutateAsync({
         ...params,
         data: stripHiddenFields(fields, params.data)
       })
@@ -259,7 +283,7 @@ export function useEventCustomAction(mutationKey: string[]) {
        * @TODO: In the future all of these forms should be the same 'primary' declare form.
        * When that is done, we can shouldn't need the action type explicitly here.
        */
-      const fields = findActiveActionFields(
+      const fields = getActiveActionFields(
         eventConfiguration,
         ActionType.DECLARE
       )

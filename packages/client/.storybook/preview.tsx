@@ -13,6 +13,14 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import type { Preview } from '@storybook/react'
 import { initialize, mswLoader } from 'msw-storybook-addon'
 import React, { PropsWithChildren } from 'react'
+
+import { Page } from '@client/components/Page'
+import { I18nContainer } from '@client/i18n/components/I18nContainer'
+import { createStore } from '@client/store'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useApolloClient } from '@client/utils/apolloClient'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { Provider } from 'react-redux'
 import {
   createMemoryRouter,
@@ -21,15 +29,9 @@ import {
   RouterProvider
 } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
-import { Page } from '@client/components/Page'
-import { I18nContainer } from '@client/i18n/components/I18nContainer'
-import { createStore } from '@client/store'
-import { useApolloClient } from '@client/utils/apolloClient'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
-import { TRPCProvider } from '@client/v2-events/trpc'
-import { handlers } from './default-request-handlers'
 import WebFont from 'webfontloader'
-import { testDataGenerator } from '@client/tests/test-data-generators'
+import { handlers } from './default-request-handlers'
+import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -38,6 +40,7 @@ WebFont.load({
 
 // Initialize MSW
 initialize({
+  quiet: true,
   onUnhandledRequest(req, print) {
     if (
       new URL(req.url).pathname.startsWith('/src/') ||
@@ -76,7 +79,9 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
                       path: '/',
                       element: (
                         <Page>
-                          <Outlet />
+                          <NavigationHistoryProvider>
+                            <Outlet />
+                          </NavigationHistoryProvider>
                         </Page>
                       ),
                       children: [
@@ -109,9 +114,24 @@ export const parameters = {
 
 const generator = testDataGenerator()
 
+/*
+ * Clear all indexedDB databases before each story
+ */
+async function clearStorage() {
+  const databases = await window.indexedDB.databases()
+  for (const db of databases) {
+    window.indexedDB.deleteDatabase(db.name!)
+  }
+}
+
+clearStorage()
+
 const preview: Preview = {
   loaders: [mswLoader],
   beforeEach: async () => {
+    await clearStorage()
+    queryClient.clear()
+
     window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
   },
   decorators: [

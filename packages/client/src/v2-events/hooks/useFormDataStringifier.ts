@@ -10,7 +10,7 @@
  */
 
 import {
-  ActionFormData,
+  EventState,
   FieldConfig,
   FieldValue,
   isAddressFieldType,
@@ -49,12 +49,12 @@ function useFieldStringifier() {
       return stringifyRadioGroup(field.value, field.config)
     }
 
-    return value.toString()
+    return !value ? '' : value.toString()
   }
 }
 
 export interface RecursiveStringRecord {
-  [key: string]: string | RecursiveStringRecord
+  [key: string]: string | undefined | RecursiveStringRecord
 }
 
 /**
@@ -65,7 +65,7 @@ export const useFormDataStringifier = () => {
   const stringifier = useFieldStringifier()
   return (
     formFields: FieldConfig[],
-    values: ActionFormData
+    values: EventState
   ): RecursiveStringRecord => {
     const stringifiedValues: RecursiveStringRecord = {}
 

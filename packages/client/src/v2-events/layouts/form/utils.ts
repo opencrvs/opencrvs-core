@@ -17,7 +17,8 @@ import { ROUTES } from '@client/v2-events/routes'
  * here is not optimal.
  */
 export type AllowedRouteWithEventId =
-  | typeof ROUTES.V2.EVENTS.REGISTER
   | typeof ROUTES.V2.EVENTS.DECLARE
+  | typeof ROUTES.V2.EVENTS.VALIDATE
+  | typeof ROUTES.V2.EVENTS.REGISTER
   | typeof ROUTES.V2.EVENTS.PRINT_CERTIFICATE
   | typeof ROUTES.V2.EVENTS.REQUEST_CORRECTION

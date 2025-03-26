@@ -9,16 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { MessageDescriptor, MessageFormatElement, useIntl } from 'react-intl'
 import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
-import { ActionFormData } from '@opencrvs/commons/client'
+import {
+  isArgumentElement,
+  isSelectElement,
+  isPluralElement,
+  parse
+} from '@formatjs/icu-messageformat-parser'
+import { EventState } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
 /**
  * Replaces dots with triple underscores in the object keys.
  * This is needed to support dot notation in the message variables.
  */
-function convertDotToTripleUnderscore(obj: ActionFormData, parentKey = '') {
+function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
   const result: Record<string, PrimitiveType> = {}
 
   for (const [key, value] of Object.entries(obj)) {
@@ -39,7 +45,7 @@ function convertDotToTripleUnderscore(obj: ActionFormData, parentKey = '') {
     } else if (typeof value === 'object' && value !== null) {
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {
-      result[newKey] = value
+      result[newKey] = !value ? EMPTY_TOKEN : value
     }
   }
 
@@ -51,11 +57,54 @@ function convertDotToTripleUnderscore(obj: ActionFormData, parentKey = '') {
  * This is needed to support dot notation in the message variables.
  */
 function convertDotInCurlyBraces(str: string): string {
-  return str.replace(/{([^}]+)}/g, (match, content) => {
+  return str.replace(/{([^}]+)}/g, (_, content) => {
     // Replace dots with triple underscores within the curly braces
     const transformedContent = content.replace(/\./g, INTERNAL_SEPARATOR)
     return `{${transformedContent}}`
   })
+}
+
+// The __EMPTY__ is our common token for missing values, that can be used when configuring a message.
+const EMPTY_TOKEN = '__EMPTY__'
+
+function getVariablesFromElement(element: MessageFormatElement): string[] {
+  if (isArgumentElement(element)) {
+    return [element.value]
+  }
+  if (isSelectElement(element)) {
+    return [element.value].concat(
+      Object.values(element.options)
+        .flatMap((el) => el.value)
+        .flatMap((el) => getVariablesFromElement(el))
+    )
+  }
+
+  if (isPluralElement(element)) {
+    return Object.values(element.options)
+      .flatMap((el) => el.value)
+      .flatMap((el) => getVariablesFromElement(el))
+  }
+  return []
+}
+
+/**
+ * Flattens a nested object into a single-level object.
+ */
+function flattenNestedObject(
+  obj: Record<string, string>,
+  prefix = ''
+): Record<string, string> {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    const newKey = prefix ? `${prefix}.${key}` : key
+
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      Object.assign(acc, flattenNestedObject(value, newKey))
+    } else {
+      acc[newKey] = value
+    }
+
+    return acc
+  }, {} as Record<string, string>)
 }
 
 /**
@@ -71,7 +120,9 @@ export function useIntlFormatMessageWithFlattenedParams() {
     message: MessageDescriptor,
     params?: T
   ): string {
-    const variables = convertDotToTripleUnderscore(params ?? {})
+    // Flatten the params to ensure all nested properties are accessible with dot notation
+    const flattenedParams = flattenNestedObject(params ?? {})
+    const variables = convertDotToTripleUnderscore(flattenedParams)
 
     const originalMessage =
       intl.messages[message.id as keyof typeof intl.messages] ||
@@ -89,15 +140,22 @@ export function useIntlFormatMessageWithFlattenedParams() {
     }
 
     const defaultMessage = convertDotInCurlyBraces(originalMessage)
+    const variablesInMessage = parse(defaultMessage).flatMap(
+      getVariablesFromElement
+    )
+    const variablesWithEmptyValues = Object.fromEntries(
+      variablesInMessage.map((variable) => [variable, EMPTY_TOKEN])
+    )
+
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
-      variables
+      { ...variablesWithEmptyValues, ...variables }
     )
     if (!formatted || typeof formatted !== 'string') {
       return ''
     }
     // When multiple variables are provided, we trim to ensure empty content in case both are missing.
     // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
-    return formatted.trim()
+    return formatted.trim().replaceAll(EMPTY_TOKEN, '')
   }
 
   return {

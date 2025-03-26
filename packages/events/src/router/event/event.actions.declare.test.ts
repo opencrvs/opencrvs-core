@@ -10,7 +10,12 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, generateActionInput, SCOPES } from '@opencrvs/commons'
+import {
+  ActionType,
+  AddressType,
+  generateActionInput,
+  SCOPES
+} from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
 
@@ -66,6 +71,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
+        addressType: AddressType.DOMESTIC,
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
         urbanOrRural: 'RURAL' as const,
@@ -90,6 +96,70 @@ test('Skips required field validation when they are conditionally hidden', async
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const data = generator.event.actions.declare(event.id, {
+    data: form
+  })
+
+  const response = await client.event.actions.declare(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.DECLARE
+  )
+  expect(savedAction?.data).toEqual(form)
+})
+
+test('gives validation error when a conditional page, which is visible, has a required field', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const form = {
+    // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
+    'applicant.dob': '1944-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const data = generator.event.actions.declare(event.id, {
+    data: form
+  })
+
+  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+})
+
+test('successfully validates a fields on a conditional page, which is visible', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const form = {
+    // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
+    'applicant.dob': '1944-02-01',
+    'senior-pass.id': '1234567890',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -121,6 +191,7 @@ test('Prevents adding birth date in future', async () => {
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -149,4 +220,26 @@ test('validation prevents including hidden fields', async () => {
   })
 
   await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+})
+
+test('valid action is appended to event actions', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const data = generator.event.actions.declare(event.id)
+
+  await client.event.actions.declare(data)
+  const updatedEvent = await client.event.get(event.id)
+
+  expect(updatedEvent.actions).toEqual([
+    expect.objectContaining({ type: ActionType.CREATE }),
+    expect.objectContaining({
+      type: ActionType.DECLARE
+    }),
+    expect.objectContaining({
+      type: ActionType.READ
+    })
+  ])
 })

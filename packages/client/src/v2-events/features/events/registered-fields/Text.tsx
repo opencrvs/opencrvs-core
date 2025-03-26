@@ -22,7 +22,7 @@ function TextInput({
   type,
   ...props
 }: TextInputProps) {
-  const inputValue = value ?? ''
+  const [inputValue, setInputValue] = React.useState(value ?? '')
 
   return (
     <TextInputComponent
@@ -32,11 +32,16 @@ function TextInput({
       isDisabled={disabled}
       maxLength={maxLength}
       value={inputValue}
+      onBlur={(e) => {
+        props.onChange?.(e)
+        props.onBlur?.(e)
+      }}
+      onChange={(e) => setInputValue(e.target.value)}
     />
   )
 }
 
 export const Text = {
   Input: TextInput,
-  Output: null
+  Output: ({ value }: { value?: string }) => <>{value?.toString() || ''}</>
 }

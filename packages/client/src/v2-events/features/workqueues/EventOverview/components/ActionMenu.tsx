@@ -14,7 +14,7 @@ import { useIntl } from 'react-intl'
 
 import { useNavigate } from 'react-router-dom'
 import { formatISO } from 'date-fns'
-import { validate, ActionType } from '@opencrvs/commons/client'
+import { validate, ActionType, ConditionalType } from '@opencrvs/commons/client'
 import { type ActionConfig } from '@opencrvs/commons'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -40,13 +40,14 @@ export function ActionMenu({ eventId }: { eventId: string }) {
     if (action.conditionals.length === 0) {
       return true
     }
+
     const params = {
       $event: event,
       $user: authentication,
       $now: formatISO(new Date(), { representation: 'date' })
     }
     return action.conditionals.reduce((acc, conditional) => {
-      if (conditional.type === 'SHOW') {
+      if (conditional.type === ConditionalType.SHOW) {
         return acc && validate(conditional.conditional, params)
       }
 
@@ -69,6 +70,9 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                 key={action.type}
                 onClick={() => {
                   if (
+                    action.type === ActionType.REJECT ||
+                    action.type === ActionType.ARCHIVE ||
+                    action.type === ActionType.MARKED_AS_DUPLICATE ||
                     action.type === ActionType.APPROVE_CORRECTION ||
                     action.type === ActionType.REJECT_CORRECTION ||
                     action.type === ActionType.CUSTOM
@@ -77,7 +81,10 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                     return
                   }
 
-                  if (action.type === ActionType.REGISTER) {
+                  if (
+                    action.type === ActionType.REGISTER ||
+                    action.type === ActionType.VALIDATE
+                  ) {
                     navigate(
                       ROUTES.V2.EVENTS[action.type].REVIEW.buildPath({
                         eventId

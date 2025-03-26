@@ -11,16 +11,19 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { ResponsiveModal, Stack } from '@opencrvs/components'
+import { Pill, ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
-import { ActionDocument } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  ActionType,
+  ActionUpdate
+} from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
-
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
-    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} other {Unknown}}'
+    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFY {Sent incomplete} READ {Viewed} other {Unknown}}'
 }
 
 const messages = defineMessages({
@@ -28,8 +31,29 @@ const messages = defineMessages({
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
     id: 'v2.configuration.timeFormat',
     description: 'Time format for timestamps in event history'
+  },
+  comment: {
+    defaultMessage: 'Comment',
+    description: 'Label for rejection comment',
+    id: 'v2.constants.comment'
+  },
+  markAsDuplicate: {
+    id: 'v2.event.history.markAsDuplicate',
+    defaultMessage: 'Marked as a duplicate'
   }
 })
+
+function prepareComments(action: ActionType, metadata: ActionUpdate) {
+  const comments: { comment: string }[] = []
+
+  if (action === ActionType.REJECT && typeof metadata.message === 'string') {
+    comments.push({ comment: metadata.message })
+  }
+  if (action === ActionType.ARCHIVE && typeof metadata.message === 'string') {
+    comments.push({ comment: metadata.message })
+  }
+  return comments
+}
 
 /**
  * Detailed view of single Action, showing the history of the event.
@@ -51,6 +75,16 @@ export function EventHistoryModal({
   const title = intl.formatMessage(eventHistoryStatusMessage, {
     status: history.type
   })
+
+  const commentsColumn = [
+    {
+      key: 'comment',
+      label: intl.formatMessage(messages.comment),
+      width: 100
+    }
+  ]
+
+  const content = prepareComments(history.type, history.metadata ?? {})
 
   return (
     <ResponsiveModal
@@ -76,6 +110,18 @@ export function EventHistoryModal({
           )}
         </Text>
       </Stack>
+      {content.length > 0 && (
+        <Table columns={commentsColumn} content={content} noResultText=" " />
+      )}
+      {history.type === ActionType.ARCHIVE && history.metadata?.isDuplicate && (
+        <p>
+          <Pill
+            label={intl.formatMessage(messages.markAsDuplicate)}
+            size="small"
+            type="inactive"
+          />
+        </p>
+      )}
     </ResponsiveModal>
   )
 }

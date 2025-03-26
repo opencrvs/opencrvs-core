@@ -23,13 +23,9 @@ import {
 } from 'pdfmake/interfaces'
 import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
+import { format, isValid } from 'date-fns'
 import { LanguageConfig } from '@opencrvs/commons'
-import {
-  ActionFormData,
-  EventDocument,
-  EventIndex,
-  User
-} from '@opencrvs/commons/client'
+import { EventIndex, EventState, User } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
@@ -68,7 +64,7 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 }
 
 function formatAllNonStringValues(
-  templateData: ActionFormData,
+  templateData: EventState,
   intl: IntlShape
 ): Record<string, string> {
   const formattedData: Record<string, string> = {}
@@ -89,7 +85,7 @@ function formatAllNonStringValues(
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
       formattedData[key] = JSON.stringify(
-        formatAllNonStringValues(value as ActionFormData, intl)
+        formatAllNonStringValues(value as EventState, intl)
       )
     } else {
       formattedData[key] = String(value)
@@ -101,14 +97,21 @@ function formatAllNonStringValues(
 
 const cache = createIntlCache()
 
-export function compileSvg(
-  templateString: string,
-  $actions: EventDocument['actions'],
-  $data: EventIndex['data'],
-  locations: Location[],
-  users: User[],
+export function compileSvg({
+  templateString,
+  $state,
+  $data,
+  locations,
+  users,
+  language
+}: {
+  templateString: string
+  $state: EventIndex
+  $data: EventState
+  locations: Location[]
+  users: User[]
   language: LanguageConfig
-): string {
+}): string {
   const intl: IntlShape = createIntl(
     {
       locale: language.lang,
@@ -131,11 +134,20 @@ export function compileSvg(
     Handlebars.registerHelper(helperName, helper)
   }
 
+  Handlebars.registerHelper(
+    'formatDate',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function (this: any, dateString: string, formatString: string) {
+      const date = new Date(dateString)
+      return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
   const template = Handlebars.compile(templateString)
   $data = formatAllNonStringValues($data, intl)
   const output = template({
     $data,
-    $actions,
+    $state,
     $references: {
       locations,
       users

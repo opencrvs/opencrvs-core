@@ -10,7 +10,7 @@
  */
 
 import { EventDocument } from '../events/EventDocument'
-import { ActionFormData } from '../events/ActionDocument'
+import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
@@ -29,7 +29,7 @@ export type EventConditionalParameters = { $now: string; $event: EventDocument }
 // @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
 export type FormConditionalParameters = {
   $now: string
-  $form: ActionFormData | Record<string, any>
+  $form: EventState | Record<string, any>
 }
 
 export type ConditionalParameters =
@@ -141,19 +141,9 @@ export const event = {
                 properties: {
                   type: {
                     const: action
-                  },
-                  draft: {
-                    type: 'boolean'
                   }
                 },
-                required: ['type'],
-                not: {
-                  properties: {
-                    draft: {
-                      const: true
-                    }
-                  }
-                }
+                required: ['type']
               }
             }
           },
@@ -319,6 +309,44 @@ export function field(fieldId: string) {
               [fieldId]: {
                 type: 'string',
                 enum: values
+              }
+            },
+            required: [fieldId]
+          }
+        },
+        required: ['$form']
+      }),
+    isValidEnglishName: () =>
+      defineConditional({
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                type: 'string',
+                pattern:
+                  "^[\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*( [\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*)*$",
+                description:
+                  "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
+              }
+            },
+            required: [fieldId]
+          }
+        },
+        required: ['$form']
+      }),
+    isBetween: (min: number, max: number) =>
+      defineConditional({
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                type: 'number',
+                minimum: min,
+                maximum: max
               }
             },
             required: [fieldId]

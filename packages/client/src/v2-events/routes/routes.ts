@@ -44,6 +44,22 @@ export const ROUTES = {
               })
             }
           ),
+          VALIDATE: route(
+            'validate/:eventId',
+            {
+              params: { eventId: string().defined() }
+            },
+            {
+              REVIEW: route('review'),
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
+                searchParams: {
+                  from: string()
+                },
+                hash: hashValues()
+              })
+            }
+          ),
           REGISTER: route(
             'register/:eventId',
             {
@@ -60,9 +76,6 @@ export const ROUTES = {
               })
             }
           ),
-          VALIDATE: route('validate/:eventId', {
-            params: { eventId: string().defined() }
-          }),
           PRINT_CERTIFICATE: route(
             'print-certificate/:eventId',
             {
@@ -85,7 +98,10 @@ export const ROUTES = {
         }
       ),
       WORKQUEUES: workqueueRoutes,
-      ADVANCED_SEARCH: route('advanced-search')
+      ADVANCED_SEARCH: route('advanced-search'),
+      SEARCH_RESULT: route('search-result/:eventType', {
+        params: { eventType: string().defined() }
+      })
     }
   )
 }

@@ -12,9 +12,10 @@
 import React from 'react'
 
 import { noop } from 'lodash'
+import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useIntl, defineMessages } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { getCurrentEventStateWithDrafts } from '@opencrvs/commons/client'
 import {
   AppBar,
   Button,
@@ -24,20 +25,19 @@ import {
   SearchTool,
   Stack
 } from '@opencrvs/components'
-import { Plus } from '@opencrvs/components/src/icons'
-import { getOrThrow } from '@opencrvs/commons/client'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { ROUTES } from '@client/v2-events/routes'
+import { Plus } from '@opencrvs/components/src/icons'
 import { ProfileMenu } from '@client/components/ProfileMenu'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import {
   useEventConfiguration,
   useEventConfigurations
 } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { getEventTitle } from '@client/v2-events/utils'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
-
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { ROUTES } from '@client/v2-events/routes'
+import { flattenEventIndex } from '@client/v2-events/utils'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -57,12 +57,10 @@ export function EventOverviewLayout({
   children: React.ReactNode
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvents } = useEvents()
-  const [events] = getEvents.useSuspenseQuery()
-  const event = getOrThrow(
-    events.find(({ id }) => id === eventId),
-    `Could not find event for ${eventId}`
-  )
+  const { getEvent } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
+  const drafts = getRemoteDrafts()
+  const [event] = getEvent.useSuspenseQuery(eventId)
 
   const allEvents = useEventConfigurations()
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -126,11 +124,10 @@ export function EventOverviewLayout({
             </Button>
           }
           mobileRight={<ActionMenu eventId={eventId} />}
-          mobileTitle={getEventTitle({
-            event,
-            eventConfig: eventConfiguration,
-            intl: flattenedIntl
-          })}
+          mobileTitle={flattenedIntl.formatMessage(
+            eventConfiguration.summary.title.label,
+            flattenEventIndex(getCurrentEventStateWithDrafts(event, drafts))
+          )}
         />
       }
       skipToContentText="skip"

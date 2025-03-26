@@ -11,17 +11,14 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { ActionType } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
-import { Pages } from '@client/v2-events/features/events/actions/declare'
-import { birthDocument } from './fixtures'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {
-  title: 'File',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'Declare'
 }
 
 export default meta
@@ -36,20 +33,28 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-export const BirthSupportingDocuments: Story = {
+// Use an undeclared draft event for tests
+const undeclaredDraftEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: tennisClubMembershipEventDocument.actions.filter(
+    ({ type }) => type === ActionType.CREATE
+  )
+}
+
+export const Page: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-        eventId: birthDocument.id,
-        pageId: 'documents'
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
       })
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return birthDocument
+            return undeclaredDraftEvent
           })
         ]
       }

@@ -56,7 +56,6 @@ export const AVATAR_API =
 export const ACCUMULATED_FILE_SIZE = 20480000
 
 export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
-export const INFORMANT_MINIMUM_AGE = 16
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
 export const APPLICATION_VERSION = APP_VERSION

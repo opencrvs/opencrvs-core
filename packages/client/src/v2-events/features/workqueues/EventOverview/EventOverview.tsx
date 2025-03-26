@@ -12,32 +12,35 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
-  EventIndex,
-  ActionDocument,
   getAllFields,
   SummaryConfig,
-  FieldValue
+  FieldValue,
+  getCurrentEventStateWithDrafts,
+  EventDocument,
+  Draft,
+  getCurrentEventState,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
-import {
-  useEventConfiguration,
-  useEventConfigurations
-} from '@client/v2-events/features/events/useEventConfiguration'
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getUserIdsFromActions } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUserIdsFromActions
+} from '@client/v2-events/utils'
 import {
   RecursiveStringRecord,
   useFormDataStringifier
 } from '@client/v2-events/hooks/useFormDataStringifier'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -50,37 +53,34 @@ import { EventOverviewProvider } from './EventOverviewContext'
 
 function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvents, getEvent } = useEvents()
+  const { getEvent } = useEvents()
+  const { getRemoteDrafts } = useDrafts()
   const { getUsers } = useUsers()
 
-  const configs = useEventConfigurations()
-
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const [events] = getEvents.useSuspenseQuery()
-  const event = events.find((e) => e.id === params.eventId)
-
-  const config = configs.find((c) => c.id === event?.type)
+  const drafts = getRemoteDrafts()
+  const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
 
   const userIds = getUserIdsFromActions(fullEvent.actions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
 
-  if (!config) {
-    return null
-  }
-  if (!event) {
-    return null
-  }
-
   return (
     <EventOverviewProvider locations={locations} users={users}>
       <EventOverview
-        event={event}
-        history={fullEvent.actions.filter((action) => !action.draft)}
+        drafts={drafts}
+        event={fullEvent}
         summary={config.summary}
       />
     </EventOverviewProvider>
   )
+}
+
+function getDefaultFieldValues(trackingId: string, status: EventStatus) {
+  return {
+    'event.trackingId': trackingId,
+    'event.status': status
+  }
 }
 
 /**
@@ -88,45 +88,51 @@ function EventOverviewContainer() {
  */
 function EventOverview({
   event,
-  summary,
-  history
+  drafts,
+  summary
 }: {
-  event: EventIndex
+  drafts: Draft[]
+  event: EventDocument
   summary: SummaryConfig
-  history: ActionDocument[]
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const allFields = getAllFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
 
+  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
+  const eventIndex = getCurrentEventState(event)
+  const { trackingId, status } = eventIndex
+
   const stringifyFormData = useFormDataStringifier()
-
-  const eventWithDefaults = stringifyFormData(allFields, event.data)
-
-  const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
+  const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
 
   const flattenedEventIndex: Record<
     string,
     FieldValue | null | RecursiveStringRecord
   > = {
-    ...emptyEvent,
-    ...eventWithDefaults
+    ...eventWithDefaults,
+    ...flattenEventIndex({ ...eventIndex, data: eventWithDrafts.data }),
+    ...getDefaultFieldValues(trackingId, status)
   }
-  const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
 
+  const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
     : ''
   return (
     <Content
-      icon={() => <IconWithName name={''} status={event.status} />}
+      icon={() => <IconWithName name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title || fallbackTitle}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
-      <EventSummary event={flattenedEventIndex} summary={summary} />
-      <EventHistory history={history} />
+      <EventSummary
+        event={flattenedEventIndex}
+        eventLabel={eventConfiguration.label}
+        summary={summary}
+      />
+      <EventHistory history={event.actions} />
     </Content>
   )
 }

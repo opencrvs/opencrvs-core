@@ -10,6 +10,11 @@
  */
 
 import { getCurrentEventState } from '.'
+import { tennisClubMembershipEvent } from '../../fixtures'
+import { getUUID } from '../../uuid'
+import { ActionType } from '../ActionType'
+import { AddressType } from '../CompositeFieldValue'
+import { generateActionDocument } from '../test.utils'
 
 describe('correction requests', () => {
   test('proposed correction data is not applied before the correction request is approved', () => {
@@ -25,12 +30,10 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:38.343Z',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
-          draft: false,
           id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
           data: {}
         },
         {
-          draft: false,
           data: { name: 'John Doe' },
           type: 'DECLARE',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -39,7 +42,6 @@ describe('correction requests', () => {
           id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8'
         },
         {
-          draft: false,
           data: {},
           type: 'REGISTER',
           identifiers: {
@@ -52,7 +54,6 @@ describe('correction requests', () => {
           id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2'
         },
         {
-          draft: false,
           data: { name: 'Doe John' },
           type: 'REQUEST_CORRECTION',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -78,12 +79,10 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:38.343Z',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
-          draft: false,
           id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
           data: {}
         },
         {
-          draft: false,
           data: { name: 'John Doe' },
           type: 'DECLARE',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -92,7 +91,6 @@ describe('correction requests', () => {
           id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8'
         },
         {
-          draft: false,
           data: {},
           type: 'REGISTER',
           identifiers: {
@@ -105,7 +103,6 @@ describe('correction requests', () => {
           id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2'
         },
         {
-          draft: false,
           data: { name: 'Doe John' },
           type: 'REQUEST_CORRECTION',
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -114,7 +111,6 @@ describe('correction requests', () => {
           id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d'
         },
         {
-          draft: false,
           data: {},
           requestId: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
           type: 'APPROVE_CORRECTION',
@@ -127,5 +123,102 @@ describe('correction requests', () => {
     })
 
     expect(state.data.name).toBe('Doe John')
+  })
+})
+
+describe('address state transitions', () => {
+  const addressWithoutVillage = {
+    country: 'FAR',
+    addressType: AddressType.DOMESTIC,
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+    urbanOrRural: 'RURAL' as const
+  }
+
+  const initialAddress = {
+    ...addressWithoutVillage,
+    village: 'Small village'
+  }
+
+  const initialForm = {
+    'applicant.dob': '2000-02-01',
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'recommender.none': true,
+    'applicant.address': { ...initialAddress }
+  }
+
+  const initialActions = [
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        data: initialForm
+      }
+    })
+  ]
+
+  test('should persist optional "village" field in address, even if it is not included in payload', () => {
+    const actions = [
+      ...initialActions,
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.DECLARE,
+        defaults: {
+          data: {
+            'applicant.address': addressWithoutVillage
+          }
+        }
+      })
+    ]
+
+    const state = getCurrentEventState({
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date().toISOString(),
+      actions,
+      id: getUUID(),
+      updatedAt: new Date().toISOString()
+    })
+
+    expect(state.data).toEqual(initialForm)
+  })
+
+  test('should remove optional "village" field in address when it is set to null', () => {
+    const addressWithNullVillage = {
+      ...addressWithoutVillage,
+      village: null
+    }
+
+    const actions = [
+      ...initialActions,
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.DECLARE,
+        defaults: {
+          data: {
+            'applicant.address': addressWithNullVillage
+          }
+        }
+      })
+    ]
+
+    const state = getCurrentEventState({
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date().toISOString(),
+      actions,
+      id: getUUID(),
+      updatedAt: new Date().toISOString()
+    })
+
+    expect(state.data).toEqual({
+      ...initialForm,
+      'applicant.address': addressWithoutVillage
+    })
   })
 })

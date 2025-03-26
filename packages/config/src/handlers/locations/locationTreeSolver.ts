@@ -14,41 +14,69 @@ import {
   resourceIdentifierToUUID,
   SavedLocation
 } from '@opencrvs/commons/types'
-import { UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import { fetchFromHearth } from '@config/services/hearth'
-import { MongoClient } from 'mongodb'
-import { env } from '@config/environment'
+import client from '@config/config/hearthClient'
 
-const client = new MongoClient(env.HEARTH_MONGO_URL)
+export const resolveLocationChildren = async (
+  id: UUID,
+  type: string | undefined
+) => {
+  const db = client.db()
 
-export const resolveLocationChildren = async (id: UUID) => {
-  try {
-    const connectedClient = await client.connect()
-    const db = connectedClient.db()
-
-    const childQuery = [
-      {
-        $match: { id: id }
-      },
-      {
-        $graphLookup: {
-          from: 'Location_view_with_plain_ids',
-          startWith: '$id',
-          connectFromField: 'id',
-          connectToField: 'partOf.reference',
-          as: 'children'
+  const childQuery = [
+    {
+      $match: { id: id }
+    },
+    {
+      $graphLookup: {
+        from: 'Location_view_with_plain_ids',
+        startWith: '$id',
+        connectFromField: 'id',
+        connectToField: 'partOf.reference',
+        as: 'children'
+      }
+    },
+    {
+      $set: {
+        children: {
+          $cond: {
+            if: { $gt: [type, undefined] },
+            then: {
+              $filter: {
+                input: '$children',
+                as: 'child',
+                cond: {
+                  $eq: [{ $arrayElemAt: ['$$child.type.coding.code', 0] }, type]
+                }
+              }
+            },
+            else: '$children'
+          }
         }
       }
-    ]
+    },
+    {
+      $project: {
+        children: {
+          id: 1,
+          name: 1,
+          type: 1
+        }
+      }
+    }
+  ]
 
+  try {
     const result = await db
       .collection<Location>('Location_view_with_plain_ids')
       .aggregate(childQuery)
       .toArray()
 
     return result.length ? result[0].children : []
-  } finally {
-    await client.close()
+  } catch (error) {
+    logger.error(error)
+    throw error
   }
 }
 

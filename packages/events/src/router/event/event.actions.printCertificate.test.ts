@@ -55,6 +55,47 @@ test('Validation error message contains all the offending fields', async () => {
   ).rejects.matchSnapshot()
 })
 
+test('Has validation errors when required VERIFICATION page metadata is missing', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  const declaredEvent = await client.event.actions.declare(
+    generator.event.actions.declare(event.id)
+  )
+
+  await expect(
+    client.event.actions.printCertificate(
+      generator.event.actions.printCertificate(declaredEvent.id, {
+        // The tennis club membership print certificate form has a verification page with conditional 'field('collector.requesterId').isEqualTo('INFORMANT')'
+        // Thus if the requester is set as INFORMANT and verification page result is not set, we should see a validation error.
+        metadata: { 'collector.requesterId': 'INFORMANT' }
+      })
+    )
+  ).rejects.matchSnapshot()
+})
+
+test('Has no validation errors when required VERIFICATION page metadata is set', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  const declaredEvent = await client.event.actions.declare(
+    generator.event.actions.declare(event.id)
+  )
+
+  await expect(
+    client.event.actions.printCertificate(
+      generator.event.actions.printCertificate(declaredEvent.id, {
+        metadata: {
+          'collector.requesterId': 'INFORMANT',
+          'collector.identity.verify': true
+        }
+      })
+    )
+  ).resolves.toBeDefined()
+})
+
 test('print certificate action can be added to a created event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)

@@ -29,6 +29,10 @@ type IProps = {
   notice?: string
   ignorePlaceHolder?: boolean
   onChange: (dateString: string) => void
+  /**
+   * Test id for the component. Ids will receive postfix (-mm, -dd, -yyyy) based on the input.
+   */
+  'data-testid'?: string
 }
 
 interface IState {
@@ -107,9 +111,6 @@ export const DateField = ({
       const updatedValue = { ...date, [segmentType]: val }
       setDate(updatedValue)
 
-      if (yyyy === '' && mm === '' && dd === '') {
-        return onChange('')
-      }
       onChange(`${updatedValue.yyyy}-${updatedValue.mm}-${updatedValue.dd}`)
     }
   }
@@ -124,6 +125,7 @@ export const DateField = ({
         )}
         <TextInput
           {...props}
+          data-testid={props['data-testid'] && `${props['data-testid']}-dd`}
           id={`${id}-dd`}
           ref={ddRef}
           error={Boolean(meta && meta.error)}
@@ -143,6 +145,7 @@ export const DateField = ({
         <TextInput
           {...props}
           id={`${id}-mm`}
+          data-testid={props['data-testid'] && `${props['data-testid']}-mm`}
           ref={mmRef}
           error={Boolean(meta && meta.error)}
           isDisabled={disabled}
@@ -162,6 +165,7 @@ export const DateField = ({
         <TextInput
           {...props}
           id={`${id}-yyyy`}
+          data-testid={props['data-testid'] && `${props['data-testid']}-yyyy`}
           ref={yyyyRef}
           error={Boolean(meta && meta.error)}
           isDisabled={disabled}

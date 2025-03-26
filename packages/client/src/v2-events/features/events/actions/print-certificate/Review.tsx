@@ -11,14 +11,20 @@
 
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import styled from 'styled-components'
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, SCOPES } from '@opencrvs/commons/client'
+import ReactTooltip from 'react-tooltip'
+import {
+  ActionType,
+  EventDocument,
+  findActiveActionForm,
+  SCOPES
+} from '@opencrvs/commons/client'
 import {
   Box,
   Button,
@@ -33,7 +39,6 @@ import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
@@ -41,6 +46,10 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useOnlineStatus } from '@client/utils'
 
 const CertificateContainer = styled.div`
   svg {
@@ -49,6 +58,14 @@ const CertificateContainer = styled.div`
   }
 `
 
+const TooltipContainer = styled.div`
+  width: 100%;
+`
+
+const TooltipMessage = styled.p`
+  ${({ theme }) => theme.fonts.reg19};
+  max-width: 200px;
+`
 const messages = defineMessages({
   printTitle: {
     id: 'v2.printAction.title',
@@ -102,6 +119,12 @@ const messages = defineMessages({
     id: 'v2.buttons.print',
     defaultMessage: 'Print',
     description: 'Print button text'
+  },
+  onlineOnly: {
+    id: 'v2.print.certificate.onlineOnly',
+    defaultMessage:
+      'Print certificate is an online only action. Please go online to print the certificate',
+    description: 'Print certificate online only message'
   }
 })
 
@@ -110,12 +133,15 @@ export function Review() {
   const [{ templateId }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
+  if (!templateId) {
+    throw new Error('Please select a template from the previous step')
+  }
   const intl = useIntl()
   const navigate = useNavigate()
-
+  const isOnline = useOnlineStatus()
   const [modal, openModal] = useModal()
 
-  const { getEvent, actions } = useEvents()
+  const { getEvent, onlineActions } = useEvents()
   const [fullEvent] = getEvent.useSuspenseQuery(eventId)
 
   const userIds = getUserIdsFromActions(fullEvent.actions)
@@ -125,8 +151,8 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { getFormValues, clear } = useEventFormData()
-  const form = getFormValues(eventId)
+  const { getMetadata } = useEventMetadata()
+  const metadata = getMetadata()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
@@ -135,12 +161,43 @@ export function Review() {
 
   const { svgCode, handleCertify } = usePrintableCertificate(
     fullEvent,
-    form,
+    metadata,
     locations,
     users,
     certificateConfig,
     language
   )
+
+  /**
+   * If there are validation errors in the form, redirect to the
+   * print certificate form page, since the user should not be able to
+   * review/print the certificate if there are validation errors.
+   */
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const formConfig = findActiveActionForm(
+    eventConfiguration,
+    ActionType.PRINT_CERTIFICATE
+  )
+
+  if (!formConfig) {
+    throw new Error('Form configuration not found for print certificate action')
+  }
+
+  if (!svgCode) {
+    return <Spinner id="review-certificate-loading" />
+  }
+
+  const validationErrorExist = validationErrorsInActionFormExist(
+    formConfig,
+    metadata
+  )
+  if (validationErrorExist) {
+    return (
+      <Navigate
+        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
+      />
+    )
+  }
 
   const handleCorrection = () =>
     navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
@@ -179,20 +236,34 @@ export function Review() {
     ))
 
     if (confirmed) {
-      handleCertify?.()
-      actions.printCertificate.mutate({
-        eventId: fullEvent.id,
-        data: form,
-        transactionId: uuid(),
-        type: ActionType.PRINT_CERTIFICATE
-      })
-      clear()
-      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-    }
-  }
+      try {
+        const response: EventDocument =
+          await onlineActions.printCertificate.mutateAsync({
+            eventId: fullEvent.id,
+            data: {},
+            metadata: { ...metadata, templateId },
+            transactionId: uuid(),
+            type: ActionType.PRINT_CERTIFICATE
+          })
+        const printAction = response.actions
+          .reverse()
+          .find((a) => a.type === ActionType.PRINT_CERTIFICATE)
 
-  if (!svgCode || !templateId) {
-    return <Spinner id="review-certificate-loading" />
+        if (printAction) {
+          await handleCertify({
+            ...fullEvent,
+            actions: [...fullEvent.actions, printAction]
+          })
+          navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+        } else {
+          throw new Error('Print action not found in the response')
+        }
+      } catch (error) {
+        // TODO: add notification alert
+        // eslint-disable-next-line no-console
+        console.error(error)
+      }
+    }
   }
 
   return (
@@ -208,6 +279,15 @@ export function Review() {
               id="print"
             />
           </Box>
+
+          {!isOnline && (
+            <ReactTooltip effect="solid" id="no-connection" place="top">
+              <TooltipMessage>
+                {intl.formatMessage(messages.onlineOnly)}
+              </TooltipMessage>
+            </ReactTooltip>
+          )}
+
           <Content
             bottomActionButtons={[
               <ProtectedComponent
@@ -227,17 +307,23 @@ export function Review() {
                   {intl.formatMessage(messages.makeCorrection)}
                 </Button>
               </ProtectedComponent>,
-              <Button
+              <TooltipContainer
                 key="confirm-and-print"
-                fullWidth
-                id="confirm-print"
-                size="large"
-                type="positive"
-                onClick={handlePrint}
+                data-tip
+                data-for="no-connection"
               >
-                <Icon name="Check" size="medium" />
-                {intl.formatMessage(messages.confirmPrint)}
-              </Button>
+                <Button
+                  fullWidth
+                  disabled={!isOnline}
+                  id="confirm-print"
+                  size="large"
+                  type="positive"
+                  onClick={handlePrint}
+                >
+                  <Icon name="Check" size="medium" />
+                  {intl.formatMessage(messages.confirmPrint)}
+                </Button>
+              </TooltipContainer>
             ]}
             bottomActionDirection="row"
             title={intl.formatMessage(messages.printTitle)}

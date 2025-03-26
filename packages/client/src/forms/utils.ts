@@ -59,7 +59,10 @@ import {
   Ii18nIDReaderFormField,
   QRReaderType,
   ReaderType,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  ILoaderFormField,
+  LOADER,
+  Ii18nLoaderFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -214,6 +217,12 @@ export const internationaliseFieldObject = (
       intl.formatMessage(field.manualInputInstructionLabel)
   }
 
+  if (isFieldLoader(field)) {
+    ;(base as Ii18nLoaderFormField).loadingText = intl.formatMessage(
+      field.loadingText
+    )
+  }
+
   return base as Ii18nFormField
 }
 
@@ -321,6 +330,7 @@ export function getNextSectionIds(
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   declaration: IDeclaration,
+  isCorrection: boolean,
   userDetails?: UserDetails | null
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -334,16 +344,18 @@ export function getNextSectionIds(
   )
 
   if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(
-      (section) =>
-        section.viewType !== VIEW_TYPE.HIDDEN &&
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          declaration.data[fromSection.id] || {},
-          declaration.data,
-          userDetails
-        ).length > 0
-    )
+    const visibleSections = sections
+      .filter((section) => (isCorrection ? section.id !== 'documents' : true))
+      .filter(
+        (section) =>
+          section.viewType !== VIEW_TYPE.HIDDEN &&
+          getVisibleSectionGroupsBasedOnConditions(
+            section,
+            declaration.data[fromSection.id] || {},
+            declaration.data,
+            userDetails
+          ).length > 0
+      )
 
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
@@ -814,6 +826,10 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
 
 export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
+}
+
+function isFieldLoader(field: IFormField): field is ILoaderFormField {
+  return field.type === LOADER
 }
 
 export function isReaderQR(reader: ReaderType): reader is QRReaderType {

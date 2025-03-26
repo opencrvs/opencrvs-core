@@ -14,7 +14,7 @@ import { Stack } from '../Stack'
 
 export const MainContainer = styled(Box)`
   background: ${({ theme }) => theme.colors.background};
-  border: 0;
+  border: none;
   flex: 1;
 `
 

@@ -35,7 +35,7 @@ export function FormLayout({
 }) {
   const { eventId } = useTypedParams(route)
   const events = useEvents()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

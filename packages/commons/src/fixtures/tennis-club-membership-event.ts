@@ -13,6 +13,7 @@ import { defineConfig } from '../events/defineConfig'
 import { defineForm } from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
+import { FormPageType } from '../events/FormConfig'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineForm({
@@ -639,6 +640,49 @@ const PRINT_CERTIFICATE_FORM = defineForm({
           type: 'FILE'
         }
       ]
+    },
+    {
+      id: 'collector.identity.verify',
+      type: FormPageType.VERIFICATION,
+      conditional: field('collector.requesterId').isEqualTo('INFORMANT'),
+      title: {
+        id: 'event.tennis-club-membership.action.print.verifyIdentity',
+        defaultMessage: 'Verify their identity',
+        description: 'This is the title of the section'
+      },
+      fields: [],
+      actions: {
+        verify: {
+          label: {
+            defaultMessage: 'Verified',
+            description: 'This is the label for the verification button',
+            id: 'v2.event.tennis-club-membership.action.certificate.form.verify'
+          }
+        },
+        cancel: {
+          label: {
+            defaultMessage: 'Identity does not match',
+            description:
+              'This is the label for the verification cancellation button',
+            id: 'v2.event.tennis-club-membership.action.certificate.form.cancel'
+          },
+          confirmation: {
+            title: {
+              defaultMessage: 'Print without proof of ID?',
+              description:
+                'This is the title for the verification cancellation modal',
+              id: 'v2.event.tennis-club-membership.action.certificate.form.cancel.confirmation.title'
+            },
+            body: {
+              defaultMessage:
+                'Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector',
+              description:
+                'This is the body for the verification cancellation modal',
+              id: 'v2.event.tennis-club-membership.action.certificate.form.cancel.confirmation.body'
+            }
+          }
+        }
+      }
     }
   ],
   review: {
@@ -669,7 +713,8 @@ export const TENNIS_CLUB_FORM = defineForm({
   review: {
     title: {
       id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
-      defaultMessage: 'Member declaration for {firstname} {surname}',
+      defaultMessage:
+        '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
       description: 'Title of the form to show in review page'
     },
     fields: [
@@ -780,6 +825,27 @@ export const TENNIS_CLUB_FORM = defineForm({
             defaultMessage: "Applicant's address",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.address.label'
+          }
+        }
+      ]
+    },
+    {
+      id: 'senior-pass',
+      conditional: field('applicant.dob').isBefore().date('1950-01-01'),
+      title: {
+        id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.title',
+        defaultMessage: 'Assign senior pass for applicant',
+        description: 'This is the title of the section'
+      },
+      fields: [
+        {
+          id: 'senior-pass.id',
+          type: 'TEXT',
+          required: true,
+          label: {
+            defaultMessage: 'Senior pass ID',
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label'
           }
         }
       ]
@@ -896,6 +962,24 @@ export const tennisClubMembershipEvent = defineConfig({
           description: 'This is the message to show when the field is empty',
           id: 'event.tennis-club-membership.summary.field.firstname.empty'
         }
+      },
+      {
+        id: 'applicant.surname',
+        label: {
+          defaultMessage: "Applicant's last name",
+          description: 'This is the label for the field',
+          id: 'event.tennis-club-membership.summary.field.surname.label'
+        },
+        value: {
+          defaultMessage: '{applicant.surname}',
+          description: 'This is the value to show in the summary',
+          id: 'event.tennis-club-membership.summary.field.surname'
+        },
+        emptyValueMessage: {
+          defaultMessage: 'Last name is not provided',
+          description: 'This is the message to show when the field is empty',
+          id: 'event.tennis-club-membership.summary.field.surname.empty'
+        }
       }
     ]
   },
@@ -923,7 +1007,7 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   actions: [
     {
-      type: 'DECLARE',
+      type: ActionType.DECLARE,
       label: {
         defaultMessage: 'Send an application',
         description:
@@ -933,27 +1017,27 @@ export const tennisClubMembershipEvent = defineConfig({
       forms: [TENNIS_CLUB_FORM]
     },
     {
-      type: 'REGISTER',
-      label: {
-        defaultMessage: 'Send an application',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.declare.label'
-      },
-      forms: [TENNIS_CLUB_FORM]
-    },
-    {
-      type: 'VALIDATE',
+      type: ActionType.VALIDATE,
       label: {
         defaultMessage: 'Validate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.validate.label'
       },
-      forms: []
+      forms: [TENNIS_CLUB_FORM]
     },
     {
-      type: 'REQUEST_CORRECTION',
+      type: ActionType.REGISTER,
+      label: {
+        defaultMessage: 'Register',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.register.label'
+      },
+      forms: [TENNIS_CLUB_FORM]
+    },
+    {
+      type: ActionType.REQUEST_CORRECTION,
       label: {
         defaultMessage: 'Request correction',
         description:
@@ -1160,7 +1244,7 @@ export const tennisClubMembershipEvent = defineConfig({
       ]
     },
     {
-      type: 'APPROVE_CORRECTION',
+      type: ActionType.APPROVE_CORRECTION,
       forms: [TENNIS_CLUB_FORM],
       label: {
         defaultMessage: 'Approve correction',
@@ -1217,11 +1301,30 @@ export const tennisClubMembershipEvent = defineConfig({
           })
         }
       ]
+    },
+    {
+      type: ActionType.ARCHIVE,
+      label: {
+        id: 'v2.event.tennis-club-membership.action.archive.label',
+        defaultMessage: 'Archive',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      forms: [TENNIS_CLUB_FORM]
+    },
+    {
+      type: ActionType.REJECT,
+      label: {
+        id: 'v2.event.tennis-club-membership.action.reject.label',
+        defaultMessage: 'Reject',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      forms: [TENNIS_CLUB_FORM]
     }
   ],
   advancedSearch: [
     {
-      id: 'RANDOM',
       title: {
         defaultMessage: 'Tennis club registration search',
         description: 'This is what this event is referred as in the system',

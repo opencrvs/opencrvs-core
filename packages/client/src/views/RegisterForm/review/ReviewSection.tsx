@@ -1632,6 +1632,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         items: items.filter((item) => item),
         action:
           this.includesVerificationStatus(section) &&
+          declaration.data[section.id]?.detailsExist !== false &&
           Boolean(declaration.data[section.id]?.verified) ? (
             <VerificationPill
               type={declaration.data[section.id].verified as string}
@@ -1849,8 +1850,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     action={
                       viewRecord ||
                       isDuplicate ||
-                      declaration.registrationStatus ===
-                        RegStatus.CorrectionRequested ? null : (
+                      isCorrection(declaration) ? null : (
                         <Link
                           font="reg16"
                           element="button"

@@ -9,16 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventDocument } from '@opencrvs/commons/events'
+import React from 'react'
+import { SubHeader } from '@opencrvs/components'
 
-export function getEventWithOnlyUserSpecificDrafts(
-  event: EventDocument,
-  userId: string
-): EventDocument {
-  return {
-    ...event,
-    actions: event.actions.filter((action) => {
-      return !action.draft || action.createdBy === userId
-    })
-  }
+function PageHeaderInput({ children }: { children: React.ReactNode }) {
+  return <SubHeader>{children}</SubHeader>
+}
+
+export const PageHeader = {
+  Input: PageHeaderInput,
+  Output: null
 }

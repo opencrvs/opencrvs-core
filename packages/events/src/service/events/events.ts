@@ -12,16 +12,18 @@
 import {
   ActionDocument,
   ActionInputWithType,
+  ActionUpdate,
+  Draft,
   EventDocument,
   EventInput,
   FieldConfig,
   FieldType,
-  FieldValue,
+  FieldUpdateValue,
   FileFieldValue,
-  isUndeclaredDraft
+  findActiveActionFields
 } from '@opencrvs/commons/events'
 import {
-  getActionFormFields,
+  getEventConfigurationById,
   notifyOnAction
 } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
@@ -30,6 +32,7 @@ import * as events from '@events/storage/mongodb/events'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await events.getClient()
@@ -48,7 +51,7 @@ class EventNotFoundError extends TRPCError {
   }
 }
 
-export async function getEventById(id: string) {
+export async function getEventById(id: string): Promise<EventDocument> {
   const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')
@@ -83,7 +86,12 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  const hasNonDeletableActions = !isUndeclaredDraft(event)
+  /**
+   * Once an event is declared, it cannot be removed anymore.
+   */
+  const hasNonDeletableActions = event.actions.some(
+    (action) => action.type !== ActionType.CREATE
+  )
 
   if (hasNonDeletableActions) {
     throw new TRPCError({
@@ -92,21 +100,24 @@ export async function deleteEvent(
     })
   }
 
-  await deleteEventAttachments(token, event)
-
   const { id } = event
-  await collection.deleteOne({ id })
+  await deleteEventAttachments(token, event)
   await deleteEventIndex(event)
+  await deleteDraftsByEventId(id)
+  await collection.deleteOne({ id })
+
   return { id }
 }
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
+
   for (const ac of event.actions) {
-    const fieldConfigs = await getActionFormFields({
-      token,
-      eventType: event.type,
-      action: ac.type
-    })
+    const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
+
     for (const [key, value] of Object.entries(ac.data)) {
       const fileValue = getValidFileValue(key, value, fieldConfigs)
 
@@ -171,7 +182,6 @@ export async function createEvent({
         createdAt: now,
         createdBy,
         createdAtLocation,
-        draft: false,
         id: getUUID(),
         data: {}
       }
@@ -186,7 +196,7 @@ export async function createEvent({
 
 function getValidFileValue(
   fieldKey: string,
-  fieldValue: FieldValue,
+  fieldValue: FieldUpdateValue,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ) {
   const isFileType =
@@ -199,7 +209,7 @@ function getValidFileValue(
 }
 
 function extractFileValues(
-  data: ActionDocument['data'],
+  data: ActionUpdate,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ): Array<{ fieldName: string; file: FileFieldValue }> {
   const fileValues: Array<{ fieldName: string; file: FileFieldValue }> = []
@@ -221,10 +231,10 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   token: string,
   fieldConfigs: FieldConfig[],
   fileValuesInCurrentAction: { fieldName: string; file: FileFieldValue }[],
-  previousDrafts: ActionDocument[]
+  drafts: Draft[]
 ): Promise<void> {
-  const previousFileValuesInDrafts = previousDrafts
-    .map((draft) => extractFileValues(draft.data, fieldConfigs))
+  const previousFileValuesInDrafts = drafts
+    .map((draft) => extractFileValues(draft.action.data, fieldConfigs))
     .flat()
 
   for (const previousFileValue of previousFileValuesInDrafts) {
@@ -259,16 +269,45 @@ export async function addAction(
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
-  const fieldConfigs = await getActionFormFields({
+  const configuration = await getEventConfigurationById({
     token,
-    eventType: event.type,
-    action: input.type
+    eventType: event.type
   })
+
+  const fieldConfigs =
+    findActiveActionFields(configuration, input.type, input.data) || []
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
+
   for (const file of fileValuesInCurrentAction) {
     if (!(await fileExists(file.file.filename, token))) {
       throw new Error(`File not found: ${file.file.filename}`)
     }
+  }
+
+  if (input.type === ActionType.ARCHIVE && input.metadata?.isDuplicate) {
+    input.transactionId = getUUID()
+    await db.collection<EventDocument>('events').updateOne(
+      {
+        id: eventId,
+        'actions.transactionId': { $nin: [transactionId, input.transactionId] }
+      },
+      {
+        $push: {
+          actions: {
+            ...input,
+            type: ActionType.MARKED_AS_DUPLICATE,
+            createdBy,
+            createdAt: now,
+            createdAtLocation,
+            id: getUUID()
+          }
+        },
+        $set: {
+          updatedAt: now
+        }
+      }
+    )
+    input.transactionId = transactionId
   }
 
   const action: ActionDocument = {
@@ -276,7 +315,6 @@ export async function addAction(
     createdBy,
     createdAt: now,
     createdAtLocation,
-    draft: input.draft || false,
     id: getUUID()
   }
 
@@ -287,21 +325,19 @@ export async function addAction(
       { $push: { actions: action }, $set: { updatedAt: now } }
     )
 
-  const actionsLatestFirst = [...event.actions].reverse()
-  const previousDrafts: ActionDocument[] = actionsLatestFirst.filter(
-    (x) => x.type === action.type && x.createdBy === action.createdBy && x.draft
+  const drafts = await getDraftsForAction(eventId, createdBy, input.type)
+
+  await cleanUnreferencedAttachmentsFromPreviousDrafts(
+    token,
+    fieldConfigs,
+    fileValuesInCurrentAction,
+    drafts
   )
 
-  if (!action.draft && previousDrafts.length > 0) {
-    await cleanUnreferencedAttachmentsFromPreviousDrafts(
-      token,
-      fieldConfigs,
-      fileValuesInCurrentAction,
-      previousDrafts
-    )
-  }
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
   await notifyOnAction(input, updatedEvent, token)
+  await deleteDraftsByEventId(eventId)
+
   return updatedEvent
 }

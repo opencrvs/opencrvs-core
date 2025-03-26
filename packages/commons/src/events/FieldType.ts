@@ -31,8 +31,18 @@ export const FieldType = {
   ADMINISTRATIVE_AREA: 'ADMINISTRATIVE_AREA',
   FACILITY: 'FACILITY',
   OFFICE: 'OFFICE',
-  SIGNATURE: 'SIGNATURE'
+  SIGNATURE: 'SIGNATURE',
+  DATA: 'DATA'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
 export type FieldType = (typeof fieldTypes)[number]
+
+/**
+ * Composite field types are field types that consist of multiple field values.
+ */
+export const compositeFieldTypes = [
+  FieldType.ADDRESS,
+  FieldType.FILE_WITH_OPTIONS,
+  FieldType.FILE
+]

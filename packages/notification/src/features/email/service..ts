@@ -16,6 +16,7 @@ import { logger } from '@opencrvs/commons'
 import { notifyCountryConfig } from '@notification/features/sms/service'
 import { internal, tooManyRequests } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { getUserDetails } from '@notification/features/utils'
 
 interface AllUsersEmailPayloadSchema {
   subject: string
@@ -28,9 +29,14 @@ interface AllUsersEmailPayloadSchema {
 let isLoopInprogress = false
 
 export async function sendAllUserEmails(request: Hapi.Request) {
+  const userDetails = await getUserDetails(request)
+  const recipientEmail = userDetails?.emailForNotification
   const payload = request.payload as AllUsersEmailPayloadSchema
   await preProcessRequest(request)
-  await NotificationQueue.create(payload)
+  await NotificationQueue.create({
+    ...payload,
+    ...(recipientEmail && { recipientEmail })
+  })
   if (!isLoopInprogress) {
     loopNotificationQueue(request.server)
   }
@@ -87,16 +93,26 @@ async function findOldestNotificationQueueRecord() {
         ]
       }
     ]
-  }).sort({ createdAt: -1 })
+  }).sort({ createdAt: 1 })
 }
 
-async function dispatch(record: NotificationQueueRecord) {
+async function dispatch(
+  recipientEmail: string | null,
+  record: NotificationQueueRecord
+) {
+  const filteredRecord = recipientEmail
+    ? record.bcc.filter((item) => item !== recipientEmail)
+    : undefined
+
   return notifyCountryConfig(
     {
       email: 'allUserNotification',
       sms: 'allUserNotification'
     },
-    { email: record.bcc[0], bcc: record.bcc.slice(1) },
+    {
+      email: recipientEmail ? recipientEmail : record.bcc[0],
+      bcc: recipientEmail ? filteredRecord : record.bcc.slice(1)
+    },
     'user',
     {
       subject: record.subject,
@@ -137,12 +153,16 @@ async function markQueueRecordSuccess(record: NotificationQueueRecord) {
 
 export async function loopNotificationQueue(server: Hapi.Server) {
   isLoopInprogress = true
+
   let record = await findOldestNotificationQueueRecord()
+
   while (record) {
     logger.info(
       `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
     )
-    const res = await dispatch(record)
+
+    const res = await dispatch(record.recipientEmail || '', record)
+
     if (!res.ok) {
       const error = await res.json()
       await markQueueRecordFailedWithErrorDetails(record, error)

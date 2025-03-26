@@ -10,12 +10,7 @@
  */
 
 import { v4 as uuid } from 'uuid'
-import {
-  ActionFormData,
-  FormConfig,
-  Scope,
-  SCOPES
-} from '@opencrvs/commons/client'
+import { EventState, FormConfig, Scope, SCOPES } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 // eslint-disable-next-line no-restricted-imports
@@ -92,7 +87,6 @@ const confirmModalMessages = {
     }
   }
 }
-
 const registerMessages = {
   title: {
     id: 'v2.review.register.title',
@@ -103,6 +97,11 @@ const registerMessages = {
     id: 'v2.review.register.confirm',
     defaultMessage: 'Register',
     description: 'The label for register button of review action'
+  },
+  onReject: {
+    id: 'v2.review.register.reject',
+    defaultMessage: 'Reject',
+    description: 'The label for reject button of review action'
   }
 }
 
@@ -116,6 +115,11 @@ const validateMessages = {
     id: 'v2.review.validate.confirm',
     defaultMessage: 'Send for approval',
     description: 'The label for review action button when validating'
+  },
+  onReject: {
+    id: 'v2.review.validate.reject',
+    defaultMessage: 'Reject',
+    description: 'The label for reject button of review action'
   }
 }
 
@@ -139,6 +143,7 @@ const reviewMessages = {
           'The description for registration action when form is complete'
       },
       onConfirm: registerMessages.onConfirm,
+      onReject: registerMessages.onReject,
       modal: confirmModalMessages.complete.register
     },
     validate: {
@@ -150,6 +155,7 @@ const reviewMessages = {
         description: 'The description for validate action when form is complete'
       },
       onConfirm: validateMessages.onConfirm,
+      onReject: validateMessages.onReject,
       modal: confirmModalMessages.complete.validate
     },
     declare: {
@@ -179,6 +185,7 @@ const reviewMessages = {
           'The description for registration action when form is incomplete'
       },
       onConfirm: registerMessages.onConfirm,
+      onReject: registerMessages.onReject,
       modal: {}
     },
     validate: {
@@ -190,6 +197,7 @@ const reviewMessages = {
         description: 'The description for validate action when form is complete'
       },
       onConfirm: validateMessages.onConfirm,
+      onReject: validateMessages.onReject,
       modal: {}
     },
     declare: {
@@ -218,8 +226,8 @@ export function useReviewActionConfig({
   scopes
 }: {
   formConfig: FormConfig
-  form: ActionFormData
-  metadata?: ActionFormData
+  form: EventState
+  metadata?: EventState
   scopes?: Scope[]
 }) {
   const events = useEvents()
@@ -231,6 +239,27 @@ export function useReviewActionConfig({
 
   const isDisabled =
     incomplete && !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
+
+  if (
+    incomplete &&
+    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE) &&
+    scopes.includes(SCOPES.RECORD_DECLARE)
+  ) {
+    return {
+      buttonType: 'positive' as const,
+      incomplete,
+      isDisabled,
+      onConfirm: (eventId: string) => {
+        events.actions.notify.mutate({
+          eventId,
+          data: form,
+          metadata,
+          transactionId: uuid()
+        })
+      },
+      messages: reviewMessages.incomplete.declare
+    }
+  }
 
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
     return {
