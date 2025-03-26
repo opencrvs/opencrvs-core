@@ -168,14 +168,16 @@ test('READ action does not delete draft', async () => {
 
   const draftEvents = await client.event.draft.list()
 
-  await client.event.get(originalEvent.id) // this triggers READ action
+  const event = await client.event.get(originalEvent.id)
+  // this triggers READ action
+  expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
 
   const draftEventsAfterRead = await client.event.draft.list()
 
   expect(draftEvents).toEqual(draftEventsAfterRead)
 })
 
-test('Other than READ action deletes draft', async () => {
+test('Action other than READ deletes draft', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
