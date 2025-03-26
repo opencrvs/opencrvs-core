@@ -19,14 +19,15 @@ import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { EventState } from './ActionDocument'
-import { FormConfig, FormPageType } from './FormConfig'
-import { isFieldVisible } from '../conditionals/validate'
+import { ActionUpdate, EventState } from './ActionDocument'
+import { FormConfig, FormPageType, FormPageConfig } from './FormConfig'
+import { isFieldVisible, validate } from '../conditionals/validate'
 import { FieldType } from './FieldType'
 import { getOrThrow } from '../utils'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID } from '../uuid'
+import { formatISO } from 'date-fns'
 
 function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
@@ -162,6 +163,26 @@ export const getFormFields = (formConfig: FormConfig) => {
   return formConfig.pages.flatMap((p) => p.fields)
 }
 
+export function isPageVisible(page: FormPageConfig, formValues: ActionUpdate) {
+  if (!page.conditional) {
+    return true
+  }
+
+  return validate(page.conditional, {
+    $form: formValues,
+    $now: formatISO(new Date(), { representation: 'date' })
+  })
+}
+
+export const getVisiblePagesFormFields = (
+  formConfig: FormConfig,
+  formData: ActionUpdate
+) => {
+  return formConfig.pages
+    .filter((p) => isPageVisible(p, formData))
+    .flatMap((p) => p.fields)
+}
+
 /**
  * Returns only form fields for the action type, if any, excluding review fields.
  */
@@ -180,12 +201,20 @@ export const findActiveActionFormFields = (
  */
 export const findActiveActionFields = (
   configuration: EventConfig,
-  action: ActionType
+  action: ActionType,
+  formData?: ActionUpdate
 ): FieldConfig[] | undefined => {
   const form = findActiveActionForm(configuration, action)
   const reviewFields = form?.review.fields
 
-  const formFields = form ? getFormFields(form) : undefined
+  let formFields: FieldConfig[] | undefined = undefined
+
+  if (form) {
+    formFields = formData
+      ? getVisiblePagesFormFields(form, formData)
+      : getFormFields(form)
+  }
+
   const allFields = formFields
     ? formFields.concat(reviewFields ?? [])
     : reviewFields
@@ -294,17 +323,6 @@ export function createEmptyDraft(
   }
 }
 
-export function findActiveActionVerificationPageIds(
-  configuration: EventConfig,
-  action: ActionType
-): string[] {
-  const pages = findActiveActionFormPages(configuration, action)
-
-  if (!pages) {
-    return []
-  }
-
-  return pages
-    .filter((page) => page.type === FormPageType.VERIFICATION)
-    .map((page) => page.id)
+export function isVerificationPage(page: FormPageConfig) {
+  return page.type === FormPageType.VERIFICATION
 }

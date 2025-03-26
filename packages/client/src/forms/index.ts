@@ -769,7 +769,11 @@ export interface IDReaderFormField extends IFormFieldBase {
   readers: [ReaderType, ...ReaderType[]]
 }
 
-export type BannerType = 'authenticated' | 'verified' | 'failed'
+export type BannerType =
+  | 'authenticated'
+  | 'verified'
+  | 'failed'
+  | 'failedFetchIdDetails'
 interface IIDVerificationBannerFormField extends IFormFieldBase {
   type: typeof ID_VERIFICATION_BANNER
   bannerType: BannerType

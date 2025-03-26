@@ -78,6 +78,29 @@ const failed = {
   }
 }
 
+const failedFetchIdDetails = {
+  title: {
+    id: 'views.idVerification.banner.failedFetchIdDetails.title',
+    defaultMessage: 'Failed to retrieve individuals details'
+  },
+  description: {
+    id: 'views.idVerification.banner.failedFetchIdDetails.description',
+    defaultMessage:
+      'We were unable to retrieve the individuals details for the National ID System. Please try again.'
+  },
+  resetConfirmation: {
+    title: {
+      id: 'views.idVerification.banner.failed.resetConfirmation.title',
+      defaultMessage: 'Reset information?'
+    },
+    description: {
+      id: 'views.idVerification.banner.failed.resetConfirmation.description',
+      defaultMessage:
+        'By clicking ‘Continue,’ you’ll clear all information to it’s default state.'
+    }
+  }
+}
+
 const actions = {
   revoke: {
     id: 'views.idVerification.banner.actions.revoke',
@@ -93,5 +116,6 @@ export const messages = {
   authenticated,
   verified,
   failed,
-  actions
+  actions,
+  failedFetchIdDetails
 }
