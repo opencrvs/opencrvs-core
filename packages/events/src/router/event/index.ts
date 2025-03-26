@@ -30,8 +30,7 @@ import {
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
   SCOPES,
-  getUUID,
-  logger
+  getUUID
 } from '@opencrvs/commons'
 import {
   ActionType,
@@ -41,16 +40,15 @@ import {
   DraftInput,
   EventIndex,
   EventInput,
-  FieldValue,
   NotifyActionInput,
   PrintCertificateActionInput,
-  RegisterActionInput,
   RejectDeclarationActionInput,
   ValidateActionInput,
   EventSearchIndex
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { registerRouter } from './actions/register'
 
 function validateEventType({
   eventTypes,
@@ -236,32 +234,7 @@ export const eventRouter = router({
           transactionId: options.input.transactionId
         })
       }),
-    register: router({
-      '': publicProcedure
-        .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
-        // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
-        .input(RegisterActionInput.omit({ identifiers: true }))
-        // @ts-expect-error
-        .use(middleware.validateAction(ActionType.REGISTER))
-        .mutation(async (options) => {
-          return addAction(
-            {
-              ...options.input,
-              identifiers: {
-                trackingId: getUUID(),
-                registrationNumber: getUUID()
-              }
-            },
-            {
-              eventId: options.input.eventId,
-              createdBy: options.ctx.user.id,
-              createdAtLocation: options.ctx.user.primaryOfficeId,
-              token: options.ctx.token,
-              transactionId: options.input.transactionId
-            }
-          )
-        })
-    }),
+    register: registerRouter,
     printCertificate: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]))
       .input(PrintCertificateActionInput)
@@ -322,22 +295,6 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
-
-  // CIHAN: tee tästä geneerinen joka actionille
-  registration: router({
-    confirm: publicProcedure
-      .input(
-        z.object({
-          eventId: z.string(),
-          data: z.record(z.string(), FieldValue)
-        })
-      )
-      .mutation(async ({ input, ctx }) => {
-        logger.info('Registration confirmed', { eventId: input.eventId })
-        logger.info(input.data)
-        return getEventById(input.eventId)
-      })
-  }),
   search: publicProcedure
     .input(EventSearchIndex)
     .query(async ({ input, ctx }) => {

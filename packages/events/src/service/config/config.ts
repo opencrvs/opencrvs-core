@@ -62,11 +62,13 @@ export async function getEventConfigurationById({
   )
 }
 
-const ActionConfirmationHandlerResponse = {
-  FAIL_IN_UNCONTROLLED_MANNER: 500, // Endpoint fails in an uncontrolled manner
-  ACTION_REJECTED: 400, // Synchronous flow failed
-  SUCCESS: 200, // Synchronous flow succeeded
-  REQUIRES_PROCESSING: 202 // Asynchronous flow succeeded, this expects that either the confirm or reject callback is called
+// TODO CIHAN: move this to commmons/toolkit, and use it from countryconfig
+// needs better typing
+const ActionConfirmationResponseCodes = {
+  FailInUncontrolledManner: 500, // Endpoint fails in an uncontrolled manner
+  ActionRejected: 400, // Synchronous flow failed
+  Success: 200, // Synchronous flow succeeded
+  RequiresProcessing: 202 // Asynchronous flow succeeded, this expects that either the confirm or reject callback is called
 } as const
 
 // TODO CIHAN: tää vois lukea yllä olevan enumi
@@ -74,9 +76,9 @@ export async function notifyOnAction(
   action: ActionInput,
   event: EventDocument,
   token: string
-) {
+): Promise<any> {
   try {
-    await fetch(
+    const res = await fetch(
       new URL(
         `/events/${event.type}/actions/${action.type}`,
         env.COUNTRY_CONFIG_URL
@@ -90,7 +92,16 @@ export async function notifyOnAction(
         }
       }
     )
+
+    const status = res.status as any
+
+    if (!Object.values(ActionConfirmationResponseCodes).includes(status)) {
+      return ActionConfirmationResponseCodes.FailInUncontrolledManner
+    }
+
+    return status
   } catch (error) {
     logger.error(error)
+    return ActionConfirmationResponseCodes.FailInUncontrolledManner
   }
 }

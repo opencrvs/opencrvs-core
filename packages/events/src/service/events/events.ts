@@ -22,10 +22,7 @@ import {
   FileFieldValue,
   findActiveActionFields
 } from '@opencrvs/commons/events'
-import {
-  getEventConfigurationById,
-  notifyOnAction
-} from '@events/service/config/config'
+import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
@@ -336,7 +333,8 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
-  await notifyOnAction(input, updatedEvent, token)
+  // TODO CIHAN: this is removed from here!
+  // await notifyOnAction(input, updatedEvent, token)
   await deleteDraftsByEventId(eventId)
 
   return updatedEvent
