@@ -336,6 +336,11 @@ export function field(fieldId: string) {
         },
         required: ['$form']
       }),
+    /**
+     * Checks if the field value matches a given regular expression pattern.
+     * @param pattern - The regular expression pattern to match the field value against.
+     * @returns A JSONSchema conditional that validates the field value against the pattern.
+     */
     matches: (pattern: string) =>
       defineConditional({
         type: 'object',
