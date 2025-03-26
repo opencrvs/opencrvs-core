@@ -13,11 +13,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import {
-  ActionType,
-  findActiveActionForm,
-  SCOPES
-} from '@opencrvs/commons/client'
+import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
@@ -143,7 +139,9 @@ export function Review() {
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
-          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
+          background={
+            reviewActionConfiguration.incomplete ? 'error' : 'success'
+          }
           isPrimaryActionDisabled={reviewActionConfiguration.isDisabled}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}

@@ -554,8 +554,8 @@ function ReviewActionComponent({
   onReject,
   messages,
   primaryButtonType,
-  canSendIncomplete,
-  isPrimaryActionDisabled
+  isPrimaryActionDisabled,
+  background
 }: {
   isPrimaryActionDisabled: boolean
   onConfirm: () => void
@@ -566,23 +566,20 @@ function ReviewActionComponent({
     onConfirm: MessageDescriptor
     onReject?: MessageDescriptor
   }
+  background?: 'error' | 'success'
   primaryButtonType?: 'positive' | 'primary'
-  action?: string
-  canSendIncomplete?: boolean
 }) {
   const intl = useIntl()
 
-  const background = isPrimaryActionDisabled ? 'error' : 'success'
-
   return (
     <Container>
-      <UnderLayBackground background={background}>
+      <UnderLayBackground background={background ?? 'success'}>
         <Content>
           <Title>{intl.formatMessage(messages.title)}</Title>
           <Description>{intl.formatMessage(messages.description)}</Description>
           <ActionContainer>
             <Button
-              disabled={isPrimaryActionDisabled && !canSendIncomplete}
+              disabled={isPrimaryActionDisabled}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}

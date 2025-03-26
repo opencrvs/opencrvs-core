@@ -235,10 +235,13 @@ export const ReviewForFieldAgentComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return {
+              ...generateEventDocument({
+                configuration: tennisClubMembershipEvent,
+                actions: [ActionType.CREATE]
+              }),
+              id: eventId
+            }
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]

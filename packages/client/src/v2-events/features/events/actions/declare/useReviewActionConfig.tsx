@@ -244,7 +244,7 @@ export function useReviewActionConfig({
     scopes.includes(SCOPES.RECORD_DECLARE)
   ) {
     return {
-      buttonType: 'positive' as const,
+      buttonType: 'primary' as const,
       incomplete,
       isDisabled,
       onConfirm: (eventId: string) => {
