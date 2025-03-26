@@ -16,8 +16,9 @@ import {
   createTestStore,
   flushPromises,
   mockUserResponse,
-  REGISTRAR_DEFAULT_SCOPES,
-  setScopes
+  SYSTEM_ADMIN_DEFAULT_SCOPES,
+  setScopes,
+  fetchUserMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
@@ -28,6 +29,8 @@ import { TeamSearch } from './TeamSearch'
 import { vi } from 'vitest'
 import { SCOPES } from '@opencrvs/commons/client'
 import { createMemoryRouter } from 'react-router-dom'
+import * as actions from '@client/profile/profileActions'
+import { NetworkStatus } from '@apollo/client'
 
 describe('Team search test', () => {
   let store: AppStore
@@ -42,11 +45,19 @@ describe('Team search test', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
+      setScopes(SYSTEM_ADMIN_DEFAULT_SCOPES, store)
       ;({ component: app, router } = await createTestComponent(<TeamSearch />, {
-        store
+        store,
+        initialEntries: [{ pathname: '', state: {} }]
       }))
-      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
+      store.dispatch(
+        actions.setUserDetails({
+          loading: false,
+          data: fetchUserMock('da672661-eb0a-437b-aa7a-a6d9a1711dd1'),
+          networkStatus: NetworkStatus.ready
+        })
+      )
       app.update()
     })
 

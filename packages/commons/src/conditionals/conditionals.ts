@@ -335,6 +335,24 @@ export function field(fieldId: string) {
           }
         },
         required: ['$form']
+      }),
+    isBetween: (min: number, max: number) =>
+      defineConditional({
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                type: 'number',
+                minimum: min,
+                maximum: max
+              }
+            },
+            required: [fieldId]
+          }
+        },
+        required: ['$form']
       })
   }
 }
