@@ -34,7 +34,7 @@ function getFieldDefinitionForActionDataField(
     !actionFields &&
     LatentActions.some((latentAction) => latentAction === actionType)
   ) {
-    // @TODO: WHhen application is refactored to use main form, remove this.
+    // @TODO: WHen form configuration is refactored to use "single" form, remove this.
     actionFields = findActiveActionFields(configuration, ActionType.DECLARE)
   }
   const fieldConfig = actionFields?.find((field) => field.id === fieldId)
