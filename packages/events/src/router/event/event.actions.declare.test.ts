@@ -237,6 +237,9 @@ test('valid action is appended to event actions', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({
       type: ActionType.DECLARE
+    }),
+    expect.objectContaining({
+      type: ActionType.READ
     })
   ])
 })
