@@ -22,8 +22,8 @@ import { TRPCError } from '@trpc/server'
 import { getUser, logger } from '@opencrvs/commons'
 import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'
-import { ensureIndexExists } from './service/indexing/indexing'
 import { getAnonymousToken } from './service/auth'
+import { ensureIndexExists } from './service/indexing/indexing'
 
 const server = createHTTPServer({
   router: appRouter,
@@ -65,10 +65,24 @@ const server = createHTTPServer({
 })
 
 export async function main() {
-  const configurations = await getEventConfigurations(await getAnonymousToken())
-  for (const configuration of configurations) {
-    logger.info(`Loaded event configuration: ${configuration.id}`)
-    await ensureIndexExists(configuration)
+  try {
+    const configurations = await getEventConfigurations(
+      await getAnonymousToken()
+    )
+    for (const configuration of configurations) {
+      logger.info(`Loaded event configuration: ${configuration.id}`)
+      await ensureIndexExists(configuration)
+    }
+  } catch (error) {
+    logger.error(error)
+    if (env.isProd) {
+      process.exit(1)
+    }
+    /*
+     * SIGUSR2 tells nodemon to restart the process without waiting for new file changes
+     */
+    setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
+    return
   }
 
   server.listen(5555)

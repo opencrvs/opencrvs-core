@@ -17,6 +17,7 @@
     "backups",
     "**/coverage",
     "packages/client/public/robots.txt",
+    "packages/client/public/mockServiceWorker.js",
     "packages/login/public/robots.txt",
     ".env*",
     ".vs",
@@ -36,6 +37,8 @@
     "packages/components/.storybook/preview.jsx",
     "packages/components/.storybook/manager-head.html",
     "grafana",
+    "packages/client/storybook-static",
+    "packages/client/.storybook/preview-head.html",
     "packages/scheduler/start.sh",
     "packages/scheduler/crontab",
     "packages/scheduler/jobs/*",
@@ -46,7 +49,9 @@
     "packages/dashboards/data/metabase/*.db",
     "packages/client/dev-dist",
     "packages/toolkit/.npmignore",
-    "packages/toolkit/tsconfig.tsbuildinfo"
+    "packages/toolkit/tsconfig.tsbuildinfo",
+    "packages/commons/src/events/EventConfig.mermaid",
+    "packages/commons/src/events/EventUpdateFlow.mermaid"
   ],
   "license": "license-header.txt",
   "licenseFormats": {

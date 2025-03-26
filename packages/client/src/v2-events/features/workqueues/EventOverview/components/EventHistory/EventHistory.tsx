@@ -11,7 +11,7 @@
 import React from 'react'
 import { format } from 'date-fns'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
 import { Link } from '@opencrvs/components'
@@ -19,16 +19,18 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ActionDocument } from '@opencrvs/commons/client'
+import { ActionDocument, ActionType } from '@opencrvs/commons/client'
 import { ResolvedUser } from '@opencrvs/commons'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
-import { EventHistoryModal } from './EventHistoryModal'
+import {
+  EventHistoryModal,
+  eventHistoryStatusMessage
+} from './EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
-import { messages } from './messages'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
@@ -39,6 +41,20 @@ const TableDiv = styled.div`
 `
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
+
+const messages = defineMessages({
+  timeFormat: {
+    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
+    id: 'v2.configuration.timeFormat',
+    description: 'Time format for timestamps in event history'
+  },
+  role: {
+    id: 'v2.event.history.role',
+    defaultMessage:
+      '{role, select, LOCAL_REGISTRAR{Local Registrar} other{Unknown}}',
+    description: 'Role of the user in the event history'
+  }
+})
 
 /**
  *  Renders the event history table. Used for audit trail.
@@ -55,64 +71,70 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
     ))
   }
 
-  const historyRows = history.map((item) => {
-    const user = getUser(item.createdBy)
+  const historyRows = history
+    .filter(({ type }) => type !== ActionType.CREATE)
+    .map((item) => {
+      const user = getUser(item.createdBy)
 
-    const location = getLocation(item.createdAtLocation)
+      const location = getLocation(item.createdAtLocation)
 
-    return {
-      date: format(
-        new Date(item.createdAt),
-        intl.formatMessage(messages['event.history.timeFormat'])
-      ),
-      action: (
-        <Link
-          font="bold14"
-          onClick={() => {
-            onHistoryRowClick(item, user)
-          }}
-        >
-          {item.type}
-        </Link>
-      ),
-      user: (
-        <Link
-          font="bold14"
-          id="profile-link"
-          onClick={() =>
-            navigate(
-              formatUrl(routes.USER_PROFILE, {
-                userId: item.createdBy
+      return {
+        date: format(
+          new Date(item.createdAt),
+          intl.formatMessage(messages.timeFormat)
+        ),
+        action: (
+          <Link
+            font="bold14"
+            onClick={() => {
+              onHistoryRowClick(item, user)
+            }}
+          >
+            {intl.formatMessage(eventHistoryStatusMessage, {
+              status: item.type
+            })}
+          </Link>
+        ),
+        user: (
+          <Link
+            font="bold14"
+            id="profile-link"
+            onClick={() =>
+              navigate(
+                formatUrl(routes.USER_PROFILE, {
+                  userId: item.createdBy
+                })
+              )
+            }
+          >
+            <UserAvatar
+              // @TODO: extend v2-events User to include avatar
+              avatar={undefined}
+              locale={intl.locale}
+              names={user.name}
+            />
+          </Link>
+        ),
+        role: intl.formatMessage(messages.role, {
+          role: user.role
+        }),
+        location: (
+          <Link
+            font="bold14"
+            onClick={() => {
+              navigate({
+                pathname: routes.TEAM_USER_LIST,
+                search: stringify({
+                  locationId: item.createdAtLocation
+                })
               })
-            )
-          }
-        >
-          <UserAvatar
-            // @TODO: extend v2-events User to include avatar
-            avatar={undefined}
-            locale={intl.locale}
-            names={user.name}
-          />
-        </Link>
-      ),
-      role: user.systemRole,
-      location: (
-        <Link
-          font="bold14"
-          onClick={() => {
-            navigate({
-              pathname: routes.TEAM_USER_LIST,
-              search: stringify({
-                locationId: item.createdAtLocation
-              })
-            })
-          }}
-        >
-          {location.name}
-        </Link>
-      )
-    }
-  })
+            }}
+          >
+            {location.name}
+          </Link>
+        )
+      }
+    })
 
   const columns = [
     {

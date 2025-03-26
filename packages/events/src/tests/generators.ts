@@ -9,13 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  DeclareActionInput,
-  EventInput,
-  getUUID,
-  ActionType,
-  ValidateActionInput
-} from '@opencrvs/commons'
+import { getUUID, eventPayloadGenerator } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
 
@@ -28,55 +22,23 @@ interface Name {
 export interface CreatedUser {
   id: string
   primaryOfficeId: string
-  systemRole: string
+  role: string
   name: Array<Name>
 }
 
 interface CreateUser {
   primaryOfficeId: string
-  systemRole?: string
+  role?: string
   name?: Array<Name>
 }
+
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
 export function payloadGenerator() {
-  const event = {
-    create: (input: Partial<EventInput> = {}) => ({
-      transactionId: input.transactionId ?? getUUID(),
-      type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP'
-    }),
-    patch: (id: string, input: Partial<EventInput> = {}) => ({
-      transactionId: input.transactionId ?? getUUID(),
-      type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
-      id
-    }),
-    actions: {
-      declare: (
-        eventId: string,
-        input: Partial<Pick<DeclareActionInput, 'transactionId' | 'data'>> = {}
-      ) => ({
-        type: ActionType.DECLARE,
-        transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
-        eventId
-      }),
-      validate: (
-        eventId: string,
-        input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
-      ) => ({
-        type: ActionType.VALIDATE,
-        transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
-        duplicates: [],
-        eventId
-      })
-    }
-  }
-
   const user = {
     create: (input: CreateUser) => ({
-      systemRole: input.systemRole ?? 'REGISTRATION_AGENT',
+      role: input.role ?? 'REGISTRATION_AGENT',
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId
     })
@@ -103,7 +65,7 @@ export function payloadGenerator() {
     }
   }
 
-  return { event, locations, user }
+  return { event: eventPayloadGenerator, locations, user }
 }
 
 /**
@@ -117,7 +79,7 @@ export function seeder() {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
-      systemRole: user.systemRole,
+      role: user.role,
       id: createdUser.insertedId.toString()
     }
   }

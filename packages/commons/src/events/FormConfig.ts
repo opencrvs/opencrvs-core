@@ -11,12 +11,56 @@
 import { z } from 'zod'
 import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { Conditional } from './Conditional'
+
+export const FormPageType = {
+  FORM: 'FORM',
+  VERIFICATION: 'VERIFICATION'
+} as const
 
 export const FormPage = z.object({
   id: z.string().describe('Unique identifier for the page'),
+  type: z.literal(FormPageType.FORM).default(FormPageType.FORM),
   title: TranslationConfig.describe('Header title of the page'),
-  fields: z.array(FieldConfig).describe('Fields to be rendered on the page')
+  fields: z.array(FieldConfig).describe('Fields to be rendered on the page'),
+  conditional: Conditional()
+    .optional()
+    .describe(
+      'Page will be shown if condition is met. If conditional is not defined, the page will be always shown.'
+    )
 })
+
+export const VerificationPageConfig = z
+  .object({
+    verify: z.object({ label: TranslationConfig }),
+    cancel: z.object({
+      label: TranslationConfig,
+      confirmation: z.object({
+        title: TranslationConfig,
+        body: TranslationConfig
+      })
+    })
+  })
+  .describe('Actions available on the verification page')
+
+export const VerificationPage = FormPage.extend({
+  type: z.literal(FormPageType.VERIFICATION),
+  actions: VerificationPageConfig
+})
+
+export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
+type AllPageConfigs = typeof FormPage | typeof VerificationPage
+
+export const FormPageConfig = z.preprocess(
+  (pageConfig: z.infer<AllPageConfigs>) => ({
+    ...pageConfig,
+    type: pageConfig.type ?? FormPageType.FORM // Default type to "FORM" if not provided
+  }),
+  z.discriminatedUnion('type', [FormPage, VerificationPage])
+) as unknown as z.ZodDiscriminatedUnion<'type', AllPageConfigs[]>
+
+export type FormPageConfigInput = z.input<typeof FormPageConfig>
+export type FormPageConfig = z.infer<typeof FormPageConfig>
 
 export const FormConfig = z.object({
   label: TranslationConfig.describe('Human readable description of the form'),
@@ -31,14 +75,16 @@ export const FormConfig = z.object({
     )
   }),
   active: z.boolean().default(false).describe('Whether the form is active'),
-  pages: z.array(FormPage),
+  pages: z.array(FormPageConfig),
   review: z.object({
     title: TranslationConfig.describe(
       'Title of the form to show in review page'
-    )
+    ),
+    fields: z
+      .array(FieldConfig)
+      .describe('Fields to be rendered on the review page for metadata')
   })
 })
 
-export type FormPage = z.infer<typeof FormPage>
 export type FormConfig = z.infer<typeof FormConfig>
 export type FormConfigInput = z.input<typeof FormConfig>

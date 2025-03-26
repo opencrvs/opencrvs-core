@@ -45,7 +45,7 @@ const Progress = styled.div`
   gap: 0px;
   border-radius: 100px;
   opacity: 0px;
-  background: ${({ theme }) => theme.colors.blueDark};
+  background: ${({ theme }) => theme.colors.primary};
   animation: ${ProgressAnimation} 300s ease;
 `
 export const LoadingBar = () => (

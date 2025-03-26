@@ -14,7 +14,7 @@ import { useIntl } from 'react-intl'
 
 import { useNavigate } from 'react-router-dom'
 import { formatISO } from 'date-fns'
-import { validate, ActionType } from '@opencrvs/commons/client'
+import { validate, ActionType, ConditionalType } from '@opencrvs/commons/client'
 import { type ActionConfig } from '@opencrvs/commons'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -37,22 +37,28 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   )
 
   function isActionVisible(action: ActionConfig) {
-    if (!action.allowedWhen) {
+    if (action.conditionals.length === 0) {
       return true
     }
+
     const params = {
       $event: event,
       $user: authentication,
       $now: formatISO(new Date(), { representation: 'date' })
     }
+    return action.conditionals.reduce((acc, conditional) => {
+      if (conditional.type === ConditionalType.SHOW) {
+        return acc && validate(conditional.conditional, params)
+      }
 
-    return validate(action.allowedWhen, params)
+      return acc
+    }, true)
   }
 
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger>
+        <DropdownMenu.Trigger asChild>
           <PrimaryButton icon={() => <CaretDown />}>
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
@@ -64,14 +70,31 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                 key={action.type}
                 onClick={() => {
                   if (
-                    action.type === ActionType.CREATE ||
+                    action.type === ActionType.REJECT ||
+                    action.type === ActionType.ARCHIVE ||
+                    action.type === ActionType.MARKED_AS_DUPLICATE ||
+                    action.type === ActionType.APPROVE_CORRECTION ||
+                    action.type === ActionType.REJECT_CORRECTION ||
                     action.type === ActionType.CUSTOM
                   ) {
                     alert(`Action ${action.type} is not implemented yet.`)
                     return
                   }
 
-                  navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
+                  if (
+                    action.type === ActionType.REGISTER ||
+                    action.type === ActionType.VALIDATE
+                  ) {
+                    navigate(
+                      ROUTES.V2.EVENTS[action.type].REVIEW.buildPath({
+                        eventId
+                      })
+                    )
+                  } else {
+                    navigate(
+                      ROUTES.V2.EVENTS[action.type].buildPath({ eventId })
+                    )
+                  }
                 }}
               >
                 {intl.formatMessage(action.label)}

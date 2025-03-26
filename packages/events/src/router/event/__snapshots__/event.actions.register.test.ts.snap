@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Prevents adding birth date in future 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2040-02-01"}]]`;
+
+exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required for registration","id":"applicant.firstname"},{"message":"Required for registration","id":"applicant.surname"},{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Required for registration","id":"applicant.address"}]]`;
+
+exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;

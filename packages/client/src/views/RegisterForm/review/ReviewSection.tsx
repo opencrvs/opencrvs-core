@@ -139,6 +139,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
+import { VerificationPill } from '@client/components/form/IDVerification/VerificationPill'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -1505,6 +1506,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.closePreviewSection(() => this.removeAttachmentFromDraft(file))
   }
 
+  includesVerificationStatus = (section: IFormSection) => {
+    return section.groups.some((group) =>
+      group.fields.some((field) => field.name === 'verified')
+    )
+  }
+
   shouldShowChangeAll = (section: IFormSection) => {
     const {
       draft: { data, event, duplicates },
@@ -1623,13 +1630,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         id: section.id,
         title: section.title ? intl.formatMessage(section.title) : '',
         items: items.filter((item) => item),
-        action: this.shouldShowChangeAll(section)
-          ? {
-              label: intl.formatMessage(buttonMessages.replace),
-              handler: () =>
+        action:
+          this.includesVerificationStatus(section) &&
+          declaration.data[section.id]?.detailsExist !== false &&
+          Boolean(declaration.data[section.id]?.verified) ? (
+            <VerificationPill
+              type={declaration.data[section.id].verified as string}
+            />
+          ) : this.shouldShowChangeAll(section) &&
+            declaration.registrationStatus !== RegStatus.CorrectionRequested ? (
+            <Link
+              font="reg16"
+              onClick={() =>
                 this.replaceHandler(section.id, visibleGroups[0].id)
-            }
-          : undefined
+              }
+            >
+              {intl.formatMessage(buttonMessages.replace)}
+            </Link>
+          ) : undefined
       }
     })
   }
@@ -1702,11 +1720,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         '') as string
     }
 
-    const informantName = getDeclarationFullName(
-      declaration,
-      intl.locale,
-      this.isLastNameFirst()
-    )
+    const informantName = getDeclarationFullName(declaration, intl)
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections.filter(
@@ -1789,15 +1803,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           <Accordion
                             name={sec.id}
                             label={sec.title}
-                            action={
-                              sec.action &&
-                              declaration.registrationStatus !==
-                                RegStatus.CorrectionRequested && (
-                                <Link font="reg16" onClick={sec.action.handler}>
-                                  {sec.action.label}
-                                </Link>
-                              )
-                            }
+                            action={sec.action}
                             labelForHideAction={intl.formatMessage(
                               messages.hideLabel
                             )}

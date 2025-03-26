@@ -8,17 +8,30 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from './ActionConfig'
 import { z } from 'zod'
-import { FieldValue } from './FieldValue'
+import { FieldValue, FieldUpdateValue } from './FieldValue'
+import { ActionType } from './ActionType'
 
-const ActionBase = z.object({
+/**
+ * ActionUpdate is a record of a specific action that updated data fields.
+ */
+export const ActionUpdate = z.record(z.string(), FieldUpdateValue)
+export type ActionUpdate = z.infer<typeof ActionUpdate>
+/**
+ * EventState is an aggregate of all the actions that have been applied to event data.
+ */
+export type EventState = Record<string, FieldValue>
+
+export const ActionBase = z.object({
+  id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.record(z.string(), FieldValue),
-  draft: z.boolean().optional().default(false),
+  data: ActionUpdate,
+  metadata: ActionUpdate.optional(),
   createdAtLocation: z.string()
 })
+
+export type ActionBase = z.infer<typeof ActionBase>
 
 const AssignedAction = ActionBase.merge(
   z.object({
@@ -55,6 +68,24 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
+const RejectAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT)
+  })
+)
+
+const MarkAsDuplicateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
+  })
+)
+
+const ArchiveAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVE)
+  })
+)
+
 const CreatedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CREATE)
@@ -67,6 +98,38 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+const PrintCertificateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
+const RequestedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REQUEST_CORRECTION)
+  })
+)
+
+const ApprovedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.APPROVE_CORRECTION),
+    requestId: z.string()
+  })
+)
+
+const RejectedCorrectionAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT_CORRECTION),
+    requestId: z.string()
+  })
+)
+
+const ReadAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.READ)
+  })
+)
+
 const CustomAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM)
@@ -76,11 +139,19 @@ const CustomAction = ActionBase.merge(
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
   ValidateAction,
+  RejectAction,
+  MarkAsDuplicateAction,
+  ArchiveAction,
   NotifiedAction,
   RegisterAction,
   DeclareAction,
   AssignedAction,
+  RequestedCorrectionAction,
+  ApprovedCorrectionAction,
+  RejectedCorrectionAction,
   UnassignedAction,
+  PrintCertificateAction,
+  ReadAction,
   CustomAction
 ])
 
@@ -88,7 +159,7 @@ export type ActionDocument = z.infer<typeof ActionDocument>
 
 export const ResolvedUser = z.object({
   id: z.string(),
-  systemRole: z.string(),
+  role: z.string(),
   name: z.array(
     z.object({
       use: z.string(),
@@ -101,5 +172,3 @@ export const ResolvedUser = z.object({
 export type ResolvedUser = z.infer<typeof ResolvedUser>
 
 export type CreatedAction = z.infer<typeof CreatedAction>
-
-export type ActionFormData = ActionDocument['data']

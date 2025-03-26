@@ -11,15 +11,29 @@
 
 import { TranslationConfig } from './TranslationConfig'
 
+import { flattenDeep, omitBy } from 'lodash'
+import { workqueues } from '../workqueues'
+import { ActionType, LatentActions } from './ActionType'
+import { EventConfig } from './EventConfig'
+import { EventConfigInput } from './EventConfigInput'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
-import { flattenDeep } from 'lodash'
-import { EventConfig, EventConfigInput } from './EventConfig'
-import { WorkqueueConfigInput } from './WorkqueueConfig'
 import { FieldConfig } from './FieldConfig'
+import { WorkqueueConfig } from './WorkqueueConfig'
+import { ActionUpdate, EventState } from './ActionDocument'
+import { FormConfig, FormPageType, FormPageConfig } from './FormConfig'
+import { isFieldVisible, validate } from '../conditionals/validate'
+import { FieldType } from './FieldType'
+import { getOrThrow } from '../utils'
+import { Draft } from './Draft'
+import { EventDocument } from './EventDocument'
+import { getUUID } from '../uuid'
+import { formatISO } from 'date-fns'
 
-const isMetadataField = <T extends string>(
+function isMetadataField<T extends string>(
   field: T | EventMetadataKeys
-): field is EventMetadataKeys => field in eventMetadataLabelMap
+): field is EventMetadataKeys {
+  return field in eventMetadataLabelMap
+}
 
 /**
  * @returns All the fields in the event configuration input.
@@ -43,9 +57,17 @@ export const findInputPageFields = (
  */
 export const findPageFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep(
-    config.actions.map(({ forms }) =>
-      forms.map(({ pages }) => pages.map(({ fields }) => fields))
-    )
+    config.actions.map((action) => {
+      if (action.type === ActionType.REQUEST_CORRECTION) {
+        return [
+          ...action.forms.map(({ pages }) => pages.map(({ fields }) => fields)),
+          ...action.onboardingForm.flatMap(({ fields }) => fields),
+          ...action.additionalDetailsForm.flatMap(({ fields }) => fields)
+        ]
+      }
+
+      return action.forms.map(({ pages }) => pages.map(({ fields }) => fields))
+    })
   )
 }
 
@@ -91,24 +113,216 @@ export const resolveLabelsFromKnownFields = ({
   })
 }
 
-export const resolveFieldLabels = ({
-  config,
-  pageFields
-}: {
-  config: WorkqueueConfigInput
-  pageFields: { id: string; label: TranslationConfig }[]
-}) => {
-  return {
-    ...config,
-    fields: resolveLabelsFromKnownFields({
-      pageFields,
-      refFields: config.fields
-    })
-  }
-}
-
 export function getAllFields(configuration: EventConfig) {
   return configuration.actions
     .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => form.pages.flatMap((page) => page.fields))
+    .flatMap((form) => [
+      ...form.review.fields,
+      ...form.pages.flatMap((page) => page.fields)
+    ])
+}
+
+export function getAllPages(configuration: EventConfig) {
+  return configuration.actions
+    .flatMap((action) => action.forms.filter((form) => form.active))
+    .flatMap((form) => form.pages)
+}
+
+export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
+  workqueueConfigs.map((workqueue) => {
+    const rootWorkqueue = Object.values(workqueues).find(
+      (wq) => wq.id === workqueue.id
+    )
+    if (!rootWorkqueue) {
+      throw new Error(
+        `Invalid workqueue configuration: workqueue not found with id: ${workqueue.id}`
+      )
+    }
+  })
+}
+
+export const findActiveActionForm = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  const actionConfig = configuration.actions.find((a) => a.type === action)
+  const form = actionConfig?.forms.find((f) => f.active)
+
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
+  return form
+}
+
+export const findActiveActionFormPages = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  return findActiveActionForm(configuration, action)?.pages
+}
+
+export const getFormFields = (formConfig: FormConfig) => {
+  return formConfig.pages.flatMap((p) => p.fields)
+}
+
+export function isPageVisible(page: FormPageConfig, formValues: ActionUpdate) {
+  if (!page.conditional) {
+    return true
+  }
+
+  return validate(page.conditional, {
+    $form: formValues,
+    $now: formatISO(new Date(), { representation: 'date' })
+  })
+}
+
+export const getVisiblePagesFormFields = (
+  formConfig: FormConfig,
+  formData: ActionUpdate
+) => {
+  return formConfig.pages
+    .filter((p) => isPageVisible(p, formData))
+    .flatMap((p) => p.fields)
+}
+
+/**
+ * Returns only form fields for the action type, if any, excluding review fields.
+ */
+export const findActiveActionFormFields = (
+  configuration: EventConfig,
+  action: ActionType
+): FieldConfig[] | undefined => {
+  const form = findActiveActionForm(configuration, action)
+
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
+  return form ? getFormFields(form) : undefined
+}
+
+/**
+ * Returns all fields for the action type, including review fields, if any.
+ */
+export const findActiveActionFields = (
+  configuration: EventConfig,
+  action: ActionType,
+  formData?: ActionUpdate
+): FieldConfig[] | undefined => {
+  const form = findActiveActionForm(configuration, action)
+  const reviewFields = form?.review.fields
+
+  let formFields: FieldConfig[] | undefined = undefined
+
+  if (form) {
+    formFields = formData
+      ? getVisiblePagesFormFields(form, formData)
+      : getFormFields(form)
+  }
+
+  const allFields = formFields
+    ? formFields.concat(reviewFields ?? [])
+    : reviewFields
+
+  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
+  return allFields
+}
+
+export const getActiveActionFormPages = (
+  configuration: EventConfig,
+  action: ActionType
+) => {
+  return getOrThrow(
+    findActiveActionForm(configuration, action)?.pages,
+    'Form configuration not found for type: ' + configuration.id
+  )
+}
+
+/**
+ * Returns all fields for the action type, including review fields, or throws
+ */
+export function getActiveActionFields(
+  configuration: EventConfig,
+  action: ActionType
+): FieldConfig[] {
+  if (LatentActions.some((latentAction) => latentAction === action)) {
+    return getActiveActionFields(configuration, ActionType.DECLARE)
+  }
+  const fields = findActiveActionFields(configuration, action)
+
+  if (!fields) {
+    throw new Error(`No active field config found for action type ${action}`)
+  }
+
+  return fields
+}
+
+export function getEventConfiguration(
+  eventConfigurations: EventConfig[],
+  type: string
+): EventConfig {
+  const config = eventConfigurations.find((config) => config.id === type)
+  if (!config) {
+    throw new Error(`Event configuration not found for type: ${type}`)
+  }
+  return config
+}
+
+function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
+  if (field.type !== FieldType.CHECKBOX || field.required) {
+    return false
+  }
+
+  return !form[field.id]
+}
+
+export function stripHiddenFields(fields: FieldConfig[], data: EventState) {
+  return omitBy(data, (_, fieldId) => {
+    const field = fields.find((f) => f.id === fieldId)
+
+    if (!field) {
+      return true
+    }
+
+    if (isOptionalUncheckedCheckbox(field, data)) {
+      return true
+    }
+
+    return !isFieldVisible(field, data)
+  })
+}
+
+export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
+  const actions = event.actions
+    .slice()
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  const lastAction = actions[actions.length - 1]
+  return (
+    drafts
+      // Temporally allows equal timestamps as the generated demo data is not perfect yet
+      // should be > rather than >=
+      .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
+      .filter(({ eventId }) => eventId === event.id)
+  )
+}
+
+export function createEmptyDraft(
+  eventId: string,
+  draftId: string,
+  actionType: ActionType
+) {
+  return {
+    id: draftId,
+    eventId,
+    createdAt: new Date().toISOString(),
+    transactionId: getUUID(),
+    action: {
+      type: actionType,
+      data: {},
+      metadata: {},
+      createdAt: new Date().toISOString(),
+      createdBy: '@todo',
+      createdAtLocation: '@todo'
+    }
+  }
+}
+
+export function isVerificationPage(page: FormPageConfig) {
+  return page.type === FormPageType.VERIFICATION
 }

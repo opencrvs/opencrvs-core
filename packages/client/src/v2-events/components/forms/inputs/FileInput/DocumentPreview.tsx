@@ -20,7 +20,8 @@ import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanC
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { getFullURL } from '@client/v2-events/features/files/useFileUpload'
+import { FileFieldValueWithOption } from '@opencrvs/commons/client'
+import { getFullUrl } from '@client/v2-events/features/files/useFileUpload'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -49,7 +50,9 @@ const ViewerContainer = styled.div`
 `
 
 interface IProps {
-  previewImage: Exclude<FileFieldValue, null>
+  previewImage:
+    | NonNullable<FileFieldValue>
+    | NonNullable<FileFieldValueWithOption>
   disableDelete?: boolean
   title?: string
   goBack: () => void
@@ -149,7 +152,7 @@ export function DocumentPreview({
         <PanViewer
           key={Math.random()}
           id="document_image"
-          image={getFullURL(previewImage.filename)}
+          image={getFullUrl(previewImage.filename)}
           rotation={rotation}
           zoom={zoom}
         />

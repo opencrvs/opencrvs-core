@@ -9,27 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { IntlShape } from 'react-intl'
-import {
-  FieldProps,
-  SelectFieldValue,
-  SelectOption
-} from '@opencrvs/commons/client'
+import { useIntl } from 'react-intl'
+import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
 import { Select } from './Select'
 
-export function SelectCountry({
+function SelectCountryInput({
   setFieldValue,
   value,
   ...props
 }: FieldProps<'COUNTRY'> & {
-  setFieldValue: (name: string, val: SelectFieldValue | undefined) => void
-  value?: SelectFieldValue
+  setFieldValue: (name: string, val: string | undefined) => void
+  value?: string
 }) {
   return (
-    <Select
+    <Select.Input
       {...props}
       // @Todo ensure countries are of the same type
+      data-testid={`location__${props.id}`}
       options={countries as SelectOption[]}
       type="SELECT"
       value={value}
@@ -38,13 +35,14 @@ export function SelectCountry({
   )
 }
 
-export const selectCountryFieldToString = (
-  val: SelectFieldValue,
-  intl: IntlShape
-) => {
-  if (!val) {
-    return ''
-  }
-  const selectedCountry = countries.find(({ value }) => value === val)
+function SelectCountryOutput({ value }: { value: string | undefined }) {
+  const intl = useIntl()
+  const selectedCountry = countries.find((country) => country.value === value)
+
   return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
+}
+
+export const SelectCountry = {
+  Input: SelectCountryInput,
+  Output: SelectCountryOutput
 }

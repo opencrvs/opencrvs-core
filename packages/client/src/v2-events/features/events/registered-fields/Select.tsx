@@ -9,56 +9,56 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
   FieldProps,
-  SelectFieldValue,
-  SelectOption
+  SelectOption,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
-import { InputField } from '@client/components/form/InputField'
 
-export function Select({
+function SelectInput({
   onChange,
-  label,
   value,
   ...props
-}: FieldProps<'SELECT'> & {
-  onChange: (newValue: SelectFieldValue) => void
-  value?: SelectFieldValue
-}) {
+}: Omit<FieldProps<'SELECT'>, 'label'> & {
+  onChange: (newValue: string) => void
+  value?: string
+  label?: TranslationConfig
+} & { 'data-testid'?: string }) {
   const intl = useIntl()
   const { options } = props
-
+  const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
     label: intl.formatMessage(option.label)
   }))
 
+  const inputValue = selectedOption?.value ?? ''
   return (
-    <InputField {...props} label={intl.formatMessage(label)} touched={false}>
-      <SelectComponent
-        label={intl.formatMessage(label)}
-        options={formattedOptions}
-        value={value ?? ''}
-        onChange={onChange}
-      />
-    </InputField>
+    <SelectComponent
+      {...props}
+      options={formattedOptions}
+      value={inputValue}
+      onChange={onChange}
+    />
   )
 }
 
-export const selectFieldToString = (
-  val: SelectFieldValue,
-  options: SelectOption[] | undefined | null,
-  intl: IntlShape
-) => {
-  if (!val) {
-    return ''
-  }
-  if (!options) {
-    return typeof val === 'string' ? val : ''
-  }
+function SelectOutput({
+  value,
+  options
+}: {
+  value: string | undefined
+  options: SelectOption[]
+}) {
+  const intl = useIntl()
+  const selectedOption = options.find((option) => option.value === value)
 
-  const selectedOption = options.find(({ value }) => value === val)
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+}
+
+export const Select = {
+  Input: SelectInput,
+  Output: SelectOutput
 }

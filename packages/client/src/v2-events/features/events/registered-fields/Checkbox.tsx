@@ -11,34 +11,51 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { Checkbox as CheckboxComponent } from '@opencrvs/components'
-import { FieldProps, CheckboxFieldValue } from '@opencrvs/commons/client'
+import { FieldProps } from '@opencrvs/commons/client'
 
-export function Checkbox({
+function CheckboxInput({
   setFieldValue,
   label,
   value,
   ...props
 }: FieldProps<'CHECKBOX'> & {
-  setFieldValue: (name: string, val: CheckboxFieldValue | undefined) => void
-  value?: CheckboxFieldValue
+  setFieldValue: (name: string, val: boolean) => void
+  value?: boolean
 }) {
   const intl = useIntl()
+  const inputValue = !!value ? 'true' : 'false'
 
   return (
     <CheckboxComponent
       label={intl.formatMessage(label)}
       name={props.id}
-      selected={value === 'true'}
-      value={value ?? 'false'}
+      selected={inputValue === 'true'}
+      value={inputValue}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-        setFieldValue(
-          props.id,
-          event.target.value === 'true' ? 'false' : 'true'
-        )
+        setFieldValue(props.id, event.target.value === 'true' ? false : true)
       }}
     />
   )
 }
 
-export const checkboxToString = (value: CheckboxFieldValue) =>
-  value === 'true' ? 'Yes' : 'No'
+function CheckboxOutput({
+  value,
+  required
+}: {
+  value?: boolean
+  required?: boolean
+}) {
+  // If a checkbox is required, we always show it
+  if (required) {
+    // We explicity check for boolean true, so that e.g. string values are not interpreted as true.
+    return value === true ? 'Yes' : 'No'
+  }
+
+  // If a checkbox is not required, we only show it if it is true
+  return value === true ? 'Yes' : null
+}
+
+export const Checkbox = {
+  Input: CheckboxInput,
+  Output: CheckboxOutput
+}

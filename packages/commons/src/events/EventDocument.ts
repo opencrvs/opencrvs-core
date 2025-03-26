@@ -15,10 +15,10 @@ import { ActionDocument } from './ActionDocument'
 export const EventDocument = z.object({
   id: z.string(),
   type: z.string(),
-  transactionId: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-  actions: z.array(ActionDocument)
+  actions: z.array(ActionDocument),
+  trackingId: z.string()
 })
 
 export type EventDocument = z.infer<typeof EventDocument>
