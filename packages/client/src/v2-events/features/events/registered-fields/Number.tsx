@@ -38,7 +38,10 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
         props.onBlur?.(e)
       }}
       onChange={(e) => {
-        const updatedValue = parseInt(e.target.value, 10)
+        // Parse the input value as a floating-point number to allow decimal values.
+        // If the parsed value is NaN (e.g., when the input is cleared), set inputValue to undefined.
+        // Otherwise, update inputValue with the parsed number.
+        const updatedValue = parseFloat(e.target.value)
         isNaN(updatedValue)
           ? setInputValue(undefined)
           : setInputValue(updatedValue)
