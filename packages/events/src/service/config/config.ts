@@ -62,6 +62,14 @@ export async function getEventConfigurationById({
   )
 }
 
+const ActionConfirmationHandlerResponse = {
+  FAIL_IN_UNCONTROLLED_MANNER: 500, // Endpoint fails in an uncontrolled manner
+  ACTION_REJECTED: 400, // Synchronous flow failed
+  SUCCESS: 200, // Synchronous flow succeeded
+  REQUIRES_PROCESSING: 202 // Asynchronous flow succeeded, this expects that either the confirm or reject callback is called
+} as const
+
+// TODO CIHAN: tää vois lukea yllä olevan enumi
 export async function notifyOnAction(
   action: ActionInput,
   event: EventDocument,

@@ -236,30 +236,32 @@ export const eventRouter = router({
           transactionId: options.input.transactionId
         })
       }),
-    register: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
-      // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
-      .input(RegisterActionInput.omit({ identifiers: true }))
-      // @ts-expect-error
-      .use(middleware.validateAction(ActionType.REGISTER))
-      .mutation(async (options) => {
-        return addAction(
-          {
-            ...options.input,
-            identifiers: {
-              trackingId: getUUID(),
-              registrationNumber: getUUID()
+    register: router({
+      '': publicProcedure
+        .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
+        // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
+        .input(RegisterActionInput.omit({ identifiers: true }))
+        // @ts-expect-error
+        .use(middleware.validateAction(ActionType.REGISTER))
+        .mutation(async (options) => {
+          return addAction(
+            {
+              ...options.input,
+              identifiers: {
+                trackingId: getUUID(),
+                registrationNumber: getUUID()
+              }
+            },
+            {
+              eventId: options.input.eventId,
+              createdBy: options.ctx.user.id,
+              createdAtLocation: options.ctx.user.primaryOfficeId,
+              token: options.ctx.token,
+              transactionId: options.input.transactionId
             }
-          },
-          {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
-          }
-        )
-      }),
+          )
+        })
+    }),
     printCertificate: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]))
       .input(PrintCertificateActionInput)
@@ -320,6 +322,8 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
+
+  // CIHAN: tee tästä geneerinen joka actionille
   registration: router({
     confirm: publicProcedure
       .input(
