@@ -281,7 +281,7 @@ export const isAgeInYearsBetween =
   (min: number, max?: number): Validation =>
   (value: IFormFieldValue) => {
     const dateFormat = /^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01])$/
-    if (dateFormat.test(value.toString())) {
+    if (value && dateFormat.test(value.toString())) {
       max = max || 120 // defaulting to 120 years as max if max is not provided
       const today = new Date()
       const dateOfBirth = new Date(value.toString())
