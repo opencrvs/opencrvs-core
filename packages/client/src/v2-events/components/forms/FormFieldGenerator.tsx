@@ -155,7 +155,7 @@ const GeneratedInputField = React.memo(
           ? undefined
           : intl.formatMessage(fieldDefinition.label),
       required: fieldDefinition.required,
-      disabled: fieldDefinition.disabled,
+      disabled: fieldDefinition.disabled || readonlyMode,
       error,
       touched
     }
@@ -166,7 +166,7 @@ const GeneratedInputField = React.memo(
       onChange,
       onBlur,
       value,
-      disabled: fieldDefinition.disabled || readonlyMode,
+      disabled: disabled || fieldDefinition.disabled || readonlyMode,
       error: Boolean(error),
       touched: Boolean(touched),
       placeholder:
@@ -286,7 +286,6 @@ const GeneratedInputField = React.memo(
         >
           <Number.Input
             {...inputProps}
-            disabled={disabled}
             value={field.value}
             min={field.config.configuration?.min}
             max={field.config.configuration?.max}
@@ -310,7 +309,6 @@ const GeneratedInputField = React.memo(
         >
           <TextArea
             {...inputProps}
-            disabled={disabled}
             maxLength={field.config.configuration?.maxLength}
             value={field.value}
           />
