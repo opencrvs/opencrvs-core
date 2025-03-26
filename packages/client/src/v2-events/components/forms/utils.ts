@@ -14,9 +14,7 @@ import {
   Inferred,
   FieldValue,
   MetaFields,
-  isFieldConfigDefaultValue,
-  DataEntry,
-  FieldType
+  isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
 import { replacePlaceholders } from '@client/v2-events/utils'
@@ -121,43 +119,4 @@ export function formatDateFieldValue(value: string) {
     .split('-')
     .map((d: string) => d.padStart(2, '0'))
     .join('-')
-}
-
-export function getFieldFromDataEntry({
-  formData,
-  dataEntry,
-  declareFormFields
-}: {
-  formData: EventState
-  dataEntry: DataEntry
-  declareFormFields: Inferred[]
-}): { value: FieldValue; config?: Inferred } {
-  if ('fieldId' in dataEntry) {
-    return {
-      value: formData[dataEntry.fieldId],
-      config: declareFormFields.find((f) => f.id === dataEntry.fieldId)
-    }
-  }
-  const { value, label } = dataEntry
-  const template = value
-  let resolvedValue = value
-  const keys = template.match(/{([^}]+)}/g)
-  if (keys) {
-    keys.forEach((key) => {
-      const val = formData[key.replace(/{|}/g, '')]
-      if (!val) {
-        throw new Error(`Could not resolve ${key}`)
-      }
-      resolvedValue = resolvedValue.replace(key, val.toString())
-    })
-  }
-
-  return {
-    value: resolvedValue,
-    config: {
-      type: FieldType.TEXT,
-      id: label.id,
-      label: label
-    }
-  }
 }

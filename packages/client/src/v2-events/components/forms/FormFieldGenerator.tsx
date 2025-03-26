@@ -21,7 +21,6 @@ import {
   evalExpressionInFieldDefinition,
   FIELD_SEPARATOR,
   getDependentFields,
-  getFieldFromDataEntry,
   handleDefaultValue,
   hasDefaultValueDependencyInfo,
   makeDatesFormatted,
@@ -94,7 +93,10 @@ import {
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
-import { Data } from '@client/v2-events/features/events/registered-fields/Data'
+import {
+  Data,
+  getFieldFromDataEntry
+} from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 
