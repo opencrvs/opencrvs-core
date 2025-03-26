@@ -11,6 +11,7 @@
 
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { noop } from 'lodash'
 import {
   ActionType,
   EventConfig,
@@ -27,6 +28,7 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 
+// These are the allowed actions based on which we can read a declarations data
 const READ_ONLY_MODE_ALLOWED_ACTIONS = [
   ActionType.APPROVE_CORRECTION,
   ActionType.REGISTER,
@@ -59,7 +61,7 @@ function findLastActionMetadata(event: EventDocument) {
   }
 }
 
-function View() {
+export function ReadOnlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VIEW)
   const { getEventState, getEvent } = useEvents()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
@@ -71,7 +73,7 @@ function View() {
   const formConfig = findLastActionFormConfigForReadOnlyMode(config, fullEvent)
 
   if (!formConfig) {
-    throw new Error('No active form configuration found for declare action')
+    throw new Error('No active form configuration found for any action')
   }
 
   const form = useEventFormData((state) =>
@@ -90,7 +92,7 @@ function View() {
         formConfig={formConfig}
         metadata={metadata}
         title={formatMessage(formConfig.review.title, form)}
-        onEdit={() => {}}
+        onEdit={noop}
         onMetadataChange={(values) => setMetadata(values)}
       >
         <></>
@@ -98,5 +100,3 @@ function View() {
     </FormLayout>
   )
 }
-
-export const ViewDeclaration = View
