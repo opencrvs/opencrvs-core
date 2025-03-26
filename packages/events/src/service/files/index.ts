@@ -16,7 +16,8 @@ import {
   EventDocument,
   FileFieldValue,
   FieldType,
-  findActiveActionFields
+  findActiveActionFields,
+  LatentActions
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { getEventConfigurations } from '@events/service/config/config'
@@ -27,8 +28,15 @@ function getFieldDefinitionForActionDataField(
   actionType: ActionType,
   fieldId: string
 ) {
-  const actionFields = findActiveActionFields(configuration, actionType)
+  let actionFields = findActiveActionFields(configuration, actionType)
 
+  if (
+    !actionFields &&
+    LatentActions.some((latentAction) => latentAction === actionType)
+  ) {
+    // @TODO: WHhen application is refactored to use main form, remove this.
+    actionFields = findActiveActionFields(configuration, ActionType.DECLARE)
+  }
   const fieldConfig = actionFields?.find((field) => field.id === fieldId)
   if (!fieldConfig) {
     logger.error(

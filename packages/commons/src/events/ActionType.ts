@@ -36,6 +36,11 @@ export const ActionType = {
  * Actions that can be attached to an event document
  * even if they are not in event configuration
  */
-export const LatentActions = [ActionType.ARCHIVE, ActionType.REJECT]
+
+export const LatentActions = [
+  ActionType.ARCHIVE,
+  ActionType.REJECT,
+  ActionType.NOTIFY
+]
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
