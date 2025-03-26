@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,21 +13,21 @@ const { FlatCompat } = require('@eslint/eslintrc')
 const globals = require('globals')
 const path = require('path')
 const tsParser = require('@typescript-eslint/parser')
+const { defineConfig } = require('eslint/config')
 
 const compat = new FlatCompat({
   baseDirectory: path.dirname(__filename)
 })
-module.exports = [
+module.exports = defineConfig([
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:jsx-a11y/recommended',
-    'plugin:import/recommended'
+    'plugin:import/recommended',
+    'plugin:prettier/recommended'
   ),
   {
     ignores: ['eslint*.js'],
     languageOptions: {
+      sourceType: 'commonjs',
       parser: tsParser,
       globals: {
         ...globals.commonjs,
@@ -44,10 +43,6 @@ module.exports = [
         afterAll: 'readonly'
       }
     },
-    env: {
-      globals
-    },
-    files: ['src/**/*.ts', 'src/**/*.tsx'],
     rules: {
       'import/namespace': 'off',
       'no-debugger': 'error',
@@ -86,18 +81,10 @@ module.exports = [
       '@typescript-eslint/prefer-interface': 'off',
       '@typescript-eslint/array-type': 'off',
       '@typescript-eslint/no-object-literal-type-assertion': 'off',
-      '@typescript-eslint/ban-types': [
-        'error',
-        {
-          types: {
-            '{}': false
-          },
-          extendDefaults: true
-        }
-      ],
+      '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-empty-function': 'off'
     }
   }
-]
+])

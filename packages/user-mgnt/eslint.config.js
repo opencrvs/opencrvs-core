@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,12 +10,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-const { defineConfig } = require('eslint/config')
 const path = require('path')
-const eventsConfig = require('../../eslint.events.config.js')
+const { defineConfig } = require('eslint/config')
+const baseConfig = require('../../eslint.config.js')
 
 module.exports = defineConfig([
-  ...eventsConfig,
+  ...baseConfig,
   {
     languageOptions: {
       sourceType: 'commonjs',
@@ -27,30 +28,8 @@ module.exports = defineConfig([
         typescript: {
           project: path.resolve(__dirname, './tsconfig.json')
         }
-      },
-      files: ['./src/**/*.ts'],
-      rules: {
-        'no-console': 'warn',
-        '@typescript-eslint/no-unused-vars': 'warn',
-        'import/order': [
-          'error',
-          {
-            pathGroups: [
-              {
-                pattern: '@opencrvs/**',
-                group: 'external',
-                position: 'after'
-              },
-              {
-                pattern: '@client/**',
-                group: 'external',
-                position: 'after'
-              }
-            ],
-            pathGroupsExcludedImportTypes: ['builtin']
-          }
-        ]
       }
-    }
+    },
+    files: ['./src/**/*.ts']
   }
 ])

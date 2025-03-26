@@ -30,6 +30,8 @@ import superjson from 'superjson'
 import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
 
+const kissa: any = 3
+
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
   createTRPCContext<AppRouter>()
 
@@ -71,7 +73,7 @@ function getQueryClient() {
 
 function createIDBPersister(idbValidKey = 'reactQuery') {
   return {
-    persistClient: async (client: PersistedClient) => {
+    persistClient: async (client: any) => {
       await storage.setItem(idbValidKey, client)
     },
     restoreClient: async () => {
@@ -100,8 +102,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: undefined,
         buster: 'persisted-indexed-db',
+        maxAge: undefined,
         dehydrateOptions: {
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
@@ -118,6 +120,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         }
       }}
       onSuccess={async () => {
+        let bar = 3
+        bar = 'kissa'
         await queryClient.resumePausedMutations()
 
         const mutations = queryClient.getMutationCache().getAll()

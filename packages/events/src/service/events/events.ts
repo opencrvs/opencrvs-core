@@ -73,6 +73,41 @@ export async function getEventTypeId(id: string) {
   return event.type
 }
 
+function getValidFileValue(
+  fieldKey: string,
+  fieldValue: FieldUpdateValue,
+  fieldTypes: Array<{ id: string; type: FieldType }>
+) {
+  const isFileType =
+    fieldTypes.find((field) => field.id === fieldKey)?.type === FieldType.FILE
+  const validFieldValue = FileFieldValue.safeParse(fieldValue)
+  if (!isFileType || !validFieldValue.success) {
+    return undefined
+  }
+  return validFieldValue.data
+}
+
+async function deleteEventAttachments(token: string, event: EventDocument) {
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
+
+  for (const ac of event.actions) {
+    const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
+
+    for (const [key, value] of Object.entries(ac.data)) {
+      const fileValue = getValidFileValue(key, value, fieldConfigs)
+
+      if (!fileValue) {
+        continue
+      }
+
+      await deleteFile(fileValue.filename, token)
+    }
+  }
+}
+
 export async function deleteEvent(
   eventId: string,
   { token }: { token: string }
@@ -107,27 +142,6 @@ export async function deleteEvent(
   await collection.deleteOne({ id })
 
   return { id }
-}
-
-async function deleteEventAttachments(token: string, event: EventDocument) {
-  const configuration = await getEventConfigurationById({
-    token,
-    eventType: event.type
-  })
-
-  for (const ac of event.actions) {
-    const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
-
-    for (const [key, value] of Object.entries(ac.data)) {
-      const fileValue = getValidFileValue(key, value, fieldConfigs)
-
-      if (!fileValue) {
-        continue
-      }
-
-      await deleteFile(fileValue.filename, token)
-    }
-  }
 }
 
 const TRACKING_ID_LENGTH = 6
@@ -192,20 +206,6 @@ export async function createEvent({
   await indexEvent(event)
 
   return event
-}
-
-function getValidFileValue(
-  fieldKey: string,
-  fieldValue: FieldUpdateValue,
-  fieldTypes: Array<{ id: string; type: FieldType }>
-) {
-  const isFileType =
-    fieldTypes.find((field) => field.id === fieldKey)?.type === FieldType.FILE
-  const validFieldValue = FileFieldValue.safeParse(fieldValue)
-  if (!isFileType || !validFieldValue.success) {
-    return undefined
-  }
-  return validFieldValue.data
 }
 
 function extractFileValues(

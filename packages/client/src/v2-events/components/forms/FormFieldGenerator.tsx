@@ -604,6 +604,7 @@ class FormSectionComponent extends React.Component<AllProps> {
   ) => {
     const updatedValues = cloneDeep(this.props.values)
     set(updatedValues, fieldName, value)
+
     if (fieldName === 'country') {
       set(
         updatedValues,
@@ -699,6 +700,8 @@ class FormSectionComponent extends React.Component<AllProps> {
             >
               <Field name={field.id}>
                 {(formikFieldProps: FieldProps<any>) => {
+                  console.log('formikFieldProps.field', formikFieldProps.field)
+                  console.log('touched', touched)
                   return (
                     <GeneratedInputField
                       fieldDefinition={field}

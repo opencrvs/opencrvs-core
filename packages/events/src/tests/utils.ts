@@ -33,20 +33,6 @@ const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_SUBMIT_FOR_UPDATES
 ]
 
-export function createTestClient(
-  user: CreatedUser,
-  scopes: Scope[] = TEST_USER_DEFAULT_SCOPES
-) {
-  const createCaller = createCallerFactory(appRouter)
-  const token = createTestToken(user.id, scopes)
-
-  const caller = createCaller({
-    user: { id: user.id, primaryOfficeId: user.primaryOfficeId },
-    token
-  })
-  return caller
-}
-
 export function createTestToken(
   userId: string,
   scopes: Scope[]
@@ -62,6 +48,20 @@ export function createTestToken(
   )
 
   return `Bearer ${token}`
+}
+
+export function createTestClient(
+  user: CreatedUser,
+  scopes: Scope[] = TEST_USER_DEFAULT_SCOPES
+) {
+  const createCaller = createCallerFactory(appRouter)
+  const token = createTestToken(user.id, scopes)
+
+  const caller = createCaller({
+    user: { id: user.id, primaryOfficeId: user.primaryOfficeId },
+    token
+  })
+  return caller
 }
 
 /**

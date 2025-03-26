@@ -44,7 +44,6 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
           )
         )
       )
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {
@@ -94,17 +93,20 @@ function flattenNestedObject(
   obj: Record<string, string>,
   prefix = ''
 ): Record<string, string> {
-  return Object.entries(obj).reduce((acc, [key, value]) => {
-    const newKey = prefix ? `${prefix}.${key}` : key
+  return Object.entries(obj).reduce(
+    (acc, [key, value]) => {
+      const newKey = prefix ? `${prefix}.${key}` : key
 
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      Object.assign(acc, flattenNestedObject(value, newKey))
-    } else {
-      acc[newKey] = value
-    }
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        Object.assign(acc, flattenNestedObject(value, newKey))
+      } else {
+        acc[newKey] = value
+      }
 
-    return acc
-  }, {} as Record<string, string>)
+      return acc
+    },
+    {} as Record<string, string>
+  )
 }
 
 /**

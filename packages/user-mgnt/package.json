@@ -10,7 +10,7 @@
     "test": "yarn test:compilation && jest  --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "eslint -c .eslintrc.js --fix ./src --max-warnings=0",
+    "lint": "eslint -c ./eslint.config.js './src/**/*.ts'",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
     "build:clean": "rm -rf build"
@@ -38,6 +38,8 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.7",
+    "@eslint/eslintrc": "^3.3.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/fhir": "^0.0.30",
     "@types/hapi__boom": "^9.0.1",
@@ -48,11 +50,18 @@
     "@types/lodash": "^4.14.135",
     "@types/node-fetch": "^2.5.12",
     "@types/uuid": "^3.4.3",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
     "cross-env": "^7.0.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^4.2.3",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.5",
     "jest": "29.7.0",
     "mockingoose": "^2.15.2",
     "nodemon": "^3.0.0",
-    "prettier": "2.8.8",
+    "prettier": "3.5.3",
     "ts-jest": "29.2.5",
     "ts-node": "^6.1.1",
     "typescript": "5.6.3"

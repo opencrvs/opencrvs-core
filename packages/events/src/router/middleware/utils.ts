@@ -12,7 +12,7 @@
 import { TokenWithBearer } from '@opencrvs/commons'
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
 
-export type Context = {
+export interface Context {
   user: {
     id: string
     primaryOfficeId: string

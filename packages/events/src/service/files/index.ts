@@ -47,6 +47,34 @@ function getFileNameAndSignature(url: string) {
   return filename + search
 }
 
+async function presignFiles(
+  filenames: string[],
+  token: string
+): Promise<string[]> {
+  const res = await fetch(new URL(`/presigned-urls`, env.DOCUMENTS_URL), {
+    method: 'POST',
+    body: JSON.stringify({ filenames }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  if (!res.ok) {
+    logger.error('Failed to presign files', {
+      filenames,
+      status: res.status,
+      text: await res.text()
+    })
+
+    throw new Error('Failed to presign files')
+  }
+
+  const fileUrls = z.array(z.string()).parse(await res.json())
+
+  return fileUrls
+}
+
 export async function presignFilesInEvent(
   event: EventDocument,
   token: string
@@ -73,6 +101,7 @@ export async function presignFilesInEvent(
           ).type === FieldType.FILE
       )
       .filter((value): value is [string, Exclude<FileFieldValue, null>] => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         return value[1] !== null
       })
       .map(([fieldId, value]) => {
@@ -133,32 +162,4 @@ export async function fileExists(filename: string, token: string) {
   })
 
   return res.ok
-}
-
-async function presignFiles(
-  filenames: string[],
-  token: string
-): Promise<string[]> {
-  const res = await fetch(new URL(`/presigned-urls`, env.DOCUMENTS_URL), {
-    method: 'POST',
-    body: JSON.stringify({ filenames }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
-
-  if (!res.ok) {
-    logger.error('Failed to presign files', {
-      filenames,
-      status: res.status,
-      text: await res.text()
-    })
-
-    throw new Error('Failed to presign files')
-  }
-
-  const fileUrls = z.array(z.string()).parse(await res.json())
-
-  return fileUrls
 }

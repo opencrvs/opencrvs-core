@@ -120,7 +120,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
 
 const eventConfig: EventConfig = tennisClubMembershipEvent
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 const declarationForm = tennisClubMembershipEvent.actions
   .find(({ type }) => type === ActionType.DECLARE)
   ?.forms.find(({ active }) => active)!

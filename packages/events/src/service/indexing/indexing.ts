@@ -31,90 +31,6 @@ import { Transform } from 'stream'
 import { z } from 'zod'
 import { DEFAULT_SIZE, generateQuery } from './utils'
 
-function eventToEventIndex(event: EventDocument): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event))
-}
-
-export type EncodedEventIndex = EventIndex
-export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
-  return {
-    ...event,
-    data: Object.entries(event.data).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [encodeFieldId(key)]: value
-      }),
-      {}
-    )
-  }
-}
-
-export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
-  return {
-    ...event,
-    data: Object.entries(event.data).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [decodeFieldId(key)]: value
-      }),
-      {}
-    )
-  }
-}
-
-/*
- * This type ensures all properties of EventIndex are present in the mapping
- */
-type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
-
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
-  const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
-
-  if (!hasEventsIndex) {
-    await createIndex(indexName, getAllFields(eventConfiguration))
-  }
-}
-
-export async function createIndex(
-  indexName: string,
-  formFields: FieldConfig[]
-) {
-  const client = getOrCreateClient()
-
-  await client.indices.create({
-    index: indexName,
-    body: {
-      mappings: {
-        properties: {
-          id: { type: 'keyword' },
-          type: { type: 'keyword' },
-          status: { type: 'keyword' },
-          createdAt: { type: 'date' },
-          createdBy: { type: 'keyword' },
-          createdAtLocation: { type: 'keyword' },
-          modifiedAt: { type: 'date' },
-          assignedTo: { type: 'keyword' },
-          updatedBy: { type: 'keyword' },
-          data: {
-            type: 'object',
-            properties: formFieldsToDataMapping(formFields)
-          },
-          trackingId: { type: 'keyword' }
-        } satisfies EventIndexMapping
-      }
-    }
-  })
-
-  return client.indices.putAlias({
-    index: indexName,
-    name: getEventAliasName()
-  })
-}
-
 const SEPARATOR = '____'
 
 export function encodeFieldId(fieldId: string) {
@@ -219,6 +135,90 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
       [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
     }
   }, {})
+}
+
+export type EncodedEventIndex = EventIndex
+export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
+  return {
+    ...event,
+    data: Object.entries(event.data).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [encodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
+}
+
+function eventToEventIndex(event: EventDocument): EventIndex {
+  return encodeEventIndex(getCurrentEventState(event))
+}
+
+export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
+  return {
+    ...event,
+    data: Object.entries(event.data).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [decodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
+}
+
+/*
+ * This type ensures all properties of EventIndex are present in the mapping
+ */
+type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
+
+export async function createIndex(
+  indexName: string,
+  formFields: FieldConfig[]
+) {
+  const client = getOrCreateClient()
+
+  await client.indices.create({
+    index: indexName,
+    body: {
+      mappings: {
+        properties: {
+          id: { type: 'keyword' },
+          type: { type: 'keyword' },
+          status: { type: 'keyword' },
+          createdAt: { type: 'date' },
+          createdBy: { type: 'keyword' },
+          createdAtLocation: { type: 'keyword' },
+          modifiedAt: { type: 'date' },
+          assignedTo: { type: 'keyword' },
+          updatedBy: { type: 'keyword' },
+          data: {
+            type: 'object',
+            properties: formFieldsToDataMapping(formFields)
+          },
+          trackingId: { type: 'keyword' }
+        } satisfies EventIndexMapping
+      }
+    }
+  })
+
+  return client.indices.putAlias({
+    index: indexName,
+    name: getEventAliasName()
+  })
+}
+
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+
+  if (!hasEventsIndex) {
+    await createIndex(indexName, getAllFields(eventConfiguration))
+  }
 }
 
 export async function indexAllEvents(eventConfiguration: EventConfig) {
