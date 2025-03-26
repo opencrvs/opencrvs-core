@@ -36,12 +36,13 @@ function register(confirmation: boolean) {
       await notifyOnAction(input, updatedEvent, token)
       // jos onnistuu heti, kutsu addAction uudestaan missä confirmed: true?
     }
+
+    return updatedEvent
   }
 }
 
 export const registerRouter = router({
-  // CIHAN: jos tää ei toimi, käytä jotain nimeä esim. 'request'
-  '': publicProcedure
+  request: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
     // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
     .input(RegisterActionInput.omit({ identifiers: true }))

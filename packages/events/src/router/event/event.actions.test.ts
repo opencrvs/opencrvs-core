@@ -47,7 +47,7 @@ test('Action data can be retrieved', async () => {
   const generatedRegistration = generator.event.actions.register(
     originalEvent.id
   )
-  await client.event.actions.register(generatedRegistration)
+  await client.event.actions.register.request(generatedRegistration)
 
   const updatedEvent = await client.event.get(originalEvent.id)
 

@@ -18,7 +18,7 @@ test('prevents forbidden access if missing required scope', async () => {
   const client = createTestClient(user, [])
 
   await expect(
-    client.event.actions.register(
+    client.event.actions.register.request(
       generator.event.actions.register('event-test-id-12345')
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -29,7 +29,7 @@ test(`allows access if required scope is present`, async () => {
   const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
 
   await expect(
-    client.event.actions.register(
+    client.event.actions.register.request(
       generator.event.actions.register('event-test-id-12345')
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -48,7 +48,9 @@ test('Validation error message contains all the offending fields', async () => {
     }
   })
 
-  await expect(client.event.actions.register(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.register.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
@@ -74,7 +76,9 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
     }
   })
 
-  await expect(client.event.actions.register(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.register.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('Skips required field validation when they are conditionally hidden', async () => {
@@ -102,7 +106,7 @@ test('Skips required field validation when they are conditionally hidden', async
     data: form
   })
 
-  const response = await client.event.actions.register(data)
+  const response = await client.event.actions.register.request(data)
   const savedAction = response.actions.find(
     (action) => action.type === ActionType.REGISTER
   )
@@ -134,5 +138,7 @@ test('Prevents adding birth date in future', async () => {
     data: form
   })
 
-  await expect(client.event.actions.register(payload)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.register.request(payload)
+  ).rejects.matchSnapshot()
 })

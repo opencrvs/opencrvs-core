@@ -133,7 +133,7 @@ export const Archive: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker['event.actions.register']++
 
             return generateEventDocument({
@@ -295,7 +295,7 @@ export const SendForUpdate: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker['event.actions.register']++
 
             return generateEventDocument({

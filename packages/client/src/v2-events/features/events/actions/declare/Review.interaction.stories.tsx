@@ -137,7 +137,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker.localRegistrar['event.actions.register']++
 
             return generateEventDocument({
@@ -258,7 +258,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker.registrationAgent['event.actions.register']++
 
             return generateEventDocument({
@@ -376,7 +376,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker.fieldAgent['event.actions.register']++
 
             return generateEventDocument({

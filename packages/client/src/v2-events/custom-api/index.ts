@@ -49,12 +49,14 @@ export async function registerOnDeclare({
     duplicates: []
   })
 
-  const latestResponse = await trpcClient.event.actions.register.mutate({
-    data,
-    metadata,
-    eventId,
-    transactionId: getUUID()
-  })
+  const latestResponse = await trpcClient.event.actions.register.request.mutate(
+    {
+      data,
+      metadata,
+      eventId,
+      transactionId: getUUID()
+    }
+  )
 
   return latestResponse
 }

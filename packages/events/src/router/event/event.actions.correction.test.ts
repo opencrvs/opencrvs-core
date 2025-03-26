@@ -116,7 +116,7 @@ test('a correction request can be added to a created event', async () => {
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
   await client.event.actions.declare(declareInput)
-  const registeredEvent = await client.event.actions.register(
+  const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
@@ -272,7 +272,7 @@ test('a correction request can be added to a created event', async () => {
   await client.event.actions.declare(
     generator.event.actions.declare(originalEvent.id)
   )
-  const registeredEvent = await client.event.actions.register(
+  const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
@@ -299,7 +299,7 @@ describe('when a correction request exists', () => {
 
     await client.event.actions.declare(declareInput)
 
-    const registeredEvent = await client.event.actions.register(
+    const registeredEvent = await client.event.actions.register.request(
       generator.event.actions.register(originalEvent.id)
     )
 
