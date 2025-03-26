@@ -93,6 +93,18 @@ function scopeToEventParams(
         : undefined
     })
   }
+  if (userScopes.includes(SCOPES.RECORDSEARCH)) {
+    eventParams.push({
+      eventName: GQLEventType.birth
+    })
+    eventParams.push({
+      eventName: GQLEventType.death
+    })
+    eventParams.push({
+      eventName: GQLEventType.marriage
+    })
+  }
+
   return eventParams
 }
 

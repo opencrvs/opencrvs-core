@@ -339,7 +339,10 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
-                assignment: reg.assignment ?? undefined,
+                assignment:
+                  foundDeclaration?.assignmentStatus ??
+                  reg.assignment ??
+                  undefined,
                 refetchQueries: [
                   {
                     query: SEARCH_EVENTS,

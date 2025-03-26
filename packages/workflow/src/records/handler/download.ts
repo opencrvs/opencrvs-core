@@ -17,13 +17,13 @@ import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/auth-utils'
-import { logger } from '@opencrvs/commons'
+import { getTokenPayload, logger } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 import { findAssignment } from '@opencrvs/commons/assignment'
-import { getUserOrSystem } from '@workflow/records/user'
+import { getUser } from '@workflow/features/user/utils'
 
 export async function downloadRecordHandler(
   request: Hapi.Request,
@@ -37,6 +37,7 @@ export async function downloadRecordHandler(
   )
 
   const token = getToken(request)
+  const tokenPayload = getTokenPayload(token)
   // Task history is fetched rather than the task only
   const record = await getValidRecordById(payload.id, token, true)
 
@@ -52,8 +53,10 @@ export async function downloadRecordHandler(
 
   const assignment = findAssignment(record)
   if (assignment) {
-    const userOrSystem = await getUserOrSystem(token)
-    const practitionerId = userOrSystem.practitionerId
+    const user = await getUser(tokenPayload.sub, {
+      Authorization: `Bearer ${token}`
+    })
+    const practitionerId = user.practitionerId
 
     if (assignment.practitioner.id !== practitionerId)
       throw new Error('Record is assigned to a different user')

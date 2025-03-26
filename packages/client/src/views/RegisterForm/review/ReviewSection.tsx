@@ -1850,8 +1850,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     action={
                       viewRecord ||
                       isDuplicate ||
-                      declaration.registrationStatus ===
-                        RegStatus.CorrectionRequested ? null : (
+                      isCorrection(declaration) ? null : (
                         <Link
                           font="reg16"
                           element="button"

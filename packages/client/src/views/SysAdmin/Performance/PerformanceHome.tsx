@@ -242,17 +242,6 @@ const PerformanceHomeComponent = (props: Props) => {
     event: parsedSearch.event || EventType.Birth
   }
 
-  let { locationId } = searchParams
-
-  // Defaults empty URL locationId to your primary office if you don't have access to all locations via scopes
-  if (
-    userDetails &&
-    !locationId &&
-    !props.scopes?.includes(SCOPES.ORGANISATION_READ_LOCATIONS)
-  ) {
-    locationId = userDetails.primaryOffice.id
-  }
-
   const selectedLocation = !searchParams.locationId
     ? getAdditionalLocations(props.intl)[0]
     : selectLocation(
