@@ -36,6 +36,15 @@ export async function postAssignmentSearch(
     })
 }
 
+export async function findUserAssignment(
+  id: string,
+  authHeader: IAuthHeader
+): Promise<string | undefined> {
+  const { practitionerId }: { practitionerId?: string } =
+    await postAssignmentSearch(authHeader, id)
+  return practitionerId
+}
+
 export async function checkUserAssignment(
   id: string,
   authHeader: IAuthHeader
