@@ -72,6 +72,8 @@ import * as routes from '@client/navigation/routes'
 import { useDeclaration } from '@client/declarations/selectors'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { useOnlineStatus } from '@client/utils'
+import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -135,10 +137,9 @@ export const ActionMenu: React.FC<{
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <Button type="primary" size="medium">
+          <PrimaryButton icon={() => <CaretDown />}>
             {intl.formatMessage(messages.action)}
-            <Icon name="CaretDown" color="currentColor" size="small" />
-          </Button>
+          </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {assignment && assignedToOther && (
