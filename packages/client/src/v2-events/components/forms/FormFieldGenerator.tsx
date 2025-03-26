@@ -93,7 +93,10 @@ import {
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
-import { Data } from '@client/v2-events/features/events/registered-fields/Data'
+import {
+  Data,
+  getFieldFromDataEntry
+} from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 
@@ -114,13 +117,25 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   fields: FieldConfig[]
   values: EventState
+  /**@todo - figure out when to use this rather than onChange handler */
   setFieldValue: (name: string, value: FieldValue | undefined) => void
   onClick?: () => void
+  /**
+   * onChange is not called within the Field component's onChange handler
+   * onChange is called within the Field component's onBlur handler
+   */
   onChange: (e: React.ChangeEvent) => void
+  /**
+   * onBlur is used to set the touched state of the field
+   * onChange doesn't set the touched state
+   */
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
   value: FieldValue
   touched: boolean
+  /**
+   * Errors are rendered only when both error and touched are truthy
+   */
   error: string
   formData: EventState
   disabled?: boolean
@@ -287,6 +302,7 @@ const GeneratedInputField = React.memo(
           <Number.Input
             {...inputProps}
             value={field.value}
+            onChange={(val) => setFieldValue(fieldDefinition.id, val)}
             min={field.config.configuration?.min}
             max={field.config.configuration?.max}
           />
@@ -496,10 +512,9 @@ const GeneratedInputField = React.memo(
         return null
       }
 
-      const fields = field.config.configuration.data.map(({ fieldId }) => ({
-        value: formData[fieldId],
-        config: declareFormFields.find((f) => f.id === fieldId)
-      }))
+      const fields = field.config.configuration.data.map((entry) =>
+        getFieldFromDataEntry({ dataEntry: entry, declareFormFields, formData })
+      )
 
       return <Data.Input {...field.config} fields={fields} />
     }

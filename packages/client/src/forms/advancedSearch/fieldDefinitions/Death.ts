@@ -255,7 +255,7 @@ const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
         description: 'Title for the event location1 select',
         id: 'form.field.label.state'
       },
-      required: true,
+      required: false,
       initialValue: '',
       validator: [],
       placeholder: {
@@ -290,7 +290,7 @@ const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
         description: 'Title for the event location 2 select',
         id: 'form.field.label.district'
       },
-      required: true,
+      required: false,
       initialValue: '',
       validator: [],
       placeholder: {

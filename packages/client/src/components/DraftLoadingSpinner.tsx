@@ -8,16 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Spinner } from '@opencrvs/components'
+import styled from 'styled-components'
+import React from 'react'
 
-export const MINIO_REGEX =
-  /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|svg)(\?.*)?$/i
+const SpinnerWrapper = styled.div`
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`
 
-export function isBase64FileString(str: string) {
-  if (str === '' || str.trim() === '') {
-    return false
-  }
-  const strSplit = str.split(':')
-  return strSplit.length > 0 && strSplit[0] === 'data'
+export function LoadingSpinner() {
+  return (
+    <SpinnerWrapper>
+      <Spinner id="draft_write_loading" />
+    </SpinnerWrapper>
+  )
 }
-
-export const isMinioUrl = (url: string) => MINIO_REGEX.test(url)

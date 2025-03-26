@@ -12,7 +12,6 @@
 import { Meta } from '@storybook/react'
 import React from 'react'
 import { Icon } from '../Icon'
-import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
 import { LeftNavigation } from './LeftNavigation'
 import { NavigationGroup } from './NavigationGroup'
 import { NavigationItem } from './NavigationItem'
@@ -21,41 +20,41 @@ export const SideNav = () => (
   <LeftNavigation applicationName="OpenCRVS" applicationVersion="1.1.0">
     <NavigationGroup>
       <NavigationItem
-        icon={() => <DeclarationIconSmall color={'purple'} />}
+        icon={() => <Icon name="File" size="small" />}
         label="In progress"
       />
       <NavigationItem
-        icon={() => <DeclarationIconSmall color={'orange'} />}
+        icon={() => <Icon name="FileSearch" size="small" />}
         label="Ready for review"
       />
       <NavigationItem
-        icon={() => <DeclarationIconSmall color={'red'} />}
+        icon={() => <Icon name="FileX" size="small" />}
         label="Requires updates"
       />
       <NavigationItem
-        icon={() => <DeclarationIconSmall color={'grey'} />}
+        icon={() => <Icon name="FileText" size="small" />}
         label="Sent for approval"
       />
       <NavigationItem
-        icon={() => <DeclarationIconSmall color={'green'} />}
+        icon={() => <Icon name="Printer" size="small" />}
         label="Ready to print"
       />
       <NavigationItem
-        icon={() => <DeclarationIconSmall color={'blue'} />}
+        icon={() => <Icon name="Handshake" size="small" />}
         label="Ready to issue"
       />
     </NavigationGroup>
     <NavigationGroup>
       <NavigationItem
-        icon={() => <Icon name="Buildings" size="medium" />}
+        icon={() => <Icon name="Buildings" size="small" />}
         label="Organisation"
       />
       <NavigationItem
-        icon={() => <Icon name="Users" size="medium" />}
+        icon={() => <Icon name="Users" size="small" />}
         label="Team"
       />
       <NavigationItem
-        icon={() => <Icon name="Activity" size="medium" />}
+        icon={() => <Icon name="Activity" size="small" />}
         label="Performance"
       />
     </NavigationGroup>

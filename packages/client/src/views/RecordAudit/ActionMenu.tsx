@@ -74,6 +74,7 @@ import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 import { useDeclaration } from '@client/declarations/selectors'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
+import { useOnlineStatus } from '@client/utils'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -337,13 +338,14 @@ const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
 > = ({ toggleDisplayDialog, isActionable, declarationStatus }) => {
   const intl = useIntl()
+  const online = useOnlineStatus()
   if (!canBeReinstated(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item
       key={'reinstate-action'}
       onClick={toggleDisplayDialog}
-      disabled={!isActionable}
+      disabled={!isActionable || !online}
     >
       <Icon name="FileArrowUp" color="currentColor" size="large" />
       {intl.formatMessage(messages.reinstateRecord)}
@@ -549,6 +551,7 @@ const UnassignAction: React.FC<{
 }> = ({ handleUnassign, assignedOther, assignedSelf, declarationStatus }) => {
   const { hasScope } = usePermissions()
   const intl = useIntl()
+  const online = useOnlineStatus()
 
   if (
     declarationStatus === SUBMISSION_STATUS.DRAFT ||
@@ -558,7 +561,11 @@ const UnassignAction: React.FC<{
     return null
 
   return (
-    <DropdownMenu.Item key={'unassign-action'} onClick={handleUnassign}>
+    <DropdownMenu.Item
+      key={'unassign-action'}
+      onClick={handleUnassign}
+      disabled={!online}
+    >
       <Icon name="ArrowCircleDown" color="currentColor" size="large" />
       {intl.formatMessage(buttonMessages.unassign)}
     </DropdownMenu.Item>

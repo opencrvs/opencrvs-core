@@ -27,7 +27,7 @@ export const up = async (db: Db, client: MongoClient) => {
                   in: {
                     $cond: {
                       if: {
-                        $gt: ['$$name.family', null]
+                        $isArray: '$$name.family'
                       },
                       then: {
                         $mergeObjects: [
