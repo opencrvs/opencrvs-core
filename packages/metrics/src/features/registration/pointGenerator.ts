@@ -53,7 +53,8 @@ import {
   getRegLastOffice,
   getEncounterLocationType,
   getPractitionerIdFromBundle,
-  fetchDeclarationsBeginnerRole
+  fetchDeclarationsBeginnerRole,
+  isNotification
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -521,6 +522,8 @@ export async function generateDeclarationStartedPoint(
       Authorization: `Bearer ${authHeader.Authorization}`
     })
   }
+  const userId = tokenPayload.sub
+
   if (!composition) {
     throw new Error('composition not found')
   }
@@ -529,7 +532,9 @@ export async function generateDeclarationStartedPoint(
     throw new Error('Task not found')
   }
 
-  const role = user.role
+  const role = isNotification(composition)
+    ? 'NOTIFICATION_API_USER'
+    : (await getUser(userId, authHeader)).role
 
   const fields: IDeclarationsStartedFields = {
     role,

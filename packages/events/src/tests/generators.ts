@@ -9,15 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  DeclareActionInput,
-  EventInput,
-  getUUID,
-  ActionType,
-  ValidateActionInput,
-  RegisterActionInput,
-  RequestCorrectionActionInput
-} from '@opencrvs/commons'
+import { getUUID, eventPayloadGenerator } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
 
@@ -39,92 +31,11 @@ interface CreateUser {
   role?: string
   name?: Array<Name>
 }
+
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
 export function payloadGenerator() {
-  const event = {
-    create: (input: Partial<EventInput> = {}) => ({
-      transactionId: input.transactionId ?? getUUID(),
-      type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP'
-    }),
-    patch: (id: string, input: Partial<EventInput> = {}) => ({
-      transactionId: input.transactionId ?? getUUID(),
-      type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
-      id
-    }),
-    actions: {
-      declare: (
-        eventId: string,
-        input: Partial<Pick<DeclareActionInput, 'transactionId' | 'data'>> = {}
-      ) => ({
-        type: ActionType.DECLARE,
-        transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
-        eventId
-      }),
-      validate: (
-        eventId: string,
-        input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
-      ) => ({
-        type: ActionType.VALIDATE,
-        transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
-        duplicates: [],
-        eventId
-      }),
-      register: (
-        eventId: string,
-        input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
-      ) => ({
-        type: ActionType.REGISTER,
-        transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
-        eventId
-      }),
-      correct: {
-        request: (
-          eventId: string,
-          input: Partial<
-            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
-          > = {}
-        ) => ({
-          type: ActionType.REQUEST_CORRECTION,
-          transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? {},
-          metadata: {},
-          eventId
-        }),
-        approve: (
-          eventId: string,
-          requestId: string,
-          input: Partial<
-            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
-          > = {}
-        ) => ({
-          type: ActionType.APPROVE_CORRECTION,
-          transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? {},
-          eventId,
-          requestId
-        }),
-        reject: (
-          eventId: string,
-          requestId: string,
-          input: Partial<
-            Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
-          > = {}
-        ) => ({
-          type: ActionType.REJECT_CORRECTION,
-          transactionId: input.transactionId ?? getUUID(),
-          data: input.data ?? {},
-          eventId,
-          requestId
-        })
-      }
-    }
-  }
-
   const user = {
     create: (input: CreateUser) => ({
       role: input.role ?? 'REGISTRATION_AGENT',
@@ -154,7 +65,7 @@ export function payloadGenerator() {
     }
   }
 
-  return { event, locations, user }
+  return { event: eventPayloadGenerator, locations, user }
 }
 
 /**

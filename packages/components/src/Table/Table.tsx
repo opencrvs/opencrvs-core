@@ -137,7 +137,7 @@ const ContentWrapper = styled.span<{
   flex-shrink: 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
-  color: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.grey400};
   padding: 0 4px;
 `
 const ValueWrapper = styled.span<{
@@ -158,6 +158,8 @@ const ValueWrapper = styled.span<{
   padding: 0 4px;
   align-self: center;
   white-space: pre-wrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`

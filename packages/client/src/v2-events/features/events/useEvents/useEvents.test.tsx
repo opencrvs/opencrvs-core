@@ -11,14 +11,21 @@
 import { renderHook, RenderHookResult, waitFor } from '@testing-library/react'
 import React, { PropsWithChildren } from 'react'
 
+import { TRPCError } from '@trpc/server'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
-import { serialize } from 'superjson'
+import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
-import { TRPCError } from '@trpc/server'
-import { EventDocument, EventInput } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventDocument,
+  EventInput,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
+import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
+import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { storage } from '@client/storage'
-import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { useEvents } from './useEvents'
 
 const serverSpy = vi.fn()
@@ -50,16 +57,16 @@ const createHandler = trpcHandler(async ({ request }) => {
   return HttpResponse.json({
     type: 'TENNIS_CLUB_MEMBERSHIP',
     id: '_REAL_UUID_',
+    trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
       {
-        type: 'CREATE',
+        type: ActionType.CREATE,
         id: '_REAL_ACTION_UUID_',
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
         createdBy: '6733309827b97e6483877188',
         createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
-        draft: false,
         data: {}
       }
     ]
@@ -80,11 +87,27 @@ function errorHandler() {
     }
   )
 }
+
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
 const server = setupServer(
   http.post<never, EventInput, EventDocument>(
     '/api/events/event.create',
     createHandler
-  )
+  ),
+
+  tRPCMsw.event.config.get.query(() => {
+    return [tennisClubMembershipEvent]
+  }),
+  tRPCMsw.event.list.query(() => {
+    return [tennisClubMembershipEventIndex]
+  })
 )
 
 beforeAll(() => server.listen())
@@ -114,10 +137,10 @@ beforeEach<TestContext>(async (testContext) => {
   await storage.removeItem('reactQuery')
 
   const eventsHook = renderHook(() => useEvents(), { wrapper })
+
   await waitFor(() => expect(eventsHook.result.current).not.toBeNull(), {
     timeout: 3000
   })
-
   const createHook = renderHook(() => eventsHook.result.current.createEvent(), {
     wrapper
   })
@@ -139,7 +162,9 @@ describe('events that have unsynced actions', () => {
     createEventHook
   }) => {
     server.use(http.post('/api/events/event.create', errorHandler))
-    createEventHook.result.current.mutate({
+
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await createEventHook.result.current.mutate({
       type: 'TENNIS_CLUB_MEMBERSHIP',
       transactionId: '_TEST_TRANSACTION_'
     })

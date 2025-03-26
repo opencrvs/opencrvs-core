@@ -11,7 +11,10 @@
 import * as Hapi from '@hapi/hapi'
 import { getValidRecordById } from '@workflow/records/index'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { isQuestionnaireResponse } from '@opencrvs/commons/types'
+import {
+  isQuestionnaireResponse,
+  QuestionnaireResponse
+} from '@opencrvs/commons/types'
 
 interface FieldInput {
   fieldId: string
@@ -19,6 +22,21 @@ interface FieldInput {
   valueBoolean?: boolean
 }
 
+export const upsertAnswer = (
+  responses: NonNullable<QuestionnaireResponse['item']>,
+  { fieldId, valueString, valueBoolean }: FieldInput
+) => [
+  ...responses.filter(({ text }) => text !== fieldId),
+  {
+    text: fieldId,
+    answer: [{ valueString, valueBoolean }]
+  }
+]
+
+/**
+ * Upserts (updates or adds) a field to the record QuestionnaireResponse
+ * Helpful for 3rd party integrations adding NID verification statuses for example
+ */
 export async function updateField(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -38,18 +56,9 @@ export async function updateField(
     isQuestionnaireResponse(resource)
   )[0]
 
-  const questionnaireResponseItems = questionnaireResponseResource.item?.map(
-    (item) => {
-      if (item.text === fieldId && valueString) {
-        item.answer![0].valueString = valueString
-      }
-
-      if (item.text === fieldId && valueBoolean) {
-        item.answer![0].valueBoolean = valueBoolean
-      }
-
-      return item
-    }
+  const questionnaireResponseItems = upsertAnswer(
+    questionnaireResponseResource.item ?? [],
+    { fieldId, valueString, valueBoolean }
   )
 
   const updatedQuestionnaireResponseResource = {

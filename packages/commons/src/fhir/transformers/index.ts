@@ -93,7 +93,10 @@ import {
   getComposition,
   markSaved,
   CompositionSectionTitleByCode,
-  EVENT_TYPE
+  EVENT_TYPE,
+  isComposition,
+  Composition,
+  findCompositionSection
 } from '..'
 import { getUUID, UUID } from '../..'
 import { replaceFromBundle } from '../../record'
@@ -838,6 +841,19 @@ function createInformantType(
     fhirBundle
   )
 
+  const currentInformantRelationship =
+    relatedPersonResource.relationship?.coding?.find(
+      ({ system }) =>
+        system === 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype'
+    )?.code
+
+  if (
+    currentInformantRelationship &&
+    currentInformantRelationship !== fieldValue
+  ) {
+    relatedPersonResource.patient = undefined
+  }
+
   if (fieldValue !== 'OTHER') {
     relatedPersonResource.relationship = {
       coding: [
@@ -867,23 +883,7 @@ function createInformantType(
       )
     }
   } else if (context.event === EVENT_TYPE.DEATH) {
-    if (fieldValue === 'MOTHER') {
-      setInformantReference(
-        MOTHER_CODE,
-        MOTHER_TITLE,
-        relatedPersonResource,
-        fhirBundle,
-        context
-      )
-    } else if (fieldValue === 'FATHER') {
-      setInformantReference(
-        FATHER_CODE,
-        FATHER_TITLE,
-        relatedPersonResource,
-        fhirBundle,
-        context
-      )
-    } else if (fieldValue === 'SPOUSE') {
+    if (fieldValue === 'SPOUSE') {
       setInformantReference(
         SPOUSE_CODE,
         SPOUSE_TITLE,
@@ -2744,7 +2744,7 @@ const builders: IFieldBuilders = {
           docRef.content = [
             {
               attachment: {
-                contentType: fieldValue
+                data: fieldValue
               }
             }
           ]
@@ -2777,7 +2777,7 @@ const builders: IFieldBuilders = {
           docRef.content = [
             {
               attachment: {
-                contentType: fieldValue
+                data: fieldValue
               }
             }
           ]
@@ -3126,6 +3126,22 @@ export function updateFHIRBundle<T extends Bundle>(
   const context = {
     event: eventType,
     _index: {}
+  }
+
+  // Remove any existing supporting documents to rebuild them from
+  // scratch allowing deletion of any removed documents
+  const composition = existingBundle.entry
+    .map((e) => e.resource)
+    .find((resource): resource is Composition => isComposition(resource))
+
+  if (composition) {
+    const documentSection = findCompositionSection(
+      'supporting-documents',
+      composition
+    )
+    if (documentSection) {
+      documentSection.entry = []
+    }
   }
 
   return transformObj(

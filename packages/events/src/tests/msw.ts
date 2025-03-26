@@ -11,15 +11,34 @@
 import { http, HttpResponse, PathParams } from 'msw'
 import { env } from '@events/environment'
 import { setupServer } from 'msw/node'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 const handlers = [
   http.post<PathParams<never>, { filenames: string[] }>(
     `${env.DOCUMENTS_URL}/presigned-urls`,
     async (info) => {
       const request = await info.request.json()
-      return HttpResponse.json(request.filenames)
+      const filenames = request.filenames.map(
+        (x) =>
+          `http://localhost:3535/ocrvs/${x}?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20250305%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20250305T100513Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=b9c1a0c9680fd344dcdfa32d2413319fcfc968090b674a3de5b66ef577d91e9b`
+      )
+      return HttpResponse.json(filenames)
     }
-  )
+  ),
+  http.get(`${env.COUNTRY_CONFIG_URL}/events`, (info) => {
+    return HttpResponse.json([
+      tennisClubMembershipEvent,
+      { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
+    ])
+  }),
+  // event.delete.test.ts
+  http.head(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
+    return HttpResponse.json({ ok: true })
+  }),
+  // event.delete.test.ts
+  http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
+    return HttpResponse.json({ ok: true })
+  })
 ]
 
 export const mswServer = setupServer(...handlers)

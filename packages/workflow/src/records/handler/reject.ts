@@ -16,7 +16,10 @@ import { validateRequest } from '@workflow/utils/index'
 import { toRejected } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
-import { sendNotification } from '@workflow/records/notification'
+import {
+  sendNotification,
+  isNotificationEnabled
+} from '@workflow/records/notification'
 import { getEventType } from '@workflow/features/registration/utils'
 import { invokeWebhooks } from '@workflow/records/webhooks'
 import { SCOPES } from '@opencrvs/commons/authentication'
@@ -50,7 +53,12 @@ export const rejectRoute = createRoute({
 
     await indexBundle(rejectedRecord, token)
     await auditEvent('sent-for-updates', rejectedRecord, token)
-    await sendNotification('sent-for-updates', rejectedRecord, token)
+
+    const event = getEventType(rejectedRecord)
+
+    if (await isNotificationEnabled('sent-for-updates', event, token)) {
+      await sendNotification('sent-for-updates', rejectedRecord, token)
+    }
 
     await invokeWebhooks({
       bundle: record,

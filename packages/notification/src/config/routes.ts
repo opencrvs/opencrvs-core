@@ -262,9 +262,6 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       handler: retrieveUserName,
       options: {
         tags: ['api'],
-        auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
-        },
         description: 'Sends an sms to a user with username',
         validate: {
           payload: retrieveUserNameNotificationSchema

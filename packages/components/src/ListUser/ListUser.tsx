@@ -94,6 +94,7 @@ export const UserRow = styled.table`
   @media screen and (max-width: 768px) {
     td:nth-child(2) {
       width: 100%;
+      max-width: 0;
     }
     td:nth-child(3) {
       display: none;

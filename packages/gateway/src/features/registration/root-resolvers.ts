@@ -11,6 +11,8 @@
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/service'
 import {
+  getTokenPayload,
+  getUser,
   hasRecordAccess,
   hasScope,
   inScope
@@ -39,7 +41,7 @@ import {
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
-import { checkUserAssignment } from '@gateway/authorisation'
+import { checkUserAssignment, findUserAssignment } from '@gateway/authorisation'
 
 import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
 import {
@@ -590,7 +592,16 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsUnassigned(_, { id }, { headers: authHeader }) {
-      const assignedToSelf = await checkUserAssignment(id, authHeader)
+      const assignedUser = await findUserAssignment(id, authHeader)
+      if (!assignedUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      const tokenPayload = getTokenPayload(
+        authHeader.Authorization.split(' ')[1]
+      )
+      const userId = tokenPayload.sub
+      const user = await getUser({ userId }, authHeader)
+      const assignedToSelf = user.practitionerId === assignedUser
       if (
         assignedToSelf ||
         inScope(authHeader, [SCOPES.RECORD_UNASSIGN_OTHERS])
@@ -602,7 +613,9 @@ export const resolvers: GQLResolver = {
         // return the taskId
         return task.id
       }
-      throw new Error('User does not have enough scope')
+      throw new UnassignError(
+        'User has been unassigned or does not have required scope'
+      )
     },
     async markEventAsDuplicate(
       _,

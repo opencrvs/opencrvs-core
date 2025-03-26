@@ -13,19 +13,17 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
+// eslint-disable-next-line
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES } from '@client/v2-events/routes'
-import { tennisClueMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
-import { useCorrectionRequestData } from './useCorrectionRequestData'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest',
-  beforeEach: () => {
-    useEventFormData.getState().clear()
-  }
+  title: 'CorrectionRequest'
 }
 
 export default meta
@@ -40,62 +38,15 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-export const Onboarding: Story = {
-  parameters: {
-    reactRouter: {
-      router: router,
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-        eventId: tennisClueMembershipEventDocument.id,
-        pageId: 'corrector'
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
 function FormClear() {
-  const form = useEventFormData()
-  const requestDetails = useCorrectionRequestData()
+  const drafts = useDrafts()
   useEffect(() => {
-    form.setFormValues(tennisClueMembershipEventDocument.id, {
-      'applicant.firstname': 'Max',
-      'applicant.surname': 'McLaren',
-      'applicant.dob': '2020-01-02'
-    })
-    requestDetails.setFormValues({
-      'correction.requester.relationship': 'ANOTHER_AGENT',
-      'correction.request.reason': "Child's name was incorrect"
-    })
+    drafts.setLocalDraft(
+      testDataGenerator().event.draft(tennisClubMembershipEventDocument.id)
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return <Outlet />
-}
-
-export const ReviewWithoutChanges: Story = {
-  parameters: {
-    reactRouter: {
-      router,
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
 }
 
 export const ReviewWithChanges: Story = {
@@ -107,14 +58,14 @@ export const ReviewWithChanges: Story = {
         children: [router]
       },
       initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
+        eventId: tennisClubMembershipEventDocument.id
       })
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return tennisClubMembershipEventDocument
           })
         ]
       }
@@ -128,14 +79,14 @@ export const AdditionalDetails: Story = {
       router: router,
       initialPath:
         ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath({
-          eventId: tennisClueMembershipEventDocument.id
+          eventId: tennisClubMembershipEventDocument.id
         })
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return tennisClubMembershipEventDocument
           })
         ]
       }
@@ -151,14 +102,14 @@ export const Summary: Story = {
         children: [router]
       },
       initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
-        eventId: tennisClueMembershipEventDocument.id
+        eventId: tennisClubMembershipEventDocument.id
       })
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClueMembershipEventDocument
+            return tennisClubMembershipEventDocument
           })
         ]
       }

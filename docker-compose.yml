@@ -8,7 +8,7 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 services:
   base:
-    image: opencrvs/ocrvs-base:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-base:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -16,7 +16,7 @@ services:
     deploy:
       replicas: 0
   client:
-    image: opencrvs/ocrvs-client:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-client:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -28,7 +28,7 @@ services:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
       - GATEWAY_URL_INTERNAL=http://gateway:7070
   dashboards:
-    image: opencrvs/ocrvs-dashboards:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-dashboards:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -38,7 +38,7 @@ services:
       - base
 
   login:
-    image: opencrvs/ocrvs-login:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -50,7 +50,7 @@ services:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
 
   gateway:
-    image: opencrvs/ocrvs-gateway:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-gateway:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -80,7 +80,7 @@ services:
       - DOCUMENTS_URL=http://documents:9050
 
   events:
-    image: opencrvs/ocrvs-events:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-events:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -98,7 +98,7 @@ services:
       - AUTH_URL=http://auth:4040
   # User facing services
   workflow:
-    image: opencrvs/ocrvs-workflow:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-workflow:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -120,7 +120,7 @@ services:
       - AUTH_URL=http://auth:4040
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:
-    image: opencrvs/ocrvs-search:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-search:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -136,7 +136,7 @@ services:
       - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
   metrics:
-    image: opencrvs/ocrvs-metrics:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-metrics:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -159,7 +159,7 @@ services:
       - FHIR_URL=http://hearth:3447/fhir
   # END User facing services
   scheduler:
-    image: opencrvs/ocrvs-scheduler:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-scheduler:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -171,7 +171,7 @@ services:
       - METRICS_URL=http://metrics:1050
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
   auth:
-    image: opencrvs/ocrvs-auth:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-auth:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -188,7 +188,7 @@ services:
       - METRICS_URL=http://metrics:1050
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   user-mgnt:
-    image: opencrvs/ocrvs-user-mgnt:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-user-mgnt:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -203,9 +203,10 @@ services:
       - METRICS_URL=http://metrics:1050
       - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
   webhooks:
-    image: opencrvs/ocrvs-webhooks:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-webhooks:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -222,7 +223,7 @@ services:
       - CHECK_INVALID_TOKEN=true
       - FHIR_URL=http://hearth:3447/fhir
   notification:
-    image: opencrvs/ocrvs-notification:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-notification:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -234,8 +235,9 @@ services:
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
   config:
-    image: opencrvs/ocrvs-config:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-config:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -256,8 +258,9 @@ services:
       - GATEWAY_URL=http://gateway:7070/
       - DOCUMENTS_URL=http://documents:9050
       - CHECK_INVALID_TOKEN=true
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
   migration:
-    image: opencrvs/ocrvs-migration:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-migration:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -278,7 +281,7 @@ services:
       - INFLUX_DB=ocrvs
       - WAIT_HOSTS=mongo1:27017,influxdb:8086,minio:9000,elasticsearch:9200
   documents:
-    image: opencrvs/ocrvs-documents:${VERSION}
+    image: ghcr.io/opencrvs/ocrvs-documents:${VERSION}
     #platform: linux/amd64
     build:
       context: .
@@ -289,3 +292,14 @@ services:
     environment:
       - NODE_ENV=development
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
+  
+  data-seeder:
+    image: ghcr.io/opencrvs/ocrvs-data-seeder:${VERSION}
+    #platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./packages/data-seeder/Dockerfile
+    depends_on:
+      - base
+    deploy:
+      replicas: 0

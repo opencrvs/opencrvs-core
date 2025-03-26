@@ -9,130 +9,91 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { hashKey } from '@tanstack/react-query'
-import { getQueryKey } from '@trpc/react-query'
-import { EventDocument, EventIndex } from '@opencrvs/commons/client'
-import { api, queryClient, utils } from '@client/v2-events/trpc'
-import { useEventAction } from './procedures/action'
-import { createEvent } from './procedures/create'
-import { useDeleteEventMutation } from './procedures/delete'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-function getPendingMutations(
-  mutationCreator: Parameters<typeof getQueryKey>[0]
-) {
-  const key = getQueryKey(mutationCreator)
-  return queryClient
-    .getMutationCache()
-    .getAll()
-    .filter((mutation) => mutation.state.status !== 'success')
-    .filter(
-      (mutation) =>
-        mutation.options.mutationKey &&
-        hashKey(mutation.options.mutationKey) === hashKey(key)
-    )
-}
-
-function filterOutboxEventsWithMutation<
-  T extends
-    | typeof api.event.create
-    | typeof api.event.actions.declare
-    | typeof api.event.actions.register
->(
-  events: EventIndex[],
-  mutation: T,
-  filter: (
-    event: EventIndex,
-    parameters: Exclude<ReturnType<T['useMutation']>['variables'], undefined>
-  ) => boolean
-) {
-  return getPendingMutations(mutation).flatMap((m) => {
-    const variables = m.state.variables as Exclude<
-      ReturnType<T['useMutation']>['variables'],
-      undefined
-    >
-    return events.filter((event) => filter(event, variables))
-  })
-}
+import { useTRPC } from '@client/v2-events/trpc'
+import { useGetEvent, useGetEventState } from './procedures/get'
+import { useOutbox } from './outbox'
+import { useCreateEvent } from './procedures/create'
+import { useDeleteEvent } from './procedures/delete'
+import {
+  customMutationKeys,
+  useEventAction,
+  useEventCustomAction
+} from './procedures/actions/action'
 
 export function useEvents() {
-  const eventsList = api.event.list.useQuery().data ?? []
-
-  function getDrafts(): EventDocument[] {
-    const queries = queryClient.getQueriesData<EventDocument>({
-      queryKey: getQueryKey(api.event.get)
-    })
-
-    return queries
-      .map((query) => query[1])
-      .filter((event): event is EventDocument =>
-        Boolean(event && event.actions[event.actions.length - 1].draft)
-      )
-  }
-
-  function getOutbox() {
-    const eventFromDeclareActions = filterOutboxEventsWithMutation(
-      eventsList,
-      api.event.actions.declare,
-      (event, parameters) => {
-        return event.id === parameters.eventId && !parameters.draft
-      }
-    )
-
-    const eventFromRegisterActions = filterOutboxEventsWithMutation(
-      eventsList,
-      api.event.actions.register,
-      (event, parameters) => {
-        return event.id === parameters.eventId && !parameters.draft
-      }
-    )
-
-    return eventFromDeclareActions
-      .concat(eventFromDeclareActions)
-      .concat(eventFromRegisterActions)
-      .filter(
-        /* uniqueById */
-        (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
-      )
-  }
-
+  const trpc = useTRPC()
+  const getEvent = useGetEvent()
   return {
-    createEvent,
-    getEvent: api.event.get,
-    getEvents: api.event.list,
-    deleteEvent: useDeleteEventMutation(),
-    getOutbox,
-    getDrafts,
+    createEvent: useCreateEvent,
+    /** Returns an event with full history. If you only need the state of the event, use getEventState. */
+    getEvent,
+    getEvents: {
+      useQuery: useQuery({
+        ...trpc.event.list.queryOptions(),
+        queryKey: trpc.event.list.queryKey()
+      }),
+      useSuspenseQuery: () => [
+        useSuspenseQuery({
+          ...trpc.event.list.queryOptions(),
+          queryKey: trpc.event.list.queryKey()
+        }).data
+      ]
+    },
+    /** Returns an event with aggregated history. If you need the history of the event, use getEvent. */
+    getEventState: useGetEventState(),
+    deleteEvent: {
+      useMutation: useDeleteEvent
+    },
+    getOutbox: useOutbox,
+    searchEvent: {
+      useQuery: (type: string, searchParams: Record<string, string>) =>
+        useQuery({
+          ...trpc.event.search.queryOptions({
+            ...searchParams,
+            type
+          }),
+          queryKey: trpc.event.search.queryKey({
+            ...searchParams,
+            type
+          })
+        }),
+      useSuspenseQuery: (type: string, searchParams: Record<string, string>) =>
+        useSuspenseQuery({
+          ...trpc.event.search.queryOptions({
+            ...searchParams,
+            type
+          }),
+          queryKey: trpc.event.search.queryKey({
+            ...searchParams,
+            type
+          })
+        }).data
+    },
     actions: {
-      validate: useEventAction(
-        utils.event.actions.validate,
-        api.event.actions.validate
-      ),
-      notify: useEventAction(
-        utils.event.actions.notify,
-        api.event.actions.notify
-      ),
-      declare: useEventAction(
-        utils.event.actions.declare,
-        api.event.actions.declare
-      ),
-      register: useEventAction(
-        utils.event.actions.register,
-        api.event.actions.register
-      ),
-      correct: {
-        request: useEventAction(
-          utils.event.actions.correct.request,
-          api.event.actions.correct.request
-        ),
-        approve: useEventAction(
-          utils.event.actions.correct.approve,
-          api.event.actions.correct.approve
-        ),
-        reject: useEventAction(
-          utils.event.actions.correct.reject,
-          api.event.actions.correct.reject
-        )
+      validate: useEventAction(trpc.event.actions.validate),
+      reject: useEventAction(trpc.event.actions.reject),
+      archive: useEventAction(trpc.event.actions.archive),
+      notify: useEventAction(trpc.event.actions.notify),
+      declare: useEventAction(trpc.event.actions.declare),
+      register: useEventAction(trpc.event.actions.register),
+      correction: {
+        request: useEventAction(trpc.event.actions.correction.request),
+        approve: useEventAction(trpc.event.actions.correction.approve),
+        reject: useEventAction(trpc.event.actions.correction.reject)
       }
+    },
+    onlineActions: {
+      printCertificate: useEventAction(trpc.event.actions.printCertificate)
+    },
+    customActions: {
+      registerOnDeclare: useEventCustomAction([
+        ...customMutationKeys.registerOnDeclare
+      ]),
+      validateOnDeclare: useEventCustomAction([
+        ...customMutationKeys.validateOnDeclare
+      ])
     }
   }
 }

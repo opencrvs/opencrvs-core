@@ -15,44 +15,34 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
+import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
-  const formEventId = useEventFormData((state) => state.eventId)
-  const form = useEventFormData((state) => state.formValues)
+  const form = useEventFormData((state) => state.getFormValues())
   const navigate = useNavigate()
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
-  const currentState = getCurrentEventState(event)
-
-  useEffect(() => {
-    if (formEventId !== event.id) {
-      setFormValues(event.id, currentState.data)
-    }
-  }, [currentState.data, event.id, formEventId, setFormValues])
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = configuration.actions
-    .find((action) => action.type === ActionType.REQUEST_CORRECTION)
-    ?.forms.find((f) => f.active)?.pages
 
-  if (!formPages) {
-    throw new Error('Form configuration not found for type: ' + event.type)
-  }
+  const formPages = getActiveActionFormPages(
+    configuration,
+    ActionType.REQUEST_CORRECTION
+  )
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -74,17 +64,15 @@ export function Pages() {
   }, [pageId, currentPageId, navigate, eventId])
 
   return (
-    <FormLayout
-      canSaveAndExit={false}
-      route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}
-    >
+    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       {modal}
       <PagesComponent
-        eventId={eventId}
+        eventConfig={configuration}
+        eventDeclarationData={event.data}
         form={form}
         formPages={formPages}
         pageId={currentPageId}
-        setFormData={(data) => setFormValues(eventId, data)}
+        setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(

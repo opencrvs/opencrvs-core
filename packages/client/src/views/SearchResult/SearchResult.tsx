@@ -315,7 +315,10 @@ function SearchResultView(props: ISearchResultProps) {
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
-                assignment: reg.assignment ?? undefined,
+                assignment:
+                  foundDeclaration?.assignmentStatus ??
+                  reg.assignment ??
+                  undefined,
                 refetchQueries: [
                   {
                     query: SEARCH_EVENTS,
@@ -435,7 +438,7 @@ function SearchResultView(props: ISearchResultProps) {
       })
   }
 
-  const { intl, userDetails } = props
+  const { intl } = props
   const search = location.search
   const params = new URLSearchParams(search)
   const [searchText, searchType] = [

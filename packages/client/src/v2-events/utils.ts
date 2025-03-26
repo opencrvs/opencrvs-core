@@ -8,9 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { uniq, isString, get, mapKeys } from 'lodash'
 
-import { uniq, isString, get } from 'lodash'
-import { ResolvedUser, ActionDocument } from '@opencrvs/commons/client'
+import { v4 as uuid } from 'uuid'
+import {
+  ResolvedUser,
+  ActionDocument,
+  EventConfig,
+  EventIndex,
+  FieldValue,
+  FieldType,
+  FieldConfigDefaultValue,
+  MetaFields,
+  isTemplateVariable,
+  mapFieldTypeToZod,
+  isFieldValueWithoutTemplates,
+  compositeFieldTypes
+} from '@opencrvs/commons/client'
 
 /**
  *
@@ -36,6 +50,7 @@ export function getUsersFullName(
 }
 
 /** Utility to get all keys from union */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**
@@ -53,4 +68,124 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   )
 
   return uniq(userIds)
+}
+
+export const getAllUniqueFields = (currentEvent: EventConfig) => {
+  return [
+    ...new Map(
+      currentEvent.actions.flatMap((action) =>
+        action.forms.flatMap((form) =>
+          form.pages.flatMap((page) =>
+            page.fields.map((field) => [field.id, field])
+          )
+        )
+      )
+    ).values()
+  ]
+}
+
+export function flattenEventIndex(
+  event: EventIndex
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Omit<EventIndex, 'data'> & { [key: string]: any } {
+  const { data, ...rest } = event
+  return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
+}
+
+export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+
+export function isTemporaryId(id: string) {
+  return id.startsWith('tmp-')
+}
+
+export function createTemporaryId() {
+  return `tmp-${uuid()}`
+}
+
+/**
+ *
+ * @param fieldType: The type of the field.
+ * @param currentValue: The current value of the field.
+ * @param defaultValue: Configured default value from the country configuration.
+ * @param meta: Metadata fields such as '$user', '$event', and others.
+ *
+ * @returns Resolves template variables in the default value and returns the resolved value.
+ *
+
+ */
+export function replacePlaceholders({
+  fieldType,
+  currentValue,
+  defaultValue,
+  meta
+}: {
+  fieldType: FieldType
+  currentValue?: FieldValue
+  defaultValue?: FieldConfigDefaultValue
+  meta: MetaFields
+}): FieldValue | undefined {
+  if (currentValue) {
+    return currentValue
+  }
+
+  if (!defaultValue) {
+    return undefined
+  }
+
+  if (isFieldValueWithoutTemplates(defaultValue)) {
+    return defaultValue
+  }
+
+  if (isTemplateVariable(defaultValue)) {
+    const resolvedValue = get(meta, defaultValue)
+    const validator = mapFieldTypeToZod(fieldType)
+
+    const parsedValue = validator.safeParse(resolvedValue)
+
+    if (parsedValue.success) {
+      return parsedValue.data as FieldValue
+    }
+
+    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
+  }
+
+  if (
+    compositeFieldTypes.some((ft) => ft === fieldType) &&
+    typeof defaultValue === 'object'
+  ) {
+    /**
+     * defaultValue is typically an ADDRESS, FILE, or FILE_WITH_OPTIONS.
+     * Some STRING values within the defaultValue object may contain template variables (prefixed with $).
+     */
+    const result = { ...defaultValue }
+
+    // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
+    for (const [key, val] of Object.entries(result)) {
+      if (isTemplateVariable(val)) {
+        const resolvedValue = get(meta, val)
+        // For now, we only support resolving template variables for text fields.
+        const validator = mapFieldTypeToZod(FieldType.TEXT)
+        const parsedValue = validator.safeParse(resolvedValue)
+        if (parsedValue.success && parsedValue.data) {
+          result[key] = resolvedValue
+        } else {
+          throw new Error(`Could not resolve ${key}: ${parsedValue.error}`)
+        }
+      }
+    }
+
+    const resultValidator = mapFieldTypeToZod(fieldType)
+    const parsedResult = resultValidator.safeParse(result)
+    if (parsedResult.success) {
+      return result as FieldValue
+    }
+    throw new Error(
+      `Could not resolve ${fieldType}: ${JSON.stringify(
+        defaultValue
+      )}. Error: ${parsedResult.error}`
+    )
+  }
+  throw new Error(
+    `Could not resolve ${fieldType}: ${JSON.stringify(defaultValue)}`
+  )
 }

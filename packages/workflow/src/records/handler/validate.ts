@@ -18,6 +18,10 @@ import * as z from 'zod'
 import { invokeWebhooks } from '@workflow/records/webhooks'
 import { getEventType } from '@workflow/features/registration/utils'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { getRecordSpecificToken } from '@workflow/records/token-exchange'
+import { getComposition } from '@opencrvs/commons/types'
+import { notifyForAction } from '@workflow/utils/country-config-api'
+import { getEventType } from '@workflow/features/registration/utils'
 
 export const validateRoute = createRoute({
   method: 'POST',
@@ -45,6 +49,23 @@ export const validateRoute = createRoute({
 
     await indexBundle(validatedRecord, token)
     await auditEvent('sent-for-approval', validatedRecord, token)
+    /*
+     * Notify country configuration about the event so that countries can hook into actions like "sent-for-approval"
+     */
+    const recordSpecificToken = await getRecordSpecificToken(
+      token,
+      request.headers,
+      getComposition(validatedRecord).id
+    )
+    await notifyForAction({
+      event: getEventType(validatedRecord),
+      action: 'sent-for-approval',
+      record,
+      headers: {
+        ...request.headers,
+        authorization: `Bearer ${recordSpecificToken.access_token}`
+      }
+    })
 
     await invokeWebhooks({
       bundle: record,
