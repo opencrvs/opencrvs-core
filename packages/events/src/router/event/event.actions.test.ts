@@ -143,3 +143,68 @@ test('Action data accepts partial changes', async () => {
     })
   ])
 })
+
+test('READ action does not delete draft', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const draftData = {
+    type: ActionType.DECLARE,
+    data: {
+      ...generator.event.actions.declare(originalEvent.id).data,
+      'applicant.image': {
+        type: 'image/png',
+        originalFilename: 'abcd.png',
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+      }
+    },
+    transactionId: 'transactionId',
+    eventId: originalEvent.id
+  }
+
+  await client.event.draft.create(draftData)
+
+  const draftEvents = await client.event.draft.list()
+
+  await client.event.get(originalEvent.id) // this triggers READ action
+
+  const draftEventsAfterRead = await client.event.draft.list()
+
+  expect(draftEvents).toEqual(draftEventsAfterRead)
+})
+
+test('Other than READ action deletes draft', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const draftData = {
+    type: ActionType.DECLARE,
+    data: {
+      ...generator.event.actions.declare(originalEvent.id).data,
+      'applicant.image': {
+        type: 'image/png',
+        originalFilename: 'abcd.png',
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+      }
+    },
+    transactionId: 'transactionId',
+    eventId: originalEvent.id
+  }
+
+  await client.event.draft.create(draftData)
+
+  const draftEvents = await client.event.draft.list()
+  expect(draftEvents.length).toBe(1)
+
+  await client.event.actions.declare(
+    generator.event.actions.declare(originalEvent.id)
+  )
+
+  const draftEventsAfterRead = await client.event.draft.list()
+
+  expect(draftEventsAfterRead.length).toBe(0)
+})
