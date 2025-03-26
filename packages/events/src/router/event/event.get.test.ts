@@ -15,7 +15,6 @@ import {
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { ActionType, SCOPES } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
 import { eventRouter } from '.'
 
@@ -49,11 +48,13 @@ function compareActionsToRouter(
   )
 
   if (casedRouterActions.length !== actionsWithoutCreate.length) {
+    // eslint-disable-next-line no-console
     console.error(
       `Router actions ${casedRouterActions.length} :`,
       casedRouterActions.sort()
     )
 
+    // eslint-disable-next-line no-console
     console.error(
       `Actions ${actionsWithoutCreate.length}:`,
       actionsWithoutCreate.sort()
