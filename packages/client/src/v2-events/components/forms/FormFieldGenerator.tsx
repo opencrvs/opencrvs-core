@@ -128,6 +128,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   requiredErrorMessage?: MessageDescriptor
   eventConfig?: EventConfig
   event?: EventIndex
+  readonlyMode?: boolean
 }
 
 const GeneratedInputField = React.memo(
@@ -141,7 +142,8 @@ const GeneratedInputField = React.memo(
     value,
     formData,
     disabled,
-    eventConfig
+    eventConfig,
+    readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
 
@@ -164,7 +166,7 @@ const GeneratedInputField = React.memo(
       onChange,
       onBlur,
       value,
-      disabled: fieldDefinition.disabled ?? disabled,
+      disabled: fieldDefinition.disabled || readonlyMode,
       error: Boolean(error),
       touched: Boolean(touched),
       placeholder:
@@ -395,7 +397,9 @@ const GeneratedInputField = React.memo(
     }
 
     if (isSignatureFieldType(field)) {
-      return (
+      return readonlyMode ? (
+        <></>
+      ) : (
         <InputField {...inputFieldProps}>
           <SignatureUploader
             name={fieldDefinition.id}
@@ -532,6 +536,7 @@ interface ExposedProps {
   initialValues?: EventState
   eventConfig?: EventConfig
   eventDeclarationData?: EventState
+  readonlyMode?: boolean
 }
 
 type AllProps = ExposedProps &
@@ -654,7 +659,8 @@ class FormSectionComponent extends React.Component<AllProps> {
       touched,
       intl,
       className,
-      eventDeclarationData
+      eventDeclarationData,
+      readonlyMode
     } = this.props
 
     const language = this.props.intl.locale
@@ -717,6 +723,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                         this.props.onUploadingStateChanged
                       }
                       eventConfig={this.props.eventConfig}
+                      readonlyMode={readonlyMode}
                     />
                   )
                 }}
