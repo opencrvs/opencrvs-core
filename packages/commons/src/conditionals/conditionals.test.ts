@@ -464,3 +464,123 @@ describe('"valid name" conditionals', () => {
     })
   })
 })
+
+describe('"range number" conditional', () => {
+  describe('Valid range', () => {
+    it('should pass when the number is at the lower boundary', () => {
+      const validRange = 0
+      const params = {
+        $form: { 'child.weightAtBirth': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(true)
+    })
+
+    it('should pass when the number is at the upper boundary', () => {
+      const validRange = 10
+      const params = {
+        $form: { 'child.weightAtBirth': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(true)
+    })
+
+    it('should pass when the number is within the range', () => {
+      const validRange = 5
+      const params = {
+        $form: { 'child.weightAtBirth': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(true)
+    })
+  })
+
+  describe('Invalid range', () => {
+    it('should fail when the number is below the lower boundary', () => {
+      const invalidRange = -1
+      const params = {
+        $form: { 'child.weightAtBirth': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(false)
+    })
+
+    it('should fail when the number is above the upper boundary', () => {
+      const invalidRange = 11
+      const params = {
+        $form: { 'child.weightAtBirth': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(false)
+    })
+  })
+
+  describe('Edge cases', () => {
+    it('should pass for a decimal number within range', () => {
+      const validRange = 5.5
+      const params = {
+        $form: { 'child.weightAtBirth': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(true)
+    })
+
+    it('should fail for a decimal number below the range', () => {
+      const invalidRange = -0.1
+      const params = {
+        $form: { 'child.weightAtBirth': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(false)
+    })
+
+    it('should fail for a decimal number above the range', () => {
+      const invalidRange = 10.1
+      const params = {
+        $form: { 'child.weightAtBirth': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(false)
+    })
+  })
+
+  describe('Different field names', () => {
+    it('should pass validation for an alternative field name', () => {
+      const validRange = 7
+      const params = {
+        $form: { 'adult.heightInFeet': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('adult.heightInFeet').isBetween(5, 8), params)
+      ).toBe(true)
+    })
+
+    it('should fail validation for an alternative field name', () => {
+      const invalidRange = 4
+      const params = {
+        $form: { 'adult.heightInFeet': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('adult.heightInFeet').isBetween(5, 8), params)
+      ).toBe(false)
+    })
+  })
+})

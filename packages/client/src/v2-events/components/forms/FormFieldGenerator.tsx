@@ -117,13 +117,25 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   fields: FieldConfig[]
   values: EventState
+  /**@todo - figure out when to use this rather than onChange handler */
   setFieldValue: (name: string, value: FieldValue | undefined) => void
   onClick?: () => void
+  /**
+   * onChange is not called within the Field component's onChange handler
+   * onChange is called within the Field component's onBlur handler
+   */
   onChange: (e: React.ChangeEvent) => void
+  /**
+   * onBlur is used to set the touched state of the field
+   * onChange doesn't set the touched state
+   */
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
   value: FieldValue
   touched: boolean
+  /**
+   * Errors are rendered only when both error and touched are truthy
+   */
   error: string
   formData: EventState
   disabled?: boolean
@@ -289,6 +301,7 @@ const GeneratedInputField = React.memo(
             {...inputProps}
             disabled={disabled}
             value={field.value}
+            onChange={(val) => setFieldValue(fieldDefinition.id, val)}
             min={field.config.configuration?.min}
             max={field.config.configuration?.max}
           />
