@@ -335,9 +335,11 @@ export async function addAction(
   )
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent)
-  await notifyOnAction(input, updatedEvent, token)
-  await deleteDraftsByEventId(eventId)
+  if (action.type !== ActionType.READ) {
+    await indexEvent(updatedEvent)
+    await notifyOnAction(input, updatedEvent, token)
+    await deleteDraftsByEventId(eventId)
+  }
 
   return updatedEvent
 }
