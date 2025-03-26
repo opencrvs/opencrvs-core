@@ -221,8 +221,8 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       event === EventType.Birth
         ? getBirthMutation(submissionAction)
         : event === EventType.Death
-        ? getDeathMutation(submissionAction)
-        : getMarriageMutation(submissionAction)
+          ? getDeathMutation(submissionAction)
+          : getMarriageMutation(submissionAction)
 
     if (!mutation) {
       throw new Error(

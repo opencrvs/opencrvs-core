@@ -28,10 +28,10 @@ describe('authenticate handler receives a request', () => {
 
   describe('user management service says credentials are valid', () => {
     it('verifies a code and generates a token', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      /* eslint-disable @typescript-eslint/no-require-imports */
+      /* eslint-disable @typescript-eslint/no-var-requires */
       const codeService = require('./service')
 
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
 
@@ -95,7 +95,6 @@ describe('authenticate handler receives a request', () => {
   })
   describe('user auth service says credentials are invalid', () => {
     it('returns a 401 if the code is bad', async () => {
-      // eslint-disable-next-line
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         id: '1',

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -67,7 +68,7 @@ module.exports = defineConfig([
       'import/no-unresolved': 'off',
       'import/prefer-default-export': 'off',
       'import/no-named-as-default': 'off',
-      'import/no-relative-parent-imports': 2,
+      'import/no-relative-parent-imports': 'error',
       'import/named': 0,
       'import/no-duplicates': 'error',
       '@typescript-eslint/explicit-function-return-type': 'off',

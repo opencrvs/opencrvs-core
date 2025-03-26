@@ -17,7 +17,7 @@
     "gen:schema:watch": "nodemon --quiet --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
     "gen:types:watch": "nodemon --quiet --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "eslint -c .eslintrc.js --fix ./src --max-warnings=0"
+    "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "dependencies": {
     "@apollo/datasource-rest": "^6.3.0",

@@ -6,7 +6,8 @@
   "license": "MPL-2.0",
   "scripts": {
     "seed": "NODE_OPTIONS=--dns-result-order=ipv4first ts-node -r tsconfig-paths/register src/index.ts",
-    "test:compilation": "tsc --noEmit"
+    "test:compilation": "tsc --noEmit",
+    "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "devDependencies": {
     "eslint": "^9.23.0",

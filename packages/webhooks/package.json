@@ -10,7 +10,7 @@
     "test": "jest  --coverage --silent --noStackTrace --forceExit && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "eslint -c .eslintrc.js --fix ./src --max-warnings=0",
+    "lint": "eslint -c eslint.config.js --fix  --max-warnings=0",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
     "build:clean": "rm -rf build"

@@ -97,7 +97,7 @@ export const useHomePage = () => {
       typeof path === 'string'
         ? pathname.startsWith(path)
         : path.pathname
-        ? pathname.startsWith(path.pathname)
-        : false
+          ? pathname.startsWith(path.pathname)
+          : false
   }
 }

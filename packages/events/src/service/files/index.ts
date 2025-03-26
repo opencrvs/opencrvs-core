@@ -109,7 +109,6 @@ export async function presignFilesInEvent(
           ).type === FieldType.FILE
       )
       .filter((value): value is [string, Exclude<FileFieldValue, null>] => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         return value[1] !== null
       })
       .map(([fieldId, value]) => {

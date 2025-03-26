@@ -9,12 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+const { FlatCompat } = require('@eslint/eslintrc')
 const { defineConfig } = require('eslint/config')
 const path = require('path')
 const eventsConfig = require('../../eslint.events.config.js')
 
+const compat = new FlatCompat({
+  baseDirectory: path.dirname(__filename)
+})
+
 module.exports = defineConfig([
-  ...eventsConfig,
+  { ignores: ['build/**/*', 'eslint*', 'vitest.config.ts'] },
+  ...compat.extends(
+    'plugin:@typescript-eslint/recommended',
+    'plugin:import/recommended',
+    'plugin:prettier/recommended'
+  ),
   {
     languageOptions: {
       sourceType: 'commonjs',
@@ -30,6 +40,7 @@ module.exports = defineConfig([
       },
       files: ['./src/**/*.ts'],
       rules: {
+        ...eventsConfig.rules,
         'no-console': 'warn',
         '@typescript-eslint/no-unused-vars': 'warn',
         'import/order': [

@@ -57,7 +57,7 @@
     "test:watch": "vitest",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
-    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
+    "lint:ts": "eslint -c eslint.config.js",
     "start:prod": "yarn serve -s -l 3020 build",
     "test:compilation": "tsc --noEmit",
     "build:clean": "rm -rf build",

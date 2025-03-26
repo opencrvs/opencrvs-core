@@ -10,49 +10,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-const { FlatCompat } = require('@eslint/eslintrc')
-const tsParser = require('@typescript-eslint/parser')
-const react = require('eslint-plugin-react')
-const reactHooks = require('eslint-plugin-react-hooks')
-const path = require('path')
 const eventsConfig = require('../../eslint.events.config.js')
 const { defineConfig } = require('eslint/config')
 
-const compat = new FlatCompat({
-  baseDirectory: path.dirname(__filename)
-})
-
 module.exports = defineConfig([
   {
-    ignores: [
-      '!src/v2-events/**/*.{ts,tsx}',
-      '!./src/v2-events/**/*.ts',
-      '!./src/v2-events/**/*.tsx'
-    ]
-  },
-  {
-    languageOptions: {
-      sourceType: 'commonjs',
-      parser: tsParser,
-      parserOptions: {
-        project: [path.resolve(__dirname, './tsconfig.json')]
-      }
-    },
-    settings: {
-      'import/resolver': {
-        typescript: {
-          project: path.resolve(__dirname, './tsconfig.json')
-        }
-      }
-    }
-  },
-  ...eventsConfig,
-  ...compat.extends('plugin:jsx-a11y/recommended'),
-  {
-    plugins: {
-      react,
-      'react-hooks': reactHooks
-    },
     files: ['./src/v2-events/**/*.ts', './src/v2-events/**/*.tsx'],
     ignores: [
       '!src/v2-events/**/*.{ts,tsx}',
@@ -60,6 +22,7 @@ module.exports = defineConfig([
       '!./src/v2-events/**/*.tsx'
     ],
     rules: {
+      ...eventsConfig.rules,
       'max-lines': ['warn', 600],
       'no-console': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',

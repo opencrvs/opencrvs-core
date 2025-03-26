@@ -32,5 +32,11 @@ module.exports = defineConfig([
       }
     },
     files: ['./src/**/*.ts']
+  },
+  {
+    rules: {
+      'no-console': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off'
+    }
   }
 ])

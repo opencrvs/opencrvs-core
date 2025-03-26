@@ -52,13 +52,11 @@ export const up = async (db: Db, client: MongoClient) => {
           'identifier.type'
         )
 
-      // eslint-disable-next-line no-console
       console.log(
         `Migration - Patient identifier update with fhir Codeableconcept, total ${patientWithRNIdentifierCount} patient needs to be processed`
       )
 
       for await (const patient of patientWithRNIdentifier) {
-        // eslint-disable-next-line no-console
         console.log(
           `Processed ${
             processPatient + 1
@@ -96,13 +94,11 @@ export const up = async (db: Db, client: MongoClient) => {
         }
       }
 
-      // eslint-disable-next-line no-console
       console.log(
         `Migration - Patient history identifier update with fhir Codeableconcept, total ${patientHistoryWithRNIdentifierCount} patient history needs to be processed`
       )
 
       for await (const patient of patientHistoryWithRNIdentifier) {
-        // eslint-disable-next-line no-console
         console.log(
           `Processed ${
             processPatientHistory + 1

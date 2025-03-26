@@ -745,8 +745,8 @@ export async function updateWorkqueueData(
     declaration.event === 'birth'
       ? ['child']
       : declaration.event === 'death'
-      ? ['deceased']
-      : ['groom', 'bride']
+        ? ['deceased']
+        : ['groom', 'bride']
 
   let transformedName: (GQLHumanName | null)[] | undefined
   let transformedNameForGroom: (GQLHumanName | null)[] | undefined

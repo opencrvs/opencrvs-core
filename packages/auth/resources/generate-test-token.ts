@@ -60,7 +60,8 @@ process.env.CONFIG_TOKEN_EXPIRY = options.expiresIn
 process.env.CERT_PRIVATE_KEY_PATH = join(__dirname, '../test/cert.key')
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, '../test/cert.key.pub')
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { createToken } = require('@auth/features/authenticate/service')
 
 createToken(

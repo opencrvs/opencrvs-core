@@ -445,10 +445,10 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         ? true
         : false
       : props.queryData.notificationData &&
-        props.queryData.notificationData.totalItems &&
-        props.queryData.notificationData.totalItems > props.pageSize
-      ? true
-      : false
+          props.queryData.notificationData.totalItems &&
+          props.queryData.notificationData.totalItems > props.pageSize
+        ? true
+        : false
 
   const { inProgressData, notificationData } = queryData
   const paginationId =

@@ -9,41 +9,51 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-const { FlatCompat } = require('@eslint/eslintrc')
 const react = require('eslint-plugin-react')
-const reactHooks = require('eslint-plugin-react-hooks')
+const { FlatCompat } = require('@eslint/eslintrc')
+const baseConfig = require('../../eslint.config.js')
 const tsParser = require('@typescript-eslint/parser')
 const path = require('path')
-const eventsConfig = require('./eslint.events.config.js')
-const legacyConfig = require('./eslint.legacy.config.js')
 
 const compat = new FlatCompat({
   baseDirectory: path.dirname(__filename)
 })
 
 module.exports = [
-  {
-    ignores: [
-      'test-runner-jest.config.js',
-      'build/**/*',
-      'eslint*',
-      '**/*.js',
-      '**/__mocks__/**/*'
-    ]
-  },
-  ...compat.extends(
-    'plugin:@typescript-eslint/recommended',
-    'plugin:import/recommended',
-    'plugin:prettier/recommended',
-    'plugin:jsx-a11y/recommended'
-  ),
+  { ignores: ['test-runner-jest.config.js', 'build/**/*', 'eslint*'] },
+  ...baseConfig,
   {
     plugins: {
-      react,
-      'react-hooks': reactHooks
-    }
-  },
-  {
+      react
+    },
+    // env: {
+    //   es6: true,
+    //   browser: true,
+    //   node: true,
+    //   jest: true
+    // },
+    files: ['./src/**/*.ts', './src/**/*.tsx'],
+    rules: {
+      'react/no-unescaped-entities': 'off',
+      'react/destructuring-assignment': 'off',
+      'react/jsx-filename-extension': [
+        1,
+        {
+          extensions: ['.tsx']
+        }
+      ],
+      'react/boolean-prop-naming': 'off',
+      'react/sort-comp': 'off',
+      'react/sort-prop-types': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off'
+    },
+    settings: {
+      react: {
+        pragma: 'React',
+        version: 'detect'
+      }
+    },
+
     languageOptions: {
       sourceType: 'commonjs',
       parser: tsParser,
@@ -58,18 +68,5 @@ module.exports = [
         }
       }
     }
-  },
-  ...eventsConfig,
-  {
-    ignores: [
-      'src/v2-events/**/*.{ts,tsx}',
-      './src/v2-events/**/*.ts',
-      './src/v2-events/**/*.tsx'
-    ]
-  },
-  {
-    files: ['./**/*.ts', './**/*.tsx'],
-    rules: { 'import/no-relative-parent-imports': 'error' }
-  },
-  ...legacyConfig
+  }
 ]

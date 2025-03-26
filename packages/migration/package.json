@@ -19,6 +19,7 @@
     "status:user-mgnt": "migrate-mongo status -f ./src/migrate-mongo-config-user-mgnt.js",
     "status:application-config": "migrate-mongo status -f ./src/migrate-mongo-config-application-config.js",
     "reindex-search": "NODE_OPTIONS=--dns-result-order=ipv4first tsx src/reindex-search.ts",
+    "lint": "eslint -c eslint.config.cjs --max-warnings=0",
     "test:compilation": "tsc --noEmit",
     "build": "rimraf build && tsc"
   },
