@@ -12,26 +12,30 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
-  EventIndex,
-  ActionDocument,
   getAllFields,
   SummaryConfig,
   FieldValue,
-  getCurrentEventStateWithDrafts
+  getCurrentEventStateWithDrafts,
+  EventDocument,
+  Draft,
+  getCurrentEventState,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getUserIdsFromActions } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUserIdsFromActions
+} from '@client/v2-events/utils'
 import {
   RecursiveStringRecord,
   useFormDataStringifier
@@ -55,9 +59,7 @@ function EventOverviewContainer() {
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
   const drafts = getRemoteDrafts()
-
   const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
-  const event = getCurrentEventStateWithDrafts(fullEvent, drafts)
 
   const userIds = getUserIdsFromActions(fullEvent.actions)
   const [users] = getUsers.useSuspenseQuery(userIds)
@@ -66,12 +68,19 @@ function EventOverviewContainer() {
   return (
     <EventOverviewProvider locations={locations} users={users}>
       <EventOverview
-        event={event}
-        history={fullEvent.actions}
+        drafts={drafts}
+        event={fullEvent}
         summary={config.summary}
       />
     </EventOverviewProvider>
   )
+}
+
+function getDefaultFieldValues(trackingId: string, status: EventStatus) {
+  return {
+    'event.trackingId': trackingId,
+    'event.status': status
+  }
 }
 
 /**
@@ -79,46 +88,51 @@ function EventOverviewContainer() {
  */
 function EventOverview({
   event,
-  summary,
-  history
+  drafts,
+  summary
 }: {
-  event: EventIndex
+  drafts: Draft[]
+  event: EventDocument
   summary: SummaryConfig
-  history: ActionDocument[]
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const allFields = getAllFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
 
+  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
+  const eventIndex = getCurrentEventState(event)
+  const { trackingId, status } = eventIndex
+
   const stringifyFormData = useFormDataStringifier()
-
-  const eventWithDefaults = stringifyFormData(allFields, event.data)
-
-  const emptyEvent = setEmptyValuesForFields(getAllFields(eventConfiguration))
+  const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
 
   const flattenedEventIndex: Record<
     string,
     FieldValue | null | RecursiveStringRecord
   > = {
-    ...emptyEvent,
-    ...eventWithDefaults
+    ...eventWithDefaults,
+    ...flattenEventIndex({ ...eventIndex, data: eventWithDrafts.data }),
+    ...getDefaultFieldValues(trackingId, status)
   }
 
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
-
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
     : ''
   return (
     <Content
-      icon={() => <IconWithName name={''} status={event.status} />}
+      icon={() => <IconWithName name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title || fallbackTitle}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
-      <EventSummary event={flattenedEventIndex} summary={summary} />
-      <EventHistory history={history} />
+      <EventSummary
+        event={flattenedEventIndex}
+        eventLabel={eventConfiguration.label}
+        summary={summary}
+      />
+      <EventHistory history={event.actions} />
     </Content>
   )
 }

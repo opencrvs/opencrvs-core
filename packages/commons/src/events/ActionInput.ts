@@ -149,6 +149,14 @@ export type ApproveCorrectionActionInput = z.infer<
   typeof ApproveCorrectionActionInput
 >
 
+export const ReadActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.READ).default(ActionType.READ)
+  })
+)
+
+export type ReadActionInput = z.infer<typeof ReadActionInput>
+
 /**
  * ActionInput types are used to validate the input data for the action.
  * In our use case, we use it directly with TRPC to validate the input data for the action.
@@ -171,7 +179,8 @@ export const ActionInput = z.discriminatedUnion('type', [
   PrintCertificateActionInput,
   RequestCorrectionActionInput,
   RejectCorrectionActionInput,
-  ApproveCorrectionActionInput
+  ApproveCorrectionActionInput,
+  ReadActionInput
 ])
 
 export type ActionInput = z.input<typeof ActionInput>

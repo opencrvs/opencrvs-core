@@ -51,7 +51,8 @@ import {
   TaskHistory,
   RejectedRecord,
   SupportedPatientIdentifierCode,
-  PractitionerRole
+  PractitionerRole,
+  Saved
 } from '@opencrvs/commons/types'
 import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
@@ -106,7 +107,8 @@ import {
   mergeChangedResourcesIntoRecord,
   createReinstateTask,
   mergeBundles,
-  getPractitionerRoleFromToken
+  getPractitionerRoleFromToken,
+  createRetrieveTask
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 import { getRecordSpecificToken } from './token-exchange'
@@ -352,7 +354,7 @@ export function toIdentifierUpserted<T extends ValidRecord>(
     type: SupportedPatientIdentifierCode
     value: string
   }[]
-): T {
+): [T, Bundle<Saved<Patient>>] {
   const task = getTaskFromSavedBundle(record)
   const event = getTaskEventType(task)
   const composition = getComposition(record)
@@ -368,16 +370,27 @@ export function toIdentifierUpserted<T extends ValidRecord>(
         .map((patient) => patient.id)
         .includes(e.resource.id)
   )
-  return {
-    ...record,
-    entry: [
-      ...filteredEntry,
-      ...patientWithUpsertedIdentifier.map((resource) => ({
-        ...record.entry.find((e) => e.resource.id === resource.id),
-        resource
-      }))
-    ]
-  }
+  return [
+    {
+      ...record,
+      entry: [
+        ...filteredEntry,
+        ...patientWithUpsertedIdentifier.map((resource) => ({
+          ...record.entry.find((e) => e.resource.id === resource.id),
+          resource
+        }))
+      ]
+    },
+    {
+      ...record,
+      entry: [
+        ...patientWithUpsertedIdentifier.map((resource) => ({
+          ...record.entry.find((e) => e.resource.id === resource.id),
+          resource
+        }))
+      ]
+    }
+  ]
 }
 
 export async function toDownloaded(
@@ -437,6 +450,49 @@ export async function toDownloaded(
   }
 
   return { downloadedRecord, downloadedBundleWithResources }
+}
+
+export async function toRetrieved(
+  record: ValidRecord,
+  token: string
+): Promise<[ValidRecord, Bundle<SavedTask>]> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const taskWithoutPractitionerDetails = createRetrieveTask(previousTask)
+  const [downloadedTask, practitionerDetailsBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerDetails, token)
+
+  // TaskHistory is added to the bundle to show audit history via gateway type resolvers in frontend
+  const taskHistoryEntry = resourceToBundleEntry(
+    toHistoryResource(previousTask)
+  ) as SavedBundleEntry<TaskHistory>
+
+  const filteredEntriesWithoutTask = record.entry.filter(
+    (entry) => entry.resource.id !== previousTask.id
+  )
+  const newTaskEntry = {
+    fullUrl: record.entry.find(
+      (entry) => entry.resource.id === previousTask.id
+    )!.fullUrl,
+    resource: downloadedTask
+  }
+
+  const updatedBundle = {
+    ...record,
+    entry: [...filteredEntriesWithoutTask, newTaskEntry, taskHistoryEntry]
+  }
+
+  const retrievedRecord = mergeBundles(
+    updatedBundle,
+    practitionerDetailsBundle
+  ) as ValidRecord
+
+  const changedResources: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: downloadedTask }]
+  }
+
+  return [retrievedRecord, changedResources]
 }
 
 export async function toRejected(

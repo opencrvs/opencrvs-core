@@ -67,6 +67,8 @@ export function Pages() {
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       {modal}
       <PagesComponent
+        eventConfig={configuration}
+        eventDeclarationData={event.data}
         form={form}
         formPages={formPages}
         pageId={currentPageId}

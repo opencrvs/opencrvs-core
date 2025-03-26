@@ -19,7 +19,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
 
   await expect(
     client.event.actions.archive(
-      generator.event.actions.archive('event-test-id-12345', {})
+      generator.event.actions.archive('event-test-id-12345')
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
@@ -30,7 +30,7 @@ test(`allows access if required scope is present`, async () => {
 
   await expect(
     client.event.actions.archive(
-      generator.event.actions.archive('event-test-id-12345', {})
+      generator.event.actions.archive('event-test-id-12345')
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
@@ -47,7 +47,7 @@ test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} 
 
   const actions = (
     await client.event.actions.archive(
-      generator.event.actions.archive(originalEvent.id, {}, true)
+      generator.event.actions.archive(originalEvent.id, undefined, true)
     )
   ).actions.map(({ type }) => type)
 

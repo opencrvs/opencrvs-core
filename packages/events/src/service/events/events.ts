@@ -19,10 +19,11 @@ import {
   FieldConfig,
   FieldType,
   FieldUpdateValue,
-  FileFieldValue
+  FileFieldValue,
+  findActiveActionFields
 } from '@opencrvs/commons/events'
 import {
-  getActionFormFields,
+  getEventConfigurationById,
   notifyOnAction
 } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
@@ -109,12 +110,14 @@ export async function deleteEvent(
 }
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
+
   for (const ac of event.actions) {
-    const fieldConfigs = await getActionFormFields({
-      token,
-      eventType: event.type,
-      action: ac.type
-    })
+    const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
+
     for (const [key, value] of Object.entries(ac.data)) {
       const fileValue = getValidFileValue(key, value, fieldConfigs)
 
@@ -266,11 +269,13 @@ export async function addAction(
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
-  const fieldConfigs = await getActionFormFields({
+  const configuration = await getEventConfigurationById({
     token,
-    eventType: event.type,
-    action: input.type
+    eventType: event.type
   })
+
+  const fieldConfigs =
+    findActiveActionFields(configuration, input.type, input.data) || []
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
 
   for (const file of fileValuesInCurrentAction) {

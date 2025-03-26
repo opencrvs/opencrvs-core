@@ -2,8 +2,10 @@
 
 exports[`Prevents adding birth date in future 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2040-02-01"}]]`;
 
-exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required for registration","id":"applicant.firstname"},{"message":"Required for registration","id":"applicant.surname"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Invalid date. Please use the format YYYY-MM-DD","id":"applicant.dob","value":"02-02"},{"message":"Required for registration","id":"applicant.address"}]]`;
+exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required for registration","id":"applicant.firstname"},{"message":"Required for registration","id":"applicant.surname"},{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Required for registration","id":"applicant.address"}]]`;
+
+exports[`gives validation error when a conditional page, which is visible, has a required field 1`] = `[TRPCError: [{"message":"Required for registration","id":"senior-pass.id"}]]`;
 
 exports[`validation prevents including hidden fields 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.firstname","value":"this should not be here"}]]`;
 
-exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"},{"message":"Invalid date. Please use the format YYYY-MM-DD","id":"applicant.dob","value":"02-1-2024"}]]`;
+exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;

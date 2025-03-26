@@ -15,12 +15,16 @@ import {
   TextInput as TextInputComponent
 } from '@opencrvs/components'
 
-interface NumberInputProps extends Omit<TextInputProps, 'type' | 'maxLength'> {
-  value: number
+interface NumberInputProps
+  extends Omit<TextInputProps, 'type' | 'maxLength' | 'onChange'> {
+  onChange(val: number | undefined): void
+  value: number | undefined
 }
 
 function NumberInput({ value, disabled, ...props }: NumberInputProps) {
-  const inputValue = isNaN(value) ? '' : value.toString()
+  const [inputValue, setInputValue] = React.useState(
+    value && isNaN(value) ? undefined : value
+  )
 
   return (
     <TextInputComponent
@@ -29,6 +33,19 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
       data-testid={`number__${props.id}`}
       isDisabled={disabled}
       value={inputValue}
+      onBlur={(e) => {
+        props.onChange(inputValue)
+        props.onBlur?.(e)
+      }}
+      onChange={(e) => {
+        // Parse the input value as a floating-point number to allow decimal values.
+        // If the parsed value is NaN (e.g., when the input is cleared), set inputValue to undefined.
+        // Otherwise, update inputValue with the parsed number.
+        const updatedValue = parseFloat(e.target.value)
+        isNaN(updatedValue)
+          ? setInputValue(undefined)
+          : setInputValue(updatedValue)
+      }}
     />
   )
 }

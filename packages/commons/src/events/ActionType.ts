@@ -29,7 +29,14 @@ export const ActionType = {
   CUSTOM: 'CUSTOM',
   REJECT: 'REJECT',
   MARKED_AS_DUPLICATE: 'MARKED_AS_DUPLICATE',
-  ARCHIVE: 'ARCHIVE'
+  ARCHIVE: 'ARCHIVE',
+  READ: 'READ'
 } as const
+
+/**
+ * Actions that can be attached to an event document
+ * even if they are not in event configuration
+ */
+export const LatentActions = [ActionType.ARCHIVE, ActionType.REJECT]
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]

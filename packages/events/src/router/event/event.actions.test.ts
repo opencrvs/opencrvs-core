@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType, getCurrentEventState } from '@opencrvs/commons'
+import {
+  ActionType,
+  AddressType,
+  getCurrentEventState
+} from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('actions can be added to created events', async () => {
@@ -51,7 +55,8 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.DECLARE }),
     expect.objectContaining({ type: ActionType.VALIDATE }),
-    expect.objectContaining({ type: ActionType.REGISTER })
+    expect.objectContaining({ type: ActionType.REGISTER }),
+    expect.objectContaining({ type: ActionType.READ })
   ])
 })
 
@@ -63,6 +68,7 @@ test('Action data accepts partial changes', async () => {
 
   const addressWithoutVillage = {
     country: 'FAR',
+    addressType: AddressType.DOMESTIC,
     province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
     urbanOrRural: 'RURAL' as const

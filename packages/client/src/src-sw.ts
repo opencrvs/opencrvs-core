@@ -81,6 +81,8 @@ registerRoute(/http(.+)handlebars\.js$/, new NetworkFirst())
 registerRoute(/http(.+)conditionals\.js$/, new NetworkFirst())
 // This caches config fetched from the config microservice
 registerRoute(/http(.+)config$/, new NetworkFirst())
+// This caches certificates fetched from the countryconfig microservice
+registerRoute(/api\/countryconfig\/certificates/, new NetworkFirst())
 
 // This caches the minio urls
 registerRoute(MINIO_REGEX, new CacheFirst())
