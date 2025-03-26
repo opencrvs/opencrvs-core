@@ -373,11 +373,22 @@ const Address = BaseField.extend({
   defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
+export const DataEntry = z.union([
+  z.object({
+    label: TranslationConfig,
+    value: z.string()
+  }),
+  z.object({
+    fieldId: z.string()
+  })
+])
+export type DataEntry = z.infer<typeof DataEntry>
+
 const DataField = BaseField.extend({
   type: z.literal(FieldType.DATA),
   configuration: z.object({
     subtitle: TranslationConfig.optional(),
-    data: z.array(z.object({ fieldId: z.string() }))
+    data: z.array(DataEntry)
   })
 }).describe('Data field for displaying read-only data')
 

@@ -93,7 +93,10 @@ import {
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
-import { Data } from '@client/v2-events/features/events/registered-fields/Data'
+import {
+  Data,
+  getFieldFromDataEntry
+} from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 
@@ -507,10 +510,9 @@ const GeneratedInputField = React.memo(
         return null
       }
 
-      const fields = field.config.configuration.data.map(({ fieldId }) => ({
-        value: formData[fieldId],
-        config: declareFormFields.find((f) => f.id === fieldId)
-      }))
+      const fields = field.config.configuration.data.map((entry) =>
+        getFieldFromDataEntry({ dataEntry: entry, declareFormFields, formData })
+      )
 
       return <Data.Input {...field.config} fields={fields} />
     }

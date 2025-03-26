@@ -45,6 +45,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
         eventConfig={tennisClubMembershipEvent}
         eventDeclarationData={{
           'applicant.firstname': 'Tanya',
+          'applicant.id': '2370934578',
           'applicant.surname': 'McQuaid',
           'applicant.dob': '1975-01-02'
         }}
@@ -72,6 +73,14 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
                 },
                 {
                   fieldId: 'applicant.dob'
+                },
+                {
+                  label: {
+                    defaultMessage: 'ID',
+                    description: 'This is the label for the field',
+                    id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
+                  },
+                  value: 'National ID | {applicant.id}'
                 }
               ]
             }
