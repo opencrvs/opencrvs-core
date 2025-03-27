@@ -15,6 +15,7 @@ import {
   FieldValue,
   isAddressFieldType,
   isAdministrativeAreaFieldType,
+  isCountryFieldType,
   isFacilityFieldType,
   isLocationFieldType,
   isRadioGroupFieldType
@@ -22,13 +23,15 @@ import {
 import {
   Address,
   AdministrativeArea,
-  RadioGroup
+  RadioGroup,
+  SelectCountry as Country
 } from '@client/v2-events/features/events/registered-fields'
 
 function useFieldStringifier() {
   const stringifyLocation = AdministrativeArea.useStringifier()
   const stringifyAddress = Address.useStringifier()
   const stringifyRadioGroup = RadioGroup.useStringifier()
+  const stringifyCountry = Country.useStringifier()
 
   return (fieldConfig: FieldConfig, value: FieldValue) => {
     const field = { config: fieldConfig, value }
@@ -47,6 +50,10 @@ function useFieldStringifier() {
 
     if (isRadioGroupFieldType(field)) {
       return stringifyRadioGroup(field.value, field.config)
+    }
+
+    if (isCountryFieldType(field)) {
+      return stringifyCountry(field.value)
     }
 
     return !value ? '' : value.toString()

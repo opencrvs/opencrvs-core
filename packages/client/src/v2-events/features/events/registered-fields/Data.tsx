@@ -11,7 +11,14 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { FieldProps, FieldValue, Inferred } from '@opencrvs/commons/client'
+import {
+  DataEntry,
+  EventState,
+  FieldProps,
+  FieldType,
+  FieldValue,
+  Inferred
+} from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
 const Container = styled.div`
@@ -62,7 +69,9 @@ function DataInput({
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
       <dl>
-        {data.map(({ fieldId }) => {
+        {data.map((dataEntry) => {
+          const fieldId =
+            'fieldId' in dataEntry ? dataEntry.fieldId : dataEntry.label.id
           const field = fields.find((f) => f.config?.id === fieldId)
 
           if (!field || !field.config) {
@@ -90,4 +99,43 @@ function DataInput({
 export const Data = {
   Input: DataInput,
   Output: null
+}
+
+export function getFieldFromDataEntry({
+  formData,
+  dataEntry,
+  declareFormFields
+}: {
+  formData: EventState
+  dataEntry: DataEntry
+  declareFormFields: Inferred[]
+}): { value: FieldValue; config?: Inferred } {
+  if ('fieldId' in dataEntry) {
+    return {
+      value: formData[dataEntry.fieldId],
+      config: declareFormFields.find((f) => f.id === dataEntry.fieldId)
+    }
+  }
+  const { value, label } = dataEntry
+  const template = value
+  let resolvedValue = value
+  const keys = template.match(/{([^}]+)}/g)
+  if (keys) {
+    keys.forEach((key) => {
+      const val = formData[key.replace(/{|}/g, '')]
+      if (!val) {
+        throw new Error(`Could not resolve ${key}`)
+      }
+      resolvedValue = resolvedValue.replace(key, val.toString())
+    })
+  }
+
+  return {
+    value: resolvedValue,
+    config: {
+      type: FieldType.TEXT,
+      id: label.id,
+      label: label
+    }
+  }
 }

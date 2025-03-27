@@ -93,7 +93,10 @@ import {
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
-import { Data } from '@client/v2-events/features/events/registered-fields/Data'
+import {
+  Data,
+  getFieldFromDataEntry
+} from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 
@@ -114,13 +117,25 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   fields: FieldConfig[]
   values: EventState
+  /**@todo - figure out when to use this rather than onChange handler */
   setFieldValue: (name: string, value: FieldValue | undefined) => void
   onClick?: () => void
+  /**
+   * onChange is not called within the Field component's onChange handler
+   * onChange is called within the Field component's onBlur handler
+   */
   onChange: (e: React.ChangeEvent) => void
+  /**
+   * onBlur is used to set the touched state of the field
+   * onChange doesn't set the touched state
+   */
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
   value: FieldValue
   touched: boolean
+  /**
+   * Errors are rendered only when both error and touched are truthy
+   */
   error: string
   formData: EventState
   disabled?: boolean
@@ -128,6 +143,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   requiredErrorMessage?: MessageDescriptor
   eventConfig?: EventConfig
   event?: EventIndex
+  readonlyMode?: boolean
 }
 
 const GeneratedInputField = React.memo(
@@ -141,7 +157,8 @@ const GeneratedInputField = React.memo(
     value,
     formData,
     disabled,
-    eventConfig
+    eventConfig,
+    readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
 
@@ -153,7 +170,7 @@ const GeneratedInputField = React.memo(
           ? undefined
           : intl.formatMessage(fieldDefinition.label),
       required: fieldDefinition.required,
-      disabled: fieldDefinition.disabled,
+      disabled: fieldDefinition.disabled || readonlyMode,
       error,
       touched
     }
@@ -164,7 +181,7 @@ const GeneratedInputField = React.memo(
       onChange,
       onBlur,
       value,
-      disabled: fieldDefinition.disabled ?? disabled,
+      disabled: disabled || fieldDefinition.disabled || readonlyMode,
       error: Boolean(error),
       touched: Boolean(touched),
       placeholder:
@@ -284,8 +301,8 @@ const GeneratedInputField = React.memo(
         >
           <Number.Input
             {...inputProps}
-            disabled={disabled}
             value={field.value}
+            onChange={(val) => setFieldValue(fieldDefinition.id, val)}
             min={field.config.configuration?.min}
             max={field.config.configuration?.max}
           />
@@ -308,7 +325,6 @@ const GeneratedInputField = React.memo(
         >
           <TextArea
             {...inputProps}
-            disabled={disabled}
             maxLength={field.config.configuration?.maxLength}
             value={field.value}
           />
@@ -395,7 +411,9 @@ const GeneratedInputField = React.memo(
     }
 
     if (isSignatureFieldType(field)) {
-      return (
+      return readonlyMode ? (
+        <></>
+      ) : (
         <InputField {...inputFieldProps}>
           <SignatureUploader
             name={fieldDefinition.id}
@@ -494,10 +512,9 @@ const GeneratedInputField = React.memo(
         return null
       }
 
-      const fields = field.config.configuration.data.map(({ fieldId }) => ({
-        value: formData[fieldId],
-        config: declareFormFields.find((f) => f.id === fieldId)
-      }))
+      const fields = field.config.configuration.data.map((entry) =>
+        getFieldFromDataEntry({ dataEntry: entry, declareFormFields, formData })
+      )
 
       return <Data.Input {...field.config} fields={fields} />
     }
@@ -532,6 +549,7 @@ interface ExposedProps {
   initialValues?: EventState
   eventConfig?: EventConfig
   eventDeclarationData?: EventState
+  readonlyMode?: boolean
 }
 
 type AllProps = ExposedProps &
@@ -655,7 +673,8 @@ class FormSectionComponent extends React.Component<AllProps> {
       touched,
       intl,
       className,
-      eventDeclarationData
+      eventDeclarationData,
+      readonlyMode
     } = this.props
 
     const language = this.props.intl.locale
@@ -720,6 +739,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                         this.props.onUploadingStateChanged
                       }
                       eventConfig={this.props.eventConfig}
+                      readonlyMode={readonlyMode}
                     />
                   )
                 }}

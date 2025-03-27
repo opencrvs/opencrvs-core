@@ -79,7 +79,7 @@ import {
 import * as React from 'react'
 import { useState } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { withTheme } from 'styled-components'
 
@@ -122,6 +122,10 @@ function InProgressComponent(props: IRegistrarHomeProps) {
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NOTIFICATION_SENT)
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.DESCENDING)
 
+  const storedDeclarations = useSelector(
+    (state: IStoreState) => state.declarationsState.declarations
+  )
+
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
@@ -144,6 +148,8 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       if (!reg) {
         throw new Error('Registration is null')
       }
+
+      const storedDeclaration = storedDeclarations.find((d) => d.id === reg.id)
 
       const regId = reg.id
       const event = reg.type
@@ -222,7 +228,9 @@ function InProgressComponent(props: IRegistrarHomeProps) {
                 event: event as string,
                 compositionId: reg.id,
                 action: DownloadAction.LOAD_REVIEW_DECLARATION,
-                assignment: reg?.registration?.assignment
+                assignment:
+                  storedDeclaration?.assignmentStatus ??
+                  reg?.registration?.assignment
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus}

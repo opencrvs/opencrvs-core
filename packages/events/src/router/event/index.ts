@@ -117,7 +117,25 @@ export const eventRouter = router({
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
-      const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
+      const eventWithReadAction = await addAction(
+        {
+          type: ActionType.READ,
+          eventId: event.id,
+          transactionId: getUUID(),
+          data: {}
+        },
+        {
+          eventId: event.id,
+          createdBy: ctx.user.id,
+          createdAtLocation: ctx.user.primaryOfficeId,
+          token: ctx.token,
+          transactionId: getUUID()
+        }
+      )
+      const eventWithSignedFiles = await presignFilesInEvent(
+        eventWithReadAction,
+        ctx.token
+      )
       return eventWithSignedFiles
     }),
   delete: publicProcedure

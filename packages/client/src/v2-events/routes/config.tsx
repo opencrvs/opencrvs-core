@@ -30,6 +30,7 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { SearchResultIndex } from '@client/v2-events/features/events/AdvancedSearch/SearchResultIndex'
 import { Action } from '@client/v2-events/features/events/components/Action'
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
+import { ReadOnlyView } from '@client/v2-events/features/events/ReadOnlyView'
 import { ROUTES } from './routes'
 
 /**
@@ -52,6 +53,10 @@ export const routesConfig = {
   ),
   children: [
     workqueueRouter,
+    {
+      path: ROUTES.V2.EVENTS.VIEW.path,
+      element: <ReadOnlyView />
+    },
     {
       path: ROUTES.V2.EVENTS.OVERVIEW.path,
       element: (

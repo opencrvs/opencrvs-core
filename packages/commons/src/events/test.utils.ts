@@ -29,8 +29,10 @@ import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
   findActiveActionFormFields,
-  stripHiddenFields,
-  findActiveActionVerificationPageIds
+  getActiveActionFormPages,
+  isPageVisible,
+  isVerificationPage,
+  stripHiddenFields
 } from './utils'
 import { FieldValue } from './FieldValue'
 import { TranslationConfig } from './TranslationConfig'
@@ -58,12 +60,15 @@ export function generateActionMetadataInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const verificationPageIds = findActiveActionVerificationPageIds(
+  const visibleVerificationPageIds = getActiveActionFormPages(
     configuration,
     action
   )
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, {}))
+    .map((page) => page.id)
 
-  return verificationPageIds.reduce(
+  return visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
       ...acc,
       [pageId]: true

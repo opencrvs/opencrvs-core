@@ -274,7 +274,8 @@ export async function addAction(
     eventType: event.type
   })
 
-  const fieldConfigs = findActiveActionFields(configuration, input.type) || []
+  const fieldConfigs =
+    findActiveActionFields(configuration, input.type, input.data) || []
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
 
   for (const file of fileValuesInCurrentAction) {
@@ -334,9 +335,11 @@ export async function addAction(
   )
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent)
-  await notifyOnAction(input, updatedEvent, token)
-  await deleteDraftsByEventId(eventId)
+  if (action.type !== ActionType.READ) {
+    await indexEvent(updatedEvent)
+    await notifyOnAction(input, updatedEvent, token)
+    await deleteDraftsByEventId(eventId)
+  }
 
   return updatedEvent
 }

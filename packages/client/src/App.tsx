@@ -38,6 +38,7 @@ import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
+import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
@@ -236,6 +237,20 @@ export const routesConfig = config.FEATURES.V2_EVENTS
           {
             path: routes.WORKFLOW_STATUS,
             element: <WorkflowStatus />
+          },
+          {
+            path: routes.TEAM_SEARCH,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.USER_READ,
+                  SCOPES.USER_READ_MY_OFFICE,
+                  SCOPES.USER_READ_MY_JURISDICTION
+                ]}
+              >
+                <TeamSearch />
+              </ProtectedRoute>
+            )
           },
           {
             path: routes.CREATE_USER_ON_LOCATION,
@@ -480,6 +495,20 @@ export const routesConfig = config.FEATURES.V2_EVENTS
           {
             path: routes.WORKFLOW_STATUS,
             element: <WorkflowStatus />
+          },
+          {
+            path: routes.TEAM_SEARCH,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.USER_READ,
+                  SCOPES.USER_READ_MY_OFFICE,
+                  SCOPES.USER_READ_MY_JURISDICTION
+                ]}
+              >
+                <TeamSearch />
+              </ProtectedRoute>
+            )
           },
           {
             path: routes.CREATE_USER_ON_LOCATION,

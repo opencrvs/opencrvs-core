@@ -102,6 +102,7 @@ const CLEAR_CORRECTION_AND_PRINT_CHANGES = 'CLEAR_CORRECTION_AND_PRINT_CHANGES'
 const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
 const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
 const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
+const UNASSIGN_DECLARATION_FAILED = 'DECLARATION/UNASSIGN_FAILED'
 const REMOVE_UNASSIGNED_DECLARATIONS =
   'DECLARATION/REMOVE_UNASSIGNED_DECLARATIONS'
 
@@ -449,6 +450,16 @@ interface IUnassignDeclarationSuccess {
   }
 }
 
+interface IUnassignDeclarationFailed {
+  type: typeof UNASSIGN_DECLARATION_FAILED
+  payload: {
+    error: ApolloError
+    declarationId: string
+    client: ApolloClient<{}>
+    refetchQueries?: InternalRefetchQueriesInclude
+  }
+}
+
 export type Action =
   | IArchiveDeclarationAction
   | IStoreDeclarationAction
@@ -472,6 +483,7 @@ export type Action =
   | IEnqueueUnassignDeclaration
   | IUnassignDeclaration
   | IUnassignDeclarationSuccess
+  | IUnassignDeclarationFailed
   | IRemoveUnassignedDeclarationAction
   | ShowUnassignedDeclarations
 
@@ -1236,6 +1248,22 @@ function unassignDeclarationSuccess([id, client, refetchQueries]: [
   }
 }
 
+function unassignDeclarationFailed(
+  error: ApolloError,
+  declarationId: string,
+  client: ApolloClient<{}>,
+  refetchQueries?: InternalRefetchQueriesInclude
+): IUnassignDeclarationFailed {
+  return {
+    type: UNASSIGN_DECLARATION_FAILED,
+    payload: {
+      error,
+      declarationId,
+      client,
+      refetchQueries
+    }
+  }
+}
 export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   state: IDeclarationsState = initialState,
   action: Action
@@ -1815,7 +1843,14 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
             ]
           },
           {
-            successActionCreator: unassignDeclarationSuccess
+            successActionCreator: unassignDeclarationSuccess,
+            failActionCreator: (err: ApolloError) =>
+              unassignDeclarationFailed(
+                err,
+                action.payload.id,
+                action.payload.client,
+                action.payload.refetchQueries
+              )
           }
         )
       )
@@ -1849,6 +1884,45 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           { sequence: true }
         )
       )
+    case UNASSIGN_DECLARATION_FAILED: {
+      const error = action.payload.error
+      const declarationNextToUnassign = state.declarations.find(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_UNASSIGN
+      )
+      if (error.graphQLErrors[0]?.extensions.code === 'UNASSIGNED') {
+        return loop(
+          state,
+          Cmd.list<
+            | IDeleteDeclarationAction
+            | UpdateRegistrarWorkqueueAction
+            | IUnassignDeclaration
+          >(
+            [
+              Cmd.action(
+                deleteDeclaration(
+                  action.payload.declarationId,
+                  action.payload.client
+                )
+              ),
+              Cmd.action(updateRegistrarWorkqueue()),
+              declarationNextToUnassign
+                ? Cmd.action(
+                    executeUnassignDeclaration(
+                      declarationNextToUnassign.id,
+                      action.payload.client,
+                      action.payload.refetchQueries
+                    )
+                  )
+                : Cmd.none
+            ],
+            { sequence: true }
+          )
+        )
+      }
+      return state
+    }
+
     case REMOVE_UNASSIGNED_DECLARATIONS:
       const unassignedDeclarationTrackingIds =
         action.payload.unassignedDeclarations.map(

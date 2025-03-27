@@ -23,6 +23,9 @@ export const ROUTES = {
         'events',
         {},
         {
+          VIEW: route('view/:eventId', {
+            params: { eventId: string().defined() }
+          }),
           OVERVIEW: route('overview/:eventId', {
             params: { eventId: string().defined() }
           }),

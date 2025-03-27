@@ -31,14 +31,114 @@ import { Transform } from 'stream'
 import { z } from 'zod'
 import { DEFAULT_SIZE, generateQuery } from './utils'
 
-const SEPARATOR = '____'
+function eventToEventIndex(event: EventDocument): EventIndex {
+  return encodeEventIndex(getCurrentEventState(event))
+}
+
+export type EncodedEventIndex = EventIndex
+
+export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
+  return {
+    ...event,
+    data: Object.entries(event.data).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [encodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
+}
+
+export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
+  return {
+    ...event,
+    data: Object.entries(event.data).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [decodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
+}
+
+/*
+ * This type ensures all properties of EventIndex are present in the mapping
+ */
+type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
+
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+
+  if (!hasEventsIndex) {
+    logger.info(`Creating index ${indexName}`)
+    await createIndex(indexName, getAllFields(eventConfiguration))
+  } else {
+    logger.info(`Index ${indexName} already exists`)
+    logger.info(JSON.stringify(hasEventsIndex))
+  }
+  return ensureAlias(indexName)
+}
+async function ensureAlias(indexName: string) {
+  const client = getOrCreateClient()
+  logger.info(`Ensuring alias for index ${indexName}`)
+  const res = await client.indices.putAlias({
+    index: indexName,
+    name: getEventAliasName()
+  })
+
+  logger.info(`Alias ${getEventAliasName()} created for index ${indexName}`)
+  logger.info(JSON.stringify(res))
+
+  return res
+}
+
+export async function createIndex(
+  indexName: string,
+  formFields: FieldConfig[]
+) {
+  const client = getOrCreateClient()
+
+  await client.indices.create({
+    index: indexName,
+    body: {
+      mappings: {
+        properties: {
+          id: { type: 'keyword' },
+          type: { type: 'keyword' },
+          status: { type: 'keyword' },
+          createdAt: { type: 'date' },
+          createdBy: { type: 'keyword' },
+          createdAtLocation: { type: 'keyword' },
+          modifiedAt: { type: 'date' },
+          assignedTo: { type: 'keyword' },
+          updatedBy: { type: 'keyword' },
+          data: {
+            type: 'object',
+            properties: formFieldsToDataMapping(formFields)
+          },
+          trackingId: { type: 'keyword' }
+        } satisfies EventIndexMapping
+      }
+    }
+  })
+
+  return ensureAlias(indexName)
+}
+
+export const FIELD_ID_SEPARATOR = '____'
 
 export function encodeFieldId(fieldId: string) {
-  return fieldId.replaceAll('.', SEPARATOR)
+  return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
 }
 
 function decodeFieldId(fieldId: string) {
-  return fieldId.replaceAll(SEPARATOR, '.')
+  return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
 type _Combine<
@@ -137,90 +237,6 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
   }, {})
 }
 
-export type EncodedEventIndex = EventIndex
-export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
-  return {
-    ...event,
-    data: Object.entries(event.data).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [encodeFieldId(key)]: value
-      }),
-      {}
-    )
-  }
-}
-
-function eventToEventIndex(event: EventDocument): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event))
-}
-
-export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
-  return {
-    ...event,
-    data: Object.entries(event.data).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [decodeFieldId(key)]: value
-      }),
-      {}
-    )
-  }
-}
-
-/*
- * This type ensures all properties of EventIndex are present in the mapping
- */
-type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
-
-export async function createIndex(
-  indexName: string,
-  formFields: FieldConfig[]
-) {
-  const client = getOrCreateClient()
-
-  await client.indices.create({
-    index: indexName,
-    body: {
-      mappings: {
-        properties: {
-          id: { type: 'keyword' },
-          type: { type: 'keyword' },
-          status: { type: 'keyword' },
-          createdAt: { type: 'date' },
-          createdBy: { type: 'keyword' },
-          createdAtLocation: { type: 'keyword' },
-          modifiedAt: { type: 'date' },
-          assignedTo: { type: 'keyword' },
-          updatedBy: { type: 'keyword' },
-          data: {
-            type: 'object',
-            properties: formFieldsToDataMapping(formFields)
-          },
-          trackingId: { type: 'keyword' }
-        } satisfies EventIndexMapping
-      }
-    }
-  })
-
-  return client.indices.putAlias({
-    index: indexName,
-    name: getEventAliasName()
-  })
-}
-
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
-  const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
-
-  if (!hasEventsIndex) {
-    await createIndex(indexName, getAllFields(eventConfiguration))
-  }
-}
-
 export async function indexAllEvents(eventConfiguration: EventConfig) {
   const mongoClient = await eventsDb.getClient()
   const esClient = getOrCreateClient()
@@ -285,13 +301,13 @@ export async function deleteEventIndex(event: EventDocument) {
 export async function getIndexedEvents() {
   const esClient = getOrCreateClient()
 
-  const hasEventsIndex = await esClient.indices.exists({
-    index: getEventAliasName()
+  const hasEventsIndex = await esClient.indices.existsAlias({
+    name: getEventAliasName()
   })
 
   if (!hasEventsIndex) {
     logger.error(
-      'Event index not created. Sending empty array. Ensure indexing is running.'
+      `Event alias ${getEventAliasName()} not created. Sending empty array. Ensure indexing is running.`
     )
     return []
   }

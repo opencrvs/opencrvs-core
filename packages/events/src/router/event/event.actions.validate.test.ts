@@ -187,6 +187,9 @@ test('valid action is appended to event actions', async () => {
     }),
     expect.objectContaining({
       type: ActionType.VALIDATE
+    }),
+    expect.objectContaining({
+      type: ActionType.READ
     })
   ])
 })

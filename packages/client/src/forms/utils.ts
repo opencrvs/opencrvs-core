@@ -330,6 +330,7 @@ export function getNextSectionIds(
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   declaration: IDeclaration,
+  isCorrection: boolean,
   userDetails?: UserDetails | null
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -343,16 +344,18 @@ export function getNextSectionIds(
   )
 
   if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(
-      (section) =>
-        section.viewType !== VIEW_TYPE.HIDDEN &&
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          declaration.data[fromSection.id] || {},
-          declaration.data,
-          userDetails
-        ).length > 0
-    )
+    const visibleSections = sections
+      .filter((section) => (isCorrection ? section.id !== 'documents' : true))
+      .filter(
+        (section) =>
+          section.viewType !== VIEW_TYPE.HIDDEN &&
+          getVisibleSectionGroupsBasedOnConditions(
+            section,
+            declaration.data[fromSection.id] || {},
+            declaration.data,
+            userDetails
+          ).length > 0
+      )
 
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id

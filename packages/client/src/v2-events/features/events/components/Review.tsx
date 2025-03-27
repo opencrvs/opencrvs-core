@@ -34,6 +34,7 @@ import {
   FormConfig,
   getFieldValidationErrors,
   isFieldVisible,
+  isPageVisible,
   SCOPES
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -276,19 +277,25 @@ function FormReview({
   form,
   previousForm,
   onEdit,
-  showPreviouslyMissingValuesAsChanged
+  showPreviouslyMissingValuesAsChanged,
+  readonlyMode
 }: {
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
+  readonlyMode?: boolean
 }) {
   const intl = useIntl()
+  const visiblePages = formConfig.pages.filter((page) =>
+    isPageVisible(page, form)
+  )
+
   return (
     <FormData>
       <ReviewContainter>
-        {formConfig.pages.map((page) => {
+        {visiblePages.map((page) => {
           const fields = page.fields
             .filter((field) => isFieldVisible(field, form))
             .map((field) => {
@@ -341,14 +348,16 @@ function FormReview({
             >
               <Accordion
                 action={
-                  <Link
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onEdit({ pageId: page.id })
-                    }}
-                  >
-                    {intl.formatMessage(reviewMessages.changeAllButton)}
-                  </Link>
+                  !readonlyMode && (
+                    <Link
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEdit({ pageId: page.id })
+                      }}
+                    >
+                      {intl.formatMessage(reviewMessages.changeAllButton)}
+                    </Link>
+                  )
                 }
                 expand={true}
                 label={intl.formatMessage(page.title)}
@@ -366,19 +375,21 @@ function FormReview({
                       <ListReview.Row
                         key={id}
                         actions={
-                          <Link
-                            data-testid={`change-button-${id}`}
-                            onClick={(e) => {
-                              e.stopPropagation()
+                          !readonlyMode && (
+                            <Link
+                              data-testid={`change-button-${id}`}
+                              onClick={(e) => {
+                                e.stopPropagation()
 
-                              onEdit({
-                                pageId: page.id,
-                                fieldId: id
-                              })
-                            }}
-                          >
-                            {intl.formatMessage(reviewMessages.changeButton)}
-                          </Link>
+                                onEdit({
+                                  pageId: page.id,
+                                  fieldId: id
+                                })
+                              }}
+                            >
+                              {intl.formatMessage(reviewMessages.changeButton)}
+                            </Link>
+                          )
                         }
                         id={id}
                         label={intl.formatMessage(label)}
@@ -407,7 +418,8 @@ function ReviewComponent({
   onEdit,
   children,
   title,
-  onMetadataChange
+  onMetadataChange,
+  readonlyMode
 }: {
   children: React.ReactNode
   eventConfig: EventConfig
@@ -426,6 +438,7 @@ function ReviewComponent({
   }) => void
   title: string
   onMetadataChange?: (values: EventState) => void
+  readonlyMode?: boolean
 }) {
   const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
@@ -452,6 +465,7 @@ function ReviewComponent({
             form={form}
             formConfig={formConfig}
             previousForm={previousForm}
+            readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
@@ -466,6 +480,7 @@ function ReviewComponent({
                   formData={metadata}
                   id={'review'}
                   initialValues={metadata}
+                  readonlyMode={readonlyMode}
                   setAllFieldsDirty={false}
                   onChange={onMetadataChange}
                 />
@@ -478,6 +493,7 @@ function ReviewComponent({
       {pageIdsWithFile.length > 0 && (
         <RightColumn>
           <DocumentViewer
+            disabled={readonlyMode}
             form={form}
             formConfig={formConfig}
             // @todo: ask about this rule

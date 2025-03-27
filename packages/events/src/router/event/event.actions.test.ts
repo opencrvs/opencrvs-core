@@ -55,7 +55,8 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.DECLARE }),
     expect.objectContaining({ type: ActionType.VALIDATE }),
-    expect.objectContaining({ type: ActionType.REGISTER })
+    expect.objectContaining({ type: ActionType.REGISTER }),
+    expect.objectContaining({ type: ActionType.READ })
   ])
 })
 
@@ -135,5 +136,77 @@ test('Action data accepts partial changes', async () => {
 
   const events = await client.event.list()
 
-  expect(events).toEqual([stateAfterVillageRemoval])
+  expect(events).toEqual([
+    expect.objectContaining({
+      ...stateAfterVillageRemoval,
+      modifiedAt: expect.any(String)
+    })
+  ])
+})
+
+test('READ action does not delete draft', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const draftData = {
+    type: ActionType.DECLARE,
+    data: {
+      ...generator.event.actions.declare(originalEvent.id).data,
+      'applicant.image': {
+        type: 'image/png',
+        originalFilename: 'abcd.png',
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+      }
+    },
+    transactionId: 'transactionId',
+    eventId: originalEvent.id
+  }
+
+  await client.event.draft.create(draftData)
+
+  const draftEvents = await client.event.draft.list()
+
+  const event = await client.event.get(originalEvent.id)
+  // this triggers READ action
+  expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
+
+  const draftEventsAfterRead = await client.event.draft.list()
+
+  expect(draftEvents).toEqual(draftEventsAfterRead)
+})
+
+test('Action other than READ deletes draft', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const draftData = {
+    type: ActionType.DECLARE,
+    data: {
+      ...generator.event.actions.declare(originalEvent.id).data,
+      'applicant.image': {
+        type: 'image/png',
+        originalFilename: 'abcd.png',
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+      }
+    },
+    transactionId: 'transactionId',
+    eventId: originalEvent.id
+  }
+
+  await client.event.draft.create(draftData)
+
+  const draftEvents = await client.event.draft.list()
+  expect(draftEvents.length).toBe(1)
+
+  await client.event.actions.declare(
+    generator.event.actions.declare(originalEvent.id)
+  )
+
+  const draftEventsAfterRead = await client.event.draft.list()
+
+  expect(draftEventsAfterRead.length).toBe(0)
 })

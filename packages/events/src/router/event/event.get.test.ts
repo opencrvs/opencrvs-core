@@ -97,7 +97,14 @@ test('Returns event', async () => {
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(fetchedEvent).toEqual(event)
+  expect(fetchedEvent.id).toEqual(event.id)
+
+  const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
+  expect(fetchedEventWithoutReadAction).toEqual(event.actions)
+
+  expect(fetchedEvent.actions[fetchedEvent.actions.length - 1]).toMatchObject({
+    type: ActionType.READ
+  })
 })
 
 test('Returns event with all actions', async () => {

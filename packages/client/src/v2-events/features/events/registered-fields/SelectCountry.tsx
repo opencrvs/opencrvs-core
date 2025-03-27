@@ -42,7 +42,17 @@ function SelectCountryOutput({ value }: { value: string | undefined }) {
   return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
 }
 
+function useStringifier() {
+  const intl = useIntl()
+
+  return (value: string) => {
+    const selectedCountry = countries.find((country) => country.value === value)
+    return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
+  }
+}
+
 export const SelectCountry = {
   Input: SelectCountryInput,
-  Output: SelectCountryOutput
+  Output: SelectCountryOutput,
+  useStringifier: useStringifier
 }
