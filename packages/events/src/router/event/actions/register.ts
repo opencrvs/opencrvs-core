@@ -19,7 +19,7 @@ import {
   ActionType,
   getUUID,
   ActionStatus,
-  ActionConfirmationResponseCodes
+  ActionConfirmationResponse
 } from '@opencrvs/commons'
 
 const RegisterActionInputWithoutIdentifiers = RegisterActionInput.omit({
@@ -54,16 +54,18 @@ export const registerRouter = router({
         status: ActionStatus.Requested
       })
 
-      const notifyResult = await notifyOnAction(addActionInput, event, token)
+      const actionConfirmationResponse = await notifyOnAction(
+        addActionInput,
+        event,
+        token
+      )
 
-      console.log('CIHAN TÄÄL')
-      console.log(notifyResult)
       // If the action is instantly accepted or rejected, simply update the action status.
-      if (notifyResult === ActionConfirmationResponseCodes.Success) {
+      if (actionConfirmationResponse === ActionConfirmationResponse.Success) {
         return updateActionStatus(event.id, actionId, ActionStatus.Accepted)
       }
 
-      if (notifyResult === ActionConfirmationResponseCodes.ActionRejected) {
+      if (actionConfirmationResponse === ActionConfirmationResponse.Rejected) {
         return updateActionStatus(event.id, actionId, ActionStatus.Rejected)
       }
 

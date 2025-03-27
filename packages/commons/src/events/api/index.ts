@@ -8,9 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+export enum ActionConfirmationResponse {
+  UnexpectedFailure, // Endpoint fails in an uncontrolled manner
+  Rejected, // Synchronous flow failed
+  Success, // Synchronous flow succeeded
+  RequiresProcessing // Asynchronous flow succeeded, this expects that either the confirm or reject callback is called
+}
+
 export const ActionConfirmationResponseCodes = {
-  FailInUncontrolledManner: 500, // Endpoint fails in an uncontrolled manner
-  ActionRejected: 400, // Synchronous flow failed
-  Success: 200, // Synchronous flow succeeded
-  RequiresProcessing: 202 // Asynchronous flow succeeded, this expects that either the confirm or reject callback is called
+  400: ActionConfirmationResponse.Rejected,
+  200: ActionConfirmationResponse.Success,
+  202: ActionConfirmationResponse.RequiresProcessing
 } as const

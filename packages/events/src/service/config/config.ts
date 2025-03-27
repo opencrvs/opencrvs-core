@@ -16,7 +16,8 @@ import {
   EventDocument,
   getOrThrow,
   logger,
-  ActionConfirmationResponseCodes
+  ActionConfirmationResponseCodes,
+  ActionConfirmationResponse
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { array } from 'zod'
@@ -63,13 +64,11 @@ export async function getEventConfigurationById({
   )
 }
 
-// TODO CIHAN: tää vois lukea yllä olevan enumi
 export async function notifyOnAction(
   action: ActionInput,
   event: EventDocument,
   token: string
-  // TODO CIHAN: type
-): Promise<any> {
+): Promise<ActionConfirmationResponse> {
   try {
     const res = await fetch(
       new URL(
@@ -86,19 +85,19 @@ export async function notifyOnAction(
       }
     )
 
-    // TODO CIHAN: type
-    const status = res.status as any
+    const status = res.status
+    const actionConfirmationResponse =
+      status in ActionConfirmationResponseCodes
+        ? ActionConfirmationResponseCodes[
+            status as keyof typeof ActionConfirmationResponseCodes
+          ]
+        : undefined
 
-    console.log('CIHAN TESTAA TÄTÄ')
-    console.log(status)
-
-    if (!Object.values(ActionConfirmationResponseCodes).includes(status)) {
-      return ActionConfirmationResponseCodes.FailInUncontrolledManner
-    }
-
-    return status
+    return (
+      actionConfirmationResponse ?? ActionConfirmationResponse.UnexpectedFailure
+    )
   } catch (error) {
     logger.error(error)
-    return ActionConfirmationResponseCodes.FailInUncontrolledManner
+    return ActionConfirmationResponse.UnexpectedFailure
   }
 }
