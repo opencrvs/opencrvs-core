@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
-import { EventDocument, EventIndex } from '@opencrvs/commons/client'
+import {
+  ActionStatus,
+  EventDocument,
+  EventIndex
+} from '@opencrvs/commons/client'
 
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
@@ -39,6 +43,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
     {
       id: 'ae9618d8-319d-48a7-adfe-7ad6cfbc56b7',
       type: 'CREATE',
+      status: ActionStatus.Accepted,
       createdAt: '2025-01-23T05:30:02.615Z',
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
@@ -46,6 +51,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
     },
     {
       id: '8db635cf-ee30-40ca-8117-a7188256a2b1',
+      status: ActionStatus.Accepted,
       data: {
         'applicant.firstname': 'Riku',
         'applicant.surname': 'Rouvila',
@@ -67,6 +73,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
+      status: ActionStatus.Accepted,
       data: {
         'applicant.firstname': 'Riku',
         'applicant.surname': 'Rouvila',
@@ -81,6 +88,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
+      status: ActionStatus.Accepted,
       data: {
         'applicant.firstname': 'Riku',
         'applicant.surname': 'Rouvila',

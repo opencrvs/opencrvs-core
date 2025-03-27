@@ -77,7 +77,7 @@ export function useEvents() {
       archive: useEventAction(trpc.event.actions.archive),
       notify: useEventAction(trpc.event.actions.notify),
       declare: useEventAction(trpc.event.actions.declare),
-      register: useEventAction(trpc.event.actions.register),
+      register: useEventAction(trpc.event.actions.register.request),
       correction: {
         request: useEventAction(trpc.event.actions.correction.request),
         approve: useEventAction(trpc.event.actions.correction.approve),
