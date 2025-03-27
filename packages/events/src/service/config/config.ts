@@ -15,7 +15,8 @@ import {
   EventConfig,
   EventDocument,
   getOrThrow,
-  logger
+  logger,
+  ActionConfirmationResponseCodes
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { array } from 'zod'
@@ -62,20 +63,12 @@ export async function getEventConfigurationById({
   )
 }
 
-// TODO CIHAN: move this to commmons/toolkit, and use it from countryconfig
-// needs better typing
-const ActionConfirmationResponseCodes = {
-  FailInUncontrolledManner: 500, // Endpoint fails in an uncontrolled manner
-  ActionRejected: 400, // Synchronous flow failed
-  Success: 200, // Synchronous flow succeeded
-  RequiresProcessing: 202 // Asynchronous flow succeeded, this expects that either the confirm or reject callback is called
-} as const
-
 // TODO CIHAN: tää vois lukea yllä olevan enumi
 export async function notifyOnAction(
   action: ActionInput,
   event: EventDocument,
   token: string
+  // TODO CIHAN: type
 ): Promise<any> {
   try {
     const res = await fetch(
@@ -93,6 +86,7 @@ export async function notifyOnAction(
       }
     )
 
+    // TODO CIHAN: type
     const status = res.status as any
 
     if (!Object.values(ActionConfirmationResponseCodes).includes(status)) {

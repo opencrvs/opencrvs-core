@@ -33,7 +33,8 @@ export const RegisterActionInput = BaseActionInput.merge(
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
-    })
+    }),
+    registrationNumber: z.string().optional()
   })
 )
 

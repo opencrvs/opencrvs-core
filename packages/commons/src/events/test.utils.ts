@@ -11,7 +11,7 @@
 import { merge } from 'lodash'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
-import { ActionBase, ActionDocument } from './ActionDocument'
+import { ActionBase, ActionDocument, ActionStatus } from './ActionDocument'
 import {
   ArchiveActionInput,
   DeclareActionInput,
@@ -274,7 +274,8 @@ export function generateActionDocument({
     createdAtLocation: 'TODO',
     data: generateActionInput(configuration, action),
     metadata: {},
-    ...defaults
+    ...defaults,
+    status: ActionStatus.Accepted // TODO CIHAN: we probably want to test other statuses as well
   } satisfies ActionBase
 
   switch (action) {

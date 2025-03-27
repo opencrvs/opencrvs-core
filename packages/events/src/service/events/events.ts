@@ -12,6 +12,7 @@
 import {
   ActionDocument,
   ActionInputWithType,
+  ActionStatus,
   ActionUpdate,
   Draft,
   EventDocument,
@@ -180,7 +181,8 @@ export async function createEvent({
         createdBy,
         createdAtLocation,
         id: getUUID(),
-        data: {}
+        data: {},
+        status: ActionStatus.Accepted
       }
     ]
   })
@@ -254,15 +256,17 @@ export async function addAction(
     createdBy,
     token,
     createdAtLocation,
-    transactionId
+    transactionId,
+    status
   }: {
     eventId: string
     createdBy: string
     createdAtLocation: string
     token: string
     transactionId: string
+    status: ActionStatus
   }
-): Promise<EventDocument> {
+): Promise<{ event: EventDocument; actionId: string }> {
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
@@ -296,7 +300,8 @@ export async function addAction(
             createdBy,
             createdAt: now,
             createdAtLocation,
-            id: getUUID()
+            id: getUUID(),
+            status
           }
         },
         $set: {
@@ -307,12 +312,15 @@ export async function addAction(
     input.transactionId = transactionId
   }
 
+  const actionId = getUUID()
+
   const action: ActionDocument = {
     ...input,
     createdBy,
     createdAt: now,
     createdAtLocation,
-    id: getUUID()
+    id: actionId,
+    status: status
   }
 
   await db
@@ -333,9 +341,24 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
-  // TODO CIHAN: this is removed from here!
-  // await notifyOnAction(input, updatedEvent, token)
   await deleteDraftsByEventId(eventId)
 
-  return updatedEvent
+  return { event: updatedEvent, actionId }
+}
+
+export async function updateActionStatus(
+  eventId: string,
+  actionId: string,
+  status: ActionStatus
+) {
+  const db = await events.getClient()
+  await db.collection<EventDocument>('events').updateOne(
+    { id: eventId, 'actions.id': actionId },
+    {
+      $set: {
+        'actions.$.status': status,
+        'actions.$.updatedAt': new Date().toISOString()
+      }
+    }
+  )
 }

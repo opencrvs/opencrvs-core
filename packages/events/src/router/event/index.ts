@@ -44,7 +44,8 @@ import {
   PrintCertificateActionInput,
   RejectDeclarationActionInput,
   ValidateActionInput,
-  EventSearchIndex
+  EventSearchIndex,
+  ActionStatus
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
@@ -115,7 +116,7 @@ export const eventRouter = router({
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
-      const eventWithReadAction = await addAction(
+      const { event: updatedEvent } = await addAction(
         {
           type: ActionType.READ,
           eventId: event.id,
@@ -127,11 +128,12 @@ export const eventRouter = router({
           createdBy: ctx.user.id,
           createdAtLocation: ctx.user.primaryOfficeId,
           token: ctx.token,
-          transactionId: getUUID()
+          transactionId: getUUID(),
+          status: ActionStatus.Accepted
         }
       )
       const eventWithSignedFiles = await presignFilesInEvent(
-        eventWithReadAction,
+        updatedEvent,
         ctx.token
       )
       return eventWithSignedFiles
@@ -163,13 +165,16 @@ export const eventRouter = router({
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))
       .input(NotifyActionInput)
       .mutation(async (options) => {
-        return addAction(options.input, {
+        const { event } = await addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token,
-          transactionId: options.input.transactionId
+          transactionId: options.input.transactionId,
+          status: ActionStatus.Accepted // TODO CIHAN
         })
+
+        return event
       }),
     declare: publicProcedure
       .use(
@@ -182,13 +187,16 @@ export const eventRouter = router({
       .input(DeclareActionInput)
       .use(middleware.validateAction(ActionType.DECLARE))
       .mutation(async (options) => {
-        return addAction(options.input, {
+        const { event } = await addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token,
-          transactionId: options.input.transactionId
+          transactionId: options.input.transactionId,
+          status: ActionStatus.Accepted // TODO CIHAN
         })
+
+        return event
       }),
     validate: publicProcedure
       .use(
@@ -200,39 +208,48 @@ export const eventRouter = router({
       .input(ValidateActionInput)
       .use(middleware.validateAction(ActionType.VALIDATE))
       .mutation(async (options) => {
-        return addAction(options.input, {
+        const { event } = await addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token,
-          transactionId: options.input.transactionId
+          transactionId: options.input.transactionId,
+          status: ActionStatus.Accepted // TODO CIHAN
         })
+
+        return event
       }),
     reject: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_FOR_UPDATES]))
       .input(RejectDeclarationActionInput)
       .use(middleware.validateAction(ActionType.REJECT))
       .mutation(async (options) => {
-        return addAction(options.input, {
+        const { event } = await addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token,
-          transactionId: options.input.transactionId
+          transactionId: options.input.transactionId,
+          status: ActionStatus.Accepted // TODO CIHAN
         })
+
+        return event
       }),
     archive: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARATION_ARCHIVE]))
       .input(ArchiveActionInput)
       .use(middleware.validateAction(ActionType.ARCHIVE))
       .mutation(async (options) => {
-        return addAction(options.input, {
+        const { event } = await addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token,
-          transactionId: options.input.transactionId
+          transactionId: options.input.transactionId,
+          status: ActionStatus.Accepted
         })
+
+        return event
       }),
     register: registerRouter,
     printCertificate: publicProcedure
@@ -240,13 +257,16 @@ export const eventRouter = router({
       .input(PrintCertificateActionInput)
       .use(middleware.validateAction(ActionType.PRINT_CERTIFICATE))
       .mutation(async (options) => {
-        return addAction(options.input, {
+        const { event } = await addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token,
-          transactionId: options.input.transactionId
+          transactionId: options.input.transactionId,
+          status: ActionStatus.Accepted
         })
+
+        return event
       }),
     correction: router({
       request: publicProcedure
@@ -256,13 +276,16 @@ export const eventRouter = router({
         .input(RequestCorrectionActionInput)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
         .mutation(async (options) => {
-          return addAction(options.input, {
+          const { event } = await addAction(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
-            transactionId: options.input.transactionId
+            transactionId: options.input.transactionId,
+            status: ActionStatus.Accepted
           })
+
+          return event
         }),
       approve: publicProcedure
         .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
