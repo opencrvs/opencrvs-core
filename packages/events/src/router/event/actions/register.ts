@@ -101,7 +101,7 @@ export const registerRouter = router({
 
   reject: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
-    .mutation(async ({ ctx, input }) => {
+    .mutation(({ ctx, input }) => {
       console.log('TODO CIHAN')
 
       // const { token, user } = ctx
