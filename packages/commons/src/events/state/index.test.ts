@@ -65,12 +65,6 @@ describe('correction requests', () => {
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
           status: ActionStatus.Accepted
-        },
-        {
-          data: {},
-          requestId: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
-          type: 'APPROVE_CORRECTION',
-          status: ActionStatus.Accepted
         }
       ]
     })

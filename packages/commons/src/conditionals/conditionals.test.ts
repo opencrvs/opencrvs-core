@@ -24,7 +24,7 @@ import {
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
-import { ActionType } from '../events'
+import { ActionType, ActionStatus } from '../events'
 
 const fieldParams = {
   $form: {
@@ -245,7 +245,8 @@ describe('"event" conditionals', () => {
             createdAt: now,
             createdBy: '12345',
             data: {},
-            createdAtLocation: '123456'
+            createdAtLocation: '123456',
+            status: ActionStatus.Accepted
           }
         ]
       }
