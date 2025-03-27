@@ -162,7 +162,7 @@ function mockNotifyApi(status = 200) {
   )
 }
 
-test.only('should mark action as accepted if notify API returns HTTP 200', async () => {
+test('should mark action as accepted if notify API returns HTTP 200', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
@@ -181,7 +181,7 @@ test.only('should mark action as accepted if notify API returns HTTP 200', async
   expect(savedAction?.status).toEqual(ActionStatus.Accepted)
 })
 
-test.only('should mark action as accepted if notify API returns HTTP 400', async () => {
+test('should mark action as rejected if notify API returns HTTP 400', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
