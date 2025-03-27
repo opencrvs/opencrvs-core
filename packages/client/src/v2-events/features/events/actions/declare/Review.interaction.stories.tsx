@@ -411,7 +411,123 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
       const modal = within(await canvas.findByRole('dialog'))
 
       await modal.findByText('Send for review?')
+      await modal.findByText('This declaration will be sent for review')
       await modal.findByRole('button', { name: 'Cancel' })
+      await userEvent.click(
+        await modal.findByRole('button', { name: 'Confirm' })
+      )
+    })
+
+    await step('Confirm action triggers scope based actions', async () => {
+      await within(canvasElement).findByText('All events')
+      await waitFor(async () => {
+        await expect(callTracker.fieldAgent['event.create']).toBe(0)
+        await expect(callTracker.fieldAgent['event.actions.declare']).toBe(1)
+        await expect(callTracker.fieldAgent['event.actions.validate']).toBe(0)
+        await expect(callTracker.fieldAgent['event.actions.register']).toBe(0)
+      })
+    })
+  }
+}
+
+export const ReviewForFieldAgentIncompleteInteraction: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      formValues: getCurrentEventState(declareEventDocument).data
+    })
+
+    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: declareEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return []
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          }),
+          tRPCMsw.event.create.mutation(() => {
+            callTracker.fieldAgent['event.create']++
+
+            return eventDocument
+          }),
+          tRPCMsw.event.actions.declare.mutation(() => {
+            callTracker.fieldAgent['event.actions.declare']++
+
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [ActionType.CREATE, ActionType.DECLARE]
+            })
+          }),
+          tRPCMsw.event.actions.validate.mutation(() => {
+            callTracker.fieldAgent['event.actions.validate']++
+
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                ActionType.CREATE,
+                ActionType.DECLARE,
+                ActionType.VALIDATE
+              ]
+            })
+          }),
+          tRPCMsw.event.actions.register.mutation(() => {
+            callTracker.fieldAgent['event.actions.register']++
+
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                ActionType.CREATE,
+                ActionType.DECLARE,
+                ActionType.VALIDATE,
+                ActionType.REGISTER
+              ]
+            })
+          })
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.registrationAgent()
+              }
+            })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    await step('Modal has scope based content', async () => {
+      const canvas = within(canvasElement)
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Send for review' })
+      )
+
+      const modal = within(await canvas.findByRole('dialog'))
+
+      await modal.findByText('Send for review?')
+      await modal.findByRole('button', { name: 'Cancel' })
+      await modal.findByText(
+        'This incomplete declaration will be sent for review.'
+      )
       await userEvent.click(
         await modal.findByRole('button', { name: 'Confirm' })
       )

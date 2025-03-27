@@ -10,9 +10,10 @@
  */
 
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { Review } from './Review'
-import { Pages } from './Pages'
+import { AdvancedSearch } from './AdvancedSearch'
+import { SearchResultIndex as SearchResult } from './SearchResultIndex'
 
-const PagesIndex = withSuspense(Pages)
-const ReviewIndex = withSuspense(Review)
-export { ReviewIndex as Review, PagesIndex as Pages }
+
+const AdvancedSearchIndex = withSuspense(AdvancedSearch)
+const SearchResultIndex = withSuspense(SearchResult)
+export { AdvancedSearchIndex as AdvancedSearch, SearchResultIndex as SearchResult }
