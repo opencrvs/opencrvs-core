@@ -86,16 +86,14 @@ export async function notifyOnAction(
     )
 
     const status = res.status
-    const actionConfirmationResponse =
+    const confirmationResponse =
       status in ActionConfirmationResponseCodes
         ? ActionConfirmationResponseCodes[
             status as keyof typeof ActionConfirmationResponseCodes
           ]
         : undefined
 
-    return (
-      actionConfirmationResponse ?? ActionConfirmationResponse.UnexpectedFailure
-    )
+    return confirmationResponse ?? ActionConfirmationResponse.UnexpectedFailure
   } catch (error) {
     logger.error(error)
     return ActionConfirmationResponse.UnexpectedFailure
