@@ -57,7 +57,6 @@ export const EventOverviewProvider = ({
 
   const getLocation = (id: string) => {
     // @TODO: Remove this fallback once  developers have had time to update their data.
-    // eslint-disable-next-line
     return locations[id] ?? { id, name: 'Unknown location' }
   }
 

@@ -71,7 +71,7 @@ function getQueryClient() {
 
 function createIDBPersister(idbValidKey = 'reactQuery') {
   return {
-    persistClient: async (client: any) => {
+    persistClient: async (client) => {
       await storage.setItem(idbValidKey, client)
     },
     restoreClient: async () => {

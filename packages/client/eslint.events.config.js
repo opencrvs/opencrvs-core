@@ -17,17 +17,17 @@ module.exports = defineConfig([
    *  When something is ignored, it won't go through the list any further.
    */
   {
-    files: ['./src/v2-events/**/*.ts', './src/v2-events/**/*.tsx'],
-    ignores: [
-      '!src/v2-events/**/*.{ts,tsx}',
-      '!./src/v2-events/**/*.ts',
-      '!./src/v2-events/**/*.tsx'
+    files: [
+      './src/v2-events/**/*.ts',
+      './src/v2-events/**/*.tsx',
+      'src/v2-events/**/*.{ts,tsx}'
     ],
     rules: {
       ...eventsConfig.rules,
       'max-lines': ['warn', 600],
       'no-console': 'warn',
       '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-unused-vars': 'warn',
       'react/destructuring-assignment': 'warn',
       'react/jsx-key': 1,
       'react/jsx-no-literals': 1,

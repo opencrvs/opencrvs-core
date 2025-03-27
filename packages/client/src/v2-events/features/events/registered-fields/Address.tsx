@@ -425,7 +425,6 @@ type AllFields = (typeof ALL_ADDRESS_FIELDS)[number]['id']
  * If you see a type error, it means that the fields in the component do not
  * match the fields in the AddressFieldValue type.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type _ExpectTrue = Expect<
   EnsureSameUnion<AllFields, RequiredKeysFromFieldValue>
 >

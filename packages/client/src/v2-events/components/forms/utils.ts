@@ -35,7 +35,6 @@ export function evalExpressionInFieldDefinition(
   /*
    * These are used in the eval expression
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { $form }: { $form: EventState }
 ) {
   // eslint-disable-next-line no-eval

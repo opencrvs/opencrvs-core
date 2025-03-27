@@ -130,7 +130,6 @@ export function createEventActionMutationFn<
   const defaultMutationFn = mutationOptions.mutationFn
 
   return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async ({ eventType, ...params }) => {
       return defaultMutationFn({
         ...params,

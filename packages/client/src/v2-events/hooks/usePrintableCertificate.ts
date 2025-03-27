@@ -15,12 +15,10 @@ import {
   EventState,
   getCurrentEventState,
   isMinioUrl,
-  User
-} from '@opencrvs/commons/client'
-import {
+  User,
   CertificateTemplateConfig,
   LanguageConfig
-} from '@opencrvs/commons/events'
+} from '@opencrvs/commons/client'
 
 import {
   addFontsToSvg,

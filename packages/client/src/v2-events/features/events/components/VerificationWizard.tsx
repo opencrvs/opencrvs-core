@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { VerificationPageConfig } from '@opencrvs/commons'
+import { VerificationPageConfig } from '@opencrvs/commons/client'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
 import {
   ResponsiveModal,

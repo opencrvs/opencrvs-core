@@ -69,6 +69,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
+    // eslint-disable-next-line no-shadow
     const { intl, redirectToAuthentication } = this.props
     if (this.state.error) {
       const error = this.state.error

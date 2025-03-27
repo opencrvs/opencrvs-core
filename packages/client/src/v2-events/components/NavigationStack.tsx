@@ -76,6 +76,6 @@ export function NavigationStack(props: PropsWithChildren) {
   if (!allowedToNavigate) {
     return null
   }
-  // eslint-disable-next-line react/destructuring-assignment
+
   return props.children
 }

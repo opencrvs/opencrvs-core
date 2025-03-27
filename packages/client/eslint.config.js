@@ -64,17 +64,6 @@ module.exports = [
     }
   },
   ...eventsConfig,
-  /**
-   *  When something is ignored, it won't go through the list any further.
-   *
-   */
-  {
-    ignores: [
-      'src/v2-events/**/*.{ts,tsx}',
-      './src/v2-events/**/*.ts',
-      './src/v2-events/**/*.tsx'
-    ]
-  },
   {
     files: ['./**/*.ts', './**/*.tsx'],
     /** To enforce relative imports, files propert needs to be defined. It cannot be shared through monorepo config at root. */
