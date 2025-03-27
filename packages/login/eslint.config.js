@@ -10,14 +10,9 @@
  */
 
 const react = require('eslint-plugin-react')
-const { FlatCompat } = require('@eslint/eslintrc')
 const baseConfig = require('../../eslint.config.js')
 const tsParser = require('@typescript-eslint/parser')
 const path = require('path')
-
-const compat = new FlatCompat({
-  baseDirectory: path.dirname(__filename)
-})
 
 module.exports = [
   { ignores: ['test-runner-jest.config.js', 'build/**/*', 'eslint*'] },
@@ -26,12 +21,6 @@ module.exports = [
     plugins: {
       react
     },
-    // env: {
-    //   es6: true,
-    //   browser: true,
-    //   node: true,
-    //   jest: true
-    // },
     files: ['./src/**/*.ts', './src/**/*.tsx'],
     rules: {
       'react/no-unescaped-entities': 'off',

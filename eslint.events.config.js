@@ -67,6 +67,6 @@ module.exports = {
     'import/no-cycle': 'warn',
     'max-lines': ['warn', 600],
     'no-eval': 'error',
-    'no-shadow': 'warn'
+    'no-unused-vars': 'off'
   }
 }

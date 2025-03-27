@@ -12,6 +12,9 @@
 
 const { defineConfig } = require('eslint/config')
 
+/**
+ * Defines the ESLint configuration for the client outside of v2-events.
+ */
 module.exports = defineConfig([
   {
     rules: {

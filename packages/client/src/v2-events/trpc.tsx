@@ -30,8 +30,6 @@ import superjson from 'superjson'
 import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
 
-const kissa: any = 3
-
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
   createTRPCContext<AppRouter>()
 
@@ -120,8 +118,6 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         }
       }}
       onSuccess={async () => {
-        let bar = 3
-        bar = 'kissa'
         await queryClient.resumePausedMutations()
 
         const mutations = queryClient.getMutationCache().getAll()

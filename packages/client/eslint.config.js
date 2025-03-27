@@ -21,6 +21,10 @@ const compat = new FlatCompat({
   baseDirectory: path.dirname(__filename)
 })
 
+/**
+ * Client runs two different rule sets. One for v2 and the other for rest.
+ * Each of them have their own config files.
+ */
 module.exports = [
   {
     ignores: [
@@ -60,6 +64,10 @@ module.exports = [
     }
   },
   ...eventsConfig,
+  /**
+   *  When something is ignored, it won't go through the list any further.
+   *
+   */
   {
     ignores: [
       'src/v2-events/**/*.{ts,tsx}',
@@ -69,6 +77,7 @@ module.exports = [
   },
   {
     files: ['./**/*.ts', './**/*.tsx'],
+    /** To enforce relative imports, files propert needs to be defined. It cannot be shared through monorepo config at root. */
     rules: { 'import/no-relative-parent-imports': 'error' }
   },
   ...legacyConfig
