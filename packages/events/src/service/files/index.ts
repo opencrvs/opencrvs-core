@@ -27,7 +27,7 @@ function getFieldDefinitionForActionDataField(
   actionType: ActionType,
   fieldId: string
 ) {
-  const actionFields = findActiveActionFields(configuration, ActionType.DECLARE)
+  const actionFields = findActiveActionFields(configuration, actionType)
 
   const fieldConfig = actionFields?.find((field) => field.id === fieldId)
   if (!fieldConfig) {
