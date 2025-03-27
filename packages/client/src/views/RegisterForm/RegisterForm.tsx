@@ -21,14 +21,15 @@ import { connect, useDispatch } from 'react-redux'
 import { isNull, isUndefined, merge, flatten, isEqual, get } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
-  PrimaryButton,
+  PrimaryButton,[TEST] PASS browser: chromium src/v2-events/components/forms/File.interaction.stories.tsx
+16
+
   TertiaryButton,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
 import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { Alert } from '@opencrvs/components/lib/Alert'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -113,6 +114,7 @@ import {
 import * as routes from '@client/navigation/routes'
 import { Params, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
+import { LoadingSpinner } from '@client/components/DraftLoadingSpinner'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -1059,6 +1061,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSection,
       activeSectionGroup,
       declaration,
+      isCorrection(declaration),
       userDetails
     )
 
@@ -1257,9 +1260,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         }
                       >
                         {this.props.isWritingDraft ? (
-                          <SpinnerWrapper>
-                            <Spinner id="draft_write_loading" />
-                          </SpinnerWrapper>
+                          <LoadingSpinner />
                         ) : (
                           <>
                             {activeSection.notice && (

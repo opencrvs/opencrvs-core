@@ -796,7 +796,7 @@ function UserListComponent(props: IProps) {
   return (
     <SysAdminContentWrapper
       changeTeamLocation={
-        (canAddOfficeUsers({ id: locationId }) && onChangeLocation) || undefined
+        isMultipleOfficeUnderJurisdiction ? onChangeLocation : undefined
       }
       isCertificatesConfigPage={true}
       hideBackground={true}

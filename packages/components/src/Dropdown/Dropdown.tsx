@@ -19,12 +19,13 @@ const StyledWrapper = styled.nav`
   display: flex;
 `
 
-const StyledTrigger = styled.button.withConfig({
+const StyledTrigger = styled.div.withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
     ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
   // Forward popovertarget prop directly
-})<{ popovertarget: string; dropdownName: string }>`
-  anchor-name: ${({ dropdownName }) => `--Dropdown-Anchor-${dropdownName}`};
+})<{ popovertarget?: string; dropdownName?: string }>`
+  anchor-name: ${({ dropdownName }) =>
+    `--Dropdown-Anchor-${dropdownName || ''}`};
   margin: 0;
   padding: 0;
   border: 0;
@@ -55,6 +56,7 @@ const StyledContent = styled.ul.withConfig({
   position-anchor: ${({ dropdownName }) => `--Dropdown-Anchor-${dropdownName}`};
   inset-area: ${({ position }) => position};
   position-area: ${({ position }) => position};
+  position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
   margin: 0;
   margin: ${({ offsetX, offsetY }) => `${offsetY}px ${offsetX}px`};
   list-style: none;
@@ -133,10 +135,26 @@ export const DropdownMenu = ({
   )
 }
 
-const Trigger: React.FC<{ children: JSX.Element }> = ({ children }) => {
+const Trigger: React.FC<{ children: JSX.Element; asChild?: boolean }> = ({
+  children,
+  asChild = false
+}) => {
   const { dropdownName } = useDropdown()
+
+  if (asChild) {
+    return (
+      <StyledTrigger>
+        {React.cloneElement(children, {
+          ...children.props,
+          popovertarget: `${dropdownName}-Dropdown-Content`,
+          dropdownName
+        })}
+      </StyledTrigger>
+    )
+  }
   return (
     <StyledTrigger
+      as={'button'}
       popovertarget={`${dropdownName}-Dropdown-Content`}
       dropdownName={dropdownName}
     >

@@ -17,12 +17,11 @@ import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
 import {
-  tennisClubMembershipEvent,
-  tennisClubMembershipEventIndex
+  tennisClubMembershipEventIndex,
+  tennisClubMembershipEventDocument
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
-import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
-import { random } from 'lodash'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -48,9 +47,19 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 export const handlers = {
+  drafts: [
+    tRPCMsw.event.draft.list.query(() => {
+      return []
+    })
+  ],
+  deleteEvent: [
+    tRPCMsw.event.delete.mutation(() => {
+      return { id: '123' }
+    })
+  ],
   events: [
     tRPCMsw.event.config.get.query(() => {
-      return [tennisClubMembershipEvent, birthEvent]
+      return [tennisClubMembershipEvent]
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]
@@ -333,6 +342,11 @@ export const handlers = {
     })
   ],
   files: [
+    http.get('/api/presigned-url/event-attachments/:filename', async (req) => {
+      return HttpResponse.json({
+        presignedURL: `http://localhost:3535/ocrvs/tree.svg`
+      })
+    }),
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 
@@ -1050,7 +1064,7 @@ export const handlers = {
               }
             ],
             primaryOffice: {
-              id: 'dfcd1cbc-30c7-41a4-afd2-020515b4d78b',
+              id: '028d2c85-ca31-426d-b5d1-2cef545a4902',
               name: 'Ibombo District Office',
               alias: ['Ibombo District Office'],
               status: 'active',
@@ -1075,6 +1089,23 @@ export const handlers = {
           }
         }
       })
+    }),
+    tRPCMsw.user.list.query(() => {
+      return [
+        {
+          id: '6780dbf7a263c6515c7b97d2',
+          name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+          role: 'LOCAL_REGISTRAR'
+        }
+      ]
+    })
+  ],
+  event: [
+    tRPCMsw.event.get.query(() => {
+      return tennisClubMembershipEventDocument
+    }),
+    tRPCMsw.event.list.query(() => {
+      return [tennisClubMembershipEventIndex]
     })
   ],
   locations: [
@@ -1335,7 +1366,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/e76fbe62-bd35-44cf-ad0b-9242db1d3085'
+                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
               },
               type: {
                 coding: [
@@ -1899,7 +1930,7 @@ export const handlers = {
   ],
   config: [
     http.get(
-      'http://localhost:6006/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
+      '/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
       () => {
         return HttpResponse.text(
           tennisClubMembershipCertifiedCertificateTemplate
@@ -1907,7 +1938,7 @@ export const handlers = {
       }
     ),
     http.get(
-      'http://localhost:6006/api/countryconfig/certificates/tennis-club-membership-certified-certificate.svg',
+      '/api/countryconfig/certificates/tennis-club-membership-certified-certificate.svg',
       () => {
         return HttpResponse.text(
           tennisClubMembershipCertifiedCertificateTemplate
@@ -1915,16 +1946,13 @@ export const handlers = {
       }
     ),
 
-    http.get(
-      'http://localhost:6006/api/countryconfig/fonts/NotoSans-Regular.ttf',
-      async () => {
-        const fontResponse = await fetch(
-          'http://localhost:3040/fonts/NotoSans-Regular.ttf'
-        )
-        const fontArrayBuffer = await fontResponse.arrayBuffer()
-        return HttpResponse.arrayBuffer(fontArrayBuffer)
-      }
-    ),
+    http.get('/api/countryconfig/fonts/NotoSans-Regular.ttf', async () => {
+      const fontResponse = await fetch(
+        'http://localhost:3040/fonts/NotoSans-Regular.ttf'
+      )
+      const fontArrayBuffer = await fontResponse.arrayBuffer()
+      return HttpResponse.arrayBuffer(fontArrayBuffer)
+    }),
 
     http.get('http://localhost:2021/config', () => {
       return HttpResponse.json({

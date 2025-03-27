@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { EnableConditional, ShowConditional } from './Conditional'
-import { FormConfig, FormPage } from './FormConfig'
+import { FormConfig, FormPageConfig } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 
@@ -31,12 +31,6 @@ export const ActionConfigBase = z.object({
   forms: z.array(FormConfig)
 })
 
-const CreateConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.CREATE)
-  })
-)
-
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE)
@@ -46,6 +40,24 @@ const DeclareConfig = ActionConfigBase.merge(
 const ValidateConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.VALIDATE)
+  })
+)
+
+const RejectDeclarationConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT)
+  })
+)
+
+const MarkedAsDuplicateConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
+  })
+)
+
+const ArchiveConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVE)
   })
 )
 
@@ -70,8 +82,8 @@ const PrintCertificateActionConfig = ActionConfigBase.merge(
 const RequestCorrectionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
-    onboardingForm: z.array(FormPage),
-    additionalDetailsForm: z.array(FormPage)
+    onboardingForm: z.array(FormPageConfig),
+    additionalDetailsForm: z.array(FormPageConfig)
   })
 )
 
@@ -101,9 +113,11 @@ const CustomConfig = ActionConfigBase.merge(
  */
 /** @knipignore */
 export type AllActionConfigFields =
-  | typeof CreateConfig
   | typeof DeclareConfig
   | typeof ValidateConfig
+  | typeof RejectDeclarationConfig
+  | typeof MarkedAsDuplicateConfig
+  | typeof ArchiveConfig
   | typeof RegisterConfig
   | typeof DeleteConfig
   | typeof PrintCertificateActionConfig
@@ -114,9 +128,11 @@ export type AllActionConfigFields =
 
 /** @knipignore */
 export type InferredActionConfig =
-  | z.infer<typeof CreateConfig>
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
+  | z.infer<typeof RejectDeclarationConfig>
+  | z.infer<typeof MarkedAsDuplicateConfig>
+  | z.infer<typeof ArchiveConfig>
   | z.infer<typeof RegisterConfig>
   | z.infer<typeof DeleteConfig>
   | z.infer<typeof PrintCertificateActionConfig>
@@ -126,9 +142,11 @@ export type InferredActionConfig =
   | z.infer<typeof CustomConfig>
 
 export const ActionConfig = z.discriminatedUnion('type', [
-  CreateConfig,
   DeclareConfig,
   ValidateConfig,
+  RejectDeclarationConfig,
+  MarkedAsDuplicateConfig,
+  ArchiveConfig,
   RegisterConfig,
   DeleteConfig,
   PrintCertificateActionConfig,

@@ -8,15 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { formatISO } from 'date-fns'
 import {
-  ActionFormData,
+  EventState,
   FieldConfig,
   Inferred,
   FieldValue,
-  isFieldHidden
+  MetaFields,
+  isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
+import { replacePlaceholders } from '@client/v2-events/utils'
 
 /*
  * Formik has a feature that automatically nests all form keys that have a dot in them.
@@ -25,28 +26,31 @@ import { DependencyInfo } from '@client/forms'
  */
 export const FIELD_SEPARATOR = '____'
 
-export function handleInitialValue(
-  field: FieldConfig,
-  formData: ActionFormData
-) {
-  const initialValue = field.initialValue
+export function makeFormFieldIdFormikCompatible(fieldId: string) {
+  return fieldId.replaceAll('.', FIELD_SEPARATOR)
+}
 
-  if (hasInitialValueDependencyInfo(initialValue)) {
-    return evalExpressionInFieldDefinition(initialValue.expression, {
+export function handleDefaultValue(
+  field: FieldConfig,
+  formData: EventState,
+  meta: MetaFields
+) {
+  const defaultValue = field.defaultValue
+
+  if (hasDefaultValueDependencyInfo(defaultValue)) {
+    return evalExpressionInFieldDefinition(defaultValue.expression, {
       $form: formData
     })
   }
 
-  return initialValue
-}
-
-export function isFormFieldVisible(field: FieldConfig, form: ActionFormData) {
-  return !isFieldHidden(field, {
-    $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
+  if (isFieldConfigDefaultValue(defaultValue)) {
+    return replacePlaceholders({
+      fieldType: field.type,
+      defaultValue,
+      meta: meta
     })
-  })
+  }
+  return defaultValue
 }
 
 export function evalExpressionInFieldDefinition(
@@ -54,16 +58,16 @@ export function evalExpressionInFieldDefinition(
   /*
    * These are used in the eval expression
    */
-  { $form }: { $form: ActionFormData }
+  { $form }: { $form: EventState }
 ) {
   // eslint-disable-next-line no-eval
   return eval(expression) as FieldValue
 }
 
-export function hasInitialValueDependencyInfo(
-  value: Inferred['initialValue']
+export function hasDefaultValueDependencyInfo(
+  value: Inferred['defaultValue']
 ): value is DependencyInfo {
-  return typeof value === 'object' && 'dependsOn' in value
+  return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
 }
 
 export function getDependentFields(
@@ -71,29 +75,14 @@ export function getDependentFields(
   fieldName: string
 ): FieldConfig[] {
   return fields.filter((field) => {
-    if (!field.initialValue) {
+    if (!field.defaultValue) {
       return false
     }
-    if (!hasInitialValueDependencyInfo(field.initialValue)) {
+    if (!hasDefaultValueDependencyInfo(field.defaultValue)) {
       return false
     }
-    return field.initialValue.dependsOn.includes(fieldName)
+    return field.defaultValue.dependsOn.includes(fieldName)
   })
-}
-
-/**
- * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
- * For setting default fields for form values @see setFormValueToOutputFormat
- *
- * @returns object based on the fields given with null values.
- */
-export function setEmptyValuesForFields(fields: FieldConfig[]) {
-  return fields.reduce((initialValues: Record<string, null>, field) => {
-    return {
-      ...initialValues,
-      [field.id]: null
-    }
-  }, {})
 }
 
 export interface Stringifiable {

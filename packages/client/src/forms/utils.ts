@@ -58,7 +58,11 @@ import {
   ID_READER,
   Ii18nIDReaderFormField,
   QRReaderType,
-  ReaderType
+  ReaderType,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  ILoaderFormField,
+  LOADER,
+  Ii18nLoaderFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -86,6 +90,7 @@ import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 import { UserDetails } from '@client/utils/userUtils'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
+import { memoize } from 'lodash'
 
 export const VIEW_TYPE = {
   FORM: 'form',
@@ -212,6 +217,12 @@ export const internationaliseFieldObject = (
       intl.formatMessage(field.manualInputInstructionLabel)
   }
 
+  if (isFieldLoader(field)) {
+    ;(base as Ii18nLoaderFormField).loadingText = intl.formatMessage(
+      field.loadingText
+    )
+  }
+
   return base as Ii18nFormField
 }
 
@@ -319,6 +330,7 @@ export function getNextSectionIds(
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   declaration: IDeclaration,
+  isCorrection: boolean,
   userDetails?: UserDetails | null
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -332,16 +344,18 @@ export function getNextSectionIds(
   )
 
   if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(
-      (section) =>
-        section.viewType !== VIEW_TYPE.HIDDEN &&
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          declaration.data[fromSection.id] || {},
-          declaration.data,
-          userDetails
-        ).length > 0
-    )
+    const visibleSections = sections
+      .filter((section) => (isCorrection ? section.id !== 'documents' : true))
+      .filter(
+        (section) =>
+          section.viewType !== VIEW_TYPE.HIDDEN &&
+          getVisibleSectionGroupsBasedOnConditions(
+            section,
+            declaration.data[fromSection.id] || {},
+            declaration.data,
+            userDetails
+          ).length > 0
+      )
 
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
@@ -364,7 +378,8 @@ export function getNextSectionIds(
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
-export const getFieldOptions = (
+export const getFieldOptionsSlow = (
+  _sectionName: string,
   field:
     | ISelectFormFieldWithOptions
     | ISelectFormFieldWithDynamicOptions
@@ -441,6 +456,46 @@ export const getFieldOptions = (
     return options
   }
 }
+
+export const getFieldOptions = (
+  _sectionName: string,
+  field:
+    | ISelectFormFieldWithOptions
+    | ISelectFormFieldWithDynamicOptions
+    | IDocumentUploaderWithOptionsFormField,
+  values: IFormSectionData,
+  offlineCountryConfig: IOfflineData,
+  declaration?: IFormData
+) => {
+  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS) {
+    return getMemoisedFieldOptions(
+      _sectionName,
+      field,
+      values,
+      offlineCountryConfig
+    )
+  }
+
+  return getFieldOptionsSlow(
+    _sectionName,
+    field,
+    values,
+    offlineCountryConfig,
+    declaration
+  )
+}
+
+/** Due to the large location trees with dependencies, generating options for them can be slow. We fix this by memoizing the options */
+const getMemoisedFieldOptions = memoize(
+  getFieldOptionsSlow,
+  (sectionName, field, values) => {
+    const dynamicField = field as ISelectFormFieldWithDynamicOptions
+    const dependencyVal = values[
+      dynamicField.dynamicOptions.dependency!
+    ] as string
+    return `field:${sectionName}.${field.name},dependency:${dynamicField.dynamicOptions.dependency},dependencyValue:${dependencyVal}`
+  }
+)
 
 interface INested {
   [key: string]: any
@@ -771,6 +826,10 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
 
 export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
+}
+
+function isFieldLoader(field: IFormField): field is ILoaderFormField {
+  return field.type === LOADER
 }
 
 export function isReaderQR(reader: ReaderType): reader is QRReaderType {

@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { useIntl } from 'react-intl'
 import {
   ActionType,
-  FormPage,
-  getCurrentEventState
+  getActiveActionFormPages,
+  isFieldVisible
 } from '@opencrvs/commons/client'
+
 import { Print } from '@opencrvs/components/lib/icons'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { FormLayout } from '@client/v2-events/layouts/form'
-import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { InputField } from '@client/components/form/InputField'
-import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { FormLayout } from '@client/v2-events/layouts'
+import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import {
+  CERT_TEMPLATE_ID,
+  useCertificateTemplateSelectorFieldConfig
+} from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -41,38 +41,23 @@ export function Pages() {
   const [searchParams] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES
   )
-  const [templateId, setTemplateId] = useState<string>()
-  const formEventId = useEventFormData((state) => state.eventId)
-  const intl = useIntl()
   const navigate = useNavigate()
-  const events = useEvents()
   const { modal } = useEventFormNavigation()
-
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
-
-  const certTemplateFieldConfig =
-    useCertificateTemplateSelectorFieldConfig(event)
-  const currentState = getCurrentEventState(event)
-
-  const { setFormValues, getFormValues } = useEventFormData()
-  const form = getFormValues(eventId)
-
-  useEffect(() => {
-    if (formEventId !== event.id) {
-      setFormValues(event.id, currentState.data)
-    }
-  }, [currentState.data, event.id, formEventId, setFormValues])
-
+  const { setMetadata, getMetadata } = useEventMetadata()
+  const metadata = getMetadata()
+  const events = useEvents()
+  const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = configuration.actions
-    .find((action) => action.type === ActionType.PRINT_CERTIFICATE)
-    ?.forms.find((f) => f.active)?.pages
+  const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
+    event.type
+  )
 
-  if (!formPages) {
-    throw new Error('Form configuration not found for type: ' + event.type)
-  }
+  const formPages = getActiveActionFormPages(
+    configuration,
+    ActionType.PRINT_CERTIFICATE
+  )
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -93,6 +78,18 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId])
 
+  // Allow the user to continue from the current page only if they have filled all the visible required fields.
+  const currentPage = formPages.find((p) => p.id === currentPageId)
+  const currentlyRequiredFields = currentPage?.fields.filter(
+    (field) => isFieldVisible(field, metadata) && field.required
+  )
+
+  const isAllRequiredFieldsFilled = currentlyRequiredFields?.every((field) =>
+    Boolean(metadata[field.id])
+  )
+
+  const isTemplateSelected = Boolean(metadata[CERT_TEMPLATE_ID])
+
   return (
     <FormLayout
       appbarIcon={<Print />}
@@ -100,10 +97,25 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        form={form}
-        formPages={formPages}
+        disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
+        eventConfig={configuration}
+        eventDeclarationData={event.data}
+        form={metadata}
+        formPages={formPages.map((page) => {
+          if (formPages[0].id === page.id) {
+            page = {
+              ...page,
+              fields: [
+                // hard coded certificate template selector form field
+                certTemplateFieldConfig,
+                ...page.fields
+              ]
+            }
+          }
+          return page
+        })}
         pageId={currentPageId}
-        setFormData={(data) => setFormValues(eventId, data)}
+        setFormData={(data) => setMetadata(data)}
         showReviewButton={searchParams.from === 'review'}
         onFormPageChange={(nextPageId: string) =>
           navigate(
@@ -114,47 +126,14 @@ export function Pages() {
           )
         }
         onSubmit={() => {
-          if (templateId) {
-            navigate(
-              ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
-                { eventId },
-                { templateId }
-              )
+          navigate(
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
+              { eventId },
+              { templateId: String(metadata[CERT_TEMPLATE_ID]) }
             )
-          }
+          )
         }}
-      >
-        {(page: FormPage) => (
-          // hard coded certificate template selector form field
-          <>
-            {formPages[0].id === page.id && (
-              <InputField
-                id={certTemplateFieldConfig.id}
-                label={intl.formatMessage(certTemplateFieldConfig.label)}
-                touched={false}
-              >
-                <Select.Input
-                  required
-                  id={certTemplateFieldConfig.id}
-                  label={certTemplateFieldConfig.label}
-                  options={certTemplateFieldConfig.options}
-                  type="SELECT"
-                  value={templateId}
-                  onChange={(val: string) => setTemplateId(val)}
-                />
-              </InputField>
-            )}
-            <FormFieldGenerator
-              fields={page.fields}
-              formData={form}
-              id="locationForm"
-              initialValues={form}
-              setAllFieldsDirty={false}
-              onChange={(values) => setFormValues(eventId, values)}
-            />
-          </>
-        )}
-      </PagesComponent>
+      />
     </FormLayout>
   )
 }

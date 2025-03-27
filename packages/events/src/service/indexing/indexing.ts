@@ -14,6 +14,7 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
+  EventSearchIndex,
   FieldConfig,
   FieldType,
   getCurrentEventState
@@ -28,6 +29,8 @@ import {
 import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
+import { DEFAULT_SIZE, generateQuery } from './utils'
+
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
 }
@@ -72,8 +75,26 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
   })
 
   if (!hasEventsIndex) {
+    logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getAllFields(eventConfiguration))
+  } else {
+    logger.info(`Index ${indexName} already exists`)
+    logger.info(JSON.stringify(hasEventsIndex))
   }
+  return ensureAlias(indexName)
+}
+async function ensureAlias(indexName: string) {
+  const client = getOrCreateClient()
+  logger.info(`Ensuring alias for index ${indexName}`)
+  const res = await client.indices.putAlias({
+    index: indexName,
+    name: getEventAliasName()
+  })
+
+  logger.info(`Alias ${getEventAliasName()} created for index ${indexName}`)
+  logger.info(JSON.stringify(res))
+
+  return res
 }
 
 export async function createIndex(
@@ -99,34 +120,40 @@ export async function createIndex(
           data: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)
-          }
+          },
+          trackingId: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }
   })
 
-  return client.indices.putAlias({
-    index: indexName,
-    name: getEventAliasName()
-  })
+  return ensureAlias(indexName)
 }
 
-const SEPARATOR = '____'
+export const FIELD_ID_SEPARATOR = '____'
 
 export function encodeFieldId(fieldId: string) {
-  return fieldId.replaceAll('.', SEPARATOR)
+  return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
 }
 
 function decodeFieldId(fieldId: string) {
-  return fieldId.replaceAll(SEPARATOR, '.')
+  return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
+
+type _Combine<
+  T,
+  K extends PropertyKey = T extends unknown ? keyof T : never
+> = T extends unknown ? T & Partial<Record<Exclude<K, keyof T>, never>> : never
+
+type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
+type AllFieldsUnion = Combine<AddressFieldValue>
 
 function mapFieldTypeToElasticsearch(field: FieldConfig) {
   switch (field.type) {
+    case FieldType.NUMBER:
+      return { type: 'double' }
     case FieldType.DATE:
-      // @TODO: This should be changed back to 'date'
-      // When we have proper validation of custom fields.
-      return { type: 'text' }
+      return { type: 'date' }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.SIGNATURE:
@@ -144,10 +171,12 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
+    case FieldType.DATA:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
         country: { type: 'keyword' },
+        addressType: { type: 'keyword' },
         province: { type: 'keyword' },
         district: { type: 'keyword' },
         urbanOrRural: { type: 'keyword' },
@@ -156,11 +185,16 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         street: { type: 'keyword' },
         number: { type: 'keyword' },
         zipCode: { type: 'keyword' },
-        village: { type: 'keyword' }
+        village: { type: 'keyword' },
+        state: { type: 'keyword' },
+        district2: { type: 'keyword' },
+        cityOrTown: { type: 'keyword' },
+        addressLine1: { type: 'keyword' },
+        addressLine2: { type: 'keyword' },
+        addressLine3: { type: 'keyword' },
+        postcodeOrZip: { type: 'keyword' }
       } satisfies {
-        [K in keyof Required<
-          NonNullable<AddressFieldValue>
-        >]: estypes.MappingProperty
+        [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
       return {
         type: 'object',
@@ -242,13 +276,11 @@ export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
-  return esClient.update<EventIndex>({
+  return esClient.index<EventIndex>({
     index: indexName,
     id: event.id,
-    body: {
-      doc: eventToEventIndex(event),
-      doc_as_upsert: true
-    },
+    /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
+    document: eventToEventIndex(event),
     refresh: 'wait_for'
   })
 }
@@ -268,13 +300,13 @@ export async function deleteEventIndex(event: EventDocument) {
 export async function getIndexedEvents() {
   const esClient = getOrCreateClient()
 
-  const hasEventsIndex = await esClient.indices.exists({
-    index: getEventAliasName()
+  const hasEventsIndex = await esClient.indices.existsAlias({
+    name: getEventAliasName()
   })
 
   if (!hasEventsIndex) {
     logger.error(
-      'Event index not created. Sending empty array. Ensure indexing is running.'
+      `Event alias ${getEventAliasName()} not created. Sending empty array. Ensure indexing is running.`
     )
     return []
   }
@@ -283,6 +315,29 @@ export async function getIndexedEvents() {
     index: getEventAliasName(),
     size: 10000,
     request_cache: false
+  })
+
+  return response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map(decodeEventIndex)
+}
+
+export async function getIndex(eventParams: EventSearchIndex) {
+  const esClient = getOrCreateClient()
+  const { type, ...queryParams } = eventParams
+
+  if (Object.values(queryParams).length === 0) {
+    throw new Error('No search params provided')
+  }
+
+  const query = generateQuery(queryParams)
+
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventIndexName(type),
+    size: DEFAULT_SIZE,
+    request_cache: false,
+    query
   })
 
   const events = z.array(EventIndex).parse(

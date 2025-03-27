@@ -51,7 +51,7 @@ export const InputField = (props: IInputFieldProps) => {
     label,
     helperText,
     tooltip,
-    required = true,
+    required,
     description,
     error,
     touched,

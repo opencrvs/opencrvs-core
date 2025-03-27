@@ -13,21 +13,38 @@ import { Conditional, ActionConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
+import {
+  CheckboxFieldValue,
+  DateValue,
+  NumberFieldValue,
+  RequiredTextValue,
+  TextValue
+} from './FieldValue'
+import { AddressFieldValue } from './CompositeFieldValue'
 
 const FieldId = z.string()
 
+const DependencyExpression = z.object({
+  dependsOn: z.array(FieldId).default([]),
+  expression: z.string()
+})
+
 const BaseField = z.object({
   id: FieldId,
-  conditionals: z.array(ActionConditional).default([]).optional(),
-  initialValue: z
+  defaultValue: z
     .union([
-      z.string(),
-      z.object({
-        dependsOn: z.array(FieldId).default([]),
-        expression: z.string()
-      })
+      // These are the currently supported default values types
+      z.union([
+        TextValue,
+        RequiredTextValue,
+        DateValue,
+        NumberFieldValue,
+        CheckboxFieldValue
+      ]),
+      DependencyExpression
     ])
     .optional(),
+  conditionals: z.array(ActionConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
   disabled: z.boolean().default(false).optional(),
   hidden: z.boolean().default(false).optional(),
@@ -55,10 +72,11 @@ export type Divider = z.infer<typeof Divider>
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
-      type: z.enum(['text', 'email', 'password', 'number']).optional(),
+      type: z.enum(['text', 'password']).optional(),
       prefix: TranslationConfig.optional(),
       postfix: TranslationConfig.optional()
     })
@@ -68,8 +86,22 @@ const TextField = BaseField.extend({
 
 export type TextField = z.infer<typeof TextField>
 
+const NumberField = BaseField.extend({
+  type: z.literal(FieldType.NUMBER),
+  defaultValue: z.union([NumberFieldValue, DependencyExpression]).optional(),
+  configuration: z
+    .object({
+      min: z.number().optional().describe('Minimum value'),
+      max: z.number().optional().describe('Maximum value'),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
+    })
+    .optional()
+}).describe('Number input')
+
 const TextAreaField = BaseField.extend({
   type: z.literal(FieldType.TEXTAREA),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -84,6 +116,18 @@ const TextAreaField = BaseField.extend({
 
 export type TextAreaField = z.infer<typeof TextAreaField>
 
+export const ImageMimeType = z.enum([
+  'image/png',
+  'image/jpg',
+  'image/jpeg',
+  'image/svg+xml'
+])
+
+export const MimeType = ImageMimeType
+export type MimeType = z.infer<typeof MimeType>
+
+const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
+
 const SignatureField = BaseField.extend({
   type: z.literal(FieldType.SIGNATURE),
   signaturePromptLabel: TranslationConfig.describe(
@@ -91,26 +135,37 @@ const SignatureField = BaseField.extend({
   ),
   configuration: z
     .object({
-      maxSizeMb: z.number().optional().describe('Maximum file size in MB'),
-      allowedFileFormats: z
-        .array(z.string())
+      maxFileSize: z
+        .number()
+        .describe('Maximum file size in bytes')
+        .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      acceptedFileTypes: MimeType.array()
         .optional()
         .describe('List of allowed file formats for the signature')
     })
-    .default({})
-    .optional()
+    .default({
+      maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
+    })
 }).describe('Signature input field')
 
 export type SignatureField = z.infer<typeof SignatureField>
 
 export const EmailField = BaseField.extend({
-  type: z.literal(FieldType.EMAIL)
+  type: z.literal(FieldType.EMAIL),
+  configuration: z
+    .object({
+      maxLength: z.number().optional().describe('Maximum length of the text')
+    })
+    .default({ maxLength: 10 })
+    .optional(),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 })
 
 export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
+  defaultValue: z.union([DateValue, DependencyExpression]).optional(),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -133,8 +188,11 @@ const HtmlFontVariant = z.enum([
   'h1'
 ])
 
+export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
   configuration: z
     .object({
       styles: z
@@ -149,24 +207,37 @@ const Paragraph = BaseField.extend({
 export type Paragraph = z.infer<typeof Paragraph>
 
 const PageHeader = BaseField.extend({
-  type: z.literal(FieldType.PAGE_HEADER)
+  type: z.literal(FieldType.PAGE_HEADER),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('A read-only header component for form pages')
 
 export type PageHeader = z.infer<typeof PageHeader>
 
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE),
-  options: z
+  configuration: z
     .object({
-      style: z.object({
-        fullWidth: z
-          .boolean()
-          .describe(
-            'Whether the file upload button should take the full width of the container or not'
-          )
-      })
+      maxFileSize: z
+        .number()
+        .describe('Maximum file size in bytes')
+        .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      acceptedFileTypes: MimeType.array()
+        .optional()
+        .describe('List of allowed file formats for the signature'),
+      style: z
+        .object({
+          width: z
+            .enum(['full', 'auto'])
+            .optional()
+            .describe(
+              'Whether the file upload button should take the full width of the container or not'
+            )
+        })
+        .optional()
     })
-    .optional()
+    .default({
+      maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
+    })
 }).describe('File upload')
 
 export type File = z.infer<typeof File>
@@ -178,6 +249,7 @@ const SelectOption = z.object({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
+  defaultValue: z.union([TextValue, DependencyExpression]).optional(),
   options: z.array(SelectOption).describe('A list of options'),
   configuration: z
     .object({
@@ -194,6 +266,7 @@ export type RadioGroup = z.infer<typeof RadioGroup>
 
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
+  defaultValue: z.string().optional(),
   items: z.array(TranslationConfig).describe('A list of items'),
   configuration: z
     .object({
@@ -210,20 +283,29 @@ export type BulletList = z.infer<typeof BulletList>
 
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
+  defaultValue: z.union([TextValue, DependencyExpression]).optional(),
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
 const Checkbox = BaseField.extend({
-  type: z.literal(FieldType.CHECKBOX)
+  type: z.literal(FieldType.CHECKBOX),
+  defaultValue: z.union([CheckboxFieldValue, DependencyExpression]).optional()
 }).describe('Boolean checkbox field')
 
 export type Checkbox = z.infer<typeof Checkbox>
 
 const Country = BaseField.extend({
-  type: z.literal(FieldType.COUNTRY)
+  type: z.literal(FieldType.COUNTRY),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('Country select field')
 
 export type Country = z.infer<typeof Country>
+
+export const AdministrativeAreas = z.enum([
+  'ADMIN_STRUCTURE',
+  'HEALTH_FACILITY',
+  'CRVS_OFFICE'
+])
 
 const AdministrativeAreaConfiguration = z
   .object({
@@ -233,46 +315,84 @@ const AdministrativeAreaConfiguration = z
       })
       .optional()
       .describe('Parent location'),
-    type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
+    type: AdministrativeAreas
   })
   .describe('Administrative area options')
 
 const AdministrativeArea = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
   configuration: AdministrativeAreaConfiguration
 }).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 const Location = BaseField.extend({
-  type: z.literal(FieldType.LOCATION)
+  type: z.literal(FieldType.LOCATION),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('Input field for a location')
 
 export type Location = z.infer<typeof Location>
 
 const FileUploadWithOptions = BaseField.extend({
   type: z.literal(FieldType.FILE_WITH_OPTIONS),
-  options: z.array(SelectOption).describe('A list of options')
-}).describe('Select input')
+  options: z.array(SelectOption).describe('A list of options'),
+  configuration: z
+    .object({
+      maxFileSize: z
+        .number()
+        .describe('Maximum file size in bytes')
+        .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      acceptedFileTypes: MimeType.array()
+        .optional()
+        .describe('List of allowed file formats for the signature')
+    })
+    .default({
+      maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
+    })
+})
 
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 const Facility = BaseField.extend({
-  type: z.literal(FieldType.FACILITY)
+  type: z.literal(FieldType.FACILITY),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
-  type: z.literal(FieldType.OFFICE)
+  type: z.literal(FieldType.OFFICE),
+  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
-  initialValue: z.object({}).passthrough().optional()
+  defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
+
+export const DataEntry = z.union([
+  z.object({
+    label: TranslationConfig,
+    value: z.string()
+  }),
+  z.object({
+    fieldId: z.string()
+  })
+])
+export type DataEntry = z.infer<typeof DataEntry>
+
+const DataField = BaseField.extend({
+  type: z.literal(FieldType.DATA),
+  configuration: z.object({
+    subtitle: TranslationConfig.optional(),
+    data: z.array(DataEntry)
+  })
+}).describe('Data field for displaying read-only data')
+
+export type DataField = z.infer<typeof DataField>
 
 /*
  * This needs to be exported so that Typescript can refer to the type in
@@ -284,6 +404,7 @@ const Address = BaseField.extend({
 export type AllFields =
   | typeof Address
   | typeof TextField
+  | typeof NumberField
   | typeof TextAreaField
   | typeof DateField
   | typeof Paragraph
@@ -302,11 +423,13 @@ export type AllFields =
   | typeof SignatureField
   | typeof EmailField
   | typeof FileUploadWithOptions
+  | typeof DataField
 
 /** @knipignore */
 export type Inferred =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
+  | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof Paragraph>
@@ -325,10 +448,40 @@ export type Inferred =
   | z.infer<typeof Office>
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
+  | z.infer<typeof DataField>
+
+/** @knipignore */
+/**
+ * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
+ */
+export type InferredInput =
+  | z.input<typeof Address>
+  | z.input<typeof TextField>
+  | z.input<typeof NumberField>
+  | z.input<typeof TextAreaField>
+  | z.input<typeof DateField>
+  | z.input<typeof Paragraph>
+  | z.input<typeof RadioGroup>
+  | z.input<typeof BulletList>
+  | z.input<typeof PageHeader>
+  | z.input<typeof Select>
+  | z.input<typeof Checkbox>
+  | z.input<typeof File>
+  | z.input<typeof FileUploadWithOptions>
+  | z.input<typeof Country>
+  | z.input<typeof AdministrativeArea>
+  | z.input<typeof Divider>
+  | z.input<typeof Location>
+  | z.input<typeof Facility>
+  | z.input<typeof Office>
+  | z.input<typeof SignatureField>
+  | z.input<typeof EmailField>
+  | z.input<typeof DataField>
 
 export const FieldConfig = z.discriminatedUnion('type', [
   Address,
   TextField,
+  NumberField,
   TextAreaField,
   DateField,
   Paragraph,
@@ -346,13 +499,15 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Office,
   SignatureField,
   EmailField,
-  FileUploadWithOptions
-]) as unknown as z.ZodType<Inferred, any, Inferred>
+  FileUploadWithOptions,
+  DataField
+]) as unknown as z.ZodType<Inferred, any, InferredInput>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
+export type NumberField = z.infer<typeof NumberField>
 export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>

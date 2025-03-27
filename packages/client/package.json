@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/client",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
@@ -15,7 +15,7 @@
     "test:watch": "vitest",
     "lint": "yarn lint:css && yarn lint:ts",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
-    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}' --max-warnings=288",
+    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}' --max-warnings=281",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "bash extract-translations.sh",
     "generate-gateway-types": "NODE_OPTIONS=--dns-result-order=ipv4first graphql-codegen --config codegen.ts && prettier --write src/utils/gateway.ts",
@@ -23,7 +23,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test-storybook": "test-storybook",
-    "chromatic": "chromatic"
+    "test-storybook:watch": "test-storybook --watch",
+    "chromatic": "chromatic --exit-zero-on-changes --only-changed"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -37,6 +38,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.0",
     "@craco/craco": "^6.4.3",
+    "@formatjs/icu-messageformat-parser": "2.1.0",
     "@opencrvs/commons": "^1.7.0",
     "@opencrvs/components": "^1.7.0",
     "@opencrvs/gateway": "^1.7.0",
@@ -46,9 +48,9 @@
     "@tanstack/react-query": "^5.61.5",
     "@tanstack/react-query-devtools": "^5.62.2",
     "@tanstack/react-query-persist-client": "^5.62.2",
-    "@trpc/client": "^11.0.0-rc.648",
-    "@trpc/react-query": "^11.0.0-rc.648",
-    "@trpc/server": "^11.0.0-rc.648",
+    "@trpc/client": "^11.0.0-rc.804",
+    "@trpc/server": "^11.0.0-rc.804",
+    "@trpc/tanstack-react-query": "^11.0.0-rc.804",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
     "@types/html-to-pdfmake": "^2.4.4",
@@ -97,7 +99,7 @@
     "react-intl": "5.25.1",
     "react-page-visibility": "^3.2.1",
     "react-redux": "^7.1.1",
-    "react-router-dom": "^6.28.0",
+    "react-router-dom": "^6.28.1",
     "react-router-typesafe-routes": "1.2.2",
     "react-stickynode": "^2.0.1",
     "react-tooltip": "^4.2.21",

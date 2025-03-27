@@ -10,7 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { SCOPES } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
 
@@ -49,7 +49,14 @@ test('Returns event', async () => {
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(fetchedEvent).toEqual(event)
+  expect(fetchedEvent.id).toEqual(event.id)
+
+  const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
+  expect(fetchedEventWithoutReadAction).toEqual(event.actions)
+
+  expect(fetchedEvent.actions[fetchedEvent.actions.length - 1]).toMatchObject({
+    type: ActionType.READ
+  })
 })
 
 test('Returns event with all actions', async () => {
@@ -59,6 +66,13 @@ test('Returns event with all actions', async () => {
   const event = await client.event.create(generator.event.create())
 
   await client.event.actions.declare(generator.event.actions.declare(event.id))
+
+  await client.event.actions.validate(
+    generator.event.actions.validate(event.id)
+  )
+
+  await client.event.actions.reject(generator.event.actions.reject(event.id))
+  await client.event.actions.archive(generator.event.actions.archive(event.id))
 
   await client.event.actions.register(
     generator.event.actions.register(event.id)
@@ -77,14 +91,16 @@ test('Returns event with all actions', async () => {
       correctionRequest.actions[correctionRequest.actions.length - 1].id
     )
   )
-  await client.event.actions.validate(
-    generator.event.actions.validate(event.id)
-  )
 
   const fetchedEvent = await client.event.get(event.id)
 
   // should throw when test is not updated after updating fixture or something breaks.
   expect(fetchedEvent.actions).toHaveLength(
-    tennisClubMembershipEvent.actions.length + 1 // CREATE EVENT
+    tennisClubMembershipEvent.actions.length + 2 // CREATE and READ EVENT
+  )
+
+  const secondTimefetchedEvent = await client.event.get(event.id)
+  expect(secondTimefetchedEvent.actions).toHaveLength(
+    tennisClubMembershipEvent.actions.length + 3 // 1 CREATE and 2 READ EVENT
   )
 })

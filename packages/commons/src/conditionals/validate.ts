@@ -10,16 +10,17 @@
  */
 
 import Ajv from 'ajv'
-import { ConditionalParameters, JSONSchema } from './conditionals'
 import addFormats from 'ajv-formats'
+import { ConditionalParameters, JSONSchema } from './conditionals'
 
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
+import { EventState, ActionUpdate } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
-import { FieldValue } from '../events/FieldValue'
-import { ActionFormData } from '../events/ActionDocument'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
+import { ConditionalType } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true
@@ -43,38 +44,77 @@ function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
-export function isFieldHidden(
+function isFieldConditionMet(
   field: FieldConfig,
-  params: ConditionalParameters
+  form: ActionUpdate | EventState,
+  conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
 ) {
-  const hasShowRule = (field.conditionals ?? []).some(
-    (conditional) => conditional.type === 'SHOW'
+  const hasRule = (field.conditionals ?? []).some(
+    (conditional) => conditional.type === conditionalType
   )
-  const validConditionals = getConditionalActionsForField(field, params)
 
-  const isVisible = !hasShowRule || validConditionals.includes('SHOW')
+  if (!hasRule) {
+    return true
+  }
 
-  return !isVisible
+  const validConditionals = getConditionalActionsForField(field, {
+    $form: form,
+    $now: formatISO(new Date(), {
+      representation: 'date'
+    })
+  })
+
+  return validConditionals.includes(conditionalType)
 }
 
-export function isFieldDisabled(
+export function isFieldVisible(
   field: FieldConfig,
-  params: ConditionalParameters
+  form: ActionUpdate | EventState
 ) {
-  const hasEnableRule = (field.conditionals ?? []).some(
-    (conditional) => conditional.type === 'ENABLE'
-  )
-  const validConditionals = getConditionalActionsForField(field, params)
-  const isEnabled = !hasEnableRule || validConditionals.includes('ENABLE')
-  return !isEnabled
+  return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
-export function isFieldHiddenOrDisabled(
+export function isFieldEnabled(
   field: FieldConfig,
-  params: ConditionalParameters
+  form: ActionUpdate | EventState
 ) {
-  return isFieldHidden(field, params) || isFieldDisabled(field, params)
+  return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
+
+export const errorMessages = {
+  hiddenField: {
+    id: 'v2.error.hidden',
+    defaultMessage: 'Hidden or disabled field should not receive a value',
+    description:
+      'Error message when field is hidden or disabled, but a value was received'
+  },
+  invalidDate: {
+    defaultMessage: 'Invalid date field',
+    description: 'Error message when date field is invalid',
+    id: 'v2.error.invalidDate'
+  },
+  invalidEmail: {
+    defaultMessage: 'Invalid email address',
+    description: 'Error message when email address is invalid',
+    id: 'v2.error.invalidEmail'
+  },
+  requiredField: {
+    defaultMessage: 'Required for registration',
+    description: 'Error message when required field is missing',
+    id: 'v2.error.required'
+  },
+  invalidInput: {
+    defaultMessage: 'Invalid input',
+    description: 'Error message when generic field is invalid',
+    id: 'v2.error.invalid'
+  }
+}
+
+const createIntlError = (message: TranslationConfig) => ({
+  message: {
+    message
+  }
+})
 
 /**
  * Form error message definitions for Zod validation errors.
@@ -84,27 +124,53 @@ const zodToIntlErrorMap = (
   issue: ZodIssueOptionalMessage,
   _ctx: ErrorMapCtx
 ) => {
-  if (issue.code === 'invalid_string' && issue.validation === 'date') {
-    return {
-      message: {
-        message: {
-          defaultMessage: 'Invalid date. Please use the format YYYY-MM-DD',
-          description: 'This is the error message for invalid date fields',
-          id: 'v2.error.invalidDate'
+  switch (issue.code) {
+    case 'invalid_string': {
+      if (_ctx.data === '') {
+        return createIntlError(errorMessages.requiredField)
+      }
+
+      if (issue.validation === 'date') {
+        return createIntlError(errorMessages.invalidDate)
+      }
+
+      if (issue.validation === 'email') {
+        return createIntlError(errorMessages.invalidEmail)
+      }
+
+      break
+    }
+
+    case 'invalid_type': {
+      if (issue.expected !== issue.received && issue.received === 'undefined') {
+        return createIntlError(errorMessages.requiredField)
+      }
+
+      break
+    }
+    case 'too_small': {
+      if (issue.message === undefined) {
+        return createIntlError(errorMessages.requiredField)
+      }
+
+      break
+    }
+    case 'invalid_union': {
+      for (const { issues } of issue.unionErrors) {
+        for (const e of issues) {
+          if (
+            zodToIntlErrorMap(e, _ctx).message.message.id !==
+            'v2.error.required'
+          ) {
+            return createIntlError(errorMessages.invalidInput)
+          }
         }
       }
+      return createIntlError(errorMessages.requiredField)
     }
   }
 
-  return {
-    message: {
-      message: {
-        defaultMessage: 'Required for registration',
-        description: 'This is the error message for required fields',
-        id: 'v2.error.required'
-      }
-    }
-  }
+  return createIntlError(errorMessages.invalidInput)
 }
 
 /**
@@ -127,29 +193,21 @@ export function getFieldValidationErrors({
   field,
   values
 }: {
+  // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
   field: FieldConfig
-  values: ActionFormData
+  values: ActionUpdate
 }) {
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' })
   }
 
-  if (
-    isFieldHidden(field, conditionalParameters) ||
-    isFieldDisabled(field, conditionalParameters)
-  ) {
+  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
     if (values[field.id]) {
       return {
         errors: [
           {
-            message: {
-              id: 'v2.error.hidden',
-              defaultMessage:
-                'Hidden or disabled field should not receive a value',
-              description:
-                'Error message when field is hidden or disabled, but a value was received'
-            }
+            message: errorMessages.hiddenField
           }
         ]
       }
@@ -171,8 +229,8 @@ export function getFieldValidationErrors({
   })
 
   return {
-    // Assumes that custom validation errors are more important than field validation errors
-    errors: [...customValidationResults, ...fieldValidationResult]
+    // Assumes that custom validation errors are based on the field type, and extend the validation.
+    errors: [...fieldValidationResult, ...customValidationResults]
   }
 }
 
@@ -202,24 +260,24 @@ function runCustomFieldValidations({
  * e.g. email is proper format, date is a valid date, etc.
  * for custom validations @see runCustomFieldValidations
  */
-function validateFieldInput({
+export function validateFieldInput({
   field,
   value
 }: {
   field: FieldConfig
-  value: FieldValue
+  value: FieldUpdateValue
 }) {
-  const error = mapFieldTypeToZod(field.type, field.required)
-    .safeParse(value, {
+  const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
+    value,
+    {
       // @ts-expect-error
       errorMap: zodToIntlErrorMap
-    })
-    .error?.format()
-
-  if (!error) {
-    return []
-  }
+    }
+  )
 
   // We have overridden the standard error messages
-  return error._errors as unknown as { message: TranslationConfig }[]
+  return (rawError.error?.issues.map((issue) => issue.message) ??
+    []) as unknown as {
+    message: TranslationConfig
+  }[]
 }

@@ -201,6 +201,18 @@ export async function fetchRegistrationForDownloading(
   )
 }
 
+/*
+ * This endpoint is system client only
+ */
+export async function retrieveRecord(id: string, authHeader: IAuthHeader) {
+  return await createRequest<SavedBundle<Resource>>(
+    'POST',
+    '/retrieve-record',
+    authHeader,
+    { id }
+  )
+}
+
 export async function registerDeclaration(
   id: string,
   authHeader: IAuthHeader,

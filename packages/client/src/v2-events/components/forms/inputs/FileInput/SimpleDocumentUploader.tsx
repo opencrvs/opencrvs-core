@@ -9,31 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import {
-  injectIntl,
-  WrappedComponentProps as IntlShapeProps,
-  MessageDescriptor
-} from 'react-intl'
+import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { FieldValue, FileFieldValue } from '@opencrvs/commons/client'
+import { MimeType, FieldValue, FileFieldValue } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { DocumentPreview } from './DocumentPreview'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
+import { useOnFileChange } from './useOnFileChange'
 
-const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
-  color: ${({ theme }) => theme.colors.primary};
+export const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   border-radius: 4px;
-  ${({ theme }) => theme.fonts.bold14};
+  ${({ theme }) => theme.fonts.bold16};
   height: 46px;
   text-transform: initial;
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-left: 0px;
-    margin-top: 10px;
   }
 `
 
@@ -42,28 +37,26 @@ const FieldDescription = styled.div`
   margin-bottom: 6px;
 `
 
-type IFullProps = {
+interface SimpleDocumentUploaderProps {
   name: string
   label?: string
   file?: FileFieldValue
   description?: string
-  fullWidth?: boolean
-  allowedDocType?: string[]
+  width?: 'full' | 'auto'
+  acceptedFileTypes?: MimeType[]
   error?: string
   disableDeleteInPreview?: boolean
   onComplete: (file: File | null) => void
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
-  requiredErrorMessage?: MessageDescriptor
   previewTransformer?: (files: FileFieldValue) => FileFieldValue
-  onlyButton?: boolean
-} & IntlShapeProps
+  maxFileSize: number
+}
 
-function SimpleDocumentUploaderComponent({
-  allowedDocType,
+export function SimpleDocumentUploader({
+  acceptedFileTypes = [],
   name,
   onUploadingStateChanged,
-  intl,
   previewTransformer,
   onComplete,
   label,
@@ -71,59 +64,19 @@ function SimpleDocumentUploaderComponent({
   description,
   error: errorProps,
   disableDeleteInPreview,
-  requiredErrorMessage,
   touched,
-  fullWidth,
-  onlyButton
-}: IFullProps) {
-  const [error, setError] = useState('')
+  width,
+  maxFileSize
+}: SimpleDocumentUploaderProps) {
+  const intl = useIntl()
   const [previewImage, setPreviewImage] = useState<FileFieldValue | null>(null)
-  const [filesBeingUploaded, setFilesBeingUploaded] = useState<
-    { label: string }[]
-  >([])
 
-  function handleFileChange(uploadedImage: File) {
-    setFilesBeingUploaded([
-      ...filesBeingUploaded,
-      { label: uploadedImage.name }
-    ])
-
-    onUploadingStateChanged && onUploadingStateChanged(true)
-
-    if (
-      allowedDocType &&
-      allowedDocType.length > 0 &&
-      !allowedDocType.includes(uploadedImage.type)
-    ) {
-      onUploadingStateChanged && onUploadingStateChanged(false)
-      setFilesBeingUploaded([])
-      const newErrorMessage = intl.formatMessage(messages.fileUploadError, {
-        type: allowedDocType
-          .map((docTypeStr) => docTypeStr.split('/').pop())
-          .join(', ')
-      })
-
-      setError(newErrorMessage)
-    } else {
-      onUploadingStateChanged && onUploadingStateChanged(false)
-      onComplete(uploadedImage)
-      setError('')
-      setFilesBeingUploaded([])
-    }
-  }
-
-  if (onlyButton) {
-    return (
-      <DocumentUploader
-        disabled={Boolean(error)}
-        id={name}
-        name={name}
-        onChange={error ? undefined : handleFileChange}
-      >
-        {intl.formatMessage(messages.uploadFile)}
-      </DocumentUploader>
-    )
-  }
+  const { error, handleFileChange } = useOnFileChange({
+    acceptedFileTypes,
+    onComplete,
+    onUploadingStateChanged,
+    maxFileSize
+  })
 
   function selectForPreview(selectedPreviewImage: FieldValue) {
     if (previewTransformer) {
@@ -138,16 +91,13 @@ function SimpleDocumentUploaderComponent({
     setPreviewImage(null)
   }
 
-  function onDelete(image: FieldValue) {
+  function onDelete() {
     onComplete(null)
     closePreviewSection()
   }
 
-  const errorMessage =
-    (requiredErrorMessage && intl.formatMessage(requiredErrorMessage)) ||
-    error ||
-    errorProps ||
-    ''
+  const errorMessage = error || errorProps || ''
+
   return (
     <>
       {description && <FieldDescription>{description}</FieldDescription>}
@@ -171,7 +121,7 @@ function SimpleDocumentUploaderComponent({
       )}
       {!file && (
         <DocumentUploader
-          fullWidth={fullWidth}
+          fullWidth={width === 'full'}
           id={name}
           name={name}
           onChange={handleFileChange}
@@ -182,7 +132,3 @@ function SimpleDocumentUploaderComponent({
     </>
   )
 }
-
-export const SimpleDocumentUploader = injectIntl<'intl', IFullProps>(
-  SimpleDocumentUploaderComponent
-)

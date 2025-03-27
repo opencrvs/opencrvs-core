@@ -12,26 +12,86 @@
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
-import { FieldValue } from '@opencrvs/commons/client'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { RecursiveStringRecord } from '@client/v2-events/hooks/useFormDataStringifier'
 
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
+/**
+ * @returns default fields for the event summary
+ */
+function getDefaultFields(
+  eventLabel: TranslationConfig
+): SummaryConfig['fields'] {
+  return [
+    {
+      id: 'status',
+      label: {
+        id: 'v2.event.summary.status.label',
+        defaultMessage: 'Status',
+        description: 'Status of the event'
+      },
+      value: {
+        id: 'v2.event.summary.status.value',
+        defaultMessage:
+          '{event.status, select, CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        description: 'Status of the event'
+      }
+    },
+    {
+      id: 'event',
+      label: {
+        id: 'v2.event.summary.event.label',
+        defaultMessage: 'Event',
+        description: 'Event label'
+      },
+      value: eventLabel
+    },
+    {
+      id: 'trackind-id',
+      label: {
+        id: 'v2.event.summary.trackingId.label',
+        defaultMessage: 'Tracking ID',
+        description: 'Tracking id label'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.trackingId.empty',
+        defaultMessage: 'No tracking ID',
+        description: 'No tracking ID message'
+      },
+      value: {
+        id: 'v2.event.summary.trackingId.value',
+        defaultMessage: '{event.trackingId}',
+        description: 'Tracking id value'
+      }
+    }
+  ]
+}
+
 export function EventSummary({
   event,
-  summary
+  summary,
+  eventLabel
 }: {
-  event: Record<string, FieldValue | null>
+  event: Record<string, FieldValue | null | RecursiveStringRecord>
   summary: SummaryConfig
+  /**
+   * Event label to be displayed in the summary page.
+   * This label is used for translation purposes and should not be stored in the event data.
+   */
+  eventLabel: TranslationConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
+  const defaultFields = getDefaultFields(eventLabel)
+  const summaryPageFields = [...defaultFields, ...summary.fields]
 
   return (
     <>
       <Summary id="summary">
-        {summary.fields.map((field) => {
+        {summaryPageFields.map((field) => {
           return (
             <Summary.Row
               key={field.id}

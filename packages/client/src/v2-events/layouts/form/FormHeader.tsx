@@ -52,7 +52,7 @@ export function FormHeader({
     throw new Error('Event id is required')
   }
   const events = useEvents()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const onExit = useCallback(async () => {
     await exit(event)
@@ -61,6 +61,16 @@ export function FormHeader({
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId)
   }, [eventId, deleteDeclaration])
+
+  const menuItems = isUndeclaredDraft(event.status)
+    ? [
+        {
+          label: 'Delete declaration',
+          icon: <Icon name="Trash" />,
+          handler: onDelete
+        }
+      ]
+    : []
 
   return (
     <AppBar
@@ -84,23 +94,20 @@ export function FormHeader({
                 <Icon name="X" />
                 {intl.formatMessage(messages.exitButton)}
               </Button>
-              <ToggleMenu
-                id={'event-menu'}
-                menuItems={
-                  isUndeclaredDraft(event)
-                    ? [
-                        {
-                          label: 'Delete declaration',
-                          icon: <Icon name="Trash" />,
-                          handler: onDelete
-                        }
-                      ]
-                    : []
-                }
-                toggleButton={
-                  <Icon color="primary" name="DotsThreeVertical" size="large" />
-                }
-              />
+              {menuItems.length > 0 && (
+                <ToggleMenu
+                  id="event-menu"
+                  menuItems={menuItems}
+                  toggleButton={
+                    <Icon
+                      color="primary"
+                      data-testid="event-menu-toggle-button-image"
+                      name="DotsThreeVertical"
+                      size="large"
+                    />
+                  }
+                />
+              )}
             </>
           ) : (
             <Button size="small" type="icon" onClick={goToHome}>
@@ -138,7 +145,12 @@ export function FormHeader({
                   }
                 ]}
                 toggleButton={
-                  <Icon color="primary" name="DotsThreeVertical" size="large" />
+                  <Icon
+                    color="primary"
+                    data-testid="event-menu-toggle-button-image"
+                    name="DotsThreeVertical"
+                    size="large"
+                  />
                 }
               />
             </>

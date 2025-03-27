@@ -159,6 +159,8 @@ const ValueWrapper = styled.span<{
   padding: 0 4px;
   align-self: center;
   white-space: pre-wrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`

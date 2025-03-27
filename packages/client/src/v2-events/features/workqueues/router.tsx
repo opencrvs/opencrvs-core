@@ -10,9 +10,9 @@
  */
 
 import React from 'react'
-import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { WorkqueueLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+import { WorkqueueIndex } from './index'
 
 export const router = {
   path: ROUTES.V2.WORKQUEUES.path,

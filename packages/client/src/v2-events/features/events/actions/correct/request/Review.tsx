@@ -13,21 +13,16 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import {
-  ActionType,
-  getAllFields,
-  getCurrentEventState
-} from '@opencrvs/commons/client'
+import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { setEmptyValuesForFields } from '@client/v2-events/components/forms/utils'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 
 export function Review() {
@@ -37,15 +32,10 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
-
-  const { forms: formConfigs } = config.actions.filter(
-    (action) => action.type === ActionType.REQUEST_CORRECTION
-  )[0]
-
-  const formConfig = formConfigs.find((form) => form.active)
+  const formConfig = findActiveActionForm(config, ActionType.REQUEST_CORRECTION)
 
   if (!formConfig) {
     throw new Error(
@@ -55,7 +45,7 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const form = getFormValues(eventId)
+  const form = getFormValues()
 
   async function handleEdit({
     pageId,
@@ -86,12 +76,12 @@ export function Review() {
     return
   }
 
-  const previousFormValues = getCurrentEventState(event).data
+  const previousFormValues = event.data
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => previousFormValues[key] !== value
   )
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
-  const initialValues = setEmptyValuesForFields(getAllFields(config))
+
   const actionConfig = config.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
@@ -108,12 +98,11 @@ export function Review() {
         eventConfig={config}
         form={form}
         formConfig={formConfig}
-        isUploadButtonVisible={true}
         previousFormValues={previousFormValues}
-        title={intlWithData.formatMessage(actionConfig.label, {
-          ...initialValues,
-          ...previousFormValues
-        })}
+        title={intlWithData.formatMessage(
+          actionConfig.label,
+          previousFormValues
+        )}
         onEdit={handleEdit}
       >
         <PrimaryButton
