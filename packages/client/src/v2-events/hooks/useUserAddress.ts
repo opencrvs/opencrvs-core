@@ -8,12 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/*eslint no-restricted-imports: ["error", { "paths": ["@client/"] }]*/
 
 import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import * as foo from '@client/App'
 
 export function useUserAddress() {
   const userDetails = useSelector(getUserDetails)

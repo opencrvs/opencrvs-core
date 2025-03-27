@@ -28,15 +28,8 @@ function getFieldDefinitionForActionDataField(
   actionType: ActionType,
   fieldId: string
 ) {
-  let actionFields = findActiveActionFields(configuration, actionType)
+  const actionFields = findActiveActionFields(configuration, ActionType.DECLARE)
 
-  if (
-    !actionFields &&
-    LatentActions.some((latentAction) => latentAction === actionType)
-  ) {
-    // @TODO: WHhen application is refactored to use main form, remove this.
-    actionFields = findActiveActionFields(configuration, ActionType.DECLARE)
-  }
   const fieldConfig = actionFields?.find((field) => field.id === fieldId)
   if (!fieldConfig) {
     logger.error(

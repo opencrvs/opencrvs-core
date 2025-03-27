@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable */
 import React, { useCallback, useEffect } from 'react'
 import { InputField } from '@client/components/form/InputField'
 import { TEXT } from '@client/forms'
@@ -719,8 +718,6 @@ class FormSectionComponent extends React.Component<AllProps> {
             >
               <Field name={field.id}>
                 {(formikFieldProps: FieldProps<any>) => {
-                  console.log('formikFieldProps.field', formikFieldProps.field)
-                  console.log('touched', touched)
                   return (
                     <GeneratedInputField
                       fieldDefinition={field}

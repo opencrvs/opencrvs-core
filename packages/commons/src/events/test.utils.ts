@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString } from 'lodash'
+import { merge } from 'lodash'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
-import { ActionBase, ActionDocument, ActionUpdate } from './ActionDocument'
+import { ActionBase, ActionDocument } from './ActionDocument'
 import {
   ArchiveActionInput,
   DeclareActionInput,
@@ -125,34 +125,6 @@ export const eventPayloadGenerator = {
         generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
       eventId
     }),
-    /**
-     * Notify allows sending incomplete data. Think it as 'partial declare' for now.
-     */
-    notify: (
-      eventId: string,
-      input: {
-        transactionId?: string
-        data?: Partial<ActionUpdate>
-      } = {}
-    ) => {
-      let data = input.data
-      if (!data) {
-        const declaration = generateActionInput(
-          tennisClubMembershipEvent,
-          ActionType.DECLARE
-        )
-
-        // Remove some fields to simulate incomplete data
-        data = omitBy(declaration, isString)
-      }
-
-      return {
-        type: ActionType.NOTIFY,
-        transactionId: input.transactionId ?? getUUID(),
-        data,
-        eventId
-      }
-    },
     validate: (
       eventId: string,
       input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}

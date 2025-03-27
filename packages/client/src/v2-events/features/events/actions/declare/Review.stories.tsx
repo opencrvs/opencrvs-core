@@ -239,8 +239,7 @@ export const ReviewForFieldAgentComplete: Story = {
               ...generateEventDocument({
                 configuration: tennisClubMembershipEvent,
                 actions: [ActionType.CREATE]
-              }),
-              id: eventId
+              })
             }
           }),
           tRPCMsw.event.list.query(() => {

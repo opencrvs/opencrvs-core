@@ -30,7 +30,7 @@ export function FormLayout({
 }: {
   route: AllowedRouteWithEventId
   children: React.ReactNode
-  onSaveAndExit?: () => void | (() => Promise<void>)
+  onSaveAndExit?: () => void | Promise<void>
   appbarIcon?: React.ReactNode
 }) {
   const { eventId } = useTypedParams(route)

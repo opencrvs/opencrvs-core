@@ -38,10 +38,6 @@ export const ActionType = {
  * even if they are not in event configuration
  */
 
-export const LatentActions = [
-  ActionType.ARCHIVE,
-  ActionType.REJECT,
-  ActionType.NOTIFY
-]
+export const LatentActions = [ActionType.ARCHIVE, ActionType.REJECT]
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
