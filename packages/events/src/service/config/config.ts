@@ -89,6 +89,9 @@ export async function notifyOnAction(
     // TODO CIHAN: type
     const status = res.status as any
 
+    console.log('CIHAN TESTAA TÄTÄ')
+    console.log(status)
+
     if (!Object.values(ActionConfirmationResponseCodes).includes(status)) {
       return ActionConfirmationResponseCodes.FailInUncontrolledManner
     }

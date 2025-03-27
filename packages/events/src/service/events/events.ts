@@ -352,6 +352,7 @@ export async function updateActionStatus(
   status: ActionStatus
 ) {
   const db = await events.getClient()
+
   await db.collection<EventDocument>('events').updateOne(
     { id: eventId, 'actions.id': actionId },
     {
@@ -361,4 +362,6 @@ export async function updateActionStatus(
       }
     }
   )
+
+  return getEventById(eventId)
 }

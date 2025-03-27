@@ -10,8 +10,16 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, AddressType, SCOPES } from '@opencrvs/commons'
+import {
+  ActionStatus,
+  ActionType,
+  AddressType,
+  SCOPES
+} from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
+import { HttpResponse, http } from 'msw'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -38,7 +46,6 @@ test(`allows access if required scope is present`, async () => {
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.register(event.id, {
@@ -56,7 +63,6 @@ test('Validation error message contains all the offending fields', async () => {
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.register(event.id, {
@@ -81,42 +87,41 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   ).rejects.matchSnapshot()
 })
 
+const validFormData = {
+  'applicant.dob': '2024-02-01',
+  'applicant.firstname': 'John',
+  'applicant.surname': 'Doe',
+  'recommender.none': true,
+  'applicant.address': {
+    country: 'FAR',
+    addressType: AddressType.DOMESTIC,
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+    urbanOrRural: 'RURAL' as const,
+    village: 'Small village'
+  }
+}
+
 test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-
   const event = await client.event.create(generator.event.create())
 
-  const form = {
-    'applicant.dob': '2024-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
-    'recommender.none': true,
-    'applicant.address': {
-      country: 'FAR',
-      addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
-    }
-  }
-
   const data = generator.event.actions.register(event.id, {
-    data: form
+    data: validFormData
   })
 
   const response = await client.event.actions.register.request(data)
   const savedAction = response.actions.find(
     (action) => action.type === ActionType.REGISTER
   )
-  expect(savedAction?.data).toEqual(form)
+  expect(savedAction?.data).toEqual(validFormData)
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
 })
 
 test('Prevents adding birth date in future', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-
   const event = await client.event.create(generator.event.create())
 
   const form = {
@@ -141,4 +146,56 @@ test('Prevents adding birth date in future', async () => {
   await expect(
     client.event.actions.register.request(payload)
   ).rejects.matchSnapshot()
+})
+
+function mockNotifyApi(status = 200) {
+  return mswServer.use(
+    http.post(
+      `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
+      () => {
+        // For some reason the msw types here complain about the status, even though this is correct
+        // https://mswjs.io/docs/api/http-response/
+        // @ts-ignore
+        return HttpResponse.json({}, { status })
+      }
+    )
+  )
+}
+
+test.only('should mark action as accepted if notify API returns HTTP 200', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await client.event.create(generator.event.create())
+
+  mockNotifyApi()
+
+  const data = generator.event.actions.register(event.id, {
+    data: validFormData
+  })
+
+  const response = await client.event.actions.register.request(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.REGISTER
+  )
+  expect(savedAction?.data).toEqual(validFormData)
+  expect(savedAction?.status).toEqual(ActionStatus.Accepted)
+})
+
+test.only('should mark action as accepted if notify API returns HTTP 400', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await client.event.create(generator.event.create())
+
+  mockNotifyApi(400)
+
+  const data = generator.event.actions.register(event.id, {
+    data: validFormData
+  })
+
+  const response = await client.event.actions.register.request(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.REGISTER
+  )
+  expect(savedAction?.data).toEqual(validFormData)
+  expect(savedAction?.status).toEqual(ActionStatus.Rejected)
 })
