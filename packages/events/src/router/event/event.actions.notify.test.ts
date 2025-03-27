@@ -10,7 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { SCOPES } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -31,4 +31,22 @@ test(`allows access if required scope is present`, async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     client.event.actions.notify({} as any)
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    SCOPES.RECORD_SUBMIT_INCOMPLETE,
+    SCOPES.RECORD_DECLARE
+  ])
+
+  const event = await client.event.create(generator.event.create())
+
+  expect(
+    (
+      await client.event.actions.notify(
+        generator.event.actions.notify(event.id)
+      )
+    ).actions.find((action) => action.type === ActionType.NOTIFY)?.data
+  ).toMatchSnapshot()
 })
