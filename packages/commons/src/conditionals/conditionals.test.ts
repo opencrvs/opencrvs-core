@@ -585,3 +585,126 @@ describe('"range number" conditional', () => {
     })
   })
 })
+
+describe('Matches conditional validation', () => {
+  const PHONE_NUMBER_REGEX = '^0(7|9)[0-9]{8}$'
+  it('should pass validation for existing phone number starting with 07', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '0733445566' },
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(true)
+  })
+
+  it('should pass validation for different phone number starting with 09', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '0933445566' },
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(true)
+  })
+
+  it('should fail validation for phone number starting with 05', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '0533445566' },
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number shorter than 10 digits', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '07334455' }, // Only 8 digits
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number longer than 10 digits', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '073344556677' }, // 12 digits
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number without leading 0', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '733445566' }, // Missing leading 0
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for non-numeric input', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '07A3445566' }, // Contains a letter
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number not starting with 07 or 09', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '08334455667' }, // Invalid prefix
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number with incorrect length (too short)', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '073344556' }, // 9 digits only
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number with incorrect length (too long)', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '073344556677' }, // 12 digits
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number with spaces when strict regex is used', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '07 334455667' }, // Spaces not allowed
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number containing non-numeric characters', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '07A34455667' }, // Contains letter
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+})

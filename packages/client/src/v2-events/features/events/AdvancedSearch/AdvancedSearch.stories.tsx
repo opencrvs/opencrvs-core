@@ -15,7 +15,7 @@ import superjson from 'superjson'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
-import AdvancedSearch from './AdvancedSearch'
+import { AdvancedSearch } from './index'
 
 const meta: Meta<typeof AdvancedSearch> = {
   title: 'AdvancedSearch',

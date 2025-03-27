@@ -179,12 +179,14 @@ export function DocumentViewer({
   form,
   formConfig,
   onEdit,
-  showInMobile
+  showInMobile,
+  disabled
 }: {
   formConfig: FormConfig
   form: EventState
   onEdit: () => void
   showInMobile?: boolean
+  disabled?: boolean
 }) {
   const intl = useIntl()
   const fileOptions = getFileOptions(form, formConfig, intl)
@@ -195,15 +197,17 @@ export function DocumentViewer({
         {fileOptions.documentOptions.length === 0 && (
           <ZeroDocument id={`zero_document`}>
             {intl.formatMessage(reviewMessages.zeroDocumentsTextForAnySection)}
-            <Link
-              id="edit-document"
-              onClick={(e) => {
-                e.stopPropagation()
-                onEdit()
-              }}
-            >
-              {intl.formatMessage(reviewMessages.editDocuments)}
-            </Link>
+            {!disabled && (
+              <Link
+                id="edit-document"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEdit()
+                }}
+              >
+                {intl.formatMessage(reviewMessages.editDocuments)}
+              </Link>
+            )}
           </ZeroDocument>
         )}
       </DocumentViewerComponent>
