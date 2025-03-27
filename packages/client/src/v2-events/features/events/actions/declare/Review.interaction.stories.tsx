@@ -27,6 +27,8 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReviewIndex } from './Review'
 
+/* eslint-disable max-lines */
+
 const generator = testDataGenerator()
 
 const declareEventDocument = generateEventDocument({
