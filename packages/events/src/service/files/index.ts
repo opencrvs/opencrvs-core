@@ -16,8 +16,7 @@ import {
   EventDocument,
   FileFieldValue,
   FieldType,
-  findActiveActionFields,
-  LatentActions
+  findActiveActionFields
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { getEventConfigurations } from '@events/service/config/config'

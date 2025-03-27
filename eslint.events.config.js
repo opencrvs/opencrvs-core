@@ -3,12 +3,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * OpenCRVS is also distributed der the terms of the Civil Registration
+ * OpenCRVS is also distributed under the terms of the Civil Registration
  * & Healthcare Disclaimer located at http://opencrvs.org/license.
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/**
+ * Defines rule set used in v2-events client and events service.
+ */
 module.exports = {
   rules: {
     'prettier/prettier': [
