@@ -46,9 +46,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.register, {
+setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.register
+    trpcOptionsProxy.event.actions.register.request
   ),
   retry: true,
   retryDelay: 10000,

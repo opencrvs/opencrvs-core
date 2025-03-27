@@ -82,7 +82,7 @@ export function useOutbox() {
 
   const eventFromRegisterActions = filterOutboxEventsWithMutation(
     eventsList,
-    trpc.event.actions.register,
+    trpc.event.actions.register.request,
     (event, parameters) => {
       return event.id === parameters.eventId
     }
