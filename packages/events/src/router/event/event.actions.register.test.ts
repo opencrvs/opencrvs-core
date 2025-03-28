@@ -161,6 +161,7 @@ describe('Request and confirmation flow', () => {
         async ({ request }) => {
           const body = await request.json()
           actionId = body.actionId
+          console.log('actionId, todo cihan', actionId)
 
           const responseBody =
             status === 200
