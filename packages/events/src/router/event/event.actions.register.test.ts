@@ -207,3 +207,42 @@ test('should mark action as rejected if notify API returns HTTP 400', async () =
   expect(savedAction?.registrationNumber).toBeUndefined()
   expect(savedAction?.status).toEqual(ActionStatus.Rejected)
 })
+
+test('should not save action if notify API returns HTTP 500', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await client.event.create(generator.event.create())
+
+  mockNotifyApi(500)
+
+  const data = generator.event.actions.register(event.id, {
+    data: validFormData
+  })
+
+  const response = await client.event.actions.register.request(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.REGISTER
+  )
+
+  expect(savedAction).toBeUndefined()
+})
+
+test('should save action in requested state if notify API returns HTTP 202', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await client.event.create(generator.event.create())
+
+  mockNotifyApi(202)
+
+  const data = generator.event.actions.register(event.id, {
+    data: validFormData
+  })
+
+  const response = await client.event.actions.register.request(data)
+  const savedAction = response.actions.find(
+    (action) => action.type === ActionType.REGISTER
+  )
+  expect(savedAction?.data).toEqual(validFormData)
+  expect(savedAction?.registrationNumber).toBeUndefined()
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+})
