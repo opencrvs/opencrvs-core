@@ -72,6 +72,7 @@ export const primary = ({ loading }: { loading?: boolean }) => css`
 export const secondary = css`
   border: 1.5px solid ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.white};
 
   svg {
     color: ${({ theme }) => theme.colors.primary};
