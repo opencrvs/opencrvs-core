@@ -348,26 +348,3 @@ export async function addAction(
 
   return { event: updatedEvent, actionId }
 }
-
-export async function updateActionStatus(
-  eventId: string,
-  actionId: string,
-  status: ActionStatus
-) {
-  const db = await events.getClient()
-
-  await db.collection<EventDocument>('events').updateOne(
-    { id: eventId, 'actions.id': actionId },
-    {
-      $set: {
-        'actions.$.status': status,
-        'actions.$.updatedAt': new Date().toISOString()
-      }
-    }
-  )
-
-  const event = await getEventById(eventId)
-  await indexEvent(event)
-
-  return event
-}

@@ -12,7 +12,7 @@ import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { router, publicProcedure } from '@events/router/trpc'
 import { notifyOnAction } from '@events/service/config/config'
-import { addAction, updateActionStatus } from '@events/service/events/events'
+import { addAction, getEventById } from '@events/service/events/events'
 import {
   SCOPES,
   RegisterActionInput,
@@ -31,29 +31,50 @@ export const registerRouter = router({
       const { token, user } = ctx
       const { eventId, transactionId } = input
 
-      const { event, actionId } = await addAction(input, {
+      const event = await getEventById(eventId)
+
+      const { responseStatus, body } = await notifyOnAction(
+        input,
+        await getEventById(eventId),
+        token
+      )
+
+      let status = ActionStatus.Requested
+      let actionInput = input
+
+      // If we get an unexpected failure response, we don't want to save the action
+      if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
+        // TODO CIHAN: error http response?
+        return event
+      }
+
+      // If we immediatly get a rejected response, we can mark the action as rejected
+      if (responseStatus === ActionConfirmationResponse.Rejected) {
+        status = ActionStatus.Rejected
+      }
+
+      // If we immediatly get a success response, we can save the registration number and mark the action as accepted
+      if (responseStatus === ActionConfirmationResponse.Success) {
+        const registrationNumber = body?.registrationNumber
+
+        if (!registrationNumber || typeof registrationNumber !== 'string') {
+          throw new Error('Invalid registration number!')
+        }
+
+        actionInput = { ...actionInput, registrationNumber }
+        status = ActionStatus.Accepted
+      }
+
+      const { event: updatedEvent } = await addAction(actionInput, {
         eventId,
         createdBy: user.id,
         createdAtLocation: user.primaryOfficeId,
         token,
         transactionId,
-        status: ActionStatus.Requested
+        status
       })
 
-      const { responseStatus, body } = await notifyOnAction(input, event, token)
-
-      // If the action is instantly accepted or rejected, simply update the action status.
-      if (responseStatus === ActionConfirmationResponse.Success) {
-        console.log('TÄSSÄ PITÄS TALLENTAA SE REGISTER NUMBER')
-        console.log(body)
-        return updateActionStatus(event.id, actionId, ActionStatus.Accepted)
-      }
-
-      if (responseStatus === ActionConfirmationResponse.Rejected) {
-        return updateActionStatus(event.id, actionId, ActionStatus.Rejected)
-      }
-
-      return event
+      return updatedEvent
     }),
 
   accept: publicProcedure

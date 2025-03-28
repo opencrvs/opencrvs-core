@@ -38,7 +38,11 @@ const handlers = [
   // event.delete.test.ts
   http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
     return HttpResponse.json({ ok: true })
-  })
+  }),
+  http.post(
+    `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
+    () => HttpResponse.json({ registrationNumber: '1234567890AB' })
+  )
 ]
 
 export const mswServer = setupServer(...handlers)

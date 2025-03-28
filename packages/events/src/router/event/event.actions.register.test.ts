@@ -116,7 +116,7 @@ test('Skips required field validation when they are conditionally hidden', async
     (action) => action.type === ActionType.REGISTER
   )
   expect(savedAction?.data).toEqual(validFormData)
-  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  expect(savedAction?.status).toEqual(ActionStatus.Accepted)
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -148,15 +148,21 @@ test('Prevents adding birth date in future', async () => {
   ).rejects.matchSnapshot()
 })
 
+export const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
+
 function mockNotifyApi(status = 200) {
   return mswServer.use(
     http.post(
       `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
       () => {
+        const responseBody =
+          status === 200 ? { registrationNumber: MOCK_REGISTRATION_NUMBER } : {}
+
         // For some reason the msw types here complain about the status, even though this is correct
         // https://mswjs.io/docs/api/http-response/
+
         // @ts-ignore
-        return HttpResponse.json({}, { status })
+        return HttpResponse.json(responseBody, { status })
       }
     )
   )
@@ -179,6 +185,7 @@ test('should mark action as accepted if notify API returns HTTP 200', async () =
   )
   expect(savedAction?.data).toEqual(validFormData)
   expect(savedAction?.status).toEqual(ActionStatus.Accepted)
+  expect(savedAction?.registrationNumber).toEqual(MOCK_REGISTRATION_NUMBER)
 })
 
 test('should mark action as rejected if notify API returns HTTP 400', async () => {
@@ -197,5 +204,6 @@ test('should mark action as rejected if notify API returns HTTP 400', async () =
     (action) => action.type === ActionType.REGISTER
   )
   expect(savedAction?.data).toEqual(validFormData)
+  expect(savedAction?.registrationNumber).toBeUndefined()
   expect(savedAction?.status).toEqual(ActionStatus.Rejected)
 })
