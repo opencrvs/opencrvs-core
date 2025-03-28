@@ -47,10 +47,6 @@ describe('correction requests', () => {
         {
           data: {},
           type: 'REGISTER',
-          identifiers: {
-            trackingId: 'b96cb6f2-ff62-4ed3-97ff-c0b8f1f98ce8',
-            registrationNumber: '47fb252f-9d23-429c-a33e-2db3481bc9fb'
-          },
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
           createdAt: '2025-01-23T02:21:40.182Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
@@ -100,10 +96,6 @@ describe('correction requests', () => {
         {
           data: {},
           type: 'REGISTER',
-          identifiers: {
-            trackingId: 'b96cb6f2-ff62-4ed3-97ff-c0b8f1f98ce8',
-            registrationNumber: '47fb252f-9d23-429c-a33e-2db3481bc9fb'
-          },
           createdBy: '6791a7b2d7f8663e9f9dcbf0',
           createdAt: '2025-01-23T02:21:40.182Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',

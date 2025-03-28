@@ -341,8 +341,7 @@ export function generateActionDocument({
     case ActionType.REGISTER:
       return {
         ...actionBase,
-        type: action,
-        identifiers: { trackingId: getUUID(), registrationNumber: getUUID() }
+        type: action
       }
 
     default:
