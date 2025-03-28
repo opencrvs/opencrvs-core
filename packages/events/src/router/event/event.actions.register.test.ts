@@ -150,7 +150,7 @@ test('Prevents adding birth date in future', async () => {
 
 export const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 
-function mockNotifyApi(status = 200) {
+function mockNotifyApi(status: number) {
   return mswServer.use(
     http.post(
       `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
@@ -173,7 +173,7 @@ test('should mark action as accepted if notify API returns HTTP 200', async () =
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
 
-  mockNotifyApi()
+  mockNotifyApi(200)
 
   const data = generator.event.actions.register(event.id, {
     data: validFormData
@@ -225,6 +225,7 @@ test('should not save action if notify API returns HTTP 500', async () => {
   )
 
   expect(savedAction).toBeUndefined()
+  // TODO CIHAN: expect error response code
 })
 
 test('should save action in requested state if notify API returns HTTP 202', async () => {
