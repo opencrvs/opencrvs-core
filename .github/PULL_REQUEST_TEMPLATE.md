@@ -1,7 +1,7 @@
 <!--
 ## Description
 
-Clearly describe what has been changed. Include relevant context or background if necessary.
+Clearly describe what has been changed. Include relevant context or background
 
 ## Checklist
 
