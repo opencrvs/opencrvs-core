@@ -38,20 +38,25 @@ function compareActionsToRouter(
   router: typeof eventRouter,
   actions: ActionType[]
 ) {
+  // We dont need to check for REGISTER_ACCEPT and REGISTER_REJECT actions
   const routerActions = getDeepKeys(router.actions)
   const casedRouterActions = routerActions.map((action) =>
     _.toUpper(_.snakeCase(action))
+  )
+
+  const filteredRouterActions = casedRouterActions.filter(
+    (action) => action !== 'REGISTER_ACCEPT' && action !== 'REGISTER_REJECT'
   )
 
   const actionsWithoutCreate = actions.filter(
     (action) => action !== ActionType.CREATE && action !== ActionType.READ
   )
 
-  if (casedRouterActions.length !== actionsWithoutCreate.length) {
+  if (filteredRouterActions.length !== actionsWithoutCreate.length) {
     // eslint-disable-next-line no-console
     console.error(
-      `Router actions ${casedRouterActions.length} :`,
-      casedRouterActions.sort()
+      `Router actions ${filteredRouterActions.length} :`,
+      filteredRouterActions.sort()
     )
 
     // eslint-disable-next-line no-console
