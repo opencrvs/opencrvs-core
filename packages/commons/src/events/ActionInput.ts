@@ -30,10 +30,6 @@ const CreateActionInput = BaseActionInput.merge(
 export const RegisterActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
-    identifiers: z.object({
-      trackingId: z.string(),
-      registrationNumber: z.string()
-    }),
     registrationNumber: z.string().optional()
   })
 )

@@ -17,35 +17,21 @@ import {
   SCOPES,
   RegisterActionInput,
   ActionType,
-  getUUID,
   ActionStatus,
   ActionConfirmationResponse
 } from '@opencrvs/commons'
-
-const RegisterActionInputWithoutIdentifiers = RegisterActionInput.omit({
-  identifiers: true
-})
 
 export const registerRouter = router({
   request: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
     // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
-    .input(RegisterActionInputWithoutIdentifiers)
-    // @ts-expect-error
+    .input(RegisterActionInput)
     .use(middleware.validateAction(ActionType.REGISTER))
     .mutation(async ({ ctx, input }) => {
       const { token, user } = ctx
       const { eventId, transactionId } = input
 
-      const addActionInput = {
-        ...input,
-        identifiers: {
-          trackingId: getUUID(),
-          registrationNumber: getUUID()
-        }
-      }
-
-      const { event, actionId } = await addAction(addActionInput, {
+      const { event, actionId } = await addAction(input, {
         eventId,
         createdBy: user.id,
         createdAtLocation: user.primaryOfficeId,
@@ -54,18 +40,14 @@ export const registerRouter = router({
         status: ActionStatus.Requested
       })
 
-      const actionConfirmationResponse = await notifyOnAction(
-        addActionInput,
-        event,
-        token
-      )
+      const notifyResponse = await notifyOnAction(input, event, token)
 
       // If the action is instantly accepted or rejected, simply update the action status.
-      if (actionConfirmationResponse === ActionConfirmationResponse.Success) {
+      if (notifyResponse === ActionConfirmationResponse.Success) {
         return updateActionStatus(event.id, actionId, ActionStatus.Accepted)
       }
 
-      if (actionConfirmationResponse === ActionConfirmationResponse.Rejected) {
+      if (notifyResponse === ActionConfirmationResponse.Rejected) {
         return updateActionStatus(event.id, actionId, ActionStatus.Rejected)
       }
 
@@ -74,22 +56,12 @@ export const registerRouter = router({
 
   accept: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
-    .input(RegisterActionInputWithoutIdentifiers)
-    // @ts-expect-error
+    .input(RegisterActionInput)
     .use(middleware.validateAction(ActionType.REGISTER))
     .mutation(async ({ ctx, input }) => {
       const { token, user } = ctx
       const { eventId, transactionId } = input
-
-      const addActionInput = {
-        ...input,
-        identifiers: {
-          trackingId: getUUID(),
-          registrationNumber: getUUID()
-        }
-      }
-
-      const { event } = await addAction(addActionInput, {
+      const { event } = await addAction(input, {
         eventId,
         createdBy: user.id,
         createdAtLocation: user.primaryOfficeId,
