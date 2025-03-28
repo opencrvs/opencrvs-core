@@ -26,7 +26,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { getAllFields, logger } from '@opencrvs/commons'
+import { getActiveDeclarationFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
 import { DEFAULT_SIZE, generateQuery } from './utils'
@@ -77,7 +77,7 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
 
   if (!hasEventsIndex) {
     logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getAllFields(eventConfiguration))
+    await createIndex(indexName, getActiveDeclarationFields(eventConfiguration))
   } else {
     logger.info(`Index ${indexName} already exists`)
     logger.info(JSON.stringify(hasEventsIndex))
@@ -246,7 +246,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   })
 
   if (!hasEventsIndex) {
-    await createIndex(indexName, getAllFields(eventConfiguration))
+    await createIndex(indexName, getActiveDeclarationFields(eventConfiguration))
   }
 
   const stream = mongoClient.collection(indexName).find().stream()

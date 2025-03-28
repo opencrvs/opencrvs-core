@@ -67,6 +67,7 @@ function getData(actions: Array<ActionDocument>) {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
+
   const excludedActions = [
     ActionType.REQUEST_CORRECTION,
     ActionType.PRINT_CERTIFICATE

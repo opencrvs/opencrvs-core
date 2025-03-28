@@ -20,7 +20,7 @@ import {
   RequestCorrectionActionInput,
   ValidateActionInput
 } from './ActionInput'
-import { ActionType } from './ActionType'
+import { ActionType, DeclarationActions } from './ActionType'
 import { Draft } from './Draft'
 import { EventConfig } from './EventConfig'
 import { EventDocument } from './EventDocument'
@@ -28,8 +28,7 @@ import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
-  findActiveActionFormFields,
-  getActiveActionFormPages,
+  getDeclarationAndReviewFields,
   isPageVisible,
   isVerificationPage,
   stripHiddenFields
@@ -41,40 +40,51 @@ export function generateActionInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const fields = findActiveActionFormFields(configuration, action) ?? []
+  const parsed = DeclarationActions.safeParse(action)
+  if (parsed.success) {
+    const fields = getDeclarationAndReviewFields(configuration, parsed.data)
 
-  const data = fields.reduce(
-    (acc, field, i) => ({
-      ...acc,
-      [field.id]: mapFieldTypeToMockValue(field, i)
-    }),
-    {}
-  )
+    const data = fields.reduce(
+      (acc, field, i) => ({
+        ...acc,
+        [field.id]: mapFieldTypeToMockValue(field, i)
+      }),
+      {}
+    )
 
-  // Strip away hidden or disabled fields from mock action data
-  // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-  return stripHiddenFields(fields, data)
+    // Strip away hidden or disabled fields from mock action data
+    // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
+    return stripHiddenFields(fields, data)
+  }
+
+  return {}
 }
 
 export function generateActionMetadataInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const visibleVerificationPageIds = getActiveActionFormPages(
-    configuration,
-    action
-  )
-    .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, {}))
-    .map((page) => page.id)
+  if (action === ActionType.PRINT_CERTIFICATE) {
+    const actionConfig = configuration.actions.find(
+      (actionConfig) => actionConfig.type === action
+    )
 
-  return visibleVerificationPageIds.reduce(
-    (acc, pageId) => ({
-      ...acc,
-      [pageId]: true
-    }),
-    {}
-  )
+    const visibleVerificationPageIds =
+      (actionConfig?.printForm.flatMap((form) => form.pages) ?? [])
+        .filter((page) => isVerificationPage(page))
+        .filter((page) => isPageVisible(page, {}))
+        .map((page) => page.id) ?? []
+
+    return visibleVerificationPageIds.reduce(
+      (acc, pageId) => ({
+        ...acc,
+        [pageId]: true
+      }),
+      {}
+    )
+  }
+
+  return undefined
 }
 
 export const eventPayloadGenerator = {
@@ -330,8 +340,6 @@ export function generateActionDocument({
       return { ...actionBase, requestId: getUUID(), type: action }
     case ActionType.REJECT_CORRECTION:
       return { ...actionBase, requestId: getUUID(), type: action }
-    case ActionType.CUSTOM:
-      return { ...actionBase, type: action }
     case ActionType.REGISTER:
       return {
         ...actionBase,

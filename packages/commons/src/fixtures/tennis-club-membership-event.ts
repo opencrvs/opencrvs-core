@@ -10,13 +10,14 @@
  */
 import { defineConditional, field, not } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
-import { defineForm } from '../events/EventConfigInput'
+import { defineActionForm, defineDeclaration } from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
-import { FormPageType } from '../events/FormConfig'
+import { PageTypes } from '../events/PageConfig'
+import { FieldType } from '../events'
 
 /** @knipignore */
-const PRINT_CERTIFICATE_FORM = defineForm({
+const PRINT_CERTIFICATE_FORM = defineActionForm({
   label: {
     id: 'v2.event.tennis-club-membership.action.certificate.form.label',
     defaultMessage: 'Tennis club membership certificate collector',
@@ -34,6 +35,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
   pages: [
     {
       id: 'collector',
+      type: PageTypes.enum.FORM,
       title: {
         id: 'v2.event.tennis-club-membership.action.certificate.form.section.who.title',
         defaultMessage: 'Print certified copy',
@@ -48,7 +50,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Requester',
             description: 'This is the label for the field'
           },
-          type: 'SELECT',
+          type: FieldType.SELECT,
           options: [
             {
               value: 'INFORMANT',
@@ -125,7 +127,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Select Type of ID',
             description: 'This is the label for selecting the type of ID'
           },
-          type: 'SELECT',
+          type: FieldType.SELECT,
           options: [
             {
               value: 'PASSPORT',
@@ -228,7 +230,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Passport Details',
             description: 'Field for entering Passport details'
           },
-          type: 'TEXT'
+          type: FieldType.TEXT
         },
         {
           id: 'collector.DRIVING_LICENSE.details',
@@ -279,7 +281,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Driving License Details',
             description: 'Field for entering Driving License details'
           },
-          type: 'TEXT'
+          type: FieldType.TEXT
         },
         {
           id: 'collector.REFUGEE_NUMBER.details',
@@ -330,7 +332,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Refugee Number Details',
             description: 'Field for entering Refugee Number details'
           },
-          type: 'TEXT'
+          type: FieldType.TEXT
         },
         {
           id: 'collector.ALIEN_NUMBER.details',
@@ -381,7 +383,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Alien Number Details',
             description: 'Field for entering Alien Number details'
           },
-          type: 'TEXT'
+          type: FieldType.TEXT
         },
         {
           id: 'collector.OTHER.idTypeOther',
@@ -432,7 +434,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Other ID Type (if applicable)',
             description: 'Field for entering ID type if "Other" is selected'
           },
-          type: 'TEXT'
+          type: FieldType.TEXT
         },
         {
           id: 'collector.OTHER.firstName',
@@ -483,7 +485,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'First Name',
             description: 'This is the label for the first name field'
           },
-          type: 'TEXT'
+          type: FieldType.TEXT
         },
         {
           id: 'collector.OTHER.lastName',
@@ -534,7 +536,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Last Name',
             description: 'This is the label for the last name field'
           },
-          type: 'TEXT'
+          type: FieldType.TEXT
         },
         {
           id: 'collector.OTHER.relationshipToMember',
@@ -586,7 +588,7 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             description:
               'This is the label for the relationship to member field'
           },
-          type: 'TEXT'
+          type: FieldType.TEXT
         },
         {
           id: 'collector.OTHER.signedAffidavit',
@@ -637,13 +639,13 @@ const PRINT_CERTIFICATE_FORM = defineForm({
             defaultMessage: 'Signed Affidavit (Optional)',
             description: 'This is the label for uploading a signed affidavit'
           },
-          type: 'FILE'
+          type: FieldType.FILE
         }
       ]
     },
     {
       id: 'collector.identity.verify',
-      type: FormPageType.VERIFICATION,
+      type: PageTypes.enum.VERIFICATION,
       conditional: field('collector.requesterId').isEqualTo('INFORMANT'),
       title: {
         id: 'event.tennis-club-membership.action.print.verifyIdentity',
@@ -684,18 +686,53 @@ const PRINT_CERTIFICATE_FORM = defineForm({
         }
       }
     }
-  ],
-  review: {
-    title: {
-      id: 'v2.event.tennis-club-membership.action.certificate.form.review.title',
-      defaultMessage: 'Member certificate collector for {firstname} {surname}',
-      description: 'Title of the form to show in review page'
-    },
-    fields: []
-  }
+  ]
+  // review: {
+  //   title: {
+  //     id: 'v2.event.tennis-club-membership.action.certificate.form.review.title',
+  //     defaultMessage: 'Member certificate collector for {firstname} {surname}',
+  //     description: 'Title of the form to show in review page'
+  //   },
+  //   fields: []
+  // } as const
 })
 
-export const TENNIS_CLUB_FORM = defineForm({
+const TENNIS_CLUB_DECLARATION_REVIEW = {
+  declarationVersionId: '1.0.0',
+  // title: {
+  //   id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
+  //   defaultMessage:
+  //     '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
+  //   description: 'Title of the form to show in review page'
+  // },
+  fields: [
+    {
+      id: 'review.comment',
+      type: FieldType.TEXTAREA,
+      label: {
+        defaultMessage: 'Comment',
+        id: 'v2.event.birth.action.declare.form.review.comment.label',
+        description: 'Label for the comment field in the review section'
+      }
+    },
+    {
+      type: FieldType.SIGNATURE,
+      id: 'review.signature',
+      label: {
+        defaultMessage: 'Signature of informant',
+        id: 'v2.event.birth.action.declare.form.review.signature.label',
+        description: 'Label for the signature field in the review section'
+      },
+      signaturePromptLabel: {
+        id: 'v2.signature.upload.modal.title',
+        defaultMessage: 'Draw signature',
+        description: 'Title for the modal to draw signature'
+      }
+    }
+  ]
+}
+
+export const TENNIS_CLUB_DECLARATION_FORM = defineDeclaration({
   label: {
     id: 'v2.event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',
@@ -710,39 +747,6 @@ export const TENNIS_CLUB_FORM = defineForm({
       description: 'This is the first version of the form'
     }
   },
-  review: {
-    title: {
-      id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
-      defaultMessage:
-        '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
-      description: 'Title of the form to show in review page'
-    },
-    fields: [
-      {
-        id: 'review.comment',
-        type: 'TEXTAREA',
-        label: {
-          defaultMessage: 'Comment',
-          id: 'v2.event.birth.action.declare.form.review.comment.label',
-          description: 'Label for the comment field in the review section'
-        }
-      },
-      {
-        type: 'SIGNATURE',
-        id: 'review.signature',
-        label: {
-          defaultMessage: 'Signature of informant',
-          id: 'v2.event.birth.action.declare.form.review.signature.label',
-          description: 'Label for the signature field in the review section'
-        },
-        signaturePromptLabel: {
-          id: 'v2.signature.upload.modal.title',
-          defaultMessage: 'Draw signature',
-          description: 'Title for the modal to draw signature'
-        }
-      }
-    ]
-  },
   pages: [
     {
       id: 'applicant',
@@ -754,7 +758,7 @@ export const TENNIS_CLUB_FORM = defineForm({
       fields: [
         {
           id: 'applicant.firstname',
-          type: 'TEXT',
+          type: FieldType.TEXT,
           required: true,
           conditionals: [],
           label: {
@@ -765,7 +769,7 @@ export const TENNIS_CLUB_FORM = defineForm({
         },
         {
           id: 'applicant.surname',
-          type: 'TEXT',
+          type: FieldType.TEXT,
           required: true,
           conditionals: [],
           label: {
@@ -808,7 +812,7 @@ export const TENNIS_CLUB_FORM = defineForm({
         },
         {
           id: 'applicant.image',
-          type: 'FILE',
+          type: FieldType.FILE,
           required: false,
           label: {
             defaultMessage: "Applicant's profile picture",
@@ -840,7 +844,7 @@ export const TENNIS_CLUB_FORM = defineForm({
       fields: [
         {
           id: 'senior-pass.id',
-          type: 'TEXT',
+          type: FieldType.TEXT,
           required: true,
           label: {
             defaultMessage: 'Senior pass ID',
@@ -871,7 +875,7 @@ export const TENNIS_CLUB_FORM = defineForm({
         },
         {
           id: 'recommender.firstname',
-          type: 'TEXT',
+          type: FieldType.TEXT,
           required: true,
           conditionals: [
             {
@@ -887,7 +891,7 @@ export const TENNIS_CLUB_FORM = defineForm({
         },
         {
           id: 'recommender.surname',
-          type: 'TEXT',
+          type: FieldType.TEXT,
           required: true,
           conditionals: [
             {
@@ -903,7 +907,7 @@ export const TENNIS_CLUB_FORM = defineForm({
         },
         {
           id: 'recommender.id',
-          type: 'TEXT',
+          type: FieldType.TEXT,
           required: true,
           conditionals: [
             {
@@ -1014,7 +1018,7 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.declare.label'
       },
-      forms: [TENNIS_CLUB_FORM]
+      review: [TENNIS_CLUB_DECLARATION_REVIEW]
     },
     {
       type: ActionType.VALIDATE,
@@ -1024,7 +1028,7 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.validate.label'
       },
-      forms: [TENNIS_CLUB_FORM]
+      review: [TENNIS_CLUB_DECLARATION_REVIEW]
     },
     {
       type: ActionType.REGISTER,
@@ -1034,7 +1038,7 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.register.label'
       },
-      forms: [TENNIS_CLUB_FORM]
+      review: [TENNIS_CLUB_DECLARATION_REVIEW]
     },
     {
       type: ActionType.REQUEST_CORRECTION,
@@ -1044,11 +1048,10 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.correction.request.label'
       },
-
-      forms: [TENNIS_CLUB_FORM],
       onboardingForm: [
         {
           id: 'correction-requester',
+          type: PageTypes.enum.FORM,
           title: {
             id: 'event.tennis-club-membership.action.requestCorrection.form.section.corrector',
             defaultMessage: 'Correction requester',
@@ -1117,6 +1120,7 @@ export const tennisClubMembershipEvent = defineConfig({
         },
         {
           id: 'identity-check',
+          type: PageTypes.enum.FORM,
           title: {
             id: 'event.tennis-club-membership.action.requestCorrection.form.section.verify',
             defaultMessage: 'Verify their identity',
@@ -1161,6 +1165,7 @@ export const tennisClubMembershipEvent = defineConfig({
       additionalDetailsForm: [
         {
           id: 'correction-request.supporting-documents',
+          type: PageTypes.enum.FORM,
           title: {
             id: 'event.tennis-club-membership.action.requestCorrection.form.section.verify',
             defaultMessage: 'Upload supporting documents',
@@ -1179,7 +1184,7 @@ export const tennisClubMembershipEvent = defineConfig({
             },
             {
               id: 'correction.supportingDocs',
-              type: 'FILE',
+              type: FieldType.FILE,
               label: {
                 id: 'correction.corrector.title',
                 defaultMessage: 'Upload supporting documents',
@@ -1224,6 +1229,7 @@ export const tennisClubMembershipEvent = defineConfig({
         },
         {
           id: 'correction-request.additional-details',
+          type: PageTypes.enum.FORM,
           title: {
             id: 'event.tennis-club-membership.action.requestCorrection.form.section.corrector',
             defaultMessage: 'Reason for correction',
@@ -1232,7 +1238,7 @@ export const tennisClubMembershipEvent = defineConfig({
           fields: [
             {
               id: 'correction.request.reason',
-              type: 'TEXT',
+              type: FieldType.TEXT,
               label: {
                 id: 'correction.reason.title',
                 defaultMessage: 'Reason for correction?',
@@ -1245,7 +1251,6 @@ export const tennisClubMembershipEvent = defineConfig({
     },
     {
       type: ActionType.APPROVE_CORRECTION,
-      forms: [TENNIS_CLUB_FORM],
       label: {
         defaultMessage: 'Approve correction',
         description:
@@ -1261,7 +1266,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      forms: [PRINT_CERTIFICATE_FORM],
+      printForm: [PRINT_CERTIFICATE_FORM],
       conditionals: [
         {
           type: 'SHOW',
@@ -1309,8 +1314,7 @@ export const tennisClubMembershipEvent = defineConfig({
         defaultMessage: 'Archive',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
-      },
-      forms: [TENNIS_CLUB_FORM]
+      }
     },
     {
       type: ActionType.REJECT,
@@ -1319,8 +1323,7 @@ export const tennisClubMembershipEvent = defineConfig({
         defaultMessage: 'Reject',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
-      },
-      forms: [TENNIS_CLUB_FORM]
+      }
     }
   ],
   advancedSearch: [
@@ -1336,5 +1339,6 @@ export const tennisClubMembershipEvent = defineConfig({
         }
       ]
     }
-  ]
+  ],
+  declaration: [TENNIS_CLUB_DECLARATION_FORM]
 })

@@ -130,12 +130,6 @@ const ReadAction = ActionBase.merge(
   })
 )
 
-const CustomAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.CUSTOM)
-  })
-)
-
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
   ValidateAction,
@@ -151,8 +145,7 @@ export const ActionDocument = z.discriminatedUnion('type', [
   RejectedCorrectionAction,
   UnassignedAction,
   PrintCertificateAction,
-  ReadAction,
-  CustomAction
+  ReadAction
 ])
 
 export type ActionDocument = z.infer<typeof ActionDocument>

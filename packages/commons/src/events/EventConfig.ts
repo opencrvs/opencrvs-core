@@ -16,6 +16,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { findPageFields } from './utils'
+import { DeclarationFormConfig } from './FormConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -32,6 +33,7 @@ export const EventConfig = z
     summary: SummaryConfig,
     label: TranslationConfig,
     actions: z.array(ActionConfig),
+    declaration: z.array(DeclarationFormConfig),
     workqueues: z.array(WorkqueueConfig),
     deduplication: z.array(DeduplicationConfig).optional().default([]),
     advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
@@ -63,8 +65,8 @@ export const EventConfig = z
         code: 'custom',
         message: `Advanced search id must match a field id in fields array.
     Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
-          .map((f) => f.fieldId)
-          .join(', ')}`,
+      .map((f) => f.fieldId)
+      .join(', ')}`,
         path: ['advancedSearch']
       })
     }

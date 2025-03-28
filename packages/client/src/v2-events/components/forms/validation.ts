@@ -13,10 +13,10 @@ import {
   FieldConfig,
   getFieldValidationErrors,
   EventState,
-  FormConfig,
   stripHiddenFields,
   getVisiblePagesFormFields,
-  isPageVisible
+  isPageVisible,
+  DeclarationFormConfig
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -50,7 +50,7 @@ export function getValidationErrorsForForm(
 }
 
 export function validationErrorsInActionFormExist(
-  formConfig: FormConfig,
+  formConfig: DeclarationFormConfig,
   form: EventState,
   metadata?: EventState
 ): boolean {

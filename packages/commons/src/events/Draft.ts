@@ -12,7 +12,7 @@
 import { z } from 'zod'
 import { ActionBase } from './ActionDocument'
 import { BaseActionInput } from './ActionInput'
-import { ActionType } from './ActionType'
+import { ActionTypes } from './ActionType'
 
 /*
  * A temporary storage for an action.
@@ -25,12 +25,12 @@ export const Draft = z.object({
   transactionId: z.string(),
   createdAt: z.string().datetime(),
   action: ActionBase.extend({
-    type: z.enum(Object.values(ActionType) as [ActionType, ...ActionType[]])
+    type: ActionTypes
   }).omit({ id: true })
 })
 
 export const DraftInput = BaseActionInput.extend({
-  type: z.enum(Object.values(ActionType) as [ActionType, ...ActionType[]])
+  type: ActionTypes
 })
 
 export type Draft = z.infer<typeof Draft>

@@ -15,7 +15,7 @@ import { inject, vi } from 'vitest'
 import { createIndex } from '@events/service/indexing/indexing'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { mswServer } from './msw'
-import { getAllFields } from '@opencrvs/commons'
+import { getActiveDeclarationFields } from '@opencrvs/commons'
 
 vi.mock('@events/storage/mongodb/events')
 vi.mock('@events/storage/mongodb/user-mgnt')
@@ -30,7 +30,10 @@ async function resetESServer() {
   const index = 'events_tennis_club_membership' + Date.now() + Math.random()
   getEventIndexName.mockReturnValue(index)
   getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
-  await createIndex(index, getAllFields(tennisClubMembershipEvent))
+  await createIndex(
+    index,
+    getActiveDeclarationFields(tennisClubMembershipEvent)
+  )
 }
 
 beforeEach(async () =>
