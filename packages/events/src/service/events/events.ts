@@ -366,5 +366,8 @@ export async function updateActionStatus(
     }
   )
 
-  return getEventById(eventId)
+  const event = await getEventById(eventId)
+  await indexEvent(event)
+
+  return event
 }

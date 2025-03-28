@@ -68,7 +68,10 @@ export async function notifyOnAction(
   action: ActionInput,
   event: EventDocument,
   token: string
-): Promise<ActionConfirmationResponse> {
+): Promise<{
+  responseStatus: ActionConfirmationResponse
+  body: Record<string, unknown> | undefined
+}> {
   try {
     const res = await fetch(
       new URL(
@@ -93,9 +96,16 @@ export async function notifyOnAction(
           ]
         : undefined
 
-    return confirmationResponse ?? ActionConfirmationResponse.UnexpectedFailure
+    return {
+      responseStatus:
+        confirmationResponse ?? ActionConfirmationResponse.UnexpectedFailure,
+      body: await res.json().catch(() => undefined)
+    }
   } catch (error) {
     logger.error(error)
-    return ActionConfirmationResponse.UnexpectedFailure
+    return {
+      responseStatus: ActionConfirmationResponse.UnexpectedFailure,
+      body: undefined
+    }
   }
 }

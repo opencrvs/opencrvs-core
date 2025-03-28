@@ -40,14 +40,16 @@ export const registerRouter = router({
         status: ActionStatus.Requested
       })
 
-      const notifyResponse = await notifyOnAction(input, event, token)
+      const { responseStatus, body } = await notifyOnAction(input, event, token)
 
       // If the action is instantly accepted or rejected, simply update the action status.
-      if (notifyResponse === ActionConfirmationResponse.Success) {
+      if (responseStatus === ActionConfirmationResponse.Success) {
+        console.log('TÄSSÄ PITÄS TALLENTAA SE REGISTER NUMBER')
+        console.log(body)
         return updateActionStatus(event.id, actionId, ActionStatus.Accepted)
       }
 
-      if (notifyResponse === ActionConfirmationResponse.Rejected) {
+      if (responseStatus === ActionConfirmationResponse.Rejected) {
         return updateActionStatus(event.id, actionId, ActionStatus.Rejected)
       }
 
