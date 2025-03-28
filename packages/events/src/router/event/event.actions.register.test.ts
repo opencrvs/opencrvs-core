@@ -161,6 +161,8 @@ describe('Request and confirmation flow', () => {
         async ({ request }) => {
           const body = await request.json()
           actionId = body.actionId
+
+          // eslint-disable-next-line no-console
           console.log('actionId, todo cihan', actionId)
 
           const responseBody =
