@@ -14,8 +14,9 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
-export function DeleteEvent() {
+function DeleteEvent() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DELETE)
   const navigate = useNavigate()
   const events = useEvents()
@@ -32,3 +33,5 @@ export function DeleteEvent() {
 
   return <div />
 }
+
+export const DeleteEventIndex = withSuspense(DeleteEvent)
