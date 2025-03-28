@@ -18,8 +18,10 @@ import {
   RegisterActionInput,
   ActionType,
   ActionStatus,
-  ActionConfirmationResponse
+  ActionConfirmationResponse,
+  getUUID
 } from '@opencrvs/commons'
+import { z } from 'zod'
 
 export const registerRouter = router({
   request: publicProcedure
@@ -30,13 +32,14 @@ export const registerRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { token, user } = ctx
       const { eventId, transactionId } = input
-
       const event = await getEventById(eventId)
+      const actionId = getUUID()
 
       const { responseStatus, body } = await notifyOnAction(
         input,
         await getEventById(eventId),
-        token
+        token,
+        actionId
       )
 
       let status = ActionStatus.Requested
@@ -65,25 +68,50 @@ export const registerRouter = router({
         status = ActionStatus.Accepted
       }
 
-      const { event: updatedEvent } = await addAction(actionInput, {
-        eventId,
-        createdBy: user.id,
-        createdAtLocation: user.primaryOfficeId,
-        token,
-        transactionId,
-        status
-      })
+      const { event: updatedEvent } = await addAction(
+        actionInput,
+        {
+          eventId,
+          createdBy: user.id,
+          createdAtLocation: user.primaryOfficeId,
+          token,
+          transactionId,
+          status
+        },
+        actionId
+      )
 
       return updatedEvent
     }),
 
   accept: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
-    .input(RegisterActionInput)
+    // TODO CIHAN: yleistä tää tyyppi
+    .input(RegisterActionInput.merge(z.object({ actionId: z.string() })))
     .use(middleware.validateAction(ActionType.REGISTER))
+    .use(async ({ ctx, input, next }) => {
+      const { eventId, actionId } = input
+      const event = await getEventById(eventId)
+      const action = event.actions.find((a) => a.id === actionId)
+
+      if (!action) {
+        throw new Error(`Action not found.`)
+      }
+
+      if (action.status === ActionStatus.Rejected) {
+        throw new Error(`Action has already been rejected.`)
+      }
+
+      return next({ ctx: { ...ctx, actionStatus: action.status }, input })
+    })
     .mutation(async ({ ctx, input }) => {
-      const { token, user } = ctx
+      const { token, user, actionStatus } = ctx
       const { eventId, transactionId } = input
+
+      if (actionStatus === ActionStatus.Accepted) {
+        return getEventById(input.eventId)
+      }
+
       const { event } = await addAction(input, {
         eventId,
         createdBy: user.id,
@@ -98,9 +126,45 @@ export const registerRouter = router({
 
   reject: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
-    .mutation(({ ctx, input }) => {
-      // const { token, user } = ctx
-      // const { eventId, transactionId } = input
-      // return addAction()
+    // TODO CIHAN: fiksaa ja yleistä tyyppi
+    .input(
+      z.object({
+        actionId: z.string(),
+        eventId: z.string(),
+        transactionId: z.string()
+      })
+    )
+    .use(async ({ ctx, input, next }) => {
+      const { eventId, actionId } = input
+      const event = await getEventById(eventId)
+      const action = event.actions.find((a) => a.id === actionId)
+
+      if (!action) {
+        throw new Error(`Action not found.`)
+      }
+
+      if (action.status === ActionStatus.Accepted) {
+        throw new Error(`Action has already been accepted.`)
+      }
+
+      return next({ ctx: { ...ctx, actionStatus: action.status }, input })
+    })
+    .mutation(async ({ ctx, input }) => {
+      const { token, user, actionStatus } = ctx
+      const { eventId, transactionId } = input
+
+      if (actionStatus === ActionStatus.Rejected) {
+        return getEventById(input.eventId)
+      }
+
+      // @ts-ignore
+      return addAction(input, {
+        eventId,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId,
+        token,
+        transactionId,
+        status: ActionStatus.Rejected
+      })
     })
 })

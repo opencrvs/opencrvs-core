@@ -67,7 +67,8 @@ export async function getEventConfigurationById({
 export async function notifyOnAction(
   action: ActionInput,
   event: EventDocument,
-  token: string
+  token: string,
+  actionId: string
 ): Promise<{
   responseStatus: ActionConfirmationResponse
   body: Record<string, unknown> | undefined
@@ -80,7 +81,7 @@ export async function notifyOnAction(
       ),
       {
         method: 'POST',
-        body: JSON.stringify(event),
+        body: JSON.stringify({ event, actionId }),
         headers: {
           'Content-Type': 'application/json',
           Authorization: token

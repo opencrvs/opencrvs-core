@@ -265,7 +265,8 @@ export async function addAction(
     token: string
     transactionId: string
     status: ActionStatus
-  }
+  },
+  actionId = getUUID()
 ): Promise<{ event: EventDocument; actionId: string }> {
   const db = await events.getClient()
   const now = new Date().toISOString()
@@ -312,8 +313,6 @@ export async function addAction(
     input.transactionId = transactionId
   }
 
-  const actionId = getUUID()
-
   const action: ActionDocument = {
     ...input,
     createdBy,
@@ -348,3 +347,26 @@ export async function addAction(
 
   return { event: updatedEvent, actionId }
 }
+
+// export async function rejectAction(actionId: string, eventId: string) {
+//   const db = await events.getClient()
+//   const now = new Date().toISOString()
+//   const event = await getEventById(eventId)
+
+//   const action: ActionDocument = {
+
+//     createdBy,
+//     createdAt: now,
+//     createdAtLocation,
+//     id: actionId,
+//     status: status
+//   }
+
+//   await db
+//     .collection<EventDocument>('events')
+//     .updateOne(
+//       { id: eventId, 'actions.transactionId': { $ne: transactionId } },
+//       { $push: { actions: action }, $set: { updatedAt: now } }
+//     )
+
+// }

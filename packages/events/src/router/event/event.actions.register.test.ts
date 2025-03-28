@@ -14,6 +14,7 @@ import {
   ActionStatus,
   ActionType,
   AddressType,
+  getUUID,
   SCOPES
 } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
@@ -150,100 +151,155 @@ test('Prevents adding birth date in future', async () => {
 
 export const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 
-function mockNotifyApi(status: number) {
-  return mswServer.use(
-    http.post(
-      `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
-      () => {
-        const responseBody =
-          status === 200 ? { registrationNumber: MOCK_REGISTRATION_NUMBER } : {}
+describe('Request and confirmation flow', () => {
+  let actionId: string
 
-        // For some reason the msw types here complain about the status, even though this is correct
-        // https://mswjs.io/docs/api/http-response/
+  function mockNotifyApi(status: number) {
+    return mswServer.use(
+      http.post<never, { actionId: string }>(
+        `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
+        async ({ request }) => {
+          const body = await request.json()
+          actionId = body.actionId
 
-        // @ts-ignore
-        return HttpResponse.json(responseBody, { status })
-      }
+          const responseBody =
+            status === 200
+              ? { registrationNumber: MOCK_REGISTRATION_NUMBER }
+              : {}
+          // For some reason the msw types here complain about the status, even though this is correct
+          // https://mswjs.io/docs/api/http-response/
+
+          // @ts-ignore
+          return HttpResponse.json(responseBody, { status })
+        }
+      )
     )
-  )
-}
+  }
 
-test('should mark action as accepted if notify API returns HTTP 200', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-  const event = await client.event.create(generator.event.create())
+  test('should mark action as accepted if notify API returns HTTP 200', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
 
-  mockNotifyApi(200)
+    mockNotifyApi(200)
 
-  const data = generator.event.actions.register(event.id, {
-    data: validFormData
+    const data = generator.event.actions.register(event.id, {
+      data: validFormData
+    })
+
+    const response = await client.event.actions.register.request(data)
+    const savedAction = response.actions.find(
+      (action) => action.type === ActionType.REGISTER
+    )
+    expect(savedAction?.data).toEqual(validFormData)
+    expect(savedAction?.status).toEqual(ActionStatus.Accepted)
+    expect(savedAction?.registrationNumber).toEqual(MOCK_REGISTRATION_NUMBER)
   })
 
-  const response = await client.event.actions.register.request(data)
-  const savedAction = response.actions.find(
-    (action) => action.type === ActionType.REGISTER
-  )
-  expect(savedAction?.data).toEqual(validFormData)
-  expect(savedAction?.status).toEqual(ActionStatus.Accepted)
-  expect(savedAction?.registrationNumber).toEqual(MOCK_REGISTRATION_NUMBER)
-})
+  test('should mark action as rejected if notify API returns HTTP 400', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
 
-test('should mark action as rejected if notify API returns HTTP 400', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-  const event = await client.event.create(generator.event.create())
+    mockNotifyApi(400)
 
-  mockNotifyApi(400)
+    const data = generator.event.actions.register(event.id, {
+      data: validFormData
+    })
 
-  const data = generator.event.actions.register(event.id, {
-    data: validFormData
+    const response = await client.event.actions.register.request(data)
+    const savedAction = response.actions.find(
+      (action) => action.type === ActionType.REGISTER
+    )
+    expect(savedAction?.data).toEqual(validFormData)
+    expect(savedAction?.registrationNumber).toBeUndefined()
+    expect(savedAction?.status).toEqual(ActionStatus.Rejected)
   })
 
-  const response = await client.event.actions.register.request(data)
-  const savedAction = response.actions.find(
-    (action) => action.type === ActionType.REGISTER
-  )
-  expect(savedAction?.data).toEqual(validFormData)
-  expect(savedAction?.registrationNumber).toBeUndefined()
-  expect(savedAction?.status).toEqual(ActionStatus.Rejected)
-})
+  test('should not save action if notify API returns HTTP 500', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
 
-test('should not save action if notify API returns HTTP 500', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-  const event = await client.event.create(generator.event.create())
+    mockNotifyApi(500)
 
-  mockNotifyApi(500)
+    const data = generator.event.actions.register(event.id, {
+      data: validFormData
+    })
 
-  const data = generator.event.actions.register(event.id, {
-    data: validFormData
+    const response = await client.event.actions.register.request(data)
+    const savedAction = response.actions.find(
+      (action) => action.type === ActionType.REGISTER
+    )
+
+    expect(savedAction).toBeUndefined()
+    // TODO CIHAN: expect error response code
   })
 
-  const response = await client.event.actions.register.request(data)
-  const savedAction = response.actions.find(
-    (action) => action.type === ActionType.REGISTER
-  )
+  test('should save action in requested state if notify API returns HTTP 202', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
 
-  expect(savedAction).toBeUndefined()
-  // TODO CIHAN: expect error response code
-})
+    mockNotifyApi(202)
 
-test('should save action in requested state if notify API returns HTTP 202', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-  const event = await client.event.create(generator.event.create())
+    const data = generator.event.actions.register(event.id, {
+      data: validFormData
+    })
 
-  mockNotifyApi(202)
-
-  const data = generator.event.actions.register(event.id, {
-    data: validFormData
+    const response = await client.event.actions.register.request(data)
+    const savedAction = response.actions.find(
+      (action) => action.type === ActionType.REGISTER
+    )
+    expect(savedAction?.data).toEqual(validFormData)
+    expect(savedAction?.registrationNumber).toBeUndefined()
+    expect(savedAction?.status).toEqual(ActionStatus.Requested)
   })
 
-  const response = await client.event.actions.register.request(data)
-  const savedAction = response.actions.find(
-    (action) => action.type === ActionType.REGISTER
-  )
-  expect(savedAction?.data).toEqual(validFormData)
-  expect(savedAction?.registrationNumber).toBeUndefined()
-  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  test('should not be able to accept the register action if register is not first requested', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    mockNotifyApi(202)
+
+    const data = generator.event.actions.register(event.id, {
+      data: validFormData
+    })
+
+    await expect(
+      client.event.actions.register.accept({
+        ...data,
+        actionId: getUUID()
+      })
+    ).rejects.matchSnapshot()
+  })
+
+  // test('should not be able to accept the register action if register action is already rejected', async () => {
+  //   const { user, generator } = await setupTestCase()
+  //   const client = createTestClient(user)
+  //   const event = await client.event.create(generator.event.create())
+  //   const eventId = event.id
+
+  //   mockNotifyApi(202)
+
+  //   const data = generator.event.actions.register(eventId, {
+  //     data: validFormData
+  //   })
+
+  //   await client.event.actions.register.request(data)
+
+  //   await client.event.actions.register.reject({
+  //     eventId,
+  //     actionId,
+  //     transactionId: getUUID()
+  //   })
+
+  //   await expect(
+  //     client.event.actions.register.accept({
+  //       ...data,
+  //       actionId
+  //     })
+  //   ).rejects.matchSnapshot()
+  // })
 })
