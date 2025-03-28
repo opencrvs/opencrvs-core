@@ -69,7 +69,8 @@ const ApplicationNameContainer = styled.div`
     display: none;
   }
 `
-const ApplicationName = styled(Text)`
+const ApplicationName = styled.div`
+  ${({ theme }) => theme.fonts.h4};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -99,17 +100,15 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
     >
       <Container>
         <ApplicationNameContainer>
-          <ApplicationName variant="h4" element="h4">
-            {props.applicationName}
-          </ApplicationName>
+          <ApplicationName>{props.applicationName}</ApplicationName>
         </ApplicationNameContainer>
         <UserInfo>
           <>
             {props.avatar && props.avatar()}
-            <UserName variant="h4" element="h4">
+            <UserName variant="h4" element="p">
               {props.name && props.name}
             </UserName>
-            <Role variant="reg12" element="span">
+            <Role variant="reg12" element="p">
               {props.role && props.role}
             </Role>
           </>
