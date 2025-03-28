@@ -17,7 +17,7 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
-  getActiveActionFormPages,
+  EventConfig,
   isFieldVisible
 } from '@opencrvs/commons/client'
 
@@ -33,6 +33,22 @@ import {
 } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+
+function getPrintCertificatePages(configuration: EventConfig) {
+  const action = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+
+  const pages = action?.printForm.find((printForm) => printForm)?.pages
+
+  if (!pages) {
+    throw new Error(
+      `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
+    )
+  }
+
+  return pages
+}
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -54,10 +70,7 @@ export function Pages() {
     event.type
   )
 
-  const formPages = getActiveActionFormPages(
-    configuration,
-    ActionType.PRINT_CERTIFICATE
-  )
+  const formPages = getPrintCertificatePages(configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -97,9 +110,9 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        declaration={event.data}
         disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
         eventConfig={configuration}
-        eventDeclarationData={event.data}
         form={metadata}
         formPages={formPages.map((page) => {
           if (formPages[0].id === page.id) {
@@ -117,7 +130,7 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setMetadata(data)}
         showReviewButton={searchParams.from === 'review'}
-        onFormPageChange={(nextPageId: string) =>
+        onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
               eventId,

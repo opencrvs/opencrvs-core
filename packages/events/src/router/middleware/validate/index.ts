@@ -13,18 +13,25 @@ import {
   ActionInputWithType,
   ActionType,
   ActionUpdate,
+  DeclarationUpdateActions,
+  NonDeclarationUpdateActions,
+  EventConfig,
   FieldConfig,
   FieldUpdateValue,
-  findActiveActionFields,
-  getActiveActionFormPages,
   getFieldValidationErrors,
   Inferred,
   isPageVisible,
-  isVerificationPage
+  isVerificationPage,
+  NonDeclarationUpdateAction,
+  findActionPages,
+  DeclarationUpdateAction,
+  getActiveActionReviewFields,
+  getActiveDeclaration,
+  getVisiblePagesFormFields
 } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventConfigurationById } from '@events/service/config/config'
-import { getEventTypeId, getEventById } from '@events/service/events/events'
+import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
 
 function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
@@ -81,6 +88,70 @@ type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
 }
 
+function throwWhenNotEmpty(errors: unknown[]) {
+  console.log('errors', errors)
+
+  if (errors.length > 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: JSON.stringify(errors)
+    })
+  }
+}
+
+function validateDeclarationUpdateAction({
+  eventConfig,
+  actionType,
+  data,
+  metadata
+}: {
+  eventConfig: EventConfig
+  actionType: DeclarationUpdateAction
+  data: ActionUpdate
+  metadata?: ActionUpdate
+}) {
+  const activeDeclaration = getActiveDeclaration(eventConfig)
+
+  const declarationFields = getVisiblePagesFormFields(activeDeclaration, data)
+  const reviewFields = getActiveActionReviewFields(eventConfig, actionType)
+
+  const fields = [...declarationFields, ...reviewFields]
+
+  // @TODO: Separate validations for metadata and data
+
+  console.log(getFormFieldErrors(fields, { ...data, ...metadata }))
+  return throwWhenNotEmpty(getFormFieldErrors(fields, { ...data, ...metadata }))
+}
+
+async function validateMetadataAction({
+  eventConfig,
+  actionType,
+  metadata = {}
+}: {
+  eventConfig: EventConfig
+  actionType: NonDeclarationUpdateAction
+  metadata?: ActionUpdate
+}) {
+  const pages = findActionPages(eventConfig, actionType)
+
+  const visibleVerificationPageIds = pages
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, metadata))
+    .map((page) => page.id)
+
+  const formFields = pages.flatMap(({ fields }) =>
+    fields.flatMap((field) => field)
+  )
+
+  const errors = [
+    ...getFormFieldErrors(formFields, metadata),
+    ...getVerificationPageErrors(visibleVerificationPageIds, metadata)
+  ]
+
+  // @TODO: Separate validations for metadata and data
+  return throwWhenNotEmpty(errors)
+}
+
 export function validateAction(actionType: ActionType) {
   return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
     const eventType = await getEventTypeId(input.eventId)
@@ -89,39 +160,32 @@ export function validateAction(actionType: ActionType) {
       eventType
     })
 
-    const formFields =
-      findActiveActionFields(eventConfig, actionType, input.data) || []
+    const declarationUpdateAction =
+      DeclarationUpdateActions.safeParse(actionType)
 
-    const data = {
-      ...input.data,
-      ...(input.metadata ?? {})
-    } satisfies ActionUpdate
+    console.log('declarationUpdateAction', declarationUpdateAction)
+    console.log('input.data', input.data)
+    console.log('input.metadata', input.metadata)
 
-    const event = await getEventById(input.eventId)
-    const eventDeclarationData =
-      event.actions.find((action) => action.type === ActionType.DECLARE)
-        ?.data ?? {}
-
-    // For each visible verification page on the form, we expect the metadata to include a field with boolean value and the page id as key.
-    const visibleVerificationPageIds = getActiveActionFormPages(
-      eventConfig,
-      actionType
-    )
-      .filter((page) => isVerificationPage(page))
-      .filter((page) =>
-        isPageVisible(page, { ...eventDeclarationData, ...data })
+    if (declarationUpdateAction.success) {
+      console.log(
+        validateDeclarationUpdateAction({
+          eventConfig,
+          data: input.data,
+          metadata: input.metadata,
+          actionType: declarationUpdateAction.data
+        })
       )
-      .map((page) => page.id)
+    }
 
-    const errors = [
-      ...getFormFieldErrors(formFields, data),
-      ...getVerificationPageErrors(visibleVerificationPageIds, data)
-    ]
+    const nonDeclarationUpdateAction =
+      NonDeclarationUpdateActions.safeParse(actionType)
 
-    if (errors.length > 0) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: JSON.stringify(errors)
+    if (nonDeclarationUpdateAction.success) {
+      validateMetadataAction({
+        eventConfig,
+        metadata: input.metadata,
+        actionType: nonDeclarationUpdateAction.data
       })
     }
 

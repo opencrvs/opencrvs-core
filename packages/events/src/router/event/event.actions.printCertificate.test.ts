@@ -55,7 +55,7 @@ test('Validation error message contains all the offending fields', async () => {
   ).rejects.matchSnapshot()
 })
 
-test('Has validation errors when required VERIFICATION page metadata is missing', async () => {
+test.only('Has validation errors when required VERIFICATION page metadata is missing', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 

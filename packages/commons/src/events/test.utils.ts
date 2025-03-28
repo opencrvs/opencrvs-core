@@ -28,7 +28,7 @@ import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
-  getDeclarationAndReviewFields,
+  getActiveDeclarationAndReviewFields,
   isPageVisible,
   isVerificationPage,
   stripHiddenFields
@@ -42,7 +42,10 @@ export function generateActionInput(
 ) {
   const parsed = DeclarationActions.safeParse(action)
   if (parsed.success) {
-    const fields = getDeclarationAndReviewFields(configuration, parsed.data)
+    const fields = getActiveDeclarationAndReviewFields(
+      configuration,
+      parsed.data
+    )
 
     const data = fields.reduce(
       (acc, field, i) => ({

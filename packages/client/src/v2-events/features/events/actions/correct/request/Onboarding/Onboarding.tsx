@@ -96,13 +96,13 @@ export function Onboarding() {
         // @TODO: Use subscription if needed
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         eventConfig={configuration}
-        eventDeclarationData={event.data}
+        declaration={event.data}
         form={metadata}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setMetadata(data)}
         showReviewButton={false}
-        onFormPageChange={(nextPageId: string) => {
+        onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
               eventId: event.id,

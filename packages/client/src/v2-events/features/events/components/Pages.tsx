@@ -15,8 +15,8 @@ import {
   EventState,
   EventConfig,
   isPageVisible,
-  FormPageConfig,
-  FormPageType
+  PageTypes,
+  PageConfig
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -32,49 +32,49 @@ export function Pages({
   pageId,
   showReviewButton,
   formPages,
-  onFormPageChange,
+  onPageChange,
   onSubmit,
   continueButtonText,
   setFormData,
   disableContinue = false,
   eventConfig,
-  eventDeclarationData
+  declaration
 }: {
   form: EventState
   setFormData: (data: EventState) => void
   pageId: string
   showReviewButton?: boolean
-  formPages: FormPageConfig[]
-  onFormPageChange: (nextPageId: string) => void
+  formPages: PageConfig[]
+  onPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
   disableContinue?: boolean
   eventConfig?: EventConfig
-  eventDeclarationData?: EventState
+  declaration?: EventState
 }) {
   const intl = useIntl()
 
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
-  const pages = formPages.filter((page) => isPageVisible(page, form))
+  const visiblePages = formPages.filter((page) => isPageVisible(page, form))
 
   const {
     page: currentPage,
     next,
     previous,
     total
-  } = usePagination(pages.length, Math.max(pageIdx, 0))
-  const page = pages[currentPage]
+  } = usePagination(visiblePages.length, Math.max(pageIdx, 0))
+  const page = visiblePages[currentPage]
 
   useEffect(() => {
-    const pageChanged = pages[currentPage].id !== pageId
+    const pageChanged = visiblePages[currentPage].id !== pageId
 
     if (pageChanged) {
-      onFormPageChange(pages[currentPage].id)
+      onPageChange(visiblePages[currentPage].id)
 
       // We use the main content anchor id to scroll to the top of the frame when page changes
       document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
     }
-  }, [pageId, currentPage, pages, onFormPageChange])
+  }, [pageId, currentPage, visiblePages, onPageChange])
 
   const wizardProps = {
     currentPage,
@@ -89,7 +89,7 @@ export function Pages({
   const fields = (
     <FormFieldGenerator
       eventConfig={eventConfig}
-      eventDeclarationData={eventDeclarationData}
+      eventDeclarationData={declaration}
       fields={page.fields}
       formData={form}
       id="locationForm"
@@ -99,7 +99,7 @@ export function Pages({
     />
   )
 
-  if (page.type === FormPageType.VERIFICATION) {
+  if (page.type === PageTypes.enum.VERIFICATION) {
     return (
       <VerificationWizard
         {...wizardProps}

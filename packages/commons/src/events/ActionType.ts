@@ -56,7 +56,7 @@ export const ActionTypes = z.enum([
   'REQUEST_CORRECTION',
   'REJECT_CORRECTION',
   'APPROVE_CORRECTION',
-  'ISSUE_CERTIFICATE',
+  // 'ISSUE_CERTIFICATE',
   'READ',
   'ASSIGN',
   'UNASSIGN'
@@ -68,20 +68,40 @@ export const PreDeclarationActions = ActionTypes.extract([
   'NOTIFY'
 ])
 
+/** Actions that are performed during declaration phase */
 export const DeclarationActions = ActionTypes.extract([
   'DECLARE',
   'VALIDATE',
   'REGISTER'
 ])
-
 export type DeclarationAction = z.infer<typeof DeclarationActions>
+
+const declarationUpdateActionValues = [
+  ActionTypes.enum.DECLARE,
+  ActionTypes.enum.VALIDATE,
+  ActionTypes.enum.REGISTER,
+  ActionTypes.enum.REQUEST_CORRECTION
+] as const
+
+/** Actions that can modify declaration data */
+export const DeclarationUpdateActions = ActionTypes.extract(
+  declarationUpdateActionValues
+)
+export type DeclarationUpdateAction = z.infer<typeof DeclarationUpdateActions>
+
+export const NonDeclarationUpdateActions = ActionTypes.exclude(
+  declarationUpdateActionValues
+)
+export type NonDeclarationUpdateAction = z.infer<
+  typeof NonDeclarationUpdateActions
+>
 
 export const RecordActions = ActionTypes.extract([
   'PRINT_CERTIFICATE',
   'REQUEST_CORRECTION',
   'REJECT_CORRECTION',
-  'APPROVE_CORRECTION',
-  'ISSUE_CERTIFICATE'
+  'APPROVE_CORRECTION'
+  // 'ISSUE_CERTIFICATE'
 ])
 
 export const GeneralActions = ActionTypes.extract([

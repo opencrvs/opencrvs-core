@@ -54,7 +54,7 @@ export const VerificationPageConfig = FormPageConfig.extend({
   type: z.literal(PageTypes.enum.VERIFICATION),
   actions: VerificationActionConfig
 })
-export type VerificationPageConfig = z.infer<typeof VerificationActionConfig>
+export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
 
 export const PageConfig = z.discriminatedUnion('type', [
   FormPageConfig,

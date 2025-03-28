@@ -15,7 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
+import { getActiveDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
@@ -44,10 +44,10 @@ export function Pages() {
     event.type
   )
 
-  const formPages = getActiveActionFormPages(configuration, ActionType.REGISTER)
+  const declarationPages = getActiveDeclarationPages(configuration)
 
   const currentPageId =
-    formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
+    declarationPages.find((p) => p.id === pageId)?.id || declarationPages[0]?.id
 
   if (!currentPageId) {
     throw new Error('Form does not have any pages')
@@ -77,14 +77,14 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        declaration={event.data}
         eventConfig={configuration}
-        eventDeclarationData={event.data}
         form={form}
-        formPages={formPages}
+        formPages={declarationPages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
-        onFormPageChange={(nextPageId: string) =>
+        onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
               eventId,
