@@ -489,7 +489,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker.fieldAgent['event.actions.register']++
 
             return generateEventDocument({
