@@ -35,7 +35,11 @@ export const ActionBase = z.object({
   data: ActionUpdate,
   metadata: ActionUpdate.optional(),
   createdAtLocation: z.string(),
-  status: z.enum([ActionStatus.Requested, ActionStatus.Accepted]),
+  status: z.enum([
+    ActionStatus.Requested,
+    ActionStatus.Accepted,
+    ActionStatus.Rejected
+  ]),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
   confirmationForActionWithId: z.string().optional()
 })
