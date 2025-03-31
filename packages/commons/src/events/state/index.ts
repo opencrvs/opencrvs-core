@@ -14,7 +14,8 @@ import {
   ActionDocument,
   ActionStatus,
   ActionUpdate,
-  EventState
+  EventState,
+  RegisterAction
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
@@ -156,8 +157,7 @@ export function isUndeclaredDraft(status: EventStatus): boolean {
 
 export function getEventActiveActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(
-    (a): a is ActionDocument =>
-      'data' in a && a.status === ActionStatus.Accepted
+    (a): a is ActionDocument => a.status === ActionStatus.Accepted
   )
 }
 
@@ -175,6 +175,13 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   // TODO CIHAN: tänne pitäs varmaa joku iffittely laittaa
 
+  const registrationAction = actions.find(
+    (a): a is RegisterAction =>
+      a.type === ActionType.REGISTER && a.status === ActionStatus.Accepted
+  )
+
+  const registrationNumber = registrationAction?.registrationNumber
+
   return deepDropNulls({
     id: event.id,
     type: event.type,
@@ -186,7 +193,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     assignedTo: getAssignedUserFromActions(actions),
     updatedBy: latestAction.createdBy,
     data: getData(actions),
-    trackingId: event.trackingId
+    trackingId: event.trackingId,
+    registrationNumber
   })
 }
 

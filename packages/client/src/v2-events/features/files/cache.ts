@@ -14,12 +14,15 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue
 } from '@opencrvs/commons/client'
+import { getEventActiveActions } from '@opencrvs/commons/client'
 import { precacheFile } from './useFileUpload'
 
 export async function cacheFiles(eventDocument: EventDocument) {
   const promises: Promise<void>[] = []
 
-  eventDocument.actions.forEach((action) =>
+  const actions = getEventActiveActions(eventDocument)
+
+  actions.forEach((action) =>
     Object.entries(action.data).forEach(([, value]) => {
       const fileParsed = FileFieldValue.safeParse(value)
       if (fileParsed.success) {

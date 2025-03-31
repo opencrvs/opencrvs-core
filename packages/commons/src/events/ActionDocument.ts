@@ -59,12 +59,14 @@ const UnassignedAction = ActionBase.merge(
   })
 )
 
-const RegisterAction = ActionBase.merge(
+export const RegisterAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
     registrationNumber: z.string().optional()
   })
 )
+
+export type RegisterAction = z.infer<typeof RegisterAction>
 
 const DeclareAction = ActionBase.merge(
   z.object({
@@ -146,7 +148,28 @@ const CustomAction = ActionBase.merge(
   })
 )
 
-export const ConfirmationRejectAction = ActionBase.omit({
+export const ActionDocument = z.discriminatedUnion('type', [
+  CreatedAction,
+  ValidateAction,
+  RejectAction,
+  MarkAsDuplicateAction,
+  ArchiveAction,
+  NotifiedAction,
+  RegisterAction,
+  DeclareAction,
+  AssignedAction,
+  RequestedCorrectionAction,
+  ApprovedCorrectionAction,
+  RejectedCorrectionAction,
+  UnassignedAction,
+  PrintCertificateAction,
+  ReadAction,
+  CustomAction
+])
+
+export type ActionDocument = z.infer<typeof ActionDocument>
+
+export const RejectActionDocument = ActionBase.omit({
   data: true,
   metadata: true,
   createdBy: true,
@@ -172,28 +195,10 @@ export const ConfirmationRejectAction = ActionBase.omit({
   })
 )
 
-export type ConfirmationRejectAction = z.infer<typeof ConfirmationRejectAction>
+export type RejectActionDocument = z.infer<typeof RejectActionDocument>
 
-export const ActionDocument = z.discriminatedUnion('type', [
-  CreatedAction,
-  ValidateAction,
-  RejectAction,
-  MarkAsDuplicateAction,
-  ArchiveAction,
-  NotifiedAction,
-  RegisterAction,
-  DeclareAction,
-  AssignedAction,
-  RequestedCorrectionAction,
-  ApprovedCorrectionAction,
-  RejectedCorrectionAction,
-  UnassignedAction,
-  PrintCertificateAction,
-  ReadAction,
-  CustomAction
-])
-
-export type ActionDocument = z.infer<typeof ActionDocument>
+export const Action = z.union([ActionDocument, RejectActionDocument])
+export type Action = ActionDocument | RejectActionDocument
 
 export const ResolvedUser = z.object({
   id: z.string(),

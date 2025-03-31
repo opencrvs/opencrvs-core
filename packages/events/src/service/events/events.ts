@@ -14,7 +14,6 @@ import {
   ActionInputWithType,
   ActionStatus,
   ActionUpdate,
-  ConfirmationRejectAction,
   Draft,
   EventDocument,
   EventInput,
@@ -24,6 +23,7 @@ import {
   FileFieldValue,
   findActiveActionFields,
   getEventActiveActions,
+  RejectActionDocument,
   RejectActionInput
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -354,15 +354,17 @@ export async function addAction(
     await deleteDraftsByEventId(eventId)
   }
 
+  // TODO CIHAN: palauta pelkkä eventti? ehkä?
   return { event: updatedEvent, actionId }
 }
 
+// TODO CIHAN: refaktoroi RejectActionInput pois?
 export async function addRejectAction(input: RejectActionInput) {
   const db = await events.getClient()
   const now = new Date().toISOString()
   const { transactionId, eventId } = input
 
-  const action: ConfirmationRejectAction = {
+  const action: RejectActionDocument = {
     ...input,
     createdAt: now,
     id: getUUID(),

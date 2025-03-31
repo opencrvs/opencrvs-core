@@ -10,14 +10,14 @@
  */
 
 import { z } from 'zod'
-import { ActionDocument, ConfirmationRejectAction } from './ActionDocument'
+import { Action } from './ActionDocument'
 
 export const EventDocument = z.object({
   id: z.string(),
   type: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-  actions: z.array(z.union([ActionDocument, ConfirmationRejectAction])),
+  actions: z.array(Action),
   trackingId: z.string()
 })
 
