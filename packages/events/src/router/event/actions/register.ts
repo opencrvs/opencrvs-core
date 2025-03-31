@@ -101,8 +101,6 @@ export const registerRouter = router({
         (a) => a.confirmationForActionWithId === actionId
       )
 
-      console.log('CIHAN EVENTT', event)
-
       if (!action) {
         throw new Error(`Action not found.`)
       }
