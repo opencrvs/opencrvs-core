@@ -268,7 +268,6 @@ export function getMetadataForAction({
   actionType: ActionType
   drafts: Draft[]
 }): EventState {
-  // TODO CIHAN: can I do this without casting?
   const activeActions = getEventActiveActions(event)
   const action = activeActions.find((action) => actionType === action.type)
 

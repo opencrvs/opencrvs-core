@@ -308,7 +308,7 @@ export function generateActionDocument({
     data: generateActionInput(configuration, action),
     metadata: {},
     ...defaults,
-    status: ActionStatus.Accepted // TODO CIHAN: we probably want to test other statuses as well
+    status: ActionStatus.Accepted
   } satisfies ActionBase
 
   switch (action) {
