@@ -12,7 +12,11 @@ import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { router, publicProcedure } from '@events/router/trpc'
 import { notifyOnAction } from '@events/service/config/config'
-import { addAction, getEventById } from '@events/service/events/events'
+import {
+  addAction,
+  addRejectAction,
+  getEventById
+} from '@events/service/events/events'
 import {
   SCOPES,
   RegisterActionInput,
@@ -171,22 +175,13 @@ export const registerRouter = router({
       })
     })
     .mutation(async ({ ctx, input }) => {
-      const { token, user, alreadyRejected } = ctx
+      const { alreadyRejected } = ctx
       const { eventId, transactionId } = input
 
       if (alreadyRejected) {
         return getEventById(input.eventId)
       }
 
-      // TODO CIHAN: korjaa tää
-      // @ts-ignore
-      return addAction(input, {
-        eventId,
-        createdBy: user.id,
-        createdAtLocation: user.primaryOfficeId,
-        token,
-        transactionId,
-        status: ActionStatus.Rejected
-      })
+      return addRejectAction(input, eventId, transactionId)
     })
 })

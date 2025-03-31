@@ -21,7 +21,8 @@ import {
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  findActiveActionFields
+  findActiveActionFields,
+  RejectAction
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
@@ -352,25 +353,34 @@ export async function addAction(
   return { event: updatedEvent, actionId }
 }
 
-// export async function rejectAction(actionId: string, eventId: string) {
-//   const db = await events.getClient()
-//   const now = new Date().toISOString()
-//   const event = await getEventById(eventId)
+export async function addRejectAction(
+  input: RejectAction,
+  eventId: string,
+  transactionId: string
+) {
+  const db = await events.getClient()
+  const now = new Date().toISOString()
 
-//   const action: ActionDocument = {
+  const action = {
+    ...input,
+    createdAt: now,
+    id: getUUID(),
+    status: ActionStatus.Rejected
+  }
 
-//     createdBy,
-//     createdAt: now,
-//     createdAtLocation,
-//     id: actionId,
-//     status: status
-//   }
+  await db
+    .collection<EventDocument>('events')
+    .updateOne(
+      { id: eventId, 'actions.transactionId': { $ne: transactionId } },
+      { $push: { actions: action }, $set: { updatedAt: now } }
+    )
 
-//   await db
-//     .collection<EventDocument>('events')
-//     .updateOne(
-//       { id: eventId, 'actions.transactionId': { $ne: transactionId } },
-//       { $push: { actions: action }, $set: { updatedAt: now } }
-//     )
+  const updatedEvent = await getEventById(eventId)
 
-// }
+  if (action.type !== ActionType.READ) {
+    await indexEvent(updatedEvent)
+    await deleteDraftsByEventId(eventId)
+  }
+
+  return updatedEvent
+}

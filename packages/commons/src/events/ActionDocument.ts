@@ -40,7 +40,6 @@ export const ActionBase = z.object({
     ActionStatus.Accepted,
     ActionStatus.Rejected
   ]),
-  updatedAt: z.string().datetime().optional(),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
   confirmationForActionWithId: z.string().optional()
 })
@@ -146,6 +145,19 @@ const CustomAction = ActionBase.merge(
     type: z.literal(ActionType.CUSTOM)
   })
 )
+
+export const ConfirmationRejectAction = ActionBase.omit({
+  data: true,
+  metadata: true,
+  createdBy: true,
+  createdAtLocation: true
+}).merge(
+  z.object({
+    type: z.nativeEnum(ActionType)
+  })
+)
+
+export type ConfirmationRejectAction = z.infer<typeof ConfirmationRejectAction>
 
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
