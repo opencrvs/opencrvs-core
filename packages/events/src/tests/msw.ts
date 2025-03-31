@@ -12,6 +12,7 @@ import { http, HttpResponse, PathParams } from 'msw'
 import { env } from '@events/environment'
 import { setupServer } from 'msw/node'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { ActionType } from '@opencrvs/commons'
 
 const handlers = [
   http.post<PathParams<never>, { filenames: string[] }>(
@@ -40,8 +41,15 @@ const handlers = [
     return HttpResponse.json({ ok: true })
   }),
   http.post(
-    `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
-    () => HttpResponse.json({ registrationNumber: '1234567890AB' })
+    `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/:action`,
+    (ctx) => {
+      const payload =
+        ctx.params.action === ActionType.REGISTER
+          ? { registrationNumber: '1234567890AB' }
+          : {}
+
+      return HttpResponse.json(payload)
+    }
   )
 ]
 

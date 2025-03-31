@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware'
+import {
+  MiddlewareOptions,
+  requiresAnyOfScopes
+} from '@events/router/middleware'
 import { publicProcedure } from '@events/router/trpc'
 import { notifyOnAction } from '@events/service/config/config'
 import { getEventById, addRejectAction } from '@events/service/events/events'
@@ -29,15 +32,18 @@ const ACTIONS = {
   [ActionType.REGISTER]: {
     scopes: [SCOPES.RECORD_REGISTER],
     inputType: RegisterActionInput,
-    additionalAcceptFields: z.object({ registrationNumber: z.string() })
+    additionalAcceptFields: z.object({ registrationNumber: z.string() }),
+    validatePayload: true
   },
   [ActionType.NOTIFY]: {
     scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
     inputType: NotifyActionInput,
-    additionalAcceptFields: undefined
+    additionalAcceptFields: undefined,
+    validatePayload: false
   }
 }
 
+/* TODO CIHAN: add comment here */
 export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
   const actionConfig = ACTIONS[actionType]
 
@@ -54,12 +60,15 @@ export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(actionConfig.scopes)
+  const validatePayloadMiddleware = actionConfig.validatePayload
+    ? middleware.validateAction(actionType)
+    : async ({ next }: MiddlewareOptions) => next()
 
   return {
     request: publicProcedure
       .use(requireScopesMiddleware)
       .input(actionConfig.inputType)
-      .use(middleware.validateAction(actionType))
+      .use(validatePayloadMiddleware)
       .use(async ({ ctx, input, next }) => {
         const { token } = ctx
         const { eventId } = input

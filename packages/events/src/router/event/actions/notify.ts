@@ -12,10 +12,10 @@ import { addAction, getEventById } from '@events/service/events/events'
 import { ActionType, ActionStatus } from '@opencrvs/commons'
 import { getActionProceduresBase } from '.'
 
-const registerActionProcedureBase = getActionProceduresBase(ActionType.REGISTER)
+const actionProceduresBase = getActionProceduresBase(ActionType.NOTIFY)
 
-export const registerRouterHandlers = {
-  request: registerActionProcedureBase.request.mutation(({ ctx, input }) => {
+export const notifyRouterHandlers = {
+  request: actionProceduresBase.request.mutation(({ ctx, input }) => {
     const { token, user, status, actionId } = ctx
     const { eventId, transactionId } = input
 
@@ -32,7 +32,7 @@ export const registerRouterHandlers = {
       actionId
     )
   }),
-  accept: registerActionProcedureBase.accept.mutation(({ ctx, input }) => {
+  accept: actionProceduresBase.accept.mutation(({ ctx, input }) => {
     const { token, user, alreadyAccepted } = ctx
     const { eventId, transactionId, actionId } = input
 
@@ -50,5 +50,5 @@ export const registerRouterHandlers = {
       confirmationForActionWithId: actionId
     })
   }),
-  reject: registerActionProcedureBase.reject
+  reject: actionProceduresBase.reject
 }

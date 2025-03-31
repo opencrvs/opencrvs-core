@@ -40,7 +40,6 @@ import {
   DraftInput,
   EventIndex,
   EventInput,
-  NotifyActionInput,
   PrintCertificateActionInput,
   RejectDeclarationActionInput,
   ValidateActionInput,
@@ -49,7 +48,8 @@ import {
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { registerRouter } from './actions/register'
+import { registerRouterHandlers } from './actions/register'
+import { notifyRouterHandlers } from './actions/notify'
 
 function validateEventType({
   eventTypes,
@@ -161,19 +161,20 @@ export const eventRouter = router({
     })
   }),
   actions: router({
-    notify: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))
-      .input(NotifyActionInput)
-      .mutation((options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token,
-          transactionId: options.input.transactionId,
-          status: ActionStatus.Accepted // TODO CIHAN
-        })
-      }),
+    notify: router(notifyRouterHandlers),
+    // notify: publicProcedure
+    //   .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))
+    //   .input(NotifyActionInput)
+    //   .mutation((options) => {
+    //     return addAction(options.input, {
+    //       eventId: options.input.eventId,
+    //       createdBy: options.ctx.user.id,
+    //       createdAtLocation: options.ctx.user.primaryOfficeId,
+    //       token: options.ctx.token,
+    //       transactionId: options.input.transactionId,
+    //       status: ActionStatus.Accepted // TODO CIHAN
+    //     })
+    //   }),
     declare: publicProcedure
       .use(
         requiresAnyOfScopes([
@@ -241,7 +242,7 @@ export const eventRouter = router({
           status: ActionStatus.Accepted
         })
       }),
-    register: registerRouter,
+    register: router(registerRouterHandlers),
     printCertificate: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]))
       .input(PrintCertificateActionInput)

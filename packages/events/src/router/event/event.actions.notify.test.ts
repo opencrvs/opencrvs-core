@@ -17,10 +17,10 @@ test(`prevents forbidden access if missing required scope`, async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await expect(client.event.actions.notify({} as any)).rejects.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
+  await expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    client.event.actions.notify.request({} as any)
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
 test(`allows access if required scope is present`, async () => {
@@ -29,7 +29,7 @@ test(`allows access if required scope is present`, async () => {
 
   await expect(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    client.event.actions.notify({} as any)
+    client.event.actions.notify.request({} as any)
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
@@ -42,7 +42,7 @@ test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () =
 
   const event = await client.event.create(generator.event.create())
 
-  const response = await client.event.actions.notify(
+  const response = await client.event.actions.notify.request(
     generator.event.actions.notify(event.id)
   )
 

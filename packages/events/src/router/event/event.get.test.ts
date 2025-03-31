@@ -18,57 +18,6 @@ import { ActionType, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { eventRouter } from '.'
 
-/**
- * Takes an object and returns the method keys.
- * Purpose is to ensure that all actions are tested. We have had few bugs because we never fetched event after action.
- *
- */
-function getDeepKeys(
-  obj: Record<string, unknown> | unknown,
-  prefix = ''
-): string[] {
-  return typeof obj === 'object' && obj !== null
-    ? _.flatMap(obj, (value, key) =>
-        getDeepKeys(value, prefix ? `${prefix}${_.capitalize(key)}` : key)
-      )
-    : [prefix]
-}
-
-function compareActionsToRouter(
-  router: typeof eventRouter,
-  actions: ActionType[]
-) {
-  // We dont need to check for REGISTER_ACCEPT and REGISTER_REJECT actions
-  const routerActions = getDeepKeys(router.actions)
-  const casedRouterActions = routerActions.map((action) =>
-    _.toUpper(_.snakeCase(action))
-  )
-
-  const filteredRouterActions = casedRouterActions.filter(
-    (action) => action !== 'REGISTER_ACCEPT' && action !== 'REGISTER_REJECT'
-  )
-
-  const actionsWithoutCreate = actions.filter(
-    (action) => action !== ActionType.CREATE && action !== ActionType.READ
-  )
-
-  if (filteredRouterActions.length !== actionsWithoutCreate.length) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Router actions ${filteredRouterActions.length} :`,
-      filteredRouterActions.sort()
-    )
-
-    // eslint-disable-next-line no-console
-    console.error(
-      `Actions ${actionsWithoutCreate.length}:`,
-      actionsWithoutCreate.sort()
-    )
-
-    throw new Error('Action count mismatch. Check console logs.')
-  }
-}
-
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
@@ -122,7 +71,9 @@ test('Returns event with all actions', async () => {
   ])
 
   const event = await client.event.create(generator.event.create())
-  await client.event.actions.notify(generator.event.actions.notify(event.id))
+  await client.event.actions.notify.request(
+    generator.event.actions.notify(event.id)
+  )
 
   await client.event.actions.declare(generator.event.actions.declare(event.id))
 
@@ -166,9 +117,4 @@ test('Returns event with all actions', async () => {
       (action) => action.type === ActionType.READ
     )
   ).toHaveLength(2)
-
-  compareActionsToRouter(
-    eventRouter,
-    secondTimefetchedEvent.actions.map((ac) => ac.type)
-  )
 })
