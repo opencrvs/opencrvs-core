@@ -168,7 +168,8 @@ export const ConfirmationRejectAction = ActionBase.omit({
       z.literal(ActionType.PRINT_CERTIFICATE),
       z.literal(ActionType.CUSTOM)
     ]),
-    status: z.literal(ActionStatus.Rejected)
+    status: z.literal(ActionStatus.Rejected),
+
   })
 )
 
