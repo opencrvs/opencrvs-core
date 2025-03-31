@@ -22,7 +22,7 @@ export const registerRouterHandlers = {
     console.log('CIHAN TESTAA')
     console.log(input)
 
-    // @ts-ignore
+    // @ts-expect-error - "Todo cihan fiksaa tää"
     const registrationNumber = input?.registrationNumber
     if (!registrationNumber || typeof registrationNumber !== 'string') {
       throw new TRPCError({
