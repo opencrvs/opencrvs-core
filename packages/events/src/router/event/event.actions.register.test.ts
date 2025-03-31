@@ -172,7 +172,7 @@ describe('Request and confirmation flow', () => {
           // For some reason the msw types here complain about the status, even though this is correct
           // https://mswjs.io/docs/api/http-response/
 
-          // @ts-ignore
+          // @ts-expect-error
           return HttpResponse.json(responseBody, { status })
         }
       )
