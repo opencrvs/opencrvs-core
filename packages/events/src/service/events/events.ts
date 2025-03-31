@@ -14,6 +14,7 @@ import {
   ActionInputWithType,
   ActionStatus,
   ActionUpdate,
+  ConfirmationRejectAction,
   Draft,
   EventDocument,
   EventInput,
@@ -22,7 +23,7 @@ import {
   FieldUpdateValue,
   FileFieldValue,
   findActiveActionFields,
-  RejectAction
+  RejectActionInput
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
@@ -92,7 +93,11 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
     eventType: event.type
   })
 
-  for (const ac of event.actions) {
+  const actionsWithData = event.actions.filter(
+    (a): a is ActionDocument => 'data' in a
+  )
+
+  for (const ac of actionsWithData) {
     const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
 
     for (const [key, value] of Object.entries(ac.data)) {
@@ -353,15 +358,12 @@ export async function addAction(
   return { event: updatedEvent, actionId }
 }
 
-export async function addRejectAction(
-  input: RejectAction,
-  eventId: string,
-  transactionId: string
-) {
+export async function addRejectAction(input: RejectActionInput) {
   const db = await events.getClient()
   const now = new Date().toISOString()
+  const { transactionId, eventId } = input
 
-  const action = {
+  const action: ConfirmationRejectAction = {
     ...input,
     createdAt: now,
     id: getUUID(),

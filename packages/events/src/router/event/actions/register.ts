@@ -176,12 +176,14 @@ export const registerRouter = router({
     })
     .mutation(async ({ ctx, input }) => {
       const { alreadyRejected } = ctx
-      const { eventId, transactionId } = input
 
       if (alreadyRejected) {
         return getEventById(input.eventId)
       }
 
-      return addRejectAction(input, eventId, transactionId)
+      return addRejectAction({
+        ...input,
+        type: ActionType.REGISTER
+      })
     })
 })

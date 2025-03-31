@@ -163,9 +163,9 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const nonRejectActions = event.actions.filter(
-    (action) => action.status !== ActionStatus.Rejected
-  )
+  const nonRejectActions = event.actions
+    .filter((action) => action.status !== ActionStatus.Rejected)
+    .filter((a): a is ActionDocument => 'data' in a)
 
   const latestAction = nonRejectActions[nonRejectActions.length - 1]
 
