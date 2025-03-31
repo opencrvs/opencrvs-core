@@ -11,7 +11,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { ApolloError, ApolloConsumer, ApolloClient } from '@apollo/client'
-// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import {
   WrappedComponentProps as IntlShapeProps,

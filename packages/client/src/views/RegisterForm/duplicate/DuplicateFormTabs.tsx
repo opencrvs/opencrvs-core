@@ -212,47 +212,51 @@ export const DuplicateFormTabs = (props: IProps) => {
     return errorsOnField.length > 0
       ? getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
-      ? (
-          (data[section.id] &&
-            data[section.id][field.name] &&
-            (data[section.id][field.name] as IFormSectionData).value &&
-            field.nestedFields[
-              (data[section.id][field.name] as IFormSectionData).value as string
-            ]) ||
-          []
-        ).reduce((groupedValues, nestedField) => {
-          const errorsOnNestedField =
-            sectionErrors[section.id][field.name].nestedFields[
-              nestedField.name
-            ] || []
-          // Value of the parentField resembles with IFormData as a nested form
-          const nestedValue =
+        ? (
             (data[section.id] &&
               data[section.id][field.name] &&
-              renderValue(
-                data[section.id][field.name] as IFormData,
-                'nestedFields',
-                nestedField,
-                intl,
-                offlineData,
-                language
-              )) ||
-            ''
-          return (
-            <>
-              {groupedValues}
-              {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
-              {errorsOnNestedField.length > 0
-                ? getFieldValueWithErrorMessage(
-                    section,
-                    field,
-                    errorsOnNestedField[0]
-                  )
-                : nestedValue}
-            </>
+              (data[section.id][field.name] as IFormSectionData).value &&
+              field.nestedFields[
+                (data[section.id][field.name] as IFormSectionData)
+                  .value as string
+              ]) ||
+            []
+          ).reduce(
+            (groupedValues, nestedField) => {
+              const errorsOnNestedField =
+                sectionErrors[section.id][field.name].nestedFields[
+                  nestedField.name
+                ] || []
+              // Value of the parentField resembles with IFormData as a nested form
+              const nestedValue =
+                (data[section.id] &&
+                  data[section.id][field.name] &&
+                  renderValue(
+                    data[section.id][field.name] as IFormData,
+                    'nestedFields',
+                    nestedField,
+                    intl,
+                    offlineData,
+                    language
+                  )) ||
+                ''
+              return (
+                <>
+                  {groupedValues}
+                  {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+                  {errorsOnNestedField.length > 0
+                    ? getFieldValueWithErrorMessage(
+                        section,
+                        field,
+                        errorsOnNestedField[0]
+                      )
+                    : nestedValue}
+                </>
+              )
+            },
+            <>{value}</>
           )
-        }, <>{value}</>)
-      : value
+        : value
   }
 
   const getRenderableField = (
@@ -564,14 +568,14 @@ export const DuplicateFormTabs = (props: IProps) => {
                   declaration
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? getNestedPreviewField(
-                  section,
-                  group,
-                  field,
-                  errorsOnFields,
-                  declaration
-                )
-              : getSinglePreviewField(draft, section, field, errorsOnFields)
+                ? getNestedPreviewField(
+                    section,
+                    group,
+                    field,
+                    errorsOnFields,
+                    declaration
+                  )
+                : getSinglePreviewField(draft, section, field, errorsOnFields)
 
             overriddenFields.forEach((overriddenField) => {
               items = getOverRiddenPreviewField(

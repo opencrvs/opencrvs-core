@@ -619,8 +619,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       columnToBeSort === 'nameIntl'
         ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
         : columnToBeSort === 'declarationStartedOn'
-        ? ['declarationStartedOnTime']
-        : [columnToBeSort],
+          ? ['declarationStartedOnTime']
+          : [columnToBeSort],
       [sortOrder[columnToBeSort]]
     ).map((row, idx) => {
       return {

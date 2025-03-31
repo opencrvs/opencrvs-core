@@ -14,7 +14,7 @@ import {
   QueryFunctionContext
 } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
-import {
+import type {
   DecorateMutationProcedure,
   DecorateQueryProcedure,
   inferInput,

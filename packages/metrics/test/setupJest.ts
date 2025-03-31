@@ -17,7 +17,8 @@ jest.mock('@metrics/influxdb/client', () => ({
   writePoints: jest.fn().mockReturnValue(Promise.resolve()),
   query: jest.fn()
 }))
-
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const taskHistory = require('./test-data/task-history-response.json')
 
 jest.mock('@metrics/api', () => ({

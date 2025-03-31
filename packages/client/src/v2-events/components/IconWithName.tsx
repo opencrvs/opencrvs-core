@@ -22,11 +22,10 @@ const Flex = styled.div`
   }
 `
 
-interface IIconWith {
+interface IconProps {
   status?: string
   name: React.ReactNode
   event?: string
-  isDuplicate?: boolean
   isValidatedOnReview?: boolean
   isArchived?: boolean
 }
@@ -95,7 +94,7 @@ export function IconWithName({
   name,
   isValidatedOnReview,
   isArchived
-}: IIconWith) {
+}: IconProps) {
   return (
     <Flex id="flex">
       {status && (
@@ -114,10 +113,9 @@ export function IconWithNameEvent({
   status,
   name,
   event,
-  isDuplicate,
   isValidatedOnReview,
   isArchived
-}: IIconWith) {
+}: IconProps) {
   return (
     <Flex id="flex">
       {status && (

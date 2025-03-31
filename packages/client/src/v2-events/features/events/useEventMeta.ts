@@ -29,8 +29,7 @@ interface EventMetadata {
 
 function removeUndefinedKeys(data: EventState) {
   return Object.fromEntries(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    Object.entries(data).filter(([_, value]) => value !== undefined)
+    Object.entries(data).filter(([, value]) => value !== undefined)
   )
 }
 /**

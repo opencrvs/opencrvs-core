@@ -18,7 +18,6 @@ import { Spinner } from '@opencrvs/components'
 export function withSuspense<
   ComponentProps extends { children?: React.ReactNode }
 >(Component: React.ComponentType<ComponentProps>) {
-  // eslint-disable-next-line react/display-name
   return (props: ComponentProps) => (
     <React.Suspense
       fallback={<Spinner id={`page-spinner-${new Date().getTime()}`} />}

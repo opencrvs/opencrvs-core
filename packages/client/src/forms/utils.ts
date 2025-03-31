@@ -624,20 +624,18 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
-  return (
-    field.conditionals
-      // eslint-disable-next-line no-eval
-      .filter((conditional) =>
-        evalExpressionInFieldDefinition(
-          conditional.expression,
-          values,
-          offlineCountryConfig,
-          draftData,
-          userDetails
-        )
+  return field.conditionals
+
+    .filter((conditional) =>
+      evalExpressionInFieldDefinition(
+        conditional.expression,
+        values,
+        offlineCountryConfig,
+        draftData,
+        userDetails
       )
-      .map((conditional: Conditional) => conditional.action)
-  )
+    )
+    .map((conditional: Conditional) => conditional.action)
 }
 
 export const evalExpressionInFieldDefinition = (
@@ -651,12 +649,11 @@ export const evalExpressionInFieldDefinition = (
   $user: (UserDetails & { token?: string }) | null
 ) => {
   // For backwards compatibility
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+
   const values = $form
   const offlineCountryConfig = $config
   const draftData = $draft
   const userDetails = $user
-  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   // eslint-disable-next-line no-eval
   return eval(expression)
@@ -668,7 +665,6 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   draftData?: IFormData,
   userDetails?: UserDetails | null
 ): IFormSectionGroup[] => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const values = sectionData
 
   // handling all possible group visibility conditionals

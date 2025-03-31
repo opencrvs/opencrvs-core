@@ -12,8 +12,7 @@
 import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { isUndeclaredDraft } from '@opencrvs/commons/client'
-import type { TranslationConfig } from '@opencrvs/commons/events'
+import { isUndeclaredDraft, TranslationConfig } from '@opencrvs/commons/client'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
@@ -131,7 +130,6 @@ export function FormHeader({
               >
                 <Icon name="DownloadSimple" />
               </Button>
-
               <Button size="small" type="icon" onClick={onExit}>
                 <Icon name="X" />
               </Button>

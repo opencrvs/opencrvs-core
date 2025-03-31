@@ -10,10 +10,12 @@
  */
 
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { AdvancedSearch } from './AdvancedSearch'
-import { SearchResultIndex as SearchResult } from './SearchResultIndex'
-
+import { AdvancedSearch } from './AdvancedSearch'
+import { SearchResultIndex as SearchResult } from './SearchResultIndex'
 
 const AdvancedSearchIndex = withSuspense(AdvancedSearch)
 const SearchResultIndex = withSuspense(SearchResult)
-export { AdvancedSearchIndex as AdvancedSearch, SearchResultIndex as SearchResult }
+export {
+  AdvancedSearchIndex as AdvancedSearch,
+  SearchResultIndex as SearchResult
+}

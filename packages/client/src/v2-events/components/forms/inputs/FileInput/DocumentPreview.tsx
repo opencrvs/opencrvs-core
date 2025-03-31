@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { useState } from 'react'
 import styled from 'styled-components'
-import { FileFieldValue } from '@opencrvs/commons'
+import { FileFieldValue } from '@opencrvs/commons/client'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { DividerVertical } from '@opencrvs/components/lib/Divider'

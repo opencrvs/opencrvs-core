@@ -470,28 +470,31 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               (data[section.id][field.name] as IFormSectionData).value as string
             ]) ||
           []
-        ).reduce((groupedValues, nestedField) => {
-          // Value of the parentField resembles with IFormData as a nested form
-          const nestedValue =
-            (data[section.id] &&
-              data[section.id][field.name] &&
-              renderValue(
-                data[section.id][field.name] as IFormData,
-                'nestedFields',
-                nestedField,
-                intl,
-                offlineResources,
-                language
-              )) ||
-            ''
-          return (
-            <>
-              {groupedValues}
-              {nestedValue && <div></div>}
-              {nestedValue}
-            </>
-          )
-        }, <>{value}</>)
+        ).reduce(
+          (groupedValues, nestedField) => {
+            // Value of the parentField resembles with IFormData as a nested form
+            const nestedValue =
+              (data[section.id] &&
+                data[section.id][field.name] &&
+                renderValue(
+                  data[section.id][field.name] as IFormData,
+                  'nestedFields',
+                  nestedField,
+                  intl,
+                  offlineResources,
+                  language
+                )) ||
+              ''
+            return (
+              <>
+                {groupedValues}
+                {nestedValue && <div></div>}
+                {nestedValue}
+              </>
+            )
+          },
+          <>{value}</>
+        )
       : value
   }
 
@@ -818,8 +821,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                     declaration.originalData[section.id]
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? this.getNestedPreviewField(section, group, field)
-              : this.getSinglePreviewField(section, group, field)
+                ? this.getNestedPreviewField(section, group, field)
+                : this.getSinglePreviewField(section, group, field)
 
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(

@@ -18,7 +18,7 @@ import {
   ActionType,
   ActionUpdate
 } from '@opencrvs/commons/client'
-import { ResolvedUser } from '@opencrvs/commons'
+import { ResolvedUser } from '@opencrvs/commons/client'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,

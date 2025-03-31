@@ -270,8 +270,8 @@ const getValue = ({
       ? field.name === 'systemRole'
         ? intl.formatMessage(userMessages[formData.systemRole as string])
         : field.name === 'role' && role
-        ? intl.formatMessage(role.label)
-        : String(formData[field.name])
+          ? intl.formatMessage(role.label)
+          : String(formData[field.name])
       : (formData[field.name] as IDynamicValues).label
     : ''
 }
