@@ -171,7 +171,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
   }
 
   const actions = getEventActiveActions(event)
-  const latestAction = actions[event.actions.length - 1]
+  const latestAction = actions[actions.length - 1]
 
   // TODO CIHAN: tänne pitäs varmaa joku iffittely laittaa
   const registrationAction = actions.find(
