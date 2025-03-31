@@ -298,7 +298,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const res = await client.event.actions.register.reject({
+        await client.event.actions.register.reject({
           eventId,
           actionId,
           transactionId: getUUID()
@@ -381,6 +381,25 @@ describe('Request and confirmation flow', () => {
     })
 
     describe('Rejecting', () => {
+      test('should not be able to reject the action if action is not first requested', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+        const event = await client.event.create(generator.event.create())
+
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(event.id, {
+          data: validFormData
+        })
+
+        await expect(
+          client.event.actions.register.reject({
+            ...data,
+            actionId: getUUID()
+          })
+        ).rejects.matchSnapshot()
+      })
+
       test('should not be able to reject the action if action is already accepted', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
