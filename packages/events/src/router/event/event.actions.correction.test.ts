@@ -15,6 +15,7 @@ import {
   AddressType,
   EventDocument,
   generateActionInput,
+  getEventActiveActions,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
@@ -227,7 +228,9 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   })
 
   const response = await client.event.actions.correction.request(data)
-  const savedAction = response.actions.find(
+  const activeActions = getEventActiveActions(response)
+
+  const savedAction = activeActions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
   expect(savedAction?.data).toEqual(form)

@@ -10,7 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionType, getEventActiveActions, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -42,11 +42,13 @@ test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () =
 
   const event = await client.event.create(generator.event.create())
 
+  const response = await client.event.actions.notify(
+    generator.event.actions.notify(event.id)
+  )
+
+  const activeActions = getEventActiveActions(response)
+
   expect(
-    (
-      await client.event.actions.notify(
-        generator.event.actions.notify(event.id)
-      )
-    ).actions.find((action) => action.type === ActionType.NOTIFY)?.data
+    activeActions.find((action) => action.type === ActionType.NOTIFY)?.data
   ).toMatchSnapshot()
 })

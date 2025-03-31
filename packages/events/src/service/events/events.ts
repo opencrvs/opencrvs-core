@@ -23,6 +23,7 @@ import {
   FieldUpdateValue,
   FileFieldValue,
   findActiveActionFields,
+  getEventActiveActions,
   RejectActionInput
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -93,11 +94,9 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
     eventType: event.type
   })
 
-  const actionsWithData = event.actions.filter(
-    (a): a is ActionDocument => 'data' in a
-  )
+  const actions = getEventActiveActions(event)
 
-  for (const ac of actionsWithData) {
+  for (const ac of actions) {
     const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
 
     for (const [key, value] of Object.entries(ac.data)) {

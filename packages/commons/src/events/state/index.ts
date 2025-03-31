@@ -154,6 +154,13 @@ export function isUndeclaredDraft(status: EventStatus): boolean {
   return status === EventStatus.CREATED
 }
 
+export function getEventActiveActions(event: EventDocument): ActionDocument[] {
+  return event.actions.filter(
+    (a): a is ActionDocument =>
+      'data' in a && a.status === ActionStatus.Accepted
+  )
+}
+
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -163,25 +170,22 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const nonRejectActions = event.actions
-    .filter((action) => action.status !== ActionStatus.Rejected)
-    .filter((a): a is ActionDocument => 'data' in a)
-
-  const latestAction = nonRejectActions[nonRejectActions.length - 1]
+  const actions = getEventActiveActions(event)
+  const latestAction = actions[actions.length - 1]
 
   // TODO CIHAN: tänne pitäs varmaa joku iffittely laittaa
 
   return deepDropNulls({
     id: event.id,
     type: event.type,
-    status: getStatusFromActions(nonRejectActions),
+    status: getStatusFromActions(actions),
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
     modifiedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(nonRejectActions),
+    assignedTo: getAssignedUserFromActions(actions),
     updatedBy: latestAction.createdBy,
-    data: getData(nonRejectActions),
+    data: getData(actions),
     trackingId: event.trackingId
   })
 }

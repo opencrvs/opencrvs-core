@@ -396,8 +396,10 @@ describe('Request and confirmation flow', () => {
 
         expect(registerActions.length).toBe(2)
         expect(registerActions[0].status).toEqual(ActionStatus.Requested)
-        expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
-        expect(registerActions[1].data).toEqual(validFormData)
+        expect(registerActions[1]).toMatchObject({
+          data: validFormData,
+          status: ActionStatus.Accepted
+        })
       })
       test.todo('should be able to edit the event data while accept action')
     })

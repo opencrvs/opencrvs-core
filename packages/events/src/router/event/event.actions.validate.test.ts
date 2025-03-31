@@ -14,6 +14,7 @@ import {
   ActionType,
   AddressType,
   generateActionInput,
+  getEventActiveActions,
   SCOPES
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -113,7 +114,9 @@ test('Skips required field validation when they are conditionally hidden', async
   })
 
   const response = await client.event.actions.validate(data)
-  const savedAction = response.actions.find(
+  const activeActions = getEventActiveActions(response)
+
+  const savedAction = activeActions.find(
     (action) => action.type === ActionType.VALIDATE
   )
   expect(savedAction?.data).toEqual(form)
