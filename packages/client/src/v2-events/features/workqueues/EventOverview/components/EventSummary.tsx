@@ -51,7 +51,7 @@ function getDefaultFields(
       value: eventLabel
     },
     {
-      id: 'trackind-id',
+      id: 'tracking-id',
       label: {
         id: 'v2.event.summary.trackingId.label',
         defaultMessage: 'Tracking ID',
@@ -66,6 +66,24 @@ function getDefaultFields(
         id: 'v2.event.summary.trackingId.value',
         defaultMessage: '{event.trackingId}',
         description: 'Tracking id value'
+      }
+    },
+    {
+      id: 'registrationNumber',
+      label: {
+        id: 'v2.event.summary.registrationNumber.label',
+        defaultMessage: 'Registration Number',
+        description: 'Registration Number label'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.registrationNumber.empty',
+        defaultMessage: 'No registration number',
+        description: 'No registration number message'
+      },
+      value: {
+        id: 'v2.event.summary.registrationNumber.value',
+        defaultMessage: '{event.registrationNumber}',
+        description: 'Registration number value'
       }
     }
   ]

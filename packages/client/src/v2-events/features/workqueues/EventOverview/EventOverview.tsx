@@ -48,17 +48,6 @@ import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
- * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
- */
-
-function getDefaultFieldValues(trackingId: string, status: EventStatus) {
-  return {
-    'event.trackingId': trackingId,
-    'event.status': status
-  }
-}
-
-/**
  * Renders the event overview page, including the event summary and history.
  */
 function EventOverview({
@@ -76,7 +65,7 @@ function EventOverview({
 
   const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
   const eventIndex = getCurrentEventState(event)
-  const { trackingId, status } = eventIndex
+  const { trackingId, status, registrationNumber } = eventIndex
 
   const stringifyFormData = useFormDataStringifier()
   const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
@@ -86,7 +75,9 @@ function EventOverview({
     FieldValue | null | RecursiveStringRecord
   > = {
     ...flattenEventIndex({ ...eventIndex, data: eventWithDefaults }),
-    ...getDefaultFieldValues(trackingId, status)
+    'event.trackingId': trackingId,
+    'event.status': status,
+    'event.registrationNumber': registrationNumber
   }
 
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)

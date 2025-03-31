@@ -99,7 +99,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       type: 'REGISTER',
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf'
+      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
+      registrationNumber: 'TEST12121212'
     }
   ]
 }
