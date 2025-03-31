@@ -377,10 +377,8 @@ export async function addRejectAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  if (action.type !== ActionType.READ) {
-    await indexEvent(updatedEvent)
-    await deleteDraftsByEventId(eventId)
-  }
+  await indexEvent(updatedEvent)
+  await deleteDraftsByEventId(eventId)
 
   return updatedEvent
 }
