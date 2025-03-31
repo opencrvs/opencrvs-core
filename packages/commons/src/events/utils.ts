@@ -78,33 +78,33 @@ export const findPageFields = (config: EventConfig): FieldConfig[] => {
 }
 
 /**
- * @returns All the metasfat fields in the event configuration.
+ * @returns All metadata fields in the event configuration.
  */
 export const findAllMetadataFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep([
-    config.actions.map((action) => {
-      if (action.type === ActionType.REQUEST_CORRECTION) {
-        return [
-          ...action.onboardingForm.flatMap(({ fields }) => fields),
-          ...action.additionalDetailsForm.flatMap(({ fields }) => fields)
-        ]
-      }
+  return flattenDeep([config.actions.map(getActionMetadataFields)])
+}
 
-      if (action.type === ActionType.PRINT_CERTIFICATE) {
-        return (
-          action?.printForm.flatMap((form) =>
-            form.pages.flatMap(({ fields }) => fields)
-          ) ?? []
-        )
-      }
+export const getActionMetadataFields = (actionConfig: ActionConfig) => {
+  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
+    return [
+      ...actionConfig.onboardingForm.flatMap(({ fields }) => fields),
+      ...actionConfig.additionalDetailsForm.flatMap(({ fields }) => fields)
+    ]
+  }
 
-      if (isDeclarationActionConfig(action)) {
-        return action.review?.flatMap(({ fields }) => fields) ?? []
-      }
+  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
+    return (
+      actionConfig?.printForm.flatMap((form) =>
+        form.pages.flatMap(({ fields }) => fields)
+      ) ?? []
+    )
+  }
 
-      return []
-    })
-  ])
+  if (isDeclarationActionConfig(actionConfig)) {
+    return actionConfig?.review?.flatMap(({ fields }) => fields) ?? []
+  }
+
+  return []
 }
 /**
  * @returns All the metadata fields configured for the action type.
@@ -240,7 +240,6 @@ export function getActiveDeclarationAndReviewFields(
   configuration: EventConfig,
   actionType: DeclarationUpdateAction
 ) {
-  const activePages = getActiveDeclarationPages(configuration)
   const reviewFields =
     actionType === ActionType.REQUEST_CORRECTION
       ? []

@@ -2,6 +2,4 @@
 
 exports[`Has validation errors when required VERIFICATION page metadata is missing 1`] = `[TRPCError: [{"message":"Verification page result is required","id":"collector.identity.verify"}]]`;
 
-exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required for registration","id":"collector.requesterId"}]]`;
-
 exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Required for registration","id":"collector.requesterId"}]]`;

@@ -76,10 +76,14 @@ export const DeclarationActions = ActionTypes.extract([
 ])
 export type DeclarationAction = z.infer<typeof DeclarationActions>
 
-const declarationUpdateActionValues = [
+const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.VALIDATE,
-  ActionTypes.enum.REGISTER,
+  ActionTypes.enum.REGISTER
+] as const
+
+const declarationUpdateActionValues = [
+  ...declarationActionValues,
   ActionTypes.enum.REQUEST_CORRECTION
 ] as const
 
@@ -87,13 +91,14 @@ const declarationUpdateActionValues = [
 export const DeclarationUpdateActions = ActionTypes.extract(
   declarationUpdateActionValues
 )
+
 export type DeclarationUpdateAction = z.infer<typeof DeclarationUpdateActions>
 
-export const NonDeclarationUpdateActions = ActionTypes.exclude(
-  declarationUpdateActionValues
+export const ExcludedDeclarationActions = ActionTypes.exclude(
+  declarationActionValues
 )
-export type NonDeclarationUpdateAction = z.infer<
-  typeof NonDeclarationUpdateActions
+export type ExcludedDeclarationAction = z.infer<
+  typeof ExcludedDeclarationActions
 >
 
 export const RecordActions = ActionTypes.extract([

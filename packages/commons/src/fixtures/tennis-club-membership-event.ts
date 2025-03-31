@@ -14,7 +14,7 @@ import { defineActionForm, defineDeclaration } from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
-import { FieldType } from '../events'
+import { FieldType } from '../events/FieldType'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({

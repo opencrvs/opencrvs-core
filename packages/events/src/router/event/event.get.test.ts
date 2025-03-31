@@ -48,13 +48,11 @@ function compareActionsToRouter(
   )
 
   if (casedRouterActions.length !== actionsWithoutCreate.length) {
-    // eslint-disable-next-line no-console
     console.error(
       `Router actions ${casedRouterActions.length} :`,
       casedRouterActions.sort()
     )
 
-    // eslint-disable-next-line no-console
     console.error(
       `Actions ${actionsWithoutCreate.length}:`,
       actionsWithoutCreate.sort()

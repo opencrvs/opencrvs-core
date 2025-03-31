@@ -20,7 +20,12 @@ import {
   RequestCorrectionActionInput,
   ValidateActionInput
 } from './ActionInput'
-import { ActionType, DeclarationActions } from './ActionType'
+import {
+  ActionType,
+  DeclarationActions,
+  DeclarationUpdateActions,
+  ExcludedDeclarationActions
+} from './ActionType'
 import { Draft } from './Draft'
 import { EventConfig } from './EventConfig'
 import { EventDocument } from './EventDocument'
@@ -28,6 +33,8 @@ import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
+  findActionPages,
+  getActionMetadataFields,
   getActiveDeclarationAndReviewFields,
   isPageVisible,
   isVerificationPage,
@@ -35,25 +42,31 @@ import {
 } from './utils'
 import { FieldValue } from './FieldValue'
 import { TranslationConfig } from './TranslationConfig'
+import { FieldConfig } from './FieldConfig'
+import { ActionConfig } from './ActionConfig'
+
+function fieldConfigsToActionPayload(fields: FieldConfig[]) {
+  return fields.reduce(
+    (acc, field, i) => ({
+      ...acc,
+      [field.id]: mapFieldTypeToMockValue(field, i)
+    }),
+    {}
+  )
+}
 
 export function generateActionInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  const parsed = DeclarationActions.safeParse(action)
+  const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
     const fields = getActiveDeclarationAndReviewFields(
       configuration,
       parsed.data
     )
 
-    const data = fields.reduce(
-      (acc, field, i) => ({
-        ...acc,
-        [field.id]: mapFieldTypeToMockValue(field, i)
-      }),
-      {}
-    )
+    const data = fieldConfigsToActionPayload(fields)
 
     // Strip away hidden or disabled fields from mock action data
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
@@ -67,27 +80,35 @@ export function generateActionMetadataInput(
   configuration: EventConfig,
   action: ActionType
 ) {
-  if (action === ActionType.PRINT_CERTIFICATE) {
-    const actionConfig = configuration.actions.find(
-      (actionConfig) => actionConfig.type === action
-    )
+  const actionConfig: ActionConfig | undefined = configuration.actions.find(
+    (actionConfig) => actionConfig.type === action
+  )
 
-    const visibleVerificationPageIds =
-      (actionConfig?.printForm.flatMap((form) => form.pages) ?? [])
-        .filter((page) => isVerificationPage(page))
-        .filter((page) => isPageVisible(page, {}))
-        .map((page) => page.id) ?? []
+  const metadataFields = actionConfig
+    ? getActionMetadataFields(actionConfig)
+    : []
+  const metadata = fieldConfigsToActionPayload(metadataFields)
 
-    return visibleVerificationPageIds.reduce(
-      (acc, pageId) => ({
-        ...acc,
-        [pageId]: true
-      }),
-      {}
-    )
+  const visibleVerificationPageIds =
+    (findActionPages(configuration, action) ?? [])
+      .filter((page) => isVerificationPage(page))
+      .filter((page) => isPageVisible(page, metadata))
+      .map((page) => page.id) ?? []
+
+  const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
+    (acc, pageId) => ({
+      ...acc,
+      [pageId]: true
+    }),
+    {}
+  )
+
+  const fieldBasedPayload = stripHiddenFields(metadataFields, metadata)
+
+  return {
+    ...fieldBasedPayload,
+    ...visiblePageVerificationMap
   }
-
-  return undefined
 }
 
 export const eventPayloadGenerator = {
@@ -225,12 +246,7 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.PRINT_CERTIFICATE,
       transactionId: input.transactionId ?? getUUID(),
-      data:
-        input.data ??
-        generateActionInput(
-          tennisClubMembershipEvent,
-          ActionType.PRINT_CERTIFICATE
-        ),
+      data: {},
       metadata:
         input.metadata ??
         generateActionMetadataInput(
@@ -243,7 +259,10 @@ export const eventPayloadGenerator = {
       request: (
         eventId: string,
         input: Partial<
-          Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          Pick<
+            RequestCorrectionActionInput,
+            'transactionId' | 'data' | 'metadata'
+          >
         > = {}
       ) => ({
         type: ActionType.REQUEST_CORRECTION,
@@ -254,14 +273,22 @@ export const eventPayloadGenerator = {
             tennisClubMembershipEvent,
             ActionType.REQUEST_CORRECTION
           ),
-        metadata: {},
+        metadata:
+          input.metadata ??
+          generateActionMetadataInput(
+            tennisClubMembershipEvent,
+            ActionType.REQUEST_CORRECTION
+          ),
         eventId
       }),
       approve: (
         eventId: string,
         requestId: string,
         input: Partial<
-          Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          Pick<
+            RequestCorrectionActionInput,
+            'transactionId' | 'data' | 'metadata'
+          >
         > = {}
       ) => ({
         type: ActionType.APPROVE_CORRECTION,
@@ -272,6 +299,10 @@ export const eventPayloadGenerator = {
             tennisClubMembershipEvent,
             ActionType.APPROVE_CORRECTION
           ),
+        metadata: generateActionMetadataInput(
+          tennisClubMembershipEvent,
+          ActionType.APPROVE_CORRECTION
+        ),
         eventId,
         requestId
       }),

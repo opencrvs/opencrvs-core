@@ -14,7 +14,7 @@ import {
   ActionType,
   ActionUpdate,
   DeclarationUpdateActions,
-  NonDeclarationUpdateActions,
+  ExcludedDeclarationActions,
   EventConfig,
   FieldConfig,
   FieldUpdateValue,
@@ -22,7 +22,7 @@ import {
   Inferred,
   isPageVisible,
   isVerificationPage,
-  NonDeclarationUpdateAction,
+  ExcludedDeclarationAction,
   findActionPages,
   DeclarationUpdateAction,
   getActiveActionReviewFields,
@@ -89,8 +89,6 @@ type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
 }
 
 function throwWhenNotEmpty(errors: unknown[]) {
-  console.log('errors', errors)
-
   if (errors.length > 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -118,18 +116,16 @@ function validateDeclarationUpdateAction({
   const fields = [...declarationFields, ...reviewFields]
 
   // @TODO: Separate validations for metadata and data
-
-  console.log(getFormFieldErrors(fields, { ...data, ...metadata }))
-  return throwWhenNotEmpty(getFormFieldErrors(fields, { ...data, ...metadata }))
+  return getFormFieldErrors(fields, { ...data, ...metadata })
 }
 
-async function validateMetadataAction({
+function validateMetadataAction({
   eventConfig,
   actionType,
   metadata = {}
 }: {
   eventConfig: EventConfig
-  actionType: NonDeclarationUpdateAction
+  actionType: ExcludedDeclarationAction
   metadata?: ActionUpdate
 }) {
   const pages = findActionPages(eventConfig, actionType)
@@ -148,8 +144,7 @@ async function validateMetadataAction({
     ...getVerificationPageErrors(visibleVerificationPageIds, metadata)
   ]
 
-  // @TODO: Separate validations for metadata and data
-  return throwWhenNotEmpty(errors)
+  return errors
 }
 
 export function validateAction(actionType: ActionType) {
@@ -163,30 +158,28 @@ export function validateAction(actionType: ActionType) {
     const declarationUpdateAction =
       DeclarationUpdateActions.safeParse(actionType)
 
-    console.log('declarationUpdateAction', declarationUpdateAction)
-    console.log('input.data', input.data)
-    console.log('input.metadata', input.metadata)
-
     if (declarationUpdateAction.success) {
-      console.log(
-        validateDeclarationUpdateAction({
-          eventConfig,
-          data: input.data,
-          metadata: input.metadata,
-          actionType: declarationUpdateAction.data
-        })
-      )
+      const errors = validateDeclarationUpdateAction({
+        eventConfig,
+        data: input.data,
+        metadata: input.metadata,
+        actionType: declarationUpdateAction.data
+      })
+
+      throwWhenNotEmpty(errors)
     }
 
     const nonDeclarationUpdateAction =
-      NonDeclarationUpdateActions.safeParse(actionType)
+      ExcludedDeclarationActions.safeParse(actionType)
 
     if (nonDeclarationUpdateAction.success) {
-      validateMetadataAction({
+      const errors = validateMetadataAction({
         eventConfig,
         metadata: input.metadata,
         actionType: nonDeclarationUpdateAction.data
       })
+
+      throwWhenNotEmpty(errors)
     }
 
     return next()
