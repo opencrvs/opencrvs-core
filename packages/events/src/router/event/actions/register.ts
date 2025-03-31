@@ -70,7 +70,7 @@ export const registerRouter = router({
         status = ActionStatus.Accepted
       }
 
-      const { event: updatedEvent } = await addAction(
+      return addAction(
         actionInput,
         {
           eventId,
@@ -82,8 +82,6 @@ export const registerRouter = router({
         },
         actionId
       )
-
-      return updatedEvent
     }),
 
   accept: publicProcedure
@@ -103,6 +101,8 @@ export const registerRouter = router({
         (a) => a.confirmationForActionWithId === actionId
       )
 
+      console.log('CIHAN EVENTT', event)
+
       if (!action) {
         throw new Error(`Action not found.`)
       }
@@ -119,7 +119,7 @@ export const registerRouter = router({
         input
       })
     })
-    .mutation(async ({ ctx, input }) => {
+    .mutation(({ ctx, input }) => {
       const { token, user, alreadyAccepted } = ctx
       const { eventId, transactionId, actionId } = input
 
@@ -127,7 +127,7 @@ export const registerRouter = router({
         return getEventById(input.eventId)
       }
 
-      const { event } = await addAction(input, {
+      return addAction(input, {
         eventId,
         createdBy: user.id,
         createdAtLocation: user.primaryOfficeId,
@@ -136,8 +136,6 @@ export const registerRouter = router({
         status: ActionStatus.Accepted,
         confirmationForActionWithId: actionId
       })
-
-      return event
     }),
 
   reject: publicProcedure

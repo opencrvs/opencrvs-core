@@ -275,7 +275,7 @@ export async function addAction(
     confirmationForActionWithId?: string
   },
   actionId = getUUID()
-): Promise<{ event: EventDocument; actionId: string }> {
+): Promise<EventDocument> {
   const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
@@ -354,8 +354,7 @@ export async function addAction(
     await deleteDraftsByEventId(eventId)
   }
 
-  // TODO CIHAN: palauta pelkkä eventti? ehkä?
-  return { event: updatedEvent, actionId }
+  return updatedEvent
 }
 
 // TODO CIHAN: refaktoroi RejectActionInput pois?

@@ -116,7 +116,7 @@ export const eventRouter = router({
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
-      const { event: updatedEvent } = await addAction(
+      const updatedEvent = await addAction(
         {
           type: ActionType.READ,
           eventId: event.id,
@@ -164,8 +164,8 @@ export const eventRouter = router({
     notify: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))
       .input(NotifyActionInput)
-      .mutation(async (options) => {
-        const { event } = await addAction(options.input, {
+      .mutation((options) => {
+        return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
@@ -173,8 +173,6 @@ export const eventRouter = router({
           transactionId: options.input.transactionId,
           status: ActionStatus.Accepted // TODO CIHAN
         })
-
-        return event
       }),
     declare: publicProcedure
       .use(
@@ -186,8 +184,8 @@ export const eventRouter = router({
       )
       .input(DeclareActionInput)
       .use(middleware.validateAction(ActionType.DECLARE))
-      .mutation(async (options) => {
-        const { event } = await addAction(options.input, {
+      .mutation((options) => {
+        return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
@@ -195,8 +193,6 @@ export const eventRouter = router({
           transactionId: options.input.transactionId,
           status: ActionStatus.Accepted // TODO CIHAN
         })
-
-        return event
       }),
     validate: publicProcedure
       .use(
@@ -207,8 +203,8 @@ export const eventRouter = router({
       )
       .input(ValidateActionInput)
       .use(middleware.validateAction(ActionType.VALIDATE))
-      .mutation(async (options) => {
-        const { event } = await addAction(options.input, {
+      .mutation((options) => {
+        return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
@@ -216,15 +212,13 @@ export const eventRouter = router({
           transactionId: options.input.transactionId,
           status: ActionStatus.Accepted // TODO CIHAN
         })
-
-        return event
       }),
     reject: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_FOR_UPDATES]))
       .input(RejectDeclarationActionInput)
       .use(middleware.validateAction(ActionType.REJECT))
-      .mutation(async (options) => {
-        const { event } = await addAction(options.input, {
+      .mutation((options) => {
+        return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
@@ -232,15 +226,13 @@ export const eventRouter = router({
           transactionId: options.input.transactionId,
           status: ActionStatus.Accepted // TODO CIHAN
         })
-
-        return event
       }),
     archive: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARATION_ARCHIVE]))
       .input(ArchiveActionInput)
       .use(middleware.validateAction(ActionType.ARCHIVE))
       .mutation(async (options) => {
-        const { event } = await addAction(options.input, {
+        return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
@@ -248,16 +240,14 @@ export const eventRouter = router({
           transactionId: options.input.transactionId,
           status: ActionStatus.Accepted
         })
-
-        return event
       }),
     register: registerRouter,
     printCertificate: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]))
       .input(PrintCertificateActionInput)
       .use(middleware.validateAction(ActionType.PRINT_CERTIFICATE))
-      .mutation(async (options) => {
-        const { event } = await addAction(options.input, {
+      .mutation((options) => {
+        return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
           createdAtLocation: options.ctx.user.primaryOfficeId,
@@ -265,8 +255,6 @@ export const eventRouter = router({
           transactionId: options.input.transactionId,
           status: ActionStatus.Accepted
         })
-
-        return event
       }),
     correction: router({
       request: publicProcedure
@@ -275,8 +263,8 @@ export const eventRouter = router({
         )
         .input(RequestCorrectionActionInput)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
-        .mutation(async (options) => {
-          const { event } = await addAction(options.input, {
+        .mutation((options) => {
+          return addAction(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,
@@ -284,8 +272,6 @@ export const eventRouter = router({
             transactionId: options.input.transactionId,
             status: ActionStatus.Accepted
           })
-
-          return event
         }),
       approve: publicProcedure
         .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))

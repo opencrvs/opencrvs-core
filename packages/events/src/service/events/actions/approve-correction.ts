@@ -39,7 +39,7 @@ export async function approveCorrection(
     throw new RequestNotFoundError(input.requestId)
   }
 
-  const { event } = await addAction(input, {
+  return addAction(input, {
     eventId,
     createdBy,
     token,
@@ -47,5 +47,4 @@ export async function approveCorrection(
     transactionId,
     status: ActionStatus.Accepted
   })
-  return event
 }

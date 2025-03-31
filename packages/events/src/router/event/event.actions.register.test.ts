@@ -176,15 +176,39 @@ describe('Request and confirmation flow', () => {
     )
   }
 
+  test('should be able to successfully call action request multiple times, without creating duplicate request actions', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const { id: eventId } = await client.event.create(generator.event.create())
+
+    mockNotifyApi(200)
+
+    const data = generator.event.actions.register(eventId, {
+      data: validFormData
+    })
+
+    await client.event.actions.register.request(data)
+    await client.event.actions.register.request(data)
+    const event = await client.event.actions.register.request(data)
+
+    const registerActions = event.actions.filter(
+      (action) => action.type === ActionType.REGISTER
+    )
+
+    expect(registerActions).toHaveLength(1)
+  })
+
   describe('Synchronous confirmation flow', () => {
     test('should mark action as accepted if notify API returns HTTP 200', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
-      const event = await client.event.create(generator.event.create())
+      const { id: eventId } = await client.event.create(
+        generator.event.create()
+      )
 
       mockNotifyApi(200)
 
-      const data = generator.event.actions.register(event.id, {
+      const data = generator.event.actions.register(eventId, {
         data: validFormData
       })
 

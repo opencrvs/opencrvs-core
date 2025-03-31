@@ -85,7 +85,7 @@ export async function validate(
       return self.findIndex((t) => t.id === event.id) === index
     })
 
-  const { event } = await addAction(
+  return addAction(
     { ...input, duplicates: duplicates.map((d) => d.id) },
     {
       eventId,
@@ -96,5 +96,4 @@ export async function validate(
       status: ActionStatus.Accepted
     }
   )
-  return event
 }
