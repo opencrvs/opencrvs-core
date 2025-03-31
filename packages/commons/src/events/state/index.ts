@@ -157,7 +157,7 @@ export function isUndeclaredDraft(status: EventStatus): boolean {
 
 export function getEventActiveActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(
-    (a): a is ActionDocument => a.status === ActionStatus.Accepted
+    (a): a is ActionDocument => !a.status || a.status === ActionStatus.Accepted
   )
 }
 
@@ -171,10 +171,9 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
   }
 
   const actions = getEventActiveActions(event)
-  const latestAction = actions[actions.length - 1]
+  const latestAction = actions[event.actions.length - 1]
 
   // TODO CIHAN: tänne pitäs varmaa joku iffittely laittaa
-
   const registrationAction = actions.find(
     (a): a is RegisterAction =>
       a.type === ActionType.REGISTER && a.status === ActionStatus.Accepted

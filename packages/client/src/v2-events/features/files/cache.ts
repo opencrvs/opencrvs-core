@@ -19,7 +19,6 @@ import { precacheFile } from './useFileUpload'
 
 export async function cacheFiles(eventDocument: EventDocument) {
   const promises: Promise<void>[] = []
-
   const actions = getEventActiveActions(eventDocument)
 
   actions.forEach((action) =>
