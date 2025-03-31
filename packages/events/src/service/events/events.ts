@@ -267,7 +267,7 @@ export async function addAction(
     createdAtLocation: string
     token: string
     transactionId: string
-    status: ActionStatus.Accepted | ActionStatus.Requested
+    status: ActionStatus
     confirmationForActionWithId?: string
   },
   actionId = getUUID()
