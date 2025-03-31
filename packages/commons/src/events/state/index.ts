@@ -10,7 +10,12 @@
  */
 
 import { ActionType } from '../ActionType'
-import { ActionDocument, ActionUpdate, EventState } from '../ActionDocument'
+import {
+  ActionDocument,
+  ActionStatus,
+  ActionUpdate,
+  EventState
+} from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
@@ -158,19 +163,25 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const latestAction = event.actions[event.actions.length - 1]
+  const nonRejectActions = event.actions.filter(
+    (action) => action.status !== ActionStatus.Rejected
+  )
+
+  const latestAction = nonRejectActions[nonRejectActions.length - 1]
+
+  // TODO CIHAN: tänne pitäs varmaa joku iffittely laittaa
 
   return deepDropNulls({
     id: event.id,
     type: event.type,
-    status: getStatusFromActions(event.actions),
+    status: getStatusFromActions(nonRejectActions),
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
     modifiedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(event.actions),
+    assignedTo: getAssignedUserFromActions(nonRejectActions),
     updatedBy: latestAction.createdBy,
-    data: getData(event.actions),
+    data: getData(nonRejectActions),
     trackingId: event.trackingId
   })
 }
@@ -247,7 +258,11 @@ export function getMetadataForAction({
   actionType: ActionType
   drafts: Draft[]
 }): EventState {
-  const action = event.actions.find((action) => actionType === action.type)
+  // TODO CIHAN: can I do this without casting?
+  const action = event.actions.find(
+    (action) =>
+      actionType === action.type && action.status === ActionStatus.Accepted
+  ) as ActionDocument | undefined
 
   const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
 

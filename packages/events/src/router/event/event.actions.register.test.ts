@@ -116,8 +116,11 @@ test('Skips required field validation when they are conditionally hidden', async
   const savedAction = response.actions.find(
     (action) => action.type === ActionType.REGISTER
   )
-  expect(savedAction?.data).toEqual(validFormData)
-  expect(savedAction?.status).toEqual(ActionStatus.Accepted)
+
+  expect(savedAction).toMatchObject({
+    status: ActionStatus.Accepted,
+    data: validFormData
+  })
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -192,9 +195,12 @@ describe('Request and confirmation flow', () => {
       const savedAction = response.actions.find(
         (action) => action.type === ActionType.REGISTER
       )
-      expect(savedAction?.data).toEqual(validFormData)
-      expect(savedAction?.status).toEqual(ActionStatus.Accepted)
-      expect(savedAction?.registrationNumber).toEqual(MOCK_REGISTRATION_NUMBER)
+
+      expect(savedAction).toMatchObject({
+        status: ActionStatus.Accepted,
+        data: validFormData,
+        registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
     })
 
     test('should mark action as rejected if notify API returns HTTP 400', async () => {
@@ -212,9 +218,11 @@ describe('Request and confirmation flow', () => {
       const savedAction = response.actions.find(
         (action) => action.type === ActionType.REGISTER
       )
-      expect(savedAction?.data).toEqual(validFormData)
-      expect(savedAction?.registrationNumber).toBeUndefined()
-      expect(savedAction?.status).toEqual(ActionStatus.Rejected)
+
+      expect(savedAction).toMatchObject({
+        status: ActionStatus.Rejected,
+        data: validFormData
+      })
     })
 
     test('should not save action if notify API returns HTTP 500', async () => {
@@ -258,9 +266,11 @@ describe('Request and confirmation flow', () => {
       const savedAction = response.actions.find(
         (action) => action.type === ActionType.REGISTER
       )
-      expect(savedAction?.data).toEqual(validFormData)
-      expect(savedAction?.registrationNumber).toBeUndefined()
-      expect(savedAction?.status).toEqual(ActionStatus.Requested)
+
+      expect(savedAction).toMatchObject({
+        status: ActionStatus.Requested,
+        data: validFormData
+      })
     })
 
     describe('Accepting', () => {
@@ -336,16 +346,18 @@ describe('Request and confirmation flow', () => {
         })
 
         const registerActions = response.actions.filter(
-          (action) => action.type === ActionType.REGISTER
+          (action) =>
+            action.type === ActionType.REGISTER &&
+            action.status !== ActionStatus.Rejected
         )
 
         expect(registerActions.length).toBe(2)
         expect(registerActions[0].status).toEqual(ActionStatus.Requested)
-        expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
-        expect(registerActions[1].data).toEqual(validFormData)
-        expect(registerActions[1].registrationNumber).toEqual(
-          MOCK_REGISTRATION_NUMBER
-        )
+        expect(registerActions[1]).toMatchObject({
+          status: ActionStatus.Accepted,
+          data: validFormData,
+          registrationNumber: MOCK_REGISTRATION_NUMBER
+        })
       })
 
       test('should be able to call accept multiple times, without creating duplicate accept actions', async () => {
@@ -377,7 +389,9 @@ describe('Request and confirmation flow', () => {
         })
 
         const registerActions = response.actions.filter(
-          (action) => action.type === ActionType.REGISTER
+          (action) =>
+            action.type === ActionType.REGISTER &&
+            action.status !== ActionStatus.Rejected
         )
 
         expect(registerActions.length).toBe(2)

@@ -35,11 +35,7 @@ export const ActionBase = z.object({
   data: ActionUpdate,
   metadata: ActionUpdate.optional(),
   createdAtLocation: z.string(),
-  status: z.enum([
-    ActionStatus.Requested,
-    ActionStatus.Accepted,
-    ActionStatus.Rejected
-  ]),
+  status: z.enum([ActionStatus.Requested, ActionStatus.Accepted]),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
   confirmationForActionWithId: z.string().optional()
 })
@@ -153,7 +149,22 @@ export const ConfirmationRejectAction = ActionBase.omit({
   createdAtLocation: true
 }).merge(
   z.object({
-    type: z.nativeEnum(ActionType)
+    type: z.union([
+      z.literal(ActionType.VALIDATE),
+      z.literal(ActionType.REJECT),
+      z.literal(ActionType.ARCHIVE),
+      z.literal(ActionType.NOTIFY),
+      z.literal(ActionType.REGISTER),
+      z.literal(ActionType.DECLARE),
+      z.literal(ActionType.ASSIGN),
+      z.literal(ActionType.REQUEST_CORRECTION),
+      z.literal(ActionType.APPROVE_CORRECTION),
+      z.literal(ActionType.REJECT_CORRECTION),
+      z.literal(ActionType.UNASSIGN),
+      z.literal(ActionType.PRINT_CERTIFICATE),
+      z.literal(ActionType.CUSTOM)
+    ]),
+    status: z.literal(ActionStatus.Rejected)
   })
 )
 

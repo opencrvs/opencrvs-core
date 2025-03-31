@@ -267,7 +267,7 @@ export async function addAction(
     createdAtLocation: string
     token: string
     transactionId: string
-    status: ActionStatus
+    status: ActionStatus.Accepted | ActionStatus.Requested
     confirmationForActionWithId?: string
   },
   actionId = getUUID()
@@ -376,7 +376,6 @@ export async function addRejectAction(
     )
 
   const updatedEvent = await getEventById(eventId)
-
   await indexEvent(updatedEvent)
   await deleteDraftsByEventId(eventId)
 
