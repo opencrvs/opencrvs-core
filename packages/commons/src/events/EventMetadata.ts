@@ -46,8 +46,7 @@ export const EventMetadata = z.object({
   assignedTo: z.string().nullish(),
   updatedBy: z.string(),
   trackingId: z.string(),
-  // TODO CIHAN
-  registrationNumber: z.string().optional()
+  registrationNumber: z.string().nullish()
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
