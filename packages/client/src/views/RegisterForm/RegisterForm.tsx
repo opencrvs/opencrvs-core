@@ -21,9 +21,7 @@ import { connect, useDispatch } from 'react-redux'
 import { isNull, isUndefined, merge, flatten, isEqual, get } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
-  PrimaryButton,[TEST] PASS browser: chromium src/v2-events/components/forms/File.interaction.stories.tsx
-16
-
+  PrimaryButton,
   TertiaryButton,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
