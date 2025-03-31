@@ -13,10 +13,11 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { noop } from 'lodash'
 import {
-  defineForm,
   tennisClubMembershipEvent,
   generateTranslationConfig,
-  FieldType
+  FieldType,
+  defineActionForm,
+  getActiveDeclaration
 } from '@opencrvs/commons/client'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -34,7 +35,7 @@ export const EmptyDocumentViewer: StoryObj<typeof DocumentViewer> = {
     return (
       <DocumentViewer
         form={{}}
-        formConfig={tennisClubMembershipEvent.actions[0].forms[0]}
+        formConfig={getActiveDeclaration(tennisClubMembershipEvent)}
         onEdit={noop}
       />
     )
@@ -89,14 +90,10 @@ export const DocumentViewerWithFiles: StoryObj<typeof DocumentViewer> = {
     return (
       <DocumentViewer
         form={form}
-        formConfig={defineForm({
+        formConfig={defineActionForm({
           version: {
             id: '1.0',
             label: generateTranslationConfig('form title')
-          },
-          review: {
-            fields: [],
-            title: generateTranslationConfig('review title')
           },
           pages: [
             {

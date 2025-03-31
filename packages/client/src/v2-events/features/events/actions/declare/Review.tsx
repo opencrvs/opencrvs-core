@@ -15,7 +15,8 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
   ActionType,
-  findActiveActionForm,
+  getActiveActionReviewFields,
+  getActiveDeclaration,
   SCOPES
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -50,10 +51,9 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const formConfig = findActiveActionForm(config, ActionType.DECLARE)
-  if (!formConfig) {
-    throw new Error('No active form configuration found for declare action')
-  }
+  const formConfig = getActiveDeclaration(config)
+
+  const reviewFields = getActiveActionReviewFields(config, ActionType.DECLARE)
 
   const form = useEventFormData((state) => state.getFormValues())
 
@@ -132,13 +132,13 @@ export function Review() {
       }
     >
       <ReviewComponent.Body
-        eventConfig={config}
-        formConfig={formConfig}
-        // eslint-disable-next-line
-        onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
-        title={formatMessage(formConfig.review.title, form)}
+        formConfig={formConfig}
         metadata={metadata}
+        reviewFields={reviewFields}
+        // @TODO: Change message back to proper one.
+        title={formatMessage(formConfig.label, form)}
+        onEdit={handleEdit}
         onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions

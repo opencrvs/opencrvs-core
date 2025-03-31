@@ -103,7 +103,7 @@ export function Pages({
     return (
       <VerificationWizard
         {...wizardProps}
-        pageConfig={page.actions}
+        pageConfig={page}
         onVerifyAction={(val: boolean) => {
           setFormData({
             ...form,

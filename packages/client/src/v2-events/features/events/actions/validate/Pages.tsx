@@ -15,11 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  ActionType,
-  findActiveDeclarationWithActionReview,
-  getActiveDeclarationPages
-} from '@opencrvs/commons/client'
+import { getActiveDeclarationPages } from '@opencrvs/commons/client'
 
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'

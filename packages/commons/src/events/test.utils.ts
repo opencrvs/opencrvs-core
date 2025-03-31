@@ -22,9 +22,8 @@ import {
 } from './ActionInput'
 import {
   ActionType,
-  DeclarationActions,
-  DeclarationUpdateActions,
-  ExcludedDeclarationActions
+  DeclarationUpdateAction,
+  DeclarationUpdateActions
 } from './ActionType'
 import { Draft } from './Draft'
 import { EventConfig } from './EventConfig'
@@ -33,9 +32,10 @@ import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
-  findActionPages,
+  findActiveActionPages,
   getActionMetadataFields,
-  getActiveDeclarationAndReviewFields,
+  getActiveActionReviewFields,
+  getActiveDeclarationFields,
   isPageVisible,
   isVerificationPage,
   stripHiddenFields
@@ -53,6 +53,20 @@ function fieldConfigsToActionPayload(fields: FieldConfig[]) {
     }),
     {}
   )
+}
+
+function getActiveDeclarationAndReviewFields(
+  configuration: EventConfig,
+  actionType: DeclarationUpdateAction
+) {
+  const reviewFields =
+    actionType === ActionType.REQUEST_CORRECTION
+      ? []
+      : getActiveActionReviewFields(configuration, actionType)
+
+  const declarationFields = getActiveDeclarationFields(configuration)
+
+  return [...declarationFields, ...reviewFields]
 }
 
 export function generateActionInput(
@@ -90,7 +104,7 @@ export function generateActionMetadataInput(
   const metadata = fieldConfigsToActionPayload(metadataFields)
 
   const visibleVerificationPageIds =
-    (findActionPages(configuration, action) ?? [])
+    (findActiveActionPages(configuration, action) ?? [])
       .filter((page) => isVerificationPage(page))
       .filter((page) => isPageVisible(page, metadata))
       .map((page) => page.id) ?? []

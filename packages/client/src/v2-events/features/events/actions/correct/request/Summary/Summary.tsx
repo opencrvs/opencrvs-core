@@ -17,12 +17,12 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   FieldConfig,
-  getActiveActionFields,
-  findActiveActionForm,
   generateTransactionId,
   Scope,
   SCOPES,
-  isFieldVisible
+  isFieldVisible,
+  getDeclarationFields,
+  getActiveDeclaration
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -104,7 +104,6 @@ export function Summary() {
   const scopes = useSelector(getScope)
 
   const [showPrompt, setShowPrompt] = React.useState(false)
-
   const togglePrompt = () => setShowPrompt(!showPrompt)
 
   const eventFormNavigation = useEventFormNavigation()
@@ -114,24 +113,17 @@ export function Summary() {
   const events = useEvents()
   const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
+
   const previousFormValues = event.data
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues()
+  const formConfig = getActiveDeclaration(eventConfiguration)
+
   const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
-  const formConfig = findActiveActionForm(
-    eventConfiguration,
-    ActionType.REQUEST_CORRECTION
-  )
-
-  if (!formConfig) {
-    throw new Error(
-      `No active form found for ${ActionType.REQUEST_CORRECTION}. This should never happen`
-    )
-  }
 
   if (!actionConfig) {
     throw new Error(
@@ -139,10 +131,7 @@ export function Summary() {
     )
   }
 
-  const fields = getActiveActionFields(
-    eventConfiguration,
-    ActionType.REQUEST_CORRECTION
-  )
+  const fields = getDeclarationFields(eventConfiguration)
 
   const allFields = [
     ...fields,

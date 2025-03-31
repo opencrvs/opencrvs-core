@@ -19,8 +19,7 @@ import {
   FieldConfig,
   FieldType,
   FieldUpdateValue,
-  FileFieldValue,
-  findActiveActionFields
+  FileFieldValue
 } from '@opencrvs/commons/events'
 import {
   getEventConfigurationById,
@@ -33,6 +32,7 @@ import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
+import { getActiveDeclarationFields } from '@opencrvs/commons/client'
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await events.getClient()
@@ -94,7 +94,8 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   })
 
   for (const ac of event.actions) {
-    const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
+    // @TODO: Check that this works after making sure data incldues only declaration fields.
+    const fieldConfigs = getActiveDeclarationFields(configuration)
 
     for (const [key, value] of Object.entries(ac.data)) {
       const fileValue = getValidFileValue(key, value, fieldConfigs)
@@ -274,8 +275,8 @@ export async function addAction(
     eventType: event.type
   })
 
-  const fieldConfigs =
-    findActiveActionFields(configuration, input.type, input.data) || []
+  // @TODO: Check that this works after making sure data incldues only declaration fields.
+  const fieldConfigs = getActiveDeclarationFields(configuration)
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
 
   for (const file of fileValuesInCurrentAction) {

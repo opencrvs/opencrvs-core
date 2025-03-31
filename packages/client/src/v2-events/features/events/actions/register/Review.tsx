@@ -17,8 +17,9 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
-  findActiveActionForm,
-  getMetadataForAction
+  getMetadataForAction,
+  getActiveDeclaration,
+  getActiveActionReviewFields
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -95,10 +96,8 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const formConfig = findActiveActionForm(config, ActionType.REGISTER)
-  if (!formConfig) {
-    throw new Error('No active form configuration found for declare action')
-  }
+  const formConfig = getActiveDeclaration(config)
+  const reviewFields = getActiveActionReviewFields(config, ActionType.REGISTER)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data
@@ -195,11 +194,11 @@ export function Review() {
       }
     >
       <ReviewComponent.Body
-        eventConfig={config}
         form={form}
         formConfig={formConfig}
         metadata={metadata}
         previousFormValues={previousFormValues}
+        reviewFields={reviewFields}
         title=""
         onEdit={handleEdit}
         onMetadataChange={(values) => setMetadata(values)}

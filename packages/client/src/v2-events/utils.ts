@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { uniq, isString, get, mapKeys } from 'lodash'
+import { uniq, isString, get, mapKeys, uniqBy } from 'lodash'
 
 import { v4 as uuid } from 'uuid'
 import {
@@ -23,7 +23,8 @@ import {
   isTemplateVariable,
   mapFieldTypeToZod,
   isFieldValueWithoutTemplates,
-  compositeFieldTypes
+  compositeFieldTypes,
+  getDeclarationFields
 } from '@opencrvs/commons/client'
 
 /**
@@ -69,18 +70,8 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   return uniq(userIds)
 }
 
-export const getAllUniqueFields = (currentEvent: EventConfig) => {
-  return [
-    ...new Map(
-      currentEvent.actions.flatMap((action) =>
-        action.forms.flatMap((form) =>
-          form.pages.flatMap((page) =>
-            page.fields.map((field) => [field.id, field])
-          )
-        )
-      )
-    ).values()
-  ]
+export const getAllUniqueFields = (eventConfig: EventConfig) => {
+  return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
 }
 
 export function flattenEventIndex(

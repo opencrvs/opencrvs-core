@@ -23,7 +23,7 @@ import {
   isPageVisible,
   isVerificationPage,
   ExcludedDeclarationAction,
-  findActionPages,
+  findActiveActionPages,
   DeclarationUpdateAction,
   getActiveActionReviewFields,
   getActiveDeclaration,
@@ -128,7 +128,7 @@ function validateMetadataAction({
   actionType: ExcludedDeclarationAction
   metadata?: ActionUpdate
 }) {
-  const pages = findActionPages(eventConfig, actionType)
+  const pages = findActiveActionPages(eventConfig, actionType)
 
   const visibleVerificationPageIds = pages
     .filter((page) => isVerificationPage(page))

@@ -12,14 +12,14 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
-  getAllFields,
   SummaryConfig,
   FieldValue,
   getCurrentEventStateWithDrafts,
   EventDocument,
   Draft,
   getCurrentEventState,
-  EventStatus
+  EventStatus,
+  getDeclarationFields
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -70,7 +70,7 @@ function EventOverview({
   summary: SummaryConfig
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const allFields = getAllFields(eventConfiguration)
+  const allFields = getDeclarationFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
 
   const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)

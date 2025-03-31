@@ -132,6 +132,7 @@ export const eventRouter = router({
           transactionId: getUUID()
         }
       )
+
       const eventWithSignedFiles = await presignFilesInEvent(
         eventWithReadAction,
         ctx.token

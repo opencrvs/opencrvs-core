@@ -13,7 +13,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType, findActiveActionForm } from '@opencrvs/commons/client'
+import { ActionType, getActiveDeclaration } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -35,13 +35,7 @@ export function Review() {
   const event = events.getEventState.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const formConfig = findActiveActionForm(config, ActionType.REQUEST_CORRECTION)
-
-  if (!formConfig) {
-    throw new Error(
-      `An active form config not found for action type ${ActionType.REQUEST_CORRECTION}`
-    )
-  }
+  const formConfig = getActiveDeclaration(config)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
@@ -95,7 +89,6 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
       <ReviewComponent.Body
-        eventConfig={config}
         form={form}
         formConfig={formConfig}
         previousFormValues={previousFormValues}

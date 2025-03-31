@@ -10,7 +10,12 @@
  */
 
 import { v4 as uuid } from 'uuid'
-import { EventState, FormConfig, Scope, SCOPES } from '@opencrvs/commons/client'
+import {
+  EventState,
+  DeclarationFormConfig,
+  Scope,
+  SCOPES
+} from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 
@@ -248,7 +253,7 @@ export function useReviewActionConfig({
   metadata,
   scopes
 }: {
-  formConfig: FormConfig
+  formConfig: DeclarationFormConfig
   form: EventState
   metadata?: EventState
   scopes?: Scope[]

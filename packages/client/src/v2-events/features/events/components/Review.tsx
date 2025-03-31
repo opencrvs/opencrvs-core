@@ -29,7 +29,7 @@ import {
 } from '@opencrvs/components'
 import {
   EventState,
-  EventConfig,
+  FieldConfig,
   FieldType,
   FormConfig,
   getFieldValidationErrors,
@@ -418,13 +418,14 @@ function ReviewComponent({
   children,
   title,
   onMetadataChange,
-  readonlyMode
+  readonlyMode,
+  reviewFields
 }: {
   children: React.ReactNode
-  eventConfig: EventConfig
   formConfig: FormConfig
   form: EventState
   metadata?: EventState
+  reviewFields?: FieldConfig[]
   previousFormValues?: EventState
   onEdit: ({
     pageId,
@@ -453,7 +454,7 @@ function ReviewComponent({
     .map(({ id }) => id)
 
   const hasReviewFieldsToUpdate =
-    metadata && onMetadataChange && formConfig.review.fields.length > 0
+    metadata && onMetadataChange && reviewFields && reviewFields.length > 0
 
   return (
     <Row>
@@ -475,7 +476,7 @@ function ReviewComponent({
             <FormData>
               <ReviewContainter>
                 <FormFieldGenerator
-                  fields={formConfig.review.fields}
+                  fields={reviewFields}
                   formData={metadata}
                   id={'review'}
                   initialValues={metadata}
@@ -582,7 +583,6 @@ function ReviewActionComponent({
     onReject?: MessageDescriptor
   }
   primaryButtonType?: 'positive' | 'primary'
-  action?: string
   canSendIncomplete?: boolean
 }) {
   const intl = useIntl()

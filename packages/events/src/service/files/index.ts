@@ -10,37 +10,25 @@
  */
 import { env } from '@events/environment'
 import {
-  ActionType,
   EventConfig,
   logger,
   EventDocument,
   FileFieldValue,
   FieldType,
-  findActiveActionFields,
-  LatentActions
+  getActiveDeclarationFields
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
-import { getEventConfigurations } from '@events/service/config/config'
+import { getEventConfigurationById } from '@events/service/config/config'
 import { z } from 'zod'
 
-function getFieldDefinitionForActionDataField(
-  configuration: EventConfig,
-  actionType: ActionType,
-  fieldId: string
-) {
-  let actionFields = findActiveActionFields(configuration, actionType)
+/** TODO: Check if this is used by non-data fields */
+function getFieldDefinitionById(configuration: EventConfig, fieldId: string) {
+  const actionFields = getActiveDeclarationFields(configuration)
 
-  if (
-    !actionFields &&
-    LatentActions.some((latentAction) => latentAction === actionType)
-  ) {
-    // @TODO: WHen form configuration is refactored to use "single" form, remove this.
-    actionFields = findActiveActionFields(configuration, ActionType.DECLARE)
-  }
-  const fieldConfig = actionFields?.find((field) => field.id === fieldId)
+  const fieldConfig = actionFields.find((field) => field.id === fieldId)
   if (!fieldConfig) {
     logger.error(
-      `Failed to find active field configuration for type: ${fieldId}, action: ${actionType}`
+      `Failed to find active field configuration for type: ${fieldId}`
     )
 
     throw new Error('Failed to find active form configuration')
@@ -87,26 +75,17 @@ export async function presignFilesInEvent(
   event: EventDocument,
   token: string
 ): Promise<EventDocument> {
-  const configurations = await getEventConfigurations(token)
-  const configuration = configurations.find(
-    (config) => config.id === event.type
-  )
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
 
-  if (!configuration) {
-    logger.error(`Failed to find configuration for event: ${event.type}`)
-
-    throw new Error('Failed to find configuration for event')
-  }
-
+  /** Note: this targets only data.  */
   const actionFileFields = event.actions.flatMap((action) =>
     Object.entries(action.data)
       .filter(
         ([fieldId]) =>
-          getFieldDefinitionForActionDataField(
-            configuration,
-            action.type,
-            fieldId
-          ).type === FieldType.FILE
+          getFieldDefinitionById(configuration, fieldId).type === FieldType.FILE
       )
       .filter((value): value is [string, Exclude<FileFieldValue, null>] => {
         return value[1] !== null

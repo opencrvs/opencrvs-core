@@ -21,8 +21,9 @@ import {
 import ReactTooltip from 'react-tooltip'
 import {
   ActionType,
+  EventConfig,
   EventDocument,
-  findActiveActionForm,
+  getOrThrow,
   SCOPES
 } from '@opencrvs/commons/client'
 import {
@@ -128,6 +129,18 @@ const messages = defineMessages({
   }
 })
 
+function getActivePrintForm(configuration: EventConfig) {
+  const actionConfig = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+  const form = actionConfig?.printForm.find((f) => f.active)
+
+  return getOrThrow(
+    form,
+    `No active form found for action: ${ActionType.PRINT_CERTIFICATE}`
+  )
+}
+
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
   const [{ templateId }] = useTypedSearchParams(
@@ -174,14 +187,7 @@ export function Review() {
    * review/print the certificate if there are validation errors.
    */
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const formConfig = findActiveActionForm(
-    eventConfiguration,
-    ActionType.PRINT_CERTIFICATE
-  )
-
-  if (!formConfig) {
-    throw new Error('Form configuration not found for print certificate action')
-  }
+  const formConfig = getActivePrintForm(eventConfiguration)
 
   if (!svgCode) {
     return <Spinner id="review-certificate-loading" />

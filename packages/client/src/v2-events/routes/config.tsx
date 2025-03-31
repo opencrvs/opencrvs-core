@@ -32,7 +32,7 @@ import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Action } from '@client/v2-events/features/events/components/Action'
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
-import { ReadOnlyView } from '@client/v2-events/features/events/ReadOnlyView'
+import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
 import { ROUTES } from './routes'
 
 /**
@@ -57,7 +57,7 @@ export const routesConfig = {
     workqueueRouter,
     {
       path: ROUTES.V2.EVENTS.VIEW.path,
-      element: <ReadOnlyView />
+      element: <ReadonlyViewIndex />
     },
     {
       path: ROUTES.V2.EVENTS.OVERVIEW.path,

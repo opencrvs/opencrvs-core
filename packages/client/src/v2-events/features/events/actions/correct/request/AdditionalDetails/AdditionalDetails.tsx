@@ -97,8 +97,8 @@ export function AdditionalDetails() {
         <PagesComponent
           // @TODO: Use subscription if needed
           continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-          eventConfig={configuration}
           declaration={event.data}
+          eventConfig={configuration}
           form={metadata}
           formPages={formPages}
           pageId={currentPageId}
