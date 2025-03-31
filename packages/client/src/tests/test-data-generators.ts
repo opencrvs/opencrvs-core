@@ -62,7 +62,7 @@ export function testDataGenerator() {
         avatar: null,
         searches: [],
         __typename: 'User'
-      } satisfies FetchUserQuery['getUser']),
+      }) satisfies FetchUserQuery['getUser'],
     registrationAgent: () =>
       ({
         id: getUUID(),
@@ -101,7 +101,7 @@ export function testDataGenerator() {
         avatar: null,
         searches: [],
         __typename: 'User'
-      } satisfies FetchUserQuery['getUser']),
+      }) satisfies FetchUserQuery['getUser'],
     localRegistrar: () =>
       ({
         id: getUUID(),
@@ -152,7 +152,7 @@ export function testDataGenerator() {
         avatar: null,
         searches: [],
         __typename: 'User'
-      } satisfies FetchUserQuery['getUser'])
+      }) satisfies FetchUserQuery['getUser']
   }
 
   return { event: eventPayloadGenerator, user }

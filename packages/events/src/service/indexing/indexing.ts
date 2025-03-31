@@ -36,6 +36,7 @@ function eventToEventIndex(event: EventDocument): EventIndex {
 }
 
 export type EncodedEventIndex = EventIndex
+
 export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
   return {
     ...event,

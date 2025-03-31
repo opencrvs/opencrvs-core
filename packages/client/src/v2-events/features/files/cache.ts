@@ -20,7 +20,7 @@ export async function cacheFiles(eventDocument: EventDocument) {
   const promises: Promise<void>[] = []
 
   eventDocument.actions.forEach((action) =>
-    Object.entries(action.data).forEach(([key, value]) => {
+    Object.entries(action.data).forEach(([, value]) => {
       const fileParsed = FileFieldValue.safeParse(value)
       if (fileParsed.success) {
         promises.push(precacheFile(fileParsed.data.filename))

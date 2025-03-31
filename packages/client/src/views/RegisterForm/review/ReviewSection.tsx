@@ -555,8 +555,8 @@ const renderValue = (
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
-      ? String(value).concat(intl.formatMessage(field.unit))
-      : value
+        ? String(value).concat(intl.formatMessage(field.unit))
+        : value
   }
 
   return value
@@ -972,39 +972,42 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             (data[section.id][field.name] as IFormSectionData).value as string
           ]) ||
         []
-      ).reduce((groupedValues, nestedField) => {
-        const errorsOnNestedField =
-          sectionErrors[section.id][field.name].nestedFields[
-            nestedField.name
-          ] || []
-        // Value of the parentField resembles with IFormData as a nested form
-        const nestedValue =
-          (data[section.id] &&
-            data[section.id][field.name] &&
-            renderValue(
-              data[section.id][field.name] as IFormData,
-              'nestedFields',
-              nestedField,
-              intl,
-              offlineCountryConfiguration,
-              language,
-              isOriginalData
-            )) ||
-          ''
-        return (
-          <>
-            {groupedValues}
-            {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
-            {errorsOnNestedField.length > 0
-              ? this.getFieldValueWithErrorMessage(
-                  section,
-                  field,
-                  errorsOnNestedField[0]
-                )
-              : nestedValue}
-          </>
-        )
-      }, <>{value}</>)
+      ).reduce(
+        (groupedValues, nestedField) => {
+          const errorsOnNestedField =
+            sectionErrors[section.id][field.name].nestedFields[
+              nestedField.name
+            ] || []
+          // Value of the parentField resembles with IFormData as a nested form
+          const nestedValue =
+            (data[section.id] &&
+              data[section.id][field.name] &&
+              renderValue(
+                data[section.id][field.name] as IFormData,
+                'nestedFields',
+                nestedField,
+                intl,
+                offlineCountryConfiguration,
+                language,
+                isOriginalData
+              )) ||
+            ''
+          return (
+            <>
+              {groupedValues}
+              {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+              {errorsOnNestedField.length > 0
+                ? this.getFieldValueWithErrorMessage(
+                    section,
+                    field,
+                    errorsOnNestedField[0]
+                  )
+                : nestedValue}
+            </>
+          )
+        },
+        <>{value}</>
+      )
     ) : (
       <>{value}</>
     )
@@ -1592,20 +1595,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     undefined
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? this.getNestedPreviewField(
-                  section,
-                  group,
-                  field,
-                  errorsOnFields
-                )
-              : this.getSinglePreviewField(
-                  section,
-                  group,
-                  field,
-                  errorsOnFields,
-                  undefined,
-                  draft.registrationStatus
-                )
+                ? this.getNestedPreviewField(
+                    section,
+                    group,
+                    field,
+                    errorsOnFields
+                  )
+                : this.getSinglePreviewField(
+                    section,
+                    group,
+                    field,
+                    errorsOnFields,
+                    undefined,
+                    draft.registrationStatus
+                  )
             if (fieldDisabled.includes('disable') && tempItem?.action) {
               tempItem.action.disabled = true
             }

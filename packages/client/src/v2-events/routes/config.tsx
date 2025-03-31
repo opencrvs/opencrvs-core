@@ -20,7 +20,10 @@ import { DeleteEventIndex } from '@client/v2-events/features/events/actions/dele
 import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
 import * as Register from '@client/v2-events/features/events/actions/register'
 import * as Validate from '@client/v2-events/features/events/actions/validate'
-import { AdvancedSearch, SearchResult } from '@client/v2-events/features/events/AdvancedSearch'
+import {
+  AdvancedSearch,
+  SearchResult
+} from '@client/v2-events/features/events/AdvancedSearch'
 import { EventSelectionIndex } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'

@@ -13,8 +13,7 @@ import { useSelector } from 'react-redux'
 import {
   LanguageConfig,
   CertificateTemplateConfig
-} from '@opencrvs/commons/events'
-// eslint-disable-next-line no-restricted-imports
+} from '@opencrvs/commons/client'
 import { getLanguage, getCertificateTemplates } from '@client/offline/selectors'
 
 interface ApplicationConfig {

@@ -78,7 +78,6 @@ import { UserAudit } from './views/UserAudit/UserAudit'
 import { config } from './config'
 
 // Injecting global styles for the body tag - used only once
-// eslint-disable-line
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;

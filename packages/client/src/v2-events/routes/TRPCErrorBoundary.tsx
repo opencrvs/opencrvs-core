@@ -1,4 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,7 +18,6 @@ import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Box } from '@opencrvs/components/lib/Box'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
-// eslint-disable-next-line no-restricted-imports
 import { redirectToAuthentication } from '@client/profile/profileActions'
 
 const ErrorContainer = styled(Box)`

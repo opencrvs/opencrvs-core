@@ -11,7 +11,6 @@
 
 import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
-// eslint-disable-next-line no-restricted-imports
 import { getUserDetails } from '@client/profile/profileSelectors'
 
 export function useUserAddress() {

@@ -10,7 +10,7 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import {
+import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'

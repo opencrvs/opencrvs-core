@@ -30,6 +30,23 @@ export function makeFormFieldIdFormikCompatible(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_SEPARATOR)
 }
 
+export function evalExpressionInFieldDefinition(
+  expression: string,
+  /*
+   * These are used in the eval expression
+   */
+  { $form }: { $form: EventState }
+) {
+  // eslint-disable-next-line no-eval
+  return eval(expression) as FieldValue
+}
+
+export function hasDefaultValueDependencyInfo(
+  value: Inferred['defaultValue']
+): value is DependencyInfo {
+  return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
+}
+
 export function handleDefaultValue(
   field: FieldConfig,
   formData: EventState,
@@ -53,23 +70,6 @@ export function handleDefaultValue(
   return defaultValue
 }
 
-export function evalExpressionInFieldDefinition(
-  expression: string,
-  /*
-   * These are used in the eval expression
-   */
-  { $form }: { $form: EventState }
-) {
-  // eslint-disable-next-line no-eval
-  return eval(expression) as FieldValue
-}
-
-export function hasDefaultValueDependencyInfo(
-  value: Inferred['defaultValue']
-): value is DependencyInfo {
-  return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
-}
-
 export function getDependentFields(
   fields: FieldConfig[],
   fieldName: string
@@ -87,6 +87,13 @@ export function getDependentFields(
 
 export interface Stringifiable {
   toString(): string
+}
+
+export function formatDateFieldValue(value: string) {
+  return value
+    .split('-')
+    .map((d: string) => d.padStart(2, '0'))
+    .join('-')
 }
 
 /**
@@ -112,11 +119,4 @@ export function makeDatesFormatted(
     }
     return acc
   }, values)
-}
-
-export function formatDateFieldValue(value: string) {
-  return value
-    .split('-')
-    .map((d: string) => d.padStart(2, '0'))
-    .join('-')
 }

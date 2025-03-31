@@ -71,7 +71,7 @@ function getQueryClient() {
 
 function createIDBPersister(idbValidKey = 'reactQuery') {
   return {
-    persistClient: async (client: PersistedClient) => {
+    persistClient: async (client) => {
       await storage.setItem(idbValidKey, client)
     },
     restoreClient: async () => {
@@ -100,8 +100,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: undefined,
         buster: 'persisted-indexed-db',
+        maxAge: undefined,
         dehydrateOptions: {
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {

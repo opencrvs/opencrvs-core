@@ -29,10 +29,10 @@ interface EventFormData {
 
 function removeUndefinedKeys(data: EventState) {
   return Object.fromEntries(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    Object.entries(data).filter(([_, value]) => value !== undefined)
+    Object.entries(data).filter(([, value]) => value !== undefined)
   )
 }
+
 /**
  * Interface representing the form data and related operations for an event.
  *
@@ -63,7 +63,7 @@ export const useEventFormData = create<EventFormData>()((set, get) => ({
   },
   getTouchedFields: () =>
     Object.fromEntries(
-      Object.entries(get().getFormValues()).map(([key, value]) => [key, true])
+      Object.entries(get().getFormValues()).map(([key]) => [key, true])
     ),
   clear: () => set(() => ({ formValues: null, touchedFields: {} }))
 }))

@@ -61,33 +61,17 @@ function addDefaultValue<T extends FieldConfigWithoutAddress>(
   }
 }
 
-/**
- * AddressInput is a form component for capturing address details based on administrative structure.
- *
- * - The form dynamically adjusts the fields displayed based on user input.
- * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
- * - All admin structure fields are hidden until the previous field is selected.
- * - Address details fields are only shown when district is selected (it being the last admin structure field).
- */
-function AddressInput(props: Props) {
-  const { onChange, defaultValue, value = {}, ...otherProps } = props
+function isDomesticAddress() {
+  return and(
+    not(createFieldCondition('country').isUndefined()),
+    createFieldCondition('addressType').isEqualTo(AddressType.DOMESTIC)
+  )
+}
 
-  const fields = [
-    ...ADMIN_STRUCTURE,
-    ...URBAN_FIELDS,
-    ...RURAL_FIELDS,
-    ...GENERIC_ADDRESS_FIELDS
-  ] satisfies Array<FieldConfigWithoutAddress>
-
-  return (
-    <FormFieldGenerator
-      {...otherProps}
-      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
-      formData={value}
-      initialValues={{ ...defaultValue, ...value }}
-      setAllFieldsDirty={false}
-      onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
-    />
+function isInternationalAddress() {
+  return and(
+    not(createFieldCondition('country').isUndefined()),
+    createFieldCondition('addressType').isEqualTo(AddressType.INTERNATIONAL)
   )
 }
 
@@ -175,20 +159,6 @@ const URBAN_FIELDS = [
     type: FieldType.TEXT
   }
 ] as const satisfies FieldConfigWithoutAddress[]
-
-function isDomesticAddress() {
-  return and(
-    not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo(AddressType.DOMESTIC)
-  )
-}
-
-function isInternationalAddress() {
-  return and(
-    not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo(AddressType.INTERNATIONAL)
-  )
-}
 
 const RURAL_FIELDS = [
   {
@@ -455,10 +425,39 @@ type AllFields = (typeof ALL_ADDRESS_FIELDS)[number]['id']
  * If you see a type error, it means that the fields in the component do not
  * match the fields in the AddressFieldValue type.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type _ExpectTrue = Expect<
   EnsureSameUnion<AllFields, RequiredKeysFromFieldValue>
 >
+
+/**
+ * AddressInput is a form component for capturing address details based on administrative structure.
+ *
+ * - The form dynamically adjusts the fields displayed based on user input.
+ * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
+ * - All admin structure fields are hidden until the previous field is selected.
+ * - Address details fields are only shown when district is selected (it being the last admin structure field).
+ */
+function AddressInput(props: Props) {
+  const { onChange, defaultValue, value = {}, ...otherProps } = props
+
+  const fields = [
+    ...ADMIN_STRUCTURE,
+    ...URBAN_FIELDS,
+    ...RURAL_FIELDS,
+    ...GENERIC_ADDRESS_FIELDS
+  ] satisfies Array<FieldConfigWithoutAddress>
+
+  return (
+    <FormFieldGenerator
+      {...otherProps}
+      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
+      formData={value}
+      initialValues={{ ...defaultValue, ...value }}
+      setAllFieldsDirty={false}
+      onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
+    />
+  )
+}
 
 function AddressOutput({ value }: { value?: AddressFieldValue }) {
   if (!value) {

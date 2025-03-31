@@ -407,8 +407,8 @@ function renderValue(
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
-      ? String(value).concat(intl.formatMessage(field.unit))
-      : value
+        ? String(value).concat(intl.formatMessage(field.unit))
+        : value
   }
 
   return value
@@ -790,8 +790,8 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
             tempItem = field.previewGroup
               ? getPreviewGroupsField(section, group, field, visitedTags)
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? getNestedPreviewField(section, group, field)
-              : getSinglePreviewField(section, group, field)
+                ? getNestedPreviewField(section, group, field)
+                : getSinglePreviewField(section, group, field)
             if (fieldDisabled.includes('disable') && tempItem?.action) {
               tempItem.action.disabled = true
             }

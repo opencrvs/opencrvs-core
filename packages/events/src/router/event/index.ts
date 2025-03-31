@@ -318,9 +318,7 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
-  search: publicProcedure
-    .input(EventSearchIndex)
-    .query(async ({ input, ctx }) => {
-      return getIndex(input)
-    })
+  search: publicProcedure.input(EventSearchIndex).query(async ({ input }) => {
+    return getIndex(input)
+  })
 })

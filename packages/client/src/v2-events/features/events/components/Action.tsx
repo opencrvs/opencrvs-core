@@ -42,6 +42,7 @@ function ActionComponent({ children, type }: Props) {
   const activeDraft = findActiveDrafts(event, drafts)[0]
 
   const localDraft = getLocalDraftOrDefault(
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     activeDraft || createEmptyDraft(params.eventId, createTemporaryId(), type)
   )
 

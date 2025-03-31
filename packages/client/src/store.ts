@@ -33,7 +33,6 @@ import {
   IReviewFormState,
   reviewReducer
 } from '@opencrvs/client/src/forms/register/reviewReducer'
-// eslint-disable-next-line no-restricted-imports
 import {
   advancedSearchParamReducer,
   IAdvancedSearchParamState

@@ -192,7 +192,6 @@ async function extractMessages() {
   }
 
   if (missingKeys.length > 0) {
-    // eslint-disable-line no-console
     console.log(chalk.red.bold('Missing translations '))
     if (ci) {
       const emptyLanguages = Object.fromEntries(

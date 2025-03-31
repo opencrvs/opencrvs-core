@@ -10,8 +10,7 @@
  */
 
 import { hashKey, Mutation, useQuery } from '@tanstack/react-query'
-
-import {
+import type {
   DecorateMutationProcedure,
   inferInput,
   inferOutput

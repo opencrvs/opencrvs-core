@@ -111,7 +111,7 @@ export const NavigationStackBack: StoryObj<typeof NavigationStack> = {
       initialPath: '/home'
     }
   },
-  play: async ({ canvasElement, step }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByTestId('wizard'))
     await userEvent.click(await canvas.findByTestId('next'))
@@ -129,7 +129,7 @@ export const NavigationStackDirect: StoryObj<typeof NavigationStack> = {
       initialPath: '/wizard/2'
     }
   },
-  play: async ({ canvasElement, step }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByTestId('page-2')).toBeInTheDocument()
   }
@@ -142,7 +142,7 @@ export const NavigationStackView: StoryObj<typeof NavigationStack> = {
       initialPath: '/home'
     }
   },
-  play: async ({ canvasElement, step }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByTestId('wizard'))
     await userEvent.click(await canvas.findByTestId('next'))

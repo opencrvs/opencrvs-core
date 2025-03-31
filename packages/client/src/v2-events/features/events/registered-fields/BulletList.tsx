@@ -11,7 +11,7 @@
 import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { BulletList as BulletListComponent } from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons'
+import { FieldProps } from '@opencrvs/commons/client'
 
 function BulletListInput({
   id,
