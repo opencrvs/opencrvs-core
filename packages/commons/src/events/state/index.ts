@@ -269,10 +269,8 @@ export function getMetadataForAction({
   drafts: Draft[]
 }): EventState {
   // TODO CIHAN: can I do this without casting?
-  const action = event.actions.find(
-    (action) =>
-      actionType === action.type && action.status === ActionStatus.Accepted
-  ) as ActionDocument | undefined
+  const activeActions = getEventActiveActions(event)
+  const action = activeActions.find((action) => actionType === action.type)
 
   const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
 
