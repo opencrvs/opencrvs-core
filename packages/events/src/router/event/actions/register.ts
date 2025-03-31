@@ -23,66 +23,201 @@ import {
   ActionType,
   ActionStatus,
   ActionConfirmationResponse,
-  getUUID
+  getUUID,
+  NotifyActionInput
 } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
-export const registerRouter = router({
-  request: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
-    // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
-    .input(RegisterActionInput)
-    .use(middleware.validateAction(ActionType.REGISTER))
-    .mutation(async ({ ctx, input }) => {
-      const { token, user } = ctx
-      const { eventId, transactionId } = input
-      const actionId = getUUID()
+const ACTIONS = {
+  [ActionType.REGISTER]: {
+    scopes: [SCOPES.RECORD_REGISTER],
+    inputType: RegisterActionInput,
+    additionalAcceptFields: z.object({ registrationNumber: z.string() })
+  },
+  [ActionType.NOTIFY]: {
+    scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
+    inputType: NotifyActionInput,
+    additionalAcceptFields: undefined
+  }
+}
 
-      const { responseStatus, body } = await notifyOnAction(
-        input,
-        await getEventById(eventId),
-        token,
-        actionId
-      )
+function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
+  const actionConfig = ACTIONS[actionType]
 
-      let status = ActionStatus.Requested
-      let actionInput = input
+  if (!actionConfig) {
+    throw new Error(`Action not configured: ${actionType}`)
+  }
 
-      // If we get an unexpected failure response, we don't want to save the action
-      if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
-        throw new Error('Unexpected failure from notification API')
-      }
+  let acceptInputFields = z.object({ actionId: z.string() })
 
-      // If we immediately get a rejected response, we can mark the action as rejected
-      if (responseStatus === ActionConfirmationResponse.Rejected) {
-        status = ActionStatus.Rejected
-      }
+  if (actionConfig.additionalAcceptFields) {
+    acceptInputFields = acceptInputFields.merge(
+      actionConfig.additionalAcceptFields
+    )
+  }
 
-      // If we immediately get a success response, we can save the registration number and mark the action as accepted
-      if (responseStatus === ActionConfirmationResponse.Success) {
-        const registrationNumber = body?.registrationNumber
+  const requireScopesMiddleware = requiresAnyOfScopes(actionConfig.scopes)
 
-        if (!registrationNumber || typeof registrationNumber !== 'string') {
-          throw new Error('Invalid registration number!')
+  return {
+    request: publicProcedure
+      .use(requireScopesMiddleware)
+      .input(actionConfig.inputType)
+      .use(middleware.validateAction(actionType))
+      .use(async ({ ctx, input, next }) => {
+        const { token } = ctx
+        const { eventId } = input
+        const actionId = getUUID()
+        const event = await getEventById(eventId)
+
+        const { responseStatus, body } = await notifyOnAction(
+          input,
+          event,
+          token,
+          actionId
+        )
+
+        // If we get an unexpected failure response, we don't want to save the action
+        if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Unexpected failure from notification API'
+          })
         }
 
-        actionInput = { ...actionInput, registrationNumber }
-        status = ActionStatus.Accepted
-      }
+        let status = ActionStatus.Requested
 
-      return addAction(
-        actionInput,
-        {
-          eventId,
-          createdBy: user.id,
-          createdAtLocation: user.primaryOfficeId,
-          token,
-          transactionId,
-          status
-        },
-        actionId
-      )
-    }),
+        // If we immediately get a rejected response, we can mark the action as rejected
+        if (responseStatus === ActionConfirmationResponse.Rejected) {
+          status = ActionStatus.Rejected
+        }
+
+        let additionalFields = {}
+
+        // If we immediately get a success response, we can save the registration number and mark the action as accepted
+        if (responseStatus === ActionConfirmationResponse.Success) {
+          if (actionType === ActionType.REGISTER) {
+            // TODO CIHAN: siirrä tää tonne registerin handleriin?
+            const registrationNumber = body?.registrationNumber
+            if (!registrationNumber || typeof registrationNumber !== 'string') {
+              throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Invalid registration number!'
+              })
+            }
+            additionalFields = { registrationNumber }
+          }
+
+          status = ActionStatus.Accepted
+        }
+
+        return next({
+          ctx: { ...ctx, status, actionId },
+          input: { ...input, ...additionalFields }
+        })
+      }),
+
+    accept: publicProcedure
+      .use(requireScopesMiddleware)
+      .input(actionConfig.inputType.merge(acceptInputFields))
+      .use(middleware.validateAction(actionType)),
+
+    reject: publicProcedure.use(requireScopesMiddleware).input(
+      z.object({
+        actionId: z.string(),
+        eventId: z.string(),
+        transactionId: z.string()
+      })
+    )
+  }
+}
+
+const registerActionProcedureBase = getActionProceduresBase(ActionType.REGISTER)
+
+export const registerRoutes2 = {
+  request: registerActionProcedureBase.request.mutation(({ ctx, input }) => {
+    const { token, user, status, actionId } = ctx
+    const { eventId, transactionId } = input
+
+    return addAction(
+      input,
+      {
+        eventId,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId,
+        token,
+        transactionId,
+        status
+      },
+      actionId
+    )
+  })
+  // accept: registerActionProcedureBase.accept,
+  // reject: registerActionProcedureBase.reject
+}
+
+const registerRoutes = {
+  // request: publicProcedure
+  //   .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
+  //   // @TODO: Find out a way to dynamically modify the MiddlewareOptions type
+  //   .input(RegisterActionInput)
+  //   .use(middleware.validateAction(ActionType.REGISTER))
+  //   .mutation(async ({ ctx, input }) => {
+  //     const { token, user } = ctx
+  //     const { eventId, transactionId } = input
+  //     const actionId = getUUID()
+
+  //     const { responseStatus, body } = await notifyOnAction(
+  //       input,
+  //       await getEventById(eventId),
+  //       token,
+  //       actionId
+  //     )
+
+  //     let status = ActionStatus.Requested
+  //     let actionInput = input
+
+  //     // If we get an unexpected failure response, we don't want to save the action
+  //     if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
+  //       throw new TRPCError({
+  //         code: 'INTERNAL_SERVER_ERROR',
+  //         message: 'Unexpected failure from notification API'
+  //       })
+  //     }
+
+  //     // If we immediately get a rejected response, we can mark the action as rejected
+  //     if (responseStatus === ActionConfirmationResponse.Rejected) {
+  //       status = ActionStatus.Rejected
+  //     }
+
+  //     // If we immediately get a success response, we can save the registration number and mark the action as accepted
+  //     if (responseStatus === ActionConfirmationResponse.Success) {
+  //       const registrationNumber = body?.registrationNumber
+
+  //       if (!registrationNumber || typeof registrationNumber !== 'string') {
+  //         throw new TRPCError({
+  //           code: 'INTERNAL_SERVER_ERROR',
+  //           message: 'Invalid registration number!'
+  //         })
+  //       }
+
+  //       actionInput = { ...actionInput, registrationNumber }
+  //       status = ActionStatus.Accepted
+  //     }
+
+  //     return addAction(
+  //       actionInput,
+  //       {
+  //         eventId,
+  //         createdBy: user.id,
+  //         createdAtLocation: user.primaryOfficeId,
+  //         token,
+  //         transactionId,
+  //         status
+  //       },
+  //       actionId
+  //     )
+  //   }),
 
   accept: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
@@ -182,4 +317,6 @@ export const registerRouter = router({
         type: ActionType.REGISTER
       })
     })
-})
+}
+
+export const registerRouter = router({ ...registerRoutes, ...registerRoutes2 })
