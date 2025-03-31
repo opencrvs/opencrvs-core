@@ -11,13 +11,25 @@
 import { addAction, getEventById } from '@events/service/events/events'
 import { ActionType, ActionStatus } from '@opencrvs/commons'
 import { getActionProceduresBase } from '.'
-
+import { TRPCError } from '@trpc/server'
 const registerActionProcedureBase = getActionProceduresBase(ActionType.REGISTER)
 
 export const registerRouterHandlers = {
   request: registerActionProcedureBase.request.mutation(({ ctx, input }) => {
     const { token, user, status, actionId } = ctx
     const { eventId, transactionId } = input
+
+    console.log('CIHAN TESTAA')
+    console.log(input)
+
+    // @ts-ignore
+    const registrationNumber = input?.registrationNumber
+    if (!registrationNumber || typeof registrationNumber !== 'string') {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Invalid registration number received from notification API'
+      })
+    }
 
     return addAction(
       input,

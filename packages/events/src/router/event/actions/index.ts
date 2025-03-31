@@ -15,7 +15,11 @@ import {
 } from '@events/router/middleware'
 import { publicProcedure } from '@events/router/trpc'
 import { notifyOnAction } from '@events/service/config/config'
-import { getEventById, addRejectAction } from '@events/service/events/events'
+import {
+  getEventById,
+  addRejectAction,
+  addAction
+} from '@events/service/events/events'
 import {
   ActionType,
   SCOPES,
@@ -23,10 +27,36 @@ import {
   NotifyActionInput,
   getUUID,
   ActionConfirmationResponse,
-  ActionStatus
+  ActionStatus,
+  UUID
 } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+
+type RequestMutationOptions = MiddlewareOptions & {
+  ctx: middleware.Context & {
+    status: ActionStatus
+    actionId: UUID
+  }
+}
+
+export function defaultRequestMutation({ ctx, input }: RequestMutationOptions) {
+  const { token, user, status, actionId } = ctx
+  const { eventId, transactionId } = input
+
+  return addAction(
+    input,
+    {
+      eventId,
+      createdBy: user.id,
+      createdAtLocation: user.primaryOfficeId,
+      token,
+      transactionId,
+      status
+    },
+    actionId
+  )
+}
 
 const ACTIONS = {
   [ActionType.REGISTER]: {
@@ -43,7 +73,17 @@ const ACTIONS = {
   }
 }
 
-/* TODO CIHAN: add comment here */
+/**
+ * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
+ * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
+ *
+ * This function creates a set of extendable router handlers, i.e. procedures, for these kinds of actions.
+ *
+ * The set includes three routes for any action: 'request', 'accept' and 'reject'.
+ * Accept and reject are used only when the action enters the so called asynchronous flow, i.e. when the notify API returns HTTP 202.
+ *
+ * @param actionType - The action type for which we want to create router handlers.
+ */
 export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
   const actionConfig = ACTIONS[actionType]
 
@@ -97,36 +137,21 @@ export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
           status = ActionStatus.Rejected
         }
 
-        let additionalFields = {}
-
-        // TODO CIHAN: siirrä tää tonne registerin handleriin?
         // If we immediately get a success response, we can save the registration number and mark the action as accepted
         if (responseStatus === ActionConfirmationResponse.Success) {
-          if (actionType === ActionType.REGISTER) {
-            const registrationNumber = body?.registrationNumber
-            if (!registrationNumber || typeof registrationNumber !== 'string') {
-              throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message:
-                  'Invalid registration number received from notification API'
-              })
-            }
-            additionalFields = { registrationNumber }
-          }
-
           status = ActionStatus.Accepted
         }
 
         return next({
           ctx: { ...ctx, status, actionId },
-          input: { ...input, ...additionalFields }
+          input: { ...input, ...body }
         })
       }),
 
     accept: publicProcedure
       .use(requireScopesMiddleware)
       .input(actionConfig.inputType.merge(acceptInputFields))
-      .use(middleware.validateAction(actionType))
+      .use(validatePayloadMiddleware)
       .use(async ({ ctx, input, next }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)
