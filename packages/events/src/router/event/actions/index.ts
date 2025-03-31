@@ -15,11 +15,7 @@ import {
 } from '@events/router/middleware'
 import { publicProcedure } from '@events/router/trpc'
 import { notifyOnAction } from '@events/service/config/config'
-import {
-  getEventById,
-  addRejectAction,
-  addAction
-} from '@events/service/events/events'
+import { getEventById, addRejectAction } from '@events/service/events/events'
 import {
   ActionType,
   SCOPES,
@@ -27,36 +23,10 @@ import {
   NotifyActionInput,
   getUUID,
   ActionConfirmationResponse,
-  ActionStatus,
-  UUID
+  ActionStatus
 } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-
-type RequestMutationOptions = MiddlewareOptions & {
-  ctx: middleware.Context & {
-    status: ActionStatus
-    actionId: UUID
-  }
-}
-
-export function defaultRequestMutation({ ctx, input }: RequestMutationOptions) {
-  const { token, user, status, actionId } = ctx
-  const { eventId, transactionId } = input
-
-  return addAction(
-    input,
-    {
-      eventId,
-      createdBy: user.id,
-      createdAtLocation: user.primaryOfficeId,
-      token,
-      transactionId,
-      status
-    },
-    actionId
-  )
-}
 
 const ACTIONS = {
   [ActionType.REGISTER]: {
