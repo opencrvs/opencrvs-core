@@ -162,9 +162,6 @@ describe('Request and confirmation flow', () => {
           const body = await request.json()
           actionId = body.actionId
 
-          // eslint-disable-next-line no-console
-          console.log('actionId, todo cihan', actionId)
-
           const responseBody =
             status === 200
               ? { registrationNumber: MOCK_REGISTRATION_NUMBER }
@@ -236,7 +233,6 @@ describe('Request and confirmation flow', () => {
     )
 
     expect(savedAction).toBeUndefined()
-    // TODO CIHAN: expect error response code
   })
 
   test('should save action in requested state if notify API returns HTTP 202', async () => {
@@ -305,4 +301,38 @@ describe('Request and confirmation flow', () => {
   //     })
   //   ).rejects.matchSnapshot()
   // })
+
+  test('should successfully accept a previously requested action', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+    const eventId = event.id
+
+    mockNotifyApi(202)
+
+    const data = generator.event.actions.register(eventId, {
+      data: validFormData
+    })
+
+    await client.event.actions.register.request(data)
+
+    const response = await client.event.actions.register.accept({
+      ...data,
+      transactionId: getUUID(),
+      actionId
+    })
+
+    const registerActions = response.actions.filter(
+      (action) => action.type === ActionType.REGISTER
+    )
+
+    console.log('CIHAN4', registerActions)
+
+    expect(registerActions.length).toBe(2)
+    // expect(savedAction?.data).toEqual(validFormData)
+    // expect(savedAction?.registrationNumber).toBeUndefined()
+    // expect(savedAction?.status).toEqual(ActionStatus.Requested))
+  })
+
+  test.todo('should be able to edit the event data while accept action')
 })
