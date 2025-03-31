@@ -182,6 +182,10 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const registrationNumber = registrationAction?.registrationNumber
 
+  // TODO CIHAN: registrationNumber loppuun
+  // eslint-disable-next-line no-console
+  console.log('registrationNumber', registrationNumber)
+
   return deepDropNulls({
     id: event.id,
     type: event.type,
@@ -193,8 +197,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     assignedTo: getAssignedUserFromActions(actions),
     updatedBy: latestAction.createdBy,
     data: getData(actions),
-    trackingId: event.trackingId,
-    registrationNumber
+    trackingId: event.trackingId
+    // registrationNumber
   })
 }
 
