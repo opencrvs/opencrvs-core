@@ -32,7 +32,6 @@ export const registerRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { token, user } = ctx
       const { eventId, transactionId } = input
-      const event = await getEventById(eventId)
       const actionId = getUUID()
 
       const { responseStatus, body } = await notifyOnAction(
@@ -147,22 +146,31 @@ export const registerRouter = router({
       const { eventId, actionId } = input
       const event = await getEventById(eventId)
       const action = event.actions.find((a) => a.id === actionId)
+      const confirmationAction = event.actions.find(
+        (a) => a.confirmationForActionWithId === actionId
+      )
 
       if (!action) {
         throw new Error(`Action not found.`)
       }
 
-      if (action.status === ActionStatus.Accepted) {
+      if (
+        confirmationAction &&
+        confirmationAction.status === ActionStatus.Accepted
+      ) {
         throw new Error(`Action has already been accepted.`)
       }
 
-      return next({ ctx: { ...ctx, actionStatus: action.status }, input })
+      return next({
+        ctx: { ...ctx, alreadyRejected: Boolean(confirmationAction) },
+        input
+      })
     })
     .mutation(async ({ ctx, input }) => {
-      const { token, user, actionStatus } = ctx
+      const { token, user, alreadyRejected } = ctx
       const { eventId, transactionId } = input
 
-      if (actionStatus === ActionStatus.Rejected) {
+      if (alreadyRejected) {
         return getEventById(input.eventId)
       }
 

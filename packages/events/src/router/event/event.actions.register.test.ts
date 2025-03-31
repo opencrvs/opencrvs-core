@@ -176,202 +176,240 @@ describe('Request and confirmation flow', () => {
     )
   }
 
-  test('should mark action as accepted if notify API returns HTTP 200', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
+  describe('Synchronous confirmation flow', () => {
+    test('should mark action as accepted if notify API returns HTTP 200', async () => {
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const event = await client.event.create(generator.event.create())
 
-    mockNotifyApi(200)
+      mockNotifyApi(200)
 
-    const data = generator.event.actions.register(event.id, {
-      data: validFormData
-    })
-
-    const response = await client.event.actions.register.request(data)
-    const savedAction = response.actions.find(
-      (action) => action.type === ActionType.REGISTER
-    )
-    expect(savedAction?.data).toEqual(validFormData)
-    expect(savedAction?.status).toEqual(ActionStatus.Accepted)
-    expect(savedAction?.registrationNumber).toEqual(MOCK_REGISTRATION_NUMBER)
-  })
-
-  test('should mark action as rejected if notify API returns HTTP 400', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-
-    mockNotifyApi(400)
-
-    const data = generator.event.actions.register(event.id, {
-      data: validFormData
-    })
-
-    const response = await client.event.actions.register.request(data)
-    const savedAction = response.actions.find(
-      (action) => action.type === ActionType.REGISTER
-    )
-    expect(savedAction?.data).toEqual(validFormData)
-    expect(savedAction?.registrationNumber).toBeUndefined()
-    expect(savedAction?.status).toEqual(ActionStatus.Rejected)
-  })
-
-  test('should not save action if notify API returns HTTP 500', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const { id: eventId } = await client.event.create(generator.event.create())
-
-    mockNotifyApi(500)
-
-    const data = generator.event.actions.register(eventId, {
-      data: validFormData
-    })
-
-    await expect(
-      client.event.actions.register.request(data)
-    ).rejects.matchSnapshot()
-
-    const event = await client.event.get(eventId)
-    const registerActions = event.actions.filter(
-      (action) => action.type === ActionType.REGISTER
-    )
-    expect(registerActions).toHaveLength(0)
-  })
-
-  test('should save action in requested state if notify API returns HTTP 202', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-
-    mockNotifyApi(202)
-
-    const data = generator.event.actions.register(event.id, {
-      data: validFormData
-    })
-
-    const response = await client.event.actions.register.request(data)
-    const savedAction = response.actions.find(
-      (action) => action.type === ActionType.REGISTER
-    )
-    expect(savedAction?.data).toEqual(validFormData)
-    expect(savedAction?.registrationNumber).toBeUndefined()
-    expect(savedAction?.status).toEqual(ActionStatus.Requested)
-  })
-
-  test('should not be able to accept the register action if register is not first requested', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-
-    mockNotifyApi(202)
-
-    const data = generator.event.actions.register(event.id, {
-      data: validFormData
-    })
-
-    await expect(
-      client.event.actions.register.accept({
-        ...data,
-        actionId: getUUID()
+      const data = generator.event.actions.register(event.id, {
+        data: validFormData
       })
-    ).rejects.matchSnapshot()
+
+      const response = await client.event.actions.register.request(data)
+      const savedAction = response.actions.find(
+        (action) => action.type === ActionType.REGISTER
+      )
+      expect(savedAction?.data).toEqual(validFormData)
+      expect(savedAction?.status).toEqual(ActionStatus.Accepted)
+      expect(savedAction?.registrationNumber).toEqual(MOCK_REGISTRATION_NUMBER)
+    })
+
+    test('should mark action as rejected if notify API returns HTTP 400', async () => {
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const event = await client.event.create(generator.event.create())
+
+      mockNotifyApi(400)
+
+      const data = generator.event.actions.register(event.id, {
+        data: validFormData
+      })
+
+      const response = await client.event.actions.register.request(data)
+      const savedAction = response.actions.find(
+        (action) => action.type === ActionType.REGISTER
+      )
+      expect(savedAction?.data).toEqual(validFormData)
+      expect(savedAction?.registrationNumber).toBeUndefined()
+      expect(savedAction?.status).toEqual(ActionStatus.Rejected)
+    })
+
+    test('should not save action if notify API returns HTTP 500', async () => {
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const { id: eventId } = await client.event.create(
+        generator.event.create()
+      )
+
+      mockNotifyApi(500)
+
+      const data = generator.event.actions.register(eventId, {
+        data: validFormData
+      })
+
+      await expect(
+        client.event.actions.register.request(data)
+      ).rejects.matchSnapshot()
+
+      const event = await client.event.get(eventId)
+      const registerActions = event.actions.filter(
+        (action) => action.type === ActionType.REGISTER
+      )
+      expect(registerActions).toHaveLength(0)
+    })
   })
 
-  // test('should not be able to accept the register action if register action is already rejected', async () => {
-  //   const { user, generator } = await setupTestCase()
-  //   const client = createTestClient(user)
-  //   const event = await client.event.create(generator.event.create())
-  //   const eventId = event.id
+  describe('Asynchronous confirmation flow', () => {
+    test('should save action in requested state if notify API returns HTTP 202', async () => {
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const event = await client.event.create(generator.event.create())
 
-  //   mockNotifyApi(202)
+      mockNotifyApi(202)
 
-  //   const data = generator.event.actions.register(eventId, {
-  //     data: validFormData
-  //   })
+      const data = generator.event.actions.register(event.id, {
+        data: validFormData
+      })
 
-  //   await client.event.actions.register.request(data)
-
-  //   await client.event.actions.register.reject({
-  //     eventId,
-  //     actionId,
-  //     transactionId: getUUID()
-  //   })
-
-  //   await expect(
-  //     client.event.actions.register.accept({
-  //       ...data,
-  //       actionId
-  //     })
-  //   ).rejects.matchSnapshot()
-  // })
-
-  test('should successfully accept a previously requested action', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-    const eventId = event.id
-
-    mockNotifyApi(202)
-
-    const data = generator.event.actions.register(eventId, {
-      data: validFormData
+      const response = await client.event.actions.register.request(data)
+      const savedAction = response.actions.find(
+        (action) => action.type === ActionType.REGISTER
+      )
+      expect(savedAction?.data).toEqual(validFormData)
+      expect(savedAction?.registrationNumber).toBeUndefined()
+      expect(savedAction?.status).toEqual(ActionStatus.Requested)
     })
 
-    await client.event.actions.register.request(data)
+    describe('Accepting', () => {
+      test('should not be able to accept the action if action is not first requested', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+        const event = await client.event.create(generator.event.create())
 
-    const response = await client.event.actions.register.accept({
-      ...data,
-      transactionId: getUUID(),
-      actionId
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(event.id, {
+          data: validFormData
+        })
+
+        await expect(
+          client.event.actions.register.accept({
+            ...data,
+            actionId: getUUID()
+          })
+        ).rejects.matchSnapshot()
+      })
+
+      // TODO CIHAN: sit ku reject toimii, nii tän voi tehdä
+      test.skip('should not be able to accept action if action is already rejected', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+        const event = await client.event.create(generator.event.create())
+        const eventId = event.id
+
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId, {
+          data: validFormData
+        })
+
+        await client.event.actions.register.request(data)
+
+        const res = await client.event.actions.register.reject({
+          eventId,
+          actionId,
+          transactionId: getUUID()
+        })
+
+        await expect(
+          client.event.actions.register.accept({
+            ...data,
+            actionId
+          })
+        ).rejects.matchSnapshot()
+      })
+
+      test('should successfully accept a previously requested action', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+        const event = await client.event.create(generator.event.create())
+        const eventId = event.id
+
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId, {
+          data: validFormData
+        })
+
+        await client.event.actions.register.request(data)
+
+        const response = await client.event.actions.register.accept({
+          ...data,
+          transactionId: getUUID(),
+          actionId
+        })
+
+        const registerActions = response.actions.filter(
+          (action) => action.type === ActionType.REGISTER
+        )
+
+        expect(registerActions.length).toBe(2)
+        expect(registerActions[0].status).toEqual(ActionStatus.Requested)
+        expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
+        expect(registerActions[1].data).toEqual(validFormData)
+      })
+
+      test('should be able to call accept multiple times, without creating duplicate accept actions', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+        const event = await client.event.create(generator.event.create())
+        const eventId = event.id
+
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId, {
+          data: validFormData
+        })
+
+        await client.event.actions.register.request(data)
+
+        await client.event.actions.register.accept({
+          ...data,
+          transactionId: getUUID(),
+          actionId
+        })
+
+        const response = await client.event.actions.register.accept({
+          ...data,
+          transactionId: getUUID(),
+          actionId
+        })
+
+        const registerActions = response.actions.filter(
+          (action) => action.type === ActionType.REGISTER
+        )
+
+        expect(registerActions.length).toBe(2)
+        expect(registerActions[0].status).toEqual(ActionStatus.Requested)
+        expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
+        expect(registerActions[1].data).toEqual(validFormData)
+      })
+      test.todo('should be able to edit the event data while accept action')
     })
 
-    const registerActions = response.actions.filter(
-      (action) => action.type === ActionType.REGISTER
-    )
+    describe('Rejecting', () => {
+      test('should not be able to reject the action if action is already accepted', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+        const event = await client.event.create(generator.event.create())
+        const eventId = event.id
 
-    expect(registerActions.length).toBe(2)
-    expect(registerActions[0].status).toEqual(ActionStatus.Requested)
-    expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
-    expect(registerActions[1].data).toEqual(validFormData)
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId, {
+          data: validFormData
+        })
+
+        await client.event.actions.register.request(data)
+
+        await client.event.actions.register.accept({
+          ...data,
+          actionId,
+          transactionId: getUUID()
+        })
+
+        await expect(
+          client.event.actions.register.reject({
+            ...data,
+            actionId
+          })
+        ).rejects.matchSnapshot()
+      })
+    })
   })
-
-  test('should be able to call accept multiple times, without creating duplicate accept actions', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-    const eventId = event.id
-
-    mockNotifyApi(202)
-
-    const data = generator.event.actions.register(eventId, {
-      data: validFormData
-    })
-
-    await client.event.actions.register.request(data)
-
-    await client.event.actions.register.accept({
-      ...data,
-      transactionId: getUUID(),
-      actionId
-    })
-
-    const response = await client.event.actions.register.accept({
-      ...data,
-      transactionId: getUUID(),
-      actionId
-    })
-
-    const registerActions = response.actions.filter(
-      (action) => action.type === ActionType.REGISTER
-    )
-
-    expect(registerActions.length).toBe(2)
-    expect(registerActions[0].status).toEqual(ActionStatus.Requested)
-    expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
-    expect(registerActions[1].data).toEqual(validFormData)
-  })
-
-  test.todo('should be able to edit the event data while accept action')
 
   test.todo('should not be able to reject a previously accepted action')
 })
