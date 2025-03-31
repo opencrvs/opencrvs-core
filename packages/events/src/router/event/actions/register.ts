@@ -85,7 +85,11 @@ export const registerRouter = router({
   accept: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTER]))
     // TODO CIHAN: yleistä tää tyyppi
-    .input(RegisterActionInput.merge(z.object({ actionId: z.string() })))
+    .input(
+      RegisterActionInput.merge(
+        z.object({ actionId: z.string(), registrationNumber: z.string() })
+      )
+    )
     .use(middleware.validateAction(ActionType.REGISTER))
     .use(async ({ ctx, input, next }) => {
       const { eventId, actionId } = input
@@ -174,6 +178,7 @@ export const registerRouter = router({
         return getEventById(input.eventId)
       }
 
+      // TODO CIHAN: korjaa tää
       // @ts-ignore
       return addAction(input, {
         eventId,

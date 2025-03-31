@@ -278,7 +278,8 @@ describe('Request and confirmation flow', () => {
         await expect(
           client.event.actions.register.accept({
             ...data,
-            actionId: getUUID()
+            actionId: getUUID(),
+            registrationNumber: MOCK_REGISTRATION_NUMBER
           })
         ).rejects.matchSnapshot()
       })
@@ -307,7 +308,8 @@ describe('Request and confirmation flow', () => {
         await expect(
           client.event.actions.register.accept({
             ...data,
-            actionId
+            actionId,
+            registrationNumber: MOCK_REGISTRATION_NUMBER
           })
         ).rejects.matchSnapshot()
       })
@@ -329,7 +331,8 @@ describe('Request and confirmation flow', () => {
         const response = await client.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
-          actionId
+          actionId,
+          registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
         const registerActions = response.actions.filter(
@@ -340,6 +343,9 @@ describe('Request and confirmation flow', () => {
         expect(registerActions[0].status).toEqual(ActionStatus.Requested)
         expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
         expect(registerActions[1].data).toEqual(validFormData)
+        expect(registerActions[1].registrationNumber).toEqual(
+          MOCK_REGISTRATION_NUMBER
+        )
       })
 
       test('should be able to call accept multiple times, without creating duplicate accept actions', async () => {
@@ -359,13 +365,15 @@ describe('Request and confirmation flow', () => {
         await client.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
-          actionId
+          actionId,
+          registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
         const response = await client.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
-          actionId
+          actionId,
+          registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
         const registerActions = response.actions.filter(
@@ -417,7 +425,8 @@ describe('Request and confirmation flow', () => {
         await client.event.actions.register.accept({
           ...data,
           actionId,
-          transactionId: getUUID()
+          transactionId: getUUID(),
+          registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
         await expect(
