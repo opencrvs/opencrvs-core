@@ -249,6 +249,7 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   }
 }
 
+// TODO CIHAN: pilko tää moneksi funktioksi
 export async function addAction(
   input: ActionInputWithType,
   {
@@ -257,7 +258,8 @@ export async function addAction(
     token,
     createdAtLocation,
     transactionId,
-    status
+    status,
+    confirmationForActionWithId
   }: {
     eventId: string
     createdBy: string
@@ -265,6 +267,7 @@ export async function addAction(
     token: string
     transactionId: string
     status: ActionStatus
+    confirmationForActionWithId?: string
   },
   actionId = getUUID()
 ): Promise<{ event: EventDocument; actionId: string }> {
@@ -319,7 +322,8 @@ export async function addAction(
     createdAt: now,
     createdAtLocation,
     id: actionId,
-    status: status
+    status: status,
+    ...(confirmationForActionWithId && { confirmationForActionWithId })
   }
 
   await db

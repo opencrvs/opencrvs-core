@@ -219,20 +219,23 @@ describe('Request and confirmation flow', () => {
   test('should not save action if notify API returns HTTP 500', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
+    const { id: eventId } = await client.event.create(generator.event.create())
 
     mockNotifyApi(500)
 
-    const data = generator.event.actions.register(event.id, {
+    const data = generator.event.actions.register(eventId, {
       data: validFormData
     })
 
-    const response = await client.event.actions.register.request(data)
-    const savedAction = response.actions.find(
+    await expect(
+      client.event.actions.register.request(data)
+    ).rejects.matchSnapshot()
+
+    const event = await client.event.get(eventId)
+    const registerActions = event.actions.filter(
       (action) => action.type === ActionType.REGISTER
     )
-
-    expect(savedAction).toBeUndefined()
+    expect(registerActions).toHaveLength(0)
   })
 
   test('should save action in requested state if notify API returns HTTP 202', async () => {
@@ -326,13 +329,49 @@ describe('Request and confirmation flow', () => {
       (action) => action.type === ActionType.REGISTER
     )
 
-    console.log('CIHAN4', registerActions)
+    expect(registerActions.length).toBe(2)
+    expect(registerActions[0].status).toEqual(ActionStatus.Requested)
+    expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
+    expect(registerActions[1].data).toEqual(validFormData)
+  })
+
+  test('should be able to call accept multiple times, without creating duplicate accept actions', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+    const eventId = event.id
+
+    mockNotifyApi(202)
+
+    const data = generator.event.actions.register(eventId, {
+      data: validFormData
+    })
+
+    await client.event.actions.register.request(data)
+
+    await client.event.actions.register.accept({
+      ...data,
+      transactionId: getUUID(),
+      actionId
+    })
+
+    const response = await client.event.actions.register.accept({
+      ...data,
+      transactionId: getUUID(),
+      actionId
+    })
+
+    const registerActions = response.actions.filter(
+      (action) => action.type === ActionType.REGISTER
+    )
 
     expect(registerActions.length).toBe(2)
-    // expect(savedAction?.data).toEqual(validFormData)
-    // expect(savedAction?.registrationNumber).toBeUndefined()
-    // expect(savedAction?.status).toEqual(ActionStatus.Requested))
+    expect(registerActions[0].status).toEqual(ActionStatus.Requested)
+    expect(registerActions[1].status).toEqual(ActionStatus.Accepted)
+    expect(registerActions[1].data).toEqual(validFormData)
   })
 
   test.todo('should be able to edit the event data while accept action')
+
+  test.todo('should not be able to reject a previously accepted action')
 })

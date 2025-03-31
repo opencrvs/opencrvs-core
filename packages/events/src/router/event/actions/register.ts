@@ -47,16 +47,15 @@ export const registerRouter = router({
 
       // If we get an unexpected failure response, we don't want to save the action
       if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
-        // TODO CIHAN: error http response?
-        return event
+        throw new Error('Unexpected failure from notification API')
       }
 
-      // If we immediatly get a rejected response, we can mark the action as rejected
+      // If we immediately get a rejected response, we can mark the action as rejected
       if (responseStatus === ActionConfirmationResponse.Rejected) {
         status = ActionStatus.Rejected
       }
 
-      // If we immediatly get a success response, we can save the registration number and mark the action as accepted
+      // If we immediately get a success response, we can save the registration number and mark the action as accepted
       if (responseStatus === ActionConfirmationResponse.Success) {
         const registrationNumber = body?.registrationNumber
 
@@ -93,22 +92,31 @@ export const registerRouter = router({
       const { eventId, actionId } = input
       const event = await getEventById(eventId)
       const action = event.actions.find((a) => a.id === actionId)
+      const confirmationAction = event.actions.find(
+        (a) => a.confirmationForActionWithId === actionId
+      )
 
       if (!action) {
         throw new Error(`Action not found.`)
       }
 
-      if (action.status === ActionStatus.Rejected) {
+      if (
+        confirmationAction &&
+        confirmationAction.status === ActionStatus.Rejected
+      ) {
         throw new Error(`Action has already been rejected.`)
       }
 
-      return next({ ctx: { ...ctx, actionStatus: action.status }, input })
+      return next({
+        ctx: { ...ctx, alreadyAccepted: Boolean(confirmationAction) },
+        input
+      })
     })
     .mutation(async ({ ctx, input }) => {
-      const { token, user, actionStatus } = ctx
-      const { eventId, transactionId } = input
+      const { token, user, alreadyAccepted } = ctx
+      const { eventId, transactionId, actionId } = input
 
-      if (actionStatus === ActionStatus.Accepted) {
+      if (alreadyAccepted) {
         return getEventById(input.eventId)
       }
 
@@ -118,7 +126,8 @@ export const registerRouter = router({
         createdAtLocation: user.primaryOfficeId,
         token,
         transactionId,
-        status: ActionStatus.Accepted
+        status: ActionStatus.Accepted,
+        confirmationForActionWithId: actionId
       })
 
       return event
