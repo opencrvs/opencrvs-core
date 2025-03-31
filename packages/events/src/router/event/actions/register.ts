@@ -15,32 +15,46 @@ import { TRPCError } from '@trpc/server'
 const registerActionProcedureBase = getActionProceduresBase(ActionType.REGISTER)
 
 export const registerRouterHandlers = {
-  request: registerActionProcedureBase.request.mutation(({ ctx, input }) => {
-    const { token, user, status, actionId } = ctx
-    const { eventId, transactionId } = input
+  request: registerActionProcedureBase.request
+    .use(({ ctx, input, next }) => {
+      // TODO CIHAN: get rid of cast?
+      const inputWithRegistrationNumber = input as {
+        registrationNumber?: string
+      }
 
-    // @ts-expect-error - "Todo cihan fiksaa tää"
-    const registrationNumber = input?.registrationNumber
-    if (!registrationNumber || typeof registrationNumber !== 'string') {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Invalid registration number received from notification API'
-      })
-    }
+      const registrationNumber = inputWithRegistrationNumber.registrationNumber
 
-    return addAction(
-      input,
-      {
-        eventId,
-        createdBy: user.id,
-        createdAtLocation: user.primaryOfficeId,
-        token,
-        transactionId,
-        status
-      },
-      actionId
-    )
-  }),
+      if (
+        ctx.status === ActionStatus.Accepted &&
+        (!registrationNumber || typeof registrationNumber !== 'string')
+      ) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Invalid registration number received from notification API'
+        })
+      }
+
+      return next({ ctx, input })
+    })
+    .mutation(({ ctx, input }) => {
+      const { token, user, status, actionId } = ctx
+      const { eventId, transactionId } = input
+
+      console.log('input', input)
+
+      return addAction(
+        input,
+        {
+          eventId,
+          createdBy: user.id,
+          createdAtLocation: user.primaryOfficeId,
+          token,
+          transactionId,
+          status
+        },
+        actionId
+      )
+    }),
   accept: registerActionProcedureBase.accept.mutation(({ ctx, input }) => {
     const { token, user, alreadyAccepted } = ctx
     const { eventId, transactionId, actionId } = input
