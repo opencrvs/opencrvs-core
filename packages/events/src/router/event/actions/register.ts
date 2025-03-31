@@ -134,7 +134,7 @@ function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
 
 const registerActionProcedureBase = getActionProceduresBase(ActionType.REGISTER)
 
-export const registerRoutes2 = {
+const registerRoutes2 = {
   request: registerActionProcedureBase.request.mutation(({ ctx, input }) => {
     const { token, user, status, actionId } = ctx
     const { eventId, transactionId } = input
