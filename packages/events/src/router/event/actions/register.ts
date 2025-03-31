@@ -19,9 +19,6 @@ export const registerRouterHandlers = {
     const { token, user, status, actionId } = ctx
     const { eventId, transactionId } = input
 
-    console.log('CIHAN TESTAA')
-    console.log(input)
-
     // @ts-expect-error - "Todo cihan fiksaa tää"
     const registrationNumber = input?.registrationNumber
     if (!registrationNumber || typeof registrationNumber !== 'string') {

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import _ from 'lodash'
 import {
   createTestClient,
   setupTestCase,
@@ -16,7 +15,6 @@ import {
 } from '@events/tests/utils'
 import { ActionType, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
-import { eventRouter } from '.'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
