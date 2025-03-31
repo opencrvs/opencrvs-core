@@ -169,10 +169,7 @@ describe('Request and confirmation flow', () => {
             status === 200
               ? { registrationNumber: MOCK_REGISTRATION_NUMBER }
               : {}
-          // For some reason the msw types here complain about the status, even though this is correct
-          // https://mswjs.io/docs/api/http-response/
-
-          // @ts-expect-error
+          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
           return HttpResponse.json(responseBody, { status })
         }
       )
