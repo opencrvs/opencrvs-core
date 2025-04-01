@@ -14,7 +14,7 @@ import { PageConfig } from './PageConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
-import { ActionFormConfig } from './FormConfig'
+import { ActionFormConfig, BaseFormConfig } from './FormConfig'
 
 /**
  * By default, when conditionals are not defined, action is visible and enabled to the user.
@@ -26,18 +26,18 @@ const ActionConditional = z.discriminatedUnion('type', [
   EnableConditional
 ])
 
-export const ReviewPageConfig = z.object({
-  declarationVersionId: z
-    .string()
-    .describe('Which declaration form the review configuration references to.'),
+export const DeclarationReviewConfig = BaseFormConfig.extend({
+  title: TranslationConfig.describe('Title of the review page'),
   fields: z
     .array(FieldConfig)
     .describe(
       'Fields to be rendered on the review page for metadata gathering.'
     )
-})
+}).describe(
+  'Configuration for **declaration** review page. Fields gathered are part of metadata.'
+)
 
-export type ReviewPageConfig = z.infer<typeof ReviewPageConfig>
+export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
@@ -48,21 +48,21 @@ export const ActionConfigBase = z.object({
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE),
-    review: z.array(ReviewPageConfig).optional()
+    review: z.array(DeclarationReviewConfig).min(1)
   })
 )
 
 const ValidateConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.VALIDATE),
-    review: z.array(ReviewPageConfig).optional()
+    review: z.array(DeclarationReviewConfig).min(1)
   })
 )
 
 const RegisterConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    review: z.array(ReviewPageConfig).optional()
+    review: z.array(DeclarationReviewConfig).min(1)
   })
 )
 

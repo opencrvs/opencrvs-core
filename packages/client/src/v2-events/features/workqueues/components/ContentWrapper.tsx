@@ -15,8 +15,8 @@ import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   LoadingIndicator,
-  withOnlineStatus,
-  IOnlineStatusProps as OnlineStatusProps
+  OnlineStatusProps,
+  withOnlineStatus
 } from '@client/v2-events/components/LoadingIndicator'
 
 /**

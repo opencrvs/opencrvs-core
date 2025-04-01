@@ -12,10 +12,7 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { FormPageConfig, PageConfig } from './PageConfig'
 
-const BaseFormConfig = z.object({
-  label: TranslationConfig.describe(
-    'Human readable description of the declaration form'
-  ),
+export const BaseFormConfig = z.object({
   version: z.object({
     id: z
       .string()
@@ -30,15 +27,19 @@ const BaseFormConfig = z.object({
 })
 
 export const DeclarationFormConfig = BaseFormConfig.extend({
+  label: TranslationConfig.describe('Human readable description of the form'),
   pages: z.array(FormPageConfig)
-})
+}).describe('Configuration for a declaration form used to gather even **data**')
 
 export type DeclarationFormConfig = z.infer<typeof DeclarationFormConfig>
 export type DeclarationFormConfigInput = z.input<typeof DeclarationFormConfig>
 
 export const ActionFormConfig = BaseFormConfig.extend({
+  label: TranslationConfig.describe('Human readable description of the form'),
   pages: z.array(PageConfig)
-})
+}).describe(
+  'Configuration for an action form used to gather event **metadata**'
+)
 
 export type ActionFormConfig = z.infer<typeof ActionFormConfig>
 export type ActionFormConfigInput = z.input<typeof ActionFormConfig>

@@ -14,7 +14,9 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
 import {
   ActionType,
+  EventConfig,
   EventDocument,
+  getActiveActionReview,
   getActiveDeclaration,
   getMetadataForAction
 } from '@opencrvs/commons/client'
@@ -26,15 +28,28 @@ import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { withSuspense } from '../../components/withSuspense'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 // These are the allowed actions based on which we can read a declarations data
 const READ_ONLY_MODE_ALLOWED_ACTIONS = [
-  ActionType.APPROVE_CORRECTION,
   ActionType.REGISTER,
   ActionType.VALIDATE,
   ActionType.DECLARE
 ]
+
+function getLastActionReviewConfig(config: EventConfig, event: EventDocument) {
+  for (const actionType of READ_ONLY_MODE_ALLOWED_ACTIONS) {
+    const availableAllowedAction = event.actions.find(
+      (a) => a.type === actionType
+    )
+
+    if (availableAllowedAction) {
+      return getActiveActionReview(config, actionType)
+    }
+  }
+
+  throw new Error('No allowed action found')
+}
 
 function findLastActionMetadata(event: EventDocument) {
   for (const actionType of READ_ONLY_MODE_ALLOWED_ACTIONS) {
@@ -62,6 +77,8 @@ function ReadonlyView() {
     state.getFormValues(currentEventState.data)
   )
 
+  const reviewConfig = getLastActionReviewConfig(config, fullEvent)
+
   const { setMetadata, getMetadata } = useEventMetadata()
   const metadata = getMetadata(findLastActionMetadata(fullEvent))
 
@@ -72,8 +89,7 @@ function ReadonlyView() {
         form={form}
         formConfig={formConfig}
         metadata={metadata}
-        // @TODO: Change message back to proper one.
-        title={formatMessage(formConfig.label, form)}
+        title={formatMessage(reviewConfig.title, form)}
         onEdit={noop}
         onMetadataChange={(values) => setMetadata(values)}
       >

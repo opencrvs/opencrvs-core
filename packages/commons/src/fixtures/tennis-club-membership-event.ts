@@ -690,24 +690,23 @@ const PRINT_CERTIFICATE_FORM = defineActionForm({
       }
     }
   ]
-  // review: {
-  //   title: {
-  //     id: 'v2.event.tennis-club-membership.action.certificate.form.review.title',
-  //     defaultMessage: 'Member certificate collector for {firstname} {surname}',
-  //     description: 'Title of the form to show in review page'
-  //   },
-  //   fields: []
-  // } as const
 })
 
 const TENNIS_CLUB_DECLARATION_REVIEW = {
-  declarationVersionId: '1.0.0',
-  // title: {
-  //   id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
-  //   defaultMessage:
-  //     '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
-  //   description: 'Title of the form to show in review page'
-  // },
+  version: {
+    id: '1.0.0',
+    label: {
+      id: 'v2.event.tennis-club-membership.action.declare.form.version.1',
+      defaultMessage: 'Version 1',
+      description: 'This is the first version of the form'
+    }
+  },
+  title: {
+    id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
+    defaultMessage:
+      '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
+    description: 'Title of the review page'
+  },
   fields: [
     {
       id: 'review.comment',

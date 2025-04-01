@@ -30,6 +30,7 @@ export const PageConfigBase = z.object({
 export const FormPageConfig = PageConfigBase.extend({
   type: z.literal(PageTypes.enum.FORM).default(PageTypes.enum.FORM)
 })
+
 export type FormPageConfig = z.infer<typeof FormPageConfig>
 export type FormPageConfigInput = z.input<typeof FormPageConfig>
 
@@ -46,16 +47,13 @@ export const VerificationActionConfig = z
   })
   .describe('Actions available on the verification page')
 
-export type AllPageConfig =
-  | typeof VerificationPageConfig
-  | typeof FormPageConfig
-
 export const VerificationPageConfig = FormPageConfig.extend({
   type: z.literal(PageTypes.enum.VERIFICATION),
   actions: VerificationActionConfig
 })
 export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
 
+type AllPageConfig = typeof VerificationPageConfig | typeof FormPageConfig
 export const PageConfig = z.discriminatedUnion('type', [
   FormPageConfig,
   VerificationPageConfig

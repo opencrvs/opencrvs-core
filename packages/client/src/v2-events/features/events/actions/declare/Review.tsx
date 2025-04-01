@@ -15,7 +15,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
   ActionType,
-  getActiveActionReviewFields,
+  getActiveActionReview,
   getActiveDeclaration,
   SCOPES
 } from '@opencrvs/commons/client'
@@ -52,7 +52,7 @@ export function Review() {
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
   const formConfig = getActiveDeclaration(config)
-  const reviewFields = getActiveActionReviewFields(config, ActionType.DECLARE)
+  const reviewConfig = getActiveActionReview(config, ActionType.DECLARE)
 
   const form = useEventFormData((state) => state.getFormValues())
 
@@ -66,7 +66,7 @@ export function Review() {
     form,
     metadata,
     scopes,
-    reviewFields
+    reviewFields: reviewConfig.fields
   })
 
   async function handleEdit({
@@ -103,7 +103,7 @@ export function Review() {
     formConfig,
     form,
     metadata,
-    reviewFields
+    reviewFields: reviewConfig.fields
   })
 
   async function handleDeclaration() {
@@ -136,9 +136,8 @@ export function Review() {
         form={form}
         formConfig={formConfig}
         metadata={metadata}
-        reviewFields={reviewFields}
-        // @TODO: Change message back to proper one.
-        title={formatMessage(formConfig.label, form)}
+        reviewFields={reviewConfig.fields}
+        title={formatMessage(reviewConfig.title, form)}
         onEdit={handleEdit}
         onMetadataChange={(values) => setMetadata(values)}
       >

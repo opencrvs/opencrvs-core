@@ -29,6 +29,7 @@ import { getUUID } from '../uuid'
 import { formatISO } from 'date-fns'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
+import { getOrThrow } from '../utils'
 
 /**
  * @returns All the fields in the event configuration.
@@ -147,21 +148,22 @@ export function getActiveActionReviewFields(
   configuration: EventConfig,
   actionType: DeclarationUpdateAction
 ) {
-  const activeDeclarationId = getActiveDeclaration(configuration).version.id
+  return getActiveActionReview(configuration, actionType).fields
+}
 
-  if (!activeDeclarationId) {
-    throw new Error('No active declaration found')
-  }
-
+export function getActiveActionReview(
+  configuration: EventConfig,
+  actionType: ActionType
+) {
   const [actionConfig] = configuration.actions.filter(
     (a): a is DeclarationActionConfig => a.type === actionType
   )
 
-  return (
-    actionConfig.review?.find(
-      (review) => review.declarationVersionId === activeDeclarationId
-    )?.fields ?? []
+  const activeReviewConfig = actionConfig.review?.find(
+    (review) => review.active
   )
+
+  return getOrThrow(activeReviewConfig, 'No active review config found')
 }
 
 export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
