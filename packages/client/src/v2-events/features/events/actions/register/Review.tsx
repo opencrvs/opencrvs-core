@@ -19,7 +19,7 @@ import {
   ActionType,
   getMetadataForAction,
   getActiveDeclaration,
-  getActiveActionReviewFields
+  getActiveActionReview
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -37,6 +37,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -80,6 +81,7 @@ export function Review() {
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const registerMutation = events.actions.register
 
@@ -97,7 +99,7 @@ export function Review() {
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
   const formConfig = getActiveDeclaration(config)
-  const reviewFields = getActiveActionReviewFields(config, ActionType.REGISTER)
+  const reviewConfig = getActiveActionReview(config, ActionType.REGISTER)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data
@@ -181,7 +183,7 @@ export function Review() {
     formConfig,
     form,
     metadata,
-    reviewFields
+    reviewFields: reviewConfig.fields
   })
 
   return (
@@ -199,8 +201,8 @@ export function Review() {
         formConfig={formConfig}
         metadata={metadata}
         previousFormValues={previousFormValues}
-        reviewFields={reviewFields}
-        title=""
+        reviewFields={reviewConfig.fields}
+        title={formatMessage(reviewConfig.title, form)}
         onEdit={handleEdit}
         onMetadataChange={(values) => setMetadata(values)}
       >
