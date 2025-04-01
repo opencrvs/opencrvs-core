@@ -43,7 +43,7 @@ test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} 
 
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
-  await client.event.actions.declare(declareInput)
+  await client.event.actions.declare.request(declareInput)
 
   const actions = (
     await client.event.actions.archive(
@@ -63,7 +63,7 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
 
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
-  await client.event.actions.declare(declareInput)
+  await client.event.actions.declare.request(declareInput)
 
   const actions = (
     await client.event.actions.archive(

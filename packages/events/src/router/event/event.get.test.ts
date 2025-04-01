@@ -73,9 +73,11 @@ test('Returns event with all actions', async () => {
     generator.event.actions.notify(event.id)
   )
 
-  await client.event.actions.declare(generator.event.actions.declare(event.id))
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
 
-  await client.event.actions.validate(
+  await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )
 

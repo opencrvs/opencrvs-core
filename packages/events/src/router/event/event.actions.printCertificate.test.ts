@@ -60,7 +60,7 @@ test('Has validation errors when required VERIFICATION page metadata is missing'
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  const declaredEvent = await client.event.actions.declare(
+  const declaredEvent = await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
 
@@ -80,7 +80,7 @@ test('Has no validation errors when required VERIFICATION page metadata is set',
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  const declaredEvent = await client.event.actions.declare(
+  const declaredEvent = await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
 
@@ -102,7 +102,7 @@ test('print certificate action can be added to a created event', async () => {
 
   const originalEvent = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id)
   )
 

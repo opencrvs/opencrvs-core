@@ -25,7 +25,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
   const client = createTestClient(user, [])
 
   await expect(
-    client.event.actions.declare(
+    client.event.actions.declare.request(
       generator.event.actions.declare('event-test-id-12345', {})
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -36,7 +36,7 @@ test(`allows access if required scope is present`, async () => {
   const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 
   await expect(
-    client.event.actions.declare(
+    client.event.actions.declare.request(
       generator.event.actions.declare('event-test-id-12345', {})
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -55,7 +55,9 @@ test('Validation error message contains all the offending fields', async () => {
     }
   })
 
-  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.declare.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
@@ -81,7 +83,9 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
     }
   })
 
-  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.declare.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('Skips required field validation when they are conditionally hidden', async () => {
@@ -109,7 +113,7 @@ test('Skips required field validation when they are conditionally hidden', async
     data: form
   })
 
-  const response = await client.event.actions.declare(data)
+  const response = await client.event.actions.declare.request(data)
   const activeActions = getEventActiveActions(response)
 
   const savedAction = activeActions.find(
@@ -144,7 +148,9 @@ test('gives validation error when a conditional page, which is visible, has a re
     data: form
   })
 
-  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.declare.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('successfully validates a fields on a conditional page, which is visible', async () => {
@@ -174,7 +180,7 @@ test('successfully validates a fields on a conditional page, which is visible', 
     data: form
   })
 
-  const response = await client.event.actions.declare(data)
+  const response = await client.event.actions.declare.request(data)
   const activeActions = getEventActiveActions(response)
 
   const savedAction = activeActions.find(
@@ -208,7 +214,9 @@ test('Prevents adding birth date in future', async () => {
     data: form
   })
 
-  await expect(client.event.actions.declare(payload)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.declare.request(payload)
+  ).rejects.matchSnapshot()
 })
 
 test('validation prevents including hidden fields', async () => {
@@ -224,7 +232,9 @@ test('validation prevents including hidden fields', async () => {
     }
   })
 
-  await expect(client.event.actions.declare(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.declare.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('valid action is appended to event actions', async () => {
@@ -235,7 +245,7 @@ test('valid action is appended to event actions', async () => {
 
   const data = generator.event.actions.declare(event.id)
 
-  await client.event.actions.declare(data)
+  await client.event.actions.declare.request(data)
   const updatedEvent = await client.event.get(event.id)
 
   expect(updatedEvent.actions).toEqual([

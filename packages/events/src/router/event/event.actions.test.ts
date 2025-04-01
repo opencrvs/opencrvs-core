@@ -22,7 +22,7 @@ test('actions can be added to created events', async () => {
 
   const originalEvent = await client.event.create(generator.event.create())
 
-  const event = await client.event.actions.declare(
+  const event = await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id)
   )
 
@@ -39,10 +39,10 @@ test('Action data can be retrieved', async () => {
   const originalEvent = await client.event.create(generator.event.create())
 
   const generatedDeclaration = generator.event.actions.declare(originalEvent.id)
-  await client.event.actions.declare(generatedDeclaration)
+  await client.event.actions.declare.request(generatedDeclaration)
 
   const generatedValidation = generator.event.actions.validate(originalEvent.id)
-  await client.event.actions.validate(generatedValidation)
+  await client.event.actions.validate.request(generatedValidation)
 
   const generatedRegistration = generator.event.actions.register(
     originalEvent.id
@@ -91,7 +91,7 @@ test('Action data accepts partial changes', async () => {
     originalEvent.id,
     { data: initialForm }
   )
-  await client.event.actions.declare(firstDeclarationPayload)
+  await client.event.actions.declare.request(firstDeclarationPayload)
 
   const declarationWithoutVillage = generator.event.actions.declare(
     originalEvent.id,
@@ -103,7 +103,7 @@ test('Action data accepts partial changes', async () => {
     }
   )
 
-  await client.event.actions.declare(declarationWithoutVillage)
+  await client.event.actions.declare.request(declarationWithoutVillage)
 
   const updatedEvent = await client.event.get(originalEvent.id)
 
@@ -123,7 +123,7 @@ test('Action data accepts partial changes', async () => {
     }
   )
 
-  await client.event.actions.declare(declarationWithVillageNull)
+  await client.event.actions.declare.request(declarationWithVillageNull)
   const eventAfterVillageRemoval = await client.event.get(originalEvent.id)
   const stateAfterVillageRemoval = getCurrentEventState(
     eventAfterVillageRemoval
@@ -202,7 +202,7 @@ test('Action other than READ deletes draft', async () => {
   const draftEvents = await client.event.draft.list()
   expect(draftEvents.length).toBe(1)
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id)
   )
 

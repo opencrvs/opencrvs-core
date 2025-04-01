@@ -97,7 +97,7 @@ export const Archive: Story = {
               actions: [ActionType.CREATE]
             })
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker['event.actions.declare']++
 
             return generateEventDocument({
@@ -119,7 +119,7 @@ export const Archive: Story = {
             })
           }),
 
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker['event.actions.validate']++
 
             return generateEventDocument({
@@ -260,7 +260,7 @@ export const SendForUpdate: Story = {
               actions: [ActionType.CREATE]
             })
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker['event.actions.declare']++
 
             return generateEventDocument({
@@ -281,7 +281,7 @@ export const SendForUpdate: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker['event.actions.validate']++
 
             return generateEventDocument({

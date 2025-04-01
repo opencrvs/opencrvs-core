@@ -22,27 +22,45 @@ import {
 import {
   ActionType,
   SCOPES,
-  RegisterActionInput,
   NotifyActionInput,
   getUUID,
   ActionConfirmationResponse,
-  ActionStatus
+  ActionStatus,
+  RegisterActionInput,
+  DeclareActionInput,
+  ValidateActionInput
 } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
 const ACTIONS = {
-  [ActionType.REGISTER]: {
-    scopes: [SCOPES.RECORD_REGISTER],
-    inputType: RegisterActionInput,
-    additionalAcceptFields: z.object({ registrationNumber: z.string() }),
-    validatePayload: true
-  },
   [ActionType.NOTIFY]: {
     scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
     inputType: NotifyActionInput,
     additionalAcceptFields: undefined,
     validatePayload: false
+  },
+  [ActionType.DECLARE]: {
+    scopes: [
+      SCOPES.RECORD_DECLARE,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_REGISTER
+    ],
+    inputType: DeclareActionInput,
+    additionalAcceptFields: undefined,
+    validatePayload: true
+  },
+  [ActionType.VALIDATE]: {
+    scopes: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER],
+    inputType: ValidateActionInput,
+    additionalAcceptFields: undefined,
+    validatePayload: true
+  },
+  [ActionType.REGISTER]: {
+    scopes: [SCOPES.RECORD_REGISTER],
+    inputType: RegisterActionInput,
+    additionalAcceptFields: z.object({ registrationNumber: z.string() }),
+    validatePayload: true
   }
 }
 

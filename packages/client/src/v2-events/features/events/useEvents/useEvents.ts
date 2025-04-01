@@ -72,11 +72,11 @@ export function useEvents() {
         }).data
     },
     actions: {
-      validate: useEventAction(trpc.event.actions.validate),
+      validate: useEventAction(trpc.event.actions.validate.request),
       reject: useEventAction(trpc.event.actions.reject),
       archive: useEventAction(trpc.event.actions.archive),
       notify: useEventAction(trpc.event.actions.notify.request),
-      declare: useEventAction(trpc.event.actions.declare),
+      declare: useEventAction(trpc.event.actions.declare.request),
       register: useEventAction(trpc.event.actions.register.request),
       correction: {
         request: useEventAction(trpc.event.actions.correction.request),

@@ -43,7 +43,7 @@ test(`should contain REJECT action for a valid request`, async () => {
 
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
-  await client.event.actions.declare(declareInput)
+  await client.event.actions.declare.request(declareInput)
 
   const actions = (
     await client.event.actions.reject(

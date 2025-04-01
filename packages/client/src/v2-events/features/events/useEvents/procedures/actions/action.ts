@@ -33,9 +33,9 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 
-setMutationDefaults(trpcOptionsProxy.event.actions.declare, {
+setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.declare
+    trpcOptionsProxy.event.actions.declare.request
   ),
   retry: true,
   retryDelay: 10000,
@@ -70,9 +70,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.validate, {
+setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.validate
+    trpcOptionsProxy.event.actions.validate.request
   ),
   retry: true,
   retryDelay: 10000,

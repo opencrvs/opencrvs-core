@@ -118,7 +118,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 
             return eventDocument
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker.localRegistrar['event.actions.declare']++
 
             return generateEventDocument({
@@ -126,7 +126,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker.localRegistrar['event.actions.validate']++
 
             return generateEventDocument({
@@ -239,7 +239,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 
             return eventDocument
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker.registrationAgent['event.actions.declare']++
 
             return generateEventDocument({
@@ -247,7 +247,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker.registrationAgent['event.actions.validate']++
 
             return generateEventDocument({
@@ -357,7 +357,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 
             return eventDocument
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker.fieldAgent['event.actions.declare']++
 
             return generateEventDocument({
@@ -365,7 +365,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker.fieldAgent['event.actions.validate']++
 
             return generateEventDocument({
@@ -470,7 +470,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 
             return eventDocument
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker.fieldAgent['event.actions.declare']++
 
             return generateEventDocument({
@@ -478,7 +478,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker.fieldAgent['event.actions.validate']++
 
             return generateEventDocument({

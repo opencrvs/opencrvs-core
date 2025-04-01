@@ -50,6 +50,8 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { registerRouterHandlers } from './actions/register'
 import { notifyRouterHandlers } from './actions/notify'
+import { declareRouterHandlers } from './actions/declare'
+import { validateRouterHandlers } from './actions/validate'
 
 function validateEventType({
   eventTypes,
@@ -162,45 +164,8 @@ export const eventRouter = router({
   }),
   actions: router({
     notify: router(notifyRouterHandlers),
-    declare: publicProcedure
-      .use(
-        requiresAnyOfScopes([
-          SCOPES.RECORD_DECLARE,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_REGISTER
-        ])
-      )
-      .input(DeclareActionInput)
-      .use(middleware.validateAction(ActionType.DECLARE))
-      .mutation((options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token,
-          transactionId: options.input.transactionId,
-          status: ActionStatus.Accepted // TODO CIHAN
-        })
-      }),
-    validate: publicProcedure
-      .use(
-        requiresAnyOfScopes([
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_REGISTER
-        ])
-      )
-      .input(ValidateActionInput)
-      .use(middleware.validateAction(ActionType.VALIDATE))
-      .mutation((options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token,
-          transactionId: options.input.transactionId,
-          status: ActionStatus.Accepted // TODO CIHAN
-        })
-      }),
+    declare: router(declareRouterHandlers),
+    validate: router(validateRouterHandlers),
     reject: publicProcedure
       .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_FOR_UPDATES]))
       .input(RejectDeclarationActionInput)
