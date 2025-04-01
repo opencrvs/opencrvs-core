@@ -103,7 +103,7 @@ export function TeamSearch() {
       ) : (
         <ConnectivityContainer>
           <NoConnectivity />
-          <Text id="no-connection-text">
+          <Text id="no-connection-text" variant="h4" element="span">
             {intl.formatMessage(constantsMessages.noConnection)}
           </Text>
         </ConnectivityContainer>
