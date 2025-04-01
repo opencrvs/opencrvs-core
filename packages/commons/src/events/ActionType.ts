@@ -44,19 +44,13 @@ export const LatentActions = [
 ]
 
 export const ConfirmableActions = [
+  ActionType.NOTIFY,
+  ActionType.DECLARE,
   ActionType.VALIDATE,
+  ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,
-  ActionType.NOTIFY,
-  ActionType.REGISTER,
-  ActionType.DECLARE,
-  ActionType.ASSIGN,
-  ActionType.REQUEST_CORRECTION,
-  ActionType.APPROVE_CORRECTION,
-  ActionType.REJECT_CORRECTION,
-  ActionType.UNASSIGN,
-  ActionType.PRINT_CERTIFICATE,
-  ActionType.CUSTOM
+  ActionType.PRINT_CERTIFICATE
 ] as const
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
