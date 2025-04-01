@@ -29,7 +29,9 @@ export const BaseFormConfig = z.object({
 export const DeclarationFormConfig = BaseFormConfig.extend({
   label: TranslationConfig.describe('Human readable description of the form'),
   pages: z.array(FormPageConfig)
-}).describe('Configuration for a declaration form used to gather even **data**')
+}).describe(
+  'Configuration for a declaration form used to gather event **data**'
+)
 
 export type DeclarationFormConfig = z.infer<typeof DeclarationFormConfig>
 export type DeclarationFormConfigInput = z.input<typeof DeclarationFormConfig>

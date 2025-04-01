@@ -525,16 +525,8 @@ const GeneratedInputField = React.memo(
       // Data input requires field configs
       const declarationFields = getActiveDeclarationFields(eventConfig)
 
-      if (!declarationFields) {
-        return null
-      }
-
       const fields = field.config.configuration.data.map((entry) =>
-        getFieldFromDataEntry({
-          dataEntry: entry,
-          declarationFields: declarationFields,
-          formData
-        })
+        getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })
       )
 
       return <Data.Input {...field.config} fields={fields} />

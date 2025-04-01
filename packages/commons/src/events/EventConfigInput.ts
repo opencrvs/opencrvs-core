@@ -10,7 +10,12 @@
  */
 import { z } from 'zod'
 import { EventConfig } from './EventConfig'
-import { PageConfig, PageConfigInput } from './PageConfig'
+import {
+  FormPageConfig,
+  FormPageConfigInput,
+  PageConfig,
+  PageConfigInput
+} from './PageConfig'
 import {
   ActionFormConfig,
   ActionFormConfigInput,
@@ -27,5 +32,8 @@ export const defineActionForm = (
   actionForm: ActionFormConfigInput
 ): ActionFormConfig => ActionFormConfig.parse(actionForm)
 
-export const definePage = (formPage: PageConfigInput): PageConfig =>
-  PageConfig.parse(formPage)
+export const definePage = (page: PageConfigInput): PageConfig =>
+  PageConfig.parse(page)
+
+export const defineFormPage = (formPage: FormPageConfigInput): FormPageConfig =>
+  FormPageConfig.parse(formPage)

@@ -18,6 +18,7 @@ import {
 import {
   ActionType,
   EventConfig,
+  getOrThrow,
   isFieldVisible
 } from '@opencrvs/commons/client'
 
@@ -40,14 +41,10 @@ function getActivePrintCertificatePages(configuration: EventConfig) {
   )
 
   const pages = action?.printForm.find((printForm) => printForm.active)?.pages
-
-  if (!pages) {
-    throw new Error(
-      `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
-    )
-  }
-
-  return pages
+  return getOrThrow(
+    pages,
+    `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
+  )
 }
 
 export function Pages() {
