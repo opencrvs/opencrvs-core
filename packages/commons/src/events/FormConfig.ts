@@ -23,7 +23,7 @@ export const BaseFormConfig = z.object({
       'Human readable description of the version'
     )
   }),
-  active: z.boolean().default(false).describe('Whether the form is active')
+  active: z.boolean().describe('Whether the form is active')
 })
 
 export const DeclarationFormConfig = BaseFormConfig.extend({

@@ -693,6 +693,7 @@ const PRINT_CERTIFICATE_FORM = defineActionForm({
 })
 
 const TENNIS_CLUB_DECLARATION_REVIEW = {
+  active: true,
   version: {
     id: '1.0.0',
     label: {
