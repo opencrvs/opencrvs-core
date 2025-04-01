@@ -20,11 +20,10 @@ import {
   addAsyncRejectAction,
   addAction
 } from '@events/service/events/events'
+import { SCOPES, getUUID } from '@opencrvs/commons'
 import {
   ActionType,
-  SCOPES,
   NotifyActionInput,
-  getUUID,
   ActionConfirmationResponse,
   ActionStatus,
   RegisterActionInput,
@@ -33,7 +32,8 @@ import {
   RejectDeclarationActionInput,
   ArchiveActionInput,
   PrintCertificateActionInput
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/events'
+
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 

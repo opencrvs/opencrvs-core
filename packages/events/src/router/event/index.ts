@@ -24,14 +24,7 @@ import {
 } from '@events/service/events/events'
 import { presignFilesInEvent } from '@events/service/files'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
-import {
-  ApproveCorrectionActionInput,
-  EventConfig,
-  RejectCorrectionActionInput,
-  RequestCorrectionActionInput,
-  SCOPES,
-  getUUID
-} from '@opencrvs/commons'
+import { SCOPES, getUUID } from '@opencrvs/commons'
 import {
   ActionType,
   Draft,
@@ -39,7 +32,11 @@ import {
   EventIndex,
   EventInput,
   EventSearchIndex,
-  ActionStatus
+  ActionStatus,
+  ApproveCorrectionActionInput,
+  EventConfig,
+  RejectCorrectionActionInput,
+  RequestCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
