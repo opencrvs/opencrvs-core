@@ -36,7 +36,14 @@ import {
   ApproveCorrectionActionInput,
   EventConfig,
   RejectCorrectionActionInput,
-  RequestCorrectionActionInput
+  RequestCorrectionActionInput,
+  NotifyActionInput,
+  DeclareActionInput,
+  ValidateActionInput,
+  RegisterActionInput,
+  PrintCertificateActionInput,
+  ArchiveActionInput,
+  RejectDeclarationActionInput
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
@@ -152,14 +159,32 @@ export const eventRouter = router({
     })
   }),
   actions: router({
-    notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
-    declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
-    validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
-    reject: router(getDefaultActionProcedures(ActionType.REJECT)),
-    archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
-    register: router(getDefaultActionProcedures(ActionType.REGISTER)),
+    notify: router(
+      getDefaultActionProcedures(ActionType.NOTIFY, NotifyActionInput)
+    ),
+    declare: router(
+      getDefaultActionProcedures(ActionType.DECLARE, DeclareActionInput)
+    ),
+    validate: router(
+      getDefaultActionProcedures(ActionType.VALIDATE, ValidateActionInput)
+    ),
+    reject: router(
+      getDefaultActionProcedures(
+        ActionType.REJECT,
+        RejectDeclarationActionInput
+      )
+    ),
+    archive: router(
+      getDefaultActionProcedures(ActionType.ARCHIVE, ArchiveActionInput)
+    ),
+    register: router(
+      getDefaultActionProcedures(ActionType.REGISTER, RegisterActionInput)
+    ),
     printCertificate: router(
-      getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
+      getDefaultActionProcedures(
+        ActionType.PRINT_CERTIFICATE,
+        PrintCertificateActionInput
+      )
     ),
     correction: router({
       request: publicProcedure

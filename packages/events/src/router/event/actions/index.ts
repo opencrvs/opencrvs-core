@@ -111,7 +111,8 @@ const ACTION_PROCEDURE_CONFIG = {
  * @param actionType - The action type for which we want to create router handlers.
  */
 export function getDefaultActionProcedures(
-  actionType: keyof typeof ACTION_PROCEDURE_CONFIG
+  actionType: keyof typeof ACTION_PROCEDURE_CONFIG,
+  inputSchema: z.ZodType
 ) {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
@@ -119,8 +120,7 @@ export function getDefaultActionProcedures(
     throw new Error(`Action not configured: ${actionType}`)
   }
 
-  const { scopes, notifyApiPayloadSchema, validatePayload, inputSchema } =
-    actionConfig
+  const { scopes, notifyApiPayloadSchema, validatePayload } = actionConfig
 
   let acceptInputFields = z.object({ actionId: z.string() })
 
@@ -205,13 +205,11 @@ export function getDefaultActionProcedures(
           },
           actionId
         )
-      }) as MutationProcedure<{
-      input: ActionInput
-      output: EventDocument
-    }>,
+      }),
 
     accept: publicProcedure
       .use(requireScopesMiddleware)
+      // @ts-expect-error - "foo"
       .input(inputSchema.merge(acceptInputFields))
       .use(validatePayloadMiddleware)
       .use(async ({ ctx, input, next }) => {
