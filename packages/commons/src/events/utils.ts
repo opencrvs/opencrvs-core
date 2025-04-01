@@ -11,11 +11,7 @@
 
 import { flattenDeep, omitBy } from 'lodash'
 import { workqueues } from '../workqueues'
-import {
-  ActionType,
-  DeclarationActions,
-  DeclarationUpdateAction
-} from './ActionType'
+import { ActionType, DeclarationAction, DeclarationActions } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
@@ -146,7 +142,7 @@ export function getActiveDeclarationPages(configuration: EventConfig) {
 
 export function getActiveActionReviewFields(
   configuration: EventConfig,
-  actionType: DeclarationUpdateAction
+  actionType: DeclarationAction
 ) {
   return getActiveActionReview(configuration, actionType).fields
 }

@@ -33,6 +33,7 @@ import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
+import { DeclarationActions } from '@opencrvs/commons/client'
 
 function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
   return formFields.reduce(
@@ -111,7 +112,11 @@ function validateDeclarationUpdateAction({
   const activeDeclaration = getActiveDeclaration(eventConfig)
 
   const declarationFields = getVisiblePagesFormFields(activeDeclaration, data)
-  const reviewFields = getActiveActionReviewFields(eventConfig, actionType)
+
+  const declarationActionParse = DeclarationActions.safeParse(actionType)
+  const reviewFields = declarationActionParse.success
+    ? getActiveActionReviewFields(eventConfig, declarationActionParse.data)
+    : []
 
   const fields = [...declarationFields, ...reviewFields]
 
