@@ -43,13 +43,7 @@ import {
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { registerRouterHandlers } from './actions/register'
-import { notifyRouterHandlers } from './actions/notify'
-import { declareRouterHandlers } from './actions/declare'
-import { validateRouterHandlers } from './actions/validate'
-import { rejectRouterHandlers } from './actions/reject'
-import { archiveRouterHandlers } from './actions/archive'
-import { printCertificateRouterHandlers } from './actions/printCertificate'
+import { getDefaultActionProcedures } from './actions'
 
 function validateEventType({
   eventTypes,
@@ -161,13 +155,15 @@ export const eventRouter = router({
     })
   }),
   actions: router({
-    notify: router(notifyRouterHandlers),
-    declare: router(declareRouterHandlers),
-    validate: router(validateRouterHandlers),
-    reject: router(rejectRouterHandlers),
-    archive: router(archiveRouterHandlers),
-    register: router(registerRouterHandlers),
-    printCertificate: router(printCertificateRouterHandlers),
+    notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
+    declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
+    validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
+    reject: router(getDefaultActionProcedures(ActionType.REJECT)),
+    archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
+    register: router(getDefaultActionProcedures(ActionType.REGISTER)),
+    printCertificate: router(
+      getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
+    ),
     correction: router({
       request: publicProcedure
         .use(

@@ -97,7 +97,7 @@ const ACTION_PROCEDURE_CONFIG = {
  *
  * @param actionType - The action type for which we want to create router handlers.
  */
-export function getActionProceduresBase(
+export function getDefaultActionProcedures(
   actionType: keyof typeof ACTION_PROCEDURE_CONFIG
 ) {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
@@ -175,6 +175,23 @@ export function getActionProceduresBase(
           ctx: { ...ctx, status, actionId },
           input: { ...input, ...parsedBody }
         })
+      })
+      .mutation(({ ctx, input }) => {
+        const { token, user, status, actionId } = ctx
+        const { eventId, transactionId } = input
+
+        return addAction(
+          input,
+          {
+            eventId,
+            createdBy: user.id,
+            createdAtLocation: user.primaryOfficeId,
+            token,
+            transactionId,
+            status
+          },
+          actionId
+        )
       }),
 
     accept: publicProcedure
