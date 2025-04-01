@@ -14,12 +14,12 @@ import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
-  ActionType,
   EventConfig,
   FieldType,
   tennisClubMembershipEvent,
   AddressFieldValue,
-  AddressType
+  AddressType,
+  getActiveDeclaration
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
@@ -120,11 +120,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
 
 const eventConfig: EventConfig = tennisClubMembershipEvent
 
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-const declarationForm = tennisClubMembershipEvent.actions
-  .find(({ type }) => type === ActionType.DECLARE)
-  ?.forms.find(({ active }) => active)!
+const declarationForm = getActiveDeclaration(eventConfig)
 
 export const AddressReviewUrban: StoryObj<typeof Review> = {
   name: 'Review output (Urban)',
@@ -134,7 +130,6 @@ export const AddressReviewUrban: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{
           'applicant.address': {
             country: 'FAR',
@@ -167,7 +162,6 @@ export const AddressReviewRural: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{
           'applicant.address': {
             country: 'FAR',
@@ -196,7 +190,6 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{
           'applicant.address': {
             country: 'FAR',
@@ -222,7 +215,6 @@ export const AddressReviewEmpty: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{}}
         formConfig={declarationForm}
         title="My address form with address output"
@@ -242,7 +234,6 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{
           'applicant.address': {
             country: 'FAR',
