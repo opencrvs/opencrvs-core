@@ -23,15 +23,8 @@ import {
 import { SCOPES, getUUID } from '@opencrvs/commons'
 import {
   ActionType,
-  NotifyActionInput,
   ActionConfirmationResponse,
   ActionStatus,
-  RegisterActionInput,
-  DeclareActionInput,
-  ValidateActionInput,
-  RejectDeclarationActionInput,
-  ArchiveActionInput,
-  PrintCertificateActionInput,
   EventDocument,
   ActionInput
 } from '@opencrvs/commons/events'
@@ -53,7 +46,6 @@ import { z } from 'zod'
 const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
-    inputSchema: NotifyActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: false
   },
@@ -63,37 +55,31 @@ const ACTION_PROCEDURE_CONFIG = {
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
       SCOPES.RECORD_REGISTER
     ],
-    inputSchema: DeclareActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.VALIDATE]: {
     scopes: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER],
-    inputSchema: ValidateActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.REGISTER]: {
     scopes: [SCOPES.RECORD_REGISTER],
-    inputSchema: RegisterActionInput,
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
     validatePayload: true
   },
   [ActionType.REJECT]: {
     scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
-    inputSchema: RejectDeclarationActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.ARCHIVE]: {
     scopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
-    inputSchema: ArchiveActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.PRINT_CERTIFICATE]: {
     scopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
-    inputSchema: PrintCertificateActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   }
