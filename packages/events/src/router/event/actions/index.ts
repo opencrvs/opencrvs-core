@@ -31,11 +31,15 @@ import {
   ValidateActionInput,
   RejectDeclarationActionInput,
   ArchiveActionInput,
-  PrintCertificateActionInput
+  PrintCertificateActionInput,
+  EventDocument,
+  ActionInput
 } from '@opencrvs/commons/events'
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+// eslint-disable-next-line import/named
+import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 
 /**
  * Configuration for different action types which use the default confirmation flow.
@@ -302,5 +306,15 @@ export function getDefaultActionProcedures(
           type: ActionType.REGISTER
         })
       })
+  } as unknown as {
+    request: MutationProcedure<{ input: ActionInput; output: EventDocument }>
+    accept: MutationProcedure<{
+      input: ActionInput & { actionId: string }
+      output: EventDocument
+    }>
+    reject: MutationProcedure<{
+      input: { eventId: string; actionId: string; transactionId: string }
+      output: EventDocument
+    }>
   }
 }
