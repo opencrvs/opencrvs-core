@@ -205,7 +205,10 @@ export function getDefaultActionProcedures(
           },
           actionId
         )
-      }),
+      }) as MutationProcedure<{
+      input: ActionInput
+      output: EventDocument
+    }>,
 
     accept: publicProcedure
       .use(requireScopesMiddleware)
@@ -259,7 +262,10 @@ export function getDefaultActionProcedures(
           status: ActionStatus.Accepted,
           originalActionId: actionId
         })
-      }),
+      }) as MutationProcedure<{
+      input: ActionInput & { actionId: string }
+      output: EventDocument
+    }>,
 
     reject: publicProcedure
       .use(requireScopesMiddleware)
@@ -306,15 +312,5 @@ export function getDefaultActionProcedures(
           type: ActionType.REGISTER
         })
       })
-  } as unknown as {
-    request: MutationProcedure<{ input: ActionInput; output: EventDocument }>
-    accept: MutationProcedure<{
-      input: ActionInput & { actionId: string }
-      output: EventDocument
-    }>
-    reject: MutationProcedure<{
-      input: { eventId: string; actionId: string; transactionId: string }
-      output: EventDocument
-    }>
   }
 }
