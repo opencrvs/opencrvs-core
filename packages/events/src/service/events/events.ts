@@ -253,7 +253,6 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   }
 }
 
-// TODO CIHAN: pilko tää moneksi funktioksi
 export async function addAction(
   input: ActionInputWithType,
   {

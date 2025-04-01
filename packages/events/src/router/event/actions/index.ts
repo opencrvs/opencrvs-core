@@ -17,8 +17,8 @@ import { publicProcedure } from '@events/router/trpc'
 import { notifyOnAction } from '@events/service/config/config'
 import {
   getEventById,
-  addAsyncRejectAction,
-  addAction
+  addAction,
+  addAsyncRejectAction
 } from '@events/service/events/events'
 import { SCOPES, getUUID } from '@opencrvs/commons'
 import {
@@ -31,10 +31,14 @@ import {
   ValidateActionInput,
   RejectDeclarationActionInput,
   ArchiveActionInput,
-  PrintCertificateActionInput
+  PrintCertificateActionInput,
+  EventDocument,
+  ActionInput
 } from '@opencrvs/commons/events'
 
 import { TRPCError } from '@trpc/server'
+// eslint-disable-next-line import/named
+import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
 
 /**
@@ -201,7 +205,10 @@ export function getDefaultActionProcedures(
           },
           actionId
         )
-      }),
+      }) as MutationProcedure<{
+      input: ActionInput
+      output: EventDocument
+    }>,
 
     accept: publicProcedure
       .use(requireScopesMiddleware)
@@ -245,7 +252,6 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        // TODO CIHAN: pystyykö originalActionId ja status ymppää inputtii?
         return addAction(
           { ...input, originalActionId: actionId },
           {
@@ -257,7 +263,10 @@ export function getDefaultActionProcedures(
             status: ActionStatus.Accepted
           }
         )
-      }),
+      }) as MutationProcedure<{
+      input: ActionInput & { actionId: string }
+      output: EventDocument
+    }>,
 
     reject: publicProcedure
       .use(requireScopesMiddleware)
