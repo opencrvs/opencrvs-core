@@ -37,10 +37,19 @@ import {
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
+/**
+ * Configuration for different action types which use the default confirmation flow.
+ *
+ * @typedef {Object} ACTION_PROCEDURE_CONFIG
+ * @property {Scope[]} scopes - The authorization scopes required to perform this action
+ * @property {z.ZodType} inputSchema - The Zod schema for validating the action input
+ * @property {z.ZodType|undefined} notifyApiPayloadSchema - Schema for notify API response payload if applicable. This will be sent either in the initial HTTP 200 response, or when the action is asynchronously accepted.
+ * @property {boolean} validatePayload - Whether the payload should be strictly validated against the inputSchema schema
+ */
 const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
-    inputType: NotifyActionInput,
+    inputSchema: NotifyActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: false
   },
@@ -50,37 +59,37 @@ const ACTION_PROCEDURE_CONFIG = {
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
       SCOPES.RECORD_REGISTER
     ],
-    inputType: DeclareActionInput,
+    inputSchema: DeclareActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.VALIDATE]: {
     scopes: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER],
-    inputType: ValidateActionInput,
+    inputSchema: ValidateActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.REGISTER]: {
     scopes: [SCOPES.RECORD_REGISTER],
-    inputType: RegisterActionInput,
+    inputSchema: RegisterActionInput,
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
     validatePayload: true
   },
   [ActionType.REJECT]: {
     scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
-    inputType: RejectDeclarationActionInput,
+    inputSchema: RejectDeclarationActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.ARCHIVE]: {
     scopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
-    inputType: ArchiveActionInput,
+    inputSchema: ArchiveActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.PRINT_CERTIFICATE]: {
     scopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
-    inputType: PrintCertificateActionInput,
+    inputSchema: PrintCertificateActionInput,
     notifyApiPayloadSchema: undefined,
     validatePayload: true
   }
@@ -106,7 +115,7 @@ export function getDefaultActionProcedures(
     throw new Error(`Action not configured: ${actionType}`)
   }
 
-  const { scopes, notifyApiPayloadSchema, validatePayload, inputType } =
+  const { scopes, notifyApiPayloadSchema, validatePayload, inputSchema } =
     actionConfig
 
   let acceptInputFields = z.object({ actionId: z.string() })
@@ -123,7 +132,7 @@ export function getDefaultActionProcedures(
   return {
     request: publicProcedure
       .use(requireScopesMiddleware)
-      .input(inputType)
+      .input(inputSchema)
       .use(validatePayloadMiddleware)
       .use(async ({ ctx, input, next }) => {
         const { token } = ctx
@@ -196,7 +205,7 @@ export function getDefaultActionProcedures(
 
     accept: publicProcedure
       .use(requireScopesMiddleware)
-      .input(inputType.merge(acceptInputFields))
+      .input(inputSchema.merge(acceptInputFields))
       .use(validatePayloadMiddleware)
       .use(async ({ ctx, input, next }) => {
         const { eventId, actionId } = input
