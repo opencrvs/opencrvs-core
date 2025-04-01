@@ -18,7 +18,7 @@ import {
   FieldType,
   findActiveActionFields,
   LatentActions,
-  getEventActiveActions
+  getAcceptedActions
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { getEventConfigurations } from '@events/service/config/config'
@@ -99,7 +99,7 @@ export async function presignFilesInEvent(
     throw new Error('Failed to find configuration for event')
   }
 
-  const activeActions = getEventActiveActions(event)
+  const activeActions = getAcceptedActions(event)
 
   const actionFileFields = activeActions.flatMap((action) =>
     Object.entries(action.data)

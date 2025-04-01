@@ -22,7 +22,7 @@ import {
   FieldUpdateValue,
   FileFieldValue,
   findActiveActionFields,
-  getEventActiveActions,
+  getAcceptedActions,
   AsyncRejectActionDocument,
   ActionType
 } from '@opencrvs/commons/events'
@@ -94,7 +94,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
     eventType: event.type
   })
 
-  const actions = getEventActiveActions(event)
+  const actions = getAcceptedActions(event)
 
   for (const ac of actions) {
     const fieldConfigs = findActiveActionFields(configuration, ac.type) || []

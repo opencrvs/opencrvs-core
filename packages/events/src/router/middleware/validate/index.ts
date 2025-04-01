@@ -17,7 +17,7 @@ import {
   FieldUpdateValue,
   findActiveActionFields,
   getActiveActionFormPages,
-  getEventActiveActions,
+  getAcceptedActions,
   getFieldValidationErrors,
   Inferred,
   isPageVisible,
@@ -99,7 +99,7 @@ export function validateAction(actionType: ActionType) {
     } satisfies ActionUpdate
 
     const event = await getEventById(input.eventId)
-    const actions = getEventActiveActions(event)
+    const actions = getAcceptedActions(event)
 
     const eventDeclarationData =
       actions.find((action) => action.type === ActionType.DECLARE)?.data ?? {}

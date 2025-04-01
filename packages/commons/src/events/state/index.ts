@@ -165,7 +165,7 @@ export function isUndeclaredDraft(status: EventStatus): boolean {
   return status === EventStatus.CREATED
 }
 
-export function getEventActiveActions(event: EventDocument): ActionDocument[] {
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(
     (a): a is ActionDocument => !a.status || a.status === ActionStatus.Accepted
   )
@@ -180,7 +180,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const activeActions = getEventActiveActions(event)
+  const activeActions = getAcceptedActions(event)
   const latestAction = activeActions[activeActions.length - 1]
 
   const registrationAction = activeActions.find(
@@ -278,7 +278,7 @@ export function getMetadataForAction({
   actionType: ActionType
   drafts: Draft[]
 }): EventState {
-  const activeActions = getEventActiveActions(event)
+  const activeActions = getAcceptedActions(event)
   const action = activeActions.find((action) => actionType === action.type)
 
   const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)

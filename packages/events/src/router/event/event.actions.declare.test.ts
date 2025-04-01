@@ -14,7 +14,7 @@ import {
   ActionType,
   AddressType,
   generateActionInput,
-  getEventActiveActions,
+  getAcceptedActions,
   SCOPES
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -114,7 +114,7 @@ test('Skips required field validation when they are conditionally hidden', async
   })
 
   const response = await client.event.actions.declare.request(data)
-  const activeActions = getEventActiveActions(response)
+  const activeActions = getAcceptedActions(response)
 
   const savedAction = activeActions.find(
     (action) => action.type === ActionType.DECLARE
@@ -181,7 +181,7 @@ test('successfully validates a fields on a conditional page, which is visible', 
   })
 
   const response = await client.event.actions.declare.request(data)
-  const activeActions = getEventActiveActions(response)
+  const activeActions = getAcceptedActions(response)
 
   const savedAction = activeActions.find(
     (action) => action.type === ActionType.DECLARE
