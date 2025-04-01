@@ -23,7 +23,7 @@ import {
   ActionType,
   EventDocument,
   findActiveActionForm,
-  getEventActiveActions,
+  getAcceptedActions,
   SCOPES
 } from '@opencrvs/commons/client'
 import {
@@ -145,7 +145,7 @@ export function Review() {
   const { getEvent, onlineActions } = useEvents()
   const [fullEvent] = getEvent.useSuspenseQuery(eventId)
 
-  const actions = getEventActiveActions(fullEvent)
+  const actions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(actions)
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)

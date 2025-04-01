@@ -20,7 +20,7 @@ import {
   Draft,
   getCurrentEventState,
   EventStatus,
-  getEventActiveActions
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -85,7 +85,7 @@ function EventOverview({
     ? intl.formatMessage(summary.title.emptyValueMessage)
     : ''
 
-  const actions = getEventActiveActions(event)
+  const actions = getAcceptedActions(event)
 
   return (
     <Content
@@ -115,7 +115,7 @@ function EventOverviewContainer() {
   const drafts = getRemoteDrafts()
   const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
 
-  const activeActions = getEventActiveActions(fullEvent)
+  const activeActions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(activeActions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
