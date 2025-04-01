@@ -35,14 +35,12 @@ import {
 import {
   ActionType,
   ArchiveActionInput,
-  DeclareActionInput,
   Draft,
   DraftInput,
   EventIndex,
   EventInput,
   PrintCertificateActionInput,
   RejectDeclarationActionInput,
-  ValidateActionInput,
   EventSearchIndex,
   ActionStatus
 } from '@opencrvs/commons/events'
