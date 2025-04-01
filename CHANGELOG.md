@@ -78,7 +78,11 @@
 
 - Fix rendering of Custom Date fields [#8885](https://github.com/opencrvs/opencrvs-core/issues/8885)
 
-## 1.6.2 Release candidate
+## [1.6.2](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.2)
+
+### Improvements
+
+- Support for 6th administrative level
 
 ### Deprecated
 
@@ -88,6 +92,7 @@
 
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 - Fix stale validations showing for document uploader with options form field
+- Fix task history getting corrupted if a user views a record while it's in external validation [#8278](https://github.com/opencrvs/opencrvs-core/issues/8278)
 
 ## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
 
@@ -216,7 +221,7 @@
 - **Check your Metabase map file.** For Metabase configuration, we renamed `farajaland-map.geojson` to `map.geojson` to not tie implementations into example country naming conventions.
 - **Feature flags** In order to make application config settings more readable, we re-organised `src/api/application/application-config-default.ts` with a clear feature flag block like so. These are then used across the front and back end of the application to control configurable functionality. New feature flags DEATH_REGISTRATION allow you to optionally run off death registration if your country doesnt want to run its first pilot including death and PRINT_DECLARATION (see New Features) have been added.
   `FEATURES: {
-  DEATH_REGISTRATION: true, 
+  DEATH_REGISTRATION: true,
   MARRIAGE_REGISTRATION: false,
   ...
 } `
