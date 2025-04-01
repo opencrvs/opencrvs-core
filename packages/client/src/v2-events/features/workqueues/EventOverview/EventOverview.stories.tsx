@@ -147,7 +147,7 @@ export const WithRejectedAction: Story = {
               ...tennisClubMembershipEventDocument,
               actions: tennisClubMembershipEventDocument.actions.concat([
                 {
-                  type: ActionType.ASSIGN,
+                  type: ActionType.ARCHIVE,
                   status: ActionStatus.Rejected,
                   id: getUUID(),
                   createdAt: new Date().toISOString(),
