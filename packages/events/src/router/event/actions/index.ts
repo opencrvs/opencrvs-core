@@ -246,15 +246,17 @@ export function getDefaultActionProcedures(
         }
 
         // TODO CIHAN: pystyykö originalActionId ja status ymppää inputtii?
-        return addAction(input, {
-          eventId,
-          createdBy: user.id,
-          createdAtLocation: user.primaryOfficeId,
-          token,
-          transactionId,
-          status: ActionStatus.Accepted,
-          originalActionId: actionId
-        })
+        return addAction(
+          { ...input, originalActionId: actionId },
+          {
+            eventId,
+            createdBy: user.id,
+            createdAtLocation: user.primaryOfficeId,
+            token,
+            transactionId,
+            status: ActionStatus.Accepted
+          }
+        )
       }),
 
     reject: publicProcedure
@@ -299,7 +301,7 @@ export function getDefaultActionProcedures(
 
         return addAsyncRejectAction({
           ...input,
-          type: ActionType.REGISTER
+          type: actionType
         })
       })
   }
