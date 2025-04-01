@@ -262,8 +262,7 @@ export async function addAction(
     token,
     createdAtLocation,
     transactionId,
-    status,
-    originalActionId
+    status
   }: {
     eventId: string
     createdBy: string
@@ -271,7 +270,6 @@ export async function addAction(
     token: string
     transactionId: string
     status: ActionStatus
-    originalActionId?: string
   },
   actionId = getUUID()
 ): Promise<EventDocument> {
@@ -326,8 +324,7 @@ export async function addAction(
     createdAt: now,
     createdAtLocation,
     id: actionId,
-    status: status,
-    ...(originalActionId && { originalActionId })
+    status: status
   }
 
   await db
