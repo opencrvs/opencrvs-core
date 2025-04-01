@@ -353,21 +353,12 @@ export async function addAction(
   return updatedEvent
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const AsyncRejectActionInput = AsyncRejectActionDocument.omit({
-  createdAt: true,
-  id: true,
-  status: true
-}).merge(
-  z.object({
-    transactionId: z.string(),
-    eventId: z.string()
-  })
-)
+type AsyncRejectActionInput = Omit<
+  z.infer<typeof AsyncRejectActionDocument>,
+  'createdAt' | 'id' | 'status'
+> & { transactionId: string; eventId: string }
 
-export async function addAsyncRejectAction(
-  input: z.infer<typeof AsyncRejectActionInput>
-) {
+export async function addAsyncRejectAction(input: AsyncRejectActionInput) {
   const db = await events.getClient()
   const now = new Date().toISOString()
   const { transactionId, eventId } = input
