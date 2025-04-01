@@ -17,7 +17,8 @@ import {
   EventSearchIndex,
   FieldConfig,
   FieldType,
-  getCurrentEventState
+  getCurrentEventState,
+  getActiveDeclarationFields
 } from '@opencrvs/commons/events'
 import { type estypes } from '@elastic/elasticsearch'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -26,7 +27,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { getActiveDeclarationFields, logger } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
 import { DEFAULT_SIZE, generateQuery } from './utils'

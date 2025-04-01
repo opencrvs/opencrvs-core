@@ -23,16 +23,12 @@ import {
   getEventById
 } from '@events/service/events/events'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import { SCOPES, getUUID, logger } from '@opencrvs/commons'
 import {
   ApproveCorrectionActionInput,
   EventConfig,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
-  SCOPES,
-  getUUID,
-  logger
-} from '@opencrvs/commons'
-import {
   ActionType,
   ArchiveActionInput,
   DeclareActionInput,

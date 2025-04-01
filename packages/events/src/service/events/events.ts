@@ -19,7 +19,9 @@ import {
   FieldConfig,
   FieldType,
   FieldUpdateValue,
-  FileFieldValue
+  FileFieldValue,
+  getActiveDeclarationFields,
+  ActionType
 } from '@opencrvs/commons/events'
 import {
   getEventConfigurationById,
@@ -28,11 +30,10 @@ import {
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
-import { ActionType, getUUID } from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
-import { getActiveDeclarationFields } from '@opencrvs/commons/client'
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await events.getClient()

@@ -27,13 +27,13 @@ import {
   DeclarationUpdateAction,
   getActiveActionReviewFields,
   getActiveDeclaration,
-  getVisiblePagesFormFields
-} from '@opencrvs/commons'
+  getVisiblePagesFormFields,
+  DeclarationActions
+} from '@opencrvs/commons/events'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventTypeId } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
-import { DeclarationActions } from '@opencrvs/commons/client'
 
 function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
   return formFields.reduce(

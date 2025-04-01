@@ -15,7 +15,7 @@ import { inject, vi } from 'vitest'
 import { createIndex } from '@events/service/indexing/indexing'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { mswServer } from './msw'
-import { getActiveDeclarationFields } from '@opencrvs/commons'
+import { getActiveDeclarationFields } from '@opencrvs/commons/events'
 
 vi.mock('@events/storage/mongodb/events')
 vi.mock('@events/storage/mongodb/user-mgnt')

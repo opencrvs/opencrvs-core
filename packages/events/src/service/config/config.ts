@@ -10,13 +10,12 @@
  */
 
 import { env } from '@events/environment'
+import { getOrThrow, logger } from '@opencrvs/commons'
 import {
   ActionInput,
   EventConfig,
-  EventDocument,
-  getOrThrow,
-  logger
-} from '@opencrvs/commons'
+  EventDocument
+} from '@opencrvs/commons/events'
 import fetch from 'node-fetch'
 import { array } from 'zod'
 
