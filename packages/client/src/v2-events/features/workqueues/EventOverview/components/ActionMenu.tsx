@@ -74,8 +74,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                     action.type === ActionType.ARCHIVE ||
                     action.type === ActionType.MARKED_AS_DUPLICATE ||
                     action.type === ActionType.APPROVE_CORRECTION ||
-                    action.type === ActionType.REJECT_CORRECTION ||
-                    action.type === ActionType.CUSTOM
+                    action.type === ActionType.REJECT_CORRECTION
                   ) {
                     alert(`Action ${action.type} is not implemented yet.`)
                     return

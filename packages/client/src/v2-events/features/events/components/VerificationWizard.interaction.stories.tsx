@@ -14,6 +14,7 @@ import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
 import { expect, fn } from '@storybook/test'
 import { noop } from 'lodash'
+import { generateTranslationConfig, PageTypes } from '@opencrvs/commons/client'
 import { VerificationWizard } from './VerificationWizard'
 
 const meta: Meta<typeof VerificationWizard> = {
@@ -37,29 +38,35 @@ export const VerificationWizardModal: Story = {
       <VerificationWizard
         currentPage={0}
         pageConfig={{
-          verify: {
-            label: {
-              id: 'v2.buttons.verify',
-              defaultMessage: 'Verify',
-              description: 'Verify button label'
-            }
-          },
-          cancel: {
-            label: {
-              id: 'v2.buttons.cancel',
-              defaultMessage: 'Cancel',
-              description: 'Cancel button label'
+          id: 'verification',
+          fields: [],
+          title: generateTranslationConfig('Verification Wizard'),
+          type: PageTypes.enum.VERIFICATION,
+          actions: {
+            verify: {
+              label: {
+                id: 'v2.buttons.verify',
+                defaultMessage: 'Verify',
+                description: 'Verify button label'
+              }
             },
-            confirmation: {
-              title: {
+            cancel: {
+              label: {
                 id: 'v2.buttons.cancel',
                 defaultMessage: 'Cancel',
-                description: 'Cancel button title'
+                description: 'Cancel button label'
               },
-              body: {
-                id: 'v2.buttons.cancel',
-                defaultMessage: 'Are you sure you want to cancel?',
-                description: 'Cancel button body'
+              confirmation: {
+                title: {
+                  id: 'v2.buttons.cancel',
+                  defaultMessage: 'Cancel',
+                  description: 'Cancel button title'
+                },
+                body: {
+                  id: 'v2.buttons.cancel',
+                  defaultMessage: 'Are you sure you want to cancel?',
+                  description: 'Cancel button body'
+                }
               }
             }
           }
