@@ -65,7 +65,8 @@ export function Review() {
     formConfig,
     form,
     metadata,
-    scopes
+    scopes,
+    reviewFields
   })
 
   async function handleEdit({
@@ -98,11 +99,12 @@ export function Review() {
     return
   }
 
-  const hasValidationErrors = validationErrorsInActionFormExist(
+  const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form,
-    metadata
-  )
+    metadata,
+    reviewFields
+  })
 
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (

@@ -193,10 +193,10 @@ export function Review() {
     return <Spinner id="review-certificate-loading" />
   }
 
-  const validationErrorExist = validationErrorsInActionFormExist(
+  const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
-    metadata
-  )
+    form: metadata
+  })
   if (validationErrorExist) {
     return (
       <Navigate

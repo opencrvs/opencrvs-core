@@ -14,7 +14,8 @@ import {
   EventState,
   DeclarationFormConfig,
   Scope,
-  SCOPES
+  SCOPES,
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -251,19 +252,22 @@ export function useReviewActionConfig({
   formConfig,
   form,
   metadata,
+  reviewFields,
   scopes
 }: {
   formConfig: DeclarationFormConfig
   form: EventState
   metadata?: EventState
+  reviewFields: FieldConfig[]
   scopes?: Scope[]
 }) {
   const events = useEvents()
-  const incomplete = validationErrorsInActionFormExist(
+  const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
-    metadata
-  )
+    metadata,
+    reviewFields
+  })
 
   const isDisabled =
     incomplete && !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)

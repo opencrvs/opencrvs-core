@@ -49,11 +49,17 @@ export function getValidationErrorsForForm(
   }, {})
 }
 
-export function validationErrorsInActionFormExist(
-  formConfig: FormConfig,
-  form: EventState,
+export function validationErrorsInActionFormExist({
+  formConfig,
+  form,
+  metadata,
+  reviewFields = []
+}: {
+  formConfig: FormConfig
+  form: EventState
   metadata?: EventState
-): boolean {
+  reviewFields?: FieldConfig[]
+}): boolean {
   // We don't want to validate hidden fields
   const formWithoutHiddenFields = stripHiddenFields(
     getVisiblePagesFormFields(formConfig, form),
@@ -61,7 +67,7 @@ export function validationErrorsInActionFormExist(
   )
 
   const metadataWithoutHiddenFields = stripHiddenFields(
-    formConfig.review.fields,
+    reviewFields,
     metadata ?? {}
   )
 
@@ -76,10 +82,7 @@ export function validationErrorsInActionFormExist(
     })
 
   const hasMetadataValidationErrors = Object.values(
-    getValidationErrorsForForm(
-      formConfig.review.fields,
-      metadataWithoutHiddenFields
-    )
+    getValidationErrorsForForm(reviewFields, metadataWithoutHiddenFields)
   ).some((field) => field.errors.length > 0)
 
   return hasValidationErrors || hasMetadataValidationErrors

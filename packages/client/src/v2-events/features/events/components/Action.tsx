@@ -28,8 +28,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
-type Props = PropsWithChildren<{ type: ActionType }>
-function ActionComponent({ children, type }: Props) {
+type Props = PropsWithChildren<{ actionType: ActionType }>
+function ActionComponent({ children, actionType }: Props) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const { getEvent } = useEvents()
@@ -37,13 +37,15 @@ function ActionComponent({ children, type }: Props) {
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
   const drafts = getRemoteDrafts()
+
   const [event] = getEvent.useSuspenseQuery(params.eventId)
 
   const activeDraft = findActiveDrafts(event, drafts)[0]
 
   const localDraft = getLocalDraftOrDefault(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    activeDraft || createEmptyDraft(params.eventId, createTemporaryId(), type)
+    activeDraft ||
+      createEmptyDraft(params.eventId, createTemporaryId(), actionType)
   )
 
   /*
@@ -110,10 +112,10 @@ function ActionComponent({ children, type }: Props) {
   const declareMetadata = useMemo(() => {
     return getMetadataForAction({
       event,
-      actionType: ActionType.DECLARE,
+      actionType,
       drafts: eventDrafts
     })
-  }, [eventDrafts, event])
+  }, [eventDrafts, event, actionType])
 
   useEffect(() => {
     setInitialFormValues(eventDataWithDrafts.data)

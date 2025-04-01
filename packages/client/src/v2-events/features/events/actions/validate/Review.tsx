@@ -179,11 +179,12 @@ export function Review() {
     }
   }
 
-  const hasValidationErrors = validationErrorsInActionFormExist(
+  const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form,
-    metadata
-  )
+    metadata,
+    reviewFields
+  })
 
   return (
     <FormLayout
