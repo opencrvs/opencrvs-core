@@ -9,50 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { addAction } from '@events/service/events/events'
-import { ActionType, ActionStatus } from '@opencrvs/commons'
+import { ActionType } from '@opencrvs/commons'
 import { getActionProceduresBase } from '.'
-import { TRPCError } from '@trpc/server'
+
 const registerActionProcedureBase = getActionProceduresBase(ActionType.REGISTER)
 
 export const registerRouterHandlers = {
-  request: registerActionProcedureBase.request
-    .use(({ ctx, input, next }) => {
-      // TODO CIHAN: get rid of cast?
-      const inputWithRegistrationNumber = input as {
-        registrationNumber?: string
-      }
+  request: registerActionProcedureBase.request.mutation(({ ctx, input }) => {
+    const { token, user, status, actionId } = ctx
+    const { eventId, transactionId } = input
 
-      const registrationNumber = inputWithRegistrationNumber.registrationNumber
-
-      if (
-        ctx.status === ActionStatus.Accepted &&
-        (!registrationNumber || typeof registrationNumber !== 'string')
-      ) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Invalid registration number received from notification API'
-        })
-      }
-
-      return next({ ctx, input })
-    })
-    .mutation(({ ctx, input }) => {
-      const { token, user, status, actionId } = ctx
-      const { eventId, transactionId } = input
-
-      return addAction(
-        input,
-        {
-          eventId,
-          createdBy: user.id,
-          createdAtLocation: user.primaryOfficeId,
-          token,
-          transactionId,
-          status
-        },
-        actionId
-      )
-    }),
+    return addAction(
+      input,
+      {
+        eventId,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId,
+        token,
+        transactionId,
+        status
+      },
+      actionId
+    )
+  }),
   accept: registerActionProcedureBase.accept,
   reject: registerActionProcedureBase.reject
 }

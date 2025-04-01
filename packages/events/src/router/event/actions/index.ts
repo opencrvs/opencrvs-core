@@ -106,23 +106,24 @@ export function getActionProceduresBase(
     throw new Error(`Action not configured: ${actionType}`)
   }
 
+  const { scopes, additionalAcceptFields, validatePayload, inputType } =
+    actionConfig
+
   let acceptInputFields = z.object({ actionId: z.string() })
 
-  if (actionConfig.additionalAcceptFields) {
-    acceptInputFields = acceptInputFields.merge(
-      actionConfig.additionalAcceptFields
-    )
+  if (additionalAcceptFields) {
+    acceptInputFields = acceptInputFields.merge(additionalAcceptFields)
   }
 
-  const requireScopesMiddleware = requiresAnyOfScopes(actionConfig.scopes)
-  const validatePayloadMiddleware = actionConfig.validatePayload
+  const requireScopesMiddleware = requiresAnyOfScopes(scopes)
+  const validatePayloadMiddleware = validatePayload
     ? middleware.validateAction(actionType)
     : async ({ next }: MiddlewareOptions) => next()
 
   return {
     request: publicProcedure
       .use(requireScopesMiddleware)
-      .input(actionConfig.inputType)
+      .input(inputType)
       .use(validatePayloadMiddleware)
       .use(async ({ ctx, input, next }) => {
         const { token } = ctx
@@ -146,26 +147,39 @@ export function getActionProceduresBase(
         }
 
         let status = ActionStatus.Requested
+        let parsedBody
 
         // If we immediately get a rejected response, we can mark the action as rejected
         if (responseStatus === ActionConfirmationResponse.Rejected) {
           status = ActionStatus.Rejected
         }
 
-        // If we immediately get a success response, we can save the registration number and mark the action as accepted
+        // If we immediately get a success response, we mark the action as succeeded
+        // and also validate the payload received from the notify API
         if (responseStatus === ActionConfirmationResponse.Success) {
           status = ActionStatus.Accepted
+
+          if (additionalAcceptFields) {
+            try {
+              parsedBody = additionalAcceptFields.parse(body)
+            } catch {
+              throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: 'Invalid payload received from notification API'
+              })
+            }
+          }
         }
 
         return next({
           ctx: { ...ctx, status, actionId },
-          input: { ...input, ...body }
+          input: { ...input, ...parsedBody }
         })
       }),
 
     accept: publicProcedure
       .use(requireScopesMiddleware)
-      .input(actionConfig.inputType.merge(acceptInputFields))
+      .input(inputType.merge(acceptInputFields))
       .use(validatePayloadMiddleware)
       .use(async ({ ctx, input, next }) => {
         const { eventId, actionId } = input

@@ -224,6 +224,41 @@ describe('Request and confirmation flow', () => {
       })
     })
 
+    test('should not save action if notify API returns invalid registration number', async () => {
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const { id: eventId } = await client.event.create(
+        generator.event.create()
+      )
+
+      mswServer.use(
+        http.post(
+          `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
+          async () => {
+            return HttpResponse.json(
+              { registrationNumber: 1234567890 },
+              // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
+              { status: 200 }
+            )
+          }
+        )
+      )
+
+      const data = generator.event.actions.register(eventId, {
+        data: validFormData
+      })
+
+      await expect(
+        client.event.actions.register.request(data)
+      ).rejects.matchSnapshot()
+
+      const event = await client.event.get(eventId)
+      const registerActions = event.actions.filter(
+        (action) => action.type === ActionType.REGISTER
+      )
+      expect(registerActions).toHaveLength(0)
+    })
+
     test('should mark action as rejected if notify API returns HTTP 400', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
