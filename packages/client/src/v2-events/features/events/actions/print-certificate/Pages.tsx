@@ -34,12 +34,12 @@ import {
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
-function getPrintCertificatePages(configuration: EventConfig) {
+function getActivePrintCertificatePages(configuration: EventConfig) {
   const action = configuration.actions.find(
     (a) => a.type === ActionType.PRINT_CERTIFICATE
   )
 
-  const pages = action?.printForm.find((printForm) => printForm)?.pages
+  const pages = action?.printForm.find((printForm) => printForm.active)?.pages
 
   if (!pages) {
     throw new Error(
@@ -70,7 +70,7 @@ export function Pages() {
     event.type
   )
 
-  const formPages = getPrintCertificatePages(configuration)
+  const formPages = getActivePrintCertificatePages(configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id

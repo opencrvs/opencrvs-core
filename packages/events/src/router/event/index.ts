@@ -198,7 +198,6 @@ export const eventRouter = router({
       .input(ValidateActionInput)
       .use(middleware.validateAction(ActionType.VALIDATE))
       .mutation(async (options) => {
-        console.log('options.input', options.input)
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,

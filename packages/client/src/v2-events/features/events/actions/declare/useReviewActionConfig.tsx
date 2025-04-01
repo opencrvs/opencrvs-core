@@ -289,9 +289,7 @@ export function useReviewActionConfig({
           transactionId: uuid()
         })
       },
-      messages: incomplete
-        ? reviewMessages.incomplete.declare
-        : reviewMessages.complete.declare
+      messages: reviewMessages.incomplete.declare
     }
   }
 

@@ -130,7 +130,6 @@ export function Summary() {
       `No action configuration found for ${ActionType.REQUEST_CORRECTION} found. This should never happen`
     )
   }
-
   const fields = getDeclarationFields(eventConfiguration)
 
   const allFields = [
