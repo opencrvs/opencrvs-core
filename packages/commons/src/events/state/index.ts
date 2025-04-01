@@ -11,6 +11,7 @@
 
 import { ActionType } from '../ActionType'
 import {
+  Action,
   ActionDocument,
   ActionStatus,
   ActionUpdate,
@@ -24,8 +25,16 @@ import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { findActiveDrafts } from '../utils'
 
-// TODO CIHAN: tänne pitää tehä tarkistus rejectedistä
-function getStatusFromActions(actions: Array<ActionDocument>) {
+function getStatusFromActions(actions: Array<Action>) {
+  // If the event has any rejected action, we consider the event to be rejected.
+  const hasRejectedAction = actions.some(
+    (a) => a.status === ActionStatus.Rejected
+  )
+
+  if (hasRejectedAction) {
+    return EventStatus.REJECTED
+  }
+
   return actions.reduce<EventStatus>((status, action) => {
     if (action.type === ActionType.CREATE) {
       return EventStatus.CREATED
@@ -171,10 +180,10 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const actions = getEventActiveActions(event)
-  const latestAction = actions[actions.length - 1]
+  const activeActions = getEventActiveActions(event)
+  const latestAction = activeActions[activeActions.length - 1]
 
-  const registrationAction = actions.find(
+  const registrationAction = activeActions.find(
     (a): a is RegisterAction =>
       a.type === ActionType.REGISTER && a.status === ActionStatus.Accepted
   )
@@ -184,14 +193,14 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
   return deepDropNulls({
     id: event.id,
     type: event.type,
-    status: getStatusFromActions(actions),
+    status: getStatusFromActions(event.actions),
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
     modifiedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(actions),
+    assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
-    data: getData(actions),
+    data: getData(activeActions),
     trackingId: event.trackingId,
     registrationNumber
   })

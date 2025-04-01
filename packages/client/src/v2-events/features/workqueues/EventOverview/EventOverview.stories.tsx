@@ -16,7 +16,9 @@ import React from 'react'
 import superjson from 'superjson'
 import {
   ActionType,
-  generateEventDraftDocument
+  generateEventDraftDocument,
+  ActionStatus,
+  getUUID
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -95,7 +97,7 @@ export const Overview: Story = {
   }
 }
 
-export const WithRegisterEvent: Story = {
+export const WithAcceptedRegisterEvent: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -108,6 +110,52 @@ export const WithRegisterEvent: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument(
+                tennisClubMembershipEventDocument.id,
+                ActionType.REGISTER,
+                {
+                  'applicant.firstname': 'Riku',
+                  'applicant.surname': 'This value is from a draft'
+                }
+              )
+            ]
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const WithRejectedAction: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return {
+              ...tennisClubMembershipEventDocument,
+              actions: tennisClubMembershipEventDocument.actions.concat([
+                {
+                  type: ActionType.ASSIGN,
+                  status: ActionStatus.Rejected,
+                  id: getUUID(),
+                  createdAt: new Date().toISOString(),
+                  createdBy: '123',
+                  createdAtLocation: '123'
+                }
+              ])
+            }
           })
         ],
         drafts: [
