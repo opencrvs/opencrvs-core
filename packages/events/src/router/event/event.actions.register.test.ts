@@ -236,7 +236,7 @@ describe('Request and confirmation flow', () => {
           `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
           async () => {
             return HttpResponse.json(
-              { registrationNumber: 1234567890 },
+              { registrationNumber: 1234567890 }, // Registration number is not a string as it should be
               // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
               { status: 200 }
             )
