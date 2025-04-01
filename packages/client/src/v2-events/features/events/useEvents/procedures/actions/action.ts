@@ -224,13 +224,6 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
       const declarationFields = getDeclarationFields(eventConfiguration)
 
-      if (actionType === ActionType.NOTIFY) {
-        return mutation.mutate({
-          ...params,
-          data: stripHiddenFields(declarationFields, params.data)
-        })
-      }
-
       return mutation.mutate({
         ...params,
         data: stripHiddenFields(declarationFields, params.data)

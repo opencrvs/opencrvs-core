@@ -20,11 +20,7 @@ import {
   RequestCorrectionActionInput,
   ValidateActionInput
 } from './ActionInput'
-import {
-  ActionType,
-  DeclarationUpdateAction,
-  DeclarationUpdateActions
-} from './ActionType'
+import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
 import { EventConfig } from './EventConfig'
 import { EventDocument } from './EventDocument'
@@ -34,7 +30,6 @@ import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
   findActiveActionPages,
   getActionMetadataFields,
-  getActiveActionReviewFields,
   getActiveDeclarationFields,
   isPageVisible,
   isVerificationPage,
@@ -55,30 +50,13 @@ function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   )
 }
 
-function getActiveDeclarationAndReviewFields(
-  configuration: EventConfig,
-  actionType: DeclarationUpdateAction
-) {
-  const reviewFields =
-    actionType === ActionType.REQUEST_CORRECTION
-      ? []
-      : getActiveActionReviewFields(configuration, actionType)
-
-  const declarationFields = getActiveDeclarationFields(configuration)
-
-  return [...declarationFields, ...reviewFields]
-}
-
 export function generateActionInput(
   configuration: EventConfig,
   action: ActionType
 ) {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
-    const fields = getActiveDeclarationAndReviewFields(
-      configuration,
-      parsed.data
-    )
+    const fields = getActiveDeclarationFields(configuration)
 
     const data = fieldConfigsToActionPayload(fields)
 
@@ -86,6 +64,9 @@ export function generateActionInput(
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
     return stripHiddenFields(fields, data)
   }
+
+  // eslint-disable-next-line no-console
+  console.warn(`${action} is not a declaration action. Setting data as {}.`)
 
   return {}
 }
@@ -101,6 +82,7 @@ export function generateActionMetadataInput(
   const metadataFields = actionConfig
     ? getActionMetadataFields(actionConfig)
     : []
+
   const metadata = fieldConfigsToActionPayload(metadataFields)
 
   const visibleVerificationPageIds =
@@ -164,13 +146,21 @@ export const eventPayloadGenerator = {
   actions: {
     declare: (
       eventId: string,
-      input: Partial<Pick<DeclareActionInput, 'transactionId' | 'data'>> = {}
+      input: Partial<
+        Pick<DeclareActionInput, 'transactionId' | 'data' | 'metadata'>
+      > = {}
     ) => ({
       type: ActionType.DECLARE,
       transactionId: input.transactionId ?? getUUID(),
       data:
         input.data ??
         generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
+      metadata:
+        input.metadata ??
+        generateActionMetadataInput(
+          tennisClubMembershipEvent,
+          ActionType.DECLARE
+        ),
       eventId
     }),
     /**
@@ -203,13 +193,21 @@ export const eventPayloadGenerator = {
     },
     validate: (
       eventId: string,
-      input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
+      input: Partial<
+        Pick<ValidateActionInput, 'transactionId' | 'data' | 'metadata'>
+      > = {}
     ) => ({
       type: ActionType.VALIDATE,
       transactionId: input.transactionId ?? getUUID(),
       data:
         input.data ??
         generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
+      metadata:
+        input.metadata ??
+        generateActionMetadataInput(
+          tennisClubMembershipEvent,
+          ActionType.VALIDATE
+        ),
       duplicates: [],
       eventId
     }),
@@ -220,9 +218,8 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.ARCHIVE,
       transactionId: input.transactionId ?? getUUID(),
-      data:
-        input.data ??
-        generateActionInput(tennisClubMembershipEvent, ActionType.ARCHIVE),
+      data: {},
+      // @TODO: Check whether generator is needed?
       metadata: { isDuplicate: isDuplicate ?? false },
       duplicates: [],
       eventId
@@ -230,32 +227,44 @@ export const eventPayloadGenerator = {
     reject: (
       eventId: string,
       input: Partial<
-        Pick<RejectDeclarationActionInput, 'transactionId' | 'data'>
+        Pick<RejectDeclarationActionInput, 'transactionId' | 'metadata'>
       > = {}
     ) => ({
       type: ActionType.REJECT,
       transactionId: input.transactionId ?? getUUID(),
-      data:
-        input.data ??
-        generateActionInput(tennisClubMembershipEvent, ActionType.REJECT),
+      data: {},
+      metadata:
+        input.metadata ??
+        generateActionMetadataInput(
+          tennisClubMembershipEvent,
+          ActionType.REJECT
+        ),
       duplicates: [],
       eventId
     }),
     register: (
       eventId: string,
-      input: Partial<Pick<RegisterActionInput, 'transactionId' | 'data'>> = {}
+      input: Partial<
+        Pick<RegisterActionInput, 'transactionId' | 'data' | 'metadata'>
+      > = {}
     ) => ({
       type: ActionType.REGISTER,
       transactionId: input.transactionId ?? getUUID(),
       data:
         input.data ??
         generateActionInput(tennisClubMembershipEvent, ActionType.REGISTER),
+      metadata:
+        input.metadata ??
+        generateActionMetadataInput(
+          tennisClubMembershipEvent,
+          ActionType.REGISTER
+        ),
       eventId
     }),
     printCertificate: (
       eventId: string,
       input: Partial<
-        Pick<RegisterActionInput, 'transactionId' | 'data' | 'metadata'>
+        Pick<RegisterActionInput, 'transactionId' | 'metadata'>
       > = {}
     ) => ({
       type: ActionType.PRINT_CERTIFICATE,
@@ -299,24 +308,18 @@ export const eventPayloadGenerator = {
         eventId: string,
         requestId: string,
         input: Partial<
-          Pick<
-            RequestCorrectionActionInput,
-            'transactionId' | 'data' | 'metadata'
-          >
+          Pick<RequestCorrectionActionInput, 'transactionId' | 'metadata'>
         > = {}
       ) => ({
         type: ActionType.APPROVE_CORRECTION,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
-          generateActionInput(
+        data: {},
+        metadata:
+          input.metadata ??
+          generateActionMetadataInput(
             tennisClubMembershipEvent,
             ActionType.APPROVE_CORRECTION
           ),
-        metadata: generateActionMetadataInput(
-          tennisClubMembershipEvent,
-          ActionType.APPROVE_CORRECTION
-        ),
         eventId,
         requestId
       }),
@@ -324,14 +327,15 @@ export const eventPayloadGenerator = {
         eventId: string,
         requestId: string,
         input: Partial<
-          Pick<RequestCorrectionActionInput, 'transactionId' | 'data'>
+          Pick<RequestCorrectionActionInput, 'transactionId' | 'metadata'>
         > = {}
       ) => ({
         type: ActionType.REJECT_CORRECTION,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
-          generateActionInput(
+        data: {},
+        metadata:
+          input.metadata ??
+          generateActionMetadataInput(
             tennisClubMembershipEvent,
             ActionType.REJECT_CORRECTION
           ),

@@ -20,12 +20,7 @@ import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionUpdate, EventState } from './ActionDocument'
-import {
-  FormPageConfig,
-  PageConfig,
-  PageTypes,
-  VerificationPageConfig
-} from './PageConfig'
+import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
 import { FieldType } from './FieldType'
 import { Draft } from './Draft'
@@ -66,7 +61,7 @@ export const findPageFields = (config: EventConfig): FieldConfig[] => {
  * @returns All metadata fields in the event configuration.
  */
 export const findAllMetadataFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep([config.actions.map(getActionMetadataFields)])
+  return flattenDeep(config.actions.map(getActionMetadataFields))
 }
 
 export const getActionMetadataFields = (actionConfig: ActionConfig) => {
@@ -121,9 +116,9 @@ function isDeclarationActionConfig(
 }
 
 export function getActiveDeclarationFields(configuration: EventConfig) {
-  return configuration.declaration
-    .filter((dec) => dec.active)
-    .flatMap(({ pages }) => pages.flatMap((page) => page.fields))
+  return getActiveDeclaration(configuration).pages.flatMap(
+    (page) => page.fields
+  )
 }
 
 export function getDeclarationFields(
@@ -152,9 +147,7 @@ export function getActiveActionReviewFields(
   configuration: EventConfig,
   actionType: DeclarationUpdateAction
 ) {
-  const activeDeclarationId = configuration.declaration.find(
-    (dec) => dec.active
-  )?.version.id
+  const activeDeclarationId = getActiveDeclaration(configuration).version.id
 
   if (!activeDeclarationId) {
     throw new Error('No active declaration found')
@@ -169,26 +162,6 @@ export function getActiveActionReviewFields(
       (review) => review.declarationVersionId === activeDeclarationId
     )?.fields ?? []
   )
-}
-
-export function getAllActiveDeclarationFields(
-  configuration: EventConfig
-): FieldConfig[] {
-  const actions = configuration.actions.filter(isDeclarationActionConfig)
-
-  const reviewFields = actions.flatMap(
-    (action) => action.review?.flatMap((review) => review.fields) ?? []
-  )
-
-  const declarationFields = getActiveDeclarationFields(configuration)
-
-  return [...declarationFields, ...reviewFields]
-}
-
-export function getAllPages(configuration: EventConfig): FormPageConfig[] {
-  return configuration.declaration
-    .filter((declaration) => declaration.active)
-    .flatMap((form) => form.pages)
 }
 
 export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {

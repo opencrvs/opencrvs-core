@@ -19,7 +19,7 @@ import {
 } from './FormConfig'
 export type EventConfigInput = z.input<typeof EventConfig>
 
-export const defineDeclaration = (
+export const defineDeclarationForm = (
   form: DeclarationFormConfigInput
 ): DeclarationFormConfig => DeclarationFormConfig.parse(form)
 

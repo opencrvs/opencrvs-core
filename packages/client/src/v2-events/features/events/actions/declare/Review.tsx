@@ -52,7 +52,6 @@ export function Review() {
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
   const formConfig = getActiveDeclaration(config)
-
   const reviewFields = getActiveActionReviewFields(config, ActionType.DECLARE)
 
   const form = useEventFormData((state) => state.getFormValues())

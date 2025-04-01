@@ -10,7 +10,10 @@
  */
 import { defineConditional, field, not } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
-import { defineActionForm, defineDeclaration } from '../events/EventConfigInput'
+import {
+  defineActionForm,
+  defineDeclarationForm
+} from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
@@ -732,7 +735,7 @@ const TENNIS_CLUB_DECLARATION_REVIEW = {
   ]
 }
 
-export const TENNIS_CLUB_DECLARATION_FORM = defineDeclaration({
+export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
   label: {
     id: 'v2.event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',

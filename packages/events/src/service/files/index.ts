@@ -27,11 +27,9 @@ function getFieldDefinitionById(configuration: EventConfig, fieldId: string) {
 
   const fieldConfig = actionFields.find((field) => field.id === fieldId)
   if (!fieldConfig) {
-    logger.error(
-      `Failed to find active field configuration for type: ${fieldId}`
+    throw new Error(
+      `Failed to find active field configuration for type ${fieldId}`
     )
-
-    throw new Error('Failed to find active form configuration')
   }
 
   return fieldConfig
