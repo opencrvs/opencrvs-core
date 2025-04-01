@@ -24,6 +24,7 @@ import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { findActiveDrafts } from '../utils'
 
+// TODO CIHAN: tänne pitää tehä tarkistus rejectedistä
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
     if (action.type === ActionType.CREATE) {

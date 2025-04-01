@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
-import { ActionType } from './ActionType'
+import { ActionType, ConfirmableActions } from './ActionType'
 
 /**
  * ActionUpdate is a record of a specific action that updated data fields.
@@ -169,36 +169,24 @@ export const ActionDocument = z.discriminatedUnion('type', [
 
 export type ActionDocument = z.infer<typeof ActionDocument>
 
-export const RejectActionDocument = ActionBase.omit({
+export const AsyncRejectActionDocument = ActionBase.omit({
   data: true,
   metadata: true,
   createdBy: true,
   createdAtLocation: true
 }).merge(
   z.object({
-    type: z.union([
-      z.literal(ActionType.VALIDATE),
-      z.literal(ActionType.REJECT),
-      z.literal(ActionType.ARCHIVE),
-      z.literal(ActionType.NOTIFY),
-      z.literal(ActionType.REGISTER),
-      z.literal(ActionType.DECLARE),
-      z.literal(ActionType.ASSIGN),
-      z.literal(ActionType.REQUEST_CORRECTION),
-      z.literal(ActionType.APPROVE_CORRECTION),
-      z.literal(ActionType.REJECT_CORRECTION),
-      z.literal(ActionType.UNASSIGN),
-      z.literal(ActionType.PRINT_CERTIFICATE),
-      z.literal(ActionType.CUSTOM)
-    ]),
+    type: z.enum(ConfirmableActions),
     status: z.literal(ActionStatus.Rejected)
   })
 )
 
-export type RejectActionDocument = z.infer<typeof RejectActionDocument>
+export type AsyncRejectActionDocument = z.infer<
+  typeof AsyncRejectActionDocument
+>
 
-export const Action = z.union([ActionDocument, RejectActionDocument])
-export type Action = ActionDocument | RejectActionDocument
+export const Action = z.union([ActionDocument, AsyncRejectActionDocument])
+export type Action = ActionDocument | AsyncRejectActionDocument
 
 export const ResolvedUser = z.object({
   id: z.string(),

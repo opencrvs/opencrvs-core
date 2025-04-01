@@ -15,7 +15,10 @@ import {
 } from '@events/router/middleware'
 import { publicProcedure } from '@events/router/trpc'
 import { notifyOnAction } from '@events/service/config/config'
-import { getEventById, addRejectAction } from '@events/service/events/events'
+import {
+  getEventById,
+  addAsyncRejectAction
+} from '@events/service/events/events'
 import {
   ActionType,
   SCOPES,
@@ -193,7 +196,7 @@ export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
           return getEventById(input.eventId)
         }
 
-        return addRejectAction({
+        return addAsyncRejectAction({
           ...input,
           type: ActionType.REGISTER
         })

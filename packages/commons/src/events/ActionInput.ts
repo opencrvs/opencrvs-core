@@ -154,32 +154,6 @@ export const ReadActionInput = BaseActionInput.merge(
 
 export type ReadActionInput = z.infer<typeof ReadActionInput>
 
-// TODO CIHAN: yhdistä tää ActionDocumentissa olevan kanssa?
-export const RejectActionInput = BaseActionInput.omit({
-  data: true,
-  metadata: true
-}).merge(
-  z.object({
-    type: z.union([
-      z.literal(ActionType.VALIDATE),
-      z.literal(ActionType.REJECT),
-      z.literal(ActionType.ARCHIVE),
-      z.literal(ActionType.NOTIFY),
-      z.literal(ActionType.REGISTER),
-      z.literal(ActionType.DECLARE),
-      z.literal(ActionType.ASSIGN),
-      z.literal(ActionType.REQUEST_CORRECTION),
-      z.literal(ActionType.APPROVE_CORRECTION),
-      z.literal(ActionType.REJECT_CORRECTION),
-      z.literal(ActionType.UNASSIGN),
-      z.literal(ActionType.PRINT_CERTIFICATE),
-      z.literal(ActionType.CUSTOM)
-    ])
-  })
-)
-
-export type RejectActionInput = z.infer<typeof RejectActionInput>
-
 /**
  * ActionInput types are used to validate the input data for the action.
  * In our use case, we use it directly with TRPC to validate the input data for the action.

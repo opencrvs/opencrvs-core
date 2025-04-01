@@ -23,8 +23,7 @@ import {
   FileFieldValue,
   findActiveActionFields,
   getEventActiveActions,
-  RejectActionDocument,
-  RejectActionInput
+  AsyncRejectActionDocument
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
@@ -357,13 +356,26 @@ export async function addAction(
   return updatedEvent
 }
 
-// TODO CIHAN: refaktoroi RejectActionInput pois?
-export async function addRejectAction(input: RejectActionInput) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const AsyncRejectActionInput = AsyncRejectActionDocument.omit({
+  createdAt: true,
+  id: true,
+  status: true
+}).merge(
+  z.object({
+    transactionId: z.string(),
+    eventId: z.string()
+  })
+)
+
+export async function addAsyncRejectAction(
+  input: z.infer<typeof AsyncRejectActionInput>
+) {
   const db = await events.getClient()
   const now = new Date().toISOString()
   const { transactionId, eventId } = input
 
-  const action: RejectActionDocument = {
+  const action: AsyncRejectActionDocument = {
     ...input,
     createdAt: now,
     id: getUUID(),
