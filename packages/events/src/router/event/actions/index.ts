@@ -41,7 +41,7 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
     inputType: NotifyActionInput,
-    additionalAcceptFields: undefined,
+    notifyApiPayloadSchema: undefined,
     validatePayload: false
   },
   [ActionType.DECLARE]: {
@@ -51,37 +51,37 @@ const ACTION_PROCEDURE_CONFIG = {
       SCOPES.RECORD_REGISTER
     ],
     inputType: DeclareActionInput,
-    additionalAcceptFields: undefined,
+    notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.VALIDATE]: {
     scopes: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER],
     inputType: ValidateActionInput,
-    additionalAcceptFields: undefined,
+    notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.REGISTER]: {
     scopes: [SCOPES.RECORD_REGISTER],
     inputType: RegisterActionInput,
-    additionalAcceptFields: z.object({ registrationNumber: z.string() }),
+    notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
     validatePayload: true
   },
   [ActionType.REJECT]: {
     scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
     inputType: RejectDeclarationActionInput,
-    additionalAcceptFields: undefined,
+    notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.ARCHIVE]: {
     scopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
     inputType: ArchiveActionInput,
-    additionalAcceptFields: undefined,
+    notifyApiPayloadSchema: undefined,
     validatePayload: true
   },
   [ActionType.PRINT_CERTIFICATE]: {
     scopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
     inputType: PrintCertificateActionInput,
-    additionalAcceptFields: undefined,
+    notifyApiPayloadSchema: undefined,
     validatePayload: true
   }
 }
@@ -106,13 +106,13 @@ export function getDefaultActionProcedures(
     throw new Error(`Action not configured: ${actionType}`)
   }
 
-  const { scopes, additionalAcceptFields, validatePayload, inputType } =
+  const { scopes, notifyApiPayloadSchema, validatePayload, inputType } =
     actionConfig
 
   let acceptInputFields = z.object({ actionId: z.string() })
 
-  if (additionalAcceptFields) {
-    acceptInputFields = acceptInputFields.merge(additionalAcceptFields)
+  if (notifyApiPayloadSchema) {
+    acceptInputFields = acceptInputFields.merge(notifyApiPayloadSchema)
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(scopes)
@@ -159,9 +159,9 @@ export function getDefaultActionProcedures(
         if (responseStatus === ActionConfirmationResponse.Success) {
           status = ActionStatus.Accepted
 
-          if (additionalAcceptFields) {
+          if (notifyApiPayloadSchema) {
             try {
-              parsedBody = additionalAcceptFields.parse(body)
+              parsedBody = notifyApiPayloadSchema.parse(body)
             } catch {
               throw new TRPCError({
                 code: 'INTERNAL_SERVER_ERROR',
