@@ -22,7 +22,6 @@ import {
   deleteEvent,
   getEventById
 } from '@events/service/events/events'
-import { presignFilesInEvent } from '@events/service/files'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import {
   ApproveCorrectionActionInput,
@@ -133,11 +132,7 @@ export const eventRouter = router({
         }
       )
 
-      const eventWithSignedFiles = await presignFilesInEvent(
-        eventWithReadAction,
-        ctx.token
-      )
-      return eventWithSignedFiles
+      return eventWithReadAction
     }),
   delete: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
@@ -203,6 +198,7 @@ export const eventRouter = router({
       .input(ValidateActionInput)
       .use(middleware.validateAction(ActionType.VALIDATE))
       .mutation(async (options) => {
+        console.log('options.input', options.input)
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
