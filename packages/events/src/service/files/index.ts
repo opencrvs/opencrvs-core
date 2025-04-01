@@ -99,7 +99,6 @@ export async function presignFilesInEvent(
     throw new Error('Failed to find configuration for event')
   }
 
-  // TODO CIHAN: meneeköhä tää oikein?
   const activeActions = getEventActiveActions(event)
 
   const actionFileFields = activeActions.flatMap((action) =>
