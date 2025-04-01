@@ -26,7 +26,14 @@ import {
   ActionConfirmationResponse,
   ActionStatus,
   EventDocument,
-  ActionInput
+  ActionInput,
+  NotifyActionInput,
+  RegisterActionInput,
+  RejectDeclarationActionInput,
+  ArchiveActionInput,
+  PrintCertificateActionInput,
+  DeclareActionInput,
+  ValidateActionInput
 } from '@opencrvs/commons/events'
 
 import { TRPCError } from '@trpc/server'
@@ -47,7 +54,8 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
     notifyApiPayloadSchema: undefined,
-    validatePayload: false
+    validatePayload: false,
+    inputSchema: NotifyActionInput
   },
   [ActionType.DECLARE]: {
     scopes: [
@@ -56,33 +64,54 @@ const ACTION_PROCEDURE_CONFIG = {
       SCOPES.RECORD_REGISTER
     ],
     notifyApiPayloadSchema: undefined,
-    validatePayload: true
+    validatePayload: true,
+    inputSchema: DeclareActionInput
   },
   [ActionType.VALIDATE]: {
     scopes: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER],
     notifyApiPayloadSchema: undefined,
-    validatePayload: true
+    validatePayload: true,
+    inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
     scopes: [SCOPES.RECORD_REGISTER],
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
-    validatePayload: true
+    validatePayload: true,
+    inputSchema: RegisterActionInput
   },
   [ActionType.REJECT]: {
     scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
     notifyApiPayloadSchema: undefined,
-    validatePayload: true
+    validatePayload: true,
+    inputSchema: RejectDeclarationActionInput
   },
   [ActionType.ARCHIVE]: {
     scopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
     notifyApiPayloadSchema: undefined,
-    validatePayload: true
+    validatePayload: true,
+    inputSchema: ArchiveActionInput
   },
   [ActionType.PRINT_CERTIFICATE]: {
     scopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
     notifyApiPayloadSchema: undefined,
-    validatePayload: true
+    validatePayload: true,
+    inputSchema: PrintCertificateActionInput
   }
+}
+
+type ActionProcedure = {
+  request: MutationProcedure<{
+    input: ActionInput
+    output: EventDocument
+  }>
+  accept: MutationProcedure<{
+    input: ActionInput & { actionId: string }
+    output: EventDocument
+  }>
+  reject: MutationProcedure<{
+    input: { eventId: string; actionId: string; transactionId: string }
+    output: EventDocument
+  }>
 }
 
 /**
@@ -97,16 +126,12 @@ const ACTION_PROCEDURE_CONFIG = {
  * @param actionType - The action type for which we want to create router handlers.
  */
 export function getDefaultActionProcedures(
-  actionType: keyof typeof ACTION_PROCEDURE_CONFIG,
-  inputSchema: z.ZodType
-) {
+  actionType: keyof typeof ACTION_PROCEDURE_CONFIG
+): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  if (!actionConfig) {
-    throw new Error(`Action not configured: ${actionType}`)
-  }
-
-  const { scopes, notifyApiPayloadSchema, validatePayload } = actionConfig
+  const { scopes, notifyApiPayloadSchema, validatePayload, inputSchema } =
+    actionConfig
 
   let acceptInputFields = z.object({ actionId: z.string() })
 
@@ -195,7 +220,6 @@ export function getDefaultActionProcedures(
 
     accept: publicProcedure
       .use(requireScopesMiddleware)
-      // @ts-expect-error - "foo"
       .input(inputSchema.merge(acceptInputFields))
       .use(validatePayloadMiddleware)
       .use(async ({ ctx, input, next }) => {
@@ -247,10 +271,7 @@ export function getDefaultActionProcedures(
             status: ActionStatus.Accepted
           }
         )
-      }) as MutationProcedure<{
-      input: ActionInput & { actionId: string }
-      output: EventDocument
-    }>,
+      }),
 
     reject: publicProcedure
       .use(requireScopesMiddleware)
