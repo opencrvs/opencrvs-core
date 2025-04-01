@@ -105,7 +105,7 @@ export const Archive: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.archive.mutation(() => {
+          tRPCMsw.event.actions.archive.request.mutation(() => {
             callTracker['event.actions.archive']++
 
             return generateEventDocument({
@@ -268,7 +268,7 @@ export const SendForUpdate: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.reject.mutation(() => {
+          tRPCMsw.event.actions.reject.request.mutation(() => {
             callTracker['event.actions.reject']++
 
             return generateEventDocument({

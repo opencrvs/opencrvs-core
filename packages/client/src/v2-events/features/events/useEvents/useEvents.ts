@@ -73,8 +73,8 @@ export function useEvents() {
     },
     actions: {
       validate: useEventAction(trpc.event.actions.validate.request),
-      reject: useEventAction(trpc.event.actions.reject),
-      archive: useEventAction(trpc.event.actions.archive),
+      reject: useEventAction(trpc.event.actions.reject.request),
+      archive: useEventAction(trpc.event.actions.archive.request),
       notify: useEventAction(trpc.event.actions.notify.request),
       declare: useEventAction(trpc.event.actions.declare.request),
       register: useEventAction(trpc.event.actions.register.request),
@@ -85,7 +85,9 @@ export function useEvents() {
       }
     },
     onlineActions: {
-      printCertificate: useEventAction(trpc.event.actions.printCertificate)
+      printCertificate: useEventAction(
+        trpc.event.actions.printCertificate.request
+      )
     },
     customActions: {
       registerOnDeclare: useEventCustomAction([

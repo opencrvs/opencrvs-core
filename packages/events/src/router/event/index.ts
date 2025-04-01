@@ -34,13 +34,10 @@ import {
 } from '@opencrvs/commons'
 import {
   ActionType,
-  ArchiveActionInput,
   Draft,
   DraftInput,
   EventIndex,
   EventInput,
-  PrintCertificateActionInput,
-  RejectDeclarationActionInput,
   EventSearchIndex,
   ActionStatus
 } from '@opencrvs/commons/events'
@@ -50,6 +47,9 @@ import { registerRouterHandlers } from './actions/register'
 import { notifyRouterHandlers } from './actions/notify'
 import { declareRouterHandlers } from './actions/declare'
 import { validateRouterHandlers } from './actions/validate'
+import { rejectRouterHandlers } from './actions/reject'
+import { archiveRouterHandlers } from './actions/archive'
+import { printCertificateRouterHandlers } from './actions/printCertificate'
 
 function validateEventType({
   eventTypes,
@@ -164,49 +164,10 @@ export const eventRouter = router({
     notify: router(notifyRouterHandlers),
     declare: router(declareRouterHandlers),
     validate: router(validateRouterHandlers),
-    reject: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_FOR_UPDATES]))
-      .input(RejectDeclarationActionInput)
-      .use(middleware.validateAction(ActionType.REJECT))
-      .mutation((options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token,
-          transactionId: options.input.transactionId,
-          status: ActionStatus.Accepted // TODO CIHAN
-        })
-      }),
-    archive: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARATION_ARCHIVE]))
-      .input(ArchiveActionInput)
-      .use(middleware.validateAction(ActionType.ARCHIVE))
-      .mutation(async (options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token,
-          transactionId: options.input.transactionId,
-          status: ActionStatus.Accepted
-        })
-      }),
+    reject: router(rejectRouterHandlers),
+    archive: router(archiveRouterHandlers),
     register: router(registerRouterHandlers),
-    printCertificate: publicProcedure
-      .use(requiresAnyOfScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]))
-      .input(PrintCertificateActionInput)
-      .use(middleware.validateAction(ActionType.PRINT_CERTIFICATE))
-      .mutation((options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token,
-          transactionId: options.input.transactionId,
-          status: ActionStatus.Accepted
-        })
-      }),
+    printCertificate: router(printCertificateRouterHandlers),
     correction: router({
       request: publicProcedure
         .use(

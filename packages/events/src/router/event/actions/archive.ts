@@ -1,0 +1,54 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { addAction, getEventById } from '@events/service/events/events'
+import { ActionType, ActionStatus } from '@opencrvs/commons'
+import { getActionProceduresBase } from '.'
+
+const actionProceduresBase = getActionProceduresBase(ActionType.ARCHIVE)
+
+export const archiveRouterHandlers = {
+  request: actionProceduresBase.request.mutation(({ ctx, input }) => {
+    const { token, user, status, actionId } = ctx
+    const { eventId, transactionId } = input
+
+    return addAction(
+      input,
+      {
+        eventId,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId,
+        token,
+        transactionId,
+        status
+      },
+      actionId
+    )
+  }),
+  accept: actionProceduresBase.accept.mutation(({ ctx, input }) => {
+    const { token, user, alreadyAccepted } = ctx
+    const { eventId, transactionId, actionId } = input
+
+    if (alreadyAccepted) {
+      return getEventById(input.eventId)
+    }
+
+    return addAction(input, {
+      eventId,
+      createdBy: user.id,
+      createdAtLocation: user.primaryOfficeId,
+      token,
+      transactionId,
+      status: ActionStatus.Accepted,
+      originalActionId: actionId
+    })
+  }),
+  reject: actionProceduresBase.reject
+}

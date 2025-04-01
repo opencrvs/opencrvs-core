@@ -28,12 +28,15 @@ import {
   ActionStatus,
   RegisterActionInput,
   DeclareActionInput,
-  ValidateActionInput
+  ValidateActionInput,
+  RejectDeclarationActionInput,
+  ArchiveActionInput,
+  PrintCertificateActionInput
 } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
-const ACTIONS = {
+const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
     inputType: NotifyActionInput,
@@ -61,6 +64,24 @@ const ACTIONS = {
     inputType: RegisterActionInput,
     additionalAcceptFields: z.object({ registrationNumber: z.string() }),
     validatePayload: true
+  },
+  [ActionType.REJECT]: {
+    scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
+    inputType: RejectDeclarationActionInput,
+    additionalAcceptFields: undefined,
+    validatePayload: true
+  },
+  [ActionType.ARCHIVE]: {
+    scopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
+    inputType: ArchiveActionInput,
+    additionalAcceptFields: undefined,
+    validatePayload: true
+  },
+  [ActionType.PRINT_CERTIFICATE]: {
+    scopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
+    inputType: PrintCertificateActionInput,
+    additionalAcceptFields: undefined,
+    validatePayload: true
   }
 }
 
@@ -75,8 +96,10 @@ const ACTIONS = {
  *
  * @param actionType - The action type for which we want to create router handlers.
  */
-export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
-  const actionConfig = ACTIONS[actionType]
+export function getActionProceduresBase(
+  actionType: keyof typeof ACTION_PROCEDURE_CONFIG
+) {
+  const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
   if (!actionConfig) {
     throw new Error(`Action not configured: ${actionType}`)
