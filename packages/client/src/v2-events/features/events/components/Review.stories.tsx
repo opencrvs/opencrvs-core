@@ -17,8 +17,7 @@ import superjson from 'superjson'
 import {
   AddressFieldValue,
   AddressType,
-  TENNIS_CLUB_FORM,
-  tennisClubMembershipEvent
+  TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -49,8 +48,7 @@ const meta: Meta<typeof Review.Body> = {
   title: 'Components/Review',
   component: Review.Body,
   args: {
-    eventConfig: tennisClubMembershipEvent,
-    formConfig: TENNIS_CLUB_FORM,
+    formConfig: TENNIS_CLUB_DECLARATION_FORM,
     form: mockFormData,
     onEdit: () => undefined,
     title: 'Member declaration for John Doe'
@@ -137,9 +135,8 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
     return (
       <>
         <Review.Body
-          eventConfig={tennisClubMembershipEvent}
           form={mockFormData}
-          formConfig={TENNIS_CLUB_FORM}
+          formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="My test action"
           onEdit={handleEdit}
         >
@@ -216,9 +213,8 @@ export const ReviewWithValidationErrors: Story = {
     }
     return (
       <Review.Body
-        eventConfig={tennisClubMembershipEvent}
         form={this.args?.form || {}}
-        formConfig={TENNIS_CLUB_FORM}
+        formConfig={TENNIS_CLUB_DECLARATION_FORM}
         title="My test action"
         onEdit={() => undefined}
       >

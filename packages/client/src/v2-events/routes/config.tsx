@@ -78,7 +78,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
       element: (
-        <Action type={ActionType.DECLARE}>
+        <Action actionType={ActionType.DECLARE}>
           <Outlet />
         </Action>
       ),
@@ -100,7 +100,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.VALIDATE.path,
       element: (
-        <Action type={ActionType.VALIDATE}>
+        <Action actionType={ActionType.VALIDATE}>
           <Outlet />
         </Action>
       ),
@@ -123,7 +123,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
       element: (
-        <Action type={ActionType.REGISTER}>
+        <Action actionType={ActionType.REGISTER}>
           <Outlet />
         </Action>
       ),
@@ -145,7 +145,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,
       element: (
-        <Action type={ActionType.PRINT_CERTIFICATE}>
+        <Action actionType={ActionType.PRINT_CERTIFICATE}>
           <Outlet />
         </Action>
       ),
