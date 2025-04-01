@@ -315,12 +315,12 @@ describe('Request and confirmation flow', () => {
         ).rejects.matchSnapshot()
       })
 
-      // TODO CIHAN: sit ku reject toimii, nii tän voi tehdä
-      test.skip('should not be able to accept action if action is already rejected', async () => {
+      test('should not be able to accept action if action is already rejected', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await client.event.create(generator.event.create())
-        const eventId = event.id
+        const { id: eventId } = await client.event.create(
+          generator.event.create()
+        )
 
         mockNotifyApi(202)
 
@@ -377,7 +377,8 @@ describe('Request and confirmation flow', () => {
         expect(registerActions[1]).toMatchObject({
           status: ActionStatus.Accepted,
           data: validFormData,
-          registrationNumber: MOCK_REGISTRATION_NUMBER
+          registrationNumber: MOCK_REGISTRATION_NUMBER,
+          originalActionId: actionId
         })
       })
 
@@ -473,8 +474,75 @@ describe('Request and confirmation flow', () => {
           })
         ).rejects.matchSnapshot()
       })
+
+      test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+        const { id: eventId } = await client.event.create(
+          generator.event.create()
+        )
+
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId, {
+          data: validFormData
+        })
+
+        await client.event.actions.register.request(data)
+
+        await client.event.actions.register.reject({
+          eventId,
+          transactionId: getUUID(),
+          actionId
+        })
+
+        const response = await client.event.actions.register.reject({
+          eventId,
+          transactionId: getUUID(),
+          actionId
+        })
+
+        const registerActions = response.actions.filter(
+          (action) => action.type === ActionType.REGISTER
+        )
+
+        expect(registerActions.length).toBe(2)
+        expect(registerActions[0].status).toEqual(ActionStatus.Requested)
+        expect(registerActions[1].status).toEqual(ActionStatus.Rejected)
+      })
+
+      test('should successfully reject a previously requested action', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+        const { id: eventId } = await client.event.create(
+          generator.event.create()
+        )
+
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId, {
+          data: validFormData
+        })
+
+        await client.event.actions.register.request(data)
+
+        const response = await client.event.actions.register.reject({
+          eventId,
+          transactionId: getUUID(),
+          actionId
+        })
+
+        const registerActions = response.actions.filter(
+          (action) => action.type === ActionType.REGISTER
+        )
+
+        expect(registerActions.length).toBe(2)
+        expect(registerActions[0].status).toEqual(ActionStatus.Requested)
+        expect(registerActions[1]).toMatchObject({
+          status: ActionStatus.Rejected,
+          originalActionId: actionId
+        })
+      })
     })
   })
-
-  test.todo('should not be able to reject a previously accepted action')
 })

@@ -40,8 +40,6 @@ export const registerRouterHandlers = {
       const { token, user, status, actionId } = ctx
       const { eventId, transactionId } = input
 
-      console.log('input', input)
-
       return addAction(
         input,
         {
@@ -70,7 +68,7 @@ export const registerRouterHandlers = {
       token,
       transactionId,
       status: ActionStatus.Accepted,
-      confirmationForActionWithId: actionId
+      originalActionId: actionId
     })
   }),
   reject: registerActionProcedureBase.reject

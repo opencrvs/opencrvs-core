@@ -41,7 +41,7 @@ export const ActionBase = z.object({
     ActionStatus.Rejected
   ]),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
-  confirmationForActionWithId: z.string().optional()
+  originalActionId: z.string().optional()
 })
 
 export type ActionBase = z.infer<typeof ActionBase>

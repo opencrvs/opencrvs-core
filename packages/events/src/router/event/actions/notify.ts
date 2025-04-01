@@ -47,7 +47,7 @@ export const notifyRouterHandlers = {
       token,
       transactionId,
       status: ActionStatus.Accepted,
-      confirmationForActionWithId: actionId
+      originalActionId: actionId
     })
   }),
   reject: actionProceduresBase.reject

@@ -162,19 +162,6 @@ export const eventRouter = router({
   }),
   actions: router({
     notify: router(notifyRouterHandlers),
-    // notify: publicProcedure
-    //   .use(requiresAnyOfScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE]))
-    //   .input(NotifyActionInput)
-    //   .mutation((options) => {
-    //     return addAction(options.input, {
-    //       eventId: options.input.eventId,
-    //       createdBy: options.ctx.user.id,
-    //       createdAtLocation: options.ctx.user.primaryOfficeId,
-    //       token: options.ctx.token,
-    //       transactionId: options.input.transactionId,
-    //       status: ActionStatus.Accepted // TODO CIHAN
-    //     })
-    //   }),
     declare: publicProcedure
       .use(
         requiresAnyOfScopes([

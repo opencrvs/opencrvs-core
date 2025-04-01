@@ -92,7 +92,7 @@ export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
           actionId
         )
 
-        // If we get an unexpected failure response, we don't want to save the action
+        // If we get an unexpected failure response, we just return HTTP 500 without saving the
         if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
@@ -127,7 +127,7 @@ export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
         const event = await getEventById(eventId)
         const action = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
-          (a) => a.confirmationForActionWithId === actionId
+          (a) => a.originalActionId === actionId
         )
 
         if (!action) {
@@ -167,7 +167,7 @@ export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
         const event = await getEventById(eventId)
         const action = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
-          (a) => a.confirmationForActionWithId === actionId
+          (a) => a.originalActionId === actionId
         )
 
         if (!action) {
@@ -183,7 +183,7 @@ export function getActionProceduresBase(actionType: keyof typeof ACTIONS) {
 
         return next({
           ctx: { ...ctx, alreadyRejected: Boolean(confirmationAction) },
-          input
+          input: { ...input, originalActionId: actionId }
         })
       })
       .mutation(async ({ ctx, input }) => {
