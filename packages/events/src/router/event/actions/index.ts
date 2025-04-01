@@ -17,7 +17,8 @@ import { publicProcedure } from '@events/router/trpc'
 import { notifyOnAction } from '@events/service/config/config'
 import {
   getEventById,
-  addAsyncRejectAction
+  addAsyncRejectAction,
+  addAction
 } from '@events/service/events/events'
 import {
   ActionType,
@@ -194,6 +195,25 @@ export function getActionProceduresBase(
         return next({
           ctx: { ...ctx, alreadyAccepted: Boolean(confirmationAction) },
           input
+        })
+      })
+      .mutation(({ ctx, input }) => {
+        const { token, user, alreadyAccepted } = ctx
+        const { eventId, transactionId, actionId } = input
+
+        if (alreadyAccepted) {
+          return getEventById(input.eventId)
+        }
+
+        // TODO CIHAN: pystyykö originalActionId ja status ymppää inputtii?
+        return addAction(input, {
+          eventId,
+          createdBy: user.id,
+          createdAtLocation: user.primaryOfficeId,
+          token,
+          transactionId,
+          status: ActionStatus.Accepted,
+          originalActionId: actionId
         })
       }),
 

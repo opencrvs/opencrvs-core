@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { addAction, getEventById } from '@events/service/events/events'
-import { ActionType, ActionStatus } from '@opencrvs/commons'
+import { addAction } from '@events/service/events/events'
+import { ActionType } from '@opencrvs/commons'
 import { getActionProceduresBase } from '.'
 
 const actionProceduresBase = getActionProceduresBase(ActionType.DECLARE)
@@ -32,23 +32,6 @@ export const declareRouterHandlers = {
       actionId
     )
   }),
-  accept: actionProceduresBase.accept.mutation(({ ctx, input }) => {
-    const { token, user, alreadyAccepted } = ctx
-    const { eventId, transactionId, actionId } = input
-
-    if (alreadyAccepted) {
-      return getEventById(input.eventId)
-    }
-
-    return addAction(input, {
-      eventId,
-      createdBy: user.id,
-      createdAtLocation: user.primaryOfficeId,
-      token,
-      transactionId,
-      status: ActionStatus.Accepted,
-      originalActionId: actionId
-    })
-  }),
+  accept: actionProceduresBase.accept,
   reject: actionProceduresBase.reject
 }
