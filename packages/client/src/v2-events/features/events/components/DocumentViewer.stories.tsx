@@ -91,6 +91,7 @@ export const DocumentViewerWithFiles: StoryObj<typeof DocumentViewer> = {
       <DocumentViewer
         form={form}
         formConfig={defineActionForm({
+          active: true,
           version: {
             id: '1.0',
             label: generateTranslationConfig('form title')
