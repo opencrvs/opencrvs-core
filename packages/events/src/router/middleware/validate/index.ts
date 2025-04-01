@@ -14,7 +14,7 @@ import {
   ActionType,
   ActionUpdate,
   DeclarationUpdateActions,
-  ExcludedDeclarationActions,
+  MetadataAction,
   EventConfig,
   FieldConfig,
   FieldUpdateValue,
@@ -22,7 +22,7 @@ import {
   Inferred,
   isPageVisible,
   isVerificationPage,
-  ExcludedDeclarationAction,
+  MetadataActions,
   findActiveActionPages,
   DeclarationUpdateAction,
   getActiveActionReviewFields,
@@ -130,7 +130,7 @@ function validateMetadataAction({
   metadata = {}
 }: {
   eventConfig: EventConfig
-  actionType: ExcludedDeclarationAction
+  actionType: MetadataAction
   metadata?: ActionUpdate
 }) {
   const pages = findActiveActionPages(eventConfig, actionType)
@@ -174,14 +174,13 @@ export function validateAction(actionType: ActionType) {
       throwWhenNotEmpty(errors)
     }
 
-    const nonDeclarationUpdateAction =
-      ExcludedDeclarationActions.safeParse(actionType)
+    const metadataAction = MetadataActions.safeParse(actionType)
 
-    if (nonDeclarationUpdateAction.success) {
+    if (metadataAction.success) {
       const errors = validateMetadataAction({
         eventConfig,
         metadata: input.metadata,
-        actionType: nonDeclarationUpdateAction.data
+        actionType: metadataAction.data
       })
 
       throwWhenNotEmpty(errors)

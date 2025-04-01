@@ -18,29 +18,29 @@ export const ActionType = {
   // Pre-declaration actions
   DELETE: 'DELETE',
   CREATE: 'CREATE',
-  // Declaration actions
   NOTIFY: 'NOTIFY',
+  // Declaration actions
   DECLARE: 'DECLARE',
   VALIDATE: 'VALIDATE',
   REGISTER: 'REGISTER',
-
+  // Declaration metadata actions
   DETECT_DUPLICATE: 'DETECT_DUPLICATE',
   REJECT: 'REJECT', // REJECT_DECLARATION
   MARKED_AS_DUPLICATE: 'MARKED_AS_DUPLICATE', // MARK_AS_DUPLICATE
   ARCHIVE: 'ARCHIVE',
   // Record actions
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
-  // ISSUE_CERTIFICATE: 'ISSUE_CERTIFICATE',
   REQUEST_CORRECTION: 'REQUEST_CORRECTION',
   REJECT_CORRECTION: 'REJECT_CORRECTION',
   APPROVE_CORRECTION: 'APPROVE_CORRECTION',
-
   // General actions
   READ: 'READ',
   ASSIGN: 'ASSIGN',
   UNASSIGN: 'UNASSIGN'
 } as const
+export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
+/** Testing building types from enums as an alternative */
 export const ActionTypes = z.enum([
   'DELETE',
   'CREATE',
@@ -56,74 +56,30 @@ export const ActionTypes = z.enum([
   'REQUEST_CORRECTION',
   'REJECT_CORRECTION',
   'APPROVE_CORRECTION',
-  // 'ISSUE_CERTIFICATE',
   'READ',
   'ASSIGN',
   'UNASSIGN'
 ])
-
-export const PreDeclarationActions = ActionTypes.extract([
-  'DELETE',
-  'CREATE',
-  'NOTIFY'
-])
-
-/** Actions that are performed during declaration phase */
-export const DeclarationActions = ActionTypes.extract([
-  'DECLARE',
-  'VALIDATE',
-  'REGISTER'
-])
-export type DeclarationAction = z.infer<typeof DeclarationActions>
 
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.VALIDATE,
   ActionTypes.enum.REGISTER
 ] as const
+/** Actions which change event data (declaration) before registration / during declaration. */
+export const DeclarationActions = ActionTypes.extract(declarationActionValues)
+export type DeclarationAction = z.infer<typeof DeclarationActions>
 
 const declarationUpdateActionValues = [
   ...declarationActionValues,
   ActionTypes.enum.REQUEST_CORRECTION
 ] as const
-
-/** Actions that can modify declaration data */
+/** Actions that can modify declaration data. Request can be corrected after declaring it. */
 export const DeclarationUpdateActions = ActionTypes.extract(
   declarationUpdateActionValues
 )
-
 export type DeclarationUpdateAction = z.infer<typeof DeclarationUpdateActions>
 
-export const ExcludedDeclarationActions = ActionTypes.exclude(
-  declarationActionValues
-)
-export type ExcludedDeclarationAction = z.infer<
-  typeof ExcludedDeclarationActions
->
-
-export const RecordActions = ActionTypes.extract([
-  'PRINT_CERTIFICATE',
-  'REQUEST_CORRECTION',
-  'REJECT_CORRECTION',
-  'APPROVE_CORRECTION'
-  // 'ISSUE_CERTIFICATE'
-])
-
-export const GeneralActions = ActionTypes.extract([
-  'READ',
-  'ASSIGN',
-  'UNASSIGN'
-])
-
-/**
- * Actions that can be attached to an event document
- * even if they are not in event configuration
- */
-
-export const LatentActions = [
-  ActionType.ARCHIVE,
-  ActionType.REJECT,
-  ActionType.NOTIFY
-]
-
-export type ActionType = (typeof ActionType)[keyof typeof ActionType]
+/** Actions which primarily change metadata or status of an event. */
+export const MetadataActions = ActionTypes.exclude(declarationActionValues)
+export type MetadataAction = z.infer<typeof MetadataActions>
