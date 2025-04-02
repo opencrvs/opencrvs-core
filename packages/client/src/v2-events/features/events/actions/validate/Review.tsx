@@ -90,13 +90,13 @@ export function Review() {
 
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const previousMetadata = getActionAnnotation({
+  const previousAnnotation = getActionAnnotation({
     event,
     actionType: ActionType.VALIDATE,
     drafts: []
   })
 
-  const annotation = getMetadata(previousMetadata)
+  const annotation = getMetadata(previousAnnotation)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -207,8 +207,8 @@ export function Review() {
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        onEdit={handleEdit}
         onAnnotationChange={(values) => setMetadata(values)}
+        onEdit={handleEdit}
       >
         <ReviewComponent.Actions
           isPrimaryActionDisabled={hasValidationErrors}

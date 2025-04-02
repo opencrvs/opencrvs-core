@@ -30,7 +30,7 @@ import { getOrThrow } from '../utils'
 /**
  * @returns All the fields in the event configuration.
  */
-export const findPageFields = (config: EventConfig): FieldConfig[] => {
+export const findAllFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
     ...getDeclarationFields(config),
     ...getAllAnnotationFields(config)

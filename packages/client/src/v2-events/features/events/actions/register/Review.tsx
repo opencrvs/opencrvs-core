@@ -87,7 +87,7 @@ export function Review() {
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const previousMetadata = getActionAnnotation({
+  const previousAnnotation = getActionAnnotation({
     event,
     actionType: ActionType.REGISTER,
     drafts: []
@@ -95,7 +95,7 @@ export function Review() {
 
   const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
     useActionAnnotation()
-  const annotation = getMetadata(previousMetadata)
+  const annotation = getMetadata(previousAnnotation)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -204,8 +204,8 @@ export function Review() {
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        onEdit={handleEdit}
         onAnnotationChange={(values) => setMetadata(values)}
+        onEdit={handleEdit}
       >
         <ReviewComponent.Actions
           isPrimaryActionDisabled={hasValidationErrors}

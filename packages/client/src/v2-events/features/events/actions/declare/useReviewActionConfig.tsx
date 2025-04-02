@@ -284,7 +284,7 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) => {
         events.actions.notify.mutate({
           eventId,
-          declaration: declaration,
+          declaration,
           annotation,
           transactionId: uuid()
         })
@@ -301,7 +301,7 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.customActions.registerOnDeclare.mutate({
           eventId,
-          declaration: declaration,
+          declaration,
           annotation
         }),
       messages: incomplete
@@ -318,7 +318,7 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.customActions.validateOnDeclare.mutate({
           eventId,
-          declaration: declaration,
+          declaration,
           annotation
         }),
       messages: incomplete
@@ -335,7 +335,7 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.actions.declare.mutate({
           eventId,
-          declaration: declaration,
+          declaration,
           annotation,
           transactionId: uuid()
         }),

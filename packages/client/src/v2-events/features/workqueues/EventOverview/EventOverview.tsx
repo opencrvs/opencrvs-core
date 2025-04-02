@@ -77,8 +77,6 @@ function EventOverview({
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status } = eventIndex
 
-  console.log('eventWithDrafts', eventWithDrafts)
-
   const stringifyFormData = useFormDataStringifier()
   const eventWithDefaults = stringifyFormData(
     allFields,

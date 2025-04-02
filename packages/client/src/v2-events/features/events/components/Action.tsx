@@ -79,7 +79,7 @@ function ActionComponent({ children, actionType }: Props) {
     (state) => state.setInitialFormValues
   )
 
-  const setInitialMetadataValues = useActionAnnotation(
+  const setInitialAnnotation = useActionAnnotation(
     (state) => state.setInitialAnnotation
   )
 
@@ -119,7 +119,7 @@ function ActionComponent({ children, actionType }: Props) {
 
   useEffect(() => {
     setInitialFormValues(eventStateWithDrafts.declaration)
-    setInitialMetadataValues(actionAnnotation)
+    setInitialAnnotation(actionAnnotation)
 
     return () => {
       /*

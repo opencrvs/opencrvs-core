@@ -25,7 +25,7 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { RejectionState, Review } from './Review'
 
-const mockFormData = {
+const mockDeclaration = {
   'applicant.firstname': 'John',
   'applicant.surname': 'Doe',
   'applicant.dob': '1990-01-01',
@@ -49,7 +49,7 @@ const meta: Meta<typeof Review.Body> = {
   component: Review.Body,
   args: {
     formConfig: TENNIS_CLUB_DECLARATION_FORM,
-    form: mockFormData,
+    form: mockDeclaration,
     onEdit: () => undefined,
     title: 'Member declaration for John Doe'
   },
@@ -135,7 +135,7 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
     return (
       <>
         <Review.Body
-          form={mockFormData}
+          form={mockDeclaration}
           formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="My test action"
           onEdit={handleEdit}

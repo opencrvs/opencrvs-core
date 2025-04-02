@@ -15,7 +15,7 @@ import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
-import { findPageFields } from './utils'
+import { findAllFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 
 /**
@@ -39,7 +39,7 @@ export const EventConfig = z
     advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
   })
   .superRefine((event, ctx) => {
-    const allFields = findPageFields(event)
+    const allFields = findAllFields(event)
     const fieldIds = allFields.map((field) => field.id)
 
     const advancedSearchFields = event.advancedSearch.flatMap((section) =>
