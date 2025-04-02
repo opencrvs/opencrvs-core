@@ -32,6 +32,7 @@ import { eventNotificationHandler } from '@workflow/records/handler/eventNotific
 import * as Hapi from '@hapi/hapi'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { upsertRegistrationHandler } from '@workflow/records/handler/upsert-identifiers'
+import { retrieveRecordHandler } from '@workflow/records/handler/retrieve'
 
 export const getRoutes = () => {
   const routes: Hapi.ServerRoute[] = [
@@ -108,6 +109,15 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Download record endpoint'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/retrieve-record',
+      handler: retrieveRecordHandler,
+      options: {
+        tags: ['api'],
+        description: 'Retrieve record endpoint'
       }
     },
     {

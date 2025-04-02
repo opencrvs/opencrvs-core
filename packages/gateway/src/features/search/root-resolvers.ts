@@ -22,7 +22,7 @@ import {
   ISearchCriteria,
   postAdvancedSearch
 } from './utils'
-import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
+import { retrieveRecord } from '@gateway/workflow/index'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { RateLimitError } from '@gateway/rate-limit'
 import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
@@ -94,7 +94,8 @@ export const resolvers: GQLResolver = {
           SCOPES.SEARCH_MARRIAGE,
           SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
           SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION,
+          SCOPES.RECORDSEARCH
         ])
       )
         return {
@@ -102,23 +103,35 @@ export const resolvers: GQLResolver = {
           results: []
         }
 
+      // TODO: refactor this concept to avoid calling the dataSource.usersAPI
       const userIdentifier = getTokenPayload(authHeader.Authorization).sub
-      const user = await dataSources.usersAPI.getUserById(userIdentifier!)
-      const office = await dataSources.locationsAPI.getLocation(
-        user.primaryOfficeId
-      )
-      const officeLocationId =
-        office.partOf?.reference &&
-        resourceIdentifierToUUID(office.partOf.reference)
+      let user
+      let system
 
-      if (!officeLocationId) {
+      const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
+
+      if (isExternalAPI) {
+        system = await getSystem({ systemId: userIdentifier }, authHeader)
+      } else {
+        user = await dataSources.usersAPI.getUserById(userIdentifier!)
+      }
+
+      const office = user
+        ? await dataSources.locationsAPI.getLocation(user.primaryOfficeId)
+        : undefined
+      const officeLocationId = office
+        ? office.partOf?.reference &&
+          resourceIdentifierToUUID(office.partOf.reference)
+        : undefined
+
+      if (user && !officeLocationId) {
         throw new Error('User office not found')
       }
 
       const transformedSearchParams = transformSearchParams(
         getTokenPayload(authHeader.Authorization).scope,
         advancedSearchParameters,
-        officeLocationId
+        officeLocationId ?? ''
       )
 
       const searchCriteria: ISearchCriteria = {
@@ -144,11 +157,7 @@ export const resolvers: GQLResolver = {
         }))
       }
 
-      const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
-      if (isExternalAPI) {
-        const payload = getTokenPayload(authHeader.Authorization)
-        const system = await getSystem({ systemId: payload.sub }, authHeader)
-
+      if (isExternalAPI && system) {
         const getTotalRequest = await getMetrics(
           '/advancedSearch',
           {},
@@ -166,9 +175,11 @@ export const resolvers: GQLResolver = {
           throw new Error(errMsg.message)
         }
 
-        ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await fetchRegistrationForDownloading(hit._id, authHeader)
-        })
+        await Promise.all(
+          (searchResult.body.hits.hits || []).map((hit) =>
+            retrieveRecord(hit._id, authHeader)
+          )
+        )
 
         if (searchResult.body.hits.total.value) {
           await postMetrics('/advancedSearch', {}, authHeader)
