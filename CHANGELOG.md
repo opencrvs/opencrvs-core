@@ -2,6 +2,10 @@
 
 ## 1.7.1 Release candidate
 
+### Bug fixes
+
+- Filter out inactive locations in the Organisations menu [#8782](https://github.com/opencrvs/opencrvs-core/issues/8782)
+
 ## 1.7.0 Release candidate
 
 ### Breaking changes
