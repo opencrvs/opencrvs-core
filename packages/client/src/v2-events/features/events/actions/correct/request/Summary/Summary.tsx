@@ -114,7 +114,7 @@ export function Summary() {
   const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
 
-  const previousFormValues = event.data
+  const previousFormValues = event.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const stringifyFormData = useFormDataStringifier()
 
@@ -184,12 +184,12 @@ export function Summary() {
       eventId,
       // @TODO:
       // @ts-ignore
-      data: {
+      declaration: {
         ...formWithOnlyChangedValues,
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      metadata: metadataForm
+      annotation: metadataForm
     })
     eventFormNavigation.goToHome()
   }, [

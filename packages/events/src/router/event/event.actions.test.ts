@@ -89,14 +89,14 @@ test('Action data accepts partial changes', async () => {
 
   const firstDeclarationPayload = generator.event.actions.declare(
     originalEvent.id,
-    { data: initialForm }
+    { declaration: initialForm }
   )
   await client.event.actions.declare(firstDeclarationPayload)
 
   const declarationWithoutVillage = generator.event.actions.declare(
     originalEvent.id,
     {
-      data: {
+      declaration: {
         ...initialForm,
         'applicant.address': addressWithoutVillage
       }
@@ -108,12 +108,12 @@ test('Action data accepts partial changes', async () => {
   const updatedEvent = await client.event.get(originalEvent.id)
 
   const eventStateBeforeVillageRemoval = getCurrentEventState(updatedEvent)
-  expect(eventStateBeforeVillageRemoval.data).toEqual(initialForm)
+  expect(eventStateBeforeVillageRemoval.declaration).toEqual(initialForm)
 
   const declarationWithVillageNull = generator.event.actions.declare(
     originalEvent.id,
     {
-      data: {
+      declaration: {
         ...initialForm,
         'applicant.address': {
           ...addressWithoutVillage,
@@ -129,7 +129,7 @@ test('Action data accepts partial changes', async () => {
     eventAfterVillageRemoval
   )
 
-  expect(stateAfterVillageRemoval.data).toEqual({
+  expect(stateAfterVillageRemoval.declaration).toEqual({
     ...initialForm,
     'applicant.address': addressWithoutVillage
   })
@@ -152,8 +152,8 @@ test('READ action does not delete draft', async () => {
 
   const draftData = {
     type: ActionType.DECLARE,
-    data: {
-      ...generator.event.actions.declare(originalEvent.id).data,
+    declaration: {
+      ...generator.event.actions.declare(originalEvent.id).declaration,
       'applicant.image': {
         type: 'image/png',
         originalFilename: 'abcd.png',
@@ -185,8 +185,8 @@ test('Action other than READ deletes draft', async () => {
 
   const draftData = {
     type: ActionType.DECLARE,
-    data: {
-      ...generator.event.actions.declare(originalEvent.id).data,
+    declaration: {
+      ...generator.event.actions.declare(originalEvent.id).declaration,
       'applicant.image': {
         type: 'image/png',
         originalFilename: 'abcd.png',

@@ -51,7 +51,7 @@ test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page me
       generator.event.actions.printCertificate(declaredEvent.id, {
         // The tennis club membership print certificate form has a verification page with conditional 'field('collector.requesterId').isEqualTo('INFORMANT')'
         // Thus if the requester is set as INFORMANT and verification page result is not set, we should see a validation error.
-        metadata: { 'collector.requesterId': 'INFORMANT' }
+        annotation: { 'collector.requesterId': 'INFORMANT' }
       })
     )
   ).rejects.matchSnapshot()
@@ -69,7 +69,7 @@ test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page
   await expect(
     client.event.actions.printCertificate(
       generator.event.actions.printCertificate(declaredEvent.id, {
-        metadata: {
+        annotation: {
           'collector.requesterId': 'INFORMANT',
           'collector.identity.verify': true
         }
@@ -110,7 +110,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   await expect(
     client.event.actions.printCertificate(
       generator.event.actions.printCertificate(event.id, {
-        metadata: {}
+        annotation: {}
       })
     )
   ).rejects.matchSnapshot()

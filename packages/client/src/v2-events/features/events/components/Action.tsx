@@ -16,7 +16,7 @@ import {
   createEmptyDraft,
   findActiveDrafts,
   getCurrentEventStateWithDrafts,
-  getMetadataForAction
+  getActionAnnotation
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -48,6 +48,10 @@ function ActionComponent({ children, actionType }: Props) {
       createEmptyDraft(params.eventId, createTemporaryId(), actionType)
   )
 
+  console.log('localdraft', localDraft)
+  console.log('activeDraft', activeDraft)
+  console.log('drafts', drafts)
+
   /*
    * Keep the local draft updated as per the form changes
    */
@@ -64,8 +68,8 @@ function ActionComponent({ children, actionType }: Props) {
       eventId: event.id,
       action: {
         ...localDraft.action,
-        data: formValues,
-        metadata: metadataValues
+        declaration: formValues,
+        annotation: metadataValues
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,13 +108,15 @@ function ActionComponent({ children, actionType }: Props) {
       }
     })
 
-  const eventDataWithDrafts = useMemo(
+  console.log('eventDrafts', eventDrafts)
+
+  const eventStateWithDrafts = useMemo(
     () => getCurrentEventStateWithDrafts(event, eventDrafts),
     [eventDrafts, event]
   )
 
-  const declareMetadata = useMemo(() => {
-    return getMetadataForAction({
+  const actionAnnotation = useMemo(() => {
+    return getActionAnnotation({
       event,
       actionType,
       drafts: eventDrafts
@@ -118,8 +124,8 @@ function ActionComponent({ children, actionType }: Props) {
   }, [eventDrafts, event, actionType])
 
   useEffect(() => {
-    setInitialFormValues(eventDataWithDrafts.data)
-    setInitialMetadataValues(declareMetadata)
+    setInitialFormValues(eventStateWithDrafts.declaration)
+    setInitialMetadataValues(actionAnnotation)
 
     return () => {
       /*

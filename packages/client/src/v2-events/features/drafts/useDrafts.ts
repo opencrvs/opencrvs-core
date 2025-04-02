@@ -119,7 +119,7 @@ export function useDrafts() {
 
       createDraft.mutate({
         eventId: localDraft.eventId,
-        data: localDraft.action.data,
+        declaration: localDraft.action.declaration,
         transactionId: localDraft.transactionId,
         type: localDraft.action.type
       })

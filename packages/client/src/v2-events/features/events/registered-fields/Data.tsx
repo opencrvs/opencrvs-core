@@ -61,7 +61,7 @@ function DataInput({
   fields: { value: FieldValue; config?: Inferred }[]
 }) {
   const intl = useIntl()
-  const { data, subtitle } = configuration
+  const { declaration, subtitle } = configuration
   const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
   return (
@@ -69,7 +69,7 @@ function DataInput({
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
       <dl>
-        {data.map((dataEntry) => {
+        {declaration.map((dataEntry) => {
           const fieldId =
             'fieldId' in dataEntry ? dataEntry.fieldId : dataEntry.label.id
           const field = fields.find((f) => f.config?.id === fieldId)

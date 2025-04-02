@@ -451,9 +451,9 @@ const GeneratedInputField = React.memo(
           <AdministrativeArea.Input
             {...field.config}
             partOf={
-              (field.config.configuration.partOf?.$data &&
+              (field.config.configuration.partOf?.$declaration &&
                 (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                  field.config.configuration.partOf.$data
+                  field.config.configuration.partOf.$declaration
                 ] as string | undefined | null)) ??
               null
             }
@@ -525,7 +525,7 @@ const GeneratedInputField = React.memo(
       // Data input requires field configs
       const declarationFields = getDeclarationFields(eventConfig)
 
-      const fields = field.config.configuration.data.map((entry) =>
+      const fields = field.config.configuration.declaration.map((entry) =>
         getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })
       )
 

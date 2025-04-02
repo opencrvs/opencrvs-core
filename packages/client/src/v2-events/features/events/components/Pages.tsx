@@ -41,7 +41,7 @@ export function Pages({
   declaration
 }: {
   form: EventState
-  setFormData: (data: EventState) => void
+  setFormData: (declaration: EventState) => void
   pageId: string
   showReviewButton?: boolean
   formPages: PageConfig[]

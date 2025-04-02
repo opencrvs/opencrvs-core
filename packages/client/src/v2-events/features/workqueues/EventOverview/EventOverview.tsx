@@ -77,14 +77,19 @@ function EventOverview({
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status } = eventIndex
 
+  console.log('eventWithDrafts', eventWithDrafts)
+
   const stringifyFormData = useFormDataStringifier()
-  const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
+  const eventWithDefaults = stringifyFormData(
+    allFields,
+    eventWithDrafts.declaration
+  )
 
   const flattenedEventIndex: Record<
     string,
     FieldValue | null | RecursiveStringRecord
   > = {
-    ...flattenEventIndex({ ...eventIndex, data: eventWithDefaults }),
+    ...flattenEventIndex({ ...eventIndex, declaration: eventWithDefaults }),
     ...getDefaultFieldValues(trackingId, status)
   }
 

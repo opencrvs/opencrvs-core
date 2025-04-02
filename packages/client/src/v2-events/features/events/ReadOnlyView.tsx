@@ -18,7 +18,7 @@ import {
   EventDocument,
   getActionReview,
   getDeclaration,
-  getMetadataForAction
+  getActionAnnotation
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -57,7 +57,7 @@ function findLastActionMetadata(event: EventDocument) {
       (a) => a.type === actionType
     )
     if (availableAllowedAction) {
-      return getMetadataForAction({ event, actionType, drafts: [] })
+      return getActionAnnotation({ event, actionType, drafts: [] })
     }
   }
 }
@@ -74,21 +74,21 @@ function ReadonlyView() {
   const formConfig = getDeclaration(config)
 
   const form = useEventFormData((state) =>
-    state.getFormValues(currentEventState.data)
+    state.getFormValues(currentEventState.declaration)
   )
 
   const reviewConfig = getLastActionReviewConfig(config, fullEvent)
 
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(findLastActionMetadata(fullEvent))
+  const annotation = getMetadata(findLastActionMetadata(fullEvent))
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
       <ReviewComponent.Body
         readonlyMode
+        annotation={annotation}
         form={form}
         formConfig={formConfig}
-        metadata={metadata}
         title={formatMessage(reviewConfig.title, form)}
         onEdit={noop}
         onMetadataChange={(values) => setMetadata(values)}

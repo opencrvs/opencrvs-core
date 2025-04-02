@@ -26,8 +26,8 @@ export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: ActionUpdate,
-  metadata: ActionUpdate.optional(),
+  declaration: ActionUpdate,
+  annotation: ActionUpdate.optional(),
   createdAtLocation: z.string()
 })
 

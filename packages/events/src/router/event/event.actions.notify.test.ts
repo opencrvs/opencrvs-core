@@ -47,6 +47,6 @@ test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () =
       await client.event.actions.notify(
         generator.event.actions.notify(event.id)
       )
-    ).actions.find((action) => action.type === ActionType.NOTIFY)?.data
+    ).actions.find((action) => action.type === ActionType.NOTIFY)?.declaration
   ).toMatchSnapshot()
 })

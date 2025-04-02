@@ -96,8 +96,8 @@ describe('check unreferenced draft attachments are deleted while final action su
     const getDraft = (n: number): DraftInput => {
       return {
         type: ActionType.DECLARE,
-        data: {
-          ...generator.event.actions.declare(event.id).data,
+        declaration: {
+          ...generator.event.actions.declare(event.id).declaration,
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
@@ -110,8 +110,8 @@ describe('check unreferenced draft attachments are deleted while final action su
     }
     const getDeclaration = (n: number) => {
       return {
-        data: {
-          ...generator.event.actions.declare(event.id).data,
+        declaration: {
+          ...generator.event.actions.declare(event.id).declaration,
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,

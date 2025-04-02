@@ -101,17 +101,20 @@ function throwWhenNotEmpty(errors: unknown[]) {
 function validateDeclarationUpdateAction({
   eventConfig,
   actionType,
-  data,
-  metadata
+  declaration,
+  annotation
 }: {
   eventConfig: EventConfig
   actionType: DeclarationUpdateAction
-  data: ActionUpdate
-  metadata?: ActionUpdate
+  declaration: ActionUpdate
+  annotation?: ActionUpdate
 }) {
-  const activeDeclaration = getDeclaration(eventConfig)
+  const declarationConfig = getDeclaration(eventConfig)
 
-  const declarationFields = getVisiblePagesFormFields(activeDeclaration, data)
+  const declarationFields = getVisiblePagesFormFields(
+    declarationConfig,
+    declaration
+  )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
   const reviewFields = declarationActionParse.success
@@ -121,7 +124,7 @@ function validateDeclarationUpdateAction({
   const fields = [...declarationFields, ...reviewFields]
 
   // @TODO: Separate validations for metadata and data
-  return getFormFieldErrors(fields, { ...data, ...metadata })
+  return getFormFieldErrors(fields, { ...declaration, ...annotation })
 }
 
 function validateMetadataAction({
@@ -166,8 +169,8 @@ export function validateAction(actionType: ActionType) {
     if (declarationUpdateAction.success) {
       const errors = validateDeclarationUpdateAction({
         eventConfig,
-        data: input.data,
-        metadata: input.metadata,
+        declaration: input.declaration,
+        annotation: input.annotation,
         actionType: declarationUpdateAction.data
       })
 
@@ -179,7 +182,7 @@ export function validateAction(actionType: ActionType) {
     if (metadataAction.success) {
       const errors = validateMetadataAction({
         eventConfig,
-        metadata: input.metadata,
+        metadata: input.annotation,
         actionType: metadataAction.data
       })
 

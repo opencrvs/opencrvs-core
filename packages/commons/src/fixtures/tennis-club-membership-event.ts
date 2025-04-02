@@ -684,15 +684,6 @@ const PRINT_CERTIFICATE_FORM = defineActionForm({
 })
 
 const TENNIS_CLUB_DECLARATION_REVIEW = {
-  active: true,
-  version: {
-    id: '1.0.0',
-    label: {
-      id: 'v2.event.tennis-club-membership.action.declare.form.version.1',
-      defaultMessage: 'Version 1',
-      description: 'This is the first version of the form'
-    }
-  },
   title: {
     id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
     defaultMessage:

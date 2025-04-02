@@ -63,7 +63,7 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-function getData(actions: Array<ActionDocument>) {
+function aggregateActionDeclarations(actions: Array<ActionDocument>) {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
@@ -91,10 +91,10 @@ function getData(actions: Array<ActionDocument>) {
       if (!requestAction) {
         return status
       }
-      return deepMerge(status, requestAction.data)
+      return deepMerge(status, requestAction.declaration)
     }
 
-    return deepMerge(status, action.data)
+    return deepMerge(status, action.declaration)
   }, {})
 }
 
@@ -171,7 +171,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     modifiedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(event.actions),
     updatedBy: latestAction.createdBy,
-    data: getData(event.actions),
+    declaration: aggregateActionDeclarations(event.actions),
     trackingId: event.trackingId
   })
 }
@@ -232,14 +232,14 @@ export function applyDraftsToEventIndex(
 
   return {
     ...eventIndex,
-    data: {
-      ...eventIndex.data,
-      ...activeDrafts[activeDrafts.length - 1].data
+    declaration: {
+      ...eventIndex.declaration,
+      ...activeDrafts[activeDrafts.length - 1].declaration
     }
   }
 }
 
-export function getMetadataForAction({
+export function getActionAnnotation({
   event,
   actionType,
   drafts
@@ -257,9 +257,9 @@ export function getMetadataForAction({
     ...eventDrafts.map((draft) => draft.action)
   ].sort()
 
-  const metadata = sorted.reduce((metadata, action) => {
-    return deepMerge(metadata, action.metadata ?? {})
+  const annotation = sorted.reduce((annotation, action) => {
+    return deepMerge(annotation, action.annotation ?? {})
   }, {})
 
-  return deepDropNulls(metadata)
+  return deepDropNulls(annotation)
 }

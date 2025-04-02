@@ -95,7 +95,7 @@ export function Onboarding() {
       <PagesComponent
         // @TODO: Use subscription if needed
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-        declaration={event.data}
+        declaration={event.declaration}
         eventConfig={configuration}
         form={metadata}
         formPages={formPages}

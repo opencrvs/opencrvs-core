@@ -36,7 +36,7 @@ function trpcHandler(
   async function wrapHttpResponseJson<T extends HttpResponse>(response: T) {
     const jsonBody = await response.json()
     return HttpResponse.json({
-      result: { data: serialize(jsonBody), type: 'data' }
+      result: { declaration: serialize(jsonBody), type: 'data' }
     })
   }
 
@@ -67,7 +67,7 @@ const createHandler = trpcHandler(async ({ request }) => {
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
         createdBy: '6733309827b97e6483877188',
         createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
-        data: {}
+        declaration: {}
       }
     ]
   })

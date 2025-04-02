@@ -84,7 +84,7 @@ export function EventHistoryModal({
     }
   ]
 
-  const content = prepareComments(history.type, history.metadata ?? {})
+  const content = prepareComments(history.type, history.annotation ?? {})
 
   return (
     <ResponsiveModal
@@ -113,15 +113,16 @@ export function EventHistoryModal({
       {content.length > 0 && (
         <Table columns={commentsColumn} content={content} noResultText=" " />
       )}
-      {history.type === ActionType.ARCHIVE && history.metadata?.isDuplicate && (
-        <p>
-          <Pill
-            label={intl.formatMessage(messages.markAsDuplicate)}
-            size="small"
-            type="inactive"
-          />
-        </p>
-      )}
+      {history.type === ActionType.ARCHIVE &&
+        history.annotation?.isDuplicate && (
+          <p>
+            <Pill
+              label={intl.formatMessage(messages.markAsDuplicate)}
+              size="small"
+              type="inactive"
+            />
+          </p>
+        )}
     </ResponsiveModal>
   )
 }

@@ -57,14 +57,14 @@ export function Review() {
   const form = useEventFormData((state) => state.getFormValues())
 
   const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata()
+  const annotation = getMetadata()
 
   const scopes = useSelector(getScope) ?? undefined
 
   const reviewActionConfiguration = useReviewActionConfig({
     formConfig,
-    form,
-    metadata,
+    declaration: form,
+    annotation,
     scopes,
     reviewFields: reviewConfig.fields
   })
@@ -102,7 +102,7 @@ export function Review() {
   const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form,
-    metadata,
+    annotation,
     reviewFields: reviewConfig.fields
   })
 
@@ -133,9 +133,9 @@ export function Review() {
       }
     >
       <ReviewComponent.Body
+        annotation={annotation}
         form={form}
         formConfig={formConfig}
-        metadata={metadata}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onEdit={handleEdit}

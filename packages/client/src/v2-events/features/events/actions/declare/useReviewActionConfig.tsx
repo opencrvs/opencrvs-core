@@ -250,22 +250,22 @@ const reviewMessages = {
 
 export function useReviewActionConfig({
   formConfig,
-  form,
-  metadata,
+  declaration,
+  annotation,
   reviewFields,
   scopes
 }: {
   formConfig: DeclarationFormConfig
-  form: EventState
-  metadata?: EventState
+  declaration: EventState
+  annotation?: EventState
   reviewFields: FieldConfig[]
   scopes?: Scope[]
 }) {
   const events = useEvents()
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form,
-    metadata,
+    form: declaration,
+    annotation,
     reviewFields
   })
 
@@ -284,8 +284,8 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) => {
         events.actions.notify.mutate({
           eventId,
-          data: form,
-          metadata,
+          declaration: declaration,
+          annotation,
           transactionId: uuid()
         })
       },
@@ -301,8 +301,8 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.customActions.registerOnDeclare.mutate({
           eventId,
-          data: form,
-          metadata
+          declaration: declaration,
+          annotation
         }),
       messages: incomplete
         ? reviewMessages.incomplete.register
@@ -318,8 +318,8 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.customActions.validateOnDeclare.mutate({
           eventId,
-          data: form,
-          metadata
+          declaration: declaration,
+          annotation
         }),
       messages: incomplete
         ? reviewMessages.incomplete.validate
@@ -335,8 +335,8 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.actions.declare.mutate({
           eventId,
-          data: form,
-          metadata,
+          declaration: declaration,
+          annotation,
           transactionId: uuid()
         }),
       messages: incomplete

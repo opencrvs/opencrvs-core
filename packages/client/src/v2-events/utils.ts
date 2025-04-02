@@ -77,9 +77,9 @@ export const getAllUniqueFields = (eventConfig: EventConfig) => {
 export function flattenEventIndex(
   event: EventIndex
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Omit<EventIndex, 'data'> & { [key: string]: any } {
-  const { data, ...rest } = event
-  return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
+): Omit<EventIndex, 'declaration'> & { [key: string]: any } {
+  const { declaration, ...rest } = event
+  return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>

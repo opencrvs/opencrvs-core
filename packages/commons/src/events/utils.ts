@@ -167,19 +167,22 @@ function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
   return !form[field.id]
 }
 
-export function stripHiddenFields(fields: FieldConfig[], data: EventState) {
-  return omitBy(data, (_, fieldId) => {
+export function stripHiddenFields(
+  fields: FieldConfig[],
+  declaration: EventState
+) {
+  return omitBy(declaration, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
 
     if (!field) {
       return true
     }
 
-    if (isOptionalUncheckedCheckbox(field, data)) {
+    if (isOptionalUncheckedCheckbox(field, declaration)) {
       return true
     }
 
-    return !isFieldVisible(field, data)
+    return !isFieldVisible(field, declaration)
   })
 }
 
@@ -189,6 +192,7 @@ export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
     .filter(({ type }) => type !== ActionType.READ)
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
+  console.log('actions', event.actions)
   const lastAction = actions[actions.length - 1]
   return (
     drafts
@@ -211,8 +215,8 @@ export function createEmptyDraft(
     transactionId: getUUID(),
     action: {
       type: actionType,
-      data: {},
-      metadata: {},
+      declaration: {},
+      annotation: {},
       createdAt: new Date().toISOString(),
       createdBy: '@todo',
       createdAtLocation: '@todo'

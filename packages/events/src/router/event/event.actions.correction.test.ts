@@ -136,7 +136,7 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.correction.request(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-02',
       'recommender.none': true
     }
@@ -154,7 +154,7 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.correction.request(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
@@ -197,14 +197,14 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   }
 
   const data = generator.event.actions.correction.request(event.id, {
-    data: form
+    declaration: form
   })
 
   const response = await client.event.actions.correction.request(data)
   const savedAction = response.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
-  expect(savedAction?.data).toEqual(form)
+  expect(savedAction?.declaration).toEqual(form)
 })
 
 test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, async () => {
@@ -229,7 +229,7 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
   }
 
   const payload = generator.event.actions.correction.request(event.id, {
-    data: form
+    declaration: form
   })
 
   await expect(
@@ -279,7 +279,7 @@ describe('when a correction request exists', () => {
 
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(registeredEvent.id, {
-        data: {
+        declaration: {
           ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
           'applicant.firstName': 'Johnny'
         }

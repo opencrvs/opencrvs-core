@@ -126,13 +126,13 @@ export const eventPayloadGenerator = {
         transactionId: getUUID(),
         action: {
           type: ActionType.REQUEST_CORRECTION,
-          data: {
+          declaration: {
             'applicant.firstname': 'Max',
             'applicant.surname': 'McLaren',
             'applicant.dob': '2020-01-02',
             'recommender.none': true
           },
-          metadata: {
+          annotation: {
             'correction.requester.relationship': 'ANOTHER_AGENT',
             'correction.request.reason': "Child's name was incorrect"
           },
@@ -147,16 +147,16 @@ export const eventPayloadGenerator = {
     declare: (
       eventId: string,
       input: Partial<
-        Pick<DeclareActionInput, 'transactionId' | 'data' | 'metadata'>
+        Pick<DeclareActionInput, 'transactionId' | 'declaration' | 'annotation'>
       > = {}
     ) => ({
       type: ActionType.DECLARE,
       transactionId: input.transactionId ?? getUUID(),
-      data:
-        input.data ??
+      declaration:
+        input.declaration ??
         generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
-      metadata:
-        input.metadata ??
+      annotation:
+        input.annotation ??
         generateActionMetadataInput(
           tennisClubMembershipEvent,
           ActionType.DECLARE
@@ -170,40 +170,44 @@ export const eventPayloadGenerator = {
       eventId: string,
       input: {
         transactionId?: string
-        data?: Partial<ActionUpdate>
+        declaration?: Partial<ActionUpdate>
       } = {}
     ) => {
-      let data = input.data
-      if (!data) {
-        const declaration = generateActionInput(
-          tennisClubMembershipEvent,
-          ActionType.DECLARE
+      let declaration = input.declaration
+      if (!declaration) {
+        // Remove some fields to simulate incomplete data
+        const partialDeclaration = omitBy(
+          generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
+          isString
         )
 
         // Remove some fields to simulate incomplete data
-        data = omitBy(declaration, isString)
+        declaration = partialDeclaration
       }
 
       return {
         type: ActionType.NOTIFY,
         transactionId: input.transactionId ?? getUUID(),
-        data,
+        declaration,
         eventId
       }
     },
     validate: (
       eventId: string,
       input: Partial<
-        Pick<ValidateActionInput, 'transactionId' | 'data' | 'metadata'>
+        Pick<
+          ValidateActionInput,
+          'transactionId' | 'declaration' | 'annotation'
+        >
       > = {}
     ) => ({
       type: ActionType.VALIDATE,
       transactionId: input.transactionId ?? getUUID(),
-      data:
-        input.data ??
+      declaration:
+        input.declaration ??
         generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
-      metadata:
-        input.metadata ??
+      annotation:
+        input.annotation ??
         generateActionMetadataInput(
           tennisClubMembershipEvent,
           ActionType.VALIDATE
@@ -213,28 +217,30 @@ export const eventPayloadGenerator = {
     }),
     archive: (
       eventId: string,
-      input: Partial<Pick<ArchiveActionInput, 'transactionId' | 'data'>> = {},
+      input: Partial<
+        Pick<ArchiveActionInput, 'transactionId' | 'declaration'>
+      > = {},
       isDuplicate?: boolean
     ) => ({
       type: ActionType.ARCHIVE,
       transactionId: input.transactionId ?? getUUID(),
-      data: {},
+      declaration: {},
       // @TODO: Check whether generator is needed?
-      metadata: { isDuplicate: isDuplicate ?? false },
+      annotation: { isDuplicate: isDuplicate ?? false },
       duplicates: [],
       eventId
     }),
     reject: (
       eventId: string,
       input: Partial<
-        Pick<RejectDeclarationActionInput, 'transactionId' | 'metadata'>
+        Pick<RejectDeclarationActionInput, 'transactionId' | 'annotation'>
       > = {}
     ) => ({
       type: ActionType.REJECT,
       transactionId: input.transactionId ?? getUUID(),
-      data: {},
-      metadata:
-        input.metadata ??
+      declaration: {},
+      annotation:
+        input.annotation ??
         generateActionMetadataInput(
           tennisClubMembershipEvent,
           ActionType.REJECT
@@ -245,16 +251,19 @@ export const eventPayloadGenerator = {
     register: (
       eventId: string,
       input: Partial<
-        Pick<RegisterActionInput, 'transactionId' | 'data' | 'metadata'>
+        Pick<
+          RegisterActionInput,
+          'transactionId' | 'declaration' | 'annotation'
+        >
       > = {}
     ) => ({
       type: ActionType.REGISTER,
       transactionId: input.transactionId ?? getUUID(),
-      data:
-        input.data ??
+      declaration:
+        input.declaration ??
         generateActionInput(tennisClubMembershipEvent, ActionType.REGISTER),
-      metadata:
-        input.metadata ??
+      annotation:
+        input.annotation ??
         generateActionMetadataInput(
           tennisClubMembershipEvent,
           ActionType.REGISTER
@@ -264,14 +273,14 @@ export const eventPayloadGenerator = {
     printCertificate: (
       eventId: string,
       input: Partial<
-        Pick<RegisterActionInput, 'transactionId' | 'metadata'>
+        Pick<RegisterActionInput, 'transactionId' | 'annotation'>
       > = {}
     ) => ({
       type: ActionType.PRINT_CERTIFICATE,
       transactionId: input.transactionId ?? getUUID(),
-      data: {},
-      metadata:
-        input.metadata ??
+      declaration: {},
+      annotation:
+        input.annotation ??
         generateActionMetadataInput(
           tennisClubMembershipEvent,
           ActionType.PRINT_CERTIFICATE
@@ -284,20 +293,20 @@ export const eventPayloadGenerator = {
         input: Partial<
           Pick<
             RequestCorrectionActionInput,
-            'transactionId' | 'data' | 'metadata'
+            'transactionId' | 'declaration' | 'annotation'
           >
         > = {}
       ) => ({
         type: ActionType.REQUEST_CORRECTION,
         transactionId: input.transactionId ?? getUUID(),
-        data:
-          input.data ??
+        declaration:
+          input.declaration ??
           generateActionInput(
             tennisClubMembershipEvent,
             ActionType.REQUEST_CORRECTION
           ),
-        metadata:
-          input.metadata ??
+        annotation:
+          input.annotation ??
           generateActionMetadataInput(
             tennisClubMembershipEvent,
             ActionType.REQUEST_CORRECTION
@@ -308,14 +317,14 @@ export const eventPayloadGenerator = {
         eventId: string,
         requestId: string,
         input: Partial<
-          Pick<RequestCorrectionActionInput, 'transactionId' | 'metadata'>
+          Pick<RequestCorrectionActionInput, 'transactionId' | 'annotation'>
         > = {}
       ) => ({
         type: ActionType.APPROVE_CORRECTION,
         transactionId: input.transactionId ?? getUUID(),
-        data: {},
-        metadata:
-          input.metadata ??
+        declaration: {},
+        annotation:
+          input.annotation ??
           generateActionMetadataInput(
             tennisClubMembershipEvent,
             ActionType.APPROVE_CORRECTION
@@ -327,14 +336,14 @@ export const eventPayloadGenerator = {
         eventId: string,
         requestId: string,
         input: Partial<
-          Pick<RequestCorrectionActionInput, 'transactionId' | 'metadata'>
+          Pick<RequestCorrectionActionInput, 'transactionId' | 'annotation'>
         > = {}
       ) => ({
         type: ActionType.REJECT_CORRECTION,
         transactionId: input.transactionId ?? getUUID(),
-        data: {},
-        metadata:
-          input.metadata ??
+        declaration: {},
+        annotation:
+          input.annotation ??
           generateActionMetadataInput(
             tennisClubMembershipEvent,
             ActionType.REJECT_CORRECTION
@@ -362,8 +371,8 @@ export function generateActionDocument({
     createdBy: getUUID(),
     id: getUUID(),
     createdAtLocation: 'TODO',
-    data: generateActionInput(configuration, action),
-    metadata: {},
+    declaration: generateActionInput(configuration, action),
+    annotation: {},
     ...defaults
   } satisfies ActionBase
 
@@ -430,7 +439,7 @@ export function generateEventDocument({
 export function generateEventDraftDocument(
   eventId: string,
   actionType: ActionType = ActionType.DECLARE,
-  data: Record<string, FieldValue> = {}
+  declaration: Record<string, FieldValue> = {}
 ): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,
@@ -441,9 +450,9 @@ export function generateEventDraftDocument(
     transactionId: getUUID(),
     action: {
       ...action,
-      data: {
-        ...action.data,
-        ...data
+      declaration: {
+        ...action.declaration,
+        ...declaration
       }
     },
     createdAt: new Date().toISOString(),
@@ -463,7 +472,7 @@ export const eventQueryDataGenerator = (
   modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
-  data: overrides.data ?? {
+  declaration: overrides.declaration ?? {
     'recommender.none': true,
     'applicant.firstname': 'Danny',
     'applicant.surname': 'Doe',

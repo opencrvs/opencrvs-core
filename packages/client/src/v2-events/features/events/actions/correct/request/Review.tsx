@@ -70,7 +70,7 @@ export function Review() {
     return
   }
 
-  const previousFormValues = event.data
+  const previousFormValues = event.declaration
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => previousFormValues[key] !== value
   )

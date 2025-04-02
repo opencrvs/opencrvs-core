@@ -117,7 +117,7 @@ export const eventRouter = router({
           type: ActionType.READ,
           eventId: event.id,
           transactionId: getUUID(),
-          data: {}
+          declaration: {}
         },
         {
           eventId: event.id,
@@ -317,12 +317,12 @@ export const eventRouter = router({
       .input(
         z.object({
           eventId: z.string(),
-          data: z.record(z.string(), FieldValue)
+          declaration: z.record(z.string(), FieldValue)
         })
       )
       .mutation(async ({ input }) => {
         logger.info('Registration confirmed', { eventId: input.eventId })
-        logger.info(input.data)
+        logger.info(input.declaration)
         return getEventById(input.eventId)
       })
   }),

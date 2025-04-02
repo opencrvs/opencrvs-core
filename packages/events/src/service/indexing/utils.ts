@@ -8,21 +8,61 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventSearchIndex } from '@opencrvs/commons/events'
+import { EventSearchIndex, EventIndex } from '@opencrvs/commons/events'
 import { estypes } from '@elastic/elasticsearch'
 
-const FIELD_SEPARATOR = '____'
+export type EncodedEventIndex = EventIndex
+
+export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
+  return {
+    ...event,
+    declaration: Object.entries(event.declaration).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [encodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
+}
+
+export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
+  return {
+    ...event,
+    declaration: Object.entries(event.declaration).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [decodeFieldId(key)]: value
+      }),
+      {}
+    )
+  }
+}
+
+export function encodeFieldId(fieldId: string) {
+  return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
+}
+
+function decodeFieldId(fieldId: string) {
+  return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
+}
+
+export const FIELD_ID_SEPARATOR = '____'
 export const DEFAULT_SIZE = 10
 
+export function declarationReference(fieldName: string) {
+  return `declaration.${fieldName}`
+}
+
 /**
- * Generates an Elasticsearch query to search within `document.data`
+ * Generates an Elasticsearch query to search within `document.declaration`
  * using the provided search payload.
  */
 export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
   const must: estypes.QueryDslQueryContainer[] = Object.entries(event).map(
     ([key, value]) => ({
       match: {
-        [`data.${key.replaceAll('.', FIELD_SEPARATOR)}`]: value
+        [declarationReference(encodeFieldId(key))]: value
       }
     })
   )

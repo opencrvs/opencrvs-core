@@ -98,7 +98,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
     // @TODO: Check that this works after making sure data incldues only declaration fields.
     const fieldConfigs = getDeclarationFields(configuration)
 
-    for (const [key, value] of Object.entries(ac.data)) {
+    for (const [key, value] of Object.entries(ac.declaration)) {
       const fileValue = getValidFileValue(key, value, fieldConfigs)
 
       if (!fileValue) {
@@ -199,7 +199,7 @@ export async function createEvent({
         createdBy,
         createdAtLocation,
         id: getUUID(),
-        data: {}
+        declaration: {}
       }
     ]
   })
@@ -236,7 +236,7 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   drafts: Draft[]
 ): Promise<void> {
   const previousFileValuesInDrafts = drafts
-    .map((draft) => extractFileValues(draft.action.data, fieldConfigs))
+    .map((draft) => extractFileValues(draft.action.declaration, fieldConfigs))
     .flat()
 
   for (const previousFileValue of previousFileValuesInDrafts) {
@@ -278,7 +278,10 @@ export async function addAction(
 
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
-  const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
+  const fileValuesInCurrentAction = extractFileValues(
+    input.declaration,
+    fieldConfigs
+  )
 
   for (const file of fileValuesInCurrentAction) {
     if (!(await fileExists(file.file.filename, token))) {
@@ -286,7 +289,7 @@ export async function addAction(
     }
   }
 
-  if (input.type === ActionType.ARCHIVE && input.metadata?.isDuplicate) {
+  if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
     input.transactionId = getUUID()
     await db.collection<EventDocument>('events').updateOne(
       {

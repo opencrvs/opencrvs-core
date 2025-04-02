@@ -52,12 +52,12 @@ export function getValidationErrorsForForm(
 export function validationErrorsInActionFormExist({
   formConfig,
   form,
-  metadata,
+  annotation,
   reviewFields = []
 }: {
   formConfig: FormConfig
   form: EventState
-  metadata?: EventState
+  annotation?: EventState
   reviewFields?: FieldConfig[]
 }): boolean {
   // We don't want to validate hidden fields
@@ -68,7 +68,7 @@ export function validationErrorsInActionFormExist({
 
   const metadataWithoutHiddenFields = stripHiddenFields(
     reviewFields,
-    metadata ?? {}
+    annotation ?? {}
   )
 
   const hasValidationErrors = formConfig.pages

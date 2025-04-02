@@ -17,7 +17,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
-  getMetadataForAction,
+  getActionAnnotation,
   getDeclaration,
   getActionReviewFields,
   getActionReview
@@ -89,13 +89,13 @@ export function Review() {
 
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const previousMetadata = getMetadataForAction({
+  const previousMetadata = getActionAnnotation({
     event,
     actionType: ActionType.VALIDATE,
     drafts: []
   })
 
-  const metadata = getMetadata(previousMetadata)
+  const annotation = getMetadata(previousMetadata)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -104,7 +104,7 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const previousFormValues = getCurrentEventState(event).data
+  const previousFormValues = getCurrentEventState(event).declaration
   const form = getFormValues()
 
   async function handleEdit({
@@ -143,9 +143,9 @@ export function Review() {
     if (confirmedRegistration) {
       validateMutation.mutate({
         eventId,
-        data: form,
+        declaration: form,
         transactionId: uuid(),
-        metadata,
+        annotation,
         duplicates: []
       })
 
@@ -163,18 +163,18 @@ export function Review() {
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
         events.actions.reject.mutate({
           eventId,
-          data: {},
+          declaration: {},
           transactionId: uuid(),
-          metadata: { message }
+          annotation: { message }
         })
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
         events.actions.archive.mutate({
           eventId,
-          data: {},
+          declaration: {},
           transactionId: uuid(),
-          metadata: { message, isDuplicate }
+          annotation: { message, isDuplicate }
         })
       }
 
@@ -185,7 +185,7 @@ export function Review() {
   const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form,
-    metadata,
+    annotation,
     reviewFields: reviewConfig.fields
   })
 
@@ -200,9 +200,9 @@ export function Review() {
       }
     >
       <ReviewComponent.Body
+        annotation={annotation}
         form={form}
         formConfig={formConfig}
-        metadata={metadata}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}

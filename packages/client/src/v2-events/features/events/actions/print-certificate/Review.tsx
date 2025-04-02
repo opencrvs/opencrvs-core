@@ -245,8 +245,8 @@ export function Review() {
         const response: EventDocument =
           await onlineActions.printCertificate.mutateAsync({
             eventId: fullEvent.id,
-            data: {},
-            metadata: { ...metadata, templateId },
+            declaration: {},
+            annotation: { ...metadata, templateId },
             transactionId: uuid(),
             type: ActionType.PRINT_CERTIFICATE
           })

@@ -80,7 +80,7 @@ export const usePrintableCertificate = (
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $state: modifiedState,
-    $data: form,
+    $declaration: form,
     locations,
     users,
     language
@@ -93,7 +93,7 @@ export const usePrintableCertificate = (
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
       $state: currentEventState,
-      $data: {
+      $declaration: {
         ...base64ReplacedTemplate,
         preview: false
       },

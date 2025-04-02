@@ -226,7 +226,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
       return mutation.mutate({
         ...params,
-        data: stripHiddenFields(declarationFields, params.data)
+        declaration: stripHiddenFields(declarationFields, params.declaration)
       })
     },
     mutateAsync: async (params: inferInput<P>) => {
@@ -243,7 +243,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
       return mutation.mutateAsync({
         ...params,
-        data: stripHiddenFields(fields, params.data)
+        declaration: stripHiddenFields(fields, params.declaration)
       })
     }
   }
@@ -269,7 +269,7 @@ export function useEventCustomAction(mutationKey: string[]) {
 
       return mutation.mutate({
         ...params,
-        data: stripHiddenFields(fields, params.data)
+        declaration: stripHiddenFields(fields, params.declaration)
       })
     }
   }

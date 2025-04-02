@@ -106,7 +106,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        declaration={event.data}
+        declaration={event.declaration}
         disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
         eventConfig={configuration}
         form={metadata}

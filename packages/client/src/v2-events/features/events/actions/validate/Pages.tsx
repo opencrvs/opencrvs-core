@@ -79,7 +79,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        declaration={event.data}
+        declaration={event.declaration}
         eventConfig={configuration}
         form={form}
         formPages={formPages}

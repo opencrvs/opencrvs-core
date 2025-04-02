@@ -30,38 +30,17 @@ import {
 import { logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
-import { DEFAULT_SIZE, generateQuery } from './utils'
+import {
+  decodeEventIndex,
+  DEFAULT_SIZE,
+  EncodedEventIndex,
+  encodeEventIndex,
+  encodeFieldId,
+  generateQuery
+} from './utils'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
-}
-
-export type EncodedEventIndex = EventIndex
-
-export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
-  return {
-    ...event,
-    data: Object.entries(event.data).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [encodeFieldId(key)]: value
-      }),
-      {}
-    )
-  }
-}
-
-export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
-  return {
-    ...event,
-    data: Object.entries(event.data).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [decodeFieldId(key)]: value
-      }),
-      {}
-    )
-  }
 }
 
 /*
@@ -119,7 +98,7 @@ export async function createIndex(
           modifiedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
-          data: {
+          declaration: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)
           },
@@ -130,16 +109,6 @@ export async function createIndex(
   })
 
   return ensureAlias(indexName)
-}
-
-export const FIELD_ID_SEPARATOR = '____'
-
-export function encodeFieldId(fieldId: string) {
-  return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
-}
-
-function decodeFieldId(fieldId: string) {
-  return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
 type _Combine<

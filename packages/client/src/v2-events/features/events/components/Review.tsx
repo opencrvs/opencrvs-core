@@ -413,7 +413,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
-  metadata,
+  annotation,
   onEdit,
   children,
   title,
@@ -424,7 +424,7 @@ function ReviewComponent({
   children: React.ReactNode
   formConfig: FormConfig
   form: EventState
-  metadata?: EventState
+  annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
   onEdit: ({
@@ -454,7 +454,7 @@ function ReviewComponent({
     .map(({ id }) => id)
 
   const hasReviewFieldsToUpdate =
-    metadata && onMetadataChange && reviewFields && reviewFields.length > 0
+    annotation && onMetadataChange && reviewFields && reviewFields.length > 0
 
   return (
     <Row>
@@ -477,9 +477,9 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
-                  formData={metadata}
+                  formData={annotation}
                   id={'review'}
-                  initialValues={metadata}
+                  initialValues={annotation}
                   readonlyMode={readonlyMode}
                   setAllFieldsDirty={false}
                   onChange={onMetadataChange}

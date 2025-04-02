@@ -11,8 +11,8 @@ flowchart TD
      eventId: string,
      transactionId: string,
      incomplete: boolean,
-     data: ActionUpdate,
-     metadata: ActionUpdate
+     declaration: ActionUpdate,
+     annotation: ActionUpdate
 "]
 
 
@@ -27,7 +27,7 @@ flowchart TD
       assignedTo?: string | null
       updatedBy: string,
       trackingId: string
-      data: EventState
+      declaration: EventState
     "]
 
     A -- EventDocument --> D
@@ -45,8 +45,8 @@ flowchart TD
     createdAt: datetime,
     createdBy: string,
     createdAtLocation: string,
-    data: ActionUpdate,
-    metadata: ActionUpdate"
+    declaration: ActionUpdate,
+    annotation: ActionUpdate"
     ]
 
 
