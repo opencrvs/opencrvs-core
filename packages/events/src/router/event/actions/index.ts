@@ -233,19 +233,16 @@ export function getDefaultActionProcedures(
           })
         }
 
-        // Action is already rejected, so we throw an error
-        if (
-          confirmationAction &&
-          confirmationAction.status === ActionStatus.Rejected
-        ) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Action has already been rejected.'
-          })
-        }
+        if (confirmationAction) {
+          // Action is already rejected, so we throw an error
+          if (confirmationAction.status === ActionStatus.Rejected) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: 'Action has already been rejected.'
+            })
+          }
 
-        // Action is already confirmed, so we just return the event
-        if (Boolean(confirmationAction)) {
+          // Action is already confirmed, so we just return the event
           return getEventById(input.eventId)
         }
 
@@ -284,16 +281,13 @@ export function getDefaultActionProcedures(
           throw new Error(`Action not found.`)
         }
 
-        // Action is already accepted
-        if (
-          confirmationAction &&
-          confirmationAction.status === ActionStatus.Accepted
-        ) {
-          throw new Error(`Action has already been accepted.`)
-        }
+        if (confirmationAction) {
+          // Action is already accepted
+          if (confirmationAction.status === ActionStatus.Accepted) {
+            throw new Error(`Action has already been accepted.`)
+          }
 
-        // Action is already rejected, so we just return the event
-        if (Boolean(confirmationAction)) {
+          // Action is already rejected, so we just return the event
           return getEventById(input.eventId)
         }
 
