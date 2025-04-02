@@ -19,7 +19,7 @@ import {
   tennisClubMembershipEvent,
   AddressFieldValue,
   AddressType,
-  getActiveDeclaration
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
@@ -120,7 +120,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
 
 const eventConfig: EventConfig = tennisClubMembershipEvent
 
-const declarationForm = getActiveDeclaration(eventConfig)
+const declarationForm = getDeclaration(eventConfig)
 
 export const AddressReviewUrban: StoryObj<typeof Review> = {
   name: 'Review output (Urban)',

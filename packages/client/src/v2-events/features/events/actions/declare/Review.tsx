@@ -15,8 +15,8 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
   ActionType,
-  getActiveActionReview,
-  getActiveDeclaration,
+  getActionReview,
+  getDeclaration,
   SCOPES
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -51,8 +51,8 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const formConfig = getActiveDeclaration(config)
-  const reviewConfig = getActiveActionReview(config, ActionType.DECLARE)
+  const formConfig = getDeclaration(config)
+  const reviewConfig = getActionReview(config, ActionType.DECLARE)
 
   const form = useEventFormData((state) => state.getFormValues())
 

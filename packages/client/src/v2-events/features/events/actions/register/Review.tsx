@@ -18,8 +18,8 @@ import {
   getCurrentEventState,
   ActionType,
   getMetadataForAction,
-  getActiveDeclaration,
-  getActiveActionReview
+  getDeclaration,
+  getActionReview
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -98,8 +98,8 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const formConfig = getActiveDeclaration(config)
-  const reviewConfig = getActiveActionReview(config, ActionType.REGISTER)
+  const formConfig = getDeclaration(config)
+  const reviewConfig = getActionReview(config, ActionType.REGISTER)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).data

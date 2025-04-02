@@ -28,9 +28,9 @@ import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
-  findActiveActionPages,
+  findRecordActionPages,
   getActionMetadataFields,
-  getActiveDeclarationFields,
+  getDeclarationFields,
   isPageVisible,
   isVerificationPage,
   stripHiddenFields
@@ -56,7 +56,7 @@ export function generateActionInput(
 ) {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
-    const fields = getActiveDeclarationFields(configuration)
+    const fields = getDeclarationFields(configuration)
 
     const data = fieldConfigsToActionPayload(fields)
 
@@ -86,7 +86,7 @@ export function generateActionMetadataInput(
   const metadata = fieldConfigsToActionPayload(metadataFields)
 
   const visibleVerificationPageIds =
-    (findActiveActionPages(configuration, action) ?? [])
+    (findRecordActionPages(configuration, action) ?? [])
       .filter((page) => isVerificationPage(page))
       .filter((page) => isPageVisible(page, metadata))
       .map((page) => page.id) ?? []

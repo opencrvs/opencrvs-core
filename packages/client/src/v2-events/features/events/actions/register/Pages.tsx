@@ -15,7 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getActiveDeclarationPages } from '@opencrvs/commons/client'
+import { getDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
@@ -44,7 +44,7 @@ export function Pages() {
     event.type
   )
 
-  const declarationPages = getActiveDeclarationPages(configuration)
+  const declarationPages = getDeclarationPages(configuration)
 
   const currentPageId =
     declarationPages.find((p) => p.id === pageId)?.id || declarationPages[0]?.id

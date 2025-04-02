@@ -33,7 +33,7 @@ export const EventConfig = z
     summary: SummaryConfig,
     label: TranslationConfig,
     actions: z.array(ActionConfig),
-    declaration: z.array(DeclarationFormConfig),
+    declaration: DeclarationFormConfig,
     workqueues: z.array(WorkqueueConfig),
     deduplication: z.array(DeduplicationConfig).optional().default([]),
     advancedSearch: z.array(AdvancedSearchConfig).optional().default([])

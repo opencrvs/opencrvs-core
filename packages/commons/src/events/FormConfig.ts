@@ -12,36 +12,26 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { FormPageConfig, PageConfig } from './PageConfig'
 
-export const BaseFormConfig = z.object({
-  version: z.object({
-    id: z
-      .string()
-      .describe(
-        'Form version. Semantic versioning recommended. Example: 0.0.1'
-      ),
-    label: TranslationConfig.describe(
-      'Human readable description of the version'
-    )
-  }),
-  active: z.boolean().describe('Whether the form is active')
-})
-
-export const DeclarationFormConfig = BaseFormConfig.extend({
-  label: TranslationConfig.describe('Human readable description of the form'),
-  pages: z.array(FormPageConfig)
-}).describe(
-  'Configuration for a declaration form used to gather event **data**'
-)
+export const DeclarationFormConfig = z
+  .object({
+    label: TranslationConfig.describe('Human readable description of the form'),
+    pages: z.array(FormPageConfig)
+  })
+  .describe(
+    'Configuration for a declaration form used to gather event **data**'
+  )
 
 export type DeclarationFormConfig = z.infer<typeof DeclarationFormConfig>
 export type DeclarationFormConfigInput = z.input<typeof DeclarationFormConfig>
 
-export const ActionFormConfig = BaseFormConfig.extend({
-  label: TranslationConfig.describe('Human readable description of the form'),
-  pages: z.array(PageConfig)
-}).describe(
-  'Configuration for an action form used to gather event **metadata**'
-)
+export const ActionFormConfig = z
+  .object({
+    label: TranslationConfig.describe('Human readable description of the form'),
+    pages: z.array(PageConfig)
+  })
+  .describe(
+    'Configuration for an action form used to gather event **metadata**'
+  )
 
 export type ActionFormConfig = z.infer<typeof ActionFormConfig>
 export type ActionFormConfigInput = z.input<typeof ActionFormConfig>

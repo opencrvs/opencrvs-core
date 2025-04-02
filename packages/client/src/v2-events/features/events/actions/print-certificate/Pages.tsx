@@ -35,14 +35,13 @@ import {
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
-function getActivePrintCertificatePages(configuration: EventConfig) {
+function getPrintCertificatePages(configuration: EventConfig) {
   const action = configuration.actions.find(
     (a) => a.type === ActionType.PRINT_CERTIFICATE
   )
 
-  const pages = action?.printForm.find((printForm) => printForm.active)?.pages
   return getOrThrow(
-    pages,
+    action?.printForm.pages,
     `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
   )
 }
@@ -67,7 +66,7 @@ export function Pages() {
     event.type
   )
 
-  const formPages = getActivePrintCertificatePages(configuration)
+  const formPages = getPrintCertificatePages(configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id

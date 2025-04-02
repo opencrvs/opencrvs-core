@@ -18,7 +18,7 @@ import {
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getActiveDeclarationFields
+  getDeclarationFields
 } from '@opencrvs/commons/events'
 import { type estypes } from '@elastic/elasticsearch'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -78,7 +78,7 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
 
   if (!hasEventsIndex) {
     logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getActiveDeclarationFields(eventConfiguration))
+    await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
     logger.info(`Index ${indexName} already exists`)
     logger.info(JSON.stringify(hasEventsIndex))
@@ -247,7 +247,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   })
 
   if (!hasEventsIndex) {
-    await createIndex(indexName, getActiveDeclarationFields(eventConfiguration))
+    await createIndex(indexName, getDeclarationFields(eventConfiguration))
   }
 
   const stream = mongoClient.collection(indexName).find().stream()

@@ -16,8 +16,8 @@ import {
   ActionType,
   EventConfig,
   EventDocument,
-  getActiveActionReview,
-  getActiveDeclaration,
+  getActionReview,
+  getDeclaration,
   getMetadataForAction
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -44,7 +44,7 @@ function getLastActionReviewConfig(config: EventConfig, event: EventDocument) {
     )
 
     if (availableAllowedAction) {
-      return getActiveActionReview(config, actionType)
+      return getActionReview(config, actionType)
     }
   }
 
@@ -71,7 +71,7 @@ function ReadonlyView() {
     currentEventState.type
   )
   const [fullEvent] = getEvent.useSuspenseQuery(eventId)
-  const formConfig = getActiveDeclaration(config)
+  const formConfig = getDeclaration(config)
 
   const form = useEventFormData((state) =>
     state.getFormValues(currentEventState.data)

@@ -20,7 +20,7 @@ import {
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  getActiveDeclarationFields,
+  getDeclarationFields,
   ActionType
 } from '@opencrvs/commons/events'
 import {
@@ -96,7 +96,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 
   for (const ac of event.actions) {
     // @TODO: Check that this works after making sure data incldues only declaration fields.
-    const fieldConfigs = getActiveDeclarationFields(configuration)
+    const fieldConfigs = getDeclarationFields(configuration)
 
     for (const [key, value] of Object.entries(ac.data)) {
       const fileValue = getValidFileValue(key, value, fieldConfigs)
@@ -277,7 +277,7 @@ export async function addAction(
   })
 
   // @TODO: Check that this works after making sure data incldues only declaration fields.
-  const fieldConfigs = getActiveDeclarationFields(configuration)
+  const fieldConfigs = getDeclarationFields(configuration)
   const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
 
   for (const file of fileValuesInCurrentAction) {

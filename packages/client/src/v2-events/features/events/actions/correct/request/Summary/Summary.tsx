@@ -22,7 +22,7 @@ import {
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getActiveDeclaration
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -119,7 +119,7 @@ export function Summary() {
   const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues()
-  const formConfig = getActiveDeclaration(eventConfiguration)
+  const formConfig = getDeclaration(eventConfiguration)
 
   const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION

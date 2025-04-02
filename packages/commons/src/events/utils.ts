@@ -32,32 +32,15 @@ import { getOrThrow } from '../utils'
  */
 export const findPageFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
-    config.declaration.map(({ pages }) => pages.map(({ fields }) => fields)),
-    config.actions.map((action) => {
-      if (action.type === ActionType.REQUEST_CORRECTION) {
-        return [
-          ...action.onboardingForm.flatMap(({ fields }) => fields),
-          ...action.additionalDetailsForm.flatMap(({ fields }) => fields)
-        ]
-      }
-
-      if (action.type === ActionType.PRINT_CERTIFICATE) {
-        return (
-          action?.printForm.flatMap((form) =>
-            form.pages.flatMap(({ fields }) => fields)
-          ) ?? []
-        )
-      }
-
-      return []
-    })
+    ...getDeclarationFields(config),
+    ...getAllMetadataFields(config)
   ])
 }
 
 /**
  * @returns All metadata fields in the event configuration.
  */
-export const findAllMetadataFields = (config: EventConfig): FieldConfig[] => {
+export const getAllMetadataFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep(config.actions.map(getActionMetadataFields))
 }
 
@@ -70,15 +53,11 @@ export const getActionMetadataFields = (actionConfig: ActionConfig) => {
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
-    return (
-      actionConfig?.printForm.flatMap((form) =>
-        form.pages.flatMap(({ fields }) => fields)
-      ) ?? []
-    )
+    return actionConfig?.printForm.pages.flatMap(({ fields }) => fields) ?? []
   }
 
   if (isDeclarationActionConfig(actionConfig)) {
-    return actionConfig?.review?.flatMap(({ fields }) => fields) ?? []
+    return actionConfig?.review.fields ?? []
   }
 
   return []
@@ -89,7 +68,7 @@ export const getActionMetadataFields = (actionConfig: ActionConfig) => {
  * @TODO: Request correction should have same format as print certificate
  *
  */
-export const findActiveActionPages = (
+export const findRecordActionPages = (
   config: EventConfig,
   actionType: ActionType
 ): PageConfig[] => {
@@ -100,7 +79,7 @@ export const findActiveActionPages = (
   }
 
   if (action?.type === ActionType.PRINT_CERTIFICATE) {
-    return action?.printForm.find((form) => form.active)?.pages ?? []
+    return action.printForm.pages
   }
 
   return []
@@ -112,42 +91,28 @@ function isDeclarationActionConfig(
   return DeclarationActions.safeParse(action.type).success
 }
 
-export function getActiveDeclarationFields(configuration: EventConfig) {
-  return getActiveDeclaration(configuration).pages.flatMap(
-    (page) => page.fields
-  )
-}
-
 export function getDeclarationFields(
   configuration: EventConfig
 ): FieldConfig[] {
-  return configuration.declaration.flatMap(({ pages }) =>
-    pages.flatMap((page) => page.fields)
-  )
+  return configuration.declaration.pages.flatMap(({ fields }) => fields)
 }
 
-export function getActiveDeclaration(configuration: EventConfig) {
-  const [declaration] = configuration.declaration.filter((dec) => dec.active)
-
-  if (!declaration) {
-    throw new Error('No active declaration found')
-  }
-
-  return declaration
+export function getDeclarationPages(configuration: EventConfig) {
+  return configuration.declaration.pages
 }
 
-export function getActiveDeclarationPages(configuration: EventConfig) {
-  return getActiveDeclaration(configuration).pages
+export function getDeclaration(configuration: EventConfig) {
+  return configuration.declaration
 }
 
-export function getActiveActionReviewFields(
+export function getActionReviewFields(
   configuration: EventConfig,
   actionType: DeclarationAction
 ) {
-  return getActiveActionReview(configuration, actionType).fields
+  return getActionReview(configuration, actionType).fields
 }
 
-export function getActiveActionReview(
+export function getActionReview(
   configuration: EventConfig,
   actionType: ActionType
 ) {
@@ -155,11 +120,10 @@ export function getActiveActionReview(
     (a): a is DeclarationActionConfig => a.type === actionType
   )
 
-  const activeReviewConfig = actionConfig.review?.find(
-    (review) => review.active
+  return getOrThrow(
+    actionConfig?.review,
+    `No review config found for ${actionType}`
   )
-
-  return getOrThrow(activeReviewConfig, 'No active review config found')
 }
 
 export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {

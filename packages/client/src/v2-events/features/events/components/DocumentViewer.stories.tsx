@@ -17,7 +17,7 @@ import {
   generateTranslationConfig,
   FieldType,
   defineActionForm,
-  getActiveDeclaration
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -35,7 +35,7 @@ export const EmptyDocumentViewer: StoryObj<typeof DocumentViewer> = {
     return (
       <DocumentViewer
         form={{}}
-        formConfig={getActiveDeclaration(tennisClubMembershipEvent)}
+        formConfig={getDeclaration(tennisClubMembershipEvent)}
         onEdit={noop}
       />
     )
@@ -91,11 +91,6 @@ export const DocumentViewerWithFiles: StoryObj<typeof DocumentViewer> = {
       <DocumentViewer
         form={form}
         formConfig={defineActionForm({
-          active: true,
-          version: {
-            id: '1.0',
-            label: generateTranslationConfig('form title')
-          },
           pages: [
             {
               fields: [

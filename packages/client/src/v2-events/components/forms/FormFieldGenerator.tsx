@@ -54,7 +54,7 @@ import {
   EventIndex,
   MetaFields,
   AddressType,
-  getActiveDeclarationFields
+  getDeclarationFields
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
@@ -523,7 +523,7 @@ const GeneratedInputField = React.memo(
       }
 
       // Data input requires field configs
-      const declarationFields = getActiveDeclarationFields(eventConfig)
+      const declarationFields = getDeclarationFields(eventConfig)
 
       const fields = field.config.configuration.data.map((entry) =>
         getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })

@@ -14,7 +14,7 @@ import { PageConfig } from './PageConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
-import { ActionFormConfig, BaseFormConfig } from './FormConfig'
+import { ActionFormConfig } from './FormConfig'
 
 /**
  * By default, when conditionals are not defined, action is visible and enabled to the user.
@@ -26,16 +26,18 @@ const ActionConditional = z.discriminatedUnion('type', [
   EnableConditional
 ])
 
-export const DeclarationReviewConfig = BaseFormConfig.extend({
-  title: TranslationConfig.describe('Title of the review page'),
-  fields: z
-    .array(FieldConfig)
-    .describe(
-      'Fields to be rendered on the review page for metadata gathering.'
-    )
-}).describe(
-  'Configuration for **declaration** review page. Fields gathered are part of metadata.'
-)
+export const DeclarationReviewConfig = z
+  .object({
+    title: TranslationConfig.describe('Title of the review page'),
+    fields: z
+      .array(FieldConfig)
+      .describe(
+        'Fields to be rendered on the review page for metadata gathering.'
+      )
+  })
+  .describe(
+    'Configuration for **declaration** review page. Fields gathered are part of metadata.'
+  )
 
 export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
 
@@ -48,21 +50,21 @@ export const ActionConfigBase = z.object({
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE),
-    review: z.array(DeclarationReviewConfig).min(1)
+    review: DeclarationReviewConfig
   })
 )
 
 const ValidateConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.VALIDATE),
-    review: z.array(DeclarationReviewConfig).min(1)
+    review: DeclarationReviewConfig
   })
 )
 
 const RegisterConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    review: z.array(DeclarationReviewConfig).min(1)
+    review: DeclarationReviewConfig
   })
 )
 
@@ -93,7 +95,7 @@ const DeleteConfig = ActionConfigBase.merge(
 const PrintCertificateActionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.PRINT_CERTIFICATE),
-    printForm: z.array(ActionFormConfig)
+    printForm: ActionFormConfig
   })
 )
 

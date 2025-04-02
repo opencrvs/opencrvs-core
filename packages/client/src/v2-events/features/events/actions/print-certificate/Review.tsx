@@ -129,15 +129,14 @@ const messages = defineMessages({
   }
 })
 
-function getActivePrintForm(configuration: EventConfig) {
+function getPrintForm(configuration: EventConfig) {
   const actionConfig = configuration.actions.find(
     (a) => a.type === ActionType.PRINT_CERTIFICATE
   )
-  const form = actionConfig?.printForm.find((f) => f.active)
 
   return getOrThrow(
-    form,
-    `No active form found for action: ${ActionType.PRINT_CERTIFICATE}`
+    actionConfig?.printForm,
+    `No form found for action: ${ActionType.PRINT_CERTIFICATE}`
   )
 }
 
@@ -187,7 +186,7 @@ export function Review() {
    * review/print the certificate if there are validation errors.
    */
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const formConfig = getActivePrintForm(eventConfiguration)
+  const formConfig = getPrintForm(eventConfiguration)
 
   if (!svgCode) {
     return <Spinner id="review-certificate-loading" />

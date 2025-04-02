@@ -23,10 +23,10 @@ import {
   isPageVisible,
   isVerificationPage,
   MetadataActions,
-  findActiveActionPages,
+  findRecordActionPages,
   DeclarationUpdateAction,
-  getActiveActionReviewFields,
-  getActiveDeclaration,
+  getActionReviewFields,
+  getDeclaration,
   getVisiblePagesFormFields,
   DeclarationActions
 } from '@opencrvs/commons/events'
@@ -109,13 +109,13 @@ function validateDeclarationUpdateAction({
   data: ActionUpdate
   metadata?: ActionUpdate
 }) {
-  const activeDeclaration = getActiveDeclaration(eventConfig)
+  const activeDeclaration = getDeclaration(eventConfig)
 
   const declarationFields = getVisiblePagesFormFields(activeDeclaration, data)
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
   const reviewFields = declarationActionParse.success
-    ? getActiveActionReviewFields(eventConfig, declarationActionParse.data)
+    ? getActionReviewFields(eventConfig, declarationActionParse.data)
     : []
 
   const fields = [...declarationFields, ...reviewFields]
@@ -133,7 +133,7 @@ function validateMetadataAction({
   actionType: MetadataAction
   metadata?: ActionUpdate
 }) {
-  const pages = findActiveActionPages(eventConfig, actionType)
+  const pages = findRecordActionPages(eventConfig, actionType)
 
   const visibleVerificationPageIds = pages
     .filter((page) => isVerificationPage(page))
