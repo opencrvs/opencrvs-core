@@ -14,7 +14,7 @@ import {
   requiresAnyOfScopes
 } from '@events/router/middleware'
 import { publicProcedure } from '@events/router/trpc'
-import { notifyOnAction } from '@events/service/config/config'
+
 import {
   getEventById,
   addAction,
@@ -23,7 +23,6 @@ import {
 import { SCOPES, getUUID } from '@opencrvs/commons'
 import {
   ActionType,
-  ActionConfirmationResponse,
   ActionStatus,
   EventDocument,
   ActionInput,
@@ -40,6 +39,10 @@ import { TRPCError } from '@trpc/server'
 // eslint-disable-next-line import/named
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
+import {
+  ActionConfirmationResponse,
+  requestActionConfirmation
+} from './actionConfirmationRequest'
 
 /**
  * Configuration for different action types which use the default confirmation flow.
@@ -155,7 +158,7 @@ export function getDefaultActionProcedures(
         const actionId = getUUID()
         const event = await getEventById(eventId)
 
-        const { responseStatus, body } = await notifyOnAction(
+        const { responseStatus, body } = await requestActionConfirmation(
           input,
           event,
           token,

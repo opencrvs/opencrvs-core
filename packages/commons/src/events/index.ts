@@ -43,4 +43,3 @@ export * from './TemplateConfig'
 // In order to infer types, we need to export the following types along with events
 export * from '../conditionals/conditionals'
 export * from '../conditionals/validate'
-export * from './api'

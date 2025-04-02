@@ -10,15 +10,7 @@
  */
 
 import { env } from '@events/environment'
-import {
-  ActionInput,
-  EventConfig,
-  EventDocument,
-  getOrThrow,
-  logger,
-  ActionConfirmationResponseCodes,
-  ActionConfirmationResponse
-} from '@opencrvs/commons'
+import { EventConfig, getOrThrow } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { array } from 'zod'
 
@@ -62,50 +54,4 @@ export async function getEventConfigurationById({
     }),
     `No configuration found for event type: ${eventType}`
   )
-}
-
-export async function notifyOnAction(
-  action: ActionInput,
-  event: EventDocument,
-  token: string,
-  actionId: string
-): Promise<{
-  responseStatus: ActionConfirmationResponse
-  body: Record<string, unknown> | undefined
-}> {
-  try {
-    const res = await fetch(
-      new URL(
-        `/events/${event.type}/actions/${action.type}`,
-        env.COUNTRY_CONFIG_URL
-      ),
-      {
-        method: 'POST',
-        body: JSON.stringify({ event, actionId, action }),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token
-        }
-      }
-    )
-
-    const status = res.status
-    const responseStatus =
-      status in ActionConfirmationResponseCodes
-        ? ActionConfirmationResponseCodes[
-            status as keyof typeof ActionConfirmationResponseCodes
-          ]
-        : ActionConfirmationResponse.UnexpectedFailure
-
-    return {
-      responseStatus,
-      body: await res.json().catch(() => undefined)
-    }
-  } catch (error) {
-    logger.error(error)
-    return {
-      responseStatus: ActionConfirmationResponse.UnexpectedFailure,
-      body: undefined
-    }
-  }
 }
