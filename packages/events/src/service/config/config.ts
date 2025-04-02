@@ -81,7 +81,7 @@ export async function notifyOnAction(
       ),
       {
         method: 'POST',
-        body: JSON.stringify({ event, actionId }),
+        body: JSON.stringify({ event, actionId, action }),
         headers: {
           'Content-Type': 'application/json',
           Authorization: token
