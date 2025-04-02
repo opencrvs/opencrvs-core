@@ -37,7 +37,7 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page metadata is missing`, async () => {
+test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page fields are missing`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -57,7 +57,7 @@ test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page me
   ).rejects.matchSnapshot()
 })
 
-test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page metadata is set`, async () => {
+test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page fields are set`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 

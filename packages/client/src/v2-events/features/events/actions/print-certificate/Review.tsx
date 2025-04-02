@@ -47,7 +47,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
@@ -163,8 +163,8 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { getMetadata } = useEventMetadata()
-  const metadata = getMetadata()
+  const { getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
@@ -173,7 +173,7 @@ export function Review() {
 
   const { svgCode, handleCertify } = usePrintableCertificate(
     fullEvent,
-    metadata,
+    annotation,
     locations,
     users,
     certificateConfig,
@@ -194,7 +194,7 @@ export function Review() {
 
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
-    form: metadata
+    form: annotation
   })
   if (validationErrorExist) {
     return (
@@ -246,7 +246,7 @@ export function Review() {
           await onlineActions.printCertificate.mutateAsync({
             eventId: fullEvent.id,
             declaration: {},
-            annotation: { ...metadata, templateId },
+            annotation: { ...annotation, templateId },
             transactionId: uuid(),
             type: ActionType.PRINT_CERTIFICATE
           })

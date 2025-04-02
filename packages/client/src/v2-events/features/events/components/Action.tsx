@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { createTemporaryId } from '@client/v2-events/utils'
@@ -48,18 +48,14 @@ function ActionComponent({ children, actionType }: Props) {
       createEmptyDraft(params.eventId, createTemporaryId(), actionType)
   )
 
-  console.log('localdraft', localDraft)
-  console.log('activeDraft', activeDraft)
-  console.log('drafts', drafts)
-
   /*
    * Keep the local draft updated as per the form changes
    */
   const formValues = useEventFormData((state) => state.formValues)
-  const metadataValues = useEventMetadata((state) => state.metadata)
+  const annotation = useActionAnnotation((state) => state.annotation)
 
   useEffect(() => {
-    if (!formValues || !metadataValues) {
+    if (!formValues || !annotation) {
       return
     }
 
@@ -69,11 +65,11 @@ function ActionComponent({ children, actionType }: Props) {
       action: {
         ...localDraft.action,
         declaration: formValues,
-        annotation: metadataValues
+        annotation
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues, metadataValues])
+  }, [formValues, annotation])
 
   /*
    * Initialize the form state
@@ -83,8 +79,8 @@ function ActionComponent({ children, actionType }: Props) {
     (state) => state.setInitialFormValues
   )
 
-  const setInitialMetadataValues = useEventMetadata(
-    (state) => state.setInitialMetadataValues
+  const setInitialMetadataValues = useActionAnnotation(
+    (state) => state.setInitialAnnotation
   )
 
   const eventDrafts = drafts
@@ -107,8 +103,6 @@ function ActionComponent({ children, actionType }: Props) {
         createdAt: new Date().toISOString()
       }
     })
-
-  console.log('eventDrafts', eventDrafts)
 
   const eventStateWithDrafts = useMemo(
     () => getCurrentEventStateWithDrafts(event, eventDrafts),

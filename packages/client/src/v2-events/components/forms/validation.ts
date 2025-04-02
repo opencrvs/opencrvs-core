@@ -66,7 +66,7 @@ export function validationErrorsInActionFormExist({
     form
   )
 
-  const metadataWithoutHiddenFields = stripHiddenFields(
+  const visibleAnnotationFields = stripHiddenFields(
     reviewFields,
     annotation ?? {}
   )
@@ -81,9 +81,9 @@ export function validationErrorsInActionFormExist({
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })
 
-  const hasMetadataValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, metadataWithoutHiddenFields)
+  const hasAnnotationValidationErrors = Object.values(
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
   ).some((field) => field.errors.length > 0)
 
-  return hasValidationErrors || hasMetadataValidationErrors
+  return hasValidationErrors || hasAnnotationValidationErrors
 }

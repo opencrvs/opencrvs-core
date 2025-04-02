@@ -22,7 +22,7 @@ import {
   Inferred,
   isPageVisible,
   isVerificationPage,
-  MetadataActions,
+  annotationActions,
   findRecordActionPages,
   DeclarationUpdateAction,
   getActionReviewFields,
@@ -123,24 +123,24 @@ function validateDeclarationUpdateAction({
 
   const fields = [...declarationFields, ...reviewFields]
 
-  // @TODO: Separate validations for metadata and data
+  // @TODO: Separate validations for annotation and declaration
   return getFormFieldErrors(fields, { ...declaration, ...annotation })
 }
 
-function validateMetadataAction({
+function validateActionAnnotation({
   eventConfig,
   actionType,
-  metadata = {}
+  annotation = {}
 }: {
   eventConfig: EventConfig
   actionType: MetadataAction
-  metadata?: ActionUpdate
+  annotation?: ActionUpdate
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
   const visibleVerificationPageIds = pages
     .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, metadata))
+    .filter((page) => isPageVisible(page, annotation))
     .map((page) => page.id)
 
   const formFields = pages.flatMap(({ fields }) =>
@@ -148,8 +148,8 @@ function validateMetadataAction({
   )
 
   const errors = [
-    ...getFormFieldErrors(formFields, metadata),
-    ...getVerificationPageErrors(visibleVerificationPageIds, metadata)
+    ...getFormFieldErrors(formFields, annotation),
+    ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
   return errors
@@ -177,13 +177,13 @@ export function validateAction(actionType: ActionType) {
       throwWhenNotEmpty(errors)
     }
 
-    const metadataAction = MetadataActions.safeParse(actionType)
+    const annotationActionParse = annotationActions.safeParse(actionType)
 
-    if (metadataAction.success) {
-      const errors = validateMetadataAction({
+    if (annotationActionParse.success) {
+      const errors = validateActionAnnotation({
         eventConfig,
-        metadata: input.annotation,
-        actionType: metadataAction.data
+        annotation: input.annotation,
+        actionType: annotationActionParse.data
       })
 
       throwWhenNotEmpty(errors)

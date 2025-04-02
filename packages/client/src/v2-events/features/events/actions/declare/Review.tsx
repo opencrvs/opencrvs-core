@@ -21,7 +21,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -56,7 +56,8 @@ export function Review() {
 
   const form = useEventFormData((state) => state.getFormValues())
 
-  const { setMetadata, getMetadata } = useEventMetadata()
+  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
+    useActionAnnotation()
   const annotation = getMetadata()
 
   const scopes = useSelector(getScope) ?? undefined
@@ -139,7 +140,7 @@ export function Review() {
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onEdit={handleEdit}
-        onMetadataChange={(values) => setMetadata(values)}
+        onAnnotationChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}

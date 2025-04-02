@@ -31,13 +31,9 @@ export const DeclarationReviewConfig = z
     title: TranslationConfig.describe('Title of the review page'),
     fields: z
       .array(FieldConfig)
-      .describe(
-        'Fields to be rendered on the review page for metadata gathering.'
-      )
+      .describe('Fields to be rendered on the review page for annotations.')
   })
-  .describe(
-    'Configuration for **declaration** review page. Fields gathered are part of metadata.'
-  )
+  .describe('Configuration for **declaration** review page.')
 
 export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
 

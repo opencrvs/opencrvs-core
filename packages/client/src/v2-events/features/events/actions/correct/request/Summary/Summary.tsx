@@ -43,7 +43,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 
 function shouldBeShownAsAValue(field: FieldConfig) {
   if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
@@ -144,11 +144,11 @@ export function Summary() {
     previousFormValues
   )
 
-  const metadata = useEventMetadata()
+  const annotation = useActionAnnotation()
 
-  const metadataForm = metadata.getMetadata()
+  const annotationForm = annotation.getAnnotation()
 
-  const stringiedRequestData = stringifyFormData(allFields, metadataForm)
+  const stringiedRequestData = stringifyFormData(allFields, annotationForm)
 
   const onboardingFormPages =
     eventConfiguration.actions.find(
@@ -189,7 +189,7 @@ export function Summary() {
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      annotation: metadataForm
+      annotation: annotationForm
     })
     eventFormNavigation.goToHome()
   }, [
@@ -197,7 +197,7 @@ export function Summary() {
     fields,
     events.actions.correction.request,
     eventId,
-    metadataForm,
+    annotationForm,
     eventFormNavigation,
     previousFormValues
   ])

@@ -32,7 +32,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -93,7 +93,8 @@ export function Review() {
     drafts: []
   })
 
-  const { setMetadata, getMetadata } = useEventMetadata()
+  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
+    useActionAnnotation()
   const annotation = getMetadata(previousMetadata)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
@@ -204,7 +205,7 @@ export function Review() {
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onEdit={handleEdit}
-        onMetadataChange={(values) => setMetadata(values)}
+        onAnnotationChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           isPrimaryActionDisabled={hasValidationErrors}

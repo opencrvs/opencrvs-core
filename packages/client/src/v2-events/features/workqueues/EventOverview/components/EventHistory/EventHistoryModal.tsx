@@ -43,14 +43,14 @@ const messages = defineMessages({
   }
 })
 
-function prepareComments(action: ActionType, metadata: ActionUpdate) {
+function prepareComments(action: ActionType, annotation: ActionUpdate) {
   const comments: { comment: string }[] = []
 
-  if (action === ActionType.REJECT && typeof metadata.message === 'string') {
-    comments.push({ comment: metadata.message })
+  if (action === ActionType.REJECT && typeof annotation.message === 'string') {
+    comments.push({ comment: annotation.message })
   }
-  if (action === ActionType.ARCHIVE && typeof metadata.message === 'string') {
-    comments.push({ comment: metadata.message })
+  if (action === ActionType.ARCHIVE && typeof annotation.message === 'string') {
+    comments.push({ comment: annotation.message })
   }
   return comments
 }

@@ -22,7 +22,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -79,7 +79,8 @@ function ReadonlyView() {
 
   const reviewConfig = getLastActionReviewConfig(config, fullEvent)
 
-  const { setMetadata, getMetadata } = useEventMetadata()
+  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
+    useActionAnnotation()
   const annotation = getMetadata(findLastActionMetadata(fullEvent))
 
   return (
@@ -91,7 +92,7 @@ function ReadonlyView() {
         formConfig={formConfig}
         title={formatMessage(reviewConfig.title, form)}
         onEdit={noop}
-        onMetadataChange={(values) => setMetadata(values)}
+        onAnnotationChange={(values) => setMetadata(values)}
       >
         <></>
       </ReviewComponent.Body>

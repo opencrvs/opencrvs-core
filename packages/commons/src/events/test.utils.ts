@@ -29,7 +29,7 @@ import { EventInput } from './EventInput'
 import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
   findRecordActionPages,
-  getActionMetadataFields,
+  getActionAnnotationFields,
   getDeclarationFields,
   isPageVisible,
   isVerificationPage,
@@ -40,7 +40,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
 
-function fieldConfigsToActionPayload(fields: FieldConfig[]) {
+function fieldConfigsToActionAnnotation(fields: FieldConfig[]) {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
@@ -58,11 +58,11 @@ export function generateActionInput(
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)
 
-    const data = fieldConfigsToActionPayload(fields)
+    const annotation = fieldConfigsToActionAnnotation(fields)
 
-    // Strip away hidden or disabled fields from mock action data
+    // Strip away hidden or disabled fields from mock action annotation
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return stripHiddenFields(fields, data)
+    return stripHiddenFields(fields, annotation)
   }
 
   // eslint-disable-next-line no-console
@@ -79,16 +79,16 @@ export function generateActionMetadataInput(
     (actionConfig) => actionConfig.type === action
   )
 
-  const metadataFields = actionConfig
-    ? getActionMetadataFields(actionConfig)
+  const annotationFields = actionConfig
+    ? getActionAnnotationFields(actionConfig)
     : []
 
-  const metadata = fieldConfigsToActionPayload(metadataFields)
+  const annotation = fieldConfigsToActionAnnotation(annotationFields)
 
   const visibleVerificationPageIds =
     (findRecordActionPages(configuration, action) ?? [])
       .filter((page) => isVerificationPage(page))
-      .filter((page) => isPageVisible(page, metadata))
+      .filter((page) => isPageVisible(page, annotation))
       .map((page) => page.id) ?? []
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
@@ -99,7 +99,7 @@ export function generateActionMetadataInput(
     {}
   )
 
-  const fieldBasedPayload = stripHiddenFields(metadataFields, metadata)
+  const fieldBasedPayload = stripHiddenFields(annotationFields, annotation)
 
   return {
     ...fieldBasedPayload,

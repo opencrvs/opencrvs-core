@@ -406,8 +406,8 @@ function FormReview({
 }
 
 /**
- * Review component, used to display the "read" version of the form with metadata input fields for the user (signatures etc.)
- * User can review the data and take actions like declare, reject or edit the data.
+ * Review component, used to display the "read" version of the declaration with annotation input fields for the user (signatures etc.)
+ * User can review the declaration and take actions like declare, reject or edit.
  */
 function ReviewComponent({
   formConfig,
@@ -417,7 +417,7 @@ function ReviewComponent({
   onEdit,
   children,
   title,
-  onMetadataChange,
+  onAnnotationChange,
   readonlyMode,
   reviewFields
 }: {
@@ -437,7 +437,7 @@ function ReviewComponent({
     confirmation?: boolean
   }) => void
   title: string
-  onMetadataChange?: (values: EventState) => void
+  onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
 }) {
   const scopes = useSelector(getScope)
@@ -454,7 +454,7 @@ function ReviewComponent({
     .map(({ id }) => id)
 
   const hasReviewFieldsToUpdate =
-    annotation && onMetadataChange && reviewFields && reviewFields.length > 0
+    annotation && onAnnotationChange && reviewFields && reviewFields.length > 0
 
   return (
     <Row>
@@ -482,7 +482,7 @@ function ReviewComponent({
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
                   setAllFieldsDirty={false}
-                  onChange={onMetadataChange}
+                  onChange={onAnnotationChange}
                 />
               </ReviewContainter>
             </FormData>

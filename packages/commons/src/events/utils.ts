@@ -33,18 +33,15 @@ import { getOrThrow } from '../utils'
 export const findPageFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
     ...getDeclarationFields(config),
-    ...getAllMetadataFields(config)
+    ...getAllAnnotationFields(config)
   ])
 }
 
-/**
- * @returns All metadata fields in the event configuration.
- */
-export const getAllMetadataFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep(config.actions.map(getActionMetadataFields))
+export const getAllAnnotationFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep(config.actions.map(getActionAnnotationFields))
 }
 
-export const getActionMetadataFields = (actionConfig: ActionConfig) => {
+export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
     return [
       ...actionConfig.onboardingForm.flatMap(({ fields }) => fields),
@@ -64,9 +61,7 @@ export const getActionMetadataFields = (actionConfig: ActionConfig) => {
 }
 
 /**
- * @returns All the metadata fields configured for the action type.
  * @TODO: Request correction should have same format as print certificate
- *
  */
 export const findRecordActionPages = (
   config: EventConfig,

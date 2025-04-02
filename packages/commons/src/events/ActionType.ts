@@ -23,7 +23,7 @@ export const ActionType = {
   DECLARE: 'DECLARE',
   VALIDATE: 'VALIDATE',
   REGISTER: 'REGISTER',
-  // Declaration metadata actions
+  // Declaration system actions. Non-configurable.
   DETECT_DUPLICATE: 'DETECT_DUPLICATE',
   REJECT: 'REJECT', // REJECT_DECLARATION
   MARKED_AS_DUPLICATE: 'MARKED_AS_DUPLICATE', // MARK_AS_DUPLICATE
@@ -80,6 +80,6 @@ export const DeclarationUpdateActions = ActionTypes.extract(
 )
 export type DeclarationUpdateAction = z.infer<typeof DeclarationUpdateActions>
 
-/** Actions which primarily change metadata or status of an event. */
-export const MetadataActions = ActionTypes.exclude(declarationActionValues)
-export type MetadataAction = z.infer<typeof MetadataActions>
+/** Actions which update annotation or status of an event. */
+export const annotationActions = ActionTypes.exclude(declarationActionValues)
+export type MetadataAction = z.infer<typeof annotationActions>
