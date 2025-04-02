@@ -717,6 +717,7 @@ const TENNIS_CLUB_DECLARATION_REVIEW = {
   ]
 }
 
+/** @knipignore */
 export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
   label: {
     id: 'v2.event.tennis-club-membership.action.declare.form.label',

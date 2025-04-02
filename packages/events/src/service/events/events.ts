@@ -68,12 +68,6 @@ export async function getEventById(id: string): Promise<EventDocument> {
   return event
 }
 
-export async function getEventTypeId(id: string) {
-  const event = await getEventById(id)
-
-  return event.type
-}
-
 function getValidFileValue(
   fieldKey: string,
   fieldValue: FieldUpdateValue,
