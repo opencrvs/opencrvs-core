@@ -93,6 +93,7 @@ export const DocumentViewerWithFiles: StoryObj<typeof DocumentViewer> = {
         formConfig={defineActionForm({
           pages: [
             {
+              type: 'FORM',
               fields: [
                 {
                   id: 'documents.one',
