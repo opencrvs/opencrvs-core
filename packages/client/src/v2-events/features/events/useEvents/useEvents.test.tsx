@@ -36,7 +36,7 @@ function trpcHandler(
   async function wrapHttpResponseJson<T extends HttpResponse>(response: T) {
     const jsonBody = await response.json()
     return HttpResponse.json({
-      result: { declaration: serialize(jsonBody), type: 'data' }
+      result: { data: serialize(jsonBody), type: 'data' }
     })
   }
 
