@@ -64,7 +64,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
                 defaultMessage: 'Some subtitle',
                 description: ''
               },
-              declaration: [
+              data: [
                 {
                   fieldId: 'applicant.firstname'
                 },

@@ -13,7 +13,7 @@ Once event has been registered, it becomes a `record`. Actions after registratio
 
 ### Event declaration
 
-1. Declaration defines is a common form configuration for gathering event data.
+1. Declaration defines a form configuration for gathering event data.
 2. Declaration is available to all actions.
 3. Actions up to `REGISTER` can make changes to declaration. `(NOTIFY) -> DECLARE -> VALIDATE -> REGISTER`
 
