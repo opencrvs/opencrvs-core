@@ -52,7 +52,6 @@ function createDraftHandlers() {
   const draftList = fn<() => Draft[]>(() => [])
   return [
     tRPCMsw.event.draft.create.mutation((req) => {
-      console.log('req coming in', req)
       const response: Draft = {
         id: 'test-draft-id',
         eventId: req.eventId,

@@ -139,8 +139,8 @@ export function Review() {
         formConfig={formConfig}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        onEdit={handleEdit}
         onAnnotationChange={(values) => setMetadata(values)}
+        onEdit={handleEdit}
       >
         <ReviewComponent.Actions
           canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}

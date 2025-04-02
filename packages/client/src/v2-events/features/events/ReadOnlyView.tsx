@@ -91,8 +91,8 @@ function ReadonlyView() {
         form={form}
         formConfig={formConfig}
         title={formatMessage(reviewConfig.title, form)}
-        onEdit={noop}
         onAnnotationChange={(values) => setMetadata(values)}
+        onEdit={noop}
       >
         <></>
       </ReviewComponent.Body>
