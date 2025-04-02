@@ -171,14 +171,14 @@ export function Review() {
     (template) => template.id === templateId
   )
 
-  const { svgCode, handleCertify } = usePrintableCertificate(
-    fullEvent,
-    annotation,
+  const { svgCode, handleCertify } = usePrintableCertificate({
+    event: fullEvent,
+    form: annotation,
     locations,
     users,
     certificateConfig,
     language
-  )
+  })
 
   /**
    * If there are validation errors in the form, redirect to the

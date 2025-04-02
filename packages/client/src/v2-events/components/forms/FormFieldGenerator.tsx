@@ -525,7 +525,7 @@ const GeneratedInputField = React.memo(
       // Data input requires field configs
       const declarationFields = getDeclarationFields(eventConfig)
 
-      const fields = field.config.configuration.declaration.map((entry) =>
+      const fields = field.config.configuration.data.map((entry) =>
         getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })
       )
 
