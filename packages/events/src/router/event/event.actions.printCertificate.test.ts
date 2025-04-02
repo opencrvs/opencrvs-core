@@ -18,7 +18,7 @@ test('prevents forbidden access if missing required scope', async () => {
   const client = createTestClient(user, [])
 
   await expect(
-    client.event.actions.printCertificate(
+    client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate('event-test-id-12345')
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -31,7 +31,7 @@ test(`allows access if required scope is present`, async () => {
   ])
 
   await expect(
-    client.event.actions.printCertificate(
+    client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate('event-test-id-12345')
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -44,7 +44,7 @@ test('Validation error message contains all the offending fields', async () => {
   const event = await client.event.create(generator.event.create())
 
   await expect(
-    client.event.actions.printCertificate(
+    client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate(event.id, {
         data: {
           'applicant.dob': '02-02',
@@ -60,12 +60,12 @@ test('Has validation errors when required VERIFICATION page metadata is missing'
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  const declaredEvent = await client.event.actions.declare(
+  const declaredEvent = await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
 
   await expect(
-    client.event.actions.printCertificate(
+    client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate(declaredEvent.id, {
         // The tennis club membership print certificate form has a verification page with conditional 'field('collector.requesterId').isEqualTo('INFORMANT')'
         // Thus if the requester is set as INFORMANT and verification page result is not set, we should see a validation error.
@@ -80,12 +80,12 @@ test('Has no validation errors when required VERIFICATION page metadata is set',
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  const declaredEvent = await client.event.actions.declare(
+  const declaredEvent = await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
 
   await expect(
-    client.event.actions.printCertificate(
+    client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate(declaredEvent.id, {
         metadata: {
           'collector.requesterId': 'INFORMANT',
@@ -102,15 +102,15 @@ test('print certificate action can be added to a created event', async () => {
 
   const originalEvent = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id)
   )
 
-  const registeredEvent = await client.event.actions.printCertificate(
+  const registeredEvent = await client.event.actions.printCertificate.request(
     generator.event.actions.printCertificate(originalEvent.id)
   )
 
-  const printCertificate = await client.event.actions.printCertificate(
+  const printCertificate = await client.event.actions.printCertificate.request(
     generator.event.actions.printCertificate(
       registeredEvent.id,
       generator.event.actions.printCertificate(registeredEvent.id)
@@ -133,6 +133,6 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   })
 
   await expect(
-    client.event.actions.printCertificate(data)
+    client.event.actions.printCertificate.request(data)
   ).rejects.matchSnapshot()
 })

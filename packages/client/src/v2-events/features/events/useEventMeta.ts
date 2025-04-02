@@ -25,6 +25,7 @@ interface EventMetadata {
   getMetadata: (initialValues?: EventState) => EventState
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
+  registrationNumber?: string
 }
 
 function removeUndefinedKeys(data: EventState) {

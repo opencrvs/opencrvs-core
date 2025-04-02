@@ -10,13 +10,7 @@
  */
 
 import { env } from '@events/environment'
-import {
-  ActionInput,
-  EventConfig,
-  EventDocument,
-  getOrThrow,
-  logger
-} from '@opencrvs/commons'
+import { EventConfig, getOrThrow } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { array } from 'zod'
 
@@ -60,29 +54,4 @@ export async function getEventConfigurationById({
     }),
     `No configuration found for event type: ${eventType}`
   )
-}
-
-export async function notifyOnAction(
-  action: ActionInput,
-  event: EventDocument,
-  token: string
-) {
-  try {
-    await fetch(
-      new URL(
-        `/events/${event.type}/actions/${action.type}`,
-        env.COUNTRY_CONFIG_URL
-      ),
-      {
-        method: 'POST',
-        body: JSON.stringify(event),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token
-        }
-      }
-    )
-  } catch (error) {
-    logger.error(error)
-  }
 }

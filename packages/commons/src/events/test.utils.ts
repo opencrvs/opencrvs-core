@@ -11,7 +11,12 @@
 import { merge, omitBy, isString } from 'lodash'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
-import { ActionBase, ActionDocument, ActionUpdate } from './ActionDocument'
+import {
+  ActionBase,
+  ActionDocument,
+  ActionUpdate,
+  ActionStatus
+} from './ActionDocument'
 import {
   ArchiveActionInput,
   DeclareActionInput,
@@ -302,7 +307,8 @@ export function generateActionDocument({
     createdAtLocation: 'TODO',
     data: generateActionInput(configuration, action),
     metadata: {},
-    ...defaults
+    ...defaults,
+    status: ActionStatus.Accepted
   } satisfies ActionBase
 
   switch (action) {
@@ -335,8 +341,7 @@ export function generateActionDocument({
     case ActionType.REGISTER:
       return {
         ...actionBase,
-        type: action,
-        identifiers: { trackingId: getUUID(), registrationNumber: getUUID() }
+        type: action
       }
 
     default:

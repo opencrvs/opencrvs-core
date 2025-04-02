@@ -34,14 +34,14 @@ export async function registerOnDeclare({
   data: EventState
   metadata?: EventState
 }) {
-  await trpcClient.event.actions.declare.mutate({
+  await trpcClient.event.actions.declare.request.mutate({
     data,
     metadata,
     eventId,
     transactionId: getUUID()
   })
 
-  await trpcClient.event.actions.validate.mutate({
+  await trpcClient.event.actions.validate.request.mutate({
     data,
     metadata,
     eventId,
@@ -49,12 +49,14 @@ export async function registerOnDeclare({
     duplicates: []
   })
 
-  const latestResponse = await trpcClient.event.actions.register.mutate({
-    data,
-    metadata,
-    eventId,
-    transactionId: getUUID()
-  })
+  const latestResponse = await trpcClient.event.actions.register.request.mutate(
+    {
+      data,
+      metadata,
+      eventId,
+      transactionId: getUUID()
+    }
+  )
 
   return latestResponse
 }
@@ -71,20 +73,22 @@ export async function validateOnDeclare(variables: {
   metadata?: EventState
 }) {
   const { eventId, data, metadata } = variables
-  await trpcClient.event.actions.declare.mutate({
+  await trpcClient.event.actions.declare.request.mutate({
     data,
     metadata,
     eventId,
     transactionId: getUUID()
   })
 
-  const latestResponse = await trpcClient.event.actions.validate.mutate({
-    data,
-    metadata,
-    eventId,
-    transactionId: getUUID(),
-    duplicates: []
-  })
+  const latestResponse = await trpcClient.event.actions.validate.request.mutate(
+    {
+      data,
+      metadata,
+      eventId,
+      transactionId: getUUID(),
+      duplicates: []
+    }
+  )
 
   return latestResponse
 }

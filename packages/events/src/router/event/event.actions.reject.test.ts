@@ -18,7 +18,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
   const client = createTestClient(user, [])
 
   await expect(
-    client.event.actions.reject(
+    client.event.actions.reject.request(
       generator.event.actions.reject('event-test-id-12345')
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -29,7 +29,7 @@ test(`allows access if required scope is present`, async () => {
   const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_FOR_UPDATES])
 
   await expect(
-    client.event.actions.reject(
+    client.event.actions.reject.request(
       generator.event.actions.reject('event-test-id-12345')
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -43,10 +43,10 @@ test(`should contain REJECT action for a valid request`, async () => {
 
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
-  await client.event.actions.declare(declareInput)
+  await client.event.actions.declare.request(declareInput)
 
   const actions = (
-    await client.event.actions.reject(
+    await client.event.actions.reject.request(
       generator.event.actions.reject(originalEvent.id)
     )
   ).actions.map(({ type }) => type)

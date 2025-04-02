@@ -97,7 +97,7 @@ export const Archive: Story = {
               actions: [ActionType.CREATE]
             })
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker['event.actions.declare']++
 
             return generateEventDocument({
@@ -105,7 +105,7 @@ export const Archive: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.archive.mutation(() => {
+          tRPCMsw.event.actions.archive.request.mutation(() => {
             callTracker['event.actions.archive']++
 
             return generateEventDocument({
@@ -119,7 +119,7 @@ export const Archive: Story = {
             })
           }),
 
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker['event.actions.validate']++
 
             return generateEventDocument({
@@ -131,7 +131,7 @@ export const Archive: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker['event.actions.register']++
 
             return generateEventDocument({
@@ -260,7 +260,7 @@ export const SendForUpdate: Story = {
               actions: [ActionType.CREATE]
             })
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker['event.actions.declare']++
 
             return generateEventDocument({
@@ -268,7 +268,7 @@ export const SendForUpdate: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.reject.mutation(() => {
+          tRPCMsw.event.actions.reject.request.mutation(() => {
             callTracker['event.actions.reject']++
 
             return generateEventDocument({
@@ -281,7 +281,7 @@ export const SendForUpdate: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker['event.actions.validate']++
 
             return generateEventDocument({
@@ -293,7 +293,7 @@ export const SendForUpdate: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker['event.actions.register']++
 
             return generateEventDocument({

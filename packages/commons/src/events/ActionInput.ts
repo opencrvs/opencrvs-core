@@ -17,7 +17,8 @@ export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
   data: ActionUpdate,
-  metadata: ActionUpdate.optional()
+  metadata: ActionUpdate.optional(),
+  originalActionId: z.string().optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -30,10 +31,7 @@ const CreateActionInput = BaseActionInput.merge(
 export const RegisterActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
-    identifiers: z.object({
-      trackingId: z.string(),
-      registrationNumber: z.string()
-    })
+    registrationNumber: z.string().optional()
   })
 )
 

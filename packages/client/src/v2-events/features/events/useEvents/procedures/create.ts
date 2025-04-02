@@ -17,7 +17,8 @@ import type {
 import {
   ActionType,
   CreatedAction,
-  getCurrentEventState
+  getCurrentEventState,
+  ActionStatus
 } from '@opencrvs/commons/client'
 
 import {
@@ -73,7 +74,8 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
           createdAtLocation: 'TODO',
-          data: {}
+          data: {},
+          status: ActionStatus.Accepted
         } satisfies CreatedAction
       ]
     }
