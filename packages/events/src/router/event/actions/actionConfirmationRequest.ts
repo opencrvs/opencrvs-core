@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import fetch from 'node-fetch'
 import { env } from '@events/environment'
 import { EventDocument, ActionInput, logger } from '@opencrvs/commons'
 
@@ -57,13 +58,9 @@ export async function requestActionConfirmation(
           ]
         : ActionConfirmationResponse.UnexpectedFailure
 
-    const body = (await res.json().catch(() => undefined)) as
-      | Record<string, unknown>
-      | undefined
-
     return {
       responseStatus,
-      body
+      body: await res.json().catch(() => undefined)
     }
   } catch (error) {
     logger.error(error)
