@@ -75,6 +75,7 @@ function EventOverview({
     FieldValue | null | RecursiveStringRecord
   > = {
     ...flattenEventIndex({ ...eventIndex, data: eventWithDefaults }),
+    // The field keys are based on packages/client/src/views/RecordAudit/RecordAudit.tsx
     'event.trackingId': trackingId,
     'event.status': status,
     'event.registrationNumber': registrationNumber
