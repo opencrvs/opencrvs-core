@@ -336,6 +336,25 @@ export function field(fieldId: string) {
         },
         required: ['$form']
       }),
+    isValidNationalId: () =>
+      defineConditional({
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                type: 'string',
+                pattern: '^[0-9]{9}$',
+                description:
+                  'The National ID can only be numeric and must be 9 digits long.'
+              }
+            },
+            required: [fieldId]
+          }
+        },
+        required: ['$form']
+      }),
     /**
      * Checks if the field value matches a given regular expression pattern.
      * @param pattern - The regular expression pattern to match the field value against.
