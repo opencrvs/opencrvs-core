@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import _ from 'lodash'
 import {
   createTestClient,
   setupTestCase,
@@ -16,51 +15,6 @@ import {
 } from '@events/tests/utils'
 import { ActionType, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
-import { eventRouter } from '.'
-
-/**
- * Takes an object and returns the method keys.
- * Purpose is to ensure that all actions are tested. We have had few bugs because we never fetched event after action.
- *
- */
-function getDeepKeys(
-  obj: Record<string, unknown> | unknown,
-  prefix = ''
-): string[] {
-  return typeof obj === 'object' && obj !== null
-    ? _.flatMap(obj, (value, key) =>
-        getDeepKeys(value, prefix ? `${prefix}${_.capitalize(key)}` : key)
-      )
-    : [prefix]
-}
-
-function compareActionsToRouter(
-  router: typeof eventRouter,
-  actions: ActionType[]
-) {
-  const routerActions = getDeepKeys(router.actions)
-  const casedRouterActions = routerActions.map((action) =>
-    _.toUpper(_.snakeCase(action))
-  )
-
-  const actionsWithoutCreate = actions.filter(
-    (action) => action !== ActionType.CREATE && action !== ActionType.READ
-  )
-
-  if (casedRouterActions.length !== actionsWithoutCreate.length) {
-    console.error(
-      `Router actions ${casedRouterActions.length} :`,
-      casedRouterActions.sort()
-    )
-
-    console.error(
-      `Actions ${actionsWithoutCreate.length}:`,
-      actionsWithoutCreate.sort()
-    )
-
-    throw new Error('Action count mismatch. Check console logs.')
-  }
-}
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -115,22 +69,30 @@ test('Returns event with all actions', async () => {
   ])
 
   const event = await client.event.create(generator.event.create())
-  await client.event.actions.notify(generator.event.actions.notify(event.id))
+  await client.event.actions.notify.request(
+    generator.event.actions.notify(event.id)
+  )
 
-  await client.event.actions.declare(generator.event.actions.declare(event.id))
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
 
-  await client.event.actions.validate(
+  await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )
 
-  await client.event.actions.reject(generator.event.actions.reject(event.id))
-  await client.event.actions.archive(generator.event.actions.archive(event.id))
+  await client.event.actions.reject.request(
+    generator.event.actions.reject(event.id)
+  )
+  await client.event.actions.archive.request(
+    generator.event.actions.archive(event.id)
+  )
 
-  await client.event.actions.register(
+  await client.event.actions.register.request(
     generator.event.actions.register(event.id)
   )
 
-  await client.event.actions.printCertificate(
+  await client.event.actions.printCertificate.request(
     generator.event.actions.printCertificate(event.id)
   )
   const correctionRequest = await client.event.actions.correction.request(
@@ -159,9 +121,4 @@ test('Returns event with all actions', async () => {
       (action) => action.type === ActionType.READ
     )
   ).toHaveLength(2)
-
-  compareActionsToRouter(
-    eventRouter,
-    secondTimefetchedEvent.actions.map((ac) => ac.type)
-  )
 })

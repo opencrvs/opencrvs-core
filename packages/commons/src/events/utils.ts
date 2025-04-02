@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { flattenDeep, omitBy } from 'lodash'
+import { flattenDeep, omitBy, mergeWith, isArray, isObject } from 'lodash'
 import { workqueues } from '../workqueues'
 import { ActionType, DeclarationAction, DeclarationActions } from './ActionType'
 import { EventConfig } from './EventConfig'
@@ -187,7 +187,6 @@ export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
     .filter(({ type }) => type !== ActionType.READ)
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  console.log('actions', event.actions)
   const lastAction = actions[actions.length - 1]
   return (
     drafts
@@ -223,4 +222,27 @@ export function isVerificationPage(
   page: PageConfig
 ): page is VerificationPageConfig {
   return page.type === PageTypes.enum.VERIFICATION
+}
+
+export function deepMerge(
+  currentDocument: ActionUpdate,
+  actionDocument: ActionUpdate
+) {
+  return mergeWith(
+    currentDocument,
+    actionDocument,
+    (previousValue, incomingValue) => {
+      if (incomingValue === undefined) {
+        return previousValue
+      }
+      if (isArray(incomingValue)) {
+        return incomingValue // Replace arrays instead of merging
+      }
+      if (isObject(previousValue) && isObject(incomingValue)) {
+        return undefined // Continue deep merging objects
+      }
+
+      return incomingValue // Override with latest value
+    }
+  )
 }

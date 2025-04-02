@@ -28,12 +28,14 @@ import {
   getActionReviewFields,
   getDeclaration,
   getVisiblePagesFormFields,
-  DeclarationActions
+  DeclarationActions,
+  getCurrentEventState
 } from '@opencrvs/commons/events'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventConfigurationById } from '@events/service/config/config'
-import { getEventTypeId } from '@events/service/events/events'
+import { getEventById } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
+import { deepMerge } from '@opencrvs/commons/client'
 
 function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
   return formFields.reduce(
@@ -157,19 +159,27 @@ function validateActionAnnotation({
 
 export function validateAction(actionType: ActionType) {
   return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
-    const eventType = await getEventTypeId(input.eventId)
+    const event = await getEventById(input.eventId)
+
     const eventConfig = await getEventConfigurationById({
       token: ctx.token,
-      eventType
+      eventType: event.type
     })
 
     const declarationUpdateAction =
       DeclarationUpdateActions.safeParse(actionType)
 
     if (declarationUpdateAction.success) {
+      const previousDeclaration = getCurrentEventState(event)
+      // since partial updates are allowed, full declaration is needed to resolve validations
+      const completeDeclaration = deepMerge(
+        previousDeclaration.declaration,
+        input.declaration
+      )
+
       const errors = validateDeclarationUpdateAction({
         eventConfig,
-        declaration: input.declaration,
+        declaration: completeDeclaration,
         annotation: input.annotation,
         actionType: declarationUpdateAction.data
       })

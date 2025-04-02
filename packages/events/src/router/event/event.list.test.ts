@@ -72,7 +72,7 @@ test('Returns aggregated event with updated status and values', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
       declaration: initialDeclaration
     })
@@ -88,7 +88,7 @@ test('Returns aggregated event with updated status and values', async () => {
     ...initialDeclaration,
     'applicant.firstname': 'Jane'
   }
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
       declaration: updatedDeclaration
     })

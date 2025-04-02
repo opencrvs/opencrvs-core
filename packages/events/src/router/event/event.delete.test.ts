@@ -131,7 +131,7 @@ describe('check unreferenced draft attachments are deleted while final action su
     await client.event.draft.create(getDraft(5))
 
     // declaring final action submission
-    await client.event.actions.declare(getDeclaration(6))
+    await client.event.actions.declare.request(getDeclaration(6))
 
     // file attachment exist api should be called once
     expect(fileExistMock.mock.calls).toHaveLength(1)

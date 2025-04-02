@@ -40,6 +40,16 @@ export const ActionType = {
 } as const
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
+export const ConfirmableActions = [
+  ActionType.NOTIFY,
+  ActionType.DECLARE,
+  ActionType.VALIDATE,
+  ActionType.REGISTER,
+  ActionType.REJECT,
+  ActionType.ARCHIVE,
+  ActionType.PRINT_CERTIFICATE
+] as const
+
 /** Testing building types from enums as an alternative */
 export const ActionTypes = z.enum([
   'DELETE',

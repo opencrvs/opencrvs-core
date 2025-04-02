@@ -33,7 +33,7 @@ test('Returns empty list when no events match search criteria', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
       declaration: initialData
     })
@@ -101,17 +101,17 @@ test('Returns events that match the text field criteria of applicant', async () 
   const event2 = await client.event.create(generator.event.create())
   const event3 = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event1.id, {
       declaration: record1
     })
   )
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event2.id, {
       declaration: record2
     })
   )
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event3.id, {
       declaration: record3
     })
@@ -165,12 +165,12 @@ test('Returns events that match date of birth of applicant', async () => {
   const event1 = await client.event.create(generator.event.create())
   const event2 = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event1.id, {
       declaration: record1
     })
   )
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event2.id, {
       declaration: record2
     })
@@ -223,12 +223,12 @@ test('Does not return events when searching with a similar but different date of
   const event1 = await client.event.create(generator.event.create())
   const event2 = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event1.id, {
       declaration: record1
     })
   )
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event2.id, {
       declaration: record2
     })

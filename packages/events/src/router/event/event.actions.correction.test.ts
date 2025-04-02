@@ -15,6 +15,7 @@ import {
   AddressType,
   EventDocument,
   generateActionInput,
+  getAcceptedActions,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
@@ -114,9 +115,9 @@ test('a correction request can be added to a created event', async () => {
   const originalEvent = await client.event.create(generator.event.create())
 
   const declareInput = generator.event.actions.declare(originalEvent.id)
-  await client.event.actions.declare(declareInput)
 
-  const registeredEvent = await client.event.actions.register(
+  await client.event.actions.declare.request(declareInput)
+  const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
@@ -201,7 +202,9 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   })
 
   const response = await client.event.actions.correction.request(data)
-  const savedAction = response.actions.find(
+  const activeActions = getAcceptedActions(response)
+
+  const savedAction = activeActions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
   expect(savedAction?.declaration).toEqual(form)
@@ -243,10 +246,10 @@ test('a correction request can be added to a created event', async () => {
 
   const originalEvent = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id)
   )
-  const registeredEvent = await client.event.actions.register(
+  const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
@@ -271,9 +274,9 @@ describe('when a correction request exists', () => {
 
     const declareInput = generator.event.actions.declare(originalEvent.id)
 
-    await client.event.actions.declare(declareInput)
+    await client.event.actions.declare.request(declareInput)
 
-    const registeredEvent = await client.event.actions.register(
+    const registeredEvent = await client.event.actions.register.request(
       generator.event.actions.register(originalEvent.id)
     )
 

@@ -10,7 +10,10 @@
  */
 
 import { addAction, getEventById } from '@events/service/events/events'
-import { ApproveCorrectionActionInput } from '@opencrvs/commons/events'
+import {
+  ActionStatus,
+  ApproveCorrectionActionInput
+} from '@opencrvs/commons/events'
 import { RequestNotFoundError } from './correction'
 
 export async function approveCorrection(
@@ -39,12 +42,12 @@ export async function approveCorrection(
     throw new RequestNotFoundError(input.requestId)
   }
 
-  const event = await addAction(input, {
+  return addAction(input, {
     eventId,
     createdBy,
     token,
     createdAtLocation,
-    transactionId
+    transactionId,
+    status: ActionStatus.Accepted
   })
-  return event
 }

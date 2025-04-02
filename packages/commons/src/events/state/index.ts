@@ -10,15 +10,30 @@
  */
 
 import { ActionType } from '../ActionType'
-import { ActionDocument, ActionUpdate, EventState } from '../ActionDocument'
+import {
+  Action,
+  ActionDocument,
+  ActionStatus,
+  EventState,
+  RegisterAction
+} from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
-import { findActiveDrafts } from '../utils'
+import { deepMerge, findActiveDrafts } from '../utils'
 
-function getStatusFromActions(actions: Array<ActionDocument>) {
+function getStatusFromActions(actions: Array<Action>) {
+  // If the event has any rejected action, we consider the event to be rejected.
+  const hasRejectedAction = actions.some(
+    (a) => a.status === ActionStatus.Rejected
+  )
+
+  if (hasRejectedAction) {
+    return EventStatus.REJECTED
+  }
+
   return actions.reduce<EventStatus>((status, action) => {
     if (action.type === ActionType.CREATE) {
       return EventStatus.CREATED
@@ -123,31 +138,14 @@ export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
   }, {} as T)
 }
 
-function deepMerge(
-  currentDocument: ActionUpdate,
-  actionDocument: ActionUpdate
-) {
-  return _.mergeWith(
-    currentDocument,
-    actionDocument,
-    (previousValue, incomingValue) => {
-      if (incomingValue === undefined) {
-        return previousValue
-      }
-      if (_.isArray(incomingValue)) {
-        return incomingValue // Replace arrays instead of merging
-      }
-      if (_.isObject(previousValue) && _.isObject(incomingValue)) {
-        return undefined // Continue deep merging objects
-      }
-
-      return incomingValue // Override with latest value
-    }
-  )
-}
-
 export function isUndeclaredDraft(status: EventStatus): boolean {
   return status === EventStatus.CREATED
+}
+
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions.filter(
+    (a): a is ActionDocument => !a.status || a.status === ActionStatus.Accepted
+  )
 }
 
 export function getCurrentEventState(event: EventDocument): EventIndex {
@@ -159,7 +157,15 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const latestAction = event.actions[event.actions.length - 1]
+  const activeActions = getAcceptedActions(event)
+  const latestAction = activeActions[activeActions.length - 1]
+
+  const registrationAction = activeActions.find(
+    (a): a is RegisterAction =>
+      a.type === ActionType.REGISTER && a.status === ActionStatus.Accepted
+  )
+
+  const registrationNumber = registrationAction?.registrationNumber ?? null
 
   return deepDropNulls({
     id: event.id,
@@ -169,10 +175,11 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
     modifiedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(event.actions),
+    assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
-    declaration: aggregateActionDeclarations(event.actions),
-    trackingId: event.trackingId
+    declaration: aggregateActionDeclarations(activeActions),
+    trackingId: event.trackingId,
+    registrationNumber
   })
 }
 
@@ -248,7 +255,8 @@ export function getActionAnnotation({
   actionType: ActionType
   drafts: Draft[]
 }): EventState {
-  const action = event.actions.find((action) => actionType === action.type)
+  const activeActions = getAcceptedActions(event)
+  const action = activeActions.find((action) => actionType === action.type)
 
   const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
 

@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
-import { ActionType } from './ActionType'
+import { ActionType, ConfirmableActions } from './ActionType'
 
 /**
  * ActionUpdate is a record of a specific action that updated data fields.
@@ -22,13 +22,28 @@ export type ActionUpdate = z.infer<typeof ActionUpdate>
  */
 export type EventState = Record<string, FieldValue>
 
+export const ActionStatus = {
+  Requested: 'Requested',
+  Accepted: 'Accepted',
+  Rejected: 'Rejected'
+} as const
+
+export type ActionStatus = keyof typeof ActionStatus
+
 export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string()
+  createdAtLocation: z.string(),
+  status: z.enum([
+    ActionStatus.Requested,
+    ActionStatus.Accepted,
+    ActionStatus.Rejected
+  ]),
+  // If the action is an asynchronous confirmation for another action, we will save the original action id here.
+  originalActionId: z.string().optional()
 })
 
 export type ActionBase = z.infer<typeof ActionBase>
@@ -46,15 +61,14 @@ const UnassignedAction = ActionBase.merge(
   })
 )
 
-const RegisterAction = ActionBase.merge(
+export const RegisterAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    identifiers: z.object({
-      trackingId: z.string(),
-      registrationNumber: z.string()
-    })
+    registrationNumber: z.string().optional()
   })
 )
+
+export type RegisterAction = z.infer<typeof RegisterAction>
 
 const DeclareAction = ActionBase.merge(
   z.object({
@@ -149,6 +163,25 @@ export const ActionDocument = z.discriminatedUnion('type', [
 ])
 
 export type ActionDocument = z.infer<typeof ActionDocument>
+
+export const AsyncRejectActionDocument = ActionBase.omit({
+  declaration: true,
+  annotation: true,
+  createdBy: true,
+  createdAtLocation: true
+}).merge(
+  z.object({
+    type: z.enum(ConfirmableActions),
+    status: z.literal(ActionStatus.Rejected)
+  })
+)
+
+export type AsyncRejectActionDocument = z.infer<
+  typeof AsyncRejectActionDocument
+>
+
+export const Action = z.union([ActionDocument, AsyncRejectActionDocument])
+export type Action = ActionDocument | AsyncRejectActionDocument
 
 export const ResolvedUser = z.object({
   id: z.string(),
