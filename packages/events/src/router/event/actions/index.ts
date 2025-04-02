@@ -173,7 +173,7 @@ export function getDefaultActionProcedures(
           })
         }
 
-        let status = ActionStatus.Requested
+        let status: ActionStatus = ActionStatus.Requested
         let parsedBody
 
         // If we immediately get a rejected response, we can mark the action as rejected

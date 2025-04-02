@@ -12,12 +12,14 @@ import fetch from 'node-fetch'
 import { env } from '@events/environment'
 import { EventDocument, ActionInput, logger } from '@opencrvs/commons'
 
-export enum ActionConfirmationResponse {
-  UnexpectedFailure, // Endpoint fails in an uncontrolled manner
-  Rejected, // Synchronous flow failed
-  Success, // Synchronous flow succeeded
-  RequiresProcessing // Asynchronous flow succeeded, this expects that either the confirm or reject callback is called
-}
+export const ActionConfirmationResponse = {
+  UnexpectedFailure: 'UnexpectedFailure', // Endpoint fails in an uncontrolled manner
+  Rejected: 'Rejected', // Synchronous flow failed
+  Success: 'Success', // Synchronous flow succeeded
+  RequiresProcessing: 'RequiresProcessing' // Asynchronous flow succeeded, this expects that either the confirm or reject callback is called
+} as const
+
+export type ActionConfirmationResponse = keyof typeof ActionConfirmationResponse
 
 const ActionConfirmationResponseCodes = {
   400: ActionConfirmationResponse.Rejected,

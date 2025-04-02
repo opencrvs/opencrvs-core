@@ -22,11 +22,13 @@ export type ActionUpdate = z.infer<typeof ActionUpdate>
  */
 export type EventState = Record<string, FieldValue>
 
-export enum ActionStatus {
-  Requested = 'Requested',
-  Accepted = 'Accepted',
-  Rejected = 'Rejected'
-}
+export const ActionStatus = {
+  Requested: 'Requested',
+  Accepted: 'Accepted',
+  Rejected: 'Rejected'
+} as const
+
+export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
   id: z.string(),
