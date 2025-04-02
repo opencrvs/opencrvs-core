@@ -363,12 +363,12 @@ export async function addAsyncRejectAction(input: AsyncRejectActionInput) {
   const now = new Date().toISOString()
   const { transactionId, eventId } = input
 
-  const action: AsyncRejectActionDocument = {
+  const action = {
     ...input,
     createdAt: now,
     id: getUUID(),
     status: ActionStatus.Rejected
-  }
+  } satisfies AsyncRejectActionDocument
 
   await db
     .collection<EventDocument>('events')
