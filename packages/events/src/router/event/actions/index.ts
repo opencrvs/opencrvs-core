@@ -152,9 +152,9 @@ export function getDefaultActionProcedures(
       .use(requireScopesMiddleware)
       .input(inputSchema)
       .use(validatePayloadMiddleware)
-      .use(async ({ ctx, input, next }) => {
-        const { token } = ctx
-        const { eventId } = input
+      .mutation(async ({ ctx, input }) => {
+        const { token, user } = ctx
+        const { eventId, transactionId } = input
         const actionId = getUUID()
         const event = await getEventById(eventId)
 
@@ -198,17 +198,8 @@ export function getDefaultActionProcedures(
           }
         }
 
-        return next({
-          ctx: { ...ctx, status, actionId },
-          input: { ...input, ...parsedBody }
-        })
-      })
-      .mutation(({ ctx, input }) => {
-        const { token, user, status, actionId } = ctx
-        const { eventId, transactionId } = input
-
         return addAction(
-          input,
+          { ...input, ...parsedBody },
           {
             eventId,
             createdBy: user.id,
@@ -225,21 +216,24 @@ export function getDefaultActionProcedures(
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
       .use(validatePayloadMiddleware)
-      .use(async ({ ctx, input, next }) => {
-        const { eventId, actionId } = input
+      .mutation(async ({ ctx, input }) => {
+        const { token, user } = ctx
+        const { eventId, actionId, transactionId } = input
         const event = await getEventById(eventId)
-        const action = event.actions.find((a) => a.id === actionId)
+        const originalAction = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId
         )
 
-        if (!action) {
+        // Original action is not found
+        if (!originalAction) {
           throw new TRPCError({
             code: 'NOT_FOUND',
             message: 'Action not found.'
           })
         }
 
+        // Action is already rejected, so we throw an error
         if (
           confirmationAction &&
           confirmationAction.status === ActionStatus.Rejected
@@ -250,16 +244,8 @@ export function getDefaultActionProcedures(
           })
         }
 
-        return next({
-          ctx: { ...ctx, alreadyAccepted: Boolean(confirmationAction) },
-          input
-        })
-      })
-      .mutation(({ ctx, input }) => {
-        const { token, user, alreadyAccepted } = ctx
-        const { eventId, transactionId, actionId } = input
-
-        if (alreadyAccepted) {
+        // Action is already confirmed, so we just return the event
+        if (Boolean(confirmationAction)) {
           return getEventById(input.eventId)
         }
 
@@ -285,7 +271,7 @@ export function getDefaultActionProcedures(
           transactionId: z.string()
         })
       )
-      .use(async ({ ctx, input, next }) => {
+      .mutation(async ({ input }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)
         const action = event.actions.find((a) => a.id === actionId)
@@ -293,10 +279,12 @@ export function getDefaultActionProcedures(
           (a) => a.originalActionId === actionId
         )
 
+        // Action is not found
         if (!action) {
           throw new Error(`Action not found.`)
         }
 
+        // Action is already accepted
         if (
           confirmationAction &&
           confirmationAction.status === ActionStatus.Accepted
@@ -304,20 +292,14 @@ export function getDefaultActionProcedures(
           throw new Error(`Action has already been accepted.`)
         }
 
-        return next({
-          ctx: { ...ctx, alreadyRejected: Boolean(confirmationAction) },
-          input: { ...input, originalActionId: actionId }
-        })
-      })
-      .mutation(async ({ ctx, input }) => {
-        const { alreadyRejected } = ctx
-
-        if (alreadyRejected) {
+        // Action is already rejected, so we just return the event
+        if (Boolean(confirmationAction)) {
           return getEventById(input.eventId)
         }
 
         return addAsyncRejectAction({
           ...input,
+          originalActionId: actionId,
           type: actionType
         })
       })
