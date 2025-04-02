@@ -7,15 +7,15 @@
 A life event (e.g., dog adoption). An entry in the database describing a past life event and all steps (actions) involved in the process.
 
 On high-level, event defines a form (`declaration`), which specifies the `data` needed to complete event registration.
-Information is gathered through specific **declaration actions**. These actions can gather additional data by defining `reviewFields`. The information input in reviewFields are not part of `declaration data` but action `metadata`. Metadata is always specific to action.
+Information is gathered through specific **declaration actions**. Actions gather additional metadata by defining `review` property. The information input in review fields are part of `action metadata`. Metadata is always specific to action.
 
-Events after registration are called **record actions**. As a rule of thumb, unless record needs to be corrected (`REQUEST_CORRECTION`), they can only change metadata.
+Events after registration are called **record actions**. As a rule of thumb, unless **record** needs to be corrected (`REQUEST_CORRECTION`), they can only change metadata.
 
 ### Event declaration
 
 1. Declaration defines is a common form configuration for gathering event `data`.
 2. Declaration `data` is available to all actions.
-3. Actions up to `REGISTER` can make changes to declaration. `DECLARE -> VALIDATE -> REGISTER`
+3. Actions up to `REGISTER` can make changes to declaration. `(NOTIFY) -> DECLARE -> VALIDATE -> REGISTER`
 4. Once event declaration is `REGISTERED`, and becomes a `record`, only `REQUEST_CORRECTION` can update the data.
 
 ### Actions
@@ -37,7 +37,8 @@ Events after registration are called **record actions**. As a rule of thumb, unl
 3. `REGISTER`
 
 Actions write `data` based on event `declaration` configuration.
-Actions may have fields in review page (`reviewFields`) which write to `metadata`.
+Actions may have fields in review page, which write to `metadata`.
+"System actions" (e.g. ARCHIVE) are related to action but do not produce data and cannot be configured.
 
 Once `declaration` is registered it becomes a `record`.
 
