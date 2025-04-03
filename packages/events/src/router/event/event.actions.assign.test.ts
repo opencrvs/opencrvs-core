@@ -13,7 +13,7 @@ import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { ActionType } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 
-test(`allows access without any scopes`, async () => {
+test(`Allows access without any scopes`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [])
 

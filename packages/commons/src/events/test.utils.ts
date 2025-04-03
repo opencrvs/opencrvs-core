@@ -24,6 +24,7 @@ import {
   RegisterActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
+  UnassignActionInput,
   ValidateActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
@@ -231,6 +232,16 @@ export const eventPayloadGenerator = {
       transactionId: input.transactionId ?? getUUID(),
       declaration: {},
       assignedTo: input.assignedTo ?? getUUID(),
+      eventId
+    }),
+    unassign: (
+      eventId: string,
+      input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
+    ) => ({
+      type: ActionType.UNASSIGN,
+      transactionId: input.transactionId ?? getUUID(),
+      declaration: {},
+      assignedTo: null,
       eventId
     }),
     archive: (
