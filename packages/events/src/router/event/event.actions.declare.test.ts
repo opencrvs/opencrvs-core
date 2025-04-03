@@ -49,7 +49,7 @@ test('Validation error message contains all the offending fields', async () => {
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.declare(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-02',
       'recommender.none': true
     }
@@ -67,7 +67,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.declare(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
@@ -110,7 +110,7 @@ test('Skips required field validation when they are conditionally hidden', async
   }
 
   const data = generator.event.actions.declare(event.id, {
-    data: form
+    declaration: form
   })
 
   const response = await client.event.actions.declare.request(data)
@@ -119,7 +119,7 @@ test('Skips required field validation when they are conditionally hidden', async
   const savedAction = activeActions.find(
     (action) => action.type === ActionType.DECLARE
   )
-  expect(savedAction?.data).toEqual(form)
+  expect(savedAction?.declaration).toEqual(form)
 })
 
 test('gives validation error when a conditional page, which is visible, has a required field', async () => {
@@ -145,7 +145,7 @@ test('gives validation error when a conditional page, which is visible, has a re
   }
 
   const data = generator.event.actions.declare(event.id, {
-    data: form
+    declaration: form
   })
 
   await expect(
@@ -177,7 +177,7 @@ test('successfully validates a fields on a conditional page, which is visible', 
   }
 
   const data = generator.event.actions.declare(event.id, {
-    data: form
+    declaration: form
   })
 
   const response = await client.event.actions.declare.request(data)
@@ -186,7 +186,7 @@ test('successfully validates a fields on a conditional page, which is visible', 
   const savedAction = activeActions.find(
     (action) => action.type === ActionType.DECLARE
   )
-  expect(savedAction?.data).toEqual(form)
+  expect(savedAction?.declaration).toEqual(form)
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -211,7 +211,7 @@ test('Prevents adding birth date in future', async () => {
   }
 
   const payload = generator.event.actions.declare(event.id, {
-    data: form
+    declaration: form
   })
 
   await expect(
@@ -226,7 +226,7 @@ test('validation prevents including hidden fields', async () => {
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.declare(event.id, {
-    data: {
+    declaration: {
       ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
       'recommender.firstname': 'this should not be here'
     }

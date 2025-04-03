@@ -311,7 +311,7 @@ const AdministrativeAreaConfiguration = z
   .object({
     partOf: z
       .object({
-        $data: z.string()
+        $declaration: z.string()
       })
       .optional()
       .describe('Parent location'),

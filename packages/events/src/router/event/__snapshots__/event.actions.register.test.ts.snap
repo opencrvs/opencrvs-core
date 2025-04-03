@@ -14,6 +14,6 @@ exports[`Request and confirmation flow > Synchronous confirmation flow > should 
 
 exports[`Request and confirmation flow > Synchronous confirmation flow > should not save action if notify API returns invalid registration number 1`] = `[TRPCError: Invalid payload received from notification API]`;
 
-exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required for registration","id":"applicant.firstname"},{"message":"Required for registration","id":"applicant.surname"},{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Required for registration","id":"applicant.address"}]]`;
+exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"}]]`;
 
 exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;

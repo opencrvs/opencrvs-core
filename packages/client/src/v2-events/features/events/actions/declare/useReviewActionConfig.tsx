@@ -10,7 +10,13 @@
  */
 
 import { v4 as uuid } from 'uuid'
-import { EventState, FormConfig, Scope, SCOPES } from '@opencrvs/commons/client'
+import {
+  EventState,
+  DeclarationFormConfig,
+  Scope,
+  SCOPES,
+  FieldConfig
+} from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 
@@ -244,21 +250,24 @@ const reviewMessages = {
 
 export function useReviewActionConfig({
   formConfig,
-  form,
-  metadata,
+  declaration,
+  annotation,
+  reviewFields,
   scopes
 }: {
-  formConfig: FormConfig
-  form: EventState
-  metadata?: EventState
+  formConfig: DeclarationFormConfig
+  declaration: EventState
+  annotation?: EventState
+  reviewFields: FieldConfig[]
   scopes?: Scope[]
 }) {
   const events = useEvents()
-  const incomplete = validationErrorsInActionFormExist(
+  const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form,
-    metadata
-  )
+    form: declaration,
+    annotation,
+    reviewFields
+  })
 
   const isDisabled =
     incomplete && !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
@@ -275,14 +284,12 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) => {
         events.actions.notify.mutate({
           eventId,
-          data: form,
-          metadata,
+          declaration,
+          annotation,
           transactionId: uuid()
         })
       },
-      messages: incomplete
-        ? reviewMessages.incomplete.declare
-        : reviewMessages.complete.declare
+      messages: reviewMessages.incomplete.declare
     }
   }
 
@@ -294,8 +301,8 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.customActions.registerOnDeclare.mutate({
           eventId,
-          data: form,
-          metadata
+          declaration,
+          annotation
         }),
       messages: incomplete
         ? reviewMessages.incomplete.register
@@ -311,8 +318,8 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.customActions.validateOnDeclare.mutate({
           eventId,
-          data: form,
-          metadata
+          declaration,
+          annotation
         }),
       messages: incomplete
         ? reviewMessages.incomplete.validate
@@ -328,8 +335,8 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.actions.declare.mutate({
           eventId,
-          data: form,
-          metadata,
+          declaration,
+          annotation,
           transactionId: uuid()
         }),
       messages: incomplete

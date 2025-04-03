@@ -86,11 +86,11 @@ export const VerificationWizard = ({
         handleClose={() => close()}
         responsive={false}
         show={true}
-        title={intl.formatMessage(pageConfig.cancel.confirmation.title)}
+        title={intl.formatMessage(pageConfig.actions.cancel.confirmation.title)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
-            {intl.formatMessage(pageConfig.cancel.confirmation.body)}
+            {intl.formatMessage(pageConfig.actions.cancel.confirmation.body)}
           </Text>
         </Stack>
       </ResponsiveModal>
@@ -119,7 +119,7 @@ export const VerificationWizard = ({
               onClick={onCancelButtonClick}
             >
               <Cross color="white" />
-              {intl.formatMessage(pageConfig.cancel.label)}
+              {intl.formatMessage(pageConfig.actions.cancel.label)}
             </Button>
 
             <Button
@@ -132,7 +132,7 @@ export const VerificationWizard = ({
               }}
             >
               <Check color="white" />
-              {intl.formatMessage(pageConfig.verify.label)}
+              {intl.formatMessage(pageConfig.actions.verify.label)}
             </Button>
 
             {showReviewButton && (

@@ -22,7 +22,7 @@ export async function cacheFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
 
   actions.forEach((action) =>
-    Object.entries(action.data).forEach(([, value]) => {
+    Object.entries(action.declaration).forEach(([, value]) => {
       const fileParsed = FileFieldValue.safeParse(value)
       if (fileParsed.success) {
         promises.push(precacheFile(fileParsed.data.filename))

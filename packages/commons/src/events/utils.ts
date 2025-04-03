@@ -9,123 +9,116 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TranslationConfig } from './TranslationConfig'
-
-import { flattenDeep, omitBy } from 'lodash'
+import { flattenDeep, omitBy, mergeWith, isArray, isObject } from 'lodash'
 import { workqueues } from '../workqueues'
-import { ActionType, LatentActions } from './ActionType'
+import { ActionType, DeclarationAction, DeclarationActions } from './ActionType'
 import { EventConfig } from './EventConfig'
-import { EventConfigInput } from './EventConfigInput'
-import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { ActionUpdate, EventState } from './ActionDocument'
-import { FormConfig, FormPageType, FormPageConfig } from './FormConfig'
+import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
 import { FieldType } from './FieldType'
-import { getOrThrow } from '../utils'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID } from '../uuid'
 import { formatISO } from 'date-fns'
-
-function isMetadataField<T extends string>(
-  field: T | EventMetadataKeys
-): field is EventMetadataKeys {
-  return field in eventMetadataLabelMap
-}
-
-/**
- * @returns All the fields in the event configuration input.
- */
-export const findInputPageFields = (
-  config: EventConfigInput
-): { id: string; label: TranslationConfig }[] => {
-  return flattenDeep(
-    config.actions.map(({ forms }) =>
-      forms.map(({ pages }) =>
-        pages.map(({ fields }) =>
-          fields.map(({ id, label }) => ({ id, label }))
-        )
-      )
-    )
-  )
-}
+import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
+import { FormConfig } from './FormConfig'
+import { getOrThrow } from '../utils'
 
 /**
  * @returns All the fields in the event configuration.
  */
-export const findPageFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep(
-    config.actions.map((action) => {
-      if (action.type === ActionType.REQUEST_CORRECTION) {
-        return [
-          ...action.forms.map(({ pages }) => pages.map(({ fields }) => fields)),
-          ...action.onboardingForm.flatMap(({ fields }) => fields),
-          ...action.additionalDetailsForm.flatMap(({ fields }) => fields)
-        ]
-      }
+export const findAllFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep([
+    ...getDeclarationFields(config),
+    ...getAllAnnotationFields(config)
+  ])
+}
 
-      return action.forms.map(({ pages }) => pages.map(({ fields }) => fields))
-    })
-  )
+export const getAllAnnotationFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep(config.actions.map(getActionAnnotationFields))
+}
+
+export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
+  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
+    return [
+      ...actionConfig.onboardingForm.flatMap(({ fields }) => fields),
+      ...actionConfig.additionalDetailsForm.flatMap(({ fields }) => fields)
+    ]
+  }
+
+  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
+    return actionConfig?.printForm.pages.flatMap(({ fields }) => fields) ?? []
+  }
+
+  if (isDeclarationActionConfig(actionConfig)) {
+    return actionConfig?.review.fields ?? []
+  }
+
+  return []
 }
 
 /**
- *
- * @param pageFields - All the fields in the event configuration
- * @param refFields - The fields referencing values within the event configuration (e.g. summary fields) or within system provided metadata fields (e.g. createdAt, updatedBy)
- * @returns referenced fields with populated labels
+ * @TODO: Request correction should have same format as print certificate
  */
-export const resolveLabelsFromKnownFields = ({
-  pageFields,
-  refFields
-}: {
-  pageFields: { id: string; label: TranslationConfig }[]
-  refFields: {
-    // @TODO: To enforce type safety we might need to create types without using zod
-    id: EventMetadataKeys | string
-    label?: TranslationConfig
-  }[]
-}) => {
-  return refFields.map((field) => {
-    if (field.label) {
-      return field
-    }
+export const findRecordActionPages = (
+  config: EventConfig,
+  actionType: ActionType
+): PageConfig[] => {
+  const action = config.actions.find((a) => a.type === actionType)
 
-    if (isMetadataField(field.id)) {
-      return {
-        ...field,
-        label: eventMetadataLabelMap[field.id]
-      }
-    }
+  if (action?.type === ActionType.REQUEST_CORRECTION) {
+    return [...action.onboardingForm, ...action.additionalDetailsForm]
+  }
 
-    const pageLabel = pageFields.find((pageField) => pageField.id === field.id)
+  if (action?.type === ActionType.PRINT_CERTIFICATE) {
+    return action.printForm.pages
+  }
 
-    if (!pageLabel) {
-      throw new Error(`Referenced field ${field.id} does not have a label`)
-    }
-
-    return {
-      ...field,
-      label: pageLabel.label
-    }
-  })
+  return []
 }
 
-export function getAllFields(configuration: EventConfig) {
-  return configuration.actions
-    .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => [
-      ...form.review.fields,
-      ...form.pages.flatMap((page) => page.fields)
-    ])
+function isDeclarationActionConfig(
+  action: ActionConfig
+): action is DeclarationActionConfig {
+  return DeclarationActions.safeParse(action.type).success
 }
 
-export function getAllPages(configuration: EventConfig) {
-  return configuration.actions
-    .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => form.pages)
+export function getDeclarationFields(
+  configuration: EventConfig
+): FieldConfig[] {
+  return configuration.declaration.pages.flatMap(({ fields }) => fields)
+}
+
+export function getDeclarationPages(configuration: EventConfig) {
+  return configuration.declaration.pages
+}
+
+export function getDeclaration(configuration: EventConfig) {
+  return configuration.declaration
+}
+
+export function getActionReviewFields(
+  configuration: EventConfig,
+  actionType: DeclarationAction
+) {
+  return getActionReview(configuration, actionType).fields
+}
+
+export function getActionReview(
+  configuration: EventConfig,
+  actionType: ActionType
+) {
+  const [actionConfig] = configuration.actions.filter(
+    (a): a is DeclarationActionConfig => a.type === actionType
+  )
+
+  return getOrThrow(
+    actionConfig?.review,
+    `No review config found for ${actionType}`
+  )
 }
 
 export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
@@ -141,29 +134,7 @@ export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
   })
 }
 
-export const findActiveActionForm = (
-  configuration: EventConfig,
-  action: ActionType
-) => {
-  const actionConfig = configuration.actions.find((a) => a.type === action)
-  const form = actionConfig?.forms.find((f) => f.active)
-
-  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
-  return form
-}
-
-export const findActiveActionFormPages = (
-  configuration: EventConfig,
-  action: ActionType
-) => {
-  return findActiveActionForm(configuration, action)?.pages
-}
-
-export const getFormFields = (formConfig: FormConfig) => {
-  return formConfig.pages.flatMap((p) => p.fields)
-}
-
-export function isPageVisible(page: FormPageConfig, formValues: ActionUpdate) {
+export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   if (!page.conditional) {
     return true
   }
@@ -183,86 +154,6 @@ export const getVisiblePagesFormFields = (
     .flatMap((p) => p.fields)
 }
 
-/**
- * Returns only form fields for the action type, if any, excluding review fields.
- */
-export const findActiveActionFormFields = (
-  configuration: EventConfig,
-  action: ActionType
-): FieldConfig[] | undefined => {
-  const form = findActiveActionForm(configuration, action)
-
-  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
-  return form ? getFormFields(form) : undefined
-}
-
-/**
- * Returns all fields for the action type, including review fields, if any.
- */
-export const findActiveActionFields = (
-  configuration: EventConfig,
-  action: ActionType,
-  formData?: ActionUpdate
-): FieldConfig[] | undefined => {
-  const form = findActiveActionForm(configuration, action)
-  const reviewFields = form?.review.fields
-
-  let formFields: FieldConfig[] | undefined = undefined
-
-  if (form) {
-    formFields = formData
-      ? getVisiblePagesFormFields(form, formData)
-      : getFormFields(form)
-  }
-
-  const allFields = formFields
-    ? formFields.concat(reviewFields ?? [])
-    : reviewFields
-
-  /** Let caller decide whether to throw an error when fields are missing, or default to empty array */
-  return allFields
-}
-
-export const getActiveActionFormPages = (
-  configuration: EventConfig,
-  action: ActionType
-) => {
-  return getOrThrow(
-    findActiveActionForm(configuration, action)?.pages,
-    'Form configuration not found for type: ' + configuration.id
-  )
-}
-
-/**
- * Returns all fields for the action type, including review fields, or throws
- */
-export function getActiveActionFields(
-  configuration: EventConfig,
-  action: ActionType
-): FieldConfig[] {
-  if (LatentActions.some((latentAction) => latentAction === action)) {
-    return getActiveActionFields(configuration, ActionType.DECLARE)
-  }
-  const fields = findActiveActionFields(configuration, action)
-
-  if (!fields) {
-    throw new Error(`No active field config found for action type ${action}`)
-  }
-
-  return fields
-}
-
-export function getEventConfiguration(
-  eventConfigurations: EventConfig[],
-  type: string
-): EventConfig {
-  const config = eventConfigurations.find((config) => config.id === type)
-  if (!config) {
-    throw new Error(`Event configuration not found for type: ${type}`)
-  }
-  return config
-}
-
 function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
   if (field.type !== FieldType.CHECKBOX || field.required) {
     return false
@@ -271,19 +162,22 @@ function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
   return !form[field.id]
 }
 
-export function stripHiddenFields(fields: FieldConfig[], data: EventState) {
-  return omitBy(data, (_, fieldId) => {
+export function stripHiddenFields(
+  fields: FieldConfig[],
+  declaration: EventState
+) {
+  return omitBy(declaration, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
 
     if (!field) {
       return true
     }
 
-    if (isOptionalUncheckedCheckbox(field, data)) {
+    if (isOptionalUncheckedCheckbox(field, declaration)) {
       return true
     }
 
-    return !isFieldVisible(field, data)
+    return !isFieldVisible(field, declaration)
   })
 }
 
@@ -315,8 +209,8 @@ export function createEmptyDraft(
     transactionId: getUUID(),
     action: {
       type: actionType,
-      data: {},
-      metadata: {},
+      declaration: {},
+      annotation: {},
       createdAt: new Date().toISOString(),
       createdBy: '@todo',
       createdAtLocation: '@todo'
@@ -324,6 +218,31 @@ export function createEmptyDraft(
   }
 }
 
-export function isVerificationPage(page: FormPageConfig) {
-  return page.type === FormPageType.VERIFICATION
+export function isVerificationPage(
+  page: PageConfig
+): page is VerificationPageConfig {
+  return page.type === PageTypes.enum.VERIFICATION
+}
+
+export function deepMerge(
+  currentDocument: ActionUpdate,
+  actionDocument: ActionUpdate
+) {
+  return mergeWith(
+    currentDocument,
+    actionDocument,
+    (previousValue, incomingValue) => {
+      if (incomingValue === undefined) {
+        return previousValue
+      }
+      if (isArray(incomingValue)) {
+        return incomingValue // Replace arrays instead of merging
+      }
+      if (isObject(previousValue) && isObject(incomingValue)) {
+        return undefined // Continue deep merging objects
+      }
+
+      return incomingValue // Override with latest value
+    }
+  )
 }

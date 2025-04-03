@@ -60,7 +60,6 @@ interface Props {
   id?: string
   documents?: FileFieldValueWithOption[] | null
   processingDocuments?: Array<{ label: string }>
-  attachment?: IAttachmentValue
   label?: string
   onSelect: (document: FileFieldValueWithOption | IAttachmentValue) => void
   dropdownOptions?: SelectOption[]

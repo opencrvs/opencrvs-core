@@ -51,8 +51,9 @@ test('Validation error message contains all the offending fields', async () => {
     generator.event.actions.declare(event.id)
   )
 
+  /** Partial payload is accepted, so it should not complain about fields already send during declaration. */
   const data = generator.event.actions.validate(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-02',
       'recommender.none': true
     }
@@ -73,7 +74,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   )
 
   const data = generator.event.actions.validate(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
@@ -119,17 +120,17 @@ test('Skips required field validation when they are conditionally hidden', async
     }
   }
 
-  const data = generator.event.actions.validate(event.id, {
-    data: form
+  const declaration = generator.event.actions.validate(event.id, {
+    declaration: form
   })
 
-  const response = await client.event.actions.validate.request(data)
+  const response = await client.event.actions.validate.request(declaration)
   const activeActions = getAcceptedActions(response)
 
   const savedAction = activeActions.find(
     (action) => action.type === ActionType.VALIDATE
   )
-  expect(savedAction?.data).toEqual(form)
+  expect(savedAction?.declaration).toEqual(form)
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -159,7 +160,7 @@ test('Prevents adding birth date in future', async () => {
 
   await expect(
     client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, { data: form })
+      generator.event.actions.validate(event.id, { declaration: form })
     )
   ).rejects.matchSnapshot()
 })
@@ -174,7 +175,7 @@ test('validation prevents including hidden fields', async () => {
   )
 
   const data = generator.event.actions.validate(event.id, {
-    data: {
+    declaration: {
       ...generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
       'recommender.firstname': 'this should not be here'
     }

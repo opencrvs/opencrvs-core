@@ -16,8 +16,8 @@ import { trpcClient } from '@client/v2-events/trpc'
 
 export interface OnDeclareParams {
   eventId: string
-  data: EventState
-  metadata?: EventState
+  declaration: EventState
+  annotation?: EventState
 }
 /**
  * Runs a sequence of actions from declare to register.
@@ -27,23 +27,23 @@ export interface OnDeclareParams {
  */
 export async function registerOnDeclare({
   eventId,
-  data,
-  metadata
+  declaration,
+  annotation
 }: {
   eventId: string
-  data: EventState
-  metadata?: EventState
+  declaration: EventState
+  annotation?: EventState
 }) {
   await trpcClient.event.actions.declare.request.mutate({
-    data,
-    metadata,
+    declaration,
+    annotation,
     eventId,
     transactionId: getUUID()
   })
 
   await trpcClient.event.actions.validate.request.mutate({
-    data,
-    metadata,
+    declaration,
+    annotation,
     eventId,
     transactionId: getUUID(),
     duplicates: []
@@ -51,8 +51,8 @@ export async function registerOnDeclare({
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
     {
-      data,
-      metadata,
+      declaration,
+      annotation,
       eventId,
       transactionId: getUUID()
     }
@@ -69,21 +69,21 @@ export async function registerOnDeclare({
  */
 export async function validateOnDeclare(variables: {
   eventId: string
-  data: EventState
-  metadata?: EventState
+  declaration: EventState
+  annotation?: EventState
 }) {
-  const { eventId, data, metadata } = variables
+  const { eventId, declaration, annotation } = variables
   await trpcClient.event.actions.declare.request.mutate({
-    data,
-    metadata,
+    declaration,
+    annotation,
     eventId,
     transactionId: getUUID()
   })
 
   const latestResponse = await trpcClient.event.actions.validate.request.mutate(
     {
-      data,
-      metadata,
+      declaration,
+      annotation,
       eventId,
       transactionId: getUUID(),
       duplicates: []

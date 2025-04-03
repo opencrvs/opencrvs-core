@@ -66,13 +66,12 @@ const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
   }
 `
 
-interface IBaseLoadingProps {
+type LoadingIndicatorCompProps = {
   loading: boolean
   hasError?: boolean
   noDeclaration?: boolean
-}
-
-type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
+} & IntlShapeProps &
+  OnlineStatusProps
 
 function LoadingIndicatorComp({
   loading,
@@ -80,7 +79,7 @@ function LoadingIndicatorComp({
   hasError,
   intl,
   isOnline
-}: IProps) {
+}: LoadingIndicatorCompProps) {
   return (
     <Wrapper>
       {isOnline && loading && (
@@ -107,17 +106,17 @@ function LoadingIndicatorComp({
   )
 }
 
-export function withOnlineStatus<T>(
-  WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
-) {
-  return function WithOnlineStatus(props: T) {
-    const isOnline = useOnlineStatus()
-    return <WrappedComponent isOnline={isOnline} {...props} />
-  }
+export interface OnlineStatusProps {
+  isOnline: boolean
 }
 
-export interface IOnlineStatusProps {
-  isOnline: boolean
+export function withOnlineStatus<ComponentProps>(
+  Component: React.ComponentType<ComponentProps>
+) {
+  return (props: Omit<ComponentProps, 'isOnline'>) => {
+    const isOnline = useOnlineStatus()
+    return <Component isOnline={isOnline} {...(props as ComponentProps)} />
+  }
 }
 
 export const LoadingIndicator = injectIntl(

@@ -13,19 +13,28 @@ import {
   ActionInputWithType,
   ActionType,
   ActionUpdate,
+  DeclarationUpdateActions,
+  MetadataAction,
+  EventConfig,
   FieldConfig,
   FieldUpdateValue,
-  findActiveActionFields,
-  getActiveActionFormPages,
-  getAcceptedActions,
   getFieldValidationErrors,
   Inferred,
   isPageVisible,
-  isVerificationPage
-} from '@opencrvs/commons'
+  isVerificationPage,
+  annotationActions,
+  findRecordActionPages,
+  DeclarationUpdateAction,
+  getActionReviewFields,
+  getDeclaration,
+  getVisiblePagesFormFields,
+  DeclarationActions,
+  getCurrentEventState,
+  deepMerge
+} from '@opencrvs/commons/events'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventConfigurationById } from '@events/service/config/config'
-import { getEventTypeId, getEventById } from '@events/service/events/events'
+import { getEventById } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
 
 function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
@@ -82,49 +91,112 @@ type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
 }
 
+function throwWhenNotEmpty(errors: unknown[]) {
+  if (errors.length > 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: JSON.stringify(errors)
+    })
+  }
+}
+
+function validateDeclarationUpdateAction({
+  eventConfig,
+  actionType,
+  declaration,
+  annotation
+}: {
+  eventConfig: EventConfig
+  actionType: DeclarationUpdateAction
+  declaration: ActionUpdate
+  annotation?: ActionUpdate
+}) {
+  const declarationConfig = getDeclaration(eventConfig)
+
+  const declarationFields = getVisiblePagesFormFields(
+    declarationConfig,
+    declaration
+  )
+
+  const declarationActionParse = DeclarationActions.safeParse(actionType)
+  const reviewFields = declarationActionParse.success
+    ? getActionReviewFields(eventConfig, declarationActionParse.data)
+    : []
+
+  const fields = [...declarationFields, ...reviewFields]
+
+  // @TODO: Separate validations for annotation and declaration
+  return getFormFieldErrors(fields, { ...declaration, ...annotation })
+}
+
+function validateActionAnnotation({
+  eventConfig,
+  actionType,
+  annotation = {}
+}: {
+  eventConfig: EventConfig
+  actionType: MetadataAction
+  annotation?: ActionUpdate
+}) {
+  const pages = findRecordActionPages(eventConfig, actionType)
+
+  const visibleVerificationPageIds = pages
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, annotation))
+    .map((page) => page.id)
+
+  const formFields = pages.flatMap(({ fields }) =>
+    fields.flatMap((field) => field)
+  )
+
+  const errors = [
+    ...getFormFieldErrors(formFields, annotation),
+    ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
+  ]
+
+  return errors
+}
+
 export function validateAction(actionType: ActionType) {
   return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
-    const eventType = await getEventTypeId(input.eventId)
+    const event = await getEventById(input.eventId)
+
     const eventConfig = await getEventConfigurationById({
       token: ctx.token,
-      eventType
+      eventType: event.type
     })
 
-    const formFields =
-      findActiveActionFields(eventConfig, actionType, input.data) || []
+    const declarationUpdateAction =
+      DeclarationUpdateActions.safeParse(actionType)
 
-    const data = {
-      ...input.data,
-      ...(input.metadata ?? {})
-    } satisfies ActionUpdate
-
-    const event = await getEventById(input.eventId)
-    const actions = getAcceptedActions(event)
-
-    const eventDeclarationData =
-      actions.find((action) => action.type === ActionType.DECLARE)?.data ?? {}
-
-    // For each visible verification page on the form, we expect the metadata to include a field with boolean value and the page id as key.
-    const visibleVerificationPageIds = getActiveActionFormPages(
-      eventConfig,
-      actionType
-    )
-      .filter((page) => isVerificationPage(page))
-      .filter((page) =>
-        isPageVisible(page, { ...eventDeclarationData, ...data })
+    if (declarationUpdateAction.success) {
+      const previousDeclaration = getCurrentEventState(event)
+      // since partial updates are allowed, full declaration is needed to resolve validations
+      const completeDeclaration = deepMerge(
+        previousDeclaration.declaration,
+        input.declaration
       )
-      .map((page) => page.id)
 
-    const errors = [
-      ...getFormFieldErrors(formFields, data),
-      ...getVerificationPageErrors(visibleVerificationPageIds, data)
-    ]
-
-    if (errors.length > 0) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: JSON.stringify(errors)
+      const errors = validateDeclarationUpdateAction({
+        eventConfig,
+        declaration: completeDeclaration,
+        annotation: input.annotation,
+        actionType: declarationUpdateAction.data
       })
+
+      throwWhenNotEmpty(errors)
+    }
+
+    const annotationActionParse = annotationActions.safeParse(actionType)
+
+    if (annotationActionParse.success) {
+      const errors = validateActionAnnotation({
+        eventConfig,
+        annotation: input.annotation,
+        actionType: annotationActionParse.data
+      })
+
+      throwWhenNotEmpty(errors)
     }
 
     return next()

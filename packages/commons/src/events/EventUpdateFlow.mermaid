@@ -10,10 +10,10 @@ flowchart TD
     N["ActionInput (simplified)"] -- Contains --- O["
      eventId: string,
      transactionId: string,
-     incomplete: boolean,
-     data: ActionUpdate,
-     metadata: ActionUpdate
-"]
+     declaration: ActionUpdate,
+     annotation?: ActionUpdate,
+     originalActionId?: string
+    "]
 
 
     X["EventIndex"] -- Contains --- Y["
@@ -26,8 +26,9 @@ flowchart TD
       modifiedAt: datetime,
       assignedTo?: string | null
       updatedBy: string,
-      trackingId: string
-      data: EventState
+      trackingId: string,
+      registrationNumber?: string | null
+      declaration: EventState
     "]
 
     A -- EventDocument --> D
@@ -37,17 +38,33 @@ flowchart TD
         type: string,
         createdAt: datetime,
         updatedAt: datetime,
-        actions: ActionDocument[],
+        actions: Action[],
         trackingId: string
-"]
+    "]
+
+
+    Z["AsyncRejectActionDocument"] -- Contains --- ZZ["
+      id: string,
+      createdAt: datetime,
+      type: ConfirmableAction,
+      status: ActionStatus.Rejected
+    "]
+
+    U["Action (ActionDocument | AsyncRejectActionDocument)"]
+
     G["ActionDocument"] -- Contains --- H["
-    id: string,
-    createdAt: datetime,
-    createdBy: string,
-    createdAtLocation: string,
-    data: ActionUpdate,
-    metadata: ActionUpdate"
+      id: string,
+      createdAt: datetime,
+      createdBy: string,
+      createdAtLocation: string,
+      declaration: ActionUpdate,
+      annotation: ActionUpdate,
+      status:  ActionStatus.Requested | ActionStatus.Accepted | ActionStatus.Rejected
+    "
     ]
+
+    G --> U
+    Z --> U
 
 
     J["ActionUpdate"] -- Contains --- I["

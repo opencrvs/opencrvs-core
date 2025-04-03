@@ -10,7 +10,10 @@
  */
 
 import { addAction, getEventById } from '@events/service/events/events'
-import { ActionStatus, RejectCorrectionActionInput } from '@opencrvs/commons'
+import {
+  ActionStatus,
+  RejectCorrectionActionInput
+} from '@opencrvs/commons/events'
 import { RequestNotFoundError } from './correction'
 
 export async function rejectCorrection(

@@ -11,7 +11,7 @@
 
 import { EventConfig } from './EventConfig'
 import { EventConfigInput } from './EventConfigInput'
-import { findInputPageFields, validateWorkqueueConfig } from './utils'
+import { validateWorkqueueConfig } from './utils'
 
 /**
  * Builds a validated configuration for an event
@@ -22,10 +22,5 @@ export const defineConfig = (config: EventConfigInput) => {
 
   const input = EventConfig.parse(config)
 
-  const pageFields = findInputPageFields(input)
-
-  return EventConfig.parse({
-    ...input,
-    pageFields
-  })
+  return input
 }

@@ -31,6 +31,7 @@ module.exports = defineConfig([
       'react/destructuring-assignment': 'warn',
       'react/jsx-key': 1,
       'react/jsx-no-literals': 1,
+      'react/no-unused-prop-types': 1,
       'react/jsx-sort-props': [
         1,
         {

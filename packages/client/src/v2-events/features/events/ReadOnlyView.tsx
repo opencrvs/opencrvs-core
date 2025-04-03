@@ -16,38 +16,39 @@ import {
   ActionType,
   EventConfig,
   EventDocument,
-  findActiveActionForm,
-  getMetadataForAction
+  getActionReview,
+  getDeclaration,
+  getActionAnnotation
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 // These are the allowed actions based on which we can read a declarations data
 const READ_ONLY_MODE_ALLOWED_ACTIONS = [
-  ActionType.APPROVE_CORRECTION,
   ActionType.REGISTER,
   ActionType.VALIDATE,
   ActionType.DECLARE
 ]
 
-function findLastActionFormConfigForReadOnlyMode(
-  config: EventConfig,
-  event: EventDocument
-) {
+function getLastActionReviewConfig(config: EventConfig, event: EventDocument) {
   for (const actionType of READ_ONLY_MODE_ALLOWED_ACTIONS) {
     const availableAllowedAction = event.actions.find(
       (a) => a.type === actionType
     )
+
     if (availableAllowedAction) {
-      return findActiveActionForm(config, actionType)
+      return getActionReview(config, actionType)
     }
   }
+
+  throw new Error('No allowed action found')
 }
 
 function findLastActionMetadata(event: EventDocument) {
@@ -56,12 +57,12 @@ function findLastActionMetadata(event: EventDocument) {
       (a) => a.type === actionType
     )
     if (availableAllowedAction) {
-      return getMetadataForAction({ event, actionType, drafts: [] })
+      return getActionAnnotation({ event, actionType, drafts: [] })
     }
   }
 }
 
-export function ReadOnlyView() {
+function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VIEW)
   const { getEventState, getEvent } = useEvents()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
@@ -70,33 +71,33 @@ export function ReadOnlyView() {
     currentEventState.type
   )
   const [fullEvent] = getEvent.useSuspenseQuery(eventId)
-  const formConfig = findLastActionFormConfigForReadOnlyMode(config, fullEvent)
-
-  if (!formConfig) {
-    throw new Error('No active form configuration found for any action')
-  }
+  const formConfig = getDeclaration(config)
 
   const form = useEventFormData((state) =>
-    state.getFormValues(currentEventState.data)
+    state.getFormValues(currentEventState.declaration)
   )
 
-  const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(findLastActionMetadata(fullEvent))
+  const reviewConfig = getLastActionReviewConfig(config, fullEvent)
+
+  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
+    useActionAnnotation()
+  const annotation = getMetadata(findLastActionMetadata(fullEvent))
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
       <ReviewComponent.Body
         readonlyMode
-        eventConfig={config}
+        annotation={annotation}
         form={form}
         formConfig={formConfig}
-        metadata={metadata}
-        title={formatMessage(formConfig.review.title, form)}
+        title={formatMessage(reviewConfig.title, form)}
+        onAnnotationChange={(values) => setMetadata(values)}
         onEdit={noop}
-        onMetadataChange={(values) => setMetadata(values)}
       >
         <></>
       </ReviewComponent.Body>
     </FormLayout>
   )
 }
+
+export const ReadonlyViewIndex = withSuspense(ReadonlyView)

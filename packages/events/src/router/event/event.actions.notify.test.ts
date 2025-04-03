@@ -49,6 +49,7 @@ test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () =
   const activeActions = getAcceptedActions(response)
 
   expect(
-    activeActions.find((action) => action.type === ActionType.NOTIFY)?.data
+    activeActions.find((action) => action.type === ActionType.NOTIFY)
+      ?.declaration
   ).toMatchSnapshot()
 })

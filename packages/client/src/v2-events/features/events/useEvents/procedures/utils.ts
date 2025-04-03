@@ -133,7 +133,7 @@ export function createEventActionMutationFn<
     async ({ eventType, ...params }) => {
       return defaultMutationFn({
         ...params,
-        data: params.data
+        declaration: params.declaration
       })
     }
   )

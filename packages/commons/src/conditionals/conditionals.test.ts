@@ -244,7 +244,7 @@ describe('"event" conditionals', () => {
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
-            data: {},
+            declaration: {},
             createdAtLocation: '123456',
             status: ActionStatus.Accepted
           }

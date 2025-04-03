@@ -107,7 +107,7 @@ export function useGetEventState() {
 
       return {
         ...response,
-        data: eventState
+        declaration: eventState
       }
     },
     useSuspenseQuery: (id: string): EventIndex => {

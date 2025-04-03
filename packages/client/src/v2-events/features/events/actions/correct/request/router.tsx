@@ -19,7 +19,7 @@ import { Action } from '@client/v2-events/features/events/components/Action'
 export const router = {
   path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.path,
   element: (
-    <Action type={ActionType.REQUEST_CORRECTION}>
+    <Action actionType={ActionType.REQUEST_CORRECTION}>
       <Outlet />
     </Action>
   ),

@@ -15,7 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
+import { getDeclarationPages } from '@opencrvs/commons/client'
 
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -46,7 +46,7 @@ export function Pages() {
     event.type
   )
 
-  const formPages = getActiveActionFormPages(configuration, ActionType.VALIDATE)
+  const formPages = getDeclarationPages(configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -79,14 +79,14 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        declaration={event.declaration}
         eventConfig={configuration}
-        eventDeclarationData={event.data}
         form={form}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
-        onFormPageChange={(nextPageId: string) =>
+        onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath({
               eventId,

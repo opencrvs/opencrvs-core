@@ -10,9 +10,11 @@
  */
 import { z } from 'zod'
 import { EnableConditional, ShowConditional } from './Conditional'
-import { FormConfig, FormPageConfig } from './FormConfig'
+import { PageConfig } from './PageConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
+import { FieldConfig } from './FieldConfig'
+import { ActionFormConfig } from './FormConfig'
 
 /**
  * By default, when conditionals are not defined, action is visible and enabled to the user.
@@ -24,22 +26,41 @@ const ActionConditional = z.discriminatedUnion('type', [
   EnableConditional
 ])
 
+export const DeclarationReviewConfig = z
+  .object({
+    title: TranslationConfig.describe('Title of the review page'),
+    fields: z
+      .array(FieldConfig)
+      .describe('Fields to be rendered on the review page for annotations.')
+  })
+  .describe('Configuration for **declaration** review page.')
+
+export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
+
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
   conditionals: z.array(ActionConditional).optional().default([]),
-  draft: z.boolean().optional(),
-  forms: z.array(FormConfig)
+  draft: z.boolean().optional()
 })
 
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE)
+    type: z.literal(ActionType.DECLARE),
+    review: DeclarationReviewConfig
   })
 )
 
 const ValidateConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.VALIDATE)
+    type: z.literal(ActionType.VALIDATE),
+    review: DeclarationReviewConfig
+  })
+)
+
+const RegisterConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.REGISTER),
+    review: DeclarationReviewConfig
   })
 )
 
@@ -61,12 +82,6 @@ const ArchiveConfig = ActionConfigBase.merge(
   })
 )
 
-const RegisterConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.REGISTER)
-  })
-)
-
 const DeleteConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DELETE)
@@ -75,15 +90,16 @@ const DeleteConfig = ActionConfigBase.merge(
 
 const PrintCertificateActionConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.PRINT_CERTIFICATE)
+    type: z.literal(ActionType.PRINT_CERTIFICATE),
+    printForm: ActionFormConfig
   })
 )
 
 const RequestCorrectionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
-    onboardingForm: z.array(FormPageConfig),
-    additionalDetailsForm: z.array(FormPageConfig)
+    onboardingForm: z.array(PageConfig),
+    additionalDetailsForm: z.array(PageConfig)
   })
 )
 
@@ -96,12 +112,6 @@ const RejectCorrectionConfig = ActionConfigBase.merge(
 const ApproveCorrectionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.APPROVE_CORRECTION)
-  })
-)
-
-const CustomConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.CUSTOM)
   })
 )
 
@@ -124,7 +134,6 @@ export type AllActionConfigFields =
   | typeof RequestCorrectionConfig
   | typeof RejectCorrectionConfig
   | typeof ApproveCorrectionConfig
-  | typeof CustomConfig
 
 /** @knipignore */
 export type InferredActionConfig =
@@ -139,7 +148,6 @@ export type InferredActionConfig =
   | z.infer<typeof RequestCorrectionConfig>
   | z.infer<typeof RejectCorrectionConfig>
   | z.infer<typeof ApproveCorrectionConfig>
-  | z.infer<typeof CustomConfig>
 
 export const ActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,
@@ -152,8 +160,15 @@ export const ActionConfig = z.discriminatedUnion('type', [
   PrintCertificateActionConfig,
   RequestCorrectionConfig,
   RejectCorrectionConfig,
-  ApproveCorrectionConfig,
-  CustomConfig
+  ApproveCorrectionConfig
 ]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
 
 export type ActionConfig = InferredActionConfig
+
+export const DeclarationActionConfig = z.discriminatedUnion('type', [
+  DeclareConfig,
+  ValidateConfig,
+  RegisterConfig
+])
+
+export type DeclarationActionConfig = z.infer<typeof DeclarationActionConfig>

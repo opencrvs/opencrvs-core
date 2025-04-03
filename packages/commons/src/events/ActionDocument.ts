@@ -34,8 +34,8 @@ export const ActionBase = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: ActionUpdate,
-  metadata: ActionUpdate.optional(),
+  declaration: ActionUpdate,
+  annotation: ActionUpdate.optional(),
   createdAtLocation: z.string(),
   status: z.enum([
     ActionStatus.Requested,
@@ -144,12 +144,6 @@ const ReadAction = ActionBase.merge(
   })
 )
 
-const CustomAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.CUSTOM)
-  })
-)
-
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
   ValidateAction,
@@ -165,15 +159,14 @@ export const ActionDocument = z.discriminatedUnion('type', [
   RejectedCorrectionAction,
   UnassignedAction,
   PrintCertificateAction,
-  ReadAction,
-  CustomAction
+  ReadAction
 ])
 
 export type ActionDocument = z.infer<typeof ActionDocument>
 
 export const AsyncRejectActionDocument = ActionBase.omit({
-  data: true,
-  metadata: true,
+  declaration: true,
+  annotation: true,
   createdBy: true,
   createdAtLocation: true
 }).merge(

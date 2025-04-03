@@ -11,7 +11,7 @@
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { SCOPES } from '@opencrvs/commons'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 
 test(`prevents forbidden access if missing required scope`, async () => {

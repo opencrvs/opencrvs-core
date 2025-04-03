@@ -54,14 +54,21 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   return recursiveTransform(template)
 }
 
-export const usePrintableCertificate = (
-  event: EventDocument,
-  form: EventState,
-  locations: Location[],
-  users: User[],
-  certificateConfig?: CertificateTemplateConfig,
+export const usePrintableCertificate = ({
+  event,
+  form,
+  locations,
+  users,
+  certificateConfig,
+  language
+}: {
+  event: EventDocument
+  form: EventState
+  locations: Location[]
+  users: User[]
+  certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
-) => {
+}) => {
   const currentState = getCurrentEventState(event)
   const modifiedState = {
     ...currentState,
@@ -80,7 +87,7 @@ export const usePrintableCertificate = (
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $state: modifiedState,
-    $data: form,
+    $declaration: form,
     locations,
     users,
     language
@@ -90,10 +97,11 @@ export const usePrintableCertificate = (
   const handleCertify = async (updatedEvent: EventDocument) => {
     const currentEventState = getCurrentEventState(updatedEvent)
     const base64ReplacedTemplate = await replaceMinioUrlWithBase64(form)
+
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
       $state: currentEventState,
-      $data: {
+      $declaration: {
         ...base64ReplacedTemplate,
         preview: false
       },

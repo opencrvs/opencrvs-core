@@ -21,7 +21,7 @@ import {
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  findActiveActionFields,
+  getDeclarationFields,
   getAcceptedActions,
   AsyncRejectActionDocument,
   ActionType
@@ -68,12 +68,6 @@ export async function getEventById(id: string): Promise<EventDocument> {
   return event
 }
 
-export async function getEventTypeId(id: string) {
-  const event = await getEventById(id)
-
-  return event.type
-}
-
 function getValidFileValue(
   fieldKey: string,
   fieldValue: FieldUpdateValue,
@@ -95,11 +89,10 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   })
 
   const actions = getAcceptedActions(event)
-
+  // @TODO: Check that this works after making sure data incldues only declaration fields.
+  const fieldConfigs = getDeclarationFields(configuration)
   for (const ac of actions) {
-    const fieldConfigs = findActiveActionFields(configuration, ac.type) || []
-
-    for (const [key, value] of Object.entries(ac.data)) {
+    for (const [key, value] of Object.entries(ac.declaration)) {
       const fileValue = getValidFileValue(key, value, fieldConfigs)
 
       if (!fileValue) {
@@ -162,6 +155,7 @@ function generateTrackingId(): string {
 }
 
 type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
+
 export async function createEvent({
   eventInput,
   createdAtLocation,
@@ -200,7 +194,7 @@ export async function createEvent({
         createdBy,
         createdAtLocation,
         id: getUUID(),
-        data: {},
+        declaration: {},
         status: ActionStatus.Accepted
       }
     ]
@@ -238,7 +232,7 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
   drafts: Draft[]
 ): Promise<void> {
   const previousFileValuesInDrafts = drafts
-    .map((draft) => extractFileValues(draft.action.data, fieldConfigs))
+    .map((draft) => extractFileValues(draft.action.declaration, fieldConfigs))
     .flat()
 
   for (const previousFileValue of previousFileValuesInDrafts) {
@@ -281,9 +275,12 @@ export async function addAction(
     eventType: event.type
   })
 
-  const fieldConfigs =
-    findActiveActionFields(configuration, input.type, input.data) || []
-  const fileValuesInCurrentAction = extractFileValues(input.data, fieldConfigs)
+  // @TODO: Check that this works after making sure data incldues only declaration fields.
+  const fieldConfigs = getDeclarationFields(configuration)
+  const fileValuesInCurrentAction = extractFileValues(
+    input.declaration,
+    fieldConfigs
+  )
 
   for (const file of fileValuesInCurrentAction) {
     if (!(await fileExists(file.file.filename, token))) {
@@ -291,7 +288,7 @@ export async function addAction(
     }
   }
 
-  if (input.type === ActionType.ARCHIVE && input.metadata?.isDuplicate) {
+  if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
     input.transactionId = getUUID()
     await db.collection<EventDocument>('events').updateOne(
       {

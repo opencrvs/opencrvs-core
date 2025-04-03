@@ -52,10 +52,9 @@ import {
   isDataFieldType,
   EventConfig,
   EventIndex,
-  ActionType,
-  findActiveActionFormFields,
   MetaFields,
-  AddressType
+  AddressType,
+  getDeclarationFields
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
@@ -452,9 +451,9 @@ const GeneratedInputField = React.memo(
           <AdministrativeArea.Input
             {...field.config}
             partOf={
-              (field.config.configuration.partOf?.$data &&
+              (field.config.configuration.partOf?.$declaration &&
                 (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                  field.config.configuration.partOf.$data
+                  field.config.configuration.partOf.$declaration
                 ] as string | undefined | null)) ??
               null
             }
@@ -524,17 +523,10 @@ const GeneratedInputField = React.memo(
       }
 
       // Data input requires field configs
-      const declareFormFields = findActiveActionFormFields(
-        eventConfig,
-        ActionType.DECLARE
-      )
-
-      if (!declareFormFields) {
-        return null
-      }
+      const declarationFields = getDeclarationFields(eventConfig)
 
       const fields = field.config.configuration.data.map((entry) =>
-        getFieldFromDataEntry({ dataEntry: entry, declareFormFields, formData })
+        getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })
       )
 
       return <Data.Input {...field.config} fields={fields} />
