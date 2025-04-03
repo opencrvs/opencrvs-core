@@ -246,19 +246,13 @@ export function field(fieldId: string) {
         return defineConditionalWithForm({
           type: 'object',
           properties: {
-            [fieldId]: { type: ['string', 'boolean'] },
+            [fieldId]: {
+              type: ['string', 'boolean'],
+              const: { $data: `1/${comparedFieldId}` }
+            },
             [comparedFieldId]: { type: ['string', 'boolean'] }
           },
-          required: [fieldId, comparedFieldId],
-          allOf: [
-            {
-              properties: {
-                [fieldId]: {
-                  const: { $data: `1/${comparedFieldId}` }
-                }
-              }
-            }
-          ]
+          required: [fieldId, comparedFieldId]
         })
       }
 
