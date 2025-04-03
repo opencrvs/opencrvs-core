@@ -24,6 +24,21 @@ export function defineConditional(schema: any) {
   return schema as JSONSchema
 }
 
+function getSchemaWithForm(schema: Record<string, any>) {
+  return {
+    type: 'object',
+    properties: {
+      $form: schema
+    },
+    required: ['$form']
+  }
+}
+
+export function defineConditionalWithForm(schema: Record<string, any>) {
+  const schemaWithForm = getSchemaWithForm(schema)
+  return defineConditional(schemaWithForm)
+}
+
 export type UserConditionalParameters = { $now: string; $user: TokenPayload }
 export type EventConditionalParameters = { $now: string; $event: EventDocument }
 // @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
@@ -171,23 +186,18 @@ export function field(fieldId: string) {
   const getDateRange = (
     date: string,
     clause: 'formatMinimum' | 'formatMaximum'
-  ) => ({
-    type: 'object',
-    properties: {
-      $form: {
-        type: 'object',
-        properties: {
-          [fieldId]: {
-            type: 'string',
-            format: 'date',
-            [clause]: date
-          }
-        },
-        required: [fieldId]
-      }
-    },
-    required: ['$form']
-  })
+  ) =>
+    getSchemaWithForm({
+      type: 'object',
+      properties: {
+        [fieldId]: {
+          type: 'string',
+          format: 'date',
+          [clause]: date
+        }
+      },
+      required: [fieldId]
+    })
 
   return {
     /**
@@ -229,53 +239,42 @@ export function field(fieldId: string) {
     isEqualTo: (
       value: string | boolean | { _fieldId: string; [key: string]: unknown }
     ) => {
-      // If the value is an reference to another field, we need to compare the values of the two fields
+      // When the value is an object, it means that the value is a reference to another field
       if (typeof value === 'object' && value._fieldId) {
         const comparedFieldId = value._fieldId
 
-        return defineConditional({
+        return defineConditionalWithForm({
           type: 'object',
           properties: {
-            $form: {
-              type: 'object',
-              properties: {
-                [fieldId]: { type: ['string', 'boolean'] },
-                [comparedFieldId]: { type: ['string', 'boolean'] }
-              },
-              required: [fieldId, comparedFieldId],
-              allOf: [
-                {
-                  properties: {
-                    [fieldId]: {
-                      const: { $data: `1/${comparedFieldId}` }
-                    }
-                  }
-                }
-              ]
-            }
+            [fieldId]: { type: ['string', 'boolean'] },
+            [comparedFieldId]: { type: ['string', 'boolean'] }
           },
-          required: ['$form']
+          required: [fieldId, comparedFieldId],
+          allOf: [
+            {
+              properties: {
+                [fieldId]: {
+                  const: { $data: `1/${comparedFieldId}` }
+                }
+              }
+            }
+          ]
         })
       }
 
-      return defineConditional({
+      // In the 'default' case, we compare the value of the field with the hard coded value
+      return defineConditionalWithForm({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                oneOf: [
-                  { type: 'string', const: value },
-                  { type: 'boolean', const: value }
-                ],
-                const: value
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            oneOf: [
+              { type: 'string', const: value },
+              { type: 'boolean', const: value }
+            ],
+            const: value
           }
         },
-        required: ['$form']
+        required: [fieldId]
       })
     },
     /**
@@ -287,109 +286,79 @@ export function field(fieldId: string) {
      *
      */
     isFalsy: () =>
-      defineConditional({
+      defineConditionalWithForm({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                anyOf: [
-                  { const: 'undefined' },
-                  { const: false },
-                  { const: null },
-                  { const: '' }
-                ]
-              }
-            },
+          [fieldId]: {
             anyOf: [
-              {
-                required: [fieldId]
-              },
-              {
-                not: {
-                  required: [fieldId]
-                }
-              }
+              { const: 'undefined' },
+              { const: false },
+              { const: null },
+              { const: '' }
             ]
           }
         },
-        required: ['$form']
-      }),
-    isUndefined: () =>
-      defineConditional({
-        type: 'object',
-        properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                enum: ['undefined']
-              }
-            },
+        anyOf: [
+          {
+            required: [fieldId]
+          },
+          {
             not: {
               required: [fieldId]
             }
           }
+        ]
+      }),
+    isUndefined: () =>
+      defineConditionalWithForm({
+        type: 'object',
+        properties: {
+          [fieldId]: {
+            type: 'string',
+            enum: ['undefined']
+          }
         },
-        required: ['$form']
+        not: {
+          required: [fieldId]
+        }
       }),
     inArray: (values: string[]) =>
-      defineConditional({
+      defineConditionalWithForm({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                enum: values
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'string',
+            enum: values
           }
         },
-        required: ['$form']
+        required: [fieldId]
       }),
     isValidEnglishName: () =>
-      defineConditional({
+      defineConditionalWithForm({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                pattern:
-                  "^[\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*( [\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*)*$",
-                description:
-                  "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'string',
+            pattern:
+              "^[\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*( [\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*)*$",
+            description:
+              "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
           }
         },
-        required: ['$form']
+        required: [fieldId]
       }),
     isValidNationalId: () =>
-      defineConditional({
+      defineConditionalWithForm({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                pattern: '^[0-9]{9}$',
-                description:
-                  'The National ID can only be numeric and must be 9 digits long.'
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'string',
+            pattern: '^[0-9]{9}$',
+            description:
+              'The National ID can only be numeric and must be 9 digits long.'
           }
         },
-        required: ['$form']
+        required: [fieldId]
       }),
     /**
      * Checks if the field value matches a given regular expression pattern.
@@ -397,39 +366,27 @@ export function field(fieldId: string) {
      * @returns A JSONSchema conditional that validates the field value against the pattern.
      */
     matches: (pattern: string) =>
-      defineConditional({
+      defineConditionalWithForm({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                pattern
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'string',
+            pattern
           }
         },
-        required: ['$form']
+        required: [fieldId]
       }),
     isBetween: (min: number, max: number) =>
-      defineConditional({
+      defineConditionalWithForm({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'number',
-                minimum: min,
-                maximum: max
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'number',
+            minimum: min,
+            maximum: max
           }
         },
-        required: ['$form']
+        required: [fieldId]
       })
   }
 }
