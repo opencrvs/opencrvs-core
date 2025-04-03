@@ -190,6 +190,7 @@ export function field(fieldId: string) {
   })
 
   return {
+    __returning: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () =>
@@ -222,8 +223,15 @@ export function field(fieldId: string) {
       now: () =>
         defineConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
     }),
-    isEqualTo: (value: string | boolean) =>
-      defineConditional({
+    isEqualTo: (value: string | boolean | { __returning: string }) => {
+      let resolvedValue: string | boolean | object = value
+
+      if (typeof value === 'object' && value.__returning) {
+        resolvedValue = { $data: `1/$form.${value.__returning}` }
+        console.log('resolvedValue', resolvedValue)
+      }
+
+      return defineConditional({
         type: 'object',
         properties: {
           $form: {
@@ -241,7 +249,8 @@ export function field(fieldId: string) {
           }
         },
         required: ['$form']
-      }),
+      })
+    },
     /**
      * Use case: Some fields are rendered when selection is not made, or boolean false is explicitly selected.
      * @example field('recommender.none').isFalsy() vs not(field('recommender.none').isEqualTo(true))
