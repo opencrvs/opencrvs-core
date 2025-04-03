@@ -30,6 +30,7 @@ import { EventIndex, EventState, User } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { getUsersFullName } from '@client/v2-events/utils'
 
 interface FontFamilyTypes {
   normal: string
@@ -141,6 +142,16 @@ export function compileSvg({
     function (this: any, dateString: string, formatString: string) {
       const date = new Date(dateString)
       return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
+  Handlebars.registerHelper(
+    'findUserById',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function (this: any, u: User[], id: string) {
+      const user = u.find((usr) => usr.id === id)
+
+      return user ? getUsersFullName(user.name, 'en') : ''
     }
   )
 
