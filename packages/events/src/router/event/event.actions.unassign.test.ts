@@ -106,3 +106,41 @@ test(`Can unassign record that is assigned to someone else, if user has ${SCOPES
 
   expect(response.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
 })
+
+test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, SCOPES_WITHOUT_UNASSIGN)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(originalEvent.id, { assignedTo: user.id })
+  )
+  const draftData = {
+    type: ActionType.DECLARE,
+    declaration: {
+      ...generator.event.actions.declare(originalEvent.id).declaration,
+      'applicant.image': {
+        type: 'image/png',
+        originalFilename: 'abcd.png',
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+      }
+    },
+    transactionId: 'transactionId',
+    eventId: originalEvent.id
+  }
+
+  await client.event.draft.create(draftData)
+  const draftsBeforeUnassign = await client.event.draft.list()
+
+  expect(draftsBeforeUnassign).not.toEqual([])
+
+  const response = await client.event.actions.assignment.unassign(
+    generator.event.actions.unassign(originalEvent.id)
+  )
+
+  const draftsAfterUnassign = await client.event.draft.list()
+  expect(draftsAfterUnassign).toEqual([])
+
+  expect(response.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
+})
