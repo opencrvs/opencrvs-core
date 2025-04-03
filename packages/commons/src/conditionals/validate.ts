@@ -248,8 +248,6 @@ function runCustomFieldValidations({
   field: FieldConfig
   conditionalParameters: ConditionalParameters
 }) {
-  console.log('validation', field)
-
   return (field.validation ?? [])
     .filter((validation) => {
       return !validate(validation.validator, conditionalParameters)
