@@ -19,6 +19,7 @@ import {
 } from './ActionDocument'
 import {
   ArchiveActionInput,
+  AssignActionInput,
   DeclareActionInput,
   RegisterActionInput,
   RejectDeclarationActionInput,
@@ -218,6 +219,18 @@ export const eventPayloadGenerator = {
           ActionType.VALIDATE
         ),
       duplicates: [],
+      eventId
+    }),
+    assign: (
+      eventId: string,
+      input: Partial<
+        Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
+      > = {}
+    ) => ({
+      type: ActionType.ASSIGN,
+      transactionId: input.transactionId ?? getUUID(),
+      declaration: {},
+      assignedTo: input.assignedTo ?? getUUID(),
       eventId
     }),
     archive: (
