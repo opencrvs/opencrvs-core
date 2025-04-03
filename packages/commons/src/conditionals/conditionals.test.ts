@@ -34,6 +34,13 @@ const fieldParams = {
   $now: formatISO(new Date(), { representation: 'date' })
 } satisfies ConditionalParameters
 
+function getFieldParams(form: Record<string, any>) {
+  return {
+    $form: form,
+    $now: formatISO(new Date(), { representation: 'date' })
+  } satisfies ConditionalParameters
+}
+
 describe('"universal" conditionals', () => {
   it('validates "and" conditional', () => {
     expect(
@@ -97,6 +104,26 @@ describe('"universal" conditionals', () => {
     expect(
       validate(not(field('applicant.name').isEqualTo('Jack Doe')), fieldParams)
     ).toBe(true)
+
+    expect(
+      validate(
+        not(field('applicant.name').isEqualTo(field('informant.name'))),
+        getFieldParams({
+          'applicant.name': 'John Doe',
+          'informant.name': 'John Doe'
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        not(field('applicant.name').isEqualTo(field('informant.name'))),
+        getFieldParams({
+          'applicant.name': 'John Doe',
+          'informant.name': 'Jane Doe'
+        })
+      )
+    ).toBe(true)
   })
 })
 
@@ -153,6 +180,82 @@ describe('"field" conditionals', () => {
       validate(
         field('applicant.field.not.exist').isEqualTo('Jane Doe'),
         fieldParams
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('applicant.name').isEqualTo(field('informant.name')),
+        getFieldParams({
+          'applicant.name': 'John Doe',
+          'informant.name': 'John Doe'
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.name').isEqualTo(field('informant.name')),
+        getFieldParams({
+          'applicant.name': 'John Doe',
+          'informant.name': 'Jane Doe'
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('applicant.name').isEqualTo(field('informant.name')),
+        getFieldParams({
+          'applicant.name': 'John Doe'
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('applicant.name').isEqualTo(field('informant.name')),
+        getFieldParams({
+          'informant.name': 'Jane Doe'
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('my.boolean').isEqualTo(field('other.boolean')),
+        getFieldParams({
+          'my.boolean': true,
+          'other.boolean': true
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('my.boolean').isEqualTo(field('other.boolean')),
+        getFieldParams({
+          'my.boolean': true,
+          'other.boolean': false
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('my.boolean').isEqualTo(field('other.boolean')),
+        getFieldParams({
+          'my.boolean': true
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('my.boolean').isEqualTo(field('other.boolean')),
+        getFieldParams({
+          'other.boolean': false
+        })
       )
     ).toBe(false)
   })

@@ -239,9 +239,8 @@ export function field(fieldId: string) {
             $form: {
               type: 'object',
               properties: {
-                // TODO CIHAN testaa myös boolean
-                [fieldId]: { type: 'string' },
-                [comparedFieldId]: { type: 'string' }
+                [fieldId]: { type: ['string', 'boolean'] },
+                [comparedFieldId]: { type: ['string', 'boolean'] }
               },
               required: [fieldId, comparedFieldId],
               allOf: [
