@@ -21,6 +21,7 @@
     "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
+    "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "yarn build",
     "build:default": "tsc --project tsconfig.build.json",
     "build:esm": "tsc --project tsconfig.esm.build.json",

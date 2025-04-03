@@ -118,9 +118,13 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
  *
  * @example
  * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
+ *
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
-  if (!_.isObject(obj)) return obj
+  if (!_.isObject(obj)) {
+    return obj
+  }
 
   return Object.entries(obj).reduce((acc: T, [key, value]) => {
     if (_.isObject(value)) {
@@ -144,7 +148,7 @@ export function isUndeclaredDraft(status: EventStatus): boolean {
 
 export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(
-    (a): a is ActionDocument => !a.status || a.status === ActionStatus.Accepted
+    (a): a is ActionDocument => a.status === ActionStatus.Accepted
   )
 }
 
@@ -256,7 +260,9 @@ export function getActionAnnotation({
   drafts: Draft[]
 }): EventState {
   const activeActions = getAcceptedActions(event)
-  const action = activeActions.find((action) => actionType === action.type)
+  const action = activeActions.find(
+    (activeAction) => actionType === activeAction.type
+  )
 
   const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
 
@@ -265,8 +271,8 @@ export function getActionAnnotation({
     ...eventDrafts.map((draft) => draft.action)
   ].sort()
 
-  const annotation = sorted.reduce((annotation, action) => {
-    return deepMerge(annotation, action.annotation ?? {})
+  const annotation = sorted.reduce((ann, sortedAction) => {
+    return deepMerge(ann, sortedAction.annotation ?? {})
   }, {})
 
   return deepDropNulls(annotation)
