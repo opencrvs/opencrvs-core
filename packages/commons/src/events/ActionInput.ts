@@ -106,11 +106,13 @@ export const AssignActionInput = BaseActionInput.merge(
 
 export type AssignActionInput = z.infer<typeof AssignActionInput>
 
-const UnassignActionInput = BaseActionInput.merge(
+export const UnassignActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.UNASSIGN).default(ActionType.UNASSIGN)
+    type: z.literal(ActionType.UNASSIGN).default(ActionType.UNASSIGN),
+    assignedTo: z.literal(null).default(null)
   })
 )
+export type UnassignActionInput = z.infer<typeof UnassignActionInput>
 
 export const RequestCorrectionActionInput = BaseActionInput.merge(
   z.object({

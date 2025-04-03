@@ -13,13 +13,12 @@ import { addAction, getEventById } from '@events/service/events/events'
 import {
   ActionStatus,
   ActionType,
-  AssignActionInput
+  UnassignActionInput
 } from '@opencrvs/commons/events'
-import { TRPCError } from '@trpc/server'
 import { getLastAssignmentAction } from '@events/service/events/utils'
 
-export async function assignRecord(
-  input: AssignActionInput,
+export async function unassignRecord(
+  input: UnassignActionInput,
   {
     eventId,
     createdBy,
@@ -35,24 +34,18 @@ export async function assignRecord(
   }
 ) {
   const storedEvent = await getEventById(eventId)
-
   const lastAssignmentAction = getLastAssignmentAction(storedEvent.actions)
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
-    if (lastAssignmentAction.assignedTo === input.assignedTo) {
-      return storedEvent
-    }
-    throw new TRPCError({
-      code: 'CONFLICT'
+    return addAction(input, {
+      eventId,
+      createdBy,
+      token,
+      createdAtLocation,
+      transactionId,
+      status: ActionStatus.Accepted
     })
   }
 
-  return addAction(input, {
-    eventId,
-    createdBy,
-    token,
-    createdAtLocation,
-    transactionId,
-    status: ActionStatus.Accepted
-  })
+  return storedEvent
 }

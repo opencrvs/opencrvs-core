@@ -36,12 +36,14 @@ import {
   EventConfig,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
-  AssignActionInput
+  AssignActionInput,
+  UnassignActionInput
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { getDefaultActionProcedures } from './actions'
-import { assignEvent } from '@events/service/events/actions/assign'
+import { assignRecord } from '@events/service/events/actions/assign'
+import { unassignRecord } from '@events/service/events/actions/unassign'
 
 function validateEventType({
   eventTypes,
@@ -164,7 +166,20 @@ export const eventRouter = router({
         .input(AssignActionInput)
         .use(middleware.validateAction(ActionType.ASSIGN))
         .mutation((options) => {
-          return assignEvent(options.input, {
+          return assignRecord(options.input, {
+            eventId: options.input.eventId,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
+          })
+        }),
+      unassign: publicProcedure
+        .input(UnassignActionInput)
+        .use(middleware.validateAction(ActionType.UNASSIGN))
+        .use(middleware.canUnassign())
+        .mutation((options) => {
+          return unassignRecord(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,

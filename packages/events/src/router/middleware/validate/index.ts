@@ -87,7 +87,7 @@ function getVerificationPageErrors(
     .filter((error) => error !== null)
 }
 
-type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
+export type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
 }
 
