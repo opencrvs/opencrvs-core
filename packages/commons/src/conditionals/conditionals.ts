@@ -226,10 +226,10 @@ export function field(fieldId: string) {
       now: () =>
         defineConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
     }),
-    // TODO CIHAN: typing
     isEqualTo: (
       value: string | boolean | { _fieldId: string; [key: string]: unknown }
     ) => {
+      // If the value is an reference to another field, we need to compare the values of the two fields
       if (typeof value === 'object' && value._fieldId) {
         const comparedFieldId = value._fieldId
 
