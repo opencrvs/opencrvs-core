@@ -15,14 +15,13 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
-import { CreatedUser, payloadGenerator } from './generators'
+import { CreatedUser, payloadGenerator, seeder } from './generators'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
-import { seeder } from '@events/tests/generators'
 
 const { createCallerFactory } = t
 
-const TEST_USER_DEFAULT_SCOPES = [
+export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_DECLARE,
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.RECORD_READ,
@@ -33,20 +32,6 @@ const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_DECLARATION_ARCHIVE,
   SCOPES.RECORD_SUBMIT_FOR_UPDATES
 ]
-
-export function createTestClient(
-  user: CreatedUser,
-  scopes: Scope[] = TEST_USER_DEFAULT_SCOPES
-) {
-  const createCaller = createCallerFactory(appRouter)
-  const token = createTestToken(user.id, scopes)
-
-  const caller = createCaller({
-    user: { id: user.id, primaryOfficeId: user.primaryOfficeId },
-    token
-  })
-  return caller
-}
 
 export function createTestToken(
   userId: string,
@@ -63,6 +48,20 @@ export function createTestToken(
   )
 
   return `Bearer ${token}`
+}
+
+export function createTestClient(
+  user: CreatedUser,
+  scopes: Scope[] = TEST_USER_DEFAULT_SCOPES
+) {
+  const createCaller = createCallerFactory(appRouter)
+  const token = createTestToken(user.id, scopes)
+
+  const caller = createCaller({
+    user: { id: user.id, primaryOfficeId: user.primaryOfficeId },
+    token
+  })
+  return caller
 }
 
 /**

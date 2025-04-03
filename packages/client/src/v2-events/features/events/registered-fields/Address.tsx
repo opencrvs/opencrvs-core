@@ -21,7 +21,9 @@ import {
   not,
   GeographicalArea,
   AdministrativeAreas,
-  isFieldVisible
+  isFieldVisible,
+  alwaysTrue,
+  AddressType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -37,11 +39,6 @@ type Props = FieldProps<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
 }
-
-const AddressType = {
-  URBAN: 'URBAN',
-  RURAL: 'RURAL'
-} as const
 
 function addDefaultValue<T extends FieldConfigWithoutAddress>(
   defaultValues?: AddressFieldValue
@@ -64,32 +61,17 @@ function addDefaultValue<T extends FieldConfigWithoutAddress>(
   }
 }
 
-/**
- * AddressInput is a form component for capturing address details based on administrative structure.
- *
- * - The form dynamically adjusts the fields displayed based on user input.
- * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
- * - All admin structure fields are hidden until the previous field is selected.
- * - Address details fields are only shown when district is selected (it being the last admin structure field).
- */
-function AddressInput(props: Props) {
-  const { onChange, defaultValue, value = {}, ...otherProps } = props
+function isDomesticAddress() {
+  return and(
+    not(createFieldCondition('country').isUndefined()),
+    createFieldCondition('addressType').isEqualTo(AddressType.DOMESTIC)
+  )
+}
 
-  const fields = [
-    ...ADMIN_STRUCTURE,
-    ...URBAN_FIELDS,
-    ...RURAL_FIELDS
-  ] satisfies Array<FieldConfigWithoutAddress>
-
-  return (
-    <FormFieldGenerator
-      {...otherProps}
-      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
-      formData={value}
-      initialValues={{ ...defaultValue, ...value }}
-      setAllFieldsDirty={false}
-      onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
-    />
+function isInternationalAddress() {
+  return and(
+    not(createFieldCondition('country').isUndefined()),
+    createFieldCondition('addressType').isEqualTo(AddressType.INTERNATIONAL)
   )
 }
 
@@ -97,11 +79,28 @@ const displayWhenDistrictUrbanSelected = [
   {
     type: ConditionalType.SHOW,
     conditional: and(
-      createFieldCondition('urbanOrRural').isEqualTo(AddressType.URBAN),
+      isDomesticAddress(),
+      createFieldCondition('urbanOrRural').isEqualTo(GeographicalArea.URBAN),
       not(createFieldCondition('district').isUndefined())
     )
   }
 ]
+
+const addressTypeField = {
+  id: 'addressType',
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: not(alwaysTrue())
+    }
+  ],
+  label: {
+    defaultMessage: '',
+    description: 'empty string',
+    id: 'v2.messages.emptyString'
+  },
+  type: FieldType.TEXT
+} as const satisfies FieldConfigWithoutAddress
 
 const URBAN_FIELDS = [
   {
@@ -168,7 +167,10 @@ const RURAL_FIELDS = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          createFieldCondition('urbanOrRural').isEqualTo(AddressType.RURAL),
+          isDomesticAddress(),
+          createFieldCondition('urbanOrRural').isEqualTo(
+            GeographicalArea.RURAL
+          ),
           not(createFieldCondition('district').isUndefined())
         )
       }
@@ -200,7 +202,7 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(createFieldCondition('country').isUndefined())
+        conditional: isDomesticAddress()
       }
     ],
     required: true,
@@ -218,7 +220,10 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(createFieldCondition('province').isUndefined())
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('province').isUndefined())
+        )
       }
     ],
     required: true,
@@ -230,7 +235,7 @@ const ADMIN_STRUCTURE = [
     configuration: {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
       partOf: {
-        $data: 'province'
+        $declaration: 'province'
       }
     }
   },
@@ -239,7 +244,10 @@ const ADMIN_STRUCTURE = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(createFieldCondition('district').isUndefined())
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('district').isUndefined())
+        )
       }
     ],
     required: false,
@@ -275,10 +283,127 @@ const ADMIN_STRUCTURE = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
+const GENERIC_ADDRESS_FIELDS = [
+  {
+    id: 'state',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: true,
+    label: {
+      id: 'v2.field.address.state.label',
+      defaultMessage: 'State',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'district2',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: true,
+    label: {
+      id: 'v2.field.address.district2.label',
+      defaultMessage: 'District',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'cityOrTown',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.cityOrTown.label',
+      defaultMessage: 'City / Town',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine1',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine1.label',
+      defaultMessage: 'Address Line 1',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine2',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine2.label',
+      defaultMessage: 'Address Line 2',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine3',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine3.label',
+      defaultMessage: 'Address Line 3',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'postcodeOrZip',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.postcodeOrZip.label',
+      defaultMessage: 'Postcode / Zip',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  }
+] as const satisfies FieldConfigWithoutAddress[]
+
 const ALL_ADDRESS_FIELDS = [
   ...ADMIN_STRUCTURE,
   ...URBAN_FIELDS,
-  ...RURAL_FIELDS
+  ...RURAL_FIELDS,
+  ...GENERIC_ADDRESS_FIELDS,
+  addressTypeField
 ]
 
 type AllKeys<T> = T extends unknown ? keyof T : never
@@ -300,10 +425,39 @@ type AllFields = (typeof ALL_ADDRESS_FIELDS)[number]['id']
  * If you see a type error, it means that the fields in the component do not
  * match the fields in the AddressFieldValue type.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type _ExpectTrue = Expect<
   EnsureSameUnion<AllFields, RequiredKeysFromFieldValue>
 >
+
+/**
+ * AddressInput is a form component for capturing address details based on administrative structure.
+ *
+ * - The form dynamically adjusts the fields displayed based on user input.
+ * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
+ * - All admin structure fields are hidden until the previous field is selected.
+ * - Address details fields are only shown when district is selected (it being the last admin structure field).
+ */
+function AddressInput(props: Props) {
+  const { onChange, defaultValue, value = {}, ...otherProps } = props
+
+  const fields = [
+    ...ADMIN_STRUCTURE,
+    ...URBAN_FIELDS,
+    ...RURAL_FIELDS,
+    ...GENERIC_ADDRESS_FIELDS
+  ] satisfies Array<FieldConfigWithoutAddress>
+
+  return (
+    <FormFieldGenerator
+      {...otherProps}
+      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
+      formData={value}
+      initialValues={{ ...defaultValue, ...value }}
+      setAllFieldsDirty={false}
+      onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
+    />
+  )
+}
 
 function AddressOutput({ value }: { value?: AddressFieldValue }) {
   if (!value) {

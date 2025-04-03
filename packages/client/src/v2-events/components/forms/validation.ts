@@ -13,9 +13,10 @@ import {
   FieldConfig,
   getFieldValidationErrors,
   EventState,
-  FormConfig,
   stripHiddenFields,
-  getFormFields
+  getVisiblePagesFormFields,
+  isPageVisible,
+  FormConfig
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -48,35 +49,41 @@ export function getValidationErrorsForForm(
   }, {})
 }
 
-export function validationErrorsInActionFormExist(
-  formConfig: FormConfig,
-  form: EventState,
-  metadata?: EventState
-): boolean {
+export function validationErrorsInActionFormExist({
+  formConfig,
+  form,
+  annotation,
+  reviewFields = []
+}: {
+  formConfig: FormConfig
+  form: EventState
+  annotation?: EventState
+  reviewFields?: FieldConfig[]
+}): boolean {
   // We don't want to validate hidden fields
   const formWithoutHiddenFields = stripHiddenFields(
-    getFormFields(formConfig),
+    getVisiblePagesFormFields(formConfig, form),
     form
   )
-  const metadataWithoutHiddenFields = stripHiddenFields(
-    formConfig.review.fields,
-    metadata ?? {}
+
+  const visibleAnnotationFields = stripHiddenFields(
+    reviewFields,
+    annotation ?? {}
   )
 
-  const hasValidationErrors = formConfig.pages.some((page) => {
-    const fieldErrors = getValidationErrorsForForm(
-      page.fields,
-      formWithoutHiddenFields
-    )
-    return Object.values(fieldErrors).some((field) => field.errors.length > 0)
-  })
+  const hasValidationErrors = formConfig.pages
+    .filter((page) => isPageVisible(page, form))
+    .some((page) => {
+      const fieldErrors = getValidationErrorsForForm(
+        page.fields,
+        formWithoutHiddenFields
+      )
+      return Object.values(fieldErrors).some((field) => field.errors.length > 0)
+    })
 
-  const hasMetadataValidationErrors = Object.values(
-    getValidationErrorsForForm(
-      formConfig.review.fields,
-      metadataWithoutHiddenFields
-    )
+  const hasAnnotationValidationErrors = Object.values(
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
   ).some((field) => field.errors.length > 0)
 
-  return hasValidationErrors || hasMetadataValidationErrors
+  return hasValidationErrors || hasAnnotationValidationErrors
 }

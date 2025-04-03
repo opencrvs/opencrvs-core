@@ -24,7 +24,7 @@ import {
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
-import { ActionType } from '../events'
+import { ActionType, ActionStatus } from '../events'
 
 const fieldParams = {
   $form: {
@@ -244,8 +244,9 @@ describe('"event" conditionals', () => {
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
-            data: {},
-            createdAtLocation: '123456'
+            declaration: {},
+            createdAtLocation: '123456',
+            status: ActionStatus.Accepted
           }
         ]
       }
@@ -258,5 +259,452 @@ describe('"event" conditionals', () => {
     expect(validate(event.hasAction(ActionType.REGISTER), eventParams)).toBe(
       false
     )
+  })
+})
+
+describe('"valid name" conditionals', () => {
+  describe('Valid names', () => {
+    it('should pass for a single-word name', () => {
+      const validName = 'John'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass for a two-word name', () => {
+      const validName = 'John Doe'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass for a hyphenated name', () => {
+      const validName = 'Anne-Marie'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass when name is enclosed in brackets', () => {
+      const validName = '(John-Doe)'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass when brackets are around part of the name', () => {
+      const validName = '(John) Doe'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass when brackets enclose the middle name', () => {
+      const validName = 'John (Denver) Doe'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass when brackets enclose the last name', () => {
+      const validName = 'John (Doe)'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass when name contains an underscore', () => {
+      const validName = 'John_Doe'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass when name contains a number', () => {
+      const validName = 'John 3rd'
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass when name starts with a number', () => {
+      const validName = "10th John The Alex'ander"
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
+    it('should pass when name contains an apostrophe', () => {
+      const validName = "John O'conor"
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+  })
+
+  describe('Invalid names', () => {
+    it('should fail when brackets are empty', () => {
+      const invalidName = '()'
+      const params = {
+        $form: { 'child.firstName': invalidName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
+    })
+
+    it('should fail when brackets are wrongly placed at the end', () => {
+      const invalidName = 'John Doe()'
+      const params = {
+        $form: { 'child.firstName': invalidName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
+    })
+
+    it('should fail when brackets are not properly closed', () => {
+      const invalidName = 'John (Doe'
+      const params = {
+        $form: { 'child.firstName': invalidName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
+    })
+
+    it('should fail when brackets are improperly nested', () => {
+      const invalidName = 'John (Doe))'
+      const params = {
+        $form: { 'child.firstName': invalidName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
+    })
+
+    it('should fail when name contains a Bengali digit', () => {
+      const invalidName = 'John১'
+      const params = {
+        $form: { 'child.firstName': invalidName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
+    })
+
+    it('should fail when name contains non-Latin characters', () => {
+      const invalidName = 'জন'
+      const params = {
+        $form: { 'child.firstName': invalidName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
+    })
+
+    it('should fail when name contains commas', () => {
+      const invalidName = ',,,'
+      const params = {
+        $form: { 'child.firstName': invalidName },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(false)
+    })
+  })
+})
+
+describe('"range number" conditional', () => {
+  describe('Valid range', () => {
+    it('should pass when the number is at the lower boundary', () => {
+      const validRange = 0
+      const params = {
+        $form: { 'child.weightAtBirth': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(true)
+    })
+
+    it('should pass when the number is at the upper boundary', () => {
+      const validRange = 10
+      const params = {
+        $form: { 'child.weightAtBirth': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(true)
+    })
+
+    it('should pass when the number is within the range', () => {
+      const validRange = 5
+      const params = {
+        $form: { 'child.weightAtBirth': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(true)
+    })
+  })
+
+  describe('Invalid range', () => {
+    it('should fail when the number is below the lower boundary', () => {
+      const invalidRange = -1
+      const params = {
+        $form: { 'child.weightAtBirth': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(false)
+    })
+
+    it('should fail when the number is above the upper boundary', () => {
+      const invalidRange = 11
+      const params = {
+        $form: { 'child.weightAtBirth': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(false)
+    })
+  })
+
+  describe('Edge cases', () => {
+    it('should pass for a decimal number within range', () => {
+      const validRange = 5.5
+      const params = {
+        $form: { 'child.weightAtBirth': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(true)
+    })
+
+    it('should fail for a decimal number below the range', () => {
+      const invalidRange = -0.1
+      const params = {
+        $form: { 'child.weightAtBirth': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(false)
+    })
+
+    it('should fail for a decimal number above the range', () => {
+      const invalidRange = 10.1
+      const params = {
+        $form: { 'child.weightAtBirth': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
+      ).toBe(false)
+    })
+  })
+
+  describe('Different field names', () => {
+    it('should pass validation for an alternative field name', () => {
+      const validRange = 7
+      const params = {
+        $form: { 'adult.heightInFeet': validRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('adult.heightInFeet').isBetween(5, 8), params)
+      ).toBe(true)
+    })
+
+    it('should fail validation for an alternative field name', () => {
+      const invalidRange = 4
+      const params = {
+        $form: { 'adult.heightInFeet': invalidRange },
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
+      expect(
+        validate(field('adult.heightInFeet').isBetween(5, 8), params)
+      ).toBe(false)
+    })
+  })
+})
+
+describe('Matches conditional validation', () => {
+  const PHONE_NUMBER_REGEX = '^0(7|9)[0-9]{8}$'
+  it('should pass validation for existing phone number starting with 07', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '0733445566' },
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(true)
+  })
+
+  it('should pass validation for different phone number starting with 09', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '0933445566' },
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(true)
+  })
+
+  it('should fail validation for phone number starting with 05', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '0533445566' },
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number shorter than 10 digits', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '07334455' }, // Only 8 digits
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number longer than 10 digits', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '073344556677' }, // 12 digits
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number without leading 0', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '733445566' }, // Missing leading 0
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for non-numeric input', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '07A3445566' }, // Contains a letter
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number not starting with 07 or 09', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '08334455667' }, // Invalid prefix
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number with incorrect length (too short)', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '073344556' }, // 9 digits only
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number with incorrect length (too long)', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '073344556677' }, // 12 digits
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number with spaces when strict regex is used', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '07 334455667' }, // Spaces not allowed
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
+  })
+
+  it('should fail validation for phone number containing non-numeric characters', () => {
+    const params = {
+      $form: { 'applicant.phoneNo': '07A34455667' }, // Contains letter
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
+    ).toBe(false)
   })
 })

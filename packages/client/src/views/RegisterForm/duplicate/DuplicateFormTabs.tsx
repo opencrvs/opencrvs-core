@@ -67,6 +67,12 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { SupportingDocumentsView } from '@client/views/RegisterForm/duplicate/SupportingDocumentsView'
 
+const RightAlignedOnSmallScreen = styled(Text)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    text-align: end;
+  }
+`
+
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 56px;
@@ -206,47 +212,51 @@ export const DuplicateFormTabs = (props: IProps) => {
     return errorsOnField.length > 0
       ? getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
-      ? (
-          (data[section.id] &&
-            data[section.id][field.name] &&
-            (data[section.id][field.name] as IFormSectionData).value &&
-            field.nestedFields[
-              (data[section.id][field.name] as IFormSectionData).value as string
-            ]) ||
-          []
-        ).reduce((groupedValues, nestedField) => {
-          const errorsOnNestedField =
-            sectionErrors[section.id][field.name].nestedFields[
-              nestedField.name
-            ] || []
-          // Value of the parentField resembles with IFormData as a nested form
-          const nestedValue =
+        ? (
             (data[section.id] &&
               data[section.id][field.name] &&
-              renderValue(
-                data[section.id][field.name] as IFormData,
-                'nestedFields',
-                nestedField,
-                intl,
-                offlineData,
-                language
-              )) ||
-            ''
-          return (
-            <>
-              {groupedValues}
-              {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
-              {errorsOnNestedField.length > 0
-                ? getFieldValueWithErrorMessage(
-                    section,
-                    field,
-                    errorsOnNestedField[0]
-                  )
-                : nestedValue}
-            </>
+              (data[section.id][field.name] as IFormSectionData).value &&
+              field.nestedFields[
+                (data[section.id][field.name] as IFormSectionData)
+                  .value as string
+              ]) ||
+            []
+          ).reduce(
+            (groupedValues, nestedField) => {
+              const errorsOnNestedField =
+                sectionErrors[section.id][field.name].nestedFields[
+                  nestedField.name
+                ] || []
+              // Value of the parentField resembles with IFormData as a nested form
+              const nestedValue =
+                (data[section.id] &&
+                  data[section.id][field.name] &&
+                  renderValue(
+                    data[section.id][field.name] as IFormData,
+                    'nestedFields',
+                    nestedField,
+                    intl,
+                    offlineData,
+                    language
+                  )) ||
+                ''
+              return (
+                <>
+                  {groupedValues}
+                  {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+                  {errorsOnNestedField.length > 0
+                    ? getFieldValueWithErrorMessage(
+                        section,
+                        field,
+                        errorsOnNestedField[0]
+                      )
+                    : nestedValue}
+                </>
+              )
+            },
+            <>{value}</>
           )
-        }, <>{value}</>)
-      : value
+        : value
   }
 
   const getRenderableField = (
@@ -558,14 +568,14 @@ export const DuplicateFormTabs = (props: IProps) => {
                   declaration
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? getNestedPreviewField(
-                  section,
-                  group,
-                  field,
-                  errorsOnFields,
-                  declaration
-                )
-              : getSinglePreviewField(draft, section, field, errorsOnFields)
+                ? getNestedPreviewField(
+                    section,
+                    group,
+                    field,
+                    errorsOnFields,
+                    declaration
+                  )
+                : getSinglePreviewField(draft, section, field, errorsOnFields)
 
             overriddenFields.forEach((overriddenField) => {
               items = getOverRiddenPreviewField(
@@ -937,8 +947,22 @@ export const DuplicateFormTabs = (props: IProps) => {
                               right: item.heading.right,
                               left: item.heading.left
                             }}
-                            leftValue={item.leftValue}
-                            rightValue={item.rightValue}
+                            leftValue={
+                              <RightAlignedOnSmallScreen
+                                variant="reg16"
+                                element="span"
+                              >
+                                {item.leftValue}
+                              </RightAlignedOnSmallScreen>
+                            }
+                            rightValue={
+                              <RightAlignedOnSmallScreen
+                                variant="reg16"
+                                element="span"
+                              >
+                                {item.rightValue}
+                              </RightAlignedOnSmallScreen>
+                            }
                             key={`row-${index}`}
                           />
                         ))}

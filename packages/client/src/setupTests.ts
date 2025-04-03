@@ -69,13 +69,11 @@ vi.stubGlobal('config', config)
 /*
  * GraphQL Queries
  */
-/* eslint-disable import/first */
 import { queries } from './profile/queries'
 
 /*
  * Country configuration
  */
-/* eslint-disable import/first */
 import {
   mockUserResponse,
   mockConfigResponse,

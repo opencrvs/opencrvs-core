@@ -2,6 +2,18 @@
 
 exports[`Prevents adding birth date in future 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2040-02-01"}]]`;
 
-exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required for registration","id":"applicant.firstname"},{"message":"Required for registration","id":"applicant.surname"},{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Required for registration","id":"applicant.address"}]]`;
+exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept action if action is already rejected 1`] = `[TRPCError: Action has already been rejected.]`;
+
+exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept the action if action is not first requested 1`] = `[TRPCError: Action not found.]`;
+
+exports[`Request and confirmation flow > Asynchronous confirmation flow > Rejecting > should not be able to reject the action if action is already accepted 1`] = `[TRPCError: Action has already been accepted.]`;
+
+exports[`Request and confirmation flow > Asynchronous confirmation flow > Rejecting > should not be able to reject the action if action is not first requested 1`] = `[TRPCError: Action not found.]`;
+
+exports[`Request and confirmation flow > Synchronous confirmation flow > should not save action if notify API returns HTTP 500 1`] = `[TRPCError: Unexpected failure from notification API]`;
+
+exports[`Request and confirmation flow > Synchronous confirmation flow > should not save action if notify API returns invalid registration number 1`] = `[TRPCError: Invalid payload received from notification API]`;
+
+exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"}]]`;
 
 exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;

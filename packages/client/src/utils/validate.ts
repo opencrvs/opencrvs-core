@@ -18,7 +18,6 @@ import { validationMessages as messages } from '@client/i18n/messages'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
-  INFORMANT_MINIMUM_AGE,
   NATIONAL_ID
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
@@ -278,6 +277,28 @@ export const minAgeGapExist = (
   return diff >= minAgeGap
 }
 
+export const isAgeInYearsBetween =
+  (min: number, max?: number): Validation =>
+  (value: IFormFieldValue) => {
+    const dateFormat = /^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01])$/
+    if (value && dateFormat.test(value.toString())) {
+      max = max || 120 // defaulting to 120 years as max if max is not provided
+      const today = new Date()
+      const dateOfBirth = new Date(value.toString())
+      const ageFromDateOfBirth = today.getFullYear() - dateOfBirth.getFullYear()
+
+      const ageIsWithinRange =
+        ageFromDateOfBirth >= min && ageFromDateOfBirth <= max
+      if (ageIsWithinRange) return undefined
+
+      return {
+        message: messages.isAgeInYearsBetween,
+        props: { min, max }
+      }
+    }
+    return undefined
+  }
+
 export const isValidBirthDate: Validation = (
   value: IFormFieldValue,
   drafts?
@@ -286,17 +307,17 @@ export const isValidBirthDate: Validation = (
   return !cast
     ? { message: messages.required }
     : cast &&
-      isDateNotInFuture(cast) &&
-      isAValidDateFormat(cast) &&
-      isDateNotAfterBirthEvent(cast, drafts as IFormData)
-    ? isDateNotAfterDeath(cast, drafts as IFormData)
-      ? undefined
+        isDateNotInFuture(cast) &&
+        isAValidDateFormat(cast) &&
+        isDateNotAfterBirthEvent(cast, drafts as IFormData)
+      ? isDateNotAfterDeath(cast, drafts as IFormData)
+        ? undefined
+        : {
+            message: messages.isDateNotAfterDeath
+          }
       : {
-          message: messages.isDateNotAfterDeath
+          message: messages.isValidBirthDate
         }
-    : {
-        message: messages.isValidBirthDate
-      }
 }
 
 export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
@@ -305,11 +326,11 @@ export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
   return !childBirthDate
     ? { message: messages.required }
     : childBirthDate &&
-      isAValidDateFormat(childBirthDate) &&
-      isDateNotInFuture(childBirthDate) &&
-      isDateNotPastLimit(childBirthDate, pastDateLimit)
-    ? undefined
-    : { message: messages.isValidBirthDate }
+        isAValidDateFormat(childBirthDate) &&
+        isDateNotInFuture(childBirthDate) &&
+        isDateNotPastLimit(childBirthDate, pastDateLimit)
+      ? undefined
+      : { message: messages.isValidBirthDate }
 }
 
 export const isValidParentsBirthDate =
@@ -740,30 +761,12 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
   }
 }
 
-export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
-  if (value) {
-    if (
-      minAgeGapExist(
-        format(new Date(Date.now()), 'yyyy-MM-dd'),
-        value.toString(),
-        INFORMANT_MINIMUM_AGE
-      )
-    ) {
-      return undefined
-    } else {
-      return {
-        message: messages.isInformantOfLegalAge
-      }
-    }
-  }
-}
-
 export const greaterThanZero: Validation = (value: IFormFieldValue) => {
   return !value && value !== 0
     ? { message: messages.required }
     : value && Number(value) > 0
-    ? undefined
-    : { message: messages.greaterThanZero }
+      ? undefined
+      : { message: messages.greaterThanZero }
 }
 
 export const notGreaterThan =

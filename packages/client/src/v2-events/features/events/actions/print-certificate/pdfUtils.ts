@@ -16,15 +16,17 @@ import {
 } from 'react-intl'
 import * as Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
-import {
+import type {
   Content,
   TDocumentDefinitions,
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
 import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
-import { ActionDocument, LanguageConfig } from '@opencrvs/commons'
-import { EventState, User } from '@opencrvs/commons/client'
+import format from 'date-fns/format'
+import isValid from 'date-fns/isValid'
+import { LanguageConfig } from '@opencrvs/commons/client'
+import { EventIndex, EventState, User } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
@@ -96,14 +98,21 @@ function formatAllNonStringValues(
 
 const cache = createIntlCache()
 
-export function compileSvg(
-  templateString: string,
-  $actions: ActionDocument[],
-  $data: EventState,
-  locations: Location[],
-  users: User[],
+export function compileSvg({
+  templateString,
+  $state,
+  $declaration,
+  locations,
+  users,
+  language
+}: {
+  templateString: string
+  $state: EventIndex
+  $declaration: EventState
+  locations: Location[]
+  users: User[]
   language: LanguageConfig
-): string {
+}): string {
   const intl: IntlShape = createIntl(
     {
       locale: language.lang,
@@ -126,11 +135,20 @@ export function compileSvg(
     Handlebars.registerHelper(helperName, helper)
   }
 
+  Handlebars.registerHelper(
+    'formatDate',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function (this: any, dateString: string, formatString: string) {
+      const date = new Date(dateString)
+      return isValid(date) ? format(date, formatString) : ''
+    }
+  )
+
   const template = Handlebars.compile(templateString)
-  $data = formatAllNonStringValues($data, intl)
+  $declaration = formatAllNonStringValues($declaration, intl)
   const output = template({
-    $data,
-    $actions,
+    $declaration,
+    $state,
     $references: {
       locations,
       users

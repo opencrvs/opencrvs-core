@@ -13,9 +13,9 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 
 import { useNavigate } from 'react-router-dom'
-import { formatISO } from 'date-fns'
+import formatISO from 'date-fns/formatISO'
 import { validate, ActionType, ConditionalType } from '@opencrvs/commons/client'
-import { type ActionConfig } from '@opencrvs/commons'
+import { ActionConfig } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -74,8 +74,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                     action.type === ActionType.ARCHIVE ||
                     action.type === ActionType.MARKED_AS_DUPLICATE ||
                     action.type === ActionType.APPROVE_CORRECTION ||
-                    action.type === ActionType.REJECT_CORRECTION ||
-                    action.type === ActionType.CUSTOM
+                    action.type === ActionType.REJECT_CORRECTION
                   ) {
                     alert(`Action ${action.type} is not implemented yet.`)
                     return

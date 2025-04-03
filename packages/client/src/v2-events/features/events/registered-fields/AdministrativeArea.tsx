@@ -11,7 +11,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { FieldProps } from '@opencrvs/commons/client'
-// eslint-disable-next-line no-restricted-imports
 import {
   getAdminStructureLocations,
   getLocations

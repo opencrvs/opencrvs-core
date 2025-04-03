@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,7 +22,6 @@ import {
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
-// eslint-disable-next-line
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReviewIndex } from './Review'
@@ -41,7 +39,7 @@ const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Rejection',
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).data
+      formValues: getCurrentEventState(declareEventDocument).declaration
     })
   }
 }
@@ -99,7 +97,7 @@ export const Archive: Story = {
               actions: [ActionType.CREATE]
             })
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker['event.actions.declare']++
 
             return generateEventDocument({
@@ -107,7 +105,7 @@ export const Archive: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.archive.mutation(() => {
+          tRPCMsw.event.actions.archive.request.mutation(() => {
             callTracker['event.actions.archive']++
 
             return generateEventDocument({
@@ -121,7 +119,7 @@ export const Archive: Story = {
             })
           }),
 
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker['event.actions.validate']++
 
             return generateEventDocument({
@@ -133,7 +131,7 @@ export const Archive: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker['event.actions.register']++
 
             return generateEventDocument({
@@ -262,7 +260,7 @@ export const SendForUpdate: Story = {
               actions: [ActionType.CREATE]
             })
           }),
-          tRPCMsw.event.actions.declare.mutation(() => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             callTracker['event.actions.declare']++
 
             return generateEventDocument({
@@ -270,7 +268,7 @@ export const SendForUpdate: Story = {
               actions: [ActionType.CREATE, ActionType.DECLARE]
             })
           }),
-          tRPCMsw.event.actions.reject.mutation(() => {
+          tRPCMsw.event.actions.reject.request.mutation(() => {
             callTracker['event.actions.reject']++
 
             return generateEventDocument({
@@ -283,7 +281,7 @@ export const SendForUpdate: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.validate.mutation(() => {
+          tRPCMsw.event.actions.validate.request.mutation(() => {
             callTracker['event.actions.validate']++
 
             return generateEventDocument({
@@ -295,7 +293,7 @@ export const SendForUpdate: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.register.mutation(() => {
+          tRPCMsw.event.actions.register.request.mutation(() => {
             callTracker['event.actions.register']++
 
             return generateEventDocument({

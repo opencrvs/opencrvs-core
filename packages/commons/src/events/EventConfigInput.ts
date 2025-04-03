@@ -10,11 +10,30 @@
  */
 import { z } from 'zod'
 import { EventConfig } from './EventConfig'
-import { FormConfig, FormConfigInput, FormPage } from './FormConfig'
+import {
+  FormPageConfig,
+  FormPageConfigInput,
+  PageConfig,
+  PageConfigInput
+} from './PageConfig'
+import {
+  ActionFormConfig,
+  ActionFormConfigInput,
+  DeclarationFormConfig,
+  DeclarationFormConfigInput
+} from './FormConfig'
 export type EventConfigInput = z.input<typeof EventConfig>
 
-export const defineForm = (form: FormConfigInput): FormConfig =>
-  FormConfig.parse(form)
+export const defineDeclarationForm = (
+  form: DeclarationFormConfigInput
+): DeclarationFormConfig => DeclarationFormConfig.parse(form)
 
-export const defineFormPage = (formPage: FormPage): FormPage =>
-  FormPage.parse(formPage)
+export const defineActionForm = (
+  actionForm: ActionFormConfigInput
+): ActionFormConfig => ActionFormConfig.parse(actionForm)
+
+export const definePage = (page: PageConfigInput): PageConfig =>
+  PageConfig.parse(page)
+
+export const defineFormPage = (formPage: FormPageConfigInput): FormPageConfig =>
+  FormPageConfig.parse(formPage)

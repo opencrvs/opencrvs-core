@@ -20,7 +20,6 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-// eslint-disable-next-line
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReviewIndex } from './Review'
@@ -235,10 +234,12 @@ export const ReviewForFieldAgentComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE]
-            })
+            return {
+              ...generateEventDocument({
+                configuration: tennisClubMembershipEvent,
+                actions: [ActionType.CREATE]
+              })
+            }
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]

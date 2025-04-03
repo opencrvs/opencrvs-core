@@ -24,11 +24,14 @@ import { getTheme } from '../../../theme'
 
 const ScannerBox = styled(Box)`
   background: ${({ theme }) => theme.colors.background};
-  width: calc(100% - 24px);
-  height: 386px;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  height: 400px;
 `
 const Info = styled(Stack)`
   margin-top: 24px;
+  width: 100%;
 `
 
 export const QRReader = (props: ScannableQRReader) => {
@@ -75,9 +78,6 @@ export const QRReader = (props: ScannableQRReader) => {
         variant="large"
         actions={[]}
       >
-        <Text variant="reg18" element="p">
-          {labels.scannerDialogSupportingCopy}
-        </Text>
         <ScannerBox>
           <Scanner
             onScan={handleScanSuccess}

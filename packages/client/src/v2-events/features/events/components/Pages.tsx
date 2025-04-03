@@ -11,12 +11,18 @@
 
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
-import { EventState, FormPage } from '@opencrvs/commons/client'
-import { FormWizard } from '@opencrvs/components'
+import {
+  EventState,
+  EventConfig,
+  isPageVisible,
+  PageTypes,
+  PageConfig
+} from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-
+import { VerificationWizard } from './VerificationWizard'
+import { FormWizard } from './FormWizard'
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
@@ -26,68 +32,97 @@ export function Pages({
   pageId,
   showReviewButton,
   formPages,
-  onFormPageChange,
+  onPageChange,
   onSubmit,
   continueButtonText,
   setFormData,
-  children
+  disableContinue = false,
+  eventConfig,
+  declaration
 }: {
   form: EventState
-  setFormData: (data: EventState) => void
+  setFormData: (dec: EventState) => void
   pageId: string
   showReviewButton?: boolean
-  formPages: FormPage[]
-  onFormPageChange: (nextPageId: string) => void
+  formPages: PageConfig[]
+  onPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
-  children?: (page: FormPage) => React.ReactNode
+  disableContinue?: boolean
+  eventConfig?: EventConfig
+  declaration?: EventState
 }) {
   const intl = useIntl()
 
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
+  const visiblePages = formPages.filter((page) => isPageVisible(page, form))
 
   const {
     page: currentPage,
     next,
     previous,
     total
-  } = usePagination(formPages.length, Math.max(pageIdx, 0))
-  const page = formPages[currentPage]
+  } = usePagination(visiblePages.length, Math.max(pageIdx, 0))
+  const page = visiblePages[currentPage]
 
   useEffect(() => {
-    const pageChanged = formPages[currentPage].id !== pageId
+    const pageChanged = visiblePages[currentPage].id !== pageId
 
     if (pageChanged) {
-      onFormPageChange(formPages[currentPage].id)
+      onPageChange(visiblePages[currentPage].id)
 
       // We use the main content anchor id to scroll to the top of the frame when page changes
       document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
     }
-  }, [pageId, currentPage, formPages, onFormPageChange])
+  }, [pageId, currentPage, visiblePages, onPageChange])
+
+  const wizardProps = {
+    currentPage,
+    pageTitle: intl.formatMessage(page.title),
+    showReviewButton,
+    totalPages: total,
+    onNextPage: next,
+    onPreviousPage: previous,
+    onSubmit
+  }
+
+  const fields = (
+    <FormFieldGenerator
+      eventConfig={eventConfig}
+      eventDeclarationData={declaration}
+      fields={page.fields}
+      formData={form}
+      id="locationForm"
+      initialValues={form}
+      setAllFieldsDirty={false}
+      onChange={(values) => setFormData(values)}
+    />
+  )
+
+  if (page.type === PageTypes.enum.VERIFICATION) {
+    return (
+      <VerificationWizard
+        {...wizardProps}
+        pageConfig={page}
+        onVerifyAction={(val: boolean) => {
+          setFormData({
+            ...form,
+            [page.id]: val
+          })
+        }}
+      >
+        {fields}
+      </VerificationWizard>
+    )
+  }
 
   return (
     <FormWizard
+      {...wizardProps}
       continueButtonText={continueButtonText}
-      currentPage={currentPage}
-      pageTitle={intl.formatMessage(page.title)}
-      showReviewButton={showReviewButton}
-      totalPages={total}
-      onNextPage={next}
-      onPreviousPage={previous}
-      onSubmit={onSubmit}
+      disableContinue={disableContinue}
     >
-      {children ? (
-        children(page)
-      ) : (
-        <FormFieldGenerator
-          fields={page.fields}
-          formData={form}
-          id="locationForm"
-          initialValues={form}
-          setAllFieldsDirty={false}
-          onChange={(values) => setFormData(values)}
-        />
-      )}
+      {fields}
     </FormWizard>
   )
 }

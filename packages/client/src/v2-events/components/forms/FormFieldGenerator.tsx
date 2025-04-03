@@ -11,24 +11,14 @@
 
 /* eslint-disable */
 import React, { useCallback, useEffect } from 'react'
-import { InputField } from '@client/components/form/InputField'
-import { TEXT } from '@client/forms'
-import { Text as TextComponent } from '@opencrvs/components/lib/Text'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
-
 import styled, { keyframes } from 'styled-components'
+import { Field, FieldProps, Formik, FormikProps } from 'formik'
+import { cloneDeep, isEqual, set, noop } from 'lodash'
 import {
-  evalExpressionInFieldDefinition,
-  FIELD_SEPARATOR,
-  getDependentFields,
-  handleDefaultValue,
-  hasDefaultValueDependencyInfo,
-  makeDatesFormatted,
-  makeFormFieldIdFormikCompatible
-} from './utils'
-import { Errors, getValidationErrorsForForm } from './validation'
-
+  WrappedComponentProps as IntlShapeProps,
+  MessageDescriptor,
+  useIntl
+} from 'react-intl'
 import {
   EventState,
   FieldConfig,
@@ -59,16 +49,17 @@ import {
   isNumberFieldType,
   isEmailFieldType,
   isFieldVisible,
-  MetaFields
+  isDataFieldType,
+  EventConfig,
+  EventIndex,
+  MetaFields,
+  AddressType,
+  getDeclarationFields
 } from '@opencrvs/commons/client'
-import { Field, FieldProps, Formik, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set } from 'lodash'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  MessageDescriptor,
-  useIntl
-} from 'react-intl'
-import { File } from './inputs/FileInput/FileInput'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
+import { TEXT } from '@client/forms'
+import { InputField } from '@client/components/form/InputField'
 
 import {
   BulletList,
@@ -87,9 +78,24 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
-import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
+import {
+  Data,
+  getFieldFromDataEntry
+} from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
+import { Errors, getValidationErrorsForForm } from './validation'
+import {
+  evalExpressionInFieldDefinition,
+  FIELD_SEPARATOR,
+  getDependentFields,
+  handleDefaultValue,
+  hasDefaultValueDependencyInfo,
+  makeDatesFormatted,
+  makeFormFieldIdFormikCompatible
+} from './utils'
+import { File } from './inputs/FileInput/FileInput'
+import { FileWithOption } from './inputs/FileInput/DocumentUploaderWithOption'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -104,22 +110,60 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik. This function unflattens
+ */
+function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      makeFormFieldIdFormikCompatible(key),
+      value
+    ])
+  )
+}
+
+function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      key.replaceAll(FIELD_SEPARATOR, '.'),
+      value
+    ])
+  )
+}
+
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   fields: FieldConfig[]
   values: EventState
+  /**@todo - figure out when to use this rather than onChange handler */
   setFieldValue: (name: string, value: FieldValue | undefined) => void
   onClick?: () => void
+  /**
+   * onChange is not called within the Field component's onChange handler
+   * onChange is called within the Field component's onBlur handler
+   */
   onChange: (e: React.ChangeEvent) => void
+  /**
+   * onBlur is used to set the touched state of the field
+   * onChange doesn't set the touched state
+   */
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
   value: FieldValue
   touched: boolean
+  /**
+   * Errors are rendered only when both error and touched are truthy
+   */
   error: string
   formData: EventState
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
+  eventConfig?: EventConfig
+  event?: EventIndex
+  readonlyMode?: boolean
 }
 
 const GeneratedInputField = React.memo(
@@ -132,17 +176,21 @@ const GeneratedInputField = React.memo(
     touched,
     value,
     formData,
-    disabled
+    disabled,
+    eventConfig,
+    readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
 
     const inputFieldProps = {
       id: fieldDefinition.id,
-      label: fieldDefinition.hideLabel
-        ? undefined
-        : intl.formatMessage(fieldDefinition.label),
+      // If label is hidden or default message is empty, we don't need to render label
+      label:
+        fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
+          ? undefined
+          : intl.formatMessage(fieldDefinition.label),
       required: fieldDefinition.required,
-      disabled: fieldDefinition.disabled,
+      disabled: fieldDefinition.disabled || readonlyMode,
       error,
       touched
     }
@@ -153,7 +201,7 @@ const GeneratedInputField = React.memo(
       onChange,
       onBlur,
       value,
-      disabled: fieldDefinition.disabled ?? disabled,
+      disabled: disabled || fieldDefinition.disabled || readonlyMode,
       error: Boolean(error),
       touched: Boolean(touched),
       placeholder:
@@ -162,14 +210,14 @@ const GeneratedInputField = React.memo(
     }
 
     const handleFileChange = useCallback(
-      (value: FileFieldValue | undefined) =>
-        setFieldValue(fieldDefinition.id, value),
+      (val: FileFieldValue | undefined) =>
+        setFieldValue(fieldDefinition.id, val),
       [fieldDefinition.id, setFieldValue]
     )
 
     const handleFileWithOptionChange = useCallback(
-      (value: FileFieldWithOptionValue | undefined) =>
-        setFieldValue(fieldDefinition.id, value),
+      (val: FileFieldWithOptionValue | undefined) =>
+        setFieldValue(fieldDefinition.id, val),
       [fieldDefinition.id, setFieldValue]
     )
 
@@ -215,7 +263,7 @@ const GeneratedInputField = React.memo(
 
       return (
         <Paragraph.Input
-          fontVariant={field.config.configuration?.styles?.fontVariant}
+          fontVariant={field.config.configuration.styles?.fontVariant}
           message={message}
         />
       )
@@ -225,13 +273,13 @@ const GeneratedInputField = React.memo(
       return (
         <InputField
           {...inputFieldProps}
-          prefix={
-            field.config.configuration?.prefix &&
-            intl.formatMessage(field.config.configuration?.prefix)
-          }
           postfix={
             field.config.configuration?.postfix &&
-            intl.formatMessage(field.config.configuration?.postfix)
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
           }
         >
           <Text.Input
@@ -262,21 +310,21 @@ const GeneratedInputField = React.memo(
       return (
         <InputField
           {...inputFieldProps}
-          prefix={
-            field.config.configuration?.prefix &&
-            intl.formatMessage(field.config.configuration?.prefix)
-          }
           postfix={
             field.config.configuration?.postfix &&
-            intl.formatMessage(field.config.configuration?.postfix)
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
           }
         >
           <Number.Input
             {...inputProps}
-            disabled={disabled}
-            value={field.value}
-            min={field.config.configuration?.min}
             max={field.config.configuration?.max}
+            min={field.config.configuration?.min}
+            value={field.value}
+            onChange={(val) => setFieldValue(fieldDefinition.id, val)}
           />
         </InputField>
       )
@@ -286,18 +334,17 @@ const GeneratedInputField = React.memo(
       return (
         <InputField
           {...inputFieldProps}
-          prefix={
-            field.config.configuration?.prefix &&
-            intl.formatMessage(field.config.configuration?.prefix)
-          }
           postfix={
             field.config.configuration?.postfix &&
-            intl.formatMessage(field.config.configuration?.postfix)
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
           }
         >
           <TextArea
             {...inputProps}
-            disabled={disabled}
             maxLength={field.config.configuration?.maxLength}
             value={field.value}
           />
@@ -310,9 +357,12 @@ const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <File.Input
             {...inputProps}
+            acceptedFileTypes={field.config.configuration.acceptedFileTypes}
+            error={inputFieldProps.error}
+            maxFileSize={field.config.configuration.maxFileSize}
             value={field.value}
+            width={field.config.configuration.style?.width}
             onChange={handleFileChange}
-            fullWidth={field.config.options?.style.fullWidth}
           />
         </InputField>
       )
@@ -353,8 +403,8 @@ const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <SelectCountry.Input
             {...field.config}
-            value={field.value}
             setFieldValue={setFieldValue}
+            value={field.value}
           />
         </InputField>
       )
@@ -363,8 +413,8 @@ const GeneratedInputField = React.memo(
       return (
         <Checkbox.Input
           {...field.config}
-          value={field.value}
           setFieldValue={setFieldValue}
+          value={field.value}
         />
       )
     }
@@ -373,21 +423,23 @@ const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <RadioGroup.Input
             {...field.config}
-            value={field.value}
             setFieldValue={setFieldValue}
+            value={field.value}
           />
         </InputField>
       )
     }
 
     if (isSignatureFieldType(field)) {
-      return (
+      return readonlyMode ? (
+        <></>
+      ) : (
         <InputField {...inputFieldProps}>
           <SignatureUploader
+            modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
             value={field.value}
             onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
-            modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
           />
         </InputField>
       )
@@ -398,15 +450,15 @@ const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <AdministrativeArea.Input
             {...field.config}
-            value={field.value}
             partOf={
-              (field.config.configuration?.partOf?.$data &&
+              (field.config.configuration.partOf?.$declaration &&
                 (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                  field.config.configuration?.partOf.$data
+                  field.config.configuration.partOf.$declaration
                 ] as string | undefined | null)) ??
               null
             }
             setFieldValue={setFieldValue}
+            value={field.value}
           />
         </InputField>
       )
@@ -416,9 +468,9 @@ const GeneratedInputField = React.memo(
       return (
         <LocationSearch.Input
           {...field.config}
-          value={field.value}
           searchableResource={['locations']}
           setFieldValue={setFieldValue}
+          value={field.value}
         />
       )
     }
@@ -427,9 +479,9 @@ const GeneratedInputField = React.memo(
       return (
         <LocationSearch.Input
           {...field.config}
-          value={field.value}
           searchableResource={['offices']}
           setFieldValue={setFieldValue}
+          value={field.value}
         />
       )
     }
@@ -438,9 +490,9 @@ const GeneratedInputField = React.memo(
       return (
         <LocationSearch.Input
           {...field.config}
-          value={field.value}
           searchableResource={['facilities']}
           setFieldValue={setFieldValue}
+          value={field.value}
         />
       )
     }
@@ -452,12 +504,32 @@ const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <FileWithOption.Input
             {...inputProps}
+            acceptedFileTypes={field.config.configuration.acceptedFileTypes}
+            error={inputFieldProps.error}
+            maxFileSize={field.config.configuration.maxFileSize}
+            options={field.config.options}
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
-            options={field.config.options}
           />
         </InputField>
       )
+    }
+
+    if (isDataFieldType(field)) {
+      // If no event config or declare form fields found, don't render the data field.
+      // This should never actually happen, but we don't want to throw an error either.
+      if (!eventConfig) {
+        return null
+      }
+
+      // Data input requires field configs
+      const declarationFields = getDeclarationFields(eventConfig)
+
+      const fields = field.config.configuration.data.map((entry) =>
+        getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })
+      )
+
+      return <Data.Input {...field.config} fields={fields} />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
@@ -468,16 +540,16 @@ GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
 type FormData = Record<string, FieldValue>
 
-const mapFieldsToValues = (
+function mapFieldsToValues(
   fields: FieldConfig[],
   formData: FormData,
   meta: MetaFields
-) =>
-  fields.reduce((memo, field) => {
+) {
+  return fields.reduce((memo, field) => {
     const fieldInitialValue = handleDefaultValue(field, formData, meta)
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
-
+}
 interface ExposedProps {
   fields: FieldConfig[]
   id: string
@@ -488,6 +560,9 @@ interface ExposedProps {
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
   initialValues?: EventState
+  eventConfig?: EventConfig
+  eventDeclarationData?: EventState
+  readonlyMode?: boolean
 }
 
 type AllProps = ExposedProps &
@@ -551,7 +626,7 @@ class FormSectionComponent extends React.Component<AllProps> {
       return { ...memo, [field.id]: true }
     }, {})
 
-    this.props.setTouched(touched)
+    void this.props.setTouched(touched)
   }
 
   setFieldValuesWithDependency = (
@@ -560,6 +635,16 @@ class FormSectionComponent extends React.Component<AllProps> {
   ) => {
     const updatedValues = cloneDeep(this.props.values)
     set(updatedValues, fieldName, value)
+
+    if (fieldName === 'country') {
+      set(
+        updatedValues,
+        'addressType',
+        value === (window.config.COUNTRY || 'FAR')
+          ? AddressType.DOMESTIC
+          : AddressType.INTERNATIONAL
+      )
+    }
     const updateDependentFields = (fieldName: string) => {
       const dependentFields = getDependentFields(this.props.fields, fieldName)
       for (const field of dependentFields) {
@@ -579,7 +664,7 @@ class FormSectionComponent extends React.Component<AllProps> {
     }
     updateDependentFields(fieldName)
 
-    this.props.setValues(updatedValues)
+    void this.props.setValues(updatedValues)
   }
 
   resetDependentSelectValues = (fieldName: string) => {
@@ -589,7 +674,7 @@ class FormSectionComponent extends React.Component<AllProps> {
     )
 
     fieldsToReset.forEach((fieldToReset) => {
-      this.props.setFieldValue(fieldToReset.id, '')
+      void this.props.setFieldValue(fieldToReset.id, '')
       this.resetDependentSelectValues(fieldToReset.id)
     })
   }
@@ -600,7 +685,9 @@ class FormSectionComponent extends React.Component<AllProps> {
       fields: fieldsWithDotIds,
       touched,
       intl,
-      className
+      className,
+      eventDeclarationData,
+      readonlyMode
     } = this.props
 
     const language = this.props.intl.locale
@@ -630,18 +717,21 @@ class FormSectionComponent extends React.Component<AllProps> {
             valuesWithFormattedDate
           )
 
-          if (!isFieldVisible(field, formData)) {
+          const allData = { ...formData, ...eventDeclarationData }
+
+          if (!isFieldVisible(field, allData)) {
             return null
           }
 
-          const isDisabled = !isFieldEnabled(field, formData)
+          const isDisabled = !isFieldEnabled(field, allData)
 
           return (
             <FormItem
-              ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
               key={`${field.id}${language}`}
+              ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
             >
               <Field name={field.id}>
+                {}
                 {(formikFieldProps: FieldProps<any>) => {
                   return (
                     <GeneratedInputField
@@ -653,8 +743,10 @@ class FormSectionComponent extends React.Component<AllProps> {
                       {...formikFieldProps.field}
                       disabled={isDisabled}
                       error={isDisabled ? '' : error}
+                      eventConfig={this.props.eventConfig}
                       fields={fields}
-                      formData={formData}
+                      formData={allData}
+                      readonlyMode={readonlyMode}
                       touched={touched[field.id] ?? false}
                       values={values}
                       onUploadingStateChanged={
@@ -672,35 +764,14 @@ class FormSectionComponent extends React.Component<AllProps> {
   }
 }
 
-/*
- * Formik has a feature that automatically nests all form keys that have a dot in them.
- * Because our form field ids can have dots in them, we temporarily transform those dots
- * to a different character before passing the data to Formik. This function unflattens
- */
-function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
-  return Object.fromEntries(
-    Object.entries(data).map(([key, value]) => [
-      makeFormFieldIdFormikCompatible(key),
-      value
-    ])
-  )
-}
-
-function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
-  return Object.fromEntries(
-    Object.entries(data).map(([key, value]) => [
-      key.replaceAll(FIELD_SEPARATOR, '.'),
-      value
-    ])
-  )
-}
-
 export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
   (props) => {
+    const { eventConfig, formData, fields, eventDeclarationData } = props
+
     const intl = useIntl()
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
-    const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
+    const nestedFormData = makeFormFieldIdsFormikCompatible(formData)
 
     const onChange = (values: EventState) => {
       props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
@@ -715,18 +786,20 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
     return (
       <Formik<EventState>
         enableReinitialize={true}
-        initialValues={initialValues}
         initialTouched={initialTouchedFields}
-        validateOnMount={true}
+        initialValues={initialValues}
         validate={(values) =>
           getValidationErrorsForForm(
-            props.fields,
+            fields,
             makeFormikFieldIdsOpenCRVSCompatible(values)
           )
         }
-        onSubmit={() => {}}
+        validateOnMount={true}
+        onSubmit={noop}
       >
         {(formikProps) => {
+          const { touched } = formikProps
+
           useEffect(() => {
             /**
              * Because 'enableReinitialize' prop is set to 'true' above, whenver initialValue changes,
@@ -735,23 +808,22 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
              * errors for all fields that have been touched.
              */
             if (
-              setAllTouchedFields &&
-              Object.keys(formikProps.touched).length > 0 &&
-              !isEqual(formikProps.touched, initialTouchedFields) &&
-              Object.keys(formikProps.touched).some(
-                (key) => !(key in initialTouchedFields)
-              )
+              Object.keys(touched).length > 0 &&
+              !isEqual(touched, initialTouchedFields) &&
+              Object.keys(touched).some((key) => !(key in initialTouchedFields))
             ) {
               setAllTouchedFields({
                 ...initialTouchedFields,
-                ...formikProps.touched
+                ...touched
               })
             }
-          }, [formikProps.touched, initialTouchedFields, setAllTouchedFields])
+          }, [touched])
           return (
             <FormSectionComponent
               {...props}
               {...formikProps}
+              eventConfig={eventConfig}
+              eventDeclarationData={eventDeclarationData}
               formData={nestedFormData}
               intl={intl}
               onChange={onChange}

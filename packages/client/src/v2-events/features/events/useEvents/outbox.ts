@@ -10,8 +10,7 @@
  */
 
 import { hashKey, Mutation, useQuery } from '@tanstack/react-query'
-
-import {
+import type {
   DecorateMutationProcedure,
   inferInput,
   inferOutput
@@ -66,7 +65,7 @@ export function useOutbox() {
 
   const eventFromDeclareActions = filterOutboxEventsWithMutation(
     eventsList,
-    trpc.event.actions.declare,
+    trpc.event.actions.declare.request,
     (event, parameters) => {
       return event.id === parameters.eventId
     }
@@ -74,7 +73,7 @@ export function useOutbox() {
 
   const eventFromValidateActions = filterOutboxEventsWithMutation(
     eventsList,
-    trpc.event.actions.validate,
+    trpc.event.actions.validate.request,
     (event, parameters) => {
       return event.id === parameters.eventId
     }
@@ -82,7 +81,7 @@ export function useOutbox() {
 
   const eventFromRegisterActions = filterOutboxEventsWithMutation(
     eventsList,
-    trpc.event.actions.register,
+    trpc.event.actions.register.request,
     (event, parameters) => {
       return event.id === parameters.eventId
     }

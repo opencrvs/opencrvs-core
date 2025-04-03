@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,6 +20,8 @@ import IframeResizer from 'iframe-resizer-react'
 import { messages } from '@client/i18n/messages/views/dashboard'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { constantsMessages } from '@client/i18n/messages'
+import { useSelector } from 'react-redux'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -35,6 +36,7 @@ interface IdashboardView {
 
 export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
   const intl = useIntl()
+  const userDetails = useSelector(getUserDetails)
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -45,7 +47,11 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
     if (navigatedFromInsideApp) {
       navigate(-1)
     } else {
-      navigate(generatePerformanceHomeUrl({}))
+      navigate(
+        generatePerformanceHomeUrl({
+          locationId: userDetails?.primaryOffice.id
+        })
+      )
     }
   }
 

@@ -201,8 +201,8 @@ export const SearchResult = ({
   const transformData = (eventData: EventIndex[]) => {
     return eventData
       .map((event) => {
-        const { data, ...rest } = event
-        return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
+        const { declaration, ...rest } = event
+        return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
       })
       .map((doc) => {
         const isInOutbox = outbox.some(

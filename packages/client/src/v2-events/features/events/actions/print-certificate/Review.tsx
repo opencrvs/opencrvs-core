@@ -21,7 +21,10 @@ import {
 import ReactTooltip from 'react-tooltip'
 import {
   ActionType,
-  findActiveActionForm,
+  EventConfig,
+  EventDocument,
+  getOrThrow,
+  getAcceptedActions,
   SCOPES
 } from '@opencrvs/commons/client'
 import {
@@ -38,7 +41,6 @@ import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useSubscribeEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
@@ -46,6 +48,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
@@ -127,6 +130,17 @@ const messages = defineMessages({
   }
 })
 
+function getPrintForm(configuration: EventConfig) {
+  const actionConfig = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+
+  return getOrThrow(
+    actionConfig?.printForm,
+    `No form found for action: ${ActionType.PRINT_CERTIFICATE}`
+  )
+}
+
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
   const [{ templateId }] = useTypedSearchParams(
@@ -143,28 +157,30 @@ export function Review() {
   const { getEvent, onlineActions } = useEvents()
   const [fullEvent] = getEvent.useSuspenseQuery(eventId)
 
-  const userIds = getUserIdsFromActions(fullEvent.actions)
+  const actions = getAcceptedActions(fullEvent)
+  const userIds = getUserIdsFromActions(actions)
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
 
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { formValues } = useSubscribeEventFormData()
+  const { getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
 
-  const { svgCode, handleCertify } = usePrintableCertificate(
-    fullEvent,
-    formValues,
+  const { svgCode, handleCertify } = usePrintableCertificate({
+    event: fullEvent,
+    form: annotation,
     locations,
     users,
     certificateConfig,
     language
-  )
+  })
 
   /**
    * If there are validation errors in the form, redirect to the
@@ -172,19 +188,16 @@ export function Review() {
    * review/print the certificate if there are validation errors.
    */
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const formConfig = findActiveActionForm(
-    eventConfiguration,
-    ActionType.PRINT_CERTIFICATE
-  )
+  const formConfig = getPrintForm(eventConfiguration)
 
-  if (!formConfig) {
-    throw new Error('Form configuration not found for print certificate action')
+  if (!svgCode) {
+    return <Spinner id="review-certificate-loading" />
   }
 
-  const validationErrorExist = validationErrorsInActionFormExist(
+  const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
-    formValues
-  )
+    form: annotation
+  })
   if (validationErrorExist) {
     return (
       <Navigate
@@ -231,15 +244,26 @@ export function Review() {
 
     if (confirmed) {
       try {
-        const response = await onlineActions.printCertificate.mutateAsync({
-          eventId: fullEvent.id,
-          data: { ...formValues, templateId },
-          transactionId: uuid(),
-          type: ActionType.PRINT_CERTIFICATE
-        })
-        if (response) {
-          handleCertify?.()
+        const response: EventDocument =
+          await onlineActions.printCertificate.mutateAsync({
+            eventId: fullEvent.id,
+            declaration: {},
+            annotation: { ...annotation, templateId },
+            transactionId: uuid(),
+            type: ActionType.PRINT_CERTIFICATE
+          })
+        const printAction = response.actions
+          .reverse()
+          .find((a) => a.type === ActionType.PRINT_CERTIFICATE)
+
+        if (printAction) {
+          await handleCertify({
+            ...fullEvent,
+            actions: [...fullEvent.actions, printAction]
+          })
           navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+        } else {
+          throw new Error('Print action not found in the response')
         }
       } catch (error) {
         // TODO: add notification alert
@@ -247,10 +271,6 @@ export function Review() {
         console.error(error)
       }
     }
-  }
-
-  if (!svgCode || !templateId) {
-    return <Spinner id="review-certificate-loading" />
   }
 
   return (

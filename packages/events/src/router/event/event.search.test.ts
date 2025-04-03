@@ -10,6 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { AddressType } from '@opencrvs/commons'
 
 test('Returns empty list when no events match search criteria', async () => {
   const { user, generator } = await setupTestCase()
@@ -22,6 +23,7 @@ test('Returns empty list when no events match search criteria', async () => {
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -31,9 +33,9 @@ test('Returns empty list when no events match search criteria', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
-      data: initialData
+      declaration: initialData
     })
   )
   const searchCriteria = {
@@ -57,6 +59,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -71,6 +74,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -85,6 +89,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -96,19 +101,19 @@ test('Returns events that match the text field criteria of applicant', async () 
   const event2 = await client.event.create(generator.event.create())
   const event3 = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event1.id, {
-      data: record1
+      declaration: record1
     })
   )
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event2.id, {
-      data: record2
+      declaration: record2
     })
   )
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event3.id, {
-      data: record3
+      declaration: record3
     })
   )
   const searchCriteria = {
@@ -134,6 +139,7 @@ test('Returns events that match date of birth of applicant', async () => {
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -148,6 +154,7 @@ test('Returns events that match date of birth of applicant', async () => {
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -158,14 +165,14 @@ test('Returns events that match date of birth of applicant', async () => {
   const event1 = await client.event.create(generator.event.create())
   const event2 = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event1.id, {
-      data: record1
+      declaration: record1
     })
   )
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event2.id, {
-      data: record2
+      declaration: record2
     })
   )
 
@@ -175,7 +182,7 @@ test('Returns events that match date of birth of applicant', async () => {
   }
 
   const fetchedEvents = await client.event.search(searchCriteria)
-  expect(fetchedEvents[0].data['applicant.firstname']).toBe('Johnson') // fetches first document as result
+  expect(fetchedEvents[0].declaration['applicant.firstname']).toBe('Johnson') // fetches first document as result
   expect(fetchedEvents).toHaveLength(1)
 })
 
@@ -190,6 +197,7 @@ test('Does not return events when searching with a similar but different date of
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -204,6 +212,7 @@ test('Does not return events when searching with a similar but different date of
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -214,14 +223,14 @@ test('Does not return events when searching with a similar but different date of
   const event1 = await client.event.create(generator.event.create())
   const event2 = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event1.id, {
-      data: record1
+      declaration: record1
     })
   )
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event2.id, {
-      data: record2
+      declaration: record2
     })
   )
 

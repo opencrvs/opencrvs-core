@@ -10,18 +10,17 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn } from '@storybook/test'
-import { userEvent, within } from '@storybook/testing-library'
+import { fn } from '@storybook/test'
 import React from 'react'
-import * as selectEvent from 'react-select-event'
 import styled from 'styled-components'
 import {
-  ActionType,
   EventConfig,
   FieldType,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  AddressFieldValue,
+  AddressType,
+  getDeclaration
 } from '@opencrvs/commons/client'
-import { AddressFieldValue } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -100,6 +99,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             },
             defaultValue: {
               country: 'FAR',
+              addressType: AddressType.DOMESTIC,
               province: '$user.province',
               district: '$user.district',
               urbanOrRural: 'URBAN'
@@ -118,86 +118,9 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
   }
 }
 
-export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
-  name: 'Interaction between fields',
-  parameters: {
-    layout: 'centered'
-  },
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await canvas.findByText(/Address/)
-
-    await step(
-      'Admin structure dropdowns are shown gradually as the inputs are filled',
-      async () => {
-        // Verify that `District` select is not visible initially
-        await expect(canvas.queryByTestId('location__district')).toBeNull()
-
-        // Select a province
-        const province = await canvas.findByTestId('location__province')
-        await userEvent.click(province)
-        await selectEvent.select(province, 'Central')
-
-        // Verify that `District` becomes visible
-        const district = await canvas.findByTestId('location__district')
-        await expect(district).toBeInTheDocument()
-
-        // Select a district
-        await userEvent.click(district)
-        await selectEvent.select(district, 'Ibombo')
-      }
-    )
-
-    await step(
-      'Selecting "Rural" for address details type hides detailed street information',
-      async () => {
-        // Click on the "RURAL" radio option
-        const ruralRadio = await canvas.findByTestId('radio-option__RURAL')
-        await userEvent.click(ruralRadio)
-
-        // Verify that the "village" input appears
-        const villageInput = await canvas.findByTestId('text__village')
-        await expect(villageInput).toBeInTheDocument()
-      }
-    )
-  },
-  render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
-    return (
-      <StyledFormFieldGenerator
-        fields={[
-          {
-            id: 'storybook.address',
-            type: FieldType.ADDRESS,
-            label: {
-              id: 'storybook.address.label',
-              defaultMessage: 'Address',
-              description: 'The title for the address input'
-            },
-            defaultValue: {
-              country: 'FAR'
-            } as AddressFieldValue
-          }
-        ]}
-        formData={formData}
-        id="my-form"
-        setAllFieldsDirty={false}
-        onChange={(data) => {
-          args.onChange(data)
-          setFormData(data)
-        }}
-      />
-    )
-  }
-}
-
 const eventConfig: EventConfig = tennisClubMembershipEvent
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
-const declarationForm = tennisClubMembershipEvent.actions
-  .find(({ type }) => type === ActionType.DECLARE)
-  ?.forms.find(({ active }) => active)!
+const declarationForm = getDeclaration(eventConfig)
 
 export const AddressReviewUrban: StoryObj<typeof Review> = {
   name: 'Review output (Urban)',
@@ -207,10 +130,10 @@ export const AddressReviewUrban: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{
           'applicant.address': {
             country: 'FAR',
+            addressType: AddressType.DOMESTIC,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
             district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
             urbanOrRural: 'URBAN',
@@ -239,10 +162,10 @@ export const AddressReviewRural: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{
           'applicant.address': {
             country: 'FAR',
+            addressType: AddressType.DOMESTIC,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
             district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
             urbanOrRural: 'RURAL',
@@ -267,10 +190,10 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{
           'applicant.address': {
             country: 'FAR',
+            addressType: AddressType.DOMESTIC,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
           } as AddressFieldValue
         }}
@@ -292,7 +215,6 @@ export const AddressReviewEmpty: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{}}
         formConfig={declarationForm}
         title="My address form with address output"
@@ -312,10 +234,10 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
   render: function Component() {
     return (
       <Review.Body
-        eventConfig={eventConfig}
         form={{
           'applicant.address': {
             country: 'FAR',
+            addressType: AddressType.DOMESTIC,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
             district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
             urbanOrRural: 'URBAN',
@@ -330,6 +252,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
         previousFormValues={{
           'applicant.address': {
             country: 'FAR',
+            addressType: AddressType.DOMESTIC,
             province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
             district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
             urbanOrRural: 'RURAL',
@@ -357,6 +280,7 @@ export const AddressInCopy: StoryObj<typeof Review> = {
     const FORM_DATA = {
       'applicant.address': {
         country: 'FAR',
+        addressType: AddressType.DOMESTIC,
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
         urbanOrRural: 'URBAN' as const,

@@ -17,7 +17,8 @@ import {
   EventSearchIndex,
   FieldConfig,
   FieldType,
-  getCurrentEventState
+  getCurrentEventState,
+  getDeclarationFields
 } from '@opencrvs/commons/events'
 import { type estypes } from '@elastic/elasticsearch'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -26,40 +27,20 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { getAllFields, logger } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
-import { DEFAULT_SIZE, generateQuery } from './utils'
+import {
+  decodeEventIndex,
+  DEFAULT_SIZE,
+  EncodedEventIndex,
+  encodeEventIndex,
+  generateQuery,
+  encodeFieldId
+} from './utils'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
-}
-
-export type EncodedEventIndex = EventIndex
-export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
-  return {
-    ...event,
-    data: Object.entries(event.data).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [encodeFieldId(key)]: value
-      }),
-      {}
-    )
-  }
-}
-
-export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
-  return {
-    ...event,
-    data: Object.entries(event.data).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [decodeFieldId(key)]: value
-      }),
-      {}
-    )
-  }
 }
 
 /*
@@ -75,15 +56,13 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
   })
 
   if (!hasEventsIndex) {
-    logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getAllFields(eventConfiguration))
-  } else {
-    logger.info(`Index ${indexName} already exists`)
-    logger.info(JSON.stringify(hasEventsIndex))
+    await createIndex(indexName, getDeclarationFields(eventConfiguration))
   }
+
   return ensureAlias(indexName)
 }
-export async function ensureAlias(indexName: string) {
+
+async function ensureAlias(indexName: string) {
   const client = getOrCreateClient()
   logger.info(`Ensuring alias for index ${indexName}`)
   const res = await client.indices.putAlias({
@@ -117,27 +96,18 @@ export async function createIndex(
           modifiedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
-          data: {
+          declaration: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)
           },
-          trackingId: { type: 'keyword' }
+          trackingId: { type: 'keyword' },
+          registrationNumber: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }
   })
 
   return ensureAlias(indexName)
-}
-
-const SEPARATOR = '____'
-
-export function encodeFieldId(fieldId: string) {
-  return fieldId.replaceAll('.', SEPARATOR)
-}
-
-function decodeFieldId(fieldId: string) {
-  return fieldId.replaceAll(SEPARATOR, '.')
 }
 
 type _Combine<
@@ -171,10 +141,12 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
+    case FieldType.DATA:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
         country: { type: 'keyword' },
+        addressType: { type: 'keyword' },
         province: { type: 'keyword' },
         district: { type: 'keyword' },
         urbanOrRural: { type: 'keyword' },
@@ -183,7 +155,14 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         street: { type: 'keyword' },
         number: { type: 'keyword' },
         zipCode: { type: 'keyword' },
-        village: { type: 'keyword' }
+        village: { type: 'keyword' },
+        state: { type: 'keyword' },
+        district2: { type: 'keyword' },
+        cityOrTown: { type: 'keyword' },
+        addressLine1: { type: 'keyword' },
+        addressLine2: { type: 'keyword' },
+        addressLine3: { type: 'keyword' },
+        postcodeOrZip: { type: 'keyword' }
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
@@ -236,7 +215,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   })
 
   if (!hasEventsIndex) {
-    await createIndex(indexName, getAllFields(eventConfiguration))
+    await createIndex(indexName, getDeclarationFields(eventConfiguration))
   }
 
   const stream = mongoClient.collection(indexName).find().stream()

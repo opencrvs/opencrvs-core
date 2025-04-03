@@ -11,7 +11,6 @@
 
 import React, { createContext, useContext } from 'react'
 import { ResolvedUser } from '@opencrvs/commons/client'
-// eslint-disable-next-line no-restricted-imports
 import { ILocation } from '@client/offline/reducer'
 
 const EventOverviewContext = createContext<{
@@ -58,7 +57,6 @@ export const EventOverviewProvider = ({
 
   const getLocation = (id: string) => {
     // @TODO: Remove this fallback once  developers have had time to update their data.
-    // eslint-disable-next-line
     return locations[id] ?? { id, name: 'Unknown location' }
   }
 

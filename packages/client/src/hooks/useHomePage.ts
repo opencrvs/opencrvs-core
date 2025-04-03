@@ -87,7 +87,9 @@ export const useHomePage = () => {
       path = PERFORMANCE_LEADER_BOARDS
       break
     case WORKQUEUE_TABS.performance:
-      path = generatePerformanceHomeUrl({ locationId: '' })
+      path = generatePerformanceHomeUrl({
+        locationId: userDetails?.primaryOffice.id
+      })
       break
   }
 
@@ -97,7 +99,7 @@ export const useHomePage = () => {
       typeof path === 'string'
         ? pathname.startsWith(path)
         : path.pathname
-        ? pathname.startsWith(path.pathname)
-        : false
+          ? pathname.startsWith(path.pathname)
+          : false
   }
 }

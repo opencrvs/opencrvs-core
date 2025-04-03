@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable import/no-relative-parent-imports */
 import { http, graphql, HttpResponse } from 'msw'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -21,7 +20,6 @@ import {
   tennisClubMembershipEventDocument
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
-import { birthEvent } from '@client/v2-events/components/forms/inputs/FileInput/fixtures'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 
 async function ensureCacheExists(cacheName: string) {
@@ -60,7 +58,7 @@ export const handlers = {
   ],
   events: [
     tRPCMsw.event.config.get.query(() => {
-      return [tennisClubMembershipEvent, birthEvent]
+      return [tennisClubMembershipEvent]
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]

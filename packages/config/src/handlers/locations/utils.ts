@@ -43,8 +43,8 @@ export const composeFhirLocation = (
             location.jurisdictionType === JurisdictionType.LOCATION_LEVEL_1
               ? JurisdictionType.STATE
               : location.jurisdictionType === JurisdictionType.LOCATION_LEVEL_2
-              ? JurisdictionType.DISTRICT
-              : location.jurisdictionType
+                ? JurisdictionType.DISTRICT
+                : location.jurisdictionType
         }
       ],
       name: location.name,
@@ -244,7 +244,7 @@ export function updateStatisticalExtensions(
 
 export async function getLocationsByIdentifier(identifier: string) {
   const locationSearchResult = await fetchFromHearth<Bundle<Location>>(
-    `/Location/?identifier=${identifier}&_count=0`
+    `Location/?identifier=${identifier}&_count=0`
   )
 
   return (

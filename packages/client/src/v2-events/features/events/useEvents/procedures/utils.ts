@@ -14,7 +14,7 @@ import {
   QueryFunctionContext
 } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
-import {
+import type {
   DecorateMutationProcedure,
   DecorateQueryProcedure,
   inferInput,
@@ -133,7 +133,7 @@ export function createEventActionMutationFn<
     async ({ eventType, ...params }) => {
       return defaultMutationFn({
         ...params,
-        data: params.data
+        declaration: params.declaration
       })
     }
   )

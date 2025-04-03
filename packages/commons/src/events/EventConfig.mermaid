@@ -4,6 +4,7 @@ classDiagram
         summary: SummaryConfig
         label: TranslationConfig
         actions: ActionConfig[]
+        declaration: DeclarationFormConfig
         workqueues: WorkqueueConfig[]
         deduplication?: DeduplicationConfig[]
         advancedSearch?: AdvancedSearchConfig[]
@@ -37,122 +38,118 @@ classDiagram
         label: TranslationConfig
         conditionals?: ActionConditional[]
         draft: boolean
-        forms: FormConfig[]
-    }
-
-    class ActionConditional {
         <<discriminated union>>
     }
 
-    class ShowConditional {
-        type: "SHOW"
-        conditional: Conditional
+    class DeclarationFormConfig {
+        label: TranslationConfig
+        pages: FormPageConfig[]
     }
 
-    class EnableConditional {
-        type: "ENABLE"
+    class ActionFormConfig {
+        label: TranslationConfig
+        pages: FormPageConfig[]
+    }
+
+    class ActionConditional {
+        type: 'SHOW' | 'ENABLE'
         conditional: Conditional
+        <<discriminated union>>
     }
 
     class FormConfig {
-        label: TranslationConfig
-        version: FormVersion
-        active: boolean
-        pages: FormPage[]
-        review: FormReview
+        <<discriminated union>>
     }
 
-    class FormVersion {
-        id: string
-        label: TranslationConfig
-    }
 
-    class FormPage {
+    class PageConfig {
         id: string
         title: TranslationConfig
+        type: 'FORM' | 'VERIFICATION'
         fields: FieldConfig[]
+        <<discriminated union>>
     }
 
-    class FormReview {
+    class FormPageConfig {
+        type: 'FORM'
+    }
+
+    class VerificationPageConfig {
+        type: 'VERIFICATION'
+        actions: VerificationActionConfig
+
+    }
+
+    class DeclarationReviewConfig {
         title: TranslationConfig
         fields: FieldConfig[]
     }
 
     class FieldConfig {
-
+        type:
+            | Address
+            | TextField
+            | NumberField
+            | TextAreaField
+            | DateField
+            | Paragraph
+            | RadioGroup
+            | BulletList
+            | PageHeader
+            | Select
+            | Checkbox
+            | File
+            | Country
+            | AdministrativeArea
+            | Divider
+            | Location
+            | Facility
+            | Office
+            | SignatureField
+            | EmailField
+            | FileUploadWithOptions
+            | DataField
+        <<discriminated union>>
     }
 
-    class Address
-    class TextField
-    class NumberField
-    class TextAreaField
-    class DateField
-    class Paragraph
-    class RadioGroup
-    class BulletList
-    class PageHeader
-    class Select
-    class Checkbox
-    class File
-    class Country
-    class AdministrativeArea
-    class Divider
-    class Location
-    class Facility
-    class Office
-    class SignatureField
-    class EmailField
-    class FileUploadWithOptions
+class DeclarationAction {
+    type: 'DECLARE' | 'VALIDATE' | 'REGISTER'
+    review: DeclarationReviewConfig
+}
+
+class RecordAction {
+    type:
+    | 'PRINT_CERTIFICATE'
+    | 'REQUEST_CORRECTION'
+    | 'REJECT_CORRECTION'
+    | 'APPROVE_CORRECTION'
+    [customForm]?: FormConfig
+}
 
     EventConfig "1" --> "1" SummaryConfig
-    EventConfig "1" --> "1" TranslationConfig
     EventConfig "1" --> "*" ActionConfig
-    EventConfig "1" --> "*" WorkqueueConfig
-    EventConfig "1" --> "*" DeduplicationConfig
-    EventConfig "1" --> "*" AdvancedSearchConfig
+    EventConfig "1" --> "*" DeclarationFormConfig
+
 
     SummaryConfig "1" --> "1" Title
     SummaryConfig "1" --> "*" Field
 
-    Title "1" --> "1" TranslationConfig
-    Field "1" --> "1" TranslationConfig
-    Field "1" --> "1" TranslationConfig
-    Field "1" --> "1" TranslationConfig
-
     ActionConfig "1" --> "*" ActionConditional
-    ActionConfig "1" --> "*" FormConfig
 
-    ActionConditional <|-- ShowConditional
-    ActionConditional <|-- EnableConditional
+    ActionConfig "1" --> "1" DeclarationAction
+    DeclarationAction "1" --> "1" DeclarationReviewConfig
+    ActionConfig "1" --> "1" RecordAction
+    ActionConfig "1" --> "1" SystemAction
 
-    ShowConditional "1" --> "1" Conditional
-    EnableConditional "1" --> "1" Conditional
 
-    FormConfig "1" --> "1" FormVersion
-    FormConfig "1" --> "*" FormPage
-    FormConfig "1" --> "1" FormReview
+    FormConfig "1" --> "*" DeclarationFormConfig
+    FormConfig "1" --> "*" ActionFormConfig
+    PageConfig "1" --> "*" FormPageConfig
+    PageConfig "1" --> "*" VerificationPageConfig
 
-    FormPage "1" --> "*" FieldConfig
-    FormReview "1" --> "*" FieldConfig
+    DeclarationFormConfig "1" --> "*" FormPageConfig
+    ActionFormConfig "1" --> "*" PageConfig
 
-    FieldConfig <|-- Address
-    FieldConfig <|-- TextField
-    FieldConfig <|-- NumberField
-    FieldConfig <|-- TextAreaField
-    FieldConfig <|-- DateField
-    FieldConfig <|-- Paragraph
-    FieldConfig <|-- RadioGroup
-    FieldConfig <|-- BulletList
-    FieldConfig <|-- PageHeader
-    FieldConfig <|-- Select
-    FieldConfig <|-- Checkbox
-    FieldConfig <|-- File
-    FieldConfig <|-- Country
-    FieldConfig <|-- AdministrativeArea
-    FieldConfig <|-- Divider
-    FieldConfig <|-- Location
-    FieldConfig <|-- Facility
-    FieldConfig <|-- Office
-    FieldConfig <|-- SignatureField
-    FieldConfig <|-- EmailField
-    FieldConfig <|-- FileUploadWithOptions
+
+    PageConfig "1" --> "*" FieldConfig
+

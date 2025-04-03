@@ -16,8 +16,9 @@ import { ActionUpdate } from './ActionDocument'
 export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  data: ActionUpdate,
-  metadata: ActionUpdate.optional()
+  declaration: ActionUpdate,
+  annotation: ActionUpdate.optional(),
+  originalActionId: z.string().optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -30,10 +31,7 @@ const CreateActionInput = BaseActionInput.merge(
 export const RegisterActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
-    identifiers: z.object({
-      trackingId: z.string(),
-      registrationNumber: z.string()
-    })
+    registrationNumber: z.string().optional()
   })
 )
 
@@ -149,6 +147,14 @@ export type ApproveCorrectionActionInput = z.infer<
   typeof ApproveCorrectionActionInput
 >
 
+export const ReadActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.READ).default(ActionType.READ)
+  })
+)
+
+export type ReadActionInput = z.infer<typeof ReadActionInput>
+
 /**
  * ActionInput types are used to validate the input data for the action.
  * In our use case, we use it directly with TRPC to validate the input data for the action.
@@ -171,7 +177,8 @@ export const ActionInput = z.discriminatedUnion('type', [
   PrintCertificateActionInput,
   RequestCorrectionActionInput,
   RejectCorrectionActionInput,
-  ApproveCorrectionActionInput
+  ApproveCorrectionActionInput,
+  ReadActionInput
 ])
 
 export type ActionInput = z.input<typeof ActionInput>

@@ -15,10 +15,8 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getActiveActionFormPages } from '@opencrvs/commons/client'
-import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
+import { getDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import {
@@ -28,28 +26,28 @@ import {
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 export function Pages() {
+  const events = useEvents()
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const { formValues: form } = useSubscribeEventFormData()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
-
   const navigate = useNavigate()
-  const events = useEvents()
   const drafts = useDrafts()
   const { modal, goToHome } = useEventFormNavigation()
-
   const event = events.getEventState.useSuspenseQuery(eventId)
-
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = getActiveActionFormPages(configuration, ActionType.REGISTER)
+
+  const declarationPages = getDeclarationPages(configuration)
 
   const currentPageId =
-    formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
+    declarationPages.find((p) => p.id === pageId)?.id || declarationPages[0]?.id
 
   if (!currentPageId) {
     throw new Error('Form does not have any pages')
@@ -79,12 +77,14 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        declaration={event.declaration}
+        eventConfig={configuration}
         form={form}
-        formPages={formPages}
+        formPages={declarationPages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
-        onFormPageChange={(nextPageId: string) =>
+        onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
               eventId,

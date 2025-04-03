@@ -15,7 +15,7 @@ import { inject, vi } from 'vitest'
 import { createIndex } from '@events/service/indexing/indexing'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { mswServer } from './msw'
-import { getAllFields } from '@opencrvs/commons'
+import { getDeclarationFields } from '@opencrvs/commons/events'
 
 vi.mock('@events/storage/mongodb/events')
 vi.mock('@events/storage/mongodb/user-mgnt')
@@ -24,13 +24,13 @@ vi.mock('@events/storage/elasticsearch')
 
 async function resetESServer() {
   const { getEventIndexName, getEventAliasName } = await import(
-    // @ts-ignore "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+    // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
   )
   const index = 'events_tennis_club_membership' + Date.now() + Math.random()
   getEventIndexName.mockReturnValue(index)
   getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
-  await createIndex(index, getAllFields(tennisClubMembershipEvent))
+  await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
 }
 
 beforeEach(async () =>
@@ -48,7 +48,6 @@ beforeAll(() =>
         req.method === 'DELETE' && req.url.includes(inject('ELASTICSEARCH_URI'))
 
       if (!isElasticResetCall) {
-        // eslint-disable-next-line no-console
         console.warn(`Unmocked request: ${req.method} ${req.url}`)
       }
     }

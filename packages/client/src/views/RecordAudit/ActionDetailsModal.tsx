@@ -408,17 +408,17 @@ const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.certifier?.name
-      ? getIndividualNameObj(
-          certificate.certifier.name,
-          window.config.LANGUAGES
-        )
-      : certificate.collector?.name
+    const name = certificate.collector?.name
       ? getIndividualNameObj(
           certificate.collector.name,
           window.config.LANGUAGES
         )
-      : {}
+      : certificate.certifier?.name
+        ? getIndividualNameObj(
+            certificate.certifier.name,
+            window.config.LANGUAGES
+          )
+        : {}
     const collectorLabel = () => {
       const relation = CollectorRelationLabelArray.find(
         (labelItem) => labelItem.value === certificate.collector?.relationship
@@ -633,7 +633,8 @@ const ActionDetailsModalListTable = ({
           />
         )}
       {!isEmpty(collectorData) &&
-        actionDetailsData.regStatus !== RegStatus.Issued && (
+        actionDetailsData.regStatus !== RegStatus.Issued &&
+        !['PRINT_IN_ADVANCE', 'OTHER'].includes(collectorData.relationship) && (
           <Table
             noResultText=" "
             columns={certificateCollectorVerified}

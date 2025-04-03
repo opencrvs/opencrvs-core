@@ -76,7 +76,7 @@ export function SingleDocumentPreview({
         <Container>
           <Label>
             <Icon color="grey600" name="Paperclip" size="medium" />
-            <Link onClick={(_) => onSelect(attachment)}>
+            <Link onClick={() => onSelect(attachment)}>
               <span>{getFormattedLabelForDocType(label) || label}</span>
             </Link>
           </Label>

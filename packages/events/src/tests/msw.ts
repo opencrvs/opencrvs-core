@@ -12,6 +12,7 @@ import { http, HttpResponse, PathParams } from 'msw'
 import { env } from '@events/environment'
 import { setupServer } from 'msw/node'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { ActionType } from '@opencrvs/commons'
 
 const handlers = [
   http.post<PathParams<never>, { filenames: string[] }>(
@@ -25,20 +26,31 @@ const handlers = [
       return HttpResponse.json(filenames)
     }
   ),
-  http.get(`${env.COUNTRY_CONFIG_URL}/events`, (info) => {
+  http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEvent,
       { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
     ])
   }),
   // event.delete.test.ts
-  http.head(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
+  http.head(`${env.DOCUMENTS_URL}/files/:fileName`, () => {
     return HttpResponse.json({ ok: true })
   }),
   // event.delete.test.ts
-  http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, (info) => {
+  http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, () => {
     return HttpResponse.json({ ok: true })
-  })
+  }),
+  http.post(
+    `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/:action`,
+    (ctx) => {
+      const payload =
+        ctx.params.action === ActionType.REGISTER
+          ? { registrationNumber: '1234567890AB' }
+          : {}
+
+      return HttpResponse.json(payload)
+    }
+  )
 ]
 
 export const mswServer = setupServer(...handlers)

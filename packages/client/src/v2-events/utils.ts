@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { uniq, isString, get, mapKeys } from 'lodash'
+import { uniq, isString, get, mapKeys, uniqBy } from 'lodash'
 
 import { v4 as uuid } from 'uuid'
 import {
@@ -23,7 +23,8 @@ import {
   isTemplateVariable,
   mapFieldTypeToZod,
   isFieldValueWithoutTemplates,
-  compositeFieldTypes
+  compositeFieldTypes,
+  getDeclarationFields
 } from '@opencrvs/commons/client'
 
 /**
@@ -50,7 +51,6 @@ export function getUsersFullName(
 }
 
 /** Utility to get all keys from union */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**
@@ -70,26 +70,16 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   return uniq(userIds)
 }
 
-export const getAllUniqueFields = (currentEvent: EventConfig) => {
-  return [
-    ...new Map(
-      currentEvent.actions.flatMap((action) =>
-        action.forms.flatMap((form) =>
-          form.pages.flatMap((page) =>
-            page.fields.map((field) => [field.id, field])
-          )
-        )
-      )
-    ).values()
-  ]
+export const getAllUniqueFields = (eventConfig: EventConfig) => {
+  return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
 }
 
 export function flattenEventIndex(
   event: EventIndex
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Omit<EventIndex, 'data'> & { [key: string]: any } {
-  const { data, ...rest } = event
-  return { ...rest, ...mapKeys(data, (_, key) => `${key}`) }
+): Omit<EventIndex, 'declaration'> & { [key: string]: any } {
+  const { declaration, ...rest } = event
+  return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>

@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,21 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { ComponentProps, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
+  MimeType,
   SelectOption
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { SimpleDocumentUploader } from './SimpleDocumentUploader'
+import { formMessages as messages } from '@client/i18n/messages'
+import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
 import { File } from './FileInput'
+import { useOnFileChange } from './useOnFileChange'
 
 const UploadWrapper = styled.div`
   width: 100%;
@@ -38,10 +39,6 @@ const Flex = styled.div`
   display: flex;
   flex-wrap: nowrap;
   gap: 8px;
-`
-
-const DocumentUploadButton = styled(SimpleDocumentUploader)`
-  flex-shrink: 0;
 `
 
 function getUpdatedFiles(
@@ -61,21 +58,33 @@ const DocumentTypeRequiredError = {
 }
 
 function DocumentUploaderWithOption({
-  ...props
-}: Omit<
-  ComponentProps<typeof SimpleDocumentUploader>,
-  'onComplete' | 'label' | 'error'
-> & {
-  value: FileFieldWithOptionValue
-  onChange: (value?: FileFieldValueWithOption[]) => void
+  value,
+  onChange,
+  name,
+  description,
+  acceptedFileTypes = [],
+  options,
+  error,
+  hideOnEmptyOption,
+  autoSelectOnlyOption,
+  maxFileSize
+}: {
+  name: string
+  description?: string
+  acceptedFileTypes?: MimeType[]
   options: SelectOption[]
-  error?: boolean
+  value: FileFieldWithOptionValue
+  onChange: (file?: FileFieldValueWithOption[]) => void
+  error?: string
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
+  maxFileSize: number
 }) {
   const intl = useIntl()
+  const documentTypeRequiredErrorMessage = intl.formatMessage(
+    DocumentTypeRequiredError
+  )
 
-  const { value, onChange, name, description, allowedDocType } = props
   const [files, setFiles] = useState(value)
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
     Array<{ label: string }>
@@ -84,15 +93,10 @@ function DocumentUploaderWithOption({
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined
   )
-  const [errorMessage, setErrorMessage] = useState('')
+  const [unselectedOptionError, setUnselectedOptionError] = useState('')
 
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
-
-  function getFormattedLabelForDocType(docType: string) {
-    const label = props.options.find(({ value: val }) => val === docType)?.label
-    return label && intl.formatMessage(label)
-  }
 
   const { uploadFile, deleteFile: deleteFileFromBackend } = useFileUpload(
     name,
@@ -116,7 +120,30 @@ function DocumentUploaderWithOption({
     }
   )
 
-  function deleteFile(fileName: string) {
+  const getLabelForDocumentOption = (docType: string) => {
+    const label = options.find(({ value: val }) => val === docType)?.label
+    return label && intl.formatMessage(label)
+  }
+
+  const onComplete = (newFile: File | null) => {
+    if (newFile) {
+      if (selectedOption) {
+        setFilesBeingProcessed((prev) => [...prev, { label: selectedOption }])
+
+        uploadFile(newFile, selectedOption)
+      } else {
+        setUnselectedOptionError(documentTypeRequiredErrorMessage)
+      }
+    }
+  }
+
+  const { error: fileChangeError, handleFileChange } = useOnFileChange({
+    acceptedFileTypes,
+    onComplete,
+    maxFileSize
+  })
+
+  const onDeleteFile = (fileName: string) => {
     deleteFileFromBackend(fileName)
     setFiles((prevFiles) =>
       prevFiles.filter((file) => file.filename !== fileName)
@@ -125,28 +152,29 @@ function DocumentUploaderWithOption({
     setPreviewImage(null)
   }
 
-  const remainingOptions = props.options.filter(
+  const remainingOptions = options.filter(
     ({ value: val }) => !files.some((file) => file.option === val)
   )
 
-  const documentTypeRequiredErrorMessage = intl.formatMessage(
-    DocumentTypeRequiredError
-  )
-
-  if (props.hideOnEmptyOption && remainingOptions.length === 0) {
+  if (hideOnEmptyOption && remainingOptions.length === 0) {
     return null
   }
 
-  if (props.options.length === 1) {
+  if (options.length === 1) {
+    const [onlyOption] = options
     return (
       <File.Input
-        {...props}
-        fullWidth={true}
-        label={intl.formatMessage(props.options[0].label)}
-        value={props.value.length === 0 ? undefined : props.value[0]}
+        acceptedFileTypes={acceptedFileTypes}
+        description={description}
+        error={error}
+        label={intl.formatMessage(onlyOption.label)}
+        maxFileSize={maxFileSize}
+        name={name}
+        value={value[0]}
+        width={'full'}
         onChange={(file) => {
           if (file) {
-            onChange([{ ...file, option: props.options[0].value }])
+            onChange([{ ...file, option: onlyOption.value }])
           }
         }}
       />
@@ -154,12 +182,14 @@ function DocumentUploaderWithOption({
   }
 
   if (
-    props.autoSelectOnlyOption &&
+    autoSelectOnlyOption &&
     remainingOptions.length === 1 &&
     remainingOptions[0].value !== selectedOption
   ) {
     setSelectedOption(remainingOptions[0].value)
   }
+
+  const errorMessage = error || unselectedOptionError || fileChangeError || ''
 
   return (
     <UploadWrapper>
@@ -170,9 +200,9 @@ function DocumentUploaderWithOption({
       )}
       <DocumentListPreview
         documents={files}
-        dropdownOptions={props.options}
+        dropdownOptions={options}
         processingDocuments={filesBeingProcessed}
-        onDelete={deleteFile}
+        onDelete={onDeleteFile}
         onSelect={(document) =>
           setPreviewImage(document as FileFieldValueWithOption)
         }
@@ -181,47 +211,33 @@ function DocumentUploaderWithOption({
       <Flex>
         <DropdownContainer>
           <Select.Input
-            id={props.name}
+            id={name}
             options={remainingOptions}
             type={'SELECT'}
             value={selectedOption}
             onChange={(val) => {
               setSelectedOption(val)
-              setErrorMessage('')
+              setUnselectedOptionError('')
             }}
           />
         </DropdownContainer>
-        <DocumentUploadButton
-          {...props}
-          allowedDocType={allowedDocType}
-          description={description}
-          error={selectedOption ? undefined : documentTypeRequiredErrorMessage}
+        <DocumentUploader
+          disabled={Boolean(error)}
+          id={name}
           name={name}
-          onlyButton={true}
-          onComplete={(newFile) => {
-            if (newFile) {
-              if (selectedOption) {
-                setFilesBeingProcessed((prev) => [
-                  ...prev,
-                  { label: selectedOption }
-                ])
-
-                uploadFile(newFile, selectedOption)
-              } else {
-                setErrorMessage(documentTypeRequiredErrorMessage)
-              }
-            }
-          }}
-        />
+          onChange={error ? undefined : handleFileChange}
+        >
+          {intl.formatMessage(messages.uploadFile)}
+        </DocumentUploader>
       </Flex>
 
       {previewImage && (
         <DocumentPreview
           goBack={() => setPreviewImage(null)}
           previewImage={previewImage}
-          title={getFormattedLabelForDocType(previewImage.option)}
+          title={getLabelForDocumentOption(previewImage.option)}
           onDelete={(file) => {
-            deleteFile(file.filename)
+            onDeleteFile(file.filename)
           }}
         />
       )}

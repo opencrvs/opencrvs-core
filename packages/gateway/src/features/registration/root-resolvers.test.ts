@@ -71,6 +71,16 @@ const certifyToken = sign(
   }
 )
 
+const unassignToken = sign(
+  { scope: [SCOPES.RECORD_UNASSIGN_OTHERS] },
+  readFileSync('./test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 const authHeaderRegCert = {
   Authorization: `Bearer ${registerCertifyToken}`
 }
@@ -85,6 +95,10 @@ const authHeaderCertify = {
 
 const authHeaderNotRegCert = {
   Authorization: `Bearer ${declareToken}`
+}
+
+const authHeaderUnassignOthers = {
+  Authorization: `Bearer ${unassignToken}`
 }
 
 const mockUserDetails = {
@@ -1766,18 +1780,61 @@ describe('Registration root resolvers', () => {
 })
 
 describe('markEventAsUnassigned()', () => {
-  it('throws error if user does not have register or validate scope', async () => {
+  it('throws error if the record is not assigned to anyone', async () => {
+    fetch.mockResponses([JSON.stringify({}), { status: 200 }])
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    await expect(
+      resolvers.Mutation!.markEventAsUnassigned(
+        {},
+        { id },
+        { headers: authHeaderNotRegCert }
+      )
+    ).rejects.toThrowError('User has been unassigned')
+  })
+  it('throws error if the record is not assigned to user & user does not have unassign-others scope', async () => {
     fetch.mockResponses(
-      [JSON.stringify(mockTaskBundle), { status: 200 }],
-      [JSON.stringify(mockUserDetails), { status: 200 }]
+      [JSON.stringify({ practitionerId: 'test-1234' }), { status: 200 }],
+      [JSON.stringify({ practitionerId: 'test-3456' }), { status: 200 }]
     )
     const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
     await expect(
       resolvers.Mutation!.markEventAsUnassigned(
         {},
         { id },
-        authHeaderNotRegCert
+        { headers: authHeaderNotRegCert }
       )
-    ).rejects.toThrowError('User does not have enough scope')
+    ).rejects.toThrowError(
+      'User has been unassigned or does not have required scope'
+    )
+  })
+  it('lets user without unassign-others scope unassign a record if the record is assigned to themselves', async () => {
+    fetch.mockResponses(
+      [JSON.stringify({ practitionerId: 'test-1234' }), { status: 200 }],
+      [JSON.stringify({ practitionerId: 'test-1234' }), { status: 200 }],
+      [JSON.stringify(mockTaskBundle), { status: 200 }]
+    )
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    expect(
+      await resolvers.Mutation!.markEventAsUnassigned(
+        {},
+        { id },
+        { headers: authHeaderNotRegCert }
+      )
+    ).toEqual('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
+  })
+  it('lets user with unassign-others scope unassign a record even if assigned to someone else', async () => {
+    fetch.mockResponses(
+      [JSON.stringify({ practitionerId: 'test-1234' }), { status: 200 }],
+      [JSON.stringify({ practitionerId: 'test-4567' }), { status: 200 }],
+      [JSON.stringify(mockTaskBundle), { status: 200 }]
+    )
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    expect(
+      await resolvers.Mutation!.markEventAsUnassigned(
+        {},
+        { id },
+        { headers: authHeaderUnassignOthers }
+      )
+    ).toEqual('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
   })
 })

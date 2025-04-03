@@ -10,7 +10,13 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, generateActionInput, SCOPES } from '@opencrvs/commons'
+import {
+  ActionType,
+  AddressType,
+  generateActionInput,
+  getAcceptedActions,
+  SCOPES
+} from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { TRPCError } from '@trpc/server'
 
@@ -19,7 +25,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
   const client = createTestClient(user, [])
 
   await expect(
-    client.event.actions.validate(
+    client.event.actions.validate.request(
       generator.event.actions.validate('registered-event-test-id-12345')
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -30,7 +36,7 @@ test(`allows access if required scope is present`, async () => {
   const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_FOR_APPROVAL])
 
   await expect(
-    client.event.actions.validate(
+    client.event.actions.validate.request(
       generator.event.actions.validate('registered-event-test-id-12345')
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -41,16 +47,21 @@ test('Validation error message contains all the offending fields', async () => {
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  await client.event.actions.declare(generator.event.actions.declare(event.id))
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
 
+  /** Partial payload is accepted, so it should not complain about fields already send during declaration. */
   const data = generator.event.actions.validate(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-02',
       'recommender.none': true
     }
   })
 
-  await expect(client.event.actions.validate(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.validate.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
@@ -58,16 +69,19 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  await client.event.actions.declare(generator.event.actions.declare(event.id))
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
 
   const data = generator.event.actions.validate(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
+        addressType: AddressType.DOMESTIC,
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
         urbanOrRural: 'RURAL' as const,
@@ -76,7 +90,9 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
     }
   })
 
-  await expect(client.event.actions.validate(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.validate.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('Skips required field validation when they are conditionally hidden', async () => {
@@ -85,7 +101,9 @@ test('Skips required field validation when they are conditionally hidden', async
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(generator.event.actions.declare(event.id))
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
 
   const form = {
     'applicant.dob': '2024-02-01',
@@ -94,6 +112,7 @@ test('Skips required field validation when they are conditionally hidden', async
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -101,15 +120,17 @@ test('Skips required field validation when they are conditionally hidden', async
     }
   }
 
-  const data = generator.event.actions.validate(event.id, {
-    data: form
+  const declaration = generator.event.actions.validate(event.id, {
+    declaration: form
   })
 
-  const response = await client.event.actions.validate(data)
-  const savedAction = response.actions.find(
+  const response = await client.event.actions.validate.request(declaration)
+  const activeActions = getAcceptedActions(response)
+
+  const savedAction = activeActions.find(
     (action) => action.type === ActionType.VALIDATE
   )
-  expect(savedAction?.data).toEqual(form)
+  expect(savedAction?.declaration).toEqual(form)
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -118,7 +139,9 @@ test('Prevents adding birth date in future', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(generator.event.actions.declare(event.id))
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
 
   const form = {
     'applicant.dob': '2040-02-01',
@@ -127,6 +150,7 @@ test('Prevents adding birth date in future', async () => {
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
       urbanOrRural: 'RURAL' as const,
@@ -135,8 +159,8 @@ test('Prevents adding birth date in future', async () => {
   }
 
   await expect(
-    client.event.actions.validate(
-      generator.event.actions.validate(event.id, { data: form })
+    client.event.actions.validate.request(
+      generator.event.actions.validate(event.id, { declaration: form })
     )
   ).rejects.matchSnapshot()
 })
@@ -146,16 +170,20 @@ test('validation prevents including hidden fields', async () => {
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
-  await client.event.actions.declare(generator.event.actions.declare(event.id))
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
 
   const data = generator.event.actions.validate(event.id, {
-    data: {
+    declaration: {
       ...generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
       'recommender.firstname': 'this should not be here'
     }
   })
 
-  await expect(client.event.actions.validate(data)).rejects.matchSnapshot()
+  await expect(
+    client.event.actions.validate.request(data)
+  ).rejects.matchSnapshot()
 })
 
 test('valid action is appended to event actions', async () => {
@@ -164,9 +192,11 @@ test('valid action is appended to event actions', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(generator.event.actions.declare(event.id))
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
 
-  await client.event.actions.validate(
+  await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )
 
@@ -179,6 +209,9 @@ test('valid action is appended to event actions', async () => {
     }),
     expect.objectContaining({
       type: ActionType.VALIDATE
+    }),
+    expect.objectContaining({
+      type: ActionType.READ
     })
   ])
 })

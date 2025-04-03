@@ -17,12 +17,12 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   FieldConfig,
-  getActiveActionFields,
-  findActiveActionForm,
   generateTransactionId,
   Scope,
   SCOPES,
-  isFieldVisible
+  isFieldVisible,
+  getDeclarationFields,
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -36,16 +36,14 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-// eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
-
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 
 function shouldBeShownAsAValue(field: FieldConfig) {
   if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
@@ -106,7 +104,6 @@ export function Summary() {
   const scopes = useSelector(getScope)
 
   const [showPrompt, setShowPrompt] = React.useState(false)
-
   const togglePrompt = () => setShowPrompt(!showPrompt)
 
   const eventFormNavigation = useEventFormNavigation()
@@ -116,35 +113,24 @@ export function Summary() {
   const events = useEvents()
   const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const previousFormValues = event.data
+
+  const previousFormValues = event.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues()
+  const formConfig = getDeclaration(eventConfiguration)
+
   const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
-  const formConfig = findActiveActionForm(
-    eventConfiguration,
-    ActionType.REQUEST_CORRECTION
-  )
-
-  if (!formConfig) {
-    throw new Error(
-      `No active form found for ${ActionType.REQUEST_CORRECTION}. This should never happen`
-    )
-  }
 
   if (!actionConfig) {
     throw new Error(
       `No action configuration found for ${ActionType.REQUEST_CORRECTION} found. This should never happen`
     )
   }
-
-  const fields = getActiveActionFields(
-    eventConfiguration,
-    ActionType.REQUEST_CORRECTION
-  )
+  const fields = getDeclarationFields(eventConfiguration)
 
   const allFields = [
     ...fields,
@@ -158,11 +144,11 @@ export function Summary() {
     previousFormValues
   )
 
-  const metadata = useEventMetadata()
+  const annotation = useActionAnnotation()
 
-  const metadataForm = metadata.getMetadata()
+  const annotationForm = annotation.getAnnotation()
 
-  const stringiedRequestData = stringifyFormData(allFields, metadataForm)
+  const stringiedRequestData = stringifyFormData(allFields, annotationForm)
 
   const onboardingFormPages =
     eventConfiguration.actions.find(
@@ -198,12 +184,12 @@ export function Summary() {
       eventId,
       // @TODO:
       // @ts-ignore
-      data: {
+      declaration: {
         ...formWithOnlyChangedValues,
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      metadata: metadataForm
+      annotation: annotationForm
     })
     eventFormNavigation.goToHome()
   }, [
@@ -211,7 +197,7 @@ export function Summary() {
     fields,
     events.actions.correction.request,
     eventId,
-    metadataForm,
+    annotationForm,
     eventFormNavigation,
     previousFormValues
   ])

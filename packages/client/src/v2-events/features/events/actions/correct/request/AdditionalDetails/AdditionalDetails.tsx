@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-imports */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -22,7 +21,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 
 const messages = defineMessages({
   title: {
@@ -39,8 +38,8 @@ export function AdditionalDetails() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS
   )
   const events = useEvents()
-  const metadata = useEventMetadata((state) => state.getMetadata())
-  const setMetadata = useEventMetadata((state) => state.setMetadata)
+  const annotation = useActionAnnotation((state) => state.getAnnotation())
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
   const event = events.getEventState.useSuspenseQuery(eventId)
 
@@ -98,12 +97,14 @@ export function AdditionalDetails() {
         <PagesComponent
           // @TODO: Use subscription if needed
           continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-          form={metadata}
+          declaration={event.declaration}
+          eventConfig={configuration}
+          form={annotation}
           formPages={formPages}
           pageId={currentPageId}
-          setFormData={(data) => setMetadata(data)}
+          setFormData={(data) => setAnnotation(data)}
           showReviewButton={false}
-          onFormPageChange={(nextPageId: string) => {
+          onPageChange={(nextPageId: string) => {
             return navigate(
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS.buildPath({
                 eventId: event.id,

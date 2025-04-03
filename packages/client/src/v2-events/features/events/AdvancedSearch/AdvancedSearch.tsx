@@ -18,7 +18,6 @@ import {
   IFormTabProps
 } from '@opencrvs/components'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { TabSearch } from './TabSearch'
 
 const messagesToDefine = {
@@ -37,7 +36,7 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
-function AdvancedSearch() {
+export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
   const location = useLocation()
@@ -86,5 +85,3 @@ function AdvancedSearch() {
     </>
   )
 }
-
-export default withSuspense(AdvancedSearch)

@@ -14,4 +14,5 @@ import { Review } from './Review'
 import { Pages } from './Pages'
 
 const PagesIndex = withSuspense(Pages)
-export { Review, PagesIndex as Pages }
+const ReviewIndex = withSuspense(Review)
+export { ReviewIndex as Review, PagesIndex as Pages }

@@ -99,45 +99,6 @@ function changeSortedColumn(
   }
 }
 
-export function WorkqueueContainer() {
-  // @TODO: We need to revisit on how the workqueue id is passed.
-  // We'll follow up during 'workqueue' feature.
-  const workqueueId = 'all'
-  const { getEvents } = useEvents()
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
-  const [events] = getEvents.useSuspenseQuery()
-
-  const eventConfigs = useEventConfigurations()
-
-  const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
-      : null
-
-  if (!workqueueConfig) {
-    return null
-  }
-
-  return (
-    <Workqueue
-      events={events}
-      workqueueConfig={workqueueConfig}
-      {...searchParams}
-      eventConfigs={eventConfigs}
-    />
-  )
-}
-
-interface Column {
-  label?: string
-  width: number
-  key: string
-  sortFunction?: (columnName: string) => void
-  isActionColumn?: boolean
-  isSorted?: boolean
-  alignment?: ColumnContentAlignment
-}
 /**
  * A Workqueue that displays a table of events based on search criteria.
  */
@@ -218,12 +179,12 @@ function Workqueue({
 
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
-          <IconWithName name={title} status={'OUTBOX'} />
+          <IconWithName name={title} status={getEventStatus()} />
         ) : (
           <IconWithNameEvent
             event={intl.formatMessage(eventConfig.label)}
             name={title}
-            status={'OUTBOX'}
+            status={getEventStatus()}
           />
         )
 
@@ -323,7 +284,6 @@ function Workqueue({
       noContent={workqueue.length === 0}
       noResultText={'No results'}
       paginationId={Math.round(offset / limit)}
-      // eslint-disable-next-line
       title={intl.formatMessage(workqueueConfig.title)}
       totalPages={totalPages}
     >
@@ -349,4 +309,44 @@ function Workqueue({
       </FabContainer>
     </WQContentWrapper>
   )
+}
+
+export function WorkqueueContainer() {
+  // @TODO: We need to revisit on how the workqueue id is passed.
+  // We'll follow up during 'workqueue' feature.
+  const workqueueId = 'all'
+  const { getEvents } = useEvents()
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+
+  const [events] = getEvents.useSuspenseQuery()
+
+  const eventConfigs = useEventConfigurations()
+
+  const workqueueConfig =
+    workqueueId in workqueues
+      ? workqueues[workqueueId as keyof typeof workqueues]
+      : null
+
+  if (!workqueueConfig) {
+    return null
+  }
+
+  return (
+    <Workqueue
+      events={events}
+      workqueueConfig={workqueueConfig}
+      {...searchParams}
+      eventConfigs={eventConfigs}
+    />
+  )
+}
+
+interface Column {
+  label?: string
+  width: number
+  key: string
+  sortFunction?: (columnName: string) => void
+  isActionColumn?: boolean
+  isSorted?: boolean
+  alignment?: ColumnContentAlignment
 }

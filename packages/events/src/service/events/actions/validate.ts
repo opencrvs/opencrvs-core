@@ -11,6 +11,7 @@
 
 import {
   ActionInputWithType,
+  ActionStatus,
   EventIndex,
   getCurrentEventState
 } from '@opencrvs/commons/events'
@@ -55,7 +56,8 @@ export async function validate(
         createdAt: new Date().toISOString(),
         createdBy,
         id: getUUID(),
-        createdAtLocation
+        createdAtLocation,
+        status: ActionStatus.Accepted
       }
     ]
   })
@@ -83,15 +85,15 @@ export async function validate(
       return self.findIndex((t) => t.id === event.id) === index
     })
 
-  const event = await addAction(
+  return addAction(
     { ...input, duplicates: duplicates.map((d) => d.id) },
     {
       eventId,
       createdBy,
       transactionId,
       token,
-      createdAtLocation
+      createdAtLocation,
+      status: ActionStatus.Accepted
     }
   )
-  return event
 }

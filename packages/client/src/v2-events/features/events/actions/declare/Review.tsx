@@ -15,12 +15,13 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
   ActionType,
-  findActiveActionForm,
+  getActionReview,
+  getDeclaration,
   SCOPES
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -29,7 +30,6 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-// eslint-disable-next-line no-restricted-imports
 import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
@@ -51,23 +51,23 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const formConfig = findActiveActionForm(config, ActionType.DECLARE)
-  if (!formConfig) {
-    throw new Error('No active form configuration found for declare action')
-  }
+  const formConfig = getDeclaration(config)
+  const reviewConfig = getActionReview(config, ActionType.DECLARE)
 
   const form = useEventFormData((state) => state.getFormValues())
 
-  const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata()
+  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
+    useActionAnnotation()
+  const annotation = getMetadata()
 
   const scopes = useSelector(getScope) ?? undefined
 
   const reviewActionConfiguration = useReviewActionConfig({
     formConfig,
-    form,
-    metadata,
-    scopes
+    declaration: form,
+    annotation,
+    scopes,
+    reviewFields: reviewConfig.fields
   })
 
   async function handleEdit({
@@ -100,11 +100,12 @@ export function Review() {
     return
   }
 
-  const hasValidationErrors = validationErrorsInActionFormExist(
+  const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form,
-    metadata
-  )
+    annotation,
+    reviewFields: reviewConfig.fields
+  })
 
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
@@ -133,15 +134,13 @@ export function Review() {
       }
     >
       <ReviewComponent.Body
-        eventConfig={config}
-        formConfig={formConfig}
-        // eslint-disable-next-line
-        onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
+        annotation={annotation}
         form={form}
-        isUploadButtonVisible={true}
-        title={formatMessage(formConfig.review.title, form)}
-        metadata={metadata}
-        onMetadataChange={(values) => setMetadata(values)}
+        formConfig={formConfig}
+        reviewFields={reviewConfig.fields}
+        title={formatMessage(reviewConfig.title, form)}
+        onAnnotationChange={(values) => setMetadata(values)}
+        onEdit={handleEdit}
       >
         <ReviewComponent.Actions
           canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}

@@ -18,12 +18,12 @@ import {
   ActionType,
   ActionUpdate
 } from '@opencrvs/commons/client'
-import { ResolvedUser } from '@opencrvs/commons'
+import { ResolvedUser } from '@opencrvs/commons/client'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
-    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFY {Sent incomplete} other {Unknown}}'
+    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFY {Sent incomplete} READ {Viewed} other {Unknown}}'
 }
 
 const messages = defineMessages({
@@ -43,14 +43,14 @@ const messages = defineMessages({
   }
 })
 
-function prepareComments(action: ActionType, metadata: ActionUpdate) {
+function prepareComments(action: ActionType, annotation: ActionUpdate) {
   const comments: { comment: string }[] = []
 
-  if (action === ActionType.REJECT && typeof metadata.message === 'string') {
-    comments.push({ comment: metadata.message })
+  if (action === ActionType.REJECT && typeof annotation.message === 'string') {
+    comments.push({ comment: annotation.message })
   }
-  if (action === ActionType.ARCHIVE && typeof metadata.message === 'string') {
-    comments.push({ comment: metadata.message })
+  if (action === ActionType.ARCHIVE && typeof annotation.message === 'string') {
+    comments.push({ comment: annotation.message })
   }
   return comments
 }
@@ -84,7 +84,7 @@ export function EventHistoryModal({
     }
   ]
 
-  const content = prepareComments(history.type, history.metadata ?? {})
+  const content = prepareComments(history.type, history.annotation ?? {})
 
   return (
     <ResponsiveModal
@@ -113,15 +113,16 @@ export function EventHistoryModal({
       {content.length > 0 && (
         <Table columns={commentsColumn} content={content} noResultText=" " />
       )}
-      {history.type === ActionType.ARCHIVE && history.metadata?.isDuplicate && (
-        <p>
-          <Pill
-            label={intl.formatMessage(messages.markAsDuplicate)}
-            size="small"
-            type="inactive"
-          />
-        </p>
-      )}
+      {history.type === ActionType.ARCHIVE &&
+        history.annotation?.isDuplicate && (
+          <p>
+            <Pill
+              label={intl.formatMessage(messages.markAsDuplicate)}
+              size="small"
+              type="inactive"
+            />
+          </p>
+        )}
     </ResponsiveModal>
   )
 }

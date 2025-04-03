@@ -9,39 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { FormPageConfig, PageConfig } from './PageConfig'
 
-export const FormPage = z.object({
-  id: z.string().describe('Unique identifier for the page'),
-  title: TranslationConfig.describe('Header title of the page'),
-  fields: z.array(FieldConfig).describe('Fields to be rendered on the page')
-})
-
-export const FormConfig = z.object({
-  label: TranslationConfig.describe('Human readable description of the form'),
-  version: z.object({
-    id: z
-      .string()
-      .describe(
-        'Form version. Semantic versioning recommended. Example: 0.0.1'
-      ),
-    label: TranslationConfig.describe(
-      'Human readable description of the version'
-    )
-  }),
-  active: z.boolean().default(false).describe('Whether the form is active'),
-  pages: z.array(FormPage),
-  review: z.object({
-    title: TranslationConfig.describe(
-      'Title of the form to show in review page'
-    ),
-    fields: z
-      .array(FieldConfig)
-      .describe('Fields to be rendered on the review page for metadata')
+export const DeclarationFormConfig = z
+  .object({
+    label: TranslationConfig.describe('Human readable description of the form'),
+    pages: z.array(FormPageConfig)
   })
+  .describe('Configuration for a declaration form')
+
+export type DeclarationFormConfig = z.infer<typeof DeclarationFormConfig>
+export type DeclarationFormConfigInput = z.input<typeof DeclarationFormConfig>
+
+export const ActionFormConfig = z.object({
+  label: TranslationConfig.describe('Human readable description of the form'),
+  pages: z.array(PageConfig)
 })
 
-export type FormPage = z.infer<typeof FormPage>
+export type ActionFormConfig = z.infer<typeof ActionFormConfig>
+export type ActionFormConfigInput = z.input<typeof ActionFormConfig>
+
+export const FormConfig = z.union([DeclarationFormConfig, ActionFormConfig])
 export type FormConfig = z.infer<typeof FormConfig>
-export type FormConfigInput = z.input<typeof FormConfig>

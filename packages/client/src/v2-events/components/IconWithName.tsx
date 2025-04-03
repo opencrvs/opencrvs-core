@@ -22,13 +22,15 @@ const Flex = styled.div`
   }
 `
 
-interface IIconWith {
+interface IconProps {
   status?: string
   name: React.ReactNode
-  event?: string
-  isDuplicate?: boolean
   isValidatedOnReview?: boolean
   isArchived?: boolean
+}
+
+interface IconWithNameEventProps extends IconProps {
+  event: string
 }
 
 const Event = styled.div`
@@ -46,10 +48,12 @@ const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
   OUTBOX: 'grey',
   ARCHIVED: 'grey',
   DRAFT: 'purple',
+  CREATED: 'purple',
   IN_PROGRESS: 'purple',
+  NOTIFIED: 'purple',
   DECLARED: 'orange',
   REJECTED: 'red',
-  VALIDATED: 'grey',
+  VALIDATED: 'orange',
   REGISTERED: 'green',
   CERTIFIED: 'teal',
   CORRECTION_REQUESTED: 'blue',
@@ -93,7 +97,7 @@ export function IconWithName({
   name,
   isValidatedOnReview,
   isArchived
-}: IIconWith) {
+}: IconProps) {
   return (
     <Flex id="flex">
       {status && (
@@ -112,10 +116,9 @@ export function IconWithNameEvent({
   status,
   name,
   event,
-  isDuplicate,
   isValidatedOnReview,
   isArchived
-}: IIconWith) {
+}: IconWithNameEventProps) {
   return (
     <Flex id="flex">
       {status && (

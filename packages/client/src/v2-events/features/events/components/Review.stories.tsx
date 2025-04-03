@@ -16,8 +16,8 @@ import React from 'react'
 import superjson from 'superjson'
 import {
   AddressFieldValue,
-  TENNIS_CLUB_FORM,
-  tennisClubMembershipEvent
+  AddressType,
+  TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -25,12 +25,13 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { RejectionState, Review } from './Review'
 
-const mockFormData = {
+const mockDeclaration = {
   'applicant.firstname': 'John',
   'applicant.surname': 'Doe',
   'applicant.dob': '1990-01-01',
   'applicant.address': {
     country: 'FAR',
+    addressType: AddressType.DOMESTIC,
     province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
     street: '123 Tennis Club Avenue',
@@ -47,9 +48,8 @@ const meta: Meta<typeof Review.Body> = {
   title: 'Components/Review',
   component: Review.Body,
   args: {
-    eventConfig: tennisClubMembershipEvent,
-    formConfig: TENNIS_CLUB_FORM,
-    form: mockFormData,
+    formConfig: TENNIS_CLUB_DECLARATION_FORM,
+    form: mockDeclaration,
     onEdit: () => undefined,
     title: 'Member declaration for John Doe'
   },
@@ -135,9 +135,8 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
     return (
       <>
         <Review.Body
-          eventConfig={tennisClubMembershipEvent}
-          form={mockFormData}
-          formConfig={TENNIS_CLUB_FORM}
+          form={mockDeclaration}
+          formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="My test action"
           onEdit={handleEdit}
         >
@@ -197,6 +196,7 @@ export const ReviewWithValidationErrors: Story = {
       'applicant.email': 'mia@',
       'applicant.address': {
         country: 'FAR',
+        addressType: AddressType.DOMESTIC,
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         urbanOrRural: 'RURAL',
         village: 'Tennisville'
@@ -213,9 +213,8 @@ export const ReviewWithValidationErrors: Story = {
     }
     return (
       <Review.Body
-        eventConfig={tennisClubMembershipEvent}
         form={this.args?.form || {}}
-        formConfig={TENNIS_CLUB_FORM}
+        formConfig={TENNIS_CLUB_DECLARATION_FORM}
         title="My test action"
         onEdit={() => undefined}
       >

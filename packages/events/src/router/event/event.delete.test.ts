@@ -96,8 +96,8 @@ describe('check unreferenced draft attachments are deleted while final action su
     const getDraft = (n: number): DraftInput => {
       return {
         type: ActionType.DECLARE,
-        data: {
-          ...generator.event.actions.declare(event.id).data,
+        declaration: {
+          ...generator.event.actions.declare(event.id).declaration,
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
@@ -110,8 +110,8 @@ describe('check unreferenced draft attachments are deleted while final action su
     }
     const getDeclaration = (n: number) => {
       return {
-        data: {
-          ...generator.event.actions.declare(event.id).data,
+        declaration: {
+          ...generator.event.actions.declare(event.id).declaration,
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
@@ -131,7 +131,7 @@ describe('check unreferenced draft attachments are deleted while final action su
     await client.event.draft.create(getDraft(5))
 
     // declaring final action submission
-    await client.event.actions.declare(getDeclaration(6))
+    await client.event.actions.declare.request(getDeclaration(6))
 
     // file attachment exist api should be called once
     expect(fileExistMock.mock.calls).toHaveLength(1)
@@ -144,7 +144,8 @@ describe('check unreferenced draft attachments are deleted while final action su
     // since declare action has been submitted 5 times
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
-      expect.objectContaining({ type: ActionType.DECLARE })
+      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.READ })
     ])
   })
 

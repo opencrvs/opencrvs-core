@@ -330,6 +330,7 @@ export function getNextSectionIds(
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   declaration: IDeclaration,
+  isCorrection: boolean,
   userDetails?: UserDetails | null
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -343,16 +344,18 @@ export function getNextSectionIds(
   )
 
   if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(
-      (section) =>
-        section.viewType !== VIEW_TYPE.HIDDEN &&
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          declaration.data[fromSection.id] || {},
-          declaration.data,
-          userDetails
-        ).length > 0
-    )
+    const visibleSections = sections
+      .filter((section) => (isCorrection ? section.id !== 'documents' : true))
+      .filter(
+        (section) =>
+          section.viewType !== VIEW_TYPE.HIDDEN &&
+          getVisibleSectionGroupsBasedOnConditions(
+            section,
+            declaration.data[fromSection.id] || {},
+            declaration.data,
+            userDetails
+          ).length > 0
+      )
 
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
@@ -621,20 +624,18 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
-  return (
-    field.conditionals
-      // eslint-disable-next-line no-eval
-      .filter((conditional) =>
-        evalExpressionInFieldDefinition(
-          conditional.expression,
-          values,
-          offlineCountryConfig,
-          draftData,
-          userDetails
-        )
+  return field.conditionals
+
+    .filter((conditional) =>
+      evalExpressionInFieldDefinition(
+        conditional.expression,
+        values,
+        offlineCountryConfig,
+        draftData,
+        userDetails
       )
-      .map((conditional: Conditional) => conditional.action)
-  )
+    )
+    .map((conditional: Conditional) => conditional.action)
 }
 
 export const evalExpressionInFieldDefinition = (
@@ -648,12 +649,11 @@ export const evalExpressionInFieldDefinition = (
   $user: (UserDetails & { token?: string }) | null
 ) => {
   // For backwards compatibility
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+
   const values = $form
   const offlineCountryConfig = $config
   const draftData = $draft
   const userDetails = $user
-  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   // eslint-disable-next-line no-eval
   return eval(expression)
@@ -665,7 +665,6 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   draftData?: IFormData,
   userDetails?: UserDetails | null
 ): IFormSectionGroup[] => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const values = sectionData
 
   // handling all possible group visibility conditionals

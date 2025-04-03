@@ -46,8 +46,34 @@ const undeclaredDraftEvent = {
     ({ type }) => type === ActionType.CREATE
   )
 }
-
 const spy = fn()
+
+function createDraftHandlers() {
+  const draftList = fn<() => Draft[]>(() => [])
+  return [
+    tRPCMsw.event.draft.create.mutation((req) => {
+      const response: Draft = {
+        id: 'test-draft-id',
+        eventId: req.eventId,
+        transactionId: req.transactionId,
+        createdAt: new Date().toISOString(),
+        action: {
+          ...req,
+          createdBy: 'test-user',
+          createdAtLocation: 'test-location',
+          createdAt: new Date().toISOString()
+        }
+      }
+      spy(req)
+      draftList.mockReturnValue([response])
+      return response
+    }),
+    tRPCMsw.event.draft.list.query(() => {
+      return draftList()
+    })
+  ]
+}
+
 export const SaveAndExit: Story = {
   parameters: {
     reactRouter: {
@@ -113,32 +139,6 @@ export const SaveAndExit: Story = {
   }
 }
 
-function createDraftHandlers() {
-  const draftList = fn<() => Draft[]>(() => [])
-  return [
-    tRPCMsw.event.draft.create.mutation((req) => {
-      const response: Draft = {
-        id: 'test-draft-id',
-        eventId: req.eventId,
-        transactionId: req.transactionId,
-        createdAt: new Date().toISOString(),
-        action: {
-          ...req,
-          createdBy: 'test-user',
-          createdAtLocation: 'test-location',
-          createdAt: new Date().toISOString()
-        }
-      }
-      spy()
-      draftList.mockReturnValue([response])
-      return response
-    }),
-    tRPCMsw.event.draft.list.query(() => {
-      return draftList()
-    })
-  ]
-}
-
 export const DraftShownInForm: Story = {
   name: 'Form with an existing remote draft',
   parameters: {
@@ -187,7 +187,8 @@ export const DraftShownInForm: Story = {
     const button = await canvas.findByRole('button', { name: /Save & Exit/ })
     await userEvent.click(button)
     const modal = within(await canvas.findByRole('dialog'))
-    await userEvent.click(modal.getByRole('button', { name: /Confirm/ }))
+    await userEvent.click(await modal.findByRole('button', { name: /Confirm/ }))
+
     await userEvent.click(await canvas.findByText('Clearly Draft'))
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
     await userEvent.click(await canvas.findByText(/Send an application/))
@@ -286,7 +287,7 @@ export const CanSubmitValidlyFilledForm: Story = {
       )
 
       await userEvent.click(await canvas.findByText('Select...'))
-      await userEvent.click(await canvas.findByText('Albania'))
+      await userEvent.click(await canvas.findByText('Bangladesh'))
       await userEvent.click(await canvas.findByText('Select...'))
       await userEvent.click(await canvas.findByText('Central'))
       await userEvent.click(await canvas.findByText('Select...'))

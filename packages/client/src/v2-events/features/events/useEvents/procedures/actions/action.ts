@@ -10,13 +10,13 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import {
+import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
 import {
   ActionType,
-  getActiveActionFields,
+  getDeclarationFields,
   stripHiddenFields
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
@@ -33,9 +33,9 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 
-setMutationDefaults(trpcOptionsProxy.event.actions.declare, {
+setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.declare
+    trpcOptionsProxy.event.actions.declare.request
   ),
   retry: true,
   retryDelay: 10000,
@@ -46,9 +46,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.register, {
+setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.register
+    trpcOptionsProxy.event.actions.register.request
   ),
   retry: true,
   retryDelay: 10000,
@@ -58,9 +58,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.notify, {
+setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.notify
+    trpcOptionsProxy.event.actions.notify.request
   ),
   retry: true,
   retryDelay: 10000,
@@ -70,9 +70,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.validate, {
+setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.validate
+    trpcOptionsProxy.event.actions.validate.request
   ),
   retry: true,
   retryDelay: 10000,
@@ -82,9 +82,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.reject, {
+setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.reject
+    trpcOptionsProxy.event.actions.reject.request
   ),
   retry: true,
   retryDelay: 10000,
@@ -94,9 +94,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.reject, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.archive, {
+setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.archive
+    trpcOptionsProxy.event.actions.archive.request
   ),
   retry: true,
   retryDelay: 10000,
@@ -106,9 +106,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate, {
+setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.printCertificate
+    trpcOptionsProxy.event.actions.printCertificate.request
   ),
   onSuccess: updateLocalEvent,
   meta: {
@@ -221,26 +221,12 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
       }
-      const fields = getActiveActionFields(eventConfiguration, actionType)
-      if (actionType === ActionType.NOTIFY) {
-        /**
-         * Because NOTIFY action is just an incomplete DECLARE action,
-         * notifyFields are decided by DECLARE action
-         */
-        const notifyFields = getActiveActionFields(
-          eventConfiguration,
-          ActionType.DECLARE
-        )
 
-        return mutation.mutate({
-          ...params,
-          data: stripHiddenFields(notifyFields, params.data)
-        })
-      }
+      const declarationFields = getDeclarationFields(eventConfiguration)
 
       return mutation.mutate({
         ...params,
-        data: stripHiddenFields(fields, params.data)
+        declaration: stripHiddenFields(declarationFields, params.declaration)
       })
     },
     mutateAsync: async (params: inferInput<P>) => {
@@ -253,11 +239,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         throw new Error('Event configuration not found')
       }
 
-      const fields = getActiveActionFields(eventConfiguration, actionType)
+      const fields = getDeclarationFields(eventConfiguration)
 
       return mutation.mutateAsync({
         ...params,
-        data: stripHiddenFields(fields, params.data)
+        declaration: stripHiddenFields(fields, params.declaration)
       })
     }
   }
@@ -279,18 +265,11 @@ export function useEventCustomAction(mutationKey: string[]) {
         throw new Error('Event configuration not found')
       }
 
-      /**
-       * @TODO: In the future all of these forms should be the same 'primary' declare form.
-       * When that is done, we can shouldn't need the action type explicitly here.
-       */
-      const fields = getActiveActionFields(
-        eventConfiguration,
-        ActionType.DECLARE
-      )
+      const fields = getDeclarationFields(eventConfiguration)
 
       return mutation.mutate({
         ...params,
-        data: stripHiddenFields(fields, params.data)
+        declaration: stripHiddenFields(fields, params.declaration)
       })
     }
   }
