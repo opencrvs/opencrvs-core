@@ -97,12 +97,15 @@ export const ArchiveActionInput = BaseActionInput.merge(
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
 
-const AssignActionInput = BaseActionInput.merge(
+export const AssignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),
     assignedTo: z.string()
   })
 )
+
+export type AssignActionInput = z.infer<typeof AssignActionInput>
+
 const UnassignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.UNASSIGN).default(ActionType.UNASSIGN)
