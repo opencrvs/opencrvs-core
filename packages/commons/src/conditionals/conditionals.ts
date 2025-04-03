@@ -190,7 +190,10 @@ export function field(fieldId: string) {
   })
 
   return {
-    __returning: fieldId,
+    /**
+     * @private Internal property used for field reference tracking.
+     */
+    _returning: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () =>
@@ -223,12 +226,37 @@ export function field(fieldId: string) {
       now: () =>
         defineConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
     }),
-    isEqualTo: (value: string | boolean | { __returning: string }) => {
-      let resolvedValue: string | boolean | object = value
+    // TODO CIHAN: typing
+    isEqualTo: (
+      value: string | boolean | { _returning: string; [key: string]: unknown }
+    ) => {
+      if (typeof value === 'object' && value._returning) {
+        const comparedFieldId = value._returning
 
-      if (typeof value === 'object' && value.__returning) {
-        resolvedValue = { $data: `1/$form.${value.__returning}` }
-        console.log('resolvedValue', resolvedValue)
+        return defineConditional({
+          type: 'object',
+          properties: {
+            $form: {
+              type: 'object',
+              properties: {
+                // TODO CIHAN testaa myös boolean
+                [fieldId]: { type: 'string' },
+                [comparedFieldId]: { type: 'string' }
+              },
+              required: [fieldId, comparedFieldId],
+              allOf: [
+                {
+                  properties: {
+                    [fieldId]: {
+                      const: { $data: `1/${comparedFieldId}` }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          required: ['$form']
+        })
       }
 
       return defineConditional({
