@@ -11,6 +11,7 @@
 set -e # fail if any of the commands fails
 
 HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
+EVENTS_CONFIG=./build/dist/src/migrate-mongo-config-events.js
 OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
 APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
@@ -23,6 +24,10 @@ export NODE_OPTIONS=--dns-result-order=ipv4first
 # hearth migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
 yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
+
+# events migrations
+yarn --cwd $SCRIPT_PATH migrate-mongo up --file $EVENTS_CONFIG
+yarn --cwd $SCRIPT_PATH migrate-mongo status --file $EVENTS_CONFIG
 
 #openhim migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
