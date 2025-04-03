@@ -42,6 +42,13 @@ export function requiresAnyOfScopes(scopes: Scope[]) {
   }
 }
 
+/**
+ * Middleware to check if a record can be unassigned.
+ * A record can only be unassigned in one of the following cases:
+ *  - The record is assigned to the user attempting to unassign it.
+ *  - The user attempting to unassign the record has the scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}.
+ * @returns A TRPC-compatible middleware function.
+ */
 export function canUnassign() {
   return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
     const storedEvent = await getEventById(input.eventId)
