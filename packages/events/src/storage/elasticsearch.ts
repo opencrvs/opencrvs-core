@@ -10,7 +10,7 @@
  */
 import * as elasticsearch from '@elastic/elasticsearch'
 import { env } from '@events/environment'
-import { FIELD_ID_SEPARATOR } from '@events/service/indexing/indexing'
+import { FIELD_ID_SEPARATOR } from '@events/service/indexing/utils'
 
 let client: elasticsearch.Client | undefined
 

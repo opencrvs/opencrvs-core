@@ -13,7 +13,10 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fn, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  FieldType,
+  TENNIS_CLUB_DECLARATION_FORM
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Review } from '@client/v2-events/features/events/components/Review'
@@ -76,9 +79,8 @@ export const CheckedCheckboxShouldAppearOnReview: StoryObj<typeof Review> = {
     return (
       <div>
         <Review.Body
-          eventConfig={tennisClubMembershipEvent}
           form={{ 'recommender.none': true }}
-          formConfig={tennisClubMembershipEvent.actions[0].forms[0]}
+          formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="Checkbox review"
           // eslint-disable-next-line no-console
           onEdit={(values) => console.log(values)}
@@ -109,9 +111,8 @@ export const UncheckedCheckboxShouldNotAppearOnReview: StoryObj<typeof Review> =
       return (
         <div>
           <Review.Body
-            eventConfig={tennisClubMembershipEvent}
             form={{}}
-            formConfig={tennisClubMembershipEvent.actions[0].forms[0]}
+            formConfig={TENNIS_CLUB_DECLARATION_FORM}
             title="Checkbox review"
             // eslint-disable-next-line no-console
             onEdit={(values) => console.log(values)}

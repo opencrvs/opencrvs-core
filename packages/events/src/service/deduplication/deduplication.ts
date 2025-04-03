@@ -23,15 +23,12 @@ import {
 } from '@opencrvs/commons/events'
 import { subDays, addDays } from 'date-fns'
 import {
+  declarationReference,
   decodeEventIndex,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId
-} from '@events/service/indexing/indexing'
-
-function dataReference(fieldName: string) {
-  return `data.${fieldName}`
-}
+} from '@events/service/indexing/utils'
 
 function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
@@ -40,7 +37,7 @@ function generateElasticsearchQuery(
   const matcherFieldWithoutData =
     configuration.type !== 'and' &&
     configuration.type !== 'or' &&
-    !eventIndex.data[encodeFieldId(configuration.fieldId)]
+    !eventIndex.declaration[encodeFieldId(configuration.fieldId)]
 
   if (matcherFieldWithoutData) {
     return null
@@ -76,8 +73,8 @@ function generateElasticsearchQuery(
       const encodedFieldId = encodeFieldId(configuration.fieldId)
       return {
         match: {
-          ['data.' + encodedFieldId]: {
-            query: eventIndex.data[encodedFieldId],
+          [declarationReference(encodedFieldId)]: {
+            query: eventIndex.declaration[encodedFieldId],
             fuzziness: configuration.options.fuzziness,
             boost: configuration.options.boost
           }
@@ -88,7 +85,8 @@ function generateElasticsearchQuery(
       const encodedFieldId = encodeFieldId(configuration.fieldId)
       return {
         match_phrase: {
-          [dataReference(encodedFieldId)]: eventIndex.data[encodedFieldId] || ''
+          [declarationReference(encodedFieldId)]:
+            eventIndex.declaration[encodedFieldId] || ''
         }
       }
     }
@@ -97,14 +95,14 @@ function generateElasticsearchQuery(
       const origin = encodeFieldId(configuration.options.origin)
       return {
         range: {
-          [dataReference(encodedFieldId)]: {
+          [declarationReference(encodedFieldId)]: {
             // @TODO: Improve types for origin field to be sure it returns a string when accessing data
             gte: subDays(
-              new Date(eventIndex.data[origin] as string),
+              new Date(eventIndex.declaration[origin] as string),
               configuration.options.days
             ).toISOString(),
             lte: addDays(
-              new Date(eventIndex.data[origin] as string),
+              new Date(eventIndex.declaration[origin] as string),
               configuration.options.days
             ).toISOString()
           }
@@ -116,9 +114,9 @@ function generateElasticsearchQuery(
       const origin = encodeFieldId(configuration.options.origin)
       return {
         distance_feature: {
-          field: dataReference(encodedFieldId),
+          field: declarationReference(encodedFieldId),
           pivot: `${configuration.options.days}d`,
-          origin: eventIndex.data[origin]
+          origin: eventIndex.declaration[origin]
         }
       }
     }

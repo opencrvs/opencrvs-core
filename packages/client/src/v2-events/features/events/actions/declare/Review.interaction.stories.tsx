@@ -40,7 +40,7 @@ const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).data
+      formValues: getCurrentEventState(declareEventDocument).declaration
     })
   }
 }
@@ -201,7 +201,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).data
+      formValues: getCurrentEventState(declareEventDocument).declaration
     })
 
     window.localStorage.setItem(
@@ -322,7 +322,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 export const ReviewForFieldAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).data
+      formValues: getCurrentEventState(declareEventDocument).declaration
     })
 
     window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
@@ -435,7 +435,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).data
+      formValues: getCurrentEventState(declareEventDocument).declaration
     })
 
     window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
@@ -550,7 +550,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 export const ChangeFieldInReview: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).data
+      formValues: getCurrentEventState(declareEventDocument).declaration
     })
   },
   parameters: {

@@ -21,8 +21,9 @@ import {
 import ReactTooltip from 'react-tooltip'
 import {
   ActionType,
+  EventConfig,
   EventDocument,
-  findActiveActionForm,
+  getOrThrow,
   getAcceptedActions,
   SCOPES
 } from '@opencrvs/commons/client'
@@ -47,7 +48,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
@@ -129,6 +130,17 @@ const messages = defineMessages({
   }
 })
 
+function getPrintForm(configuration: EventConfig) {
+  const actionConfig = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+
+  return getOrThrow(
+    actionConfig?.printForm,
+    `No form found for action: ${ActionType.PRINT_CERTIFICATE}`
+  )
+}
+
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
   const [{ templateId }] = useTypedSearchParams(
@@ -153,22 +165,22 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { getMetadata } = useEventMetadata()
-  const metadata = getMetadata()
+  const { getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
 
-  const { svgCode, handleCertify } = usePrintableCertificate(
-    fullEvent,
-    metadata,
+  const { svgCode, handleCertify } = usePrintableCertificate({
+    event: fullEvent,
+    form: annotation,
     locations,
     users,
     certificateConfig,
     language
-  )
+  })
 
   /**
    * If there are validation errors in the form, redirect to the
@@ -176,23 +188,16 @@ export function Review() {
    * review/print the certificate if there are validation errors.
    */
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const formConfig = findActiveActionForm(
-    eventConfiguration,
-    ActionType.PRINT_CERTIFICATE
-  )
-
-  if (!formConfig) {
-    throw new Error('Form configuration not found for print certificate action')
-  }
+  const formConfig = getPrintForm(eventConfiguration)
 
   if (!svgCode) {
     return <Spinner id="review-certificate-loading" />
   }
 
-  const validationErrorExist = validationErrorsInActionFormExist(
+  const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
-    metadata
-  )
+    form: annotation
+  })
   if (validationErrorExist) {
     return (
       <Navigate
@@ -242,8 +247,8 @@ export function Review() {
         const response: EventDocument =
           await onlineActions.printCertificate.mutateAsync({
             eventId: fullEvent.id,
-            data: {},
-            metadata: { ...metadata, templateId },
+            declaration: {},
+            annotation: { ...annotation, templateId },
             transactionId: uuid(),
             type: ActionType.PRINT_CERTIFICATE
           })

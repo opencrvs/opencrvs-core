@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionType, PageTypes, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { TRPCError } from '@trpc/server'
 
@@ -37,25 +37,7 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test('Validation error message contains all the offending fields', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await client.event.create(generator.event.create())
-
-  await expect(
-    client.event.actions.printCertificate.request(
-      generator.event.actions.printCertificate(event.id, {
-        data: {
-          'applicant.dob': '02-02',
-          'recommender.none': true
-        }
-      })
-    )
-  ).rejects.matchSnapshot()
-})
-
-test('Has validation errors when required VERIFICATION page metadata is missing', async () => {
+test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page fields are missing`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -69,13 +51,13 @@ test('Has validation errors when required VERIFICATION page metadata is missing'
       generator.event.actions.printCertificate(declaredEvent.id, {
         // The tennis club membership print certificate form has a verification page with conditional 'field('collector.requesterId').isEqualTo('INFORMANT')'
         // Thus if the requester is set as INFORMANT and verification page result is not set, we should see a validation error.
-        metadata: { 'collector.requesterId': 'INFORMANT' }
+        annotation: { 'collector.requesterId': 'INFORMANT' }
       })
     )
   ).rejects.matchSnapshot()
 })
 
-test('Has no validation errors when required VERIFICATION page metadata is set', async () => {
+test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page fields are set`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -87,7 +69,7 @@ test('Has no validation errors when required VERIFICATION page metadata is set',
   await expect(
     client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate(declaredEvent.id, {
-        metadata: {
+        annotation: {
           'collector.requesterId': 'INFORMANT',
           'collector.identity.verify': true
         }
@@ -96,7 +78,7 @@ test('Has no validation errors when required VERIFICATION page metadata is set',
   ).resolves.toBeDefined()
 })
 
-test('print certificate action can be added to a created event', async () => {
+test(`${ActionType.PRINT_CERTIFICATE} action can be added to registered event`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -106,15 +88,12 @@ test('print certificate action can be added to a created event', async () => {
     generator.event.actions.declare(originalEvent.id)
   )
 
-  const registeredEvent = await client.event.actions.printCertificate.request(
-    generator.event.actions.printCertificate(originalEvent.id)
+  const registeredEvent = await client.event.actions.register.request(
+    generator.event.actions.register(originalEvent.id)
   )
 
   const printCertificate = await client.event.actions.printCertificate.request(
-    generator.event.actions.printCertificate(
-      registeredEvent.id,
-      generator.event.actions.printCertificate(registeredEvent.id)
-    )
+    generator.event.actions.printCertificate(registeredEvent.id)
   )
 
   expect(
@@ -128,11 +107,11 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
 
   const event = await client.event.create(generator.event.create())
 
-  const data = generator.event.actions.printCertificate(event.id, {
-    data: {}
-  })
-
   await expect(
-    client.event.actions.printCertificate.request(data)
+    client.event.actions.printCertificate.request(
+      generator.event.actions.printCertificate(event.id, {
+        annotation: {}
+      })
+    )
   ).rejects.matchSnapshot()
 })

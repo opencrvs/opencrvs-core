@@ -235,7 +235,7 @@ const ADMIN_STRUCTURE = [
     configuration: {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
       partOf: {
-        $data: 'province'
+        $declaration: 'province'
       }
     }
   },

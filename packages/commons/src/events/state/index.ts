@@ -14,7 +14,6 @@ import {
   Action,
   ActionDocument,
   ActionStatus,
-  ActionUpdate,
   EventState,
   RegisterAction
 } from '../ActionDocument'
@@ -23,7 +22,7 @@ import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
-import { findActiveDrafts } from '../utils'
+import { deepMerge, findActiveDrafts } from '../utils'
 
 function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -79,10 +78,11 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-function getData(actions: Array<ActionDocument>) {
+function aggregateActionDeclarations(actions: Array<ActionDocument>) {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
+
   const excludedActions = [
     ActionType.REQUEST_CORRECTION,
     ActionType.PRINT_CERTIFICATE
@@ -106,10 +106,10 @@ function getData(actions: Array<ActionDocument>) {
       if (!requestAction) {
         return status
       }
-      return deepMerge(status, requestAction.data)
+      return deepMerge(status, requestAction.declaration)
     }
 
-    return deepMerge(status, action.data)
+    return deepMerge(status, action.declaration)
   }, {})
 }
 
@@ -136,29 +136,6 @@ export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
 
     return acc
   }, {} as T)
-}
-
-function deepMerge(
-  currentDocument: ActionUpdate,
-  actionDocument: ActionUpdate
-) {
-  return _.mergeWith(
-    currentDocument,
-    actionDocument,
-    (previousValue, incomingValue) => {
-      if (incomingValue === undefined) {
-        return previousValue
-      }
-      if (_.isArray(incomingValue)) {
-        return incomingValue // Replace arrays instead of merging
-      }
-      if (_.isObject(previousValue) && _.isObject(incomingValue)) {
-        return undefined // Continue deep merging objects
-      }
-
-      return incomingValue // Override with latest value
-    }
-  )
 }
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
@@ -200,7 +177,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     modifiedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
-    data: getData(activeActions),
+    declaration: aggregateActionDeclarations(activeActions),
     trackingId: event.trackingId,
     registrationNumber
   })
@@ -262,14 +239,14 @@ export function applyDraftsToEventIndex(
 
   return {
     ...eventIndex,
-    data: {
-      ...eventIndex.data,
-      ...activeDrafts[activeDrafts.length - 1].data
+    declaration: {
+      ...eventIndex.declaration,
+      ...activeDrafts[activeDrafts.length - 1].declaration
     }
   }
 }
 
-export function getMetadataForAction({
+export function getActionAnnotation({
   event,
   actionType,
   drafts
@@ -288,9 +265,9 @@ export function getMetadataForAction({
     ...eventDrafts.map((draft) => draft.action)
   ].sort()
 
-  const metadata = sorted.reduce((metadata, action) => {
-    return deepMerge(metadata, action.metadata ?? {})
+  const annotation = sorted.reduce((annotation, action) => {
+    return deepMerge(annotation, action.annotation ?? {})
   }, {})
 
-  return deepDropNulls(metadata)
+  return deepDropNulls(annotation)
 }

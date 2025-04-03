@@ -55,7 +55,7 @@ test('Returns aggregated event with updated status and values', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const initialData = {
+  const initialDeclaration = {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'applicant.dob': '2000-01-01',
@@ -74,7 +74,7 @@ test('Returns aggregated event with updated status and values', async () => {
 
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
-      data: initialData
+      declaration: initialDeclaration
     })
   )
 
@@ -82,12 +82,15 @@ test('Returns aggregated event with updated status and values', async () => {
 
   expect(initialEvents).toHaveLength(1)
   expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
-  expect(initialEvents[0].data).toEqual(initialData)
+  expect(initialEvents[0].declaration).toEqual(initialDeclaration)
 
-  const updatedData = { ...initialData, 'applicant.firstname': 'Jane' }
+  const updatedDeclaration = {
+    ...initialDeclaration,
+    'applicant.firstname': 'Jane'
+  }
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
-      data: updatedData
+      declaration: updatedDeclaration
     })
   )
 
@@ -96,5 +99,5 @@ test('Returns aggregated event with updated status and values', async () => {
   expect(updatedEvents).toHaveLength(1)
 
   expect(updatedEvents[0].status).toBe(EventStatus.DECLARED)
-  expect(updatedEvents[0].data).toEqual(updatedData)
+  expect(updatedEvents[0].declaration).toEqual(updatedDeclaration)
 })

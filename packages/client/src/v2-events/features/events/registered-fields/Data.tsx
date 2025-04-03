@@ -104,16 +104,16 @@ export const Data = {
 export function getFieldFromDataEntry({
   formData,
   dataEntry,
-  declareFormFields
+  declarationFields
 }: {
   formData: EventState
   dataEntry: DataEntry
-  declareFormFields: Inferred[]
+  declarationFields: Inferred[]
 }): { value: FieldValue; config?: Inferred } {
   if ('fieldId' in dataEntry) {
     return {
       value: formData[dataEntry.fieldId],
-      config: declareFormFields.find((f) => f.id === dataEntry.fieldId)
+      config: declarationFields.find((f) => f.id === dataEntry.fieldId)
     }
   }
   const { value, label } = dataEntry

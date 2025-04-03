@@ -13,7 +13,7 @@ import { z } from 'zod'
 import { EventMetadata } from './EventMetadata'
 
 export const EventIndex = EventMetadata.extend({
-  data: z.record(z.string(), z.any())
+  declaration: z.record(z.string(), z.any())
 })
 
 export const EventSearchIndex = z.record(z.string(), z.any()).and(

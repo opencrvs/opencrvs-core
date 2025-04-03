@@ -94,7 +94,7 @@ function Component() {
 
 const onSubmit = (form, eventId) => events.actions.register.request.mutate({
           eventId: eventId,
-          data: form,
+          declaration: form,
           transactionId: uuid(),
         })
 

@@ -25,9 +25,12 @@ const Flex = styled.div`
 interface IconProps {
   status?: string
   name: React.ReactNode
-  event?: string
   isValidatedOnReview?: boolean
   isArchived?: boolean
+}
+
+interface IconWithNameEventProps extends IconProps {
+  event: string
 }
 
 const Event = styled.div`
@@ -115,7 +118,7 @@ export function IconWithNameEvent({
   event,
   isValidatedOnReview,
   isArchived
-}: IconProps) {
+}: IconWithNameEventProps) {
   return (
     <Flex id="flex">
       {status && (

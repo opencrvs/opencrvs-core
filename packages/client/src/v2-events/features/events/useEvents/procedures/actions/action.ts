@@ -16,7 +16,7 @@ import type {
 } from '@trpc/tanstack-react-query'
 import {
   ActionType,
-  getActiveActionFields,
+  getDeclarationFields,
   stripHiddenFields
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
@@ -221,26 +221,12 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
       }
-      if (actionType === ActionType.NOTIFY) {
-        /**
-         * Because NOTIFY action is just an incomplete DECLARE action,
-         * notifyFields are decided by DECLARE action
-         */
-        const notifyFields = getActiveActionFields(
-          eventConfiguration,
-          ActionType.DECLARE
-        )
 
-        return mutation.mutate({
-          ...params,
-          data: stripHiddenFields(notifyFields, params.data)
-        })
-      }
-      const fields = getActiveActionFields(eventConfiguration, actionType)
+      const declarationFields = getDeclarationFields(eventConfiguration)
 
       return mutation.mutate({
         ...params,
-        data: stripHiddenFields(fields, params.data)
+        declaration: stripHiddenFields(declarationFields, params.declaration)
       })
     },
     mutateAsync: async (params: inferInput<P>) => {
@@ -253,11 +239,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         throw new Error('Event configuration not found')
       }
 
-      const fields = getActiveActionFields(eventConfiguration, actionType)
+      const fields = getDeclarationFields(eventConfiguration)
 
       return mutation.mutateAsync({
         ...params,
-        data: stripHiddenFields(fields, params.data)
+        declaration: stripHiddenFields(fields, params.declaration)
       })
     }
   }
@@ -279,18 +265,11 @@ export function useEventCustomAction(mutationKey: string[]) {
         throw new Error('Event configuration not found')
       }
 
-      /**
-       * @TODO: In the future all of these forms should be the same 'primary' declare form.
-       * When that is done, we can shouldn't need the action type explicitly here.
-       */
-      const fields = getActiveActionFields(
-        eventConfiguration,
-        ActionType.DECLARE
-      )
+      const fields = getDeclarationFields(eventConfiguration)
 
       return mutation.mutate({
         ...params,
-        data: stripHiddenFields(fields, params.data)
+        declaration: stripHiddenFields(fields, params.declaration)
       })
     }
   }

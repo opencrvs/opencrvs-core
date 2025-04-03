@@ -22,7 +22,6 @@ import {
   deleteEvent,
   getEventById
 } from '@events/service/events/events'
-import { presignFilesInEvent } from '@events/service/files'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { SCOPES, getUUID } from '@opencrvs/commons'
 import {
@@ -112,7 +111,7 @@ export const eventRouter = router({
           type: ActionType.READ,
           eventId: event.id,
           transactionId: getUUID(),
-          data: {}
+          declaration: {}
         },
         {
           eventId: event.id,
@@ -123,11 +122,8 @@ export const eventRouter = router({
           status: ActionStatus.Accepted
         }
       )
-      const eventWithSignedFiles = await presignFilesInEvent(
-        updatedEvent,
-        ctx.token
-      )
-      return eventWithSignedFiles
+
+      return updatedEvent
     }),
   delete: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))

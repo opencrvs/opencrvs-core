@@ -34,30 +34,33 @@ We will be iterating over the structure during the project. Treat it as a starti
 By default, Events V2 is accessible via the /v2 route, allowing the application’s normal operations to continue alongside its development. When Events V2 needs to be deployed to a live environment as the primary event type, the environment variable `V2_EVENTS=true` can be set in the country config package. This hides the old event views completely and replaces them with Events V2. Once Events V2 is officially released, it will become the default event view.
 
 ### Creating route components
+
 1. Each action route should be wrapped with `Action.tsx` component.
-  ```tsx
-  // packages/client/src/v2-events/routes/config.tsx
-  {
-    path: ROUTES.V2.EVENTS.DECLARE.path,
-    element: (
-      <Action type={ActionType.DECLARE}>
-        <Outlet />
-      </Action>
-    )
-  }
-  ```
-  - Action-component manages the action form state for the child components (pages, review).
+
+```tsx
+// packages/client/src/v2-events/routes/config.tsx
+{
+  path: ROUTES.V2.EVENTS.DECLARE.path,
+  element: (
+    <Action actionType={ActionType.DECLARE}>
+      <Outlet />
+    </Action>
+  )
+}
+```
+
+- Action-component manages the action form state for the child components (pages, review).
 
 2. Each route component should be wrapped with `withSuspense.tsx` component.
+
 ```tsx
 // packages/client/src/v2-events/features/events/actions/declare/index.tsx
 const PagesIndex = withSuspense(Pages)
 const ReviewIndex = withSuspense(Review)
 export { PagesIndex as Pages, ReviewIndex as Review }
 ```
-  - `withSuspense` allows the route to use suspense queries. Usage without the hook will result to intermittent crashing of the route components.
 
-  
+- `withSuspense` allows the route to use suspense queries. Usage without the hook will result to intermittent crashing of the route components.
 
 ## Development practices
 

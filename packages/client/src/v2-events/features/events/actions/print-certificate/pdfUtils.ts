@@ -101,14 +101,14 @@ const cache = createIntlCache()
 export function compileSvg({
   templateString,
   $state,
-  $data,
+  $declaration,
   locations,
   users,
   language
 }: {
   templateString: string
   $state: EventIndex
-  $data: EventState
+  $declaration: EventState
   locations: Location[]
   users: User[]
   language: LanguageConfig
@@ -145,9 +145,9 @@ export function compileSvg({
   )
 
   const template = Handlebars.compile(templateString)
-  $data = formatAllNonStringValues($data, intl)
+  $declaration = formatAllNonStringValues($declaration, intl)
   const output = template({
-    $data,
+    $declaration,
     $state,
     $references: {
       locations,

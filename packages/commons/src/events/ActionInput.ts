@@ -16,8 +16,8 @@ import { ActionUpdate } from './ActionDocument'
 export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  data: ActionUpdate,
-  metadata: ActionUpdate.optional(),
+  declaration: ActionUpdate,
+  annotation: ActionUpdate.optional(),
   originalActionId: z.string().optional()
 })
 

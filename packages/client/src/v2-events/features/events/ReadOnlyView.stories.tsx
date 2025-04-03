@@ -22,17 +22,17 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
-import { ReadOnlyView } from './ReadOnlyView'
+import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
 
-const meta: Meta<typeof ReadOnlyView> = {
+const meta: Meta<typeof ReadonlyViewIndex> = {
   title: 'ReadOnlyView'
 }
 
 export default meta
 
-type Story = StoryObj<typeof ReadOnlyView>
+type Story = StoryObj<typeof ReadonlyViewIndex>
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({

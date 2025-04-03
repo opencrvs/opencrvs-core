@@ -17,8 +17,9 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
-  findActiveActionForm,
-  getMetadataForAction
+  getActionAnnotation,
+  getDeclaration,
+  getActionReview
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -31,11 +32,12 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -79,29 +81,29 @@ export function Review() {
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const registerMutation = events.actions.register
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const previousMetadata = getMetadataForAction({
+  const previousAnnotation = getActionAnnotation({
     event,
     actionType: ActionType.REGISTER,
     drafts: []
   })
 
-  const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata(previousMetadata)
+  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
+    useActionAnnotation()
+  const annotation = getMetadata(previousAnnotation)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const formConfig = findActiveActionForm(config, ActionType.REGISTER)
-  if (!formConfig) {
-    throw new Error('No active form configuration found for declare action')
-  }
+  const formConfig = getDeclaration(config)
+  const reviewConfig = getActionReview(config, ActionType.REGISTER)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const previousFormValues = getCurrentEventState(event).data
+  const previousFormValues = getCurrentEventState(event).declaration
   const form = getFormValues()
 
   async function handleEdit({
@@ -140,9 +142,9 @@ export function Review() {
     if (confirmedRegistration) {
       registerMutation.mutate({
         eventId,
-        data: form,
+        declaration: form,
         transactionId: uuid(),
-        metadata
+        annotation
       })
 
       goToHome()
@@ -159,18 +161,18 @@ export function Review() {
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
         events.actions.reject.mutate({
           eventId,
-          data: {},
+          declaration: {},
           transactionId: uuid(),
-          metadata: { message }
+          annotation: { message }
         })
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
         events.actions.archive.mutate({
           eventId,
-          data: {},
+          declaration: {},
           transactionId: uuid(),
-          metadata: { message, isDuplicate }
+          annotation: { message, isDuplicate }
         })
       }
 
@@ -178,11 +180,12 @@ export function Review() {
     }
   }
 
-  const hasValidationErrors = validationErrorsInActionFormExist(
+  const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form,
-    metadata
-  )
+    annotation,
+    reviewFields: reviewConfig.fields
+  })
 
   return (
     <FormLayout
@@ -195,14 +198,14 @@ export function Review() {
       }
     >
       <ReviewComponent.Body
-        eventConfig={config}
+        annotation={annotation}
         form={form}
         formConfig={formConfig}
-        metadata={metadata}
         previousFormValues={previousFormValues}
-        title=""
+        reviewFields={reviewConfig.fields}
+        title={formatMessage(reviewConfig.title, form)}
+        onAnnotationChange={(values) => setMetadata(values)}
         onEdit={handleEdit}
-        onMetadataChange={(values) => setMetadata(values)}
       >
         <ReviewComponent.Actions
           isPrimaryActionDisabled={hasValidationErrors}

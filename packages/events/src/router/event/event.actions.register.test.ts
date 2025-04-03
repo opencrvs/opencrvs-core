@@ -49,8 +49,16 @@ test('Validation error message contains all the offending fields', async () => {
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
 
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(event.id)
+  )
+
+  /** Partial payload is accepted, so it should not complain about fields already send during declaration. */
   const data = generator.event.actions.register(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-02',
       'recommender.none': true
     }
@@ -67,7 +75,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.register(event.id, {
-    data: {
+    declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
@@ -88,7 +96,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   ).rejects.matchSnapshot()
 })
 
-const validFormData = {
+const declaration = {
   'applicant.dob': '2024-02-01',
   'applicant.firstname': 'John',
   'applicant.surname': 'Doe',
@@ -109,7 +117,7 @@ test('Skips required field validation when they are conditionally hidden', async
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.register(event.id, {
-    data: validFormData
+    declaration
   })
 
   const response = await client.event.actions.register.request(data)
@@ -119,7 +127,7 @@ test('Skips required field validation when they are conditionally hidden', async
 
   expect(savedAction).toMatchObject({
     status: ActionStatus.Accepted,
-    data: validFormData
+    declaration
   })
 })
 
@@ -144,7 +152,7 @@ test('Prevents adding birth date in future', async () => {
   }
 
   const payload = generator.event.actions.register(event.id, {
-    data: form
+    declaration: form
   })
 
   await expect(
@@ -184,7 +192,7 @@ describe('Request and confirmation flow', () => {
     mockNotifyApi(200)
 
     const data = generator.event.actions.register(eventId, {
-      data: validFormData
+      declaration
     })
 
     await client.event.actions.register.request(data)
@@ -209,7 +217,7 @@ describe('Request and confirmation flow', () => {
       mockNotifyApi(200)
 
       const data = generator.event.actions.register(eventId, {
-        data: validFormData
+        declaration
       })
 
       const response = await client.event.actions.register.request(data)
@@ -219,7 +227,7 @@ describe('Request and confirmation flow', () => {
 
       expect(savedAction).toMatchObject({
         status: ActionStatus.Accepted,
-        data: validFormData,
+        declaration,
         registrationNumber: MOCK_REGISTRATION_NUMBER
       })
     })
@@ -245,7 +253,7 @@ describe('Request and confirmation flow', () => {
       )
 
       const data = generator.event.actions.register(eventId, {
-        data: validFormData
+        declaration
       })
 
       await expect(
@@ -267,7 +275,7 @@ describe('Request and confirmation flow', () => {
       mockNotifyApi(400)
 
       const data = generator.event.actions.register(event.id, {
-        data: validFormData
+        declaration
       })
 
       const response = await client.event.actions.register.request(data)
@@ -277,7 +285,7 @@ describe('Request and confirmation flow', () => {
 
       expect(savedAction).toMatchObject({
         status: ActionStatus.Rejected,
-        data: validFormData
+        declaration
       })
     })
 
@@ -291,7 +299,7 @@ describe('Request and confirmation flow', () => {
       mockNotifyApi(500)
 
       const data = generator.event.actions.register(eventId, {
-        data: validFormData
+        declaration
       })
 
       await expect(
@@ -299,6 +307,7 @@ describe('Request and confirmation flow', () => {
       ).rejects.matchSnapshot()
 
       const event = await client.event.get(eventId)
+
       const registerActions = event.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
@@ -315,7 +324,7 @@ describe('Request and confirmation flow', () => {
       mockNotifyApi(202)
 
       const data = generator.event.actions.register(event.id, {
-        data: validFormData
+        declaration
       })
 
       const response = await client.event.actions.register.request(data)
@@ -325,7 +334,7 @@ describe('Request and confirmation flow', () => {
 
       expect(savedAction).toMatchObject({
         status: ActionStatus.Requested,
-        data: validFormData
+        declaration
       })
     })
 
@@ -338,7 +347,7 @@ describe('Request and confirmation flow', () => {
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(event.id, {
-          data: validFormData
+          declaration
         })
 
         await expect(
@@ -360,7 +369,7 @@ describe('Request and confirmation flow', () => {
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(eventId, {
-          data: validFormData
+          declaration
         })
 
         await client.event.actions.register.request(data)
@@ -389,7 +398,7 @@ describe('Request and confirmation flow', () => {
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(eventId, {
-          data: validFormData
+          declaration
         })
 
         await client.event.actions.register.request(data)
@@ -411,7 +420,7 @@ describe('Request and confirmation flow', () => {
         expect(registerActions[0].status).toEqual(ActionStatus.Requested)
         expect(registerActions[1]).toMatchObject({
           status: ActionStatus.Accepted,
-          data: validFormData,
+          declaration,
           registrationNumber: MOCK_REGISTRATION_NUMBER,
           originalActionId: actionId
         })
@@ -426,7 +435,7 @@ describe('Request and confirmation flow', () => {
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(eventId, {
-          data: validFormData
+          declaration
         })
 
         await client.event.actions.register.request(data)
@@ -454,7 +463,7 @@ describe('Request and confirmation flow', () => {
         expect(registerActions.length).toBe(2)
         expect(registerActions[0].status).toEqual(ActionStatus.Requested)
         expect(registerActions[1]).toMatchObject({
-          data: validFormData,
+          declaration,
           status: ActionStatus.Accepted
         })
       })
@@ -470,7 +479,7 @@ describe('Request and confirmation flow', () => {
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(event.id, {
-          data: validFormData
+          declaration
         })
 
         await expect(
@@ -490,7 +499,7 @@ describe('Request and confirmation flow', () => {
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(eventId, {
-          data: validFormData
+          declaration
         })
 
         await client.event.actions.register.request(data)
@@ -520,7 +529,7 @@ describe('Request and confirmation flow', () => {
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(eventId, {
-          data: validFormData
+          declaration
         })
 
         await client.event.actions.register.request(data)
@@ -556,7 +565,7 @@ describe('Request and confirmation flow', () => {
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(eventId, {
-          data: validFormData
+          declaration
         })
 
         await client.event.actions.register.request(data)

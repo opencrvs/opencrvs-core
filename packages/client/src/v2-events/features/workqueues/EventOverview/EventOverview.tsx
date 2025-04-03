@@ -12,14 +12,13 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
-  getAllFields,
   SummaryConfig,
   FieldValue,
   getCurrentEventStateWithDrafts,
   EventDocument,
   Draft,
   getCurrentEventState,
-  EventStatus,
+  getDeclarationFields,
   getAcceptedActions
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -48,6 +47,10 @@ import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
+ * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
+ */
+
+/**
  * Renders the event overview page, including the event summary and history.
  */
 function EventOverview({
@@ -60,7 +63,7 @@ function EventOverview({
   summary: SummaryConfig
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const allFields = getAllFields(eventConfiguration)
+  const allFields = getDeclarationFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
 
   const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
@@ -68,14 +71,17 @@ function EventOverview({
   const { trackingId, status, registrationNumber } = eventIndex
 
   const stringifyFormData = useFormDataStringifier()
-  const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
+  const eventWithDefaults = stringifyFormData(
+    allFields,
+    eventWithDrafts.declaration
+  )
 
   const flattenedEventIndex: Record<
     string,
     FieldValue | null | RecursiveStringRecord
   > = {
-    ...flattenEventIndex({ ...eventIndex, data: eventWithDefaults }),
-    // The field keys are based on packages/client/src/views/RecordAudit/RecordAudit.tsx
+    ...flattenEventIndex({ ...eventIndex, declaration: eventWithDefaults }),
+    // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
     'event.status': status,
     'event.registrationNumber': registrationNumber

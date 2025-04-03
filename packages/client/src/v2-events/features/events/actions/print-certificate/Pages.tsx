@@ -17,7 +17,8 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
-  getActiveActionFormPages,
+  EventConfig,
+  getOrThrow,
   isFieldVisible
 } from '@opencrvs/commons/client'
 
@@ -26,13 +27,24 @@ import { Pages as PagesComponent } from '@client/v2-events/features/events/compo
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormLayout } from '@client/v2-events/layouts'
-import { useEventMetadata } from '@client/v2-events/features/events/useEventMeta'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import {
   CERT_TEMPLATE_ID,
   useCertificateTemplateSelectorFieldConfig
 } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+
+function getPrintCertificatePages(configuration: EventConfig) {
+  const action = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+
+  return getOrThrow(
+    action?.printForm.pages,
+    `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
+  )
+}
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -43,8 +55,8 @@ export function Pages() {
   )
   const navigate = useNavigate()
   const { modal } = useEventFormNavigation()
-  const { setMetadata, getMetadata } = useEventMetadata()
-  const metadata = getMetadata()
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
   const events = useEvents()
   const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
@@ -54,10 +66,7 @@ export function Pages() {
     event.type
   )
 
-  const formPages = getActiveActionFormPages(
-    configuration,
-    ActionType.PRINT_CERTIFICATE
-  )
+  const formPages = getPrintCertificatePages(configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -81,14 +90,14 @@ export function Pages() {
   // Allow the user to continue from the current page only if they have filled all the visible required fields.
   const currentPage = formPages.find((p) => p.id === currentPageId)
   const currentlyRequiredFields = currentPage?.fields.filter(
-    (field) => isFieldVisible(field, metadata) && field.required
+    (field) => isFieldVisible(field, annotation) && field.required
   )
 
   const isAllRequiredFieldsFilled = currentlyRequiredFields?.every((field) =>
-    Boolean(metadata[field.id])
+    Boolean(annotation[field.id])
   )
 
-  const isTemplateSelected = Boolean(metadata[CERT_TEMPLATE_ID])
+  const isTemplateSelected = Boolean(annotation[CERT_TEMPLATE_ID])
 
   return (
     <FormLayout
@@ -97,10 +106,10 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        declaration={event.declaration}
         disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
         eventConfig={configuration}
-        eventDeclarationData={event.data}
-        form={metadata}
+        form={annotation}
         formPages={formPages.map((page) => {
           if (formPages[0].id === page.id) {
             page = {
@@ -115,9 +124,9 @@ export function Pages() {
           return page
         })}
         pageId={currentPageId}
-        setFormData={(data) => setMetadata(data)}
+        setFormData={(data) => setAnnotation(data)}
         showReviewButton={searchParams.from === 'review'}
-        onFormPageChange={(nextPageId: string) =>
+        onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
               eventId,
@@ -129,7 +138,7 @@ export function Pages() {
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
               { eventId },
-              { templateId: String(metadata[CERT_TEMPLATE_ID]) }
+              { templateId: String(annotation[CERT_TEMPLATE_ID]) }
             )
           )
         }}
