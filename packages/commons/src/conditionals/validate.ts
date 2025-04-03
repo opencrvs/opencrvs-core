@@ -168,9 +168,6 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
       }
       return createIntlError(errorMessages.requiredField)
     }
-
-    default:
-      return createIntlError(errorMessages.invalidInput)
   }
 
   return createIntlError(errorMessages.invalidInput)

@@ -871,6 +871,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   getFieldValueWithErrorMessage(
     section: IFormSection,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     errorsOnField: any
   ) {
     return (
@@ -1318,6 +1319,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) {
     const { draft } = this.props
     const visitedTags: string[] = []
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
@@ -1418,7 +1420,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     overriddenField: IFormField,
     sectionErrors: IErrorsBySection,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     items: any[],
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     item: any
   ) {
     overriddenField.label =
@@ -1557,8 +1561,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const { intl, draft, userDetails } = this.props
     const overriddenFields =
       this.getOverriddenFieldsListForPreview(formSections)
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let tempItem: any
     return formSections.map((section) => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       let items: any[] = []
       const visitedTags: string[] = []
       const visibleGroups = getVisibleSectionGroupsBasedOnConditions(

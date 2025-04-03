@@ -13,10 +13,12 @@ import type { GQLRelatedPersonInput } from '@client/utils/gateway-deprecated-do-
 import { ICertificate, IFileValue } from '@client/forms'
 import { omit } from 'lodash'
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export function stripTypename(obj: any): any {
   if (Array.isArray(obj)) {
     return obj.map(stripTypename)
   } else if (obj !== null && typeof obj === 'object') {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const newObj: any = {}
     for (const key in obj) {
       if (key !== '__typename' && Object.hasOwn(obj, key)) {
@@ -72,6 +74,7 @@ export function transformCertificateData(certificates: ICertificate[]) {
         }
       ]
     }
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     updatedCertificates[0].collector = collector as any
   }
 

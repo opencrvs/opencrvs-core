@@ -54,7 +54,7 @@ export const createClient = (
       }
     }
   })
-
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const errorLink = onError((error: any) => {
     if (
       (error.networkError &&
