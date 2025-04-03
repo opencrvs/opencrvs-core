@@ -16,7 +16,6 @@ import {
   TranslationConfig
 } from '../events'
 import { errorMessages, validateFieldInput } from './validate'
-import Ajv from 'ajv'
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
  * We should be able to trust zod validation for the rest.
@@ -146,41 +145,5 @@ describe(`validateFieldInput -- ${FieldType.EMAIL}`, () => {
         validateFieldInput({ field: input.field, value: input.value })
       ).toEqual(output)
     })
-  })
-
-  it.only('foo', () => {
-    const ajv = new Ajv({
-      $data: true
-    })
-
-    const schema = {
-      type: 'object',
-      properties: {
-        foo: { type: 'string' },
-        'foo.bar': { type: 'string' }
-      },
-      required: ['foo', 'foo.bar'],
-      allOf: [
-        {
-          if: {
-            properties: {
-              bar: { type: 'string' }
-            },
-            required: ['foo.bar']
-          },
-          then: {
-            properties: {
-              foo: { const: { $data: '1/foo.bar' } }
-            }
-          }
-        }
-      ]
-    }
-
-    const validate = ajv.compile(schema)
-    const valid = validate({ foo: 'bar', 'foo.bar': 'bar' })
-    console.log('valid', valid)
-    console.log('errors', validate.errors)
-    expect(valid).toBe(true)
   })
 })
