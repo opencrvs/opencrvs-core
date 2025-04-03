@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { TRPCError } from '@trpc/server'
+import { HttpResponse, http } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -17,8 +18,7 @@ import {
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
-import { TRPCError } from '@trpc/server'
-import { HttpResponse, http } from 'msw'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
@@ -242,7 +242,7 @@ describe('Request and confirmation flow', () => {
       mswServer.use(
         http.post(
           `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
-          async () => {
+          () => {
             return HttpResponse.json(
               { registrationNumber: 1234567890 }, // Registration number is not a string as it should be
               // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TokenWithBearer } from '@opencrvs/commons'
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
+import { TokenWithBearer } from '@opencrvs/commons'
 
 export interface Context {
   user: {

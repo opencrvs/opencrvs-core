@@ -9,20 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
-import { publicProcedure, router } from '@events/router/trpc'
-import { getEventConfigurations } from '@events/service/config/config'
-import { approveCorrection } from '@events/service/events/actions/approve-correction'
-import { rejectCorrection } from '@events/service/events/actions/reject-correction'
-import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
-import {
-  addAction,
-  createEvent,
-  deleteEvent,
-  getEventById
-} from '@events/service/events/events'
-import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 import { SCOPES, getUUID } from '@opencrvs/commons'
 import {
   ActionType,
@@ -37,8 +25,20 @@ import {
   RejectCorrectionActionInput,
   RequestCorrectionActionInput
 } from '@opencrvs/commons/events'
-import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
+import * as middleware from '@events/router/middleware'
+import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
+import { publicProcedure, router } from '@events/router/trpc'
+import { getEventConfigurations } from '@events/service/config/config'
+import { approveCorrection } from '@events/service/events/actions/approve-correction'
+import { rejectCorrection } from '@events/service/events/actions/reject-correction'
+import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
+import {
+  addAction,
+  createEvent,
+  deleteEvent,
+  getEventById
+} from '@events/service/events/events'
+import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { getDefaultActionProcedures } from './actions'
 
 function validateEventType({
@@ -164,7 +164,7 @@ export const eventRouter = router({
         )
         .input(RequestCorrectionActionInput)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
-        .mutation((options) => {
+        .mutation(async (options) => {
           return addAction(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,

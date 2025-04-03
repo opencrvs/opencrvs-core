@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { http, HttpResponse, PathParams } from 'msw'
-import { env } from '@events/environment'
 import { setupServer } from 'msw/node'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { ActionType } from '@opencrvs/commons'
+import { env } from '@events/environment'
 
 const handlers = [
   http.post<PathParams<never>, { filenames: string[] }>(

@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { appRouter } from '@events/router/router'
-import { t } from '@events/router/trpc'
-import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import * as jwt from 'jsonwebtoken'
 import { Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
-import { CreatedUser, payloadGenerator, seeder } from './generators'
+import { t } from '@events/router/trpc'
+import { appRouter } from '@events/router/router'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
+import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 const { createCallerFactory } = t
 

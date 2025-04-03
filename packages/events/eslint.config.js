@@ -22,46 +22,56 @@ module.exports = defineConfig([
   { ignores: ['build/**/*', 'eslint*', 'vitest.config.ts'] },
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
-    'plugin:import/recommended',
     'plugin:prettier/recommended'
   ),
   {
+    files: ['./src/**/*.ts', 'src/**/*.ts'],
     languageOptions: {
       sourceType: 'commonjs',
       parserOptions: {
         project: [path.resolve(__dirname, './tsconfig.json')]
       }
     },
+    plugins: {
+      import: require('eslint-plugin-import')
+    },
     settings: {
       'import/resolver': {
         typescript: {
           project: path.resolve(__dirname, './tsconfig.json')
         }
-      },
-      files: ['./src/**/*.ts'],
-      rules: {
-        ...eventsConfig.rules,
-        'no-console': 'warn',
-        '@typescript-eslint/no-unused-vars': 'warn',
-        'import/order': [
-          'error',
-          {
-            pathGroups: [
-              {
-                pattern: '@opencrvs/**',
-                group: 'external',
-                position: 'after'
-              },
-              {
-                pattern: '@client/**',
-                group: 'external',
-                position: 'after'
-              }
-            ],
-            pathGroupsExcludedImportTypes: ['builtin']
-          }
-        ]
       }
+    },
+    rules: {
+      ...eventsConfig.rules,
+      'no-console': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/consistent-type-definitions': 'off',
+      'import/order': [
+        'error',
+        {
+          pathGroups: [
+            {
+              pattern: '@opencrvs/**',
+              group: 'external',
+              position: 'after'
+            },
+            {
+              pattern: '@events/**',
+              group: 'external',
+              position: 'after'
+            }
+          ],
+          pathGroupsExcludedImportTypes: ['builtin']
+        }
+      ],
+      'no-restricted-imports': [
+        'error',
+        {
+          name: '@opencrvs/commons/client',
+          message: 'Please use @opencrvs/commons or @opencrvs/commons/events'
+        }
+      ]
     }
   }
 ])

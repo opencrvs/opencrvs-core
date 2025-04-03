@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { z } from 'zod'
+import { SCOPES } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import {
@@ -16,8 +18,6 @@ import {
   Location,
   setLocations
 } from '@events/service/locations/locations'
-import { z } from 'zod'
-import { SCOPES } from '@opencrvs/commons'
 
 export const locationRouter = router({
   set: publicProcedure

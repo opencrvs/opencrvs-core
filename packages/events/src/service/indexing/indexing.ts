@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { Transform } from 'stream'
+import { type estypes } from '@elastic/elasticsearch'
+import { z } from 'zod'
 import {
   AddressFieldValue,
   EventConfig,
@@ -20,16 +23,13 @@ import {
   getCurrentEventState,
   getDeclarationFields
 } from '@opencrvs/commons/events'
-import { type estypes } from '@elastic/elasticsearch'
+import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { logger } from '@opencrvs/commons'
-import { Transform } from 'stream'
-import { z } from 'zod'
 import {
   decodeEventIndex,
   DEFAULT_SIZE,
@@ -48,22 +48,6 @@ function eventToEventIndex(event: EventDocument): EventIndex {
  */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
 
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
-  const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
-
-  if (!hasEventsIndex) {
-    logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
-  } else {
-    logger.info(`Index ${indexName} already exists`)
-    logger.info(JSON.stringify(hasEventsIndex))
-  }
-  return ensureAlias(indexName)
-}
 async function ensureAlias(indexName: string) {
   const client = getOrCreateClient()
   logger.info(`Ensuring alias for index ${indexName}`)
@@ -77,48 +61,6 @@ async function ensureAlias(indexName: string) {
 
   return res
 }
-
-export async function createIndex(
-  indexName: string,
-  formFields: FieldConfig[]
-) {
-  const client = getOrCreateClient()
-
-  await client.indices.create({
-    index: indexName,
-    body: {
-      mappings: {
-        properties: {
-          id: { type: 'keyword' },
-          type: { type: 'keyword' },
-          status: { type: 'keyword' },
-          createdAt: { type: 'date' },
-          createdBy: { type: 'keyword' },
-          createdAtLocation: { type: 'keyword' },
-          modifiedAt: { type: 'date' },
-          assignedTo: { type: 'keyword' },
-          updatedBy: { type: 'keyword' },
-          declaration: {
-            type: 'object',
-            properties: formFieldsToDataMapping(formFields)
-          },
-          trackingId: { type: 'keyword' },
-          registrationNumber: { type: 'keyword' }
-        } satisfies EventIndexMapping
-      }
-    }
-  })
-
-  return ensureAlias(indexName)
-}
-
-type _Combine<
-  T,
-  K extends PropertyKey = T extends unknown ? keyof T : never
-> = T extends unknown ? T & Partial<Record<Exclude<K, keyof T>, never>> : never
-
-type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
-type AllFieldsUnion = Combine<AddressFieldValue>
 
 function mapFieldTypeToElasticsearch(field: FieldConfig) {
   switch (field.type) {
@@ -207,6 +149,65 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
     }
   }, {})
 }
+
+export async function createIndex(
+  indexName: string,
+  formFields: FieldConfig[]
+) {
+  const client = getOrCreateClient()
+
+  await client.indices.create({
+    index: indexName,
+    body: {
+      mappings: {
+        properties: {
+          id: { type: 'keyword' },
+          type: { type: 'keyword' },
+          status: { type: 'keyword' },
+          createdAt: { type: 'date' },
+          createdBy: { type: 'keyword' },
+          createdAtLocation: { type: 'keyword' },
+          modifiedAt: { type: 'date' },
+          assignedTo: { type: 'keyword' },
+          updatedBy: { type: 'keyword' },
+          declaration: {
+            type: 'object',
+            properties: formFieldsToDataMapping(formFields)
+          },
+          trackingId: { type: 'keyword' },
+          registrationNumber: { type: 'keyword' }
+        } satisfies EventIndexMapping
+      }
+    }
+  })
+
+  return ensureAlias(indexName)
+}
+
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+
+  if (!hasEventsIndex) {
+    logger.info(`Creating index ${indexName}`)
+    await createIndex(indexName, getDeclarationFields(eventConfiguration))
+  } else {
+    logger.info(`Index ${indexName} already exists`)
+    logger.info(JSON.stringify(hasEventsIndex))
+  }
+  return ensureAlias(indexName)
+}
+
+type _Combine<
+  T,
+  K extends PropertyKey = T extends unknown ? keyof T : never
+> = T extends unknown ? T & Partial<Record<Exclude<K, keyof T>, never>> : never
+
+type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
+type AllFieldsUnion = Combine<AddressFieldValue>
 
 export async function indexAllEvents(eventConfiguration: EventConfig) {
   const mongoClient = await eventsDb.getClient()

@@ -11,22 +11,21 @@
 
 import '@opencrvs/commons/monitoring'
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-const path = require('path')
-/* eslint-disable @typescript-eslint/no-require-imports */
-const appModulePath = require('app-module-path')
-
-appModulePath.addPath(path.join(__dirname, '../'))
-
-import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'
+import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { getUser, logger } from '@opencrvs/commons'
+import { appRouter } from './router/router'
 import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'
 import { getAnonymousToken } from './service/auth'
 import { ensureIndexExists } from './service/indexing/indexing'
+
+/* eslint-disable @typescript-eslint/no-require-imports */
+const path = require('path')
+const appModulePath = require('app-module-path')
+
+appModulePath.addPath(path.join(__dirname, '../'))
 
 const server = createHTTPServer({
   router: appRouter,
