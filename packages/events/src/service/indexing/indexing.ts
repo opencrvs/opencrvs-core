@@ -35,8 +35,8 @@ import {
   DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
-  generateQuery,
-  encodeFieldId
+  encodeFieldId,
+  generateQuery
 } from './utils'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
