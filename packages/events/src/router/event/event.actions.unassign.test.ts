@@ -52,7 +52,7 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
   })
 
   describe(`If assigned to self`, () => {
-    test.only(`If there is no ${ActionType.UNASSIGN} action after last ${ActionType.ASSIGN} action, should not throw error and should add unassign action`, async () => {
+    test(`If there is no ${ActionType.UNASSIGN} action after last ${ActionType.ASSIGN} action, should not throw error and should add unassign action`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, SCOPES_WITHOUT_UNASSIGN)
       const originalEvent = await client.event.create(generator.event.create())
