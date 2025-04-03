@@ -19,7 +19,8 @@ import {
   EventDocument,
   Draft,
   getCurrentEventState,
-  EventStatus
+  EventStatus,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -47,17 +48,6 @@ import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
- * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
- */
-
-function getDefaultFieldValues(trackingId: string, status: EventStatus) {
-  return {
-    'event.trackingId': trackingId,
-    'event.status': status
-  }
-}
-
-/**
  * Renders the event overview page, including the event summary and history.
  */
 function EventOverview({
@@ -75,7 +65,7 @@ function EventOverview({
 
   const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
   const eventIndex = getCurrentEventState(event)
-  const { trackingId, status } = eventIndex
+  const { trackingId, status, registrationNumber } = eventIndex
 
   const stringifyFormData = useFormDataStringifier()
   const eventWithDefaults = stringifyFormData(allFields, eventWithDrafts.data)
@@ -85,13 +75,19 @@ function EventOverview({
     FieldValue | null | RecursiveStringRecord
   > = {
     ...flattenEventIndex({ ...eventIndex, data: eventWithDefaults }),
-    ...getDefaultFieldValues(trackingId, status)
+    // The field keys are based on packages/client/src/views/RecordAudit/RecordAudit.tsx
+    'event.trackingId': trackingId,
+    'event.status': status,
+    'event.registrationNumber': registrationNumber
   }
 
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
     : ''
+
+  const actions = getAcceptedActions(event)
+
   return (
     <Content
       icon={() => <IconWithName name={''} status={status} />}
@@ -105,7 +101,7 @@ function EventOverview({
         eventLabel={eventConfiguration.label}
         summary={summary}
       />
-      <EventHistory history={event.actions} />
+      <EventHistory history={actions} />
     </Content>
   )
 }
@@ -120,7 +116,8 @@ function EventOverviewContainer() {
   const drafts = getRemoteDrafts()
   const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
 
-  const userIds = getUserIdsFromActions(fullEvent.actions)
+  const activeActions = getAcceptedActions(fullEvent)
+  const userIds = getUserIdsFromActions(activeActions)
   const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
 

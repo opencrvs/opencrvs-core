@@ -17,6 +17,7 @@ import {
   FieldUpdateValue,
   findActiveActionFields,
   getActiveActionFormPages,
+  getAcceptedActions,
   getFieldValidationErrors,
   Inferred,
   isPageVisible,
@@ -98,9 +99,10 @@ export function validateAction(actionType: ActionType) {
     } satisfies ActionUpdate
 
     const event = await getEventById(input.eventId)
+    const actions = getAcceptedActions(event)
+
     const eventDeclarationData =
-      event.actions.find((action) => action.type === ActionType.DECLARE)
-        ?.data ?? {}
+      actions.find((action) => action.type === ActionType.DECLARE)?.data ?? {}
 
     // For each visible verification page on the form, we expect the metadata to include a field with boolean value and the page id as key.
     const visibleVerificationPageIds = getActiveActionFormPages(

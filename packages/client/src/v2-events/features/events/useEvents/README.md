@@ -92,7 +92,7 @@ export function useEvents() {
 function Component() {
   const events = useEvents()
 
-const onSubmit = (form, eventId) => events.actions.register.mutate({
+const onSubmit = (form, eventId) => events.actions.register.request.mutate({
           eventId: eventId,
           data: form,
           transactionId: uuid(),

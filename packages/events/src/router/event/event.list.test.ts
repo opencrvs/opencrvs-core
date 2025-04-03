@@ -72,7 +72,7 @@ test('Returns aggregated event with updated status and values', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
       data: initialData
     })
@@ -85,7 +85,7 @@ test('Returns aggregated event with updated status and values', async () => {
   expect(initialEvents[0].data).toEqual(initialData)
 
   const updatedData = { ...initialData, 'applicant.firstname': 'Jane' }
-  await client.event.actions.declare(
+  await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
       data: updatedData
     })

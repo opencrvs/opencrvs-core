@@ -24,6 +24,7 @@
     "envalid": "^8.0.0",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "6.9.0",
+    "msw": "^2.7.3",
     "superjson": "1.9.0-0",
     "tsconfig-paths": "^3.13.0",
     "zod": "^3.23.8"
@@ -44,7 +45,6 @@
     "globals": "^16.0.0",
     "lint-staged": "^15.0.0",
     "mongodb-memory-server": "^10.1.2",
-    "msw": "^2.7.0",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
     "testcontainers": "^10.15.0",
