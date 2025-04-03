@@ -26,15 +26,12 @@ import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
 import { ActionType, ActionStatus } from '../events'
 
-const fieldParams = {
-  $form: {
-    'applicant.name': 'John Doe',
-    'applicant.dob': '1990-01-02'
-  },
-  $now: formatISO(new Date(), { representation: 'date' })
-} satisfies ConditionalParameters
+const DEFAULT_FORM = {
+  'applicant.name': 'John Doe',
+  'applicant.dob': '1990-01-02'
+}
 
-function getFieldParams(form: Record<string, any>) {
+function getFieldParams(form: Record<string, any> = DEFAULT_FORM) {
   return {
     $form: form,
     $now: formatISO(new Date(), { representation: 'date' })
@@ -49,7 +46,7 @@ describe('"universal" conditionals', () => {
           field('applicant.name').isEqualTo('John Doe'),
           field('applicant.dob').isAfter().date('1989-01-01')
         ),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(true)
 
@@ -59,7 +56,7 @@ describe('"universal" conditionals', () => {
           field('applicant.name').isEqualTo('John Doe'),
           field('applicant.dob').isAfter().date('1991-01-01')
         ),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(false)
   })
@@ -71,7 +68,7 @@ describe('"universal" conditionals', () => {
           field('applicant.name').isEqualTo('John Doe'),
           field('applicant.dob').isAfter().date('1989-01-01')
         ),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(true)
 
@@ -81,7 +78,7 @@ describe('"universal" conditionals', () => {
           field('applicant.name').isEqualTo('John Doe'),
           field('applicant.dob').isAfter().date('1991-01-01')
         ),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(true)
 
@@ -91,18 +88,24 @@ describe('"universal" conditionals', () => {
           field('applicant.name').isEqualTo('Jack Doe'),
           field('applicant.dob').isAfter().date('1991-01-01')
         ),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(false)
   })
 
   it('validates "not" conditional', () => {
     expect(
-      validate(not(field('applicant.name').isEqualTo('John Doe')), fieldParams)
+      validate(
+        not(field('applicant.name').isEqualTo('John Doe')),
+        getFieldParams()
+      )
     ).toBe(false)
 
     expect(
-      validate(not(field('applicant.name').isEqualTo('Jack Doe')), fieldParams)
+      validate(
+        not(field('applicant.name').isEqualTo('Jack Doe')),
+        getFieldParams()
+      )
     ).toBe(true)
 
     expect(
@@ -130,16 +133,25 @@ describe('"universal" conditionals', () => {
 describe('"field" conditionals', () => {
   it('validates "field.isAfter" conditional', () => {
     expect(
-      validate(field('applicant.dob').isAfter().date('1990-01-03'), fieldParams)
+      validate(
+        field('applicant.dob').isAfter().date('1990-01-03'),
+        getFieldParams()
+      )
     ).toBe(false)
 
     // seems to be inclusive
     expect(
-      validate(field('applicant.dob').isAfter().date('1990-01-02'), fieldParams)
+      validate(
+        field('applicant.dob').isAfter().date('1990-01-02'),
+        getFieldParams()
+      )
     ).toBe(true)
 
     expect(
-      validate(field('applicant.dob').isAfter().date('1990-01-01'), fieldParams)
+      validate(
+        field('applicant.dob').isAfter().date('1990-01-01'),
+        getFieldParams()
+      )
     ).toBe(true)
   })
 
@@ -147,7 +159,7 @@ describe('"field" conditionals', () => {
     expect(
       validate(
         field('applicant.dob').isBefore().date('1990-01-03'),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(true)
 
@@ -155,31 +167,31 @@ describe('"field" conditionals', () => {
     expect(
       validate(
         field('applicant.dob').isBefore().date('1990-01-02'),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(true)
 
     expect(
       validate(
         field('applicant.dob').isBefore().date('1990-01-01'),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(false)
   })
 
   it('validates "field.isEqualTo" conditional', () => {
     expect(
-      validate(field('applicant.name').isEqualTo('John Doe'), fieldParams)
+      validate(field('applicant.name').isEqualTo('John Doe'), getFieldParams())
     ).toBe(true)
 
     expect(
-      validate(field('applicant.name').isEqualTo('Jane Doe'), fieldParams)
+      validate(field('applicant.name').isEqualTo('Jane Doe'), getFieldParams())
     ).toBe(false)
 
     expect(
       validate(
         field('applicant.field.not.exist').isEqualTo('Jane Doe'),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(false)
 
@@ -261,11 +273,14 @@ describe('"field" conditionals', () => {
   })
 
   it('validates "field.isUndefined" conditional', () => {
-    expect(validate(field('applicant.name').isUndefined(), fieldParams)).toBe(
-      false
-    )
     expect(
-      validate(field('applicant.field.not.exist').isUndefined(), fieldParams)
+      validate(field('applicant.name').isUndefined(), getFieldParams())
+    ).toBe(false)
+    expect(
+      validate(
+        field('applicant.field.not.exist').isUndefined(),
+        getFieldParams()
+      )
     ).toBe(true)
   })
 
@@ -273,14 +288,14 @@ describe('"field" conditionals', () => {
     expect(
       validate(
         field('applicant.name').inArray(['Jack Doe', 'Jane Doe']),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(false)
 
     expect(
       validate(
         field('applicant.name').inArray(['John Doe', 'Jane Doe']),
-        fieldParams
+        getFieldParams()
       )
     ).toBe(true)
   })

@@ -193,7 +193,7 @@ export function field(fieldId: string) {
     /**
      * @private Internal property used for field reference tracking.
      */
-    _returning: fieldId,
+    _fieldId: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () =>
@@ -228,10 +228,10 @@ export function field(fieldId: string) {
     }),
     // TODO CIHAN: typing
     isEqualTo: (
-      value: string | boolean | { _returning: string; [key: string]: unknown }
+      value: string | boolean | { _fieldId: string; [key: string]: unknown }
     ) => {
-      if (typeof value === 'object' && value._returning) {
-        const comparedFieldId = value._returning
+      if (typeof value === 'object' && value._fieldId) {
+        const comparedFieldId = value._fieldId
 
         return defineConditional({
           type: 'object',
