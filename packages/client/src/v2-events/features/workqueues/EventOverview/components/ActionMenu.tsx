@@ -11,11 +11,16 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-
 import { useNavigate } from 'react-router-dom'
 import formatISO from 'date-fns/formatISO'
-import { validate, ActionType, ConditionalType } from '@opencrvs/commons/client'
-import { ActionConfig } from '@opencrvs/commons/client'
+import {
+  validate,
+  ActionType,
+  ConditionalType,
+  SCOPES,
+  EventDocument,
+  type ActionConfig
+} from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -24,6 +29,35 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
+import ProtectedComponent from '@client/components/ProtectedComponent'
+
+const viewRecordMessage = {
+  id: 'v2.view.record',
+  description: 'Label for view record',
+  defaultMessage: 'View record'
+}
+
+function ReadOnlyViewOption({ event }: { event: EventDocument }) {
+  const intl = useIntl()
+  const navigate = useNavigate()
+  // if a event has declare action, then it has already data to be viewed
+  if (event.actions.some((a) => a.type === ActionType.DECLARE)) {
+    return (
+      <ProtectedComponent scopes={[SCOPES.RECORD_READ]}>
+        <DropdownMenu.Item
+          key="view-declaration"
+          onClick={() =>
+            navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
+          }
+        >
+          {intl.formatMessage(viewRecordMessage)}
+        </DropdownMenu.Item>
+      </ProtectedComponent>
+    )
+  }
+
+  return <></>
+}
 
 export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
@@ -64,6 +98,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
+          <ReadOnlyViewOption event={event} />
           {configuration.actions.filter(isActionVisible).map((action) => {
             return (
               <DropdownMenu.Item
