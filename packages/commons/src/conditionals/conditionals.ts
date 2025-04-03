@@ -169,6 +169,9 @@ export const event = {
     })
 }
 
+const getDateFromNow = (days: number) =>
+  new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
 /**
  * Generate conditional rules for a form field.
  *
@@ -178,11 +181,6 @@ export const event = {
  *
  */
 export function field(fieldId: string) {
-  const getDateFromNow = (days: number) =>
-    new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0]
-
   const getDateRange = (
     date: string,
     clause: 'formatMinimum' | 'formatMaximum'
