@@ -145,13 +145,14 @@ export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
 export function isUndeclaredDraft(status: EventStatus): boolean {
   return status === EventStatus.CREATED
 }
-
 export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(
-    (a): a is ActionDocument => a.status === ActionStatus.Accepted
+    // @TODO: Check whether types or data generators are wrong.
+    // Following types and removing this will break at least request correction review.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    (a): a is ActionDocument => !a.status || a.status === ActionStatus.Accepted
   )
 }
-
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
