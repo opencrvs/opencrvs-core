@@ -172,6 +172,11 @@ export const event = {
 const getDateFromNow = (days: number) =>
   new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
+type FieldReference = { _fieldId: string; [key: string]: unknown }
+
+const isFieldReference = (value: unknown): value is FieldReference =>
+  typeof value === 'object' && value !== null && '_fieldId' in value
+
 /**
  * Generate conditional rules for a form field.
  *
@@ -213,8 +218,13 @@ export function field(fieldId: string) {
             getDateRange(getDateFromNow(-days), 'formatMinimum')
           )
       }),
-      date: (date: string) =>
-        defineConditional(getDateRange(date, 'formatMinimum')),
+      date: (date: string | FieldReference) => {
+        if (isFieldReference(date)) {
+          return defineConditional('todo')
+        }
+
+        return defineConditional(getDateRange(date, 'formatMinimum'))
+      },
       now: () =>
         defineConditional(getDateRange(getDateFromNow(0), 'formatMinimum'))
     }),
@@ -229,16 +239,19 @@ export function field(fieldId: string) {
             getDateRange(getDateFromNow(-days), 'formatMaximum')
           )
       }),
-      date: (date: string) =>
-        defineConditional(getDateRange(date, 'formatMaximum')),
+      date: (date: string | FieldReference) => {
+        if (isFieldReference(date)) {
+          return defineConditional('todo')
+        }
+
+        return defineConditional(getDateRange(date, 'formatMaximum'))
+      },
       now: () =>
         defineConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
     }),
-    isEqualTo: (
-      value: string | boolean | { _fieldId: string; [key: string]: unknown }
-    ) => {
+    isEqualTo: (value: string | boolean | FieldReference) => {
       // When the value is an object, it means that the value is a reference to another field
-      if (typeof value === 'object' && value._fieldId) {
+      if (isFieldReference(value)) {
         const comparedFieldId = value._fieldId
 
         return defineConditionalWithForm({
