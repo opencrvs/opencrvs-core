@@ -14,6 +14,10 @@ import { z } from 'zod'
 import { getUsersById } from '@events/service/users/users'
 
 export const userRouter = router({
+  get: publicProcedure.input(z.string()).query(async ({ input }) => {
+    const [user] = await getUsersById([input])
+    return user
+  }),
   list: publicProcedure
     .input(z.array(z.string()))
     .query(async ({ input }) => getUsersById(input))
