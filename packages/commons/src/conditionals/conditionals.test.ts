@@ -153,6 +153,44 @@ describe('"field" conditionals', () => {
         getFieldParams()
       )
     ).toBe(true)
+
+    expect(
+      validate(
+        field('mother.dob').isAfter().date(field('child.dob')),
+        getFieldParams({
+          'child.dob': '1990-01-02',
+          'mother.dob': '1991-05-03'
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('mother.dob').isAfter().date(field('child.dob')),
+        getFieldParams({
+          'child.dob': '1990-01-02',
+          'mother.dob': '1990-01-01'
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('mother.dob').isAfter().date(field('child.dob')),
+        getFieldParams({
+          'child.dob': '1990-01-02'
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('mother.dob').isAfter().date(field('child.dob')),
+        getFieldParams({
+          'child.dob': '1990-01-02'
+        })
+      )
+    ).toBe(false)
   })
 
   it('validates "field.isBefore" conditional', () => {

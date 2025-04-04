@@ -177,6 +177,24 @@ type FieldReference = { _fieldId: string; [key: string]: unknown }
 const isFieldReference = (value: unknown): value is FieldReference =>
   typeof value === 'object' && value !== null && '_fieldId' in value
 
+const getDateRangeToFieldReference = (
+  fieldId: string,
+  comparedFieldId: string,
+  clause: 'formatMinimum' | 'formatMaximum'
+) =>
+  getSchemaWithForm({
+    type: 'object',
+    properties: {
+      [fieldId]: {
+        type: 'string',
+        format: 'date',
+        [clause]: { $data: `1/${comparedFieldId}` }
+      },
+      [comparedFieldId]: { type: 'string', format: 'date' }
+    },
+    required: [fieldId, comparedFieldId]
+  })
+
 /**
  * Generate conditional rules for a form field.
  *
@@ -220,7 +238,14 @@ export function field(fieldId: string) {
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
-          return defineConditional('todo')
+          const comparedFieldId = date._fieldId
+          return defineConditional(
+            getDateRangeToFieldReference(
+              fieldId,
+              comparedFieldId,
+              'formatMinimum'
+            )
+          )
         }
 
         return defineConditional(getDateRange(date, 'formatMinimum'))
