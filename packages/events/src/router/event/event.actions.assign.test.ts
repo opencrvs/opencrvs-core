@@ -47,11 +47,24 @@ test(`Should not add any new actions when assigned to the same user`, async () =
     generator.event.actions.assign(originalEvent.id, { assignedTo: user.id })
   )
 
+  expect(response.actions.map(({ type }) => type)).toEqual([
+    ActionType.CREATE,
+    ActionType.ASSIGN
+  ])
+
   const response2 = await client.event.actions.assignment.assign(
     generator.event.actions.assign(originalEvent.id, { assignedTo: user.id })
   )
 
   expect(response2).toEqual(response)
+
+  const finalEvent = await client.event.get(originalEvent.id)
+
+  expect(finalEvent.actions.map(({ type }) => type)).toEqual([
+    ActionType.CREATE,
+    ActionType.ASSIGN, // only a single assign entry
+    ActionType.READ
+  ])
 })
 
 test(`Should throw error when assigned to a different user`, async () => {
