@@ -169,11 +169,6 @@ export const event = {
 const getDateFromNow = (days: number) =>
   new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
-type FieldReference = { _fieldId: string; [key: string]: unknown }
-
-const isFieldReference = (value: unknown): value is FieldReference =>
-  typeof value === 'object' && value !== null && '_fieldId' in value
-
 /* This function will output JSONSchema which looks for example like this:
 {
   "type": "object",
@@ -212,6 +207,10 @@ const getDateRangeToFieldReference = (
   },
   required: [fieldId, comparedFieldId]
 })
+
+type FieldReference = { _fieldId: string; [key: string]: unknown }
+const isFieldReference = (value: unknown): value is FieldReference =>
+  typeof value === 'object' && value !== null && '_fieldId' in value
 
 /**
  * Generate conditional rules for a form field.
