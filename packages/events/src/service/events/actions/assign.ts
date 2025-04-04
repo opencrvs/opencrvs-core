@@ -16,7 +16,7 @@ import {
   AssignActionInput
 } from '@opencrvs/commons/events'
 import { TRPCError } from '@trpc/server'
-import { getLastAssignmentAction } from '@events/service/events/utils'
+import { findLastAssignmentAction } from '@events/service/events/utils'
 
 export async function assignRecord({
   createdBy,
@@ -31,7 +31,7 @@ export async function assignRecord({
 }) {
   const storedEvent = await getEventById(input.eventId)
 
-  const lastAssignmentAction = getLastAssignmentAction(storedEvent.actions)
+  const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
     if (lastAssignmentAction.assignedTo === input.assignedTo) {

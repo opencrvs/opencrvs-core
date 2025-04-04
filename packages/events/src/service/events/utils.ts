@@ -11,7 +11,7 @@
 
 import { Action, ActionType } from '@opencrvs/commons'
 
-export function getLastAssignmentAction(actions: Action[]) {
+export function findLastAssignmentAction(actions: Action[]) {
   return actions
     .filter(
       ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN

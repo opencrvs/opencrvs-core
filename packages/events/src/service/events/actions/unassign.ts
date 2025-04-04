@@ -15,7 +15,7 @@ import {
   ActionType,
   UnassignActionInput
 } from '@opencrvs/commons/events'
-import { getLastAssignmentAction } from '@events/service/events/utils'
+import { findLastAssignmentAction } from '@events/service/events/utils'
 import { inScope, SCOPES } from '@opencrvs/commons'
 import { setBearerForToken } from '@events/router/middleware'
 import { TRPCError } from '@trpc/server'
@@ -37,7 +37,7 @@ export async function unassignRecord(
   }
 ) {
   const storedEvent = await getEventById(eventId)
-  const lastAssignmentAction = getLastAssignmentAction(storedEvent.actions)
+  const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
     if (

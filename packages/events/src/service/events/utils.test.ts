@@ -10,7 +10,7 @@
  */
 
 import { Action, ActionType } from '@opencrvs/commons'
-import { getLastAssignmentAction } from './utils'
+import { findLastAssignmentAction } from './utils'
 
 const commonAction = {
   status: 'Requested' as const,
@@ -115,12 +115,12 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
   }
 ]
 
-describe('getLastAssignmentAction', () => {
+describe('findLastAssignmentAction', () => {
   testCases.forEach(({ expected, actions }) => {
     it(`When actions are ${actions.map(
       ({ type, createdAt }) => `${type}-${createdAt}`
     )}`, () => {
-      const result = getLastAssignmentAction(actions)
+      const result = findLastAssignmentAction(actions)
       expect(result).toEqual(expected)
     })
   })
