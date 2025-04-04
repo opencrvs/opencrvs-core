@@ -32,20 +32,18 @@ import {
 } from './utils'
 import { FormSectionComponent } from './FormSectionComponent'
 
-type FormData = Record<string, FieldValue>
-
 function mapFieldsToValues(
   fields: FieldConfig[],
-  formData: FormData,
+  form: EventState,
   meta: MetaFields
 ) {
   return fields.reduce((memo, field) => {
-    const fieldInitialValue = handleDefaultValue(field, formData, meta)
+    const fieldInitialValue = handleDefaultValue(field, form, meta)
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
 }
 
-interface ExposedProps {
+interface FormFieldGeneratorProps {
   fields: FieldConfig[]
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
@@ -60,7 +58,7 @@ interface ExposedProps {
   readonlyMode?: boolean
 }
 
-export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
+export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
   (props) => {
     const { eventConfig, formData, fields, declaration } = props
 
@@ -119,6 +117,10 @@ export const FormFieldGenerator: React.FC<ExposedProps> = React.memo(
               {...props}
               {...formikProps}
               declaration={declaration}
+              // @TODO: Formik does not type errors well. Actual error message differs from the type.
+              // This was previously cast on FormSectionComponent level.
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              errors={formikProps.errors as any}
               eventConfig={eventConfig}
               formData={nestedFormData}
               intl={intl}

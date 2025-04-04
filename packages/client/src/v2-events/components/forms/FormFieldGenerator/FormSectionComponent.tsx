@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Field, FieldProps, FormikProps, FormikErrors } from 'formik'
+import { Field, FieldProps, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -36,7 +36,6 @@ import {
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible
 } from '@client/v2-events/components/forms/utils'
-import { Errors } from '@client/v2-events/components/forms/validation'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -241,27 +240,18 @@ export class FormSectionComponent extends React.Component<AllProps> {
             >
               <Field name={field.id}>
                 {}
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {(formikFieldProps: FieldProps<any>) => {
                   return (
                     <GeneratedInputField
                       fieldDefinition={field}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
                       setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
                       disabled={isDisabled}
                       error={isDisabled ? '' : error}
                       eventConfig={this.props.eventConfig}
-                      fields={fields}
                       formData={allData}
                       readonlyMode={readonlyMode}
                       touched={touched[field.id] ?? false}
-                      values={values}
-                      onUploadingStateChanged={
-                        this.props.onUploadingStateChanged
-                      }
                     />
                   )
                 }}
