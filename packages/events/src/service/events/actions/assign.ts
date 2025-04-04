@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { addAction, getEventById } from '@events/service/events/events'
+import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
   AssignActionInput
 } from '@opencrvs/commons/events'
-import { TRPCError } from '@trpc/server'
+import { addAction, getEventById } from '@events/service/events/events'
 import { findLastAssignmentAction } from '@events/service/events/utils'
 
 export async function assignRecord({

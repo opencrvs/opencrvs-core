@@ -41,9 +41,9 @@ import {
   getEventById
 } from '@events/service/events/events'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
-import { getDefaultActionProcedures } from './actions'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
+import { getDefaultActionProcedures } from './actions'
 
 function validateEventType({
   eventTypes,
@@ -165,7 +165,7 @@ export const eventRouter = router({
       assign: publicProcedure
         .input(AssignActionInput)
         .use(middleware.validateAction(ActionType.ASSIGN))
-        .mutation((options) => {
+        .mutation(async (options) => {
           return assignRecord({
             input: options.input,
             createdBy: options.ctx.user.id,
@@ -176,7 +176,7 @@ export const eventRouter = router({
       unassign: publicProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction(ActionType.UNASSIGN))
-        .mutation((options) => {
+        .mutation(async (options) => {
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,

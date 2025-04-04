@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { addAction, getEventById } from '@events/service/events/events'
+import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
   UnassignActionInput
 } from '@opencrvs/commons/events'
-import { findLastAssignmentAction } from '@events/service/events/utils'
 import { inScope, SCOPES } from '@opencrvs/commons'
+import { addAction, getEventById } from '@events/service/events/events'
+import { findLastAssignmentAction } from '@events/service/events/utils'
 import { setBearerForToken } from '@events/router/middleware'
-import { TRPCError } from '@trpc/server'
 
 export async function unassignRecord(
   input: UnassignActionInput,

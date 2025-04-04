@@ -16,11 +16,7 @@ export function findLastAssignmentAction(actions: Action[]) {
     .filter(
       ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
     )
-    .reduce<Action | undefined>(
-      (latestAction, action) =>
-        !latestAction || action.createdAt > latestAction.createdAt
-          ? action
-          : latestAction,
-      undefined
-    )
+    .reduce<
+      Action | undefined
+    >((latestAction, action) => (!latestAction || action.createdAt > latestAction.createdAt ? action : latestAction), undefined)
 }
