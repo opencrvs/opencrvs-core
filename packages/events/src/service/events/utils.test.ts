@@ -28,9 +28,9 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
   {
     actions: [
       {
+        ...commonAction,
         type: ActionType.CREATE,
-        createdAt: '2023-01-01T00:00:00Z',
-        ...commonAction
+        createdAt: '2023-01-01T00:00:00Z'
       }
     ],
     expected: undefined
@@ -38,47 +38,47 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
   {
     actions: [
       {
+        ...commonAction,
         type: ActionType.CREATE,
-        createdAt: '2023-01-01T00:00:00Z',
-        ...commonAction
+        createdAt: '2023-01-01T00:00:00Z'
       },
       {
+        ...commonAction,
         type: ActionType.ASSIGN,
         createdAt: '2023-01-01T01:00:00Z',
-        assignedTo: 'user-id-2',
-        ...commonAction
+        assignedTo: 'user-id-2'
       }
     ],
     expected: {
+      ...commonAction,
       type: ActionType.ASSIGN,
       createdAt: '2023-01-01T01:00:00Z',
-      assignedTo: 'user-id-2',
-      ...commonAction
+      assignedTo: 'user-id-2'
     }
   },
   {
     actions: [
       {
+        ...commonAction,
         type: ActionType.CREATE,
-        createdAt: '2023-01-01T00:00:00Z',
-        ...commonAction
+        createdAt: '2023-01-01T00:00:00Z'
       },
       {
+        ...commonAction,
         type: ActionType.ASSIGN,
         createdAt: '2023-01-01T01:00:00Z',
-        assignedTo: 'user-id-2',
-        ...commonAction
+        assignedTo: 'user-id-2'
       },
       {
+        ...commonAction,
         type: ActionType.UNASSIGN,
-        createdAt: '2023-01-01T02:00:00Z',
-        ...commonAction
+        createdAt: '2023-01-01T02:00:00Z'
       }
     ],
     expected: {
+      ...commonAction,
       type: ActionType.UNASSIGN,
-      createdAt: '2023-01-01T02:00:00Z',
-      ...commonAction
+      createdAt: '2023-01-01T02:00:00Z'
     }
   }
 ]
