@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DraftInput, Draft } from '@opencrvs/commons/events'
+import { DraftInput, Draft, ActionStatus } from '@opencrvs/commons/events'
 
 import { getUUID } from '@opencrvs/commons'
 import * as events from '@events/storage/mongodb/events'
@@ -39,6 +39,7 @@ export async function createDraft(
     transactionId,
     action: {
       ...input,
+      status: ActionStatus.Accepted,
       type: input.type,
       createdBy,
       createdAt: now,

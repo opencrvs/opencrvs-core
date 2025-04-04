@@ -146,6 +146,10 @@ export function Review() {
   const [{ templateId }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
+
+  const { getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
+
   if (!templateId) {
     throw new Error('Please select a template from the previous step')
   }
@@ -165,9 +169,6 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const { getAnnotation } = useActionAnnotation()
-  const annotation = getAnnotation()
-
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
@@ -175,7 +176,6 @@ export function Review() {
 
   const { svgCode, handleCertify } = usePrintableCertificate({
     event: fullEvent,
-    form: annotation,
     locations,
     users,
     certificateConfig,
@@ -198,7 +198,10 @@ export function Review() {
     formConfig,
     form: annotation
   })
+
   if (validationErrorExist) {
+    // eslint-disable-next-line no-console
+    console.warn('Form is not properly filled. Redirecting to the beginning...')
     return (
       <Navigate
         to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
