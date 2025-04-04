@@ -72,7 +72,7 @@ export function handleDefaultValue(
 
 export function getDependentFields(
   fields: FieldConfig[],
-  fieldName: string
+  fieldId: string
 ): FieldConfig[] {
   return fields.filter((field) => {
     if (!field.defaultValue) {
@@ -81,7 +81,7 @@ export function getDependentFields(
     if (!hasDefaultValueDependencyInfo(field.defaultValue)) {
       return false
     }
-    return field.defaultValue.dependsOn.includes(fieldName)
+    return field.defaultValue.dependsOn.includes(fieldId)
   })
 }
 

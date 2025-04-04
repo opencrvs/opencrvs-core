@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { IndexMap } from '../../../utils'
 import { FIELD_SEPARATOR, makeFormFieldIdFormikCompatible } from '../utils'
 
 /*
@@ -16,7 +17,9 @@ import { FIELD_SEPARATOR, makeFormFieldIdFormikCompatible } from '../utils'
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-export function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
+export function makeFormFieldIdsFormikCompatible<T>(
+  data: Record<string, T>
+): IndexMap<T> {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
       makeFormFieldIdFormikCompatible(key),
@@ -26,8 +29,8 @@ export function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
 }
 
 export function makeFormikFieldIdsOpenCRVSCompatible<T>(
-  data: Record<string, T>
-) {
+  data: Record<string, T | undefined>
+): IndexMap<T> {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
       key.replaceAll(FIELD_SEPARATOR, '.'),
