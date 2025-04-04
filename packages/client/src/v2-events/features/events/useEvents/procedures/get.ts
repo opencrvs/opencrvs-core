@@ -20,6 +20,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { setQueryDefaults } from './utils'
+import { cacheUsers } from '@client/v2-events/features/users/cache'
 
 /*
  * This logic overrides the default behaviour of "api.event.get"
@@ -52,7 +53,7 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 
     const eventDocument = EventDocument.parse(response)
 
-    await cacheFiles(eventDocument)
+    await Promise.all([cacheFiles(eventDocument), cacheUsers(eventDocument)])
     return eventDocument
   }
 })
