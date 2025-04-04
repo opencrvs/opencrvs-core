@@ -23,7 +23,7 @@ import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/utils/countries'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { camelCase } from 'lodash'
+import { camelCase, memoize } from 'lodash'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -148,14 +148,28 @@ export function generateSearchableLocations(
   return generated
 }
 
-export function generateLocations(
+export const generateLocations = memoize(
+  generateLocationsSlow,
+  (
+    locations: { [key: string]: ILocation },
+    intl: IntlShape,
+    filterByJurisdictionTypes?: string[],
+    filterByLocationTypes?: LocationType[]
+  ) => {
+    const locKeys = Object.keys(locations)
+    const firstKey = locKeys[0] || ''
+    const lastKey = locKeys[locKeys.length - 1] || ''
+    return `${firstKey}|${lastKey}|${locKeys.length}|${intl.locale}|${filterByJurisdictionTypes}|${filterByLocationTypes}`
+  }
+)
+
+export function generateLocationsSlow(
   locations: { [key: string]: ILocation },
   intl: IntlShape,
   filterByJurisdictionTypes?: string[],
   filterByLocationTypes?: LocationType[]
 ) {
   let locationArray = Object.values(locations)
-
   if (filterByLocationTypes) {
     locationArray = locationArray.filter(
       (location) =>
