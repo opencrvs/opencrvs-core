@@ -10,23 +10,16 @@
  */
 
 import { env } from '@events/environment'
-import { EventConfig, getOrThrow } from '@opencrvs/commons'
-import fetch from 'node-fetch'
-import { array } from 'zod'
+import { createAPIClient, getOrThrow } from '@opencrvs/commons'
+
+const apiClient = createAPIClient(env.COUNTRY_CONFIG_URL)
 
 export async function getEventConfigurations(token: string) {
-  const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
+  return apiClient.getEventConfigurations({
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     }
   })
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch events config')
-  }
-
-  return array(EventConfig).parse(await res.json())
 }
 
 async function findEventConfigurationById({

@@ -8,15 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/service'
-export * from './authentication'
-export * from './utils'
-export * from './countryconfig'
+
+import { OpenApiBuilder } from '@zodios/openapi'
+import * as yaml from 'yaml'
+import { countryConfigAPI } from '.'
+
+const openapi = new OpenApiBuilder({
+  title: 'Country config API',
+  version: '1.8.0',
+  description: 'Country specific configuration server for OpenCRVS'
+})
+  .addPublicApi(countryConfigAPI)
+  .build()
+
+// eslint-disable-next-line no-console
+console.log(yaml.stringify(openapi))
