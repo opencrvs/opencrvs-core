@@ -10,7 +10,6 @@
  */
 
 import {
-  ActionInputWithType,
   ActionType,
   ActionUpdate,
   DeclarationUpdateActions,
@@ -32,10 +31,10 @@ import {
   getCurrentEventState,
   deepMerge
 } from '@opencrvs/commons/events'
-import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
 import { TRPCError } from '@trpc/server'
+import { ActionMiddlewareOptions } from '@events/router/middleware/utils'
 
 function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
   return formFields.reduce(
@@ -85,10 +84,6 @@ function getVerificationPageErrors(
         : null
     })
     .filter((error) => error !== null)
-}
-
-export type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
-  input: ActionInputWithType
 }
 
 function throwWhenNotEmpty(errors: unknown[]) {
