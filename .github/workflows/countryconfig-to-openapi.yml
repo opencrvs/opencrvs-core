@@ -30,16 +30,13 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Generate OpenAPI YAML
-        run: npx tsx src/countryconfig/openapi.ts
+        run: npx tsx src/countryconfig/openapi.ts > openapi.yml
         working-directory: packages/commons
-
-      - name: Install redoc-cli
-        run: yarn global add redoc-cli
 
       - name: Generate HTML from OpenAPI
         run: |
           mkdir output
-          redoc-cli bundle packages/commons/openapi.yml -o output/index.html
+          npx @redocly/cli build-docs packages/commons/openapi.yml -o output/index.html
 
       - name: Deploy to GitHub Pages
         run: |
