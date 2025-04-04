@@ -9,12 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType, inScope, Scope, SCOPES } from '@opencrvs/commons'
+import { inScope, Scope } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
-import { getEventById } from '@events/service/events/events'
-import { getLastAssignmentAction } from '@events/service/events/utils'
-import { ActionMiddlewareOptions } from '@events/router/middleware'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
