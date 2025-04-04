@@ -176,7 +176,6 @@ export const eventRouter = router({
       unassign: publicProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction(ActionType.UNASSIGN))
-        .use(middleware.canUnassign())
         .mutation((options) => {
           return unassignRecord(options.input, {
             eventId: options.input.eventId,

@@ -20,7 +20,7 @@ import { ActionMiddlewareOptions } from '@events/router/middleware'
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
  * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
  */
-function setBearerForToken(token: string) {
+export function setBearerForToken(token: string) {
   const bearer = 'Bearer'
 
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
@@ -39,31 +39,5 @@ export function requiresAnyOfScopes(scopes: Scope[]) {
     }
 
     throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-}
-
-/**
- * Middleware to check if a record can be unassigned.
- * A record can only be unassigned in one of the following cases:
- *  - The record is assigned to the user attempting to unassign it.
- *  - The user attempting to unassign the record has the scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}.
- * @returns A TRPC-compatible middleware function.
- */
-export function canUnassign() {
-  return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
-    const storedEvent = await getEventById(input.eventId)
-    const lastAssignmentAction = getLastAssignmentAction(storedEvent.actions)
-    if (
-      lastAssignmentAction?.type === ActionType.ASSIGN &&
-      lastAssignmentAction.assignedTo !== ctx.user.id &&
-      !inScope({ Authorization: setBearerForToken(ctx.token) }, [
-        SCOPES.RECORD_UNASSIGN_OTHERS
-      ])
-    ) {
-      throw new TRPCError({
-        code: 'FORBIDDEN'
-      })
-    }
-    return next()
   }
 }
