@@ -80,6 +80,38 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       type: ActionType.UNASSIGN,
       createdAt: '2023-01-01T02:00:00Z'
     }
+  },
+  {
+    actions: [
+      {
+        ...commonAction,
+        type: ActionType.CREATE,
+        createdAt: '2023-01-01T00:00:00Z'
+      },
+      {
+        ...commonAction,
+        type: ActionType.ASSIGN,
+        createdAt: '2023-01-01T01:00:00Z',
+        assignedTo: 'user-id-2'
+      },
+      {
+        ...commonAction,
+        type: ActionType.UNASSIGN,
+        createdAt: '2023-01-01T02:00:00Z'
+      },
+      {
+        ...commonAction,
+        type: ActionType.ASSIGN,
+        createdAt: '2023-01-01T03:00:00Z',
+        assignedTo: 'user-id-4'
+      }
+    ],
+    expected: {
+      ...commonAction,
+      type: ActionType.ASSIGN,
+      createdAt: '2023-01-01T03:00:00Z',
+      assignedTo: 'user-id-4'
+    }
   }
 ]
 
