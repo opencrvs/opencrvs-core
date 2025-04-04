@@ -23,7 +23,8 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType } from '../events/Conditional'
 
 const ajv = new Ajv({
-  $data: true
+  $data: true,
+  allowUnionTypes: true
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
