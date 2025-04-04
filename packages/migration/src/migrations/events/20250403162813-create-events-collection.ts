@@ -20,11 +20,6 @@ export const up = async (db: Db, client: MongoClient) => {
     await session.withTransaction(async () => {
       await db.createCollection('events')
       await db.collection('events').createIndex({ id: 1 }, { unique: true })
-
-      await db.createCollection('drafts')
-      await db.collection('drafts').createIndex({ id: 1 }, { unique: true })
-
-      await db.createCollection('locations')
     })
   } catch (error) {
     console.error(
@@ -44,17 +39,6 @@ export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      // Drop locations collection if it exists
-      const locationsExists = await db
-        .listCollections({ name: 'locations' })
-        .hasNext()
-      if (locationsExists) {
-        await db.dropCollection('locations')
-        console.log('locations collection removed successfully')
-      } else {
-        console.log('locations collection does not exist, skipping removal')
-      }
-
       // Drop events collection if it exists
       const eventsExists = await db
         .listCollections({ name: 'events' })
@@ -64,17 +48,6 @@ export const down = async (db: Db, client: MongoClient) => {
         console.log('events collection removed successfully')
       } else {
         console.log('events collection does not exist, skipping removal')
-      }
-
-      // Drop drafts collection if it exists
-      const draftsExists = await db
-        .listCollections({ name: 'drafts' })
-        .hasNext()
-      if (draftsExists) {
-        await db.dropCollection('drafts')
-        console.log('drafts collection removed successfully')
-      } else {
-        console.log('drafts collection does not exist, skipping removal')
       }
     })
   } catch (error) {
