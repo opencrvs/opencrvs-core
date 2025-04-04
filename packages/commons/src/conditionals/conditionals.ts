@@ -181,7 +181,7 @@ const isFieldReference = (value: unknown): value is FieldReference =>
     "mother.dob": {
       "type": "string",
       "format": "date",
-      "formatMinimum": {
+      "formatMaximum": {
         "$data": "1/child.dob"
       }
     },
