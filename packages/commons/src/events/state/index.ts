@@ -208,6 +208,7 @@ export function getCurrentEventStateWithDrafts(
           action,
           {
             ...action,
+            status: ActionStatus.Accepted,
             type: ActionType.APPROVE_CORRECTION
           }
         ] as ActionDocument[]
@@ -269,6 +270,7 @@ export function getActionAnnotation({
     ...eventDrafts.map((draft) => draft.action)
   ].sort()
 
+  console.log('SORTED', sorted)
   const annotation = sorted.reduce((ann, sortedAction) => {
     return deepMerge(ann, sortedAction.annotation ?? {})
   }, {})

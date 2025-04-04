@@ -15,7 +15,7 @@ import { ActionType, DeclarationAction, DeclarationActions } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { ActionUpdate, EventState } from './ActionDocument'
+import { ActionStatus, ActionUpdate, EventState } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
 import { FieldType } from './FieldType'
@@ -201,13 +201,14 @@ export function createEmptyDraft(
   eventId: string,
   draftId: string,
   actionType: ActionType
-) {
+): Draft {
   return {
     id: draftId,
     eventId,
     createdAt: new Date().toISOString(),
     transactionId: getUUID(),
     action: {
+      status: ActionStatus.Accepted,
       type: actionType,
       declaration: {},
       annotation: {},
