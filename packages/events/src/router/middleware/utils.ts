@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TokenWithBearer } from '@opencrvs/commons'
+import { ActionInputWithType, TokenWithBearer } from '@opencrvs/commons'
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
 
 export interface Context {
@@ -28,3 +28,7 @@ export type MiddlewareOptions = Omit<
   Parameters<AnyTRPCMiddlewareFunction>[0],
   'ctx'
 > & { ctx: Context }
+
+export type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
+  input: ActionInputWithType
+}
