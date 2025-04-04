@@ -9,22 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  createTestClient,
-  setupTestCase,
-  TEST_USER_DEFAULT_SCOPES
-} from '@events/tests/utils'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { ActionType, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
-
-const SCOPES_WITHOUT_UNASSIGN = TEST_USER_DEFAULT_SCOPES.filter(
-  (scope) => scope != SCOPES.RECORD_UNASSIGN_OTHERS
-)
 
 describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
   test(`If there is no ${ActionType.ASSIGN} action, should not throw error and should not add unassign action`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user, SCOPES_WITHOUT_UNASSIGN)
+    const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 
     const originalEvent = await client.event.create(generator.event.create())
     const response = await client.event.actions.assignment.unassign(
@@ -35,9 +27,9 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
 
   test(`Can not unassign record that is assigned to someone else`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user, SCOPES_WITHOUT_UNASSIGN)
+    const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
     const { user: user2 } = await setupTestCase()
-    const client2 = createTestClient(user2, SCOPES_WITHOUT_UNASSIGN)
+    const client2 = createTestClient(user2, [SCOPES.RECORD_DECLARE])
     const originalEvent = await client.event.create(generator.event.create())
 
     await client.event.actions.assignment.assign(
@@ -54,7 +46,7 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
   describe(`If assigned to self`, () => {
     test(`If there is no ${ActionType.UNASSIGN} action after last ${ActionType.ASSIGN} action, should not throw error and should add unassign action`, async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user, SCOPES_WITHOUT_UNASSIGN)
+      const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
       const originalEvent = await client.event.create(generator.event.create())
 
       await client.event.actions.assignment.assign(
@@ -70,7 +62,7 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
 
     test(`If there is ${ActionType.UNASSIGN} action after last ${ActionType.ASSIGN} action, should not throw error and should not add unassign action`, async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user, SCOPES_WITHOUT_UNASSIGN)
+      const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
       const originalEvent = await client.event.create(generator.event.create())
 
       await client.event.actions.assignment.assign(
@@ -92,7 +84,7 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
 
 test(`Can unassign record that is assigned to someone else, if user has ${SCOPES.RECORD_UNASSIGN_OTHERS} scope`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, SCOPES_WITHOUT_UNASSIGN)
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
   const { user: user2 } = await setupTestCase()
   const client2 = createTestClient(user2)
   const originalEvent = await client.event.create(generator.event.create())
@@ -109,7 +101,7 @@ test(`Can unassign record that is assigned to someone else, if user has ${SCOPES
 
 test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, SCOPES_WITHOUT_UNASSIGN)
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 
   const originalEvent = await client.event.create(generator.event.create())
 
