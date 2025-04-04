@@ -25,7 +25,7 @@ export function defineConditional(schema: any) {
   return schema as JSONSchema
 }
 
-export function defineFormConditional(schema: Record<string, any>) {
+export function defineFormConditional(schema: Record<string, unknown>) {
   const schemaWithForm = {
     type: 'object',
     properties: {

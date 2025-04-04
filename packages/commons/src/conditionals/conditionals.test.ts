@@ -34,7 +34,7 @@ const DEFAULT_FORM = {
   'applicant.dob': '1990-01-02'
 }
 
-function getFieldParams(form: Record<string, any> = DEFAULT_FORM) {
+function getFieldParams(form: Record<string, unknown> = DEFAULT_FORM) {
   return {
     $form: form,
     $now: formatISO(new Date(), { representation: 'date' })
