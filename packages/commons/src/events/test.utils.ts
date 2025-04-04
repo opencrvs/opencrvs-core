@@ -230,6 +230,7 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.ASSIGN,
       transactionId: input.transactionId ?? getUUID(),
+      declaration: {},
       assignedTo: input.assignedTo ?? getUUID(),
       eventId
     }),
@@ -239,6 +240,7 @@ export const eventPayloadGenerator = {
     ) => ({
       type: ActionType.UNASSIGN,
       transactionId: input.transactionId ?? getUUID(),
+      declaration: {},
       assignedTo: null,
       eventId
     }),
