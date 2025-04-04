@@ -24,18 +24,15 @@ export function defineConditional(schema: any) {
   return schema as JSONSchema
 }
 
-function getSchemaWithForm(schema: Record<string, any>) {
-  return {
+export function defineFormConditional(schema: Record<string, any>) {
+  const schemaWithForm = {
     type: 'object',
     properties: {
       $form: schema
     },
     required: ['$form']
   }
-}
 
-export function defineConditionalWithForm(schema: Record<string, any>) {
-  const schemaWithForm = getSchemaWithForm(schema)
   return defineConditional(schemaWithForm)
 }
 
@@ -177,23 +174,44 @@ type FieldReference = { _fieldId: string; [key: string]: unknown }
 const isFieldReference = (value: unknown): value is FieldReference =>
   typeof value === 'object' && value !== null && '_fieldId' in value
 
+/* This function will output JSONSchema which looks for example like this:
+{
+  "type": "object",
+  "properties": {
+    "mother.dob": {
+      "type": "string",
+      "format": "date",
+      "formatMinimum": {
+        "$data": "1/child.dob"
+      }
+    },
+    "child.dob": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "mother.dob",
+    "child.dob"
+  ]
+}
+*/
 const getDateRangeToFieldReference = (
   fieldId: string,
   comparedFieldId: string,
   clause: 'formatMinimum' | 'formatMaximum'
-) =>
-  getSchemaWithForm({
-    type: 'object',
-    properties: {
-      [fieldId]: {
-        type: 'string',
-        format: 'date',
-        [clause]: { $data: `1/${comparedFieldId}` }
-      },
-      [comparedFieldId]: { type: 'string', format: 'date' }
+) => ({
+  type: 'object',
+  properties: {
+    [fieldId]: {
+      type: 'string',
+      format: 'date',
+      [clause]: { $data: `1/${comparedFieldId}` }
     },
-    required: [fieldId, comparedFieldId]
-  })
+    [comparedFieldId]: { type: 'string', format: 'date' }
+  },
+  required: [fieldId, comparedFieldId]
+})
 
 /**
  * Generate conditional rules for a form field.
@@ -207,18 +225,17 @@ export function field(fieldId: string) {
   const getDateRange = (
     date: string,
     clause: 'formatMinimum' | 'formatMaximum'
-  ) =>
-    getSchemaWithForm({
-      type: 'object',
-      properties: {
-        [fieldId]: {
-          type: 'string',
-          format: 'date',
-          [clause]: date
-        }
-      },
-      required: [fieldId]
-    })
+  ) => ({
+    type: 'object',
+    properties: {
+      [fieldId]: {
+        type: 'string',
+        format: 'date',
+        [clause]: date
+      }
+    },
+    required: [fieldId]
+  })
 
   return {
     /**
@@ -228,18 +245,18 @@ export function field(fieldId: string) {
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () =>
-          defineConditional(
+          defineFormConditional(
             getDateRange(getDateFromNow(days), 'formatMinimum')
           ),
         inFuture: () =>
-          defineConditional(
+          defineFormConditional(
             getDateRange(getDateFromNow(-days), 'formatMinimum')
           )
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
           const comparedFieldId = date._fieldId
-          return defineConditional(
+          return defineFormConditional(
             getDateRangeToFieldReference(
               fieldId,
               comparedFieldId,
@@ -248,38 +265,45 @@ export function field(fieldId: string) {
           )
         }
 
-        return defineConditional(getDateRange(date, 'formatMinimum'))
+        return defineFormConditional(getDateRange(date, 'formatMinimum'))
       },
       now: () =>
-        defineConditional(getDateRange(getDateFromNow(0), 'formatMinimum'))
+        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMinimum'))
     }),
     isBefore: () => ({
       days: (days: number) => ({
         inPast: () =>
-          defineConditional(
+          defineFormConditional(
             getDateRange(getDateFromNow(days), 'formatMaximum')
           ),
         inFuture: () =>
-          defineConditional(
+          defineFormConditional(
             getDateRange(getDateFromNow(-days), 'formatMaximum')
           )
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
-          return defineConditional('todo')
+          const comparedFieldId = date._fieldId
+          return defineFormConditional(
+            getDateRangeToFieldReference(
+              fieldId,
+              comparedFieldId,
+              'formatMaximum'
+            )
+          )
         }
 
-        return defineConditional(getDateRange(date, 'formatMaximum'))
+        return defineFormConditional(getDateRange(date, 'formatMaximum'))
       },
       now: () =>
-        defineConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
+        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
     }),
     isEqualTo: (value: string | boolean | FieldReference) => {
-      // When the value is an object, it means that the value is a reference to another field
+      // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
       if (isFieldReference(value)) {
         const comparedFieldId = value._fieldId
 
-        return defineConditionalWithForm({
+        return defineFormConditional({
           type: 'object',
           properties: {
             [fieldId]: {
@@ -293,7 +317,7 @@ export function field(fieldId: string) {
       }
 
       // In the 'default' case, we compare the value of the field with the hard coded value
-      return defineConditionalWithForm({
+      return defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {
@@ -316,7 +340,7 @@ export function field(fieldId: string) {
      *
      */
     isFalsy: () =>
-      defineConditionalWithForm({
+      defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {
@@ -340,7 +364,7 @@ export function field(fieldId: string) {
         ]
       }),
     isUndefined: () =>
-      defineConditionalWithForm({
+      defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {
@@ -353,7 +377,7 @@ export function field(fieldId: string) {
         }
       }),
     inArray: (values: string[]) =>
-      defineConditionalWithForm({
+      defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {
@@ -364,7 +388,7 @@ export function field(fieldId: string) {
         required: [fieldId]
       }),
     isValidEnglishName: () =>
-      defineConditionalWithForm({
+      defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {
@@ -378,7 +402,7 @@ export function field(fieldId: string) {
         required: [fieldId]
       }),
     isValidNationalId: () =>
-      defineConditionalWithForm({
+      defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {
@@ -396,7 +420,7 @@ export function field(fieldId: string) {
      * @returns A JSONSchema conditional that validates the field value against the pattern.
      */
     matches: (pattern: string) =>
-      defineConditionalWithForm({
+      defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {
@@ -407,7 +431,7 @@ export function field(fieldId: string) {
         required: [fieldId]
       }),
     isBetween: (min: number, max: number) =>
-      defineConditionalWithForm({
+      defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {

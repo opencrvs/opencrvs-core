@@ -154,16 +154,18 @@ describe('"field" conditionals', () => {
       )
     ).toBe(true)
 
+    // Reference to another field, when the comparable field is after the reference field
     expect(
       validate(
         field('mother.dob').isAfter().date(field('child.dob')),
         getFieldParams({
           'child.dob': '1990-01-02',
-          'mother.dob': '1991-05-03'
+          'mother.dob': '1990-02-03'
         })
       )
     ).toBe(true)
 
+    // Reference to another field, when the comparable field is before the reference field
     expect(
       validate(
         field('mother.dob').isAfter().date(field('child.dob')),
@@ -174,6 +176,7 @@ describe('"field" conditionals', () => {
       )
     ).toBe(false)
 
+    // Reference to another field, when the comparable field is undefined
     expect(
       validate(
         field('mother.dob').isAfter().date(field('child.dob')),
@@ -183,11 +186,34 @@ describe('"field" conditionals', () => {
       )
     ).toBe(false)
 
+    // Reference to another field, when the reference field is undefined
     expect(
       validate(
         field('mother.dob').isAfter().date(field('child.dob')),
         getFieldParams({
-          'child.dob': '1990-01-02'
+          'mother.dob': '1990-01-02'
+        })
+      )
+    ).toBe(false)
+
+    // Reference to another field, when the comparable field is wrong format
+    expect(
+      validate(
+        field('mother.dob').isAfter().date(field('child.dob')),
+        getFieldParams({
+          'child.dob': '1990-01-02',
+          'mother.dob': '1990-01-03123'
+        })
+      )
+    ).toBe(false)
+
+    // Reference to another field, when the reference field is wrong format
+    expect(
+      validate(
+        field('mother.dob').isAfter().date(field('child.dob')),
+        getFieldParams({
+          'child.dob': '1990-01-021231',
+          'mother.dob': '1990-01-03'
         })
       )
     ).toBe(false)
@@ -213,6 +239,70 @@ describe('"field" conditionals', () => {
       validate(
         field('applicant.dob').isBefore().date('1990-01-01'),
         getFieldParams()
+      )
+    ).toBe(false)
+
+    // Reference to another field, when the comparable field is before the reference field
+    expect(
+      validate(
+        field('child.dob').isBefore().date(field('mother.dob')),
+        getFieldParams({
+          'mother.dob': '1990-01-02',
+          'child.dob': '1990-01-01'
+        })
+      )
+    ).toBe(true)
+
+    // Reference to another field, when the comparable field is after the reference field
+    expect(
+      validate(
+        field('child.dob').isBefore().date(field('mother.dob')),
+        getFieldParams({
+          'mother.dob': '1990-01-02',
+          'child.dob': '1990-01-03'
+        })
+      )
+    ).toBe(false)
+
+    // Reference to another field, when the comparable field is undefined
+    expect(
+      validate(
+        field('child.dob').isBefore().date(field('mother.dob')),
+        getFieldParams({
+          'mother.dob': '1990-01-02'
+        })
+      )
+    ).toBe(false)
+
+    // Reference to another field, when the reference field is undefined
+    expect(
+      validate(
+        field('child.dob').isBefore().date(field('mother.dob')),
+        getFieldParams({
+          'child.dob': '1990-01-02'
+        })
+      )
+    ).toBe(false)
+
+    // Reference to another field, when the comparable field is wrong format
+    expect(
+      validate(
+        field('child.dob').isBefore().date(field('mother.dob')),
+        getFieldParams({
+          'mother.dob': '1990-01-02',
+          'child.dob': '1990-01-03123'
+        })
+      )
+    ).toBe(false)
+
+    // Reference to another field, when the reference field is wrong format
+    expect(
+      validate(
+        field('child.dob').isBefore().date(field('mother.dob')),
+        getFieldParams({
+          'mother.dob': '1990-01-021231',
+          'child.dob': '1990-01-03'
+        })
       )
     ).toBe(false)
   })
