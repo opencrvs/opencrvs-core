@@ -175,8 +175,11 @@ export const event = {
     })
 }
 
-const getDateFromNow = (days: number) =>
-  new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+function getDateFromNow(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+}
 
 /* This function will output JSONSchema which looks for example like this:
 {
@@ -200,26 +203,29 @@ const getDateFromNow = (days: number) =>
   ]
 }
 */
-const getDateRangeToFieldReference = (
+function getDateRangeToFieldReference(
   fieldId: string,
   comparedFieldId: string,
   clause: 'formatMinimum' | 'formatMaximum'
-) => ({
-  type: 'object',
-  properties: {
-    [fieldId]: {
-      type: 'string',
-      format: 'date',
-      [clause]: { $data: `1/${comparedFieldId}` }
+) {
+  return {
+    type: 'object',
+    properties: {
+      [fieldId]: {
+        type: 'string',
+        format: 'date',
+        [clause]: { $data: `1/${comparedFieldId}` }
+      },
+      [comparedFieldId]: { type: 'string', format: 'date' }
     },
-    [comparedFieldId]: { type: 'string', format: 'date' }
-  },
-  required: [fieldId, comparedFieldId]
-})
+    required: [fieldId, comparedFieldId]
+  }
+}
 
 type FieldReference = { _fieldId: string; [key: string]: unknown }
-const isFieldReference = (value: unknown): value is FieldReference =>
-  typeof value === 'object' && value !== null && '_fieldId' in value
+function isFieldReference(value: unknown): value is FieldReference {
+  return typeof value === 'object' && value !== null && '_fieldId' in value
+}
 
 /**
  * Generate conditional rules for a form field.
