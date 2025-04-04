@@ -302,6 +302,7 @@ describe('SearchResult tests', () => {
       <SearchResult />,
       {
         store,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         graphqlMocks: graphqlMock as any,
         initialEntries: ['/?searchText=01622688232&searchType=PHONE_NUMBER']
       }
@@ -345,6 +346,7 @@ describe('SearchResult tests', () => {
       />,
       {
         store,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         graphqlMocks: graphqlMock as any,
         initialEntries: ['/?searchText=+8801622688232&searchType=PHONE_NUMBER']
       }
@@ -456,6 +458,7 @@ describe('SearchResult tests', () => {
       <SearchResult />,
       {
         store,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         graphqlMocks: graphqlMock as any,
         initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
       }
@@ -553,6 +556,7 @@ describe('SearchResult tests', () => {
       <SearchResult />,
       {
         store,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         graphqlMocks: graphqlMock as any,
         initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
       }
@@ -648,6 +652,7 @@ describe('SearchResult tests', () => {
       <SearchResult />,
       {
         store,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         graphqlMocks: graphqlMock as any,
         initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
       }
@@ -752,6 +757,7 @@ describe('SearchResult downloadButton tests', () => {
       <SearchResult />,
       {
         store,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         graphqlMocks: graphqlMock as any,
         initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
       }
@@ -847,6 +853,7 @@ describe('SearchResult downloadButton tests', () => {
       <SearchResult />,
       {
         store,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         graphqlMocks: graphqlMock as any,
         initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
       }

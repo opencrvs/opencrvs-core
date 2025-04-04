@@ -159,10 +159,12 @@ export const internationaliseFieldObject = (
     base.type === CHECKBOX_GROUP ||
     base.type === DOCUMENT_UPLOADER_WITH_OPTION
   ) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
   if (base.type === BULLET_LIST) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).items = internationaliseListFieldObject(intl, base.items)
   }
 
@@ -170,8 +172,10 @@ export const internationaliseFieldObject = (
     base.type === RADIO_GROUP ||
     base.type === RADIO_GROUP_WITH_NESTED_FIELDS
   ) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).options = internationaliseOptions(intl, base.options)
     if ((field as IDateFormField).notice) {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(base as any).notice = intl.formatMessage(
         // @ts-ignore
         (field as IRadioGroupFormField).notice
@@ -180,6 +184,7 @@ export const internationaliseFieldObject = (
   }
 
   if (base.type === DATE && (field as IDateFormField).notice) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).notice = intl.formatMessage(
       // @ts-ignore
       (field as IDateFormField).notice
@@ -187,12 +192,15 @@ export const internationaliseFieldObject = (
   }
 
   if (base.type === FETCH_BUTTON) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).modalTitle = intl.formatMessage(
       (field as ILoaderButton).modalTitle
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).successTitle = intl.formatMessage(
       (field as ILoaderButton).successTitle
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
     )
@@ -311,6 +319,7 @@ export const getFieldValidation = (
   ) {
     field.dynamicDefinitions.validator.map(
       (element: IDynamicFormFieldValidators) => {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const params: any[] = []
         element.dependencies.map((dependency: string) =>
           params.push(values[dependency])
@@ -498,6 +507,7 @@ const getMemoisedFieldOptions = memoize(
 )
 
 interface INested {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 }
 
@@ -579,6 +589,7 @@ export function isDefaultCountry(countryCode: string): boolean {
 }
 
 interface IVars {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 }
 

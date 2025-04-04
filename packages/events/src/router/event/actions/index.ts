@@ -8,18 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as middleware from '@events/router/middleware'
-import {
-  MiddlewareOptions,
-  requiresAnyOfScopes
-} from '@events/router/middleware'
-import { publicProcedure } from '@events/router/trpc'
-
-import {
-  getEventById,
-  addAction,
-  addAsyncRejectAction
-} from '@events/service/events/events'
+import { TRPCError } from '@trpc/server'
+import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
+import { z } from 'zod'
 import { SCOPES, getUUID } from '@opencrvs/commons'
 import {
   ActionType,
@@ -34,11 +25,18 @@ import {
   DeclareActionInput,
   ValidateActionInput
 } from '@opencrvs/commons/events'
+import * as middleware from '@events/router/middleware'
+import {
+  MiddlewareOptions,
+  requiresAnyOfScopes
+} from '@events/router/middleware'
+import { publicProcedure } from '@events/router/trpc'
 
-import { TRPCError } from '@trpc/server'
-// eslint-disable-next-line import/named
-import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
-import { z } from 'zod'
+import {
+  getEventById,
+  addAction,
+  addAsyncRejectAction
+} from '@events/service/events/events'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation

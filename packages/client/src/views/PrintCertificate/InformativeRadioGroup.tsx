@@ -29,7 +29,9 @@ const RadioGroupWrapper = styled.div`
 
 type IInputProps = {
   id: string
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   onChange: (e: React.ChangeEvent<any>) => void
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   onBlur: (e: React.FocusEvent<any>) => void
   value: IFormFieldValue
   disabled?: boolean

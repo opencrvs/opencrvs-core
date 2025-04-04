@@ -58,7 +58,9 @@ import * as labels from '@client/forms/certificate/fieldDefinitions/label'
  *
  * This here removes those from the type, so we don't have to cast anything to any
  */
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export type AnyFn<T> = (...args: any[]) => T
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type AnyFactoryFn<T> = (...args: any[]) => (...args: any[]) => T
 
 type FilterType<Base, Condition> = {
@@ -89,6 +91,7 @@ function isFactoryOperation(
 function isFactoryOperation(
   descriptor: IValidatorDescriptor
 ): descriptor is ValidationFactoryOperation
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 function isFactoryOperation(descriptor: any) {
   return Boolean((descriptor as ValidationFactoryOperation).parameters)
 }
@@ -144,7 +147,7 @@ function sectionMutationDescriptorToMutationFunction(
   }
   return transformer
 }
-
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 function isOperation(param: any): param is IMutationDescriptor {
   return typeof param === 'object' && param['operation']
 }

@@ -9,12 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  FieldConfig,
-  FieldType,
-  FieldUpdateValue,
-  TranslationConfig
-} from '../events'
+import { FieldConfig } from '../events/FieldConfig'
+import { FieldType } from '../events/FieldType'
+import { FieldUpdateValue } from '../events/FieldValue'
+import { TranslationConfig } from '../events/TranslationConfig'
 import { errorMessages, validateFieldInput } from './validate'
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
@@ -25,8 +23,9 @@ type TestCase = {
   output: { message: TranslationConfig }[]
 }
 
-const getErrorIds = (errors: { message: TranslationConfig }[]) =>
-  errors.map((o) => o.message.id)
+function getErrorIds(errors: { message: TranslationConfig }[]) {
+  return errors.map((o) => o.message.id)
+}
 
 const dateFieldConfig = {
   type: FieldType.DATE,

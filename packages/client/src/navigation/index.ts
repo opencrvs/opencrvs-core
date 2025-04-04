@@ -39,6 +39,7 @@ import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 
 export interface IDynamicValues {
+  /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 }
 

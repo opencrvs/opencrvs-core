@@ -19,7 +19,7 @@ import { FieldValue } from './FieldValue'
 /**
  * Available system variables for configuration.
  */
-export interface MetaFields {
+export type MetaFields = {
   $user: {
     province: string
     district: string
@@ -33,6 +33,7 @@ export interface MetaFields {
  * // 'a.b' | 'a.c.d' but not 'a' or 'a.c'
  */
 type FlattenedKeyStrings<T, Prefix extends string = ''> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [K in keyof T]: T[K] extends Record<string, any>
     ? FlattenedKeyStrings<T[K], `${Prefix}${K & string}.`>
     : `${Prefix}${K & string}`
@@ -82,9 +83,12 @@ export function isFieldValueWithoutTemplates(
 }
 
 export function isFieldConfigDefaultValue(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any
 ): value is FieldConfigDefaultValue {
-  if (!value) return false
+  if (!value) {
+    return false
+  }
 
   if (isFieldValue(value)) {
     return true

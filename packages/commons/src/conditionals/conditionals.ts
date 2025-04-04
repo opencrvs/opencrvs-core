@@ -20,6 +20,7 @@ export type JSONSchema = {
   readonly __nominal__type: 'JSONSchema'
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defineConditional(schema: any) {
   return schema as JSONSchema
 }
@@ -36,11 +37,18 @@ export function defineFormConditional(schema: Record<string, any>) {
   return defineConditional(schemaWithForm)
 }
 
-export type UserConditionalParameters = { $now: string; $user: TokenPayload }
-export type EventConditionalParameters = { $now: string; $event: EventDocument }
+export type UserConditionalParameters = {
+  $now: string
+  $user: TokenPayload
+}
+export type EventConditionalParameters = {
+  $now: string
+  $event: EventDocument
+}
 // @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
 export type FormConditionalParameters = {
   $now: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $form: EventState | Record<string, any>
 }
 
@@ -49,6 +57,7 @@ export type ConditionalParameters =
   | EventConditionalParameters
   | FormConditionalParameters
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   k: infer I
 ) => void

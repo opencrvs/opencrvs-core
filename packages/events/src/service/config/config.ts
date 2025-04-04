@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { env } from '@events/environment'
-import { EventConfig, getOrThrow } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { array } from 'zod'
+import { EventConfig, getOrThrow } from '@opencrvs/commons'
+import { env } from '@events/environment'
 
 export async function getEventConfigurations(token: string) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {

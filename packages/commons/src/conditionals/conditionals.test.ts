@@ -24,7 +24,10 @@ import {
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
-import { ActionType, ActionStatus } from '../events'
+import { ActionType } from '../events/ActionType'
+import { ActionStatus } from '../events/ActionDocument'
+
+/*  eslint-disable max-lines */
 
 const DEFAULT_FORM = {
   'applicant.name': 'John Doe',

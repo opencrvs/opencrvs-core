@@ -95,6 +95,7 @@ vi.mock('@client/forms/handlebarHelpers', async () => {
 })
 
 vi.mock('@client/forms/conditionals', async () => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const actual = (await vi.importActual('@client/forms/conditionals')) as any
   return {
     ...actual,
@@ -104,6 +105,7 @@ vi.mock('@client/forms/conditionals', async () => {
 })
 
 vi.mock('@client/forms/validators', async () => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const actual = (await vi.importActual('@client/forms/validators')) as any
   return {
     ...actual,
@@ -115,6 +117,7 @@ vi.mock('@client/forms/validators', async () => {
 vi.mock('@client/forms/handlebarHelpers', async () => {
   const actual = (await vi.importActual(
     '@client/forms/handlebarHelpers'
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   )) as any
   return {
     ...actual,

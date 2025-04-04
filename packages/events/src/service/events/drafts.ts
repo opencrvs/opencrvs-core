@@ -11,8 +11,8 @@
 
 import { DraftInput, Draft } from '@opencrvs/commons/events'
 
-import * as events from '@events/storage/mongodb/events'
 import { getUUID } from '@opencrvs/commons'
+import * as events from '@events/storage/mongodb/events'
 
 export async function createDraft(
   input: DraftInput,
