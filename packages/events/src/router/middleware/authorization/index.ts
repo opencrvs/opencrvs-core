@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { inScope, Scope } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
+import { inScope, Scope } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 
 /**

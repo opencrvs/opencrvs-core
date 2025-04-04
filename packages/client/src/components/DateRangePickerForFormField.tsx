@@ -30,6 +30,7 @@ interface IDateRangePickerProps extends WrappedComponentProps {
   onChange: (val: IDateRangePickerValue) => void
   notice?: string
   ignorePlaceHolder?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   inputProps: any
 }
 

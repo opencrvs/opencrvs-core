@@ -94,6 +94,7 @@ interface IStateProps {
   userDetails: UserDetails | null
 }
 interface IDispatchProps {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   submitForm: (variables: Record<string, any>) => void
   modify: (values: IFormSectionData) => void
 }
@@ -454,6 +455,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 
   return {
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     submitForm: (variables: Record<string, any>) => {
       dispatch(
         submitUserFormData(

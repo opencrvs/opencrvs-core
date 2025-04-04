@@ -357,7 +357,7 @@ describe('archiveDeclaration tests', () => {
     }
 
     // Mocking storage reading
-
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     storage.getItem = vi.fn<[string], Promise<any | null>>(
       <T = string>(key: string): Promise<T | null> => {
         switch (key) {

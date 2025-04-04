@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { AddressType, FieldType, mapFieldTypeToZod } from '../events'
+import { FieldType } from '../events/FieldType'
+import { AddressType } from '../events/CompositeFieldValue'
+import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 
 const testCases = [
   {

@@ -83,7 +83,7 @@ export function generateActionMetadataInput(
   action: ActionType
 ) {
   const actionConfig: ActionConfig | undefined = configuration.actions.find(
-    (actionConfig) => actionConfig.type === action
+    (ac) => ac.type === action
   )
 
   const annotationFields = actionConfig
@@ -92,11 +92,13 @@ export function generateActionMetadataInput(
 
   const annotation = fieldConfigsToActionAnnotation(annotationFields)
 
-  const visibleVerificationPageIds =
-    (findRecordActionPages(configuration, action) ?? [])
-      .filter((page) => isVerificationPage(page))
-      .filter((page) => isPageVisible(page, annotation))
-      .map((page) => page.id) ?? []
+  const visibleVerificationPageIds = findRecordActionPages(
+    configuration,
+    action
+  )
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, annotation))
+    .map((page) => page.id)
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
@@ -407,6 +409,10 @@ export function generateActionDocument({
   } satisfies ActionBase
 
   switch (action) {
+    case ActionType.READ:
+      return { ...actionBase, type: action }
+    case ActionType.MARKED_AS_DUPLICATE:
+      return { ...actionBase, type: action }
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
@@ -437,6 +443,8 @@ export function generateActionDocument({
         type: action
       }
 
+    case ActionType.DELETE:
+    case ActionType.DETECT_DUPLICATE:
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }

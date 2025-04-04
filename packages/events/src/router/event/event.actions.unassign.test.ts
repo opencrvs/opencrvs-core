@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, SCOPES } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
+import { ActionType, SCOPES } from '@opencrvs/commons'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
   test(`If there is no ${ActionType.ASSIGN} action, should not throw error and should not add unassign action`, async () => {

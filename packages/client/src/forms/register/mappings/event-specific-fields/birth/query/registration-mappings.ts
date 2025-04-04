@@ -14,6 +14,7 @@ import { EventType } from '@client/utils/gateway'
 
 export function getBirthRegistrationSectionTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string
 ) {

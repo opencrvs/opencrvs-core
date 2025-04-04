@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   ActionUpdate,
@@ -33,7 +34,6 @@ import {
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
-import { TRPCError } from '@trpc/server'
 import { ActionMiddlewareOptions } from '@events/router/middleware/utils'
 
 function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {

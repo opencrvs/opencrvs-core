@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { Db } from 'mongodb'
 import { getUUID, eventPayloadGenerator } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
-import { Db } from 'mongodb'
 
 interface Name {
   use: string

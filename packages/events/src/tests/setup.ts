@@ -8,14 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { inject, vi } from 'vitest'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { getDeclarationFields } from '@opencrvs/commons/events'
 import { resetServer as resetEventsMongoServer } from '@events/storage/mongodb/__mocks__/events'
 import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
-import { inject, vi } from 'vitest'
 
 import { createIndex } from '@events/service/indexing/indexing'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { mswServer } from './msw'
-import { getDeclarationFields } from '@opencrvs/commons/events'
 
 vi.mock('@events/storage/mongodb/events')
 vi.mock('@events/storage/mongodb/user-mgnt')
@@ -48,6 +48,7 @@ beforeAll(() =>
         req.method === 'DELETE' && req.url.includes(inject('ELASTICSEARCH_URI'))
 
       if (!isElasticResetCall) {
+        // eslint-disable-next-line no-console
         console.warn(`Unmocked request: ${req.method} ${req.url}`)
       }
     }
