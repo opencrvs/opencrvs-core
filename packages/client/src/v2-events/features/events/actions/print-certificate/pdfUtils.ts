@@ -14,7 +14,7 @@ import {
   createIntl,
   createIntlCache
 } from 'react-intl'
-import * as Handlebars from 'handlebars'
+import Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
 import type {
   Content,
@@ -138,8 +138,7 @@ export function compileSvg({
 
   Handlebars.registerHelper(
     'formatDate',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function (this: any, dateString: string, formatString: string) {
+    function (_, dateString: string, formatString: string) {
       const date = new Date(dateString)
       return isValid(date) ? format(date, formatString) : ''
     }
@@ -147,8 +146,7 @@ export function compileSvg({
 
   Handlebars.registerHelper(
     'findUserById',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function (this: any, u: User[], id: string) {
+    function (_, u: User[], id: string) {
       const user = u.find((usr) => usr.id === id)
 
       return user ? getUsersFullName(user.name, 'en') : ''
