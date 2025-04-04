@@ -166,12 +166,11 @@ export const eventRouter = router({
         .input(AssignActionInput)
         .use(middleware.validateAction(ActionType.ASSIGN))
         .mutation((options) => {
-          return assignRecord(options.input, {
-            eventId: options.input.eventId,
+          return assignRecord({
+            input: options.input,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+            token: options.ctx.token
           })
         }),
       unassign: publicProcedure

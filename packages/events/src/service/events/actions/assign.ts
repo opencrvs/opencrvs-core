@@ -18,23 +18,18 @@ import {
 import { TRPCError } from '@trpc/server'
 import { getLastAssignmentAction } from '@events/service/events/utils'
 
-export async function assignRecord(
-  input: AssignActionInput,
-  {
-    eventId,
-    createdBy,
-    token,
-    createdAtLocation,
-    transactionId
-  }: {
-    eventId: string
-    createdBy: string
-    createdAtLocation: string
-    token: string
-    transactionId: string
-  }
-) {
-  const storedEvent = await getEventById(eventId)
+export async function assignRecord({
+  createdBy,
+  token,
+  createdAtLocation,
+  input
+}: {
+  createdBy: string
+  createdAtLocation: string
+  token: string
+  input: AssignActionInput
+}) {
+  const storedEvent = await getEventById(input.eventId)
 
   const lastAssignmentAction = getLastAssignmentAction(storedEvent.actions)
 
@@ -48,11 +43,11 @@ export async function assignRecord(
   }
 
   return addAction(input, {
-    eventId,
+    eventId: input.eventId,
     createdBy,
     token,
     createdAtLocation,
-    transactionId,
+    transactionId: input.transactionId,
     status: ActionStatus.Accepted
   })
 }
