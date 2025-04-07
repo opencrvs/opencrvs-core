@@ -120,7 +120,7 @@ export const eventRouter = router({
         {
           eventId: event.id,
           createdBy: ctx.user.id,
-          createdAtLocation: ctx.user.primaryOfficeId,
+          updatedAtLocation: ctx.user.primaryOfficeId,
           token: ctx.token,
           transactionId: getUUID(),
           status: ActionStatus.Accepted
@@ -169,7 +169,7 @@ export const eventRouter = router({
           return assignRecord({
             input: options.input,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token
           })
         }),
@@ -180,7 +180,7 @@ export const eventRouter = router({
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -197,7 +197,7 @@ export const eventRouter = router({
           return addAction(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId,
             status: ActionStatus.Accepted
@@ -211,7 +211,7 @@ export const eventRouter = router({
           return approveCorrection(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -223,7 +223,7 @@ export const eventRouter = router({
           return rejectCorrection(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -234,7 +234,7 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
-  search: publicProcedure.input(EventSearchIndex).query(async ({ input }) => {
-    return getIndex(input)
-  })
+  search: publicProcedure
+    .input(EventSearchIndex)
+    .query(async ({ input }) => getIndex(input))
 })

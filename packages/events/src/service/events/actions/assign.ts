@@ -21,11 +21,11 @@ import { findLastAssignmentAction } from '@events/service/events/utils'
 export async function assignRecord({
   createdBy,
   token,
-  createdAtLocation,
+  updatedAtLocation,
   input
 }: {
   createdBy: string
-  createdAtLocation: string
+  updatedAtLocation: string
   token: string
   input: AssignActionInput
 }) {
@@ -46,7 +46,7 @@ export async function assignRecord({
     eventId: input.eventId,
     createdBy,
     token,
-    createdAtLocation,
+    updatedAtLocation,
     transactionId: input.transactionId,
     status: ActionStatus.Accepted
   })

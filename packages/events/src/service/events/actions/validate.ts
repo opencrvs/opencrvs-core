@@ -28,11 +28,11 @@ export async function validate(
     createdBy,
     token,
     transactionId,
-    createdAtLocation
+    updatedAtLocation
   }: {
     eventId: string
     createdBy: string
-    createdAtLocation: string
+    updatedAtLocation: string
     transactionId: string
     token: string
   }
@@ -56,7 +56,7 @@ export async function validate(
         createdAt: new Date().toISOString(),
         createdBy,
         id: getUUID(),
-        createdAtLocation,
+        updatedAtLocation,
         status: ActionStatus.Accepted
       }
     ]
@@ -92,7 +92,7 @@ export async function validate(
       createdBy,
       transactionId,
       token,
-      createdAtLocation,
+      updatedAtLocation,
       status: ActionStatus.Accepted
     }
   )

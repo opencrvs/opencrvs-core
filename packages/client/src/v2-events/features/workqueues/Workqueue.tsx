@@ -157,7 +157,7 @@ function Workqueue({
         (outboxEvent) => outboxEvent.id === event.id
       )
       const isInDrafts = drafts
-        .filter((draft) => draft.createdAt > event.modifiedAt)
+        .filter((draft) => draft.createdAt > event.updatedAt)
         .some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
@@ -192,7 +192,7 @@ function Workqueue({
         ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
-        modifiedAt: formattedDuration(new Date(event.modifiedAt)),
+        modifiedAt: formattedDuration(new Date(event.updatedAt)),
 
         status: intl.formatMessage(
           {

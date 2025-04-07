@@ -148,7 +148,8 @@ export const eventPayloadGenerator = {
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
-          createdAtLocation: '@todo'
+          createdAtLocation: '@todo',
+          updatedAtLocation: '@todo'
         }
       } satisfies Draft,
       input
@@ -403,6 +404,7 @@ export function generateActionDocument({
     createdBy: getUUID(),
     id: getUUID(),
     createdAtLocation: 'TODO',
+    updatedAtLocation: 'TODO',
     declaration: generateActionInput(configuration, action),
     annotation: {},
     ...defaults,
@@ -507,7 +509,7 @@ export const eventQueryDataGenerator = (
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   createdBy: overrides.createdBy ?? getUUID(),
   createdAtLocation: overrides.createdAtLocation ?? getUUID(),
-  modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
+  updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
   declaration: overrides.declaration ?? {
