@@ -18,6 +18,7 @@ export const userRouter = router({
   get: publicProcedure.input(z.string()).query(async ({ input }) => {
     const [user] = await getUsersById([input])
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!user) {
       throw new TRPCError({ code: 'NOT_FOUND' })
     }
