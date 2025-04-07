@@ -21,9 +21,9 @@ import { findUserIdsFromDocument, findUserIdsFromIndex } from './utils'
 async function cacheUsers(userIds: string[]) {
   const users = await trpcClient.user.list.query(userIds)
 
-  users.map((user) =>
+  for (const user of users) {
     queryClient.setQueryData(trpcOptionsProxy.user.get.queryKey(user.id), user)
-  )
+  }
 }
 
 export async function cacheUsersFromEventDocument(
@@ -37,10 +37,5 @@ export async function cacheUsersFromEventIndices(eventIndices: EventIndex[]) {
   const userIds = uniq(
     flatten(eventIndices.map((eventIndex) => findUserIdsFromIndex(eventIndex)))
   )
-
-  const users = await trpcClient.user.list.query(userIds)
-
-  users.map((user) =>
-    queryClient.setQueryData(trpcOptionsProxy.user.get.queryKey(user.id), user)
-  )
+  await cacheUsers(userIds)
 }
