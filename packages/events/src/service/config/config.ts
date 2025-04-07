@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { env } from '@events/environment'
 import { createAPIClient, getOrThrow } from '@opencrvs/commons'
+import { env } from '@events/environment'
 
 const apiClient = createAPIClient(env.COUNTRY_CONFIG_URL)
 
-export async function getEventConfigurations(token: string) {
+export function getEventConfigurations(token: string) {
   return apiClient.getEventConfigurations({
     headers: {
       Authorization: `Bearer ${token}`

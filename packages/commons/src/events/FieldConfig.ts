@@ -501,6 +501,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   EmailField,
   FileUploadWithOptions,
   DataField
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ]) as unknown as z.ZodType<Inferred, any, InferredInput>
 
 export type SelectField = z.infer<typeof Select>

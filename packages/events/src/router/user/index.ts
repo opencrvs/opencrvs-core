@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { router, publicProcedure } from '@events/router/trpc'
 import { z } from 'zod'
+import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 
 export const userRouter = router({

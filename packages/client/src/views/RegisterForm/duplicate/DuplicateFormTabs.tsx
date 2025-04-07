@@ -163,6 +163,7 @@ export const DuplicateFormTabs = (props: IProps) => {
   const getFieldValueWithErrorMessage = (
     section: IFormSection,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     errorsOnField: any
   ) => {
     return (
@@ -424,6 +425,7 @@ export const DuplicateFormTabs = (props: IProps) => {
   ) => {
     const draft = declaration
     const visitedTags: string[] = []
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
@@ -478,7 +480,9 @@ export const DuplicateFormTabs = (props: IProps) => {
     overriddenField: IFormField,
     sectionErrors: IErrorsBySection,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     items: any[],
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     item: any
   ) => {
     overriddenField.label =
@@ -534,8 +538,10 @@ export const DuplicateFormTabs = (props: IProps) => {
       offlineData,
       userDetails
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let tempItem: any
     return formSections.map((section) => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       let items: any[] = []
       const visitedTags: string[] = []
       const visibleGroups = getVisibleSectionGroupsBasedOnConditions(

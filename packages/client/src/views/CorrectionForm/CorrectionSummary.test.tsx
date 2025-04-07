@@ -217,62 +217,74 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with Child name', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.corrector.relationship as any).value = 'CHILD'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const msg = instance.getRequestedBy()
       expect(msg).toEqual('Mike Test')
     })
 
     it('should match corrector with Father name', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.corrector.relationship as any).value = 'FATHER'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const msg = instance.getRequestedBy()
       expect(msg).toEqual('Jeff Test')
     })
 
     it('should match corrector with LEGAL_GUARDIAN', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.corrector.relationship as any).value =
         'LEGAL_GUARDIAN'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const corrector = instance.getRequestedBy()
       expect(corrector).toEqual('Legal guardian')
     })
 
     it('should match corrector with ANOTHER_AGENT', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.corrector.relationship as any).value =
         'ANOTHER_AGENT'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const corrector = instance.getRequestedBy()
       expect(corrector).toEqual('Another registration agent or field agent')
     })
 
     it('should match corrector with ANOTHER_AGENT', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.corrector.relationship as any).value = 'REGISTRAR'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const corrector = instance.getRequestedBy()
       expect(corrector).toEqual('Me (Registrar)')
     })
 
     it('should match corrector with COURT', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.corrector.relationship as any).value = 'COURT'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const corrector = instance.getRequestedBy()
       expect(corrector).toEqual('Court')
@@ -288,46 +300,55 @@ describe('Correction summary', () => {
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const corrector = instance.getRequestedBy()
       expect(corrector).toEqual('Uncle')
     })
 
     it('should match corrector with CLERICAL_ERROR', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.reason as any).type.value = 'CLERICAL_ERROR'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const reason = instance.getReasonForRequest()
       expect(reason).toBeDefined()
     })
 
     it('should match corrector with MATERIAL_ERROR', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.reason as any).type.value = 'MATERIAL_ERROR'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const reason = instance.getReasonForRequest()
       expect(reason).toBeDefined()
     })
 
     it('should match corrector with MATERIAL_OMISSION', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.reason as any).type.value = 'MATERIAL_OMISSION'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const reason = instance.getReasonForRequest()
       expect(reason).toBeDefined()
     })
 
     it('should match corrector with JUDICIAL_ORDER', () => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(birthDeclaration.data.reason as any).type.value = 'JUDICIAL_ORDER'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const reason = instance.getReasonForRequest()
       expect(reason).toBeDefined()
@@ -346,6 +367,7 @@ describe('Correction summary', () => {
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const reason = instance.getReasonForRequest()
       expect(reason).toBeDefined()
@@ -420,6 +442,7 @@ describe('Correction summary', () => {
     it('should return corrector informat', () => {
       const instance = wrapper
         .find('CorrectionSummaryComponent')
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         .instance() as any
       const corrector = instance.getRequestedBy()
       expect(corrector).toEqual('John Millar')

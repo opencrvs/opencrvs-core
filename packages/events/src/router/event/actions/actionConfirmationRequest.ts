@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { env } from '@events/environment'
 import { EventDocument, ActionInput, logger } from '@opencrvs/commons'
+import { env } from '@events/environment'
 
 export const ActionConfirmationResponse = {
   UnexpectedFailure: 'UnexpectedFailure', // Endpoint fails in an uncontrolled manner

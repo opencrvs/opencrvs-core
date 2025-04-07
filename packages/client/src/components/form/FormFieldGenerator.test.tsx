@@ -129,6 +129,7 @@ describe('form component', () => {
       beforeEach(() => {
         const instance = component
           .find('FormSectionComponent')
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           .instance() as any
         instance.resetDependentSelectValues('statePrimary')
       })

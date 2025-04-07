@@ -48,18 +48,18 @@ export type IFieldBuilders<
         : // Otherwise expect a builder function
           IFieldBuilderFunction<RootKey | Key, Item>
       : // Check for nominal Date
-      IsDate<NonNullable<Root[Key]>> extends true
-      ? IFieldBuilderFunction<RootKey | Key, Root[Key]>
-      : // Check for nominal type
-      IsNominal<NonNullable<Root[Key]>> extends true
-      ? // Otherwise expect a builder function
-        IFieldBuilderFunction<RootKey | Key, Root[Key]>
-      : // If it's not an array, but a record instead
-      NonNullable<Root[Key]> extends Record<any, any>
-      ? // Keep on recursing
-        IFieldBuilders<RootKey | Key, NonNullable<Root[Key]>>
-      : // Otherwise expect a builder function
-        IFieldBuilderFunction<RootKey | Key, Root[Key]>
+        IsDate<NonNullable<Root[Key]>> extends true
+        ? IFieldBuilderFunction<RootKey | Key, Root[Key]>
+        : // Check for nominal type
+          IsNominal<NonNullable<Root[Key]>> extends true
+          ? // Otherwise expect a builder function
+            IFieldBuilderFunction<RootKey | Key, Root[Key]>
+          : // If it's not an array, but a record instead
+            NonNullable<Root[Key]> extends Record<any, any>
+            ? // Keep on recursing
+              IFieldBuilders<RootKey | Key, NonNullable<Root[Key]>>
+            : // Otherwise expect a builder function
+              IFieldBuilderFunction<RootKey | Key, Root[Key]>
   >
 }
 

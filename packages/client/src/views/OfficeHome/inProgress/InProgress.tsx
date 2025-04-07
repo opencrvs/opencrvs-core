@@ -309,6 +309,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         ...item,
         notificationSent:
           item.notificationSent &&
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           formattedDuration(item.notificationSent as any),
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date)

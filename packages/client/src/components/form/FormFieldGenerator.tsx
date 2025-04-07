@@ -184,7 +184,9 @@ type GeneratedInputFieldProps = {
   values: IFormSectionData
   setFieldValue: (name: string, value: IFormFieldValue) => void
   onClick?: () => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (e: React.ChangeEvent<any>) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onBlur: (e: React.FocusEvent<any>) => void
   resetDependentSelectValues: (name: string) => void
   resetNestedInputValues?: (field: Ii18nFormField) => void
@@ -556,6 +558,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
       const message = intl.formatMessage(label, {
         ...values,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         [fieldDefinition.name]: value as any
       })
 
@@ -852,6 +855,7 @@ type Props = IFormSectionProps &
   IntlShapeProps
 
 interface IQueryData {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
@@ -937,6 +941,7 @@ class FormSectionComponent extends React.Component<Props> {
     this.props.setTouched(touched)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleBlur = (e: React.FocusEvent<any>) => {
     this.props.setFieldTouched(e.target.name)
   }
@@ -1193,6 +1198,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
@@ -1255,6 +1261,7 @@ class FormSectionComponent extends React.Component<Props> {
                       ignoreBottomMargin={field.ignoreBottomMargin}
                     >
                       <FastField name={nestedFieldName}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
                             fieldDefinition={internationaliseFieldObject(intl, {
@@ -1292,6 +1299,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={`${field.name}.value`}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
@@ -1324,6 +1332,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <GeneratedInputField

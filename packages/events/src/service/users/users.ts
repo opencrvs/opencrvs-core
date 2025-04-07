@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
-import { ResolvedUser } from '@opencrvs/commons'
 import { ObjectId } from 'mongodb'
+import { ResolvedUser } from '@opencrvs/commons'
+import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
 
 export const getUsersById = async (ids: string[]) => {
   const db = await userMgntDb.getClient()

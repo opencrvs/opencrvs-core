@@ -20,15 +20,35 @@ export type JSONSchema = {
   readonly __nominal__type: 'JSONSchema'
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defineConditional(schema: any) {
   return schema as JSONSchema
 }
 
-export type UserConditionalParameters = { $now: string; $user: TokenPayload }
-export type EventConditionalParameters = { $now: string; $event: EventDocument }
+export function defineFormConditional(schema: Record<string, unknown>) {
+  const schemaWithForm = {
+    type: 'object',
+    properties: {
+      $form: schema
+    },
+    required: ['$form']
+  }
+
+  return defineConditional(schemaWithForm)
+}
+
+export type UserConditionalParameters = {
+  $now: string
+  $user: TokenPayload
+}
+export type EventConditionalParameters = {
+  $now: string
+  $event: EventDocument
+}
 // @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
 export type FormConditionalParameters = {
   $now: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $form: EventState | Record<string, any>
 }
 
@@ -37,6 +57,7 @@ export type ConditionalParameters =
   | EventConditionalParameters
   | FormConditionalParameters
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   k: infer I
 ) => void
@@ -154,6 +175,58 @@ export const event = {
     })
 }
 
+function getDateFromNow(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+}
+
+/* This function will output JSONSchema which looks for example like this:
+{
+  "type": "object",
+  "properties": {
+    "mother.dob": {
+      "type": "string",
+      "format": "date",
+      "formatMaximum": {
+        "$data": "1/child.dob"
+      }
+    },
+    "child.dob": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "mother.dob",
+    "child.dob"
+  ]
+}
+*/
+function getDateRangeToFieldReference(
+  fieldId: string,
+  comparedFieldId: string,
+  clause: 'formatMinimum' | 'formatMaximum'
+) {
+  return {
+    type: 'object',
+    properties: {
+      [fieldId]: {
+        type: 'string',
+        format: 'date',
+        [clause]: { $data: `1/${comparedFieldId}` }
+      },
+      [comparedFieldId]: { type: 'string', format: 'date' }
+    },
+    required: [fieldId, comparedFieldId]
+  }
+}
+
+type FieldReference = { _fieldId: string; [key: string]: unknown }
+function isFieldReference(value: unknown): value is FieldReference {
+  return typeof value === 'object' && value !== null && '_fieldId' in value
+}
+
 /**
  * Generate conditional rules for a form field.
  *
@@ -163,85 +236,115 @@ export const event = {
  *
  */
 export function field(fieldId: string) {
-  const getDateFromNow = (days: number) =>
-    new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0]
-
   const getDateRange = (
     date: string,
     clause: 'formatMinimum' | 'formatMaximum'
   ) => ({
     type: 'object',
     properties: {
-      $form: {
-        type: 'object',
-        properties: {
-          [fieldId]: {
-            type: 'string',
-            format: 'date',
-            [clause]: date
-          }
-        },
-        required: [fieldId]
+      [fieldId]: {
+        type: 'string',
+        format: 'date',
+        [clause]: date
       }
     },
-    required: ['$form']
+    required: [fieldId]
   })
 
   return {
+    /**
+     * @private Internal property used for field reference tracking.
+     */
+    _fieldId: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () =>
-          defineConditional(
+          defineFormConditional(
             getDateRange(getDateFromNow(days), 'formatMinimum')
           ),
         inFuture: () =>
-          defineConditional(
+          defineFormConditional(
             getDateRange(getDateFromNow(-days), 'formatMinimum')
           )
       }),
-      date: (date: string) =>
-        defineConditional(getDateRange(date, 'formatMinimum')),
+      date: (date: string | FieldReference) => {
+        if (isFieldReference(date)) {
+          const comparedFieldId = date._fieldId
+          return defineFormConditional(
+            getDateRangeToFieldReference(
+              fieldId,
+              comparedFieldId,
+              'formatMinimum'
+            )
+          )
+        }
+
+        return defineFormConditional(getDateRange(date, 'formatMinimum'))
+      },
       now: () =>
-        defineConditional(getDateRange(getDateFromNow(0), 'formatMinimum'))
+        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMinimum'))
     }),
     isBefore: () => ({
       days: (days: number) => ({
         inPast: () =>
-          defineConditional(
+          defineFormConditional(
             getDateRange(getDateFromNow(days), 'formatMaximum')
           ),
         inFuture: () =>
-          defineConditional(
+          defineFormConditional(
             getDateRange(getDateFromNow(-days), 'formatMaximum')
           )
       }),
-      date: (date: string) =>
-        defineConditional(getDateRange(date, 'formatMaximum')),
+      date: (date: string | FieldReference) => {
+        if (isFieldReference(date)) {
+          const comparedFieldId = date._fieldId
+          return defineFormConditional(
+            getDateRangeToFieldReference(
+              fieldId,
+              comparedFieldId,
+              'formatMaximum'
+            )
+          )
+        }
+
+        return defineFormConditional(getDateRange(date, 'formatMaximum'))
+      },
       now: () =>
-        defineConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
+        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
     }),
-    isEqualTo: (value: string | boolean) =>
-      defineConditional({
+    isEqualTo: (value: string | boolean | FieldReference) => {
+      // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
+      if (isFieldReference(value)) {
+        const comparedFieldId = value._fieldId
+
+        return defineFormConditional({
+          type: 'object',
+          properties: {
+            [fieldId]: {
+              type: ['string', 'boolean'],
+              const: { $data: `1/${comparedFieldId}` }
+            },
+            [comparedFieldId]: { type: ['string', 'boolean'] }
+          },
+          required: [fieldId, comparedFieldId]
+        })
+      }
+
+      // In the 'default' case, we compare the value of the field with the hard coded value
+      return defineFormConditional({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                oneOf: [
-                  { type: 'string', const: value },
-                  { type: 'boolean', const: value }
-                ],
-                const: value
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            oneOf: [
+              { type: 'string', const: value },
+              { type: 'boolean', const: value }
+            ],
+            const: value
           }
         },
-        required: ['$form']
-      }),
+        required: [fieldId]
+      })
+    },
     /**
      * Use case: Some fields are rendered when selection is not made, or boolean false is explicitly selected.
      * @example field('recommender.none').isFalsy() vs not(field('recommender.none').isEqualTo(true))
@@ -251,90 +354,66 @@ export function field(fieldId: string) {
      *
      */
     isFalsy: () =>
-      defineConditional({
+      defineFormConditional({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                anyOf: [
-                  { const: 'undefined' },
-                  { const: false },
-                  { const: null },
-                  { const: '' }
-                ]
-              }
-            },
+          [fieldId]: {
             anyOf: [
-              {
-                required: [fieldId]
-              },
-              {
-                not: {
-                  required: [fieldId]
-                }
-              }
+              { const: 'undefined' },
+              { const: false },
+              { const: null },
+              { const: '' }
             ]
           }
         },
-        required: ['$form']
-      }),
-    isUndefined: () =>
-      defineConditional({
-        type: 'object',
-        properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                enum: ['undefined']
-              }
-            },
+        anyOf: [
+          {
+            required: [fieldId]
+          },
+          {
             not: {
               required: [fieldId]
             }
           }
+        ]
+      }),
+    isUndefined: () =>
+      defineFormConditional({
+        type: 'object',
+        properties: {
+          [fieldId]: {
+            type: 'string',
+            enum: ['undefined']
+          }
         },
-        required: ['$form']
+        not: {
+          required: [fieldId]
+        }
       }),
     inArray: (values: string[]) =>
-      defineConditional({
+      defineFormConditional({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                enum: values
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'string',
+            enum: values
           }
         },
-        required: ['$form']
+        required: [fieldId]
       }),
     isValidEnglishName: () =>
-      defineConditional({
+      defineFormConditional({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                pattern:
-                  "^[\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*( [\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*)*$",
-                description:
-                  "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'string',
+            pattern:
+              "^[\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*( [\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*)*$",
+            description:
+              "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
           }
         },
-        required: ['$form']
+        required: [fieldId]
       }),
     /**
      * Checks if the field value matches a given regular expression pattern.
@@ -342,39 +421,27 @@ export function field(fieldId: string) {
      * @returns A JSONSchema conditional that validates the field value against the pattern.
      */
     matches: (pattern: string) =>
-      defineConditional({
+      defineFormConditional({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'string',
-                pattern
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'string',
+            pattern
           }
         },
-        required: ['$form']
+        required: [fieldId]
       }),
     isBetween: (min: number, max: number) =>
-      defineConditional({
+      defineFormConditional({
         type: 'object',
         properties: {
-          $form: {
-            type: 'object',
-            properties: {
-              [fieldId]: {
-                type: 'number',
-                minimum: min,
-                maximum: max
-              }
-            },
-            required: [fieldId]
+          [fieldId]: {
+            type: 'number',
+            minimum: min,
+            maximum: max
           }
         },
-        required: ['$form']
+        required: [fieldId]
       })
   }
 }
