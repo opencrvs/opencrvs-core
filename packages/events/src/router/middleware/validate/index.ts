@@ -13,7 +13,7 @@ import {
   ActionType,
   ActionUpdate,
   DeclarationUpdateActions,
-  MetadataAction,
+  AnnotationActionType,
   EventConfig,
   FieldConfig,
   FieldUpdateValue,
@@ -23,7 +23,7 @@ import {
   isVerificationPage,
   annotationActions,
   findRecordActionPages,
-  DeclarationUpdateAction,
+  DeclarationUpdateActionType,
   getActionReviewFields,
   getDeclaration,
   getVisiblePagesFormFields,
@@ -102,7 +102,7 @@ function validateDeclarationUpdateAction({
   annotation
 }: {
   eventConfig: EventConfig
-  actionType: DeclarationUpdateAction
+  actionType: DeclarationUpdateActionType
   declaration: ActionUpdate
   annotation?: ActionUpdate
 }) {
@@ -130,7 +130,7 @@ function validateActionAnnotation({
   annotation = {}
 }: {
   eventConfig: EventConfig
-  actionType: MetadataAction
+  actionType: AnnotationActionType
   annotation?: ActionUpdate
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)

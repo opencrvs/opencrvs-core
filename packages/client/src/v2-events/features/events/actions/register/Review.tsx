@@ -93,9 +93,8 @@ export function Review() {
     drafts: []
   })
 
-  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
-    useActionAnnotation()
-  const annotation = getMetadata(previousAnnotation)
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation(previousAnnotation)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -204,7 +203,7 @@ export function Review() {
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        onAnnotationChange={(values) => setMetadata(values)}
+        onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions

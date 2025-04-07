@@ -124,7 +124,10 @@ export const eventPayloadGenerator = {
     type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
     id
   }),
-  draft: (eventId: string, input: Partial<Draft> = {}) =>
+  draft: (
+    { eventId, actionType }: { eventId: string; actionType: ActionType },
+    input: Partial<Draft> = {}
+  ): Draft =>
     merge(
       {
         id: getUUID(),
@@ -132,7 +135,8 @@ export const eventPayloadGenerator = {
         createdAt: new Date().toISOString(),
         transactionId: getUUID(),
         action: {
-          type: ActionType.REQUEST_CORRECTION,
+          type: actionType,
+          status: ActionStatus.Accepted,
           declaration: {
             'applicant.firstname': 'Max',
             'applicant.surname': 'McLaren',
