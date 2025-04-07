@@ -269,18 +269,14 @@ export function useReviewActionConfig({
     reviewFields
   })
 
-  const isDisabled =
-    incomplete && !scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
-
   if (
     incomplete &&
     scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE) &&
     scopes.includes(SCOPES.RECORD_DECLARE)
   ) {
     return {
-      buttonType: 'positive' as const,
+      buttonType: 'primary' as const,
       incomplete,
-      isDisabled,
       onConfirm: (eventId: string) => {
         events.actions.notify.mutate({
           eventId,
@@ -297,7 +293,6 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive' as const,
       incomplete,
-      isDisabled,
       onConfirm: (eventId: string) =>
         events.customActions.registerOnDeclare.mutate({
           eventId,
@@ -314,7 +309,6 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive' as const,
       incomplete,
-      isDisabled,
       onConfirm: (eventId: string) =>
         events.customActions.validateOnDeclare.mutate({
           eventId,
@@ -329,9 +323,8 @@ export function useReviewActionConfig({
 
   if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
     return {
-      buttonType: 'primary' as const,
+      buttonType: 'positive' as const,
       incomplete,
-      isDisabled,
       onConfirm: (eventId: string) =>
         events.actions.declare.mutate({
           eventId,
