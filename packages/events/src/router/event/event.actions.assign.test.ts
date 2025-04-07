@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
+import { ActionType } from '@opencrvs/commons'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test(`Allows access without any scopes`, async () => {
   const { user, generator } = await setupTestCase()

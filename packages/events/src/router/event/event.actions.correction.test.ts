@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { TRPCError } from '@trpc/server'
 import {
   ActionDocument,
   ActionType,
@@ -19,10 +20,8 @@ import {
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { TRPCError } from '@trpc/server'
-
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()

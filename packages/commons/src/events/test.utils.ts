@@ -83,7 +83,7 @@ export function generateActionMetadataInput(
   action: ActionType
 ) {
   const actionConfig: ActionConfig | undefined = configuration.actions.find(
-    (actionConfig) => actionConfig.type === action
+    (ac) => ac.type === action
   )
 
   const annotationFields = actionConfig
@@ -92,11 +92,13 @@ export function generateActionMetadataInput(
 
   const annotation = fieldConfigsToActionAnnotation(annotationFields)
 
-  const visibleVerificationPageIds =
-    (findRecordActionPages(configuration, action) ?? [])
-      .filter((page) => isVerificationPage(page))
-      .filter((page) => isPageVisible(page, annotation))
-      .map((page) => page.id) ?? []
+  const visibleVerificationPageIds = findRecordActionPages(
+    configuration,
+    action
+  )
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, annotation))
+    .map((page) => page.id)
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
@@ -124,7 +126,7 @@ export const eventPayloadGenerator = {
     type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
     id
   }),
-  draft: (eventId: string, input: Partial<Draft> = {}) =>
+  draft: (eventId: string, input: Partial<Draft> = {}): Draft =>
     merge(
       {
         id: getUUID(),
@@ -133,6 +135,7 @@ export const eventPayloadGenerator = {
         transactionId: getUUID(),
         action: {
           type: ActionType.REQUEST_CORRECTION,
+          status: ActionStatus.Accepted,
           declaration: {
             'applicant.firstname': 'Max',
             'applicant.surname': 'McLaren',
@@ -147,7 +150,7 @@ export const eventPayloadGenerator = {
           createdBy: '@todo',
           createdAtLocation: '@todo'
         }
-      },
+      } satisfies Draft,
       input
     ),
   actions: {
@@ -407,6 +410,10 @@ export function generateActionDocument({
   } satisfies ActionBase
 
   switch (action) {
+    case ActionType.READ:
+      return { ...actionBase, type: action }
+    case ActionType.MARKED_AS_DUPLICATE:
+      return { ...actionBase, type: action }
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
@@ -437,6 +444,8 @@ export function generateActionDocument({
         type: action
       }
 
+    case ActionType.DELETE:
+    case ActionType.DETECT_DUPLICATE:
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }

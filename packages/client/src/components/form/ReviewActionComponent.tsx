@@ -110,6 +110,7 @@ const ACTION_TO_CONTENT_MAP_SKELETON: (
   deliveryMethod: string,
   hasErrorsOnFields: boolean
 ) => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 } = (deliveryMethod, hasErrorsOnFields) => ({
   [String(ACTION.DECLARATION_TO_BE_DECLARED)]: {

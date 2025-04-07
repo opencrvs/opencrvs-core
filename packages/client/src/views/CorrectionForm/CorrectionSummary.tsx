@@ -733,7 +733,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     group: IFormSectionGroup,
     overriddenField: IFormField,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     items: any[],
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     item: any,
     deathForm: IForm
   ) => {
@@ -785,8 +787,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       offlineResources,
       userDetails
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let tempItem: any
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let items: any[] = []
     formSections.forEach((section) => {
       const visitedTags: string[] = []
@@ -1007,6 +1011,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             return (
               <SupportingDocument key={`proof-${i}`}>
                 <PaperClip />
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <span>{doc[1] as any}</span>
               </SupportingDocument>
             )

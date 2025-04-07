@@ -12,7 +12,7 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { Draft } from '@opencrvs/commons/client'
+import { ActionStatus, Draft } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   invalidateDraftsList,
@@ -72,6 +72,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
       eventId: variables.eventId,
       transactionId: variables.transactionId,
       action: {
+        status: ActionStatus.Accepted,
         createdAt: new Date().toISOString(),
         createdBy: '@todo',
         createdAtLocation: '@todo',

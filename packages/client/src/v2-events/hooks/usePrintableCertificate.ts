@@ -56,14 +56,12 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
 
 export const usePrintableCertificate = ({
   event,
-  form,
   locations,
   users,
   certificateConfig,
   language
 }: {
   event: EventDocument
-  form: EventState
   locations: Location[]
   users: User[]
   certificateConfig?: CertificateTemplateConfig
@@ -87,16 +85,19 @@ export const usePrintableCertificate = ({
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $state: modifiedState,
-    $declaration: form,
+    $declaration: currentState.declaration,
     locations,
     users,
     language
   })
+
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   const handleCertify = async (updatedEvent: EventDocument) => {
     const currentEventState = getCurrentEventState(updatedEvent)
-    const base64ReplacedTemplate = await replaceMinioUrlWithBase64(form)
+    const base64ReplacedTemplate = await replaceMinioUrlWithBase64(
+      currentEventState.declaration
+    )
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
@@ -109,6 +110,7 @@ export const usePrintableCertificate = ({
       users,
       language
     })
+
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
     const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
     printAndDownloadPdf(pdfTemplate, event.id)

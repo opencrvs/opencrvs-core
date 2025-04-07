@@ -10,9 +10,9 @@
  */
 
 import { SCOPES } from '@opencrvs/commons'
-import { requiresAnyOfScopes } from '.'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { createTestToken } from '@events/tests/utils'
+import { requiresAnyOfScopes } from '.'
 
 describe('requiresScopes()', () => {
   test('should throw TRPCError with code "FORBIDDEN" if none of the required scopes are present on the token', async () => {
