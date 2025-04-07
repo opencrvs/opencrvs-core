@@ -566,14 +566,14 @@ const ActionContainer = styled.div`
 `
 
 function ReviewActionComponent({
+  incomplete,
   onConfirm,
   onReject,
   messages,
   primaryButtonType,
-  canSendIncomplete,
-  isPrimaryActionDisabled
+  canSendIncomplete
 }: {
-  isPrimaryActionDisabled: boolean
+  incomplete: boolean
   onConfirm: () => void
   onReject?: () => void
   messages: {
@@ -587,7 +587,7 @@ function ReviewActionComponent({
 }) {
   const intl = useIntl()
 
-  const background = isPrimaryActionDisabled ? 'error' : 'success'
+  const background = incomplete ? 'error' : 'success'
 
   return (
     <Container>
@@ -597,7 +597,7 @@ function ReviewActionComponent({
           <Description>{intl.formatMessage(messages.description)}</Description>
           <ActionContainer>
             <Button
-              disabled={isPrimaryActionDisabled && !canSendIncomplete}
+              disabled={!!incomplete && !canSendIncomplete}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}

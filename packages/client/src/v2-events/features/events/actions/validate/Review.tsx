@@ -211,7 +211,7 @@ export function Review() {
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
-          isPrimaryActionDisabled={hasValidationErrors}
+          incomplete={hasValidationErrors}
           messages={{
             title: messages.validateActionTitle,
             description: hasValidationErrors
