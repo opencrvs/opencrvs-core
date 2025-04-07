@@ -25,14 +25,8 @@ import { setQueryDefaults } from './utils'
 setQueryDefaults(trpcOptionsProxy.event.list, {
   queryFn: async (...params) => {
     const {
-      meta,
       queryKey: [, input]
     } = params[0]
-    if (!meta) {
-      throw new Error(
-        'api.event.list was called without passing mandatory event configuration'
-      )
-    }
 
     const queryOptions = trpcOptionsProxy.event.list.queryOptions()
 
@@ -56,16 +50,12 @@ export function useGetEvents() {
   const trpc = useTRPC()
   return {
     useQuery: () => {
-      const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
       const { queryFn, ...options } = trpc.event.list.queryOptions()
 
       return useQuery({
         ...options,
-        queryKey: trpc.event.list.queryKey(),
-        meta: {
-          eventConfig
-        }
+        queryKey: trpc.event.list.queryKey()
       })
     },
     useSuspenseQuery: () => {
