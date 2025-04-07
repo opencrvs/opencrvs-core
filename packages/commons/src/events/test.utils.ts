@@ -509,6 +509,7 @@ export const eventQueryDataGenerator = (
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   createdBy: overrides.createdBy ?? getUUID(),
   createdAtLocation: overrides.createdAtLocation ?? getUUID(),
+  updatedAtLocation: overrides.updatedAtLocation ?? getUUID(),
   updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),

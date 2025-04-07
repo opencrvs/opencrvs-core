@@ -167,6 +167,7 @@ export async function createIndex(
           createdAt: { type: 'date' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
+          updatedAtLocation: { type: 'keyword' },
           updatedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
