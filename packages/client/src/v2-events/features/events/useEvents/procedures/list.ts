@@ -11,25 +11,20 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import {
-  EventDocument,
-  EventIndex,
-  getCurrentEventState
-} from '@opencrvs/commons/client'
+import { EventIndex } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { setQueryDefaults } from './utils'
-import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { cacheUsersFromEventIndex } from '@client/v2-events/features/users/cache'
 
 /*
- * This logic overrides the default behaviour of "api.event.get"
+ * This logic overrides the default behaviour of "api.event.list"
  * by making it so all "FILE" or "FILE_WITH_OPTIONS" type data points
  * are parsed from the received event document and prefetched as part of fetching the record
  *
  * This ensures the full record can be browsed even when the user goes offline
  */
-setQueryDefaults(trpcOptionsProxy.event.get, {
+setQueryDefaults(trpcOptionsProxy.event.list, {
   queryFn: async (...params) => {
     const {
       meta,
@@ -37,11 +32,11 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
     } = params[0]
     if (!meta) {
       throw new Error(
-        'api.event.get was called without passing mandatory event configuration'
+        'api.event.list was called without passing mandatory event configuration'
       )
     }
 
-    const queryOptions = trpcOptionsProxy.event.get.queryOptions(input.input)
+    const queryOptions = trpcOptionsProxy.event.list.queryOptions()
 
     if (typeof queryOptions.queryFn !== 'function') {
       throw new Error('queryFn is not a function')
@@ -51,73 +46,50 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
      */
     const response = await queryOptions.queryFn(...params)
 
-    const eventDocument = EventDocument.parse(response)
+    response.forEach((eventIndex) => {
+      EventIndex.parse(eventIndex)
+    })
 
-    await Promise.all([
-      cacheFiles(eventDocument),
-      cacheUsersFromEventDocument(eventDocument)
-    ])
-    return eventDocument
+    await Promise.all(
+      response.map((eventIndex) => {
+        return cacheUsersFromEventIndex(eventIndex)
+      })
+    )
+
+    return response
   }
 })
 
-export function useGetEvent() {
+export function useGetEvents() {
   const trpc = useTRPC()
   return {
-    useQuery: (id: string) => {
+    useQuery: () => {
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
-      const { queryFn, ...options } = trpc.event.get.queryOptions(id)
+      const { queryFn, ...options } = trpc.event.list.queryOptions()
 
       return useQuery({
         ...options,
-        queryKey: trpc.event.get.queryKey(id),
+        queryKey: trpc.event.list.queryKey(),
         meta: {
           eventConfig
         }
       })
     },
-    useSuspenseQuery: (id: string) => {
+    useSuspenseQuery: () => {
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
-      const { queryFn, ...options } = trpc.event.get.queryOptions(id)
+      const { queryFn, ...options } = trpc.event.list.queryOptions()
 
       return [
         useSuspenseQuery({
           ...options,
-          queryKey: trpc.event.get.queryKey(id),
+          queryKey: trpc.event.list.queryKey(),
           meta: {
             eventConfig
           }
         }).data
       ]
-    }
-  }
-}
-
-/**
- * When full history of an event is not needed, this hook can be used to get the current state of an event.
- * @returns convenience hooks for getting EventState from EventDocument.
- */
-export function useGetEventState() {
-  const getEvent = useGetEvent()
-
-  return {
-    useQuery: (id: string) => {
-      const response = getEvent.useQuery(id)
-      const eventState = response.data
-        ? getCurrentEventState(response.data)
-        : undefined
-
-      return {
-        ...response,
-        declaration: eventState
-      }
-    },
-    useSuspenseQuery: (id: string): EventIndex => {
-      const [eventDocument] = getEvent.useSuspenseQuery(id)
-
-      return getCurrentEventState(eventDocument)
     }
   }
 }

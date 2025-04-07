@@ -9,10 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventDocument } from '@opencrvs/commons/client'
+import { EventDocument, EventIndex } from '@opencrvs/commons/client'
+import _ from 'lodash'
 
 export function findUserIdsFromDocument(eventDocument: EventDocument) {
-  return eventDocument.actions
-    .map((action) => ('createdBy' in action ? action.createdBy : undefined))
-    .filter((maybeUserId): maybeUserId is string => Boolean(maybeUserId))
+  return _.uniq(
+    eventDocument.actions
+      .map((action) => ('createdBy' in action ? action.createdBy : undefined))
+      .filter((maybeUserId): maybeUserId is string => Boolean(maybeUserId))
+  )
+}
+
+export function findUserIdsFromIndex(eventIndex: EventIndex) {
+  return _.uniq(
+    [eventIndex.assignedTo, eventIndex.createdBy, eventIndex.updatedBy].filter(
+      (maybeUserId): maybeUserId is string => Boolean(maybeUserId)
+    )
+  )
 }
