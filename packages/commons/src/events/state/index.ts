@@ -120,12 +120,9 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
  * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
  *
  */
-
 export function deepDropNulls<T>(obj: T): T {
   if (Array.isArray(obj)) {
-    return obj
-      .map((item) => deepDropNulls(item))
-      .filter((item) => item !== null) as T
+    return obj as T
   }
 
   if (obj !== null && typeof obj === 'object') {

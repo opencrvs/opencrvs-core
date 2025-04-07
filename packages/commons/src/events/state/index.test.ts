@@ -248,34 +248,6 @@ describe('deepDropNulls()', () => {
     })
   })
 
-  it('should handle arrays with null values', () => {
-    const before = {
-      items: [null, 'item1', null, 'item2']
-    }
-
-    const after = deepDropNulls(before)
-
-    expect(after).toEqual({
-      items: ['item1', 'item2']
-    })
-  })
-
-  it('should handle deeply nested nulls in arrays', () => {
-    const before = {
-      records: [
-        { id: 1, value: null },
-        { id: 2, value: 'valid' },
-        { id: null, value: 'missing-id' }
-      ]
-    }
-
-    const after = deepDropNulls(before)
-
-    expect(after).toEqual({
-      records: [{ id: 1 }, { id: 2, value: 'valid' }, { value: 'missing-id' }]
-    })
-  })
-
   it('should preserve primitive values', () => {
     expect(deepDropNulls('string')).toBe('string')
     expect(deepDropNulls(123)).toBe(123)
