@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getCurrentEventState } from '.'
+import { deepDropNulls, getCurrentEventState } from '.'
 import { tennisClubMembershipEvent } from '../../fixtures'
 import { getUUID } from '../../uuid'
 import { ActionStatus } from '../ActionDocument'
@@ -222,5 +222,65 @@ describe('address state transitions', () => {
       ...initialForm,
       'applicant.address': addressWithoutVillage
     })
+  })
+})
+
+describe('deepDropNulls()', () => {
+  it('should clean nulls correctly with nested objects', () => {
+    const before = {
+      a: null,
+      b: {
+        c: null,
+        d: 'foo',
+        e: [{ foo: 'bar' }]
+      },
+      f: [{ asd: 'asd' }]
+    }
+
+    const after = deepDropNulls(before)
+
+    expect(after).toEqual({
+      b: {
+        d: 'foo',
+        e: [{ foo: 'bar' }]
+      },
+      f: [{ asd: 'asd' }]
+    })
+  })
+
+  it('should handle arrays with null values', () => {
+    const before = {
+      items: [null, 'item1', null, 'item2']
+    }
+
+    const after = deepDropNulls(before)
+
+    expect(after).toEqual({
+      items: ['item1', 'item2']
+    })
+  })
+
+  it('should handle deeply nested nulls in arrays', () => {
+    const before = {
+      records: [
+        { id: 1, value: null },
+        { id: 2, value: 'valid' },
+        { id: null, value: 'missing-id' }
+      ]
+    }
+
+    const after = deepDropNulls(before)
+
+    expect(after).toEqual({
+      records: [{ id: 1 }, { id: 2, value: 'valid' }, { value: 'missing-id' }]
+    })
+  })
+
+  it('should preserve primitive values', () => {
+    expect(deepDropNulls('string')).toBe('string')
+    expect(deepDropNulls(123)).toBe(123)
+    expect(deepDropNulls(false)).toBe(false)
+    expect(deepDropNulls(null)).toBe(null)
+    expect(deepDropNulls(undefined)).toBe(undefined)
   })
 })

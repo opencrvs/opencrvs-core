@@ -120,26 +120,26 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
  * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
-  if (!_.isObject(obj)) {
+
+export function deepDropNulls<T>(obj: T): T {
+  if (Array.isArray(obj)) {
     return obj
+      .map((item) => deepDropNulls(item))
+      .filter((item) => item !== null) as T
   }
 
-  return Object.entries(obj).reduce((acc: T, [key, value]) => {
-    if (_.isObject(value)) {
-      value = deepDropNulls(value)
-    }
-
-    if (value !== null) {
-      return {
-        ...acc,
-        [key]: value
+  if (obj !== null && typeof obj === 'object') {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+      const cleanedValue = deepDropNulls(value)
+      if (cleanedValue !== null) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(acc as any)[key] = cleanedValue
       }
-    }
+      return acc
+    }, {} as T)
+  }
 
-    return acc
-  }, {} as T)
+  return obj
 }
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
