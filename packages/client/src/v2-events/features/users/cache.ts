@@ -18,7 +18,7 @@ import {
 } from '@client/v2-events/trpc'
 import { findUserIdsFromDocument, findUserIdsFromIndex } from './utils'
 
-export async function cacheUsers(userIds: string[]) {
+async function cacheUsers(userIds: string[]) {
   const users = await trpcClient.user.list.query(userIds)
 
   users.map((user) =>
