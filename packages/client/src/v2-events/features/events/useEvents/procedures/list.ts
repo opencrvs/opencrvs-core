@@ -18,11 +18,9 @@ import { setQueryDefaults } from './utils'
 import { cacheUsersFromEventIndices } from '@client/v2-events/features/users/cache'
 
 /*
- * This logic overrides the default behaviour of "api.event.list"
- * by making it so all "FILE" or "FILE_WITH_OPTIONS" type data points
- * are parsed from the received event document and prefetched as part of fetching the record
- *
- * This ensures the full record can be browsed even when the user goes offline
+ * This logic overrides the default behavior of "api.event.list"
+ * by ensuring that all users referenced in the event indices
+ * are prefetched as part of fetching the records.
  */
 setQueryDefaults(trpcOptionsProxy.event.list, {
   queryFn: async (...params) => {

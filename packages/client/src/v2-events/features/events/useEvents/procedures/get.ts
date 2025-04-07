@@ -27,6 +27,8 @@ import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/ca
  * by making it so all "FILE" or "FILE_WITH_OPTIONS" type data points
  * are parsed from the received event document and prefetched as part of fetching the record
  *
+ * Additionally, all users referenced in the event document are prefetched.
+ *
  * This ensures the full record can be browsed even when the user goes offline
  */
 setQueryDefaults(trpcOptionsProxy.event.get, {
