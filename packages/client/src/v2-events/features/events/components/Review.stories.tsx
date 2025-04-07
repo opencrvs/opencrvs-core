@@ -141,7 +141,7 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
           onEdit={handleEdit}
         >
           <Review.Actions
-            isPrimaryActionDisabled={false}
+            incomplete={false}
             messages={{
               title: {
                 id: 'v2.changeModal.title',
@@ -219,7 +219,7 @@ export const ReviewWithValidationErrors: Story = {
         onEdit={() => undefined}
       >
         <Review.Actions
-          isPrimaryActionDisabled={false}
+          incomplete={false}
           messages={{
             title: {
               id: 'v2.changeModal.title',
