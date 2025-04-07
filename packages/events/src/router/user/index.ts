@@ -12,10 +12,16 @@
 import { z } from 'zod'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
+import { TRPCError } from '@trpc/server'
 
 export const userRouter = router({
   get: publicProcedure.input(z.string()).query(async ({ input }) => {
     const [user] = await getUsersById([input])
+
+    if (!user) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
     return user
   }),
   list: publicProcedure
