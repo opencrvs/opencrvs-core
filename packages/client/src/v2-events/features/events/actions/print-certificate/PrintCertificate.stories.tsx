@@ -23,7 +23,6 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import * as PrintCertificate from './index'
-import { graphql, HttpResponse } from 'msw'
 
 const meta: Meta<typeof PrintCertificate.Review> = {
   title: 'Print Certificate'
