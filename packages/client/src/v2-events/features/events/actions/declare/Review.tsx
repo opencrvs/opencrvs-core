@@ -143,7 +143,7 @@ export function Review() {
       >
         <ReviewComponent.Actions
           canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
-          isPrimaryActionDisabled={reviewActionConfiguration.isDisabled}
+          incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}

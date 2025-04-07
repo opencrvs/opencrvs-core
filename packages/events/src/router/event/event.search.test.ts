@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { AddressType } from '@opencrvs/commons'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns empty list when no events match search criteria', async () => {
   const { user, generator } = await setupTestCase()

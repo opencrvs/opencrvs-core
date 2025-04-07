@@ -13,6 +13,8 @@
  */
 import { visit } from 'graphql'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 const extractPersistDirectivePaths = (
   originalQuery: any,
   directive = 'persist'

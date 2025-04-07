@@ -30,7 +30,7 @@ import { useDrafts } from '../../../drafts/useDrafts'
 import { CERT_TEMPLATE_ID } from '../../useCertificateTemplateSelectorFieldConfig'
 import * as PrintCertificate from './index'
 
-const meta: Meta<typeof PrintCertificate.Pages> = {
+const meta: Meta<typeof PrintCertificate.Review> = {
   title: 'Print Certificate'
 }
 

@@ -13,6 +13,7 @@ import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
+  ActionStatus,
   ActionType,
   Draft,
   getCurrentEventState,
@@ -58,6 +59,7 @@ function createDraftHandlers() {
         transactionId: req.transactionId,
         createdAt: new Date().toISOString(),
         action: {
+          status: ActionStatus.Accepted,
           ...req,
           createdBy: 'test-user',
           createdAtLocation: 'test-location',

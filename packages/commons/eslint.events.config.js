@@ -9,23 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-const { FlatCompat } = require('@eslint/eslintrc')
+const eventsConfig = require('../../eslint.events.config.js')
 const { defineConfig } = require('eslint/config')
 const path = require('path')
-const eventsConfig = require('../../eslint.events.config.js')
-
-const compat = new FlatCompat({
-  baseDirectory: path.dirname(__filename)
-})
 
 module.exports = defineConfig([
-  { ignores: ['build/**/*', 'eslint*', 'vitest.config.ts'] },
-  ...compat.extends(
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended'
-  ),
   {
-    files: ['./src/**/*.ts', 'src/**/*.ts'],
     languageOptions: {
       sourceType: 'commonjs',
       parserOptions: {
@@ -42,34 +31,36 @@ module.exports = defineConfig([
         }
       }
     },
+    files: [
+      './src/events/**/*.ts',
+      'src/events/**/*.ts',
+      'src/conditionals/**/*.ts',
+      './src/conditionals/**/*.ts'
+    ],
     rules: {
       ...eventsConfig.rules,
-      'no-console': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
-      '@typescript-eslint/consistent-type-definitions': 'off',
-      'import/order': [
-        'error',
-        {
-          pathGroups: [
-            {
-              pattern: '@opencrvs/**',
-              group: 'external',
-              position: 'after'
-            },
-            {
-              pattern: '@events/**',
-              group: 'external',
-              position: 'after'
-            }
-          ],
-          pathGroupsExcludedImportTypes: ['builtin']
-        }
-      ],
+      'import/no-relative-parent-imports': 'off',
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
       'no-restricted-imports': [
         'error',
         {
-          name: '@opencrvs/commons/client',
-          message: 'Please use @opencrvs/commons or @opencrvs/commons/events'
+          paths: [
+            {
+              name: '../events',
+              message:
+                "Don't import from '../events' directly under commons. Use the actual file (e.g., 'events/EventConfig') to avoid Zod type issues."
+            },
+            {
+              name: './events',
+              message:
+                "Don't import from './events' directly under commons. Use the actual file (e.g., 'events/EventConfig') to avoid Zod type issues."
+            }
+          ],
+          patterns: [
+            '**/events/index',
+            '**/events/index.ts',
+            '**/events/index.js'
+          ]
         }
       ]
     }

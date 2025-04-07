@@ -39,6 +39,7 @@ describe('Create new user page tests', () => {
           mockOfflineData.userForms
             .sections[0] as unknown as ISerializedFormSection,
           // Needs to be casted as any as there are non-validator functions in the import
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           builtInValidators as Record<string, any>
         )}
         activeGroup={
@@ -46,6 +47,7 @@ describe('Create new user page tests', () => {
             mockOfflineData.userForms
               .sections[0] as unknown as ISerializedFormSection,
             // Needs to be casted as any as there are non-validator functions in the import
+            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
             builtInValidators as Record<string, any>
           ).groups[0]
         }

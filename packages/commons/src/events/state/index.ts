@@ -118,36 +118,35 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
  *
  * @example
  * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
+ *
  */
-export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
-  if (!_.isObject(obj)) return obj
+export function deepDropNulls<T>(obj: T): T {
+  if (Array.isArray(obj)) {
+    return obj as T
+  }
 
-  return Object.entries(obj).reduce((acc: T, [key, value]) => {
-    if (_.isObject(value)) {
-      value = deepDropNulls(value)
-    }
-
-    if (value !== null) {
-      return {
-        ...acc,
-        [key]: value
+  if (obj !== null && typeof obj === 'object') {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+      const cleanedValue = deepDropNulls(value)
+      if (cleanedValue !== null) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(acc as any)[key] = cleanedValue
       }
-    }
+      return acc
+    }, {} as T)
+  }
 
-    return acc
-  }, {} as T)
+  return obj
 }
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
   return status === EventStatus.CREATED
 }
-
 export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(
-    (a): a is ActionDocument => !a.status || a.status === ActionStatus.Accepted
+    (a): a is ActionDocument => a.status === ActionStatus.Accepted
   )
 }
-
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -272,7 +271,9 @@ export function getActionAnnotation({
   drafts: Draft[]
 }): EventState {
   const activeActions = getAcceptedActions(event)
-  const action = activeActions.find((action) => actionType === action.type)
+  const action = activeActions.find(
+    (activeAction) => actionType === activeAction.type
+  )
 
   const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
 
@@ -281,8 +282,8 @@ export function getActionAnnotation({
     ...eventDrafts.map((draft) => draft.action)
   ].sort()
 
-  const annotation = sorted.reduce((annotation, action) => {
-    return deepMerge(annotation, action.annotation ?? {})
+  const annotation = sorted.reduce((ann, sortedAction) => {
+    return deepMerge(ann, sortedAction.annotation ?? {})
   }, {})
 
   return deepDropNulls(annotation)

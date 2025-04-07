@@ -64,6 +64,36 @@ export const handlers = {
       return [tennisClubMembershipEventIndex]
     })
   ],
+  eventLocations: [
+    tRPCMsw.locations.get.query(() => {
+      return [
+        {
+          id: '93897b67-29af-4a00-8381-42a694187666',
+          externalId: 'AWn3s2RqgAN',
+          name: 'Central',
+          partOf: null
+        },
+        {
+          id: 'c599b691-fd2d-45e1-abf4-d185de727fb5',
+          externalId: 'KozcEjeTyuD',
+          name: 'Sulaka',
+          partOf: null
+        },
+        {
+          id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64',
+          externalId: 'B1u1bVtIA92',
+          name: 'Pualula',
+          partOf: null
+        },
+        {
+          id: '6d1a59df-988c-4021-a846-ccbc021931a7',
+          externalId: 'dbTLdTi7s8F',
+          name: 'Chuminga',
+          partOf: null
+        }
+      ]
+    })
+  ],
   getUserRoles: [
     graphql.query('getUserRoles', () => {
       return HttpResponse.json({

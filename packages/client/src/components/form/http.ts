@@ -25,6 +25,7 @@ function evalTemplateString(
 }
 
 function transformRequestBody(
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   body: Record<string, any>,
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) {
