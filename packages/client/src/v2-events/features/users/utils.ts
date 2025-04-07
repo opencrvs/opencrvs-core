@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 import _ from 'lodash'
+import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 
 export function findUserIdsFromDocument(eventDocument: EventDocument) {
   return _.uniq(

@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { flatten, uniq } from 'lodash'
 import { EventDocument, EventIndex } from '@opencrvs/commons/client'
-import { findUserIdsFromDocument, findUserIdsFromIndex } from './utils'
 import {
   queryClient,
   trpcClient,
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
-import { flatten, uniq } from 'lodash'
+import { findUserIdsFromDocument, findUserIdsFromIndex } from './utils'
 
 export async function cacheUsers(userIds: string[]) {
   const users = await trpcClient.user.list.query(userIds)

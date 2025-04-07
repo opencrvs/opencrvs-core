@@ -14,8 +14,8 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { EventIndex } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
-import { setQueryDefaults } from './utils'
 import { cacheUsersFromEventIndices } from '@client/v2-events/features/users/cache'
+import { setQueryDefaults } from './utils'
 
 /*
  * This logic overrides the default behavior of "api.event.list"

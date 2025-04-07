@@ -19,8 +19,8 @@ import {
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
-import { setQueryDefaults } from './utils'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { setQueryDefaults } from './utils'
 
 /*
  * This logic overrides the default behaviour of "api.event.get"
