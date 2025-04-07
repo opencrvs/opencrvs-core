@@ -16,6 +16,7 @@ import {
   trpcClient,
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
+import { flatten, uniq } from 'lodash'
 
 export async function cacheUsers(userIds: string[]) {
   const users = await trpcClient.user.list.query(userIds)
@@ -32,8 +33,10 @@ export async function cacheUsersFromEventDocument(
   await cacheUsers(userIds)
 }
 
-export async function cacheUsersFromEventIndex(eventIndex: EventIndex) {
-  const userIds = findUserIdsFromIndex(eventIndex)
+export async function cacheUsersFromEventIndices(eventIndices: EventIndex[]) {
+  const userIds = uniq(
+    flatten(eventIndices.map((eventIndex) => findUserIdsFromIndex(eventIndex)))
+  )
 
   const users = await trpcClient.user.list.query(userIds)
 

@@ -15,7 +15,7 @@ import { EventIndex } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { setQueryDefaults } from './utils'
-import { cacheUsersFromEventIndex } from '@client/v2-events/features/users/cache'
+import { cacheUsersFromEventIndices } from '@client/v2-events/features/users/cache'
 
 /*
  * This logic overrides the default behaviour of "api.event.list"
@@ -49,13 +49,7 @@ setQueryDefaults(trpcOptionsProxy.event.list, {
     response.forEach((eventIndex) => {
       EventIndex.parse(eventIndex)
     })
-
-    await Promise.all(
-      response.map((eventIndex) => {
-        return cacheUsersFromEventIndex(eventIndex)
-      })
-    )
-
+    await cacheUsersFromEventIndices(response)
     return response
   }
 })
