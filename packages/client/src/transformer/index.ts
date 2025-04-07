@@ -204,7 +204,8 @@ export function getChangedValues(
         originalDraftData[section.id] ??= {}
 
         if (
-          !conditionalActions.includes('hide') &&
+          (!conditionalActions.includes('hide') ||
+            fieldDef.name === 'detailsExist') &&
           !isMetaTypeField(fieldDef) &&
           hasFieldChanged(
             fieldDef,
@@ -287,7 +288,8 @@ export const draftToGqlTransformer = (
           draftData[section.id][fieldDef.name] !== null &&
           draftData[section.id][fieldDef.name] !== undefined &&
           draftData[section.id][fieldDef.name] !== '' &&
-          !conditionalActions.includes('hide')
+          (!conditionalActions.includes('hide') ||
+            fieldDef.name === 'detailsExist') // https://github.com/opencrvs/opencrvs-core/issues/7821#issuecomment-2514398986
         ) {
           if (fieldDef.mapping && fieldDef.mapping.mutation) {
             fieldDef.mapping.mutation(
