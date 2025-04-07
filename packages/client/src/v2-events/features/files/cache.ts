@@ -12,9 +12,9 @@
 import {
   EventDocument,
   FileFieldValue,
-  FileFieldWithOptionValue
+  FileFieldWithOptionValue,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
-import { getAcceptedActions } from '@opencrvs/commons/client'
 import { precacheFile } from './useFileUpload'
 
 export async function cacheFiles(eventDocument: EventDocument) {
