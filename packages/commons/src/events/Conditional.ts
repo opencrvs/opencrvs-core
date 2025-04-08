@@ -20,11 +20,8 @@ export const Conditional = z.custom<JSONSchema>(
  * By default, when conditionals are undefined, action is visible and enabled to everyone.
  */
 export const ConditionalType = {
-  /** When 'SHOW' conditional is defined, the action is shown to the user only if the condition is met */
   SHOW: 'SHOW',
-  /** If 'ENABLE' conditional is defined, the action is enabled only if the condition is met */
   ENABLE: 'ENABLE',
-  /** If 'DISPLAY_ON_REVIEW' conditional is defined, the action is displayed on the review page only if the condition is met */
   DISPLAY_ON_REVIEW: 'DISPLAY_ON_REVIEW'
 } as const
 
@@ -32,12 +29,20 @@ export type ConditionalType =
   (typeof ConditionalType)[keyof typeof ConditionalType]
 
 export const ShowConditional = z.object({
-  type: z.literal(ConditionalType.SHOW),
+  type: z
+    .literal(ConditionalType.SHOW)
+    .describe(
+      "When 'SHOW' conditional is defined, the action is shown to the user only if the condition is met"
+    ),
   conditional: Conditional
 })
 
 export const EnableConditional = z.object({
-  type: z.literal(ConditionalType.ENABLE),
+  type: z
+    .literal(ConditionalType.ENABLE)
+    .describe(
+      "If 'ENABLE' conditional is defined, the action is enabled only if the condition is met"
+    ),
   conditional: Conditional
 })
 
@@ -67,7 +72,11 @@ export const ActionConditional = z.discriminatedUnion('type', [
 export type ActionConditional = InferredActionConditional
 
 export const DisplayOnReviewConditional = z.object({
-  type: z.literal(ConditionalType.DISPLAY_ON_REVIEW),
+  type: z
+    .literal(ConditionalType.DISPLAY_ON_REVIEW)
+    .describe(
+      'Controls the visibility of a field on review pages. This should only be used for fields within declaration forms, as they are the only ones with review pages. By default, all fields are visible on the review page. For a field to be shown, both ConditionalType.SHOW and ConditionalType.DISPLAY_ON_REVIEW conditions must be satisfied.'
+    ),
   conditional: Conditional
 })
 
