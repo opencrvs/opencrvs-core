@@ -33,6 +33,7 @@ import {
   FieldType,
   FormConfig,
   getFieldValidationErrors,
+  isFieldDisplayedOnReview,
   isFieldVisible,
   isPageVisible,
   SCOPES
@@ -296,7 +297,7 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldVisible(field, form))
+            .filter((field) => isFieldDisplayedOnReview(field, form))
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]

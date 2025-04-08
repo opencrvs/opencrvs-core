@@ -28,8 +28,13 @@ export const ConditionalType = {
   /** When 'SHOW' conditional is defined, the action is shown to the user only if the condition is met */
   SHOW: 'SHOW',
   /** If 'ENABLE' conditional is defined, the action is enabled only if the condition is met */
-  ENABLE: 'ENABLE'
+  ENABLE: 'ENABLE',
+  /** If 'DISPLAY_ON_REVIEW' conditional is defined, the action is displayed on the review page only if the condition is met */
+  DISPLAY_ON_REVIEW: 'DISPLAY_ON_REVIEW'
 } as const
+
+export type ConditionalType =
+  (typeof ConditionalType)[keyof typeof ConditionalType]
 
 export const ShowConditional = z.object({
   type: z.literal(ConditionalType.SHOW),
@@ -65,3 +70,37 @@ export const ActionConditional = z.discriminatedUnion('type', [
 ]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConditionalFields[]>
 
 export type ActionConditional = InferredActionConditional
+
+export const DisplayOnReviewConditional = z.object({
+  type: z.literal(ConditionalType.DISPLAY_ON_REVIEW),
+  conditional: Conditional()
+})
+
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllFieldConditionalFields =
+  | typeof ShowConditional
+  | typeof EnableConditional
+  | typeof DisplayOnReviewConditional
+
+/** @knipignore */
+export type InferredFieldConditional =
+  | z.infer<typeof ShowConditional>
+  | z.infer<typeof EnableConditional>
+  | z.infer<typeof DisplayOnReviewConditional>
+
+export const FieldConditional = z.discriminatedUnion('type', [
+  // Field can be shown / hidden
+  ShowConditional,
+  // Field can be shown to the user but as disabled
+  EnableConditional,
+  // Field result can be shown / hidden on the review page
+  DisplayOnReviewConditional
+]) as unknown as z.ZodDiscriminatedUnion<'type', AllFieldConditionalFields[]>
+
+export type FieldConditional = z.infer<typeof FieldConditional>
