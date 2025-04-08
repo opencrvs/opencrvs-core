@@ -99,11 +99,11 @@ export type InferredFieldConditional =
   | z.infer<typeof DisplayOnReviewConditional>
 
 export const FieldConditional = z.discriminatedUnion('type', [
-  // Field can be shown / hidden
+  // Field input can be shown / hidden
   ShowConditional,
-  // Field can be shown to the user but as disabled
+  // Field input can be shown to the user but as disabled
   EnableConditional,
-  // Field result can be shown / hidden on the review page
+  // Field output can be shown / hidden on the review page
   DisplayOnReviewConditional
 ]) as unknown as z.ZodDiscriminatedUnion<'type', TFieldConditional[]>
 
