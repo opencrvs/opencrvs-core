@@ -18,6 +18,7 @@ import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 import {
   customMutationKeys,
+  useAssignAction,
   useEventAction,
   useEventCustomAction
 } from './procedures/actions/action'
@@ -75,7 +76,7 @@ export function useEvents() {
         reject: useEventAction(trpc.event.actions.correction.reject)
       },
       assignment: {
-        assign: useEventAction(trpc.event.actions.assignment.assign),
+        assign: useAssignAction([...customMutationKeys.getEventAndAssign]),
         unassign: useEventAction(trpc.event.actions.assignment.unassign)
       }
     },

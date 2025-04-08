@@ -85,8 +85,6 @@ export function ActionMenu({ eventId }: { eventId: string }) {
         onClick={() => {
           events.actions.assignment.assign.mutate({
             eventId,
-            transactionId: getUUID(),
-            declaration: {},
             assignedTo: authentication.sub
           })
         }}
