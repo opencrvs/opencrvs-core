@@ -86,6 +86,9 @@ export function useEvents() {
       ]),
       validateOnDeclare: useEventCustomAction([
         ...customMutationKeys.validateOnDeclare
+      ]),
+      registerOnValidate: useEventCustomAction([
+        ...customMutationKeys.registerOnValidate
       ])
     }
   }

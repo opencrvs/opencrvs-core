@@ -154,7 +154,8 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
 
 export const customMutationKeys = {
   validateOnDeclare: ['validateOnDeclare'],
-  registerOnDeclare: ['registerOnDeclare']
+  registerOnDeclare: ['registerOnDeclare'],
+  registerOnValidate: ['registerOnValidate']
 } as const
 
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
@@ -166,6 +167,13 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent
+})
+
+queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
+  mutationFn: customApi.registerOnValidate,
   retry: true,
   retryDelay: 10000,
   onSuccess: updateLocalEvent

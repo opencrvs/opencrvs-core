@@ -42,32 +42,12 @@ export function useReviewActionConfig({
     reviewFields
   })
 
-  if (
-    incomplete &&
-    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE) &&
-    scopes.includes(SCOPES.RECORD_DECLARE)
-  ) {
-    return {
-      buttonType: 'primary' as const,
-      incomplete,
-      onConfirm: (eventId: string) => {
-        events.actions.notify.mutate({
-          eventId,
-          declaration,
-          annotation,
-          transactionId: uuid()
-        })
-      },
-      messages: reviewMessages.incomplete.declare
-    }
-  }
-
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
     return {
       buttonType: 'positive' as const,
       incomplete,
       onConfirm: (eventId: string) =>
-        events.customActions.registerOnDeclare.mutate({
+        events.customActions.registerOnValidate.mutate({
           eventId,
           declaration,
           annotation
@@ -83,22 +63,6 @@ export function useReviewActionConfig({
       buttonType: 'positive' as const,
       incomplete,
       onConfirm: (eventId: string) =>
-        events.customActions.validateOnDeclare.mutate({
-          eventId,
-          declaration,
-          annotation
-        }),
-      messages: incomplete
-        ? reviewMessages.incomplete.validate
-        : reviewMessages.complete.validate
-    }
-  }
-
-  if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
-    return {
-      buttonType: 'positive' as const,
-      incomplete,
-      onConfirm: (eventId: string) =>
         events.actions.declare.mutate({
           eventId,
           declaration,
@@ -106,8 +70,8 @@ export function useReviewActionConfig({
           transactionId: uuid()
         }),
       messages: incomplete
-        ? reviewMessages.incomplete.declare
-        : reviewMessages.complete.declare
+        ? reviewMessages.incomplete.validate
+        : reviewMessages.complete.validate
     }
   }
 
