@@ -43,42 +43,16 @@ const actionMessages = defineMessages({
   }
 })
 
-export function ActionMenu({ eventId }: { eventId: string }) {
+function AssignmentActions({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
-  const navigate = useNavigate()
   const authentication = useAuthentication()
-
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
-
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
 
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
   }
 
-  function isActionVisible(action: ActionConfig) {
-    if (action.conditionals.length === 0) {
-      return true
-    }
-
-    const params = {
-      $event: event,
-      $user: authentication,
-      $now: formatISO(new Date(), { representation: 'date' })
-    }
-    return action.conditionals.reduce((acc, conditional) => {
-      if (conditional.type === ConditionalType.SHOW) {
-        return acc && validate(conditional.conditional, params)
-      }
-
-      return acc
-    }, true)
-  }
-
-  const AssignmentActions = (
+  return (
     <>
       <DropdownMenu.Item
         key={ActionType.ASSIGN}
@@ -107,6 +81,38 @@ export function ActionMenu({ eventId }: { eventId: string }) {
       </DropdownMenu.Item>
     </>
   )
+}
+
+export function ActionMenu({ eventId }: { eventId: string }) {
+  const intl = useIntl()
+  const events = useEvents()
+  const navigate = useNavigate()
+  const authentication = useAuthentication()
+
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
+
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
+
+  function isActionVisible(action: ActionConfig) {
+    if (action.conditionals.length === 0) {
+      return true
+    }
+
+    const params = {
+      $event: event,
+      $user: authentication,
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    return action.conditionals.reduce((acc, conditional) => {
+      if (conditional.type === ConditionalType.SHOW) {
+        return acc && validate(conditional.conditional, params)
+      }
+
+      return acc
+    }, true)
+  }
 
   return (
     <>
@@ -153,7 +159,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               </DropdownMenu.Item>
             )
           })}
-          {AssignmentActions}
+          <AssignmentActions eventId={eventId} />
         </DropdownMenu.Content>
       </DropdownMenu>
     </>
