@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: events
+  name: events
+spec:
+  ports:
+    - port: 5555
+      targetPort: 5555
+  selector:
+    app: events
+  type: LoadBalancer
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: events-route
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: 'Host(`events.{{ .Values.hostname }}`)'
+    kind: Rule
+    services:
+    - name: events
+      namespace: opencrvs-services-dev
+      port: 5555
+    middlewares:
+      - name: sts-and-basic-response-headers
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: events
+  name: events
+spec:
+  replicas: {{ .Values.events.replicas }}
+  selector:
+    matchLabels:
+      app: events
+  template:
+    metadata:
+      labels:
+        app: events
+    spec:
+      containers:
+        - name: events
+          image: "ghcr.io/opencrvs/ocrvs-events:{{ .Values.image.tag }}"
+          env:
+            - name: MONGO_URL
+              value: mongodb://mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local/events
+            - name: AUTH_URL
+              value: "http://auth.opencrvs-services-dev.svc.cluster.local:4040"
+            - name: COUNTRY_CONFIG_URL
+              value: "http://countryconfig.opencrvs-services-dev.svc.cluster.local:3040"
+            - name: DOCUMENTS_URL
+              value: "http://documents.opencrvs-services-dev.svc.cluster.local:9050"
+            # TODO: Add password
+            - name: ES_URL
+              value: "http://elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200"
+            - name: ES_INDEX_PREFIX
+              value: "foo"
+            # TODO: Add URL
+            - name: EVENTS_MONGO_URL
+              value: "mongodb://mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local/events"
+            - name: USER_MANAGEMENT_URL
+              value: "http://user-mgnt.opencrvs-services-dev.svc.cluster.local:3030/"
+            # TODO: Add URL
+            - name: USER_MGNT_MONGO_URL
+              value: "mongodb://mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local/user-mgnt"
+          ports:
+            - containerPort: 5555
+              protocol: TCP
+      restartPolicy: Always

@@ -1,0 +1,43 @@
+# FIXME: This is likely not gonna work as expected and is naive implementation
+# see also https://github.com/opencrvs/opencrvs-core/issues/7451
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: mongo-on-update
+  name: mongo-on-update
+spec:
+  template:
+    metadata:
+      labels:
+        app: mongo-on-update
+    spec:
+      containers:
+        - name: mongo-on-update
+          image: "mongo:4.4"
+          env:
+            - name: MONGODB_ADMIN_USER
+              value: MONGODB_ADMIN_USER
+            - name:  MONGODB_ADMIN_PASSWORD
+              value: MONGODB_ADMIN_PASSWORD
+            - name: USER_MGNT_MONGODB_PASSWORD
+              value: USER_MGNT_MONGODB_PASSWORD
+            - name: HEARTH_MONGODB_PASSWORD
+              value: HEARTH_MONGODB_PASSWORD
+            - name: CONFIG_MONGODB_PASSWORD
+              value: CONFIG_MONGODB_PASSWORD
+            - name: PERFORMANCE_MONGODB_PASSWORD
+              value: PERFORMANCE_MONGODB_PASSWORD
+            - name: METRICS_MONGODB_PASSWORD
+              value: METRICS_MONGODB_PASSWORD
+            - name: OPENHIM_MONGODB_PASSWORD
+              value: OPENHIM_MONGODB_PASSWORD
+            - name: WEBHOOKS_MONGODB_PASSWORD
+              value: WEBHOOKS_MONGODB_PASSWORD
+            - name: NOTIFICATION_MONGODB_PASSWORD
+              value: NOTIFICATION_MONGODB_PASSWORD
+            - name: EVENTS_MONGODB_PASSWORD
+              value: EVENTS_MONGODB_PASSWORD
+      completions: 1 # Run the job once
+      backoffLimit: 0 # Don't retry if the job fails
+      restartPolicy: "OnFailure"
