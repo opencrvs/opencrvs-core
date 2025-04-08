@@ -23,7 +23,8 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   createdAt: '2023-03-01T00:00:00.000Z',
   createdBy: uuid(),
   createdAtLocation: uuid(),
-  modifiedAt: '2023-03-01T00:00:00.000Z',
+  updatedAt: '2023-03-01T00:00:00.000Z',
+  updatedAtLocation: uuid(),
   assignedTo: null,
   updatedBy: 'system',
   declaration: {
