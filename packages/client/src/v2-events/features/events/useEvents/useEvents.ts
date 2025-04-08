@@ -73,6 +73,10 @@ export function useEvents() {
         request: useEventAction(trpc.event.actions.correction.request),
         approve: useEventAction(trpc.event.actions.correction.approve),
         reject: useEventAction(trpc.event.actions.correction.reject)
+      },
+      assignment: {
+        assign: useEventAction(trpc.event.actions.assignment.assign),
+        unassign: useEventAction(trpc.event.actions.assignment.unassign)
       }
     },
     onlineActions: {

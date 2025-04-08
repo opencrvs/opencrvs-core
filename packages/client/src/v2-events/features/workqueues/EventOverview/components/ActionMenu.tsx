@@ -10,12 +10,17 @@
  */
 
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 
 import { useNavigate } from 'react-router-dom'
 import formatISO from 'date-fns/formatISO'
-import { validate, ActionType, ConditionalType } from '@opencrvs/commons/client'
-import { ActionConfig } from '@opencrvs/commons/client'
+import {
+  validate,
+  ActionType,
+  ConditionalType,
+  ActionConfig,
+  getUUID
+} from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -25,16 +30,34 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
 
+const actionMessages = defineMessages({
+  assignLabel: {
+    defaultMessage: 'Assign',
+    description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
+    id: 'v2.action.assign.label'
+  },
+  unassignLabel: {
+    defaultMessage: 'Unassign',
+    description: `Label for the ${ActionType.UNASSIGN} action in the action menu`,
+    id: 'v2.action.unassign.label'
+  }
+})
+
 export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
+
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+
+  if (!authentication) {
+    throw new Error('Authentication is not available but is required')
+  }
 
   function isActionVisible(action: ActionConfig) {
     if (action.conditionals.length === 0) {
@@ -54,6 +77,38 @@ export function ActionMenu({ eventId }: { eventId: string }) {
       return acc
     }, true)
   }
+
+  const AssignmentActions = (
+    <>
+      <DropdownMenu.Item
+        key={ActionType.ASSIGN}
+        onClick={() => {
+          events.actions.assignment.assign.mutate({
+            eventId,
+            transactionId: getUUID(),
+            declaration: {},
+            assignedTo: authentication.sub
+          })
+        }}
+      >
+        {intl.formatMessage(actionMessages.assignLabel)}
+      </DropdownMenu.Item>
+
+      <DropdownMenu.Item
+        key={ActionType.UNASSIGN}
+        onClick={() => {
+          events.actions.assignment.unassign.mutate({
+            eventId,
+            transactionId: getUUID(),
+            declaration: {},
+            assignedTo: null
+          })
+        }}
+      >
+        {intl.formatMessage(actionMessages.unassignLabel)}
+      </DropdownMenu.Item>
+    </>
+  )
 
   return (
     <>
@@ -100,6 +155,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               </DropdownMenu.Item>
             )
           })}
+          {AssignmentActions}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>

@@ -152,6 +152,30 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
   }
 })
 
+setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.assignment.assign
+  ),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.ASSIGN
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.assignment.unassign
+  ),
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.UNASSIGN
+  }
+})
+
 export const customMutationKeys = {
   validateOnDeclare: ['validateOnDeclare'],
   registerOnDeclare: ['registerOnDeclare']
