@@ -32,7 +32,7 @@ export const ShowConditional = z.object({
   type: z
     .literal(ConditionalType.SHOW)
     .describe(
-      "When 'SHOW' conditional is defined, the action is shown to the user only if the condition is met"
+      "If 'SHOW' conditional is defined, the component is shown to the user only if the condition is met"
     ),
   conditional: Conditional
 })
@@ -41,7 +41,7 @@ export const EnableConditional = z.object({
   type: z
     .literal(ConditionalType.ENABLE)
     .describe(
-      "If 'ENABLE' conditional is defined, the action is enabled only if the condition is met"
+      "If 'ENABLE' conditional is defined, the component is enabled only if the condition is met"
     ),
   conditional: Conditional
 })
@@ -75,7 +75,7 @@ export const DisplayOnReviewConditional = z.object({
   type: z
     .literal(ConditionalType.DISPLAY_ON_REVIEW)
     .describe(
-      'Controls the visibility of a field on review pages. This should only be used for fields within declaration forms, as they are the only ones with review pages. By default, all fields are visible on the review page. For a field to be shown, both ConditionalType.SHOW and ConditionalType.DISPLAY_ON_REVIEW conditions must be satisfied.'
+      "If 'DISPLAY_ON_REVIEW' conditional is defined, the component is shown on the review page only if both the 'DISPLAY_ON_REVIEW' and 'SHOW' conditions are met. This should only be used for fields within declaration forms, as they are the only ones with review pages."
     ),
   conditional: Conditional
 })
