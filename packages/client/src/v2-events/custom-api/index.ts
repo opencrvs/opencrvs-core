@@ -92,24 +92,3 @@ export async function validateOnDeclare(variables: {
 
   return latestResponse
 }
-
-export interface AssignParams {
-  eventId: string
-  assignedTo: string
-}
-
-export async function getEventAndAssign(variables: AssignParams) {
-  const { eventId, assignedTo } = variables
-
-  await trpcClient.event.get.query(eventId)
-
-  const assignedEvent = await trpcClient.event.actions.assignment.assign.mutate(
-    {
-      eventId,
-      assignedTo,
-      transactionId: getUUID()
-    }
-  )
-
-  return assignedEvent
-}

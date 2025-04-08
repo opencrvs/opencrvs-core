@@ -185,8 +185,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
 
 export const customMutationKeys = {
   validateOnDeclare: ['validateOnDeclare'],
-  registerOnDeclare: ['registerOnDeclare'],
-  getEventAndAssign: ['getEventAndAssign']
+  registerOnDeclare: ['registerOnDeclare']
 } as const
 
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
@@ -199,14 +198,6 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
   retry: true,
-  retryDelay: 10000,
-  onSuccess: updateLocalEvent
-})
-
-queryClient.setMutationDefaults(customMutationKeys.getEventAndAssign, {
-  mutationFn: waitUntilEventIsCreated(customApi.getEventAndAssign),
-  retry: (_, error: TRPCClientError<AppRouter>) =>
-    error.data?.httpStatus !== 409,
   retryDelay: 10000,
   onSuccess: updateLocalEvent
 })
@@ -310,18 +301,6 @@ export function useEventCustomAction(mutationKey: string[]) {
       return mutation.mutate({
         ...params,
         declaration: stripHiddenFields(fields, params.declaration)
-      })
-    }
-  }
-}
-
-export function useAssignAction(mutationKey: string[]) {
-  const mutation = useMutation(queryClient.getMutationDefaults(mutationKey))
-
-  return {
-    mutate: (params: customApi.AssignParams) => {
-      return mutation.mutate({
-        ...params
       })
     }
   }

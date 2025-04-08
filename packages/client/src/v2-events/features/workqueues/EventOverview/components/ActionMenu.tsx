@@ -56,8 +56,8 @@ function AssignmentActions({ eventId }: { eventId: string }) {
     <>
       <DropdownMenu.Item
         key={ActionType.ASSIGN}
-        onClick={() => {
-          events.actions.assignment.assign.mutate({
+        onClick={async () => {
+          await events.actions.assignment.assign.mutate({
             eventId,
             assignedTo: authentication.sub
           })
