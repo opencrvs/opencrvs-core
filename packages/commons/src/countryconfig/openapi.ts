@@ -14,11 +14,18 @@ import * as yaml from 'yaml'
 import { countryConfigAPI } from '.'
 
 const openapi = new OpenApiBuilder({
-  title: 'Country config API',
+  title: 'Countryconfig implementation requirements',
   version: '1.8.0',
   description: 'Country specific configuration server for OpenCRVS'
 })
   .addPublicApi(countryConfigAPI)
+  /*
+   * This just overrides the build-in tag logic of zodios-openapi
+   */
+  .setCustomTagsFn(
+    (api) => countryConfigAPI.find((a) => a.path === api)?.tags || []
+  )
+
   .build()
 
 // eslint-disable-next-line no-console

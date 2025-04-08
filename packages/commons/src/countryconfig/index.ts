@@ -11,14 +11,45 @@
 
 import { makeApi, makeErrors, Zodios } from '@zodios/core'
 import { z } from 'zod'
-import { EventConfig } from 'src/events'
+import { ActionInput, ActionTypes, EventConfig, EventDocument } from '../events'
 
 export const countryConfigAPI = makeApi([
   {
     method: 'get',
     path: '/events',
     alias: 'getEventConfigurations',
+    tags: ['CC Events'],
     description: 'Get event configurations',
+    response: z.array(EventConfig),
+    errors: makeErrors([])
+  },
+  {
+    method: 'post',
+    path: '/events/:eventType/actions/:actionType',
+    alias: 'actionEventTrigger',
+    tags: ['CC Events'],
+    description: 'Receive a notification of an action',
+    parameters: [
+      {
+        name: 'action',
+        type: 'Body',
+        schema: z.object({
+          actionId: z.string(),
+          event: EventDocument,
+          action: ActionInput
+        })
+      },
+      {
+        name: 'eventType',
+        type: 'Path',
+        schema: z.string()
+      },
+      {
+        name: 'actionType',
+        type: 'Path',
+        schema: ActionTypes
+      }
+    ],
     response: z.array(EventConfig),
     errors: makeErrors([])
   }

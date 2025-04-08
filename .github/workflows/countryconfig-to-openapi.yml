@@ -29,16 +29,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Generate OpenAPI YAML
-        run: npx tsx src/countryconfig/openapi.ts > openapi.yml
-        working-directory: packages/commons
-
-      - name: Generate HTML from OpenAPI
-        run: |
-          mkdir output
-          npx @redocly/cli build-docs packages/commons/openapi.yml -o output/index.html
+      - name: Generate OpenAPI
+        run: bash build.sh
+        working-directory: packages/api-docs
 
       - name: Deploy to GitHub Pages
+        working-directory: packages/api-docs
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
@@ -52,7 +48,7 @@ jobs:
 
           rm -rf $TARGET_DIR/$BRANCH_NAME
           mkdir -p $TARGET_DIR/$BRANCH_NAME
-          cp -r output/* $TARGET_DIR/$BRANCH_NAME/
+          cp -r build/* $TARGET_DIR/$BRANCH_NAME/
 
           cd $TARGET_DIR
           git add .
