@@ -28,23 +28,23 @@ export const ConditionalType = {
 export type ConditionalType =
   (typeof ConditionalType)[keyof typeof ConditionalType]
 
-export const ShowConditional = z.object({
-  type: z
-    .literal(ConditionalType.SHOW)
-    .describe(
-      "If 'SHOW' conditional is defined, the component is shown to the user only if the condition is met"
-    ),
-  conditional: Conditional
-})
+export const ShowConditional = z
+  .object({
+    type: z.literal(ConditionalType.SHOW),
+    conditional: Conditional
+  })
+  .describe(
+    "If 'SHOW' conditional is defined, the component is shown to the user only if the condition is met"
+  )
 
-export const EnableConditional = z.object({
-  type: z
-    .literal(ConditionalType.ENABLE)
-    .describe(
-      "If 'ENABLE' conditional is defined, the component is enabled only if the condition is met"
-    ),
-  conditional: Conditional
-})
+export const EnableConditional = z
+  .object({
+    type: z.literal(ConditionalType.ENABLE),
+    conditional: Conditional
+  })
+  .describe(
+    "If 'ENABLE' conditional is defined, the component is enabled only if the condition is met"
+  )
 
 /*
  * This needs to be exported so that Typescript can refer to the type in
@@ -71,14 +71,14 @@ export const ActionConditional = z.discriminatedUnion('type', [
 
 export type ActionConditional = InferredActionConditional
 
-export const DisplayOnReviewConditional = z.object({
-  type: z
-    .literal(ConditionalType.DISPLAY_ON_REVIEW)
-    .describe(
-      "If 'DISPLAY_ON_REVIEW' conditional is defined, the component is shown on the review page only if both the 'DISPLAY_ON_REVIEW' and 'SHOW' conditions are met. This should only be used for fields within declaration forms, as they are the only ones with review pages."
-    ),
-  conditional: Conditional
-})
+export const DisplayOnReviewConditional = z
+  .object({
+    type: z.literal(ConditionalType.DISPLAY_ON_REVIEW),
+    conditional: Conditional
+  })
+  .describe(
+    "If 'DISPLAY_ON_REVIEW' conditional is defined, the component is shown on the review page only if both the 'DISPLAY_ON_REVIEW' and 'SHOW' conditions are met. This should only be used for fields within declaration forms, as they are the only ones with review pages."
+  )
 
 /*
  * This needs to be exported so that Typescript can refer to the type in
