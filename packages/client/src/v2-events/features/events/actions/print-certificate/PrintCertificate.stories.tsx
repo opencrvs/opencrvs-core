@@ -26,7 +26,7 @@ import {
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { useDrafts } from '../../../drafts/useDrafts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { CERT_TEMPLATE_ID } from '../../useCertificateTemplateSelectorFieldConfig'
 import * as PrintCertificate from './index'
 

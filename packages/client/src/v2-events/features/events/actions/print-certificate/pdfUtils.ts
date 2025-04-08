@@ -25,8 +25,12 @@ import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
 import format from 'date-fns/format'
 import isValid from 'date-fns/isValid'
-import { LanguageConfig } from '@opencrvs/commons/client'
-import { EventIndex, EventState, User } from '@opencrvs/commons/client'
+import {
+  EventIndex,
+  EventState,
+  User,
+  LanguageConfig
+} from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'

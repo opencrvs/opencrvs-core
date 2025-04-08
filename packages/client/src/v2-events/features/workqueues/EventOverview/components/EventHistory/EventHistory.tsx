@@ -19,8 +19,11 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ActionDocument, ActionType } from '@opencrvs/commons/client'
-import { ResolvedUser } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  ActionType,
+  ResolvedUser
+} from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'

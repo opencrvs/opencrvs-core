@@ -88,6 +88,21 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                 getUser: generator.user.localRegistrar()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [
+              {
+                id: '67bda93bfc07dee78ae558cf',
+                name: [
+                  {
+                    use: 'en',
+                    given: ['Kalusha'],
+                    family: 'Bwalya'
+                  }
+                ],
+                role: 'SOCIAL_WORKER'
+              }
+            ]
           })
         ]
       }
