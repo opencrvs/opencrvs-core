@@ -72,7 +72,6 @@ function AssignmentActions({ eventId }: { eventId: string }) {
           events.actions.assignment.unassign.mutate({
             eventId,
             transactionId: getUUID(),
-            declaration: {},
             assignedTo: null
           })
         }}

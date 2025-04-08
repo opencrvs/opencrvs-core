@@ -107,8 +107,7 @@ export async function getEventAndAssign(variables: AssignParams) {
     {
       eventId,
       assignedTo,
-      transactionId: getUUID(),
-      declaration: {}
+      transactionId: getUUID()
     }
   )
 
