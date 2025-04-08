@@ -28,8 +28,8 @@ export function useUserAddress() {
     const provinceId = district?.partOf.split('/')[1]
 
     return {
-      district: districtId,
-      province: provinceId
+      district: districtId ?? '',
+      province: provinceId ?? ''
     }
   }
 
