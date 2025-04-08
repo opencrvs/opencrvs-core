@@ -22,7 +22,7 @@ import { EventState } from '@opencrvs/commons/client'
 const INTERNAL_SEPARATOR = '___'
 
 // The __EMPTY__ is our common token for missing values, that can be used when configuring a message.
-const EMPTY_TOKEN = '__EMPTY__'
+export const EMPTY_TOKEN = '__EMPTY__'
 /**
  * Replaces dots with triple underscores in the object keys.
  * This is needed to support dot notation in the message variables.

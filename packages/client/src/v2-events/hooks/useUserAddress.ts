@@ -22,16 +22,17 @@ export function useUserAddress() {
   if (primaryOfficeId) {
     const primaryOfficeLocation = locations[primaryOfficeId]
 
-    const districtId = primaryOfficeLocation.partOf.split('/')[1]
-    const district = locations[districtId]
+    const districtId = primaryOfficeLocation?.partOf.split('/')[1]
+    const district = districtId ? locations[districtId] : undefined
 
-    const provinceId = district.partOf.split('/')[1]
+    const provinceId = district?.partOf.split('/')[1]
 
     return {
       district: districtId,
       province: provinceId
     }
   }
+
   return {
     district: '',
     province: ''
