@@ -82,7 +82,7 @@ export function isFieldEnabled(
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
 
-// Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' are met
+// Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
 export function isFieldDisplayedOnReview(
   field: FieldConfig,
   form: ActionUpdate | EventState
