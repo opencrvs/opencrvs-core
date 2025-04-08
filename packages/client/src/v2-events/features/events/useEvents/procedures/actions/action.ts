@@ -31,7 +31,12 @@ import {
   setMutationDefaults,
   waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
-import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  queryClient,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
+import { TRPCClientError } from '@trpc/client'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
@@ -156,7 +161,8 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.assignment.assign
   ),
-  retry: true,
+  retry: (_, error: TRPCClientError<AppRouter>) =>
+    error.data?.httpStatus !== 409,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
   meta: {
@@ -168,7 +174,8 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.assignment.unassign
   ),
-  retry: true,
+  retry: (_, error: TRPCClientError<AppRouter>) =>
+    error.data?.httpStatus !== 403,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
   meta: {
@@ -198,7 +205,8 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
 
 queryClient.setMutationDefaults(customMutationKeys.getEventAndAssign, {
   mutationFn: waitUntilEventIsCreated(customApi.getEventAndAssign),
-  retry: true,
+  retry: (_, error: TRPCClientError<AppRouter>) =>
+    error.data?.httpStatus !== 409,
   retryDelay: 10000,
   onSuccess: updateLocalEvent
 })
