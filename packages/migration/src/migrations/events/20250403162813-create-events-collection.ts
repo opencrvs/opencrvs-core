@@ -18,14 +18,16 @@ export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db.createCollection('events')
-      await db.collection('events').createIndex({ id: 1 }, { unique: true })
+      const eventsExists = await db
+        .listCollections({ name: 'events' })
+        .hasNext()
+      if (!eventsExists) {
+        await db.createCollection('events')
+        await db.collection('events').createIndex({ id: 1 }, { unique: true })
+      }
     })
   } catch (error) {
-    console.error(
-      'Error occurred while creating events, drafts and location collection:',
-      error
-    )
+    console.error('Error occurred while creating events collection:', error)
     throw error
   } finally {
     session.endSession()
