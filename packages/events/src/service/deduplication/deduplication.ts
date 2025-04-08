@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  getOrCreateClient,
-  getEventIndexName
-} from '@events/storage/elasticsearch'
 import * as elasticsearch from '@elastic/elasticsearch'
 
+import { subDays, addDays } from 'date-fns'
 import {
   EventIndex,
   DeduplicationConfig,
   Clause,
   ClauseOutput
 } from '@opencrvs/commons/events'
-import { subDays, addDays } from 'date-fns'
+import {
+  getOrCreateClient,
+  getEventIndexName
+} from '@events/storage/elasticsearch'
 import {
   declarationReference,
   decodeEventIndex,

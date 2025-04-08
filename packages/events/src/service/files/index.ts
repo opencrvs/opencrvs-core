@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { env } from '@events/environment'
 import fetch from 'node-fetch'
+import { env } from '@events/environment'
 
 export async function deleteFile(filename: string, token: string) {
   const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {

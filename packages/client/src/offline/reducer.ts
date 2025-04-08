@@ -257,7 +257,7 @@ const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
 })
 
 const RETRY_TIMEOUT = 5000
-
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 function delay(cmd: RunCmd<any>, time: number) {
   return Cmd.list(
     [Cmd.run(() => new Promise((resolve) => setTimeout(resolve, time))), cmd],

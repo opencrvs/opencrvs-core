@@ -19,7 +19,7 @@ import { join } from 'path'
 const forms = JSON.parse(
   readFileSync(join(__dirname, '../../tests/forms.json')).toString()
 )
-
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 function isGraphQLTag(item: any) {
   return typeof item === 'object' && item.kind && item.directives
 }
@@ -36,6 +36,7 @@ function hasOperatorDescriptors(form: IForm) {
   )
 }
 // Needs to be casted as any as there are non-validator functions in the import
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const validators = builtInValidators as Record<string, any>
 
 describe('Form deserializer', () => {
@@ -66,6 +67,7 @@ describe('Form deserializer', () => {
     } = forms
 
     birth.sections[2].groups[0].fields[0].mapping!.mutation!.operation =
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       'non_existing_123' as any
 
     expect(() => deserializeForm(birth, validators)).toThrow()

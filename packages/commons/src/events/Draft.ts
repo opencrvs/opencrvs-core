@@ -26,7 +26,7 @@ export const Draft = z.object({
   createdAt: z.string().datetime(),
   action: ActionBase.extend({
     type: ActionTypes
-  }).omit({ id: true, status: true })
+  }).omit({ id: true })
 })
 
 export const DraftInput = BaseActionInput.extend({

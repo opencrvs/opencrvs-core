@@ -36,7 +36,7 @@ export default class TimeoutLink extends ApolloLink {
     super()
     this.timeout = timeout
   }
-
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   public request(operation: Operation, forward?: NextLink): any {
     let controller: AbortController
     let ctxTimeout: number | null

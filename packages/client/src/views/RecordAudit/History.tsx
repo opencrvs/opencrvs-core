@@ -129,7 +129,7 @@ function getSystemType(type: string | undefined) {
   }
   return integrationMessages.healthSystem
 }
-
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
   if (
@@ -189,6 +189,7 @@ export const GetHistory = ({
       </>
     )
   let allHistoryData = (draft.data.history || []) as unknown as {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     [key: string]: any
   }[]
   if (!allHistoryData.length && userDetails) {

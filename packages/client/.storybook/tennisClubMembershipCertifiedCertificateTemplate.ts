@@ -14,7 +14,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
   <g clip-path="url(#clip0_5_2)">
     <path d="M583 0H0V842H583V0Z" fill="white" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="426.352">01 April 2012 </tspan>
+      <tspan x="62" y="426.352">{{ formatDate (lookup $state "modifiedAt") "dd MMMM yyyy"}}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="413.552">Date of certification&#10;</tspan>
@@ -26,7 +26,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
       <tspan x="62" y="447.552">Place of certification&#10;</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="494.104">12345678912345678912345678900</tspan>
+      <tspan x="62" y="494.104">{{ lookup $state "id" }}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="482.104">Application ID</tspan>
@@ -34,7 +34,9 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M498.965 404.396H316.826V472.396H498.965V404.396Z" fill="url(#pattern0_5_2)" fill-opacity="0.2" />
     <path d="M309.793 475.396L505.999 476.321" stroke="#CCCCCC" stroke-width="0.782258" stroke-dasharray="3.13 1.56" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="366.248" y="489.656">Registrar Jude Hopper</tspan>
+      <tspan x="366.248" y="489.656">
+        Registrar {{ findUserById (lookup $references "users") (lookup $state "updatedBy") }}
+      </tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
       <tspan x="62" y="359.604">I certify that this certificate is a true copy of the civil registry and is issued by the mandated authority in </tspan>
@@ -48,7 +50,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M50 700H535" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <path d="M50 184H534" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <text fill="#C86E00" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
-      <tspan x="215.483" y="199.76">No. 2023HSND234S</tspan>
+      <tspan x="215.483" y="199.76">No. {{ lookup $state "registrationNumber" }}</tspan>
     </text>
     <path d="M50 206H534" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
@@ -66,7 +68,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask0_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="247.708">{{ "applicant.firstname"}} {{ "applicant.surname"}}</tspan>
+        <tspan x="312" y="247.708">{{ lookup $declaration "applicant.firstname" }} {{ lookup $declaration "applicant.surname" }}</tspan>
       </text>
     </g>
     <path d="M70 253.5H514" stroke="#ECECEC" />
@@ -81,7 +83,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask1_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="267.708">{{ "applicant.dob" }}</tspan>
+        <tspan x="312" y="267.708">{{ lookup $declaration "applicant.dob"  }}</tspan>
       </text>
     </g>
     <path d="M70 273.5H514" stroke="#ECECEC" />
@@ -97,7 +99,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask2_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="287.708">{{ "recommender.firstname" }} {{ "recommender.surname" }}</tspan>
+        <tspan x="312" y="287.708">{{ lookup $declaration "recommender.firstname"  }} {{ lookup $declaration "recommender.surname"  }}</tspan>
       </text>
     </g>
     <path d="M70 293.5H514" stroke="#ECECEC" />
@@ -133,7 +135,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
         <tspan x="114" y="149.208">Farajaland Countryside Tennis Club</tspan>
       </text>
       <text fill="#C86E00" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
-        <tspan x="114" y="165.76">Farajaland Tennis Club Membership Certified Certificate</tspan>
+        <tspan x="114" y="165.76">Farajaland Tennis Club Membership Certificate</tspan>
       </text>
     </g>
     <mask id="mask4_5_2" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="53" y="513" width="484" height="40">

@@ -38,8 +38,10 @@ function storeOutboxDeclaration(
 }
 describe('outbox component tests', () => {
   let testComponent: ReactWrapper<
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     any,
     Readonly<{}>,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     React.Component<{}, {}, any>
   >
   let store: AppStore
