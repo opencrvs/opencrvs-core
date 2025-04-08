@@ -199,7 +199,6 @@ export function useResolveLocationFullName(
   }
 
   const location = locations[locationId]
-  console.log('location', location)
 
   if (!location) {
     if (locationId === ROOT_LOCATION_ID) {
