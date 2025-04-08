@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import formatISO from 'date-fns/formatISO'
@@ -19,7 +19,8 @@ import {
   ConditionalType,
   SCOPES,
   EventDocument,
-  type ActionConfig
+  type ActionConfig,
+  getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -30,6 +31,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
 import ProtectedComponent from '@client/components/ProtectedComponent'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 const viewRecordMessage = {
   id: 'v2.view.record',
@@ -40,23 +42,18 @@ const viewRecordMessage = {
 function ReadOnlyViewOption({ event }: { event: EventDocument }) {
   const intl = useIntl()
   const navigate = useNavigate()
-  // if a event has declare action, then it has already data to be viewed
-  if (event.actions.some((a) => a.type === ActionType.DECLARE)) {
-    return (
-      <ProtectedComponent scopes={[SCOPES.RECORD_READ]}>
-        <DropdownMenu.Item
-          key="view-declaration"
-          onClick={() =>
-            navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
-          }
-        >
-          {intl.formatMessage(viewRecordMessage)}
-        </DropdownMenu.Item>
-      </ProtectedComponent>
-    )
-  }
-
-  return <></>
+  return (
+    <ProtectedComponent scopes={[SCOPES.RECORD_READ]}>
+      <DropdownMenu.Item
+        key="view-declaration"
+        onClick={() =>
+          navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
+        }
+      >
+        {intl.formatMessage(viewRecordMessage)}
+      </DropdownMenu.Item>
+    </ProtectedComponent>
+  )
 }
 
 export function ActionMenu({ eventId }: { eventId: string }) {
@@ -65,6 +62,13 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   const navigate = useNavigate()
   const authentication = useAuthentication()
   const [event] = events.getEvent.useSuspenseQuery(eventId)
+
+  const { getRemoteDrafts } = useDrafts()
+  const drafts = getRemoteDrafts()
+  const eventStateWithDrafts = useMemo(
+    () => getCurrentEventStateWithDrafts(event, drafts),
+    [drafts, event]
+  )
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -93,12 +97,18 @@ export function ActionMenu({ eventId }: { eventId: string }) {
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton icon={() => <CaretDown />}>
+          <PrimaryButton
+            data-testid="action-dropdownMenu"
+            icon={() => <CaretDown />}
+          >
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          <ReadOnlyViewOption event={event} />
+          {/* if an event has declaration, then it is viewable */}
+          {Object.keys(eventStateWithDrafts.declaration).length > 0 && (
+            <ReadOnlyViewOption event={event} />
+          )}
           {configuration.actions.filter(isActionVisible).map((action) => {
             return (
               <DropdownMenu.Item

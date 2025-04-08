@@ -34,7 +34,8 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 const READ_ONLY_MODE_ALLOWED_ACTIONS = [
   ActionType.REGISTER,
   ActionType.VALIDATE,
-  ActionType.DECLARE
+  ActionType.DECLARE,
+  ActionType.CREATE
 ]
 
 function getLastActionReviewConfig(config: EventConfig, event: EventDocument) {
@@ -44,6 +45,9 @@ function getLastActionReviewConfig(config: EventConfig, event: EventDocument) {
     )
 
     if (availableAllowedAction) {
+      if (availableAllowedAction.type === ActionType.CREATE) {
+        return getActionReview(config, ActionType.DECLARE)
+      }
       return getActionReview(config, actionType)
     }
   }
@@ -90,6 +94,7 @@ function ReadonlyView() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
+        reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onAnnotationChange={(values) => setMetadata(values)}
         onEdit={noop}
