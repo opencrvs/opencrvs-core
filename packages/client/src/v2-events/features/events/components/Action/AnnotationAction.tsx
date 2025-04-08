@@ -15,11 +15,9 @@ import {
   ActionType,
   createEmptyDraft,
   findActiveDrafts,
-  getCurrentEventStateWithDrafts,
-  getActionAnnotation
+  getAnnotationFromDrafts
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -28,17 +26,30 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
+// @TODO: Update type to more strict once REQUEST_CORRECTION uses annotations
 type Props = PropsWithChildren<{ actionType: ActionType }>
-function ActionComponent({ children, actionType }: Props) {
+
+/**
+ * Creates a wrapper component for the annotation action.
+ * Manages the state of the annotation action and its local draft.
+ *
+ * Annotation is always specific to the action. Annotation action does not modify declaration.
+ * Annotation action can be triggered multiple times. Annotation state should be based on draft, if available.
+ * Annotation action is always an "independent" action, and should not base its state on previous action of same type.
+ *
+ * This differs from DeclarationAction, which is a series of one-time actions that modify the declaration.
+ */
+function AnnotationActionComponent({ children, actionType }: Props) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const { getEvent } = useEvents()
 
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
+  const drafts = getRemoteDrafts()
+
   const [event] = getEvent.useSuspenseQuery(params.eventId)
 
-  const drafts = getRemoteDrafts()
   const activeDraft = findActiveDrafts(event, drafts)[0]
   const localDraft = getLocalDraftOrDefault(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -46,14 +57,10 @@ function ActionComponent({ children, actionType }: Props) {
       createEmptyDraft(params.eventId, createTemporaryId(), actionType)
   )
 
-  /*
-   * Keep the local draft updated as per the form changes
-   */
-  const formValues = useEventFormData((state) => state.formValues)
   const annotation = useActionAnnotation((state) => state.annotation)
 
   useEffect(() => {
-    if (!formValues || !annotation) {
+    if (!annotation) {
       return
     }
 
@@ -62,21 +69,15 @@ function ActionComponent({ children, actionType }: Props) {
       eventId: event.id,
       action: {
         ...localDraft.action,
-        declaration: formValues,
         annotation
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues, annotation])
+  }, [annotation])
 
   /*
    * Initialize the form state
    */
-
-  const setInitialFormValues = useEventFormData(
-    (state) => state.setInitialFormValues
-  )
-
   const setInitialAnnotation = useActionAnnotation(
     (state) => state.setInitialAnnotation
   )
@@ -102,21 +103,11 @@ function ActionComponent({ children, actionType }: Props) {
       }
     })
 
-  const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, eventDrafts),
-    [eventDrafts, event]
-  )
-
   const actionAnnotation = useMemo(() => {
-    return getActionAnnotation({
-      event,
-      actionType,
-      drafts: eventDrafts
-    })
-  }, [eventDrafts, event, actionType])
+    return getAnnotationFromDrafts(eventDrafts)
+  }, [eventDrafts])
 
   useEffect(() => {
-    setInitialFormValues(eventStateWithDrafts.declaration)
     setInitialAnnotation(actionAnnotation)
 
     return () => {
@@ -138,4 +129,4 @@ function ActionComponent({ children, actionType }: Props) {
   return <NavigationStack>{children}</NavigationStack>
 }
 
-export const Action = withSuspense(ActionComponent)
+export const AnnotationAction = withSuspense(AnnotationActionComponent)

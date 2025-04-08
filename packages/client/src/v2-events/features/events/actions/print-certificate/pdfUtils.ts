@@ -142,20 +142,17 @@ export function compileSvg({
 
   Handlebars.registerHelper(
     'formatDate',
-    function (_, dateString: string, formatString: string) {
+    function (dateString: string, formatString: string) {
       const date = new Date(dateString)
       return isValid(date) ? format(date, formatString) : ''
     }
   )
 
-  Handlebars.registerHelper(
-    'findUserById',
-    function (u: User[], id: string, _) {
-      const user = u.find((usr) => usr.id === id)
+  Handlebars.registerHelper('findUserById', function (u: User[], id: string) {
+    const user = u.find((usr) => usr.id === id)
 
-      return user ? getUsersFullName(user.name, 'en') : ''
-    }
-  )
+    return user ? getUsersFullName(user.name, 'en') : ''
+  })
 
   const template = Handlebars.compile(templateString)
   $declaration = formatAllNonStringValues($declaration, intl)
