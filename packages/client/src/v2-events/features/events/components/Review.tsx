@@ -34,7 +34,6 @@ import {
   FormConfig,
   getFieldValidationErrors,
   isFieldDisplayedOnReview,
-  isFieldVisible,
   isPageVisible,
   SCOPES
 } from '@opencrvs/commons/client'
