@@ -20,11 +20,9 @@ const PageConfigBase = z.object({
   id: z.string().describe('Unique identifier for the page'),
   title: TranslationConfig.describe('Header title of the page'),
   fields: z.array(FieldConfig).describe('Fields to be rendered on the page'),
-  conditional: Conditional()
-    .optional()
-    .describe(
-      'Page will be shown if condition is met. If conditional is not defined, the page will be always shown.'
-    )
+  conditional: Conditional.optional().describe(
+    'Page will be shown if condition is met. If conditional is not defined, the page will be always shown.'
+  )
 })
 
 export const FormPageConfig = PageConfigBase.extend({

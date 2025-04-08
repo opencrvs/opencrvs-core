@@ -12,14 +12,9 @@
 import { JSONSchema } from '../conditionals/conditionals'
 import { z } from 'zod'
 
-export function Conditional() {
-  /*
-   * Using JSONSchema directly here would cause a
-   * "The inferred type of this node exceeds the maximum length the compiler will serialize."
-   * error, so I've copied the type here
-   */
-  return z.custom<JSONSchema>((val) => typeof val === 'object' && val !== null)
-}
+export const Conditional = z.custom<JSONSchema>(
+  (val) => typeof val === 'object' && val !== null
+)
 
 /**
  * By default, when conditionals are undefined, action is visible and enabled to everyone.
@@ -38,12 +33,12 @@ export type ConditionalType =
 
 export const ShowConditional = z.object({
   type: z.literal(ConditionalType.SHOW),
-  conditional: Conditional()
+  conditional: Conditional
 })
 
 export const EnableConditional = z.object({
   type: z.literal(ConditionalType.ENABLE),
-  conditional: Conditional()
+  conditional: Conditional
 })
 
 /*
@@ -73,7 +68,7 @@ export type ActionConditional = InferredActionConditional
 
 export const DisplayOnReviewConditional = z.object({
   type: z.literal(ConditionalType.DISPLAY_ON_REVIEW),
-  conditional: Conditional()
+  conditional: Conditional
 })
 
 /*

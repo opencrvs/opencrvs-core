@@ -52,7 +52,7 @@ const BaseField = z.object({
   validation: z
     .array(
       z.object({
-        validator: Conditional(),
+        validator: Conditional,
         message: TranslationConfig
       })
     )
