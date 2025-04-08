@@ -13,6 +13,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
+import { ActionType } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -41,7 +42,10 @@ function FormClear() {
   const drafts = useDrafts()
   useEffect(() => {
     drafts.setLocalDraft(
-      testDataGenerator().event.draft(tennisClubMembershipEventDocument.id)
+      testDataGenerator().event.draft({
+        eventId: tennisClubMembershipEventDocument.id,
+        actionType: ActionType.REQUEST_CORRECTION
+      })
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
