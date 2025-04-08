@@ -17,11 +17,11 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
-  EventSearchIndex,
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields
+  getDeclarationFields,
+  QueryType
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -297,9 +297,15 @@ export async function getIndexedEvents() {
     .map(decodeEventIndex)
 }
 
-export async function getIndex(eventParams: EventSearchIndex) {
+export async function getIndex(eventParams: QueryType) {
   const esClient = getOrCreateClient()
-  const { type, ...queryParams } = eventParams
+  if ('type' in eventParams && eventParams.type === 'or') {
+    const { clauses } = eventParams
+    console.log({ clauses })
+    return
+  }
+
+  const { eventType, ...queryParams } = eventParams
 
   if (Object.values(queryParams).length === 0) {
     throw new Error('No search params provided')
@@ -307,8 +313,12 @@ export async function getIndex(eventParams: EventSearchIndex) {
 
   const query = generateQuery(queryParams)
 
+  if (!eventType) {
+    throw new Error('No eventType provided')
+  }
+
   const response = await esClient.search<EncodedEventIndex>({
-    index: getEventIndexName(type),
+    index: getEventIndexName(eventType),
     size: DEFAULT_SIZE,
     request_cache: false,
     query

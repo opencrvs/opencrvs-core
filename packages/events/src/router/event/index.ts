@@ -18,14 +18,14 @@ import {
   DraftInput,
   EventIndex,
   EventInput,
-  EventSearchIndex,
   ActionStatus,
   ApproveCorrectionActionInput,
   EventConfig,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
   AssignActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  QueryType
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -235,6 +235,6 @@ export const eventRouter = router({
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
   search: publicProcedure
-    .input(EventSearchIndex)
+    .input(QueryType)
     .query(async ({ input }) => getIndex(input))
 })

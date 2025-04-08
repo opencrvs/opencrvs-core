@@ -40,7 +40,7 @@ test('Returns empty list when no events match search criteria', async () => {
   )
   const searchCriteria = {
     'applicant.firstname': 'Johnson',
-    type: 'TENNIS_CLUB_MEMBERSHIP'
+    eventType: 'TENNIS_CLUB_MEMBERSHIP'
   }
 
   const fetchedEvents = await client.event.search(searchCriteria)
@@ -119,8 +119,7 @@ test('Returns events that match the text field criteria of applicant', async () 
   const searchCriteria = {
     'applicant.firstname': 'John',
     'applicant.dob': '2000-01-01',
-
-    type: 'TENNIS_CLUB_MEMBERSHIP'
+    eventType: 'TENNIS_CLUB_MEMBERSHIP'
   }
 
   const fetchedEvents = await client.event.search(searchCriteria)
@@ -178,11 +177,11 @@ test('Returns events that match date of birth of applicant', async () => {
 
   const searchCriteria = {
     'applicant.dob': '2000-01-01',
-    type: 'TENNIS_CLUB_MEMBERSHIP'
+    eventType: 'TENNIS_CLUB_MEMBERSHIP'
   }
 
   const fetchedEvents = await client.event.search(searchCriteria)
-  expect(fetchedEvents[0].declaration['applicant.firstname']).toBe('Johnson') // fetches first document as result
+  expect(fetchedEvents?.[0].declaration['applicant.firstname']).toBe('Johnson') // fetches first document as result
   expect(fetchedEvents).toHaveLength(1)
 })
 
@@ -236,7 +235,7 @@ test('Does not return events when searching with a similar but different date of
 
   const searchCriteria = {
     'applicant.dob': '1999-11-11', // search with same day and month
-    type: 'TENNIS_CLUB_MEMBERSHIP'
+    eventType: 'TENNIS_CLUB_MEMBERSHIP'
   }
 
   const fetchedEvents = await client.event.search(searchCriteria)

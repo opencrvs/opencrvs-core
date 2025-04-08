@@ -43,22 +43,22 @@ export function useEvents() {
         useQuery({
           ...trpc.event.search.queryOptions({
             ...searchParams,
-            type
+            eventType: type
           }),
           queryKey: trpc.event.search.queryKey({
             ...searchParams,
-            type
+            eventType: type
           })
         }),
       useSuspenseQuery: (type: string, searchParams: Record<string, string>) =>
         useSuspenseQuery({
           ...trpc.event.search.queryOptions({
             ...searchParams,
-            type
+            eventType: type
           }),
           queryKey: trpc.event.search.queryKey({
             ...searchParams,
-            type
+            eventType: type
           })
         }).data
     },

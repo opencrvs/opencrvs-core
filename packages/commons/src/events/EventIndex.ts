@@ -24,3 +24,48 @@ export const EventSearchIndex = z.record(z.string(), z.any()).and(
 
 export type EventSearchIndex = z.infer<typeof EventSearchIndex>
 export type EventIndex = z.infer<typeof EventIndex>
+
+const Fuzzy = z.object({ type: z.literal('fuzzy'), term: z.string() })
+const Exact = z.object({ type: z.literal('exact'), term: z.string() })
+function OneOf<T extends z.ZodTypeAny>(type: T) {
+  return z.object({ type: z.literal('oneOf'), terms: z.array(type) })
+}
+function Range<T extends z.ZodTypeAny>(type: T) {
+  return z.object({ type: z.literal('range'), gte: type, lte: type })
+}
+const Within = z.object({ type: z.literal('within'), location: z.string() })
+
+const DateCondition = z.union([Exact, Range(z.string())])
+function Condition<T extends z.ZodTypeAny>(type: T) {
+  return z.union([Fuzzy, Exact, OneOf(type), Range(type)])
+}
+
+// Recursive DataCondition
+type ZDataCondition = z.ZodType<unknown>
+const DataCondition: ZDataCondition = z.lazy(() =>
+  z.record(z.union([Condition(z.any()), DataCondition]))
+)
+
+const QueryExpression = z
+  .object({
+    type: z.optional(z.union([OneOf(z.string()), Exact])),
+    eventType: z.string(),
+    status: z.optional(z.union([OneOf(z.string()), Exact])),
+    createdAt: z.optional(DateCondition),
+    updatedAt: z.optional(DateCondition),
+    createAtLocation: z.optional(z.union([Within, Exact])),
+    updatedAtLocation: z.optional(z.union([Within, Exact])),
+    createdBy: z.optional(Exact),
+    updatedBy: z.optional(Exact),
+    trackingId: z.optional(Exact),
+    data: z.optional(z.record(DataCondition))
+  })
+  .partial()
+
+const Or = z.object({
+  type: z.literal('or'),
+  clauses: z.array(QueryExpression)
+})
+
+export const QueryType = z.union([QueryExpression, Or])
+export type QueryType = z.infer<typeof QueryType>

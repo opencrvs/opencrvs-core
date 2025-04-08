@@ -42,7 +42,7 @@ export const SearchResultIndex = () => {
   return (
     <SearchResult
       currentEvent={currentEvent}
-      queryData={queryData}
+      queryData={queryData ?? []}
       searchParams={searchParams}
       workqueueConfig={workqueueConfig}
     />
