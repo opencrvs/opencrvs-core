@@ -95,7 +95,8 @@ import {
   DependencyInfo,
   Ii18nButtonFormField,
   REDIRECT,
-  IDocumentUploaderWithOptionsFormField
+  IDocumentUploaderWithOptionsFormField,
+  ILocationSearchInputFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -123,7 +124,10 @@ import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUplo
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
 import { useDispatch, useSelector } from 'react-redux'
-import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
+import {
+  ISearchLocation,
+  LocationSearch
+} from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -1117,21 +1121,6 @@ class FormSectionComponent extends React.Component<Props> {
                     setValues(updatedValues)
                   }
                 } as ILoaderButton)
-              : field.type === LOCATION_SEARCH_INPUT
-              ? {
-                  ...field,
-                  locationList: generateLocations(
-                    field.searchableResource.reduce((locations, resource) => {
-                      return {
-                        ...locations,
-                        ...getListOfLocations(offlineCountryConfig, resource)
-                      }
-                    }, {}),
-                    intl,
-                    undefined,
-                    field.searchableType as LocationType[]
-                  )
-                }
               : field.type === NID_VERIFICATION_BUTTON
               ? ({
                   ...field,
@@ -1275,6 +1264,46 @@ class FormSectionComponent extends React.Component<Props> {
                 </Field>
               </FormItem>
             )
+          } else if (field.type === LOCATION_SEARCH_INPUT) {
+            return (
+              <FormItem
+                key={`${field.name}${language}`}
+                ignoreBottomMargin={field.ignoreBottomMargin}
+              >
+                <Field name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => {
+                    return (
+                      <MemoizedLocationList field={field}>
+                        {(locationList) => (
+                          <GeneratedInputField
+                            fieldDefinition={internationaliseFieldObject(intl, {
+                              ...field,
+                              locationList
+                            })}
+                            setFieldValue={this.setFieldValuesWithDependency}
+                            setFieldTouched={setFieldTouched}
+                            resetDependentSelectValues={
+                              this.resetDependentSelectValues
+                            }
+                            {...formikFieldProps.field}
+                            touched={touched[field.name] || false}
+                            error={isFieldDisabled ? '' : error}
+                            draftData={draftData}
+                            fields={fields}
+                            values={values}
+                            dynamicDispatch={dynamicDispatch}
+                            disabled={isFieldDisabled}
+                            onUploadingStateChanged={
+                              this.props.onUploadingStateChanged
+                            }
+                          />
+                        )}
+                      </MemoizedLocationList>
+                    )
+                  }}
+                </Field>
+              </FormItem>
+            )
           } else {
             return (
               <FormItem
@@ -1316,6 +1345,30 @@ class FormSectionComponent extends React.Component<Props> {
       </section>
     )
   }
+}
+
+const MemoizedLocationList: React.FC<{
+  children: (locationList: ISearchLocation[]) => React.ReactElement
+  field: ILocationSearchInputFormField
+}> = ({ children, field }) => {
+  const offlineCountryConfig = useSelector(getOfflineData)
+  const intl = useIntl()
+  const locationList = React.useMemo(
+    () =>
+      generateLocations(
+        field.searchableResource.reduce((locations, resource) => {
+          return {
+            ...locations,
+            ...getListOfLocations(offlineCountryConfig, resource)
+          }
+        }, {}),
+        intl,
+        undefined,
+        field.searchableType as LocationType[]
+      ),
+    [field, offlineCountryConfig, intl]
+  )
+  return children(locationList)
 }
 
 export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
