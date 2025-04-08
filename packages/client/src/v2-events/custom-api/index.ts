@@ -111,7 +111,8 @@ export async function registerOnValidate(variables: {
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID()
+    transactionId: getUUID(),
+    duplicates: []
   })
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(

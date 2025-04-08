@@ -125,6 +125,8 @@ export function Review() {
       />
     ))
     if (confirmedValidation) {
+      reviewActionConfiguration.onConfirm(eventId)
+
       goToHome()
     }
   }
