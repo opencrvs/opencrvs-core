@@ -14,6 +14,7 @@ import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
+import { TRPCClientError } from '@trpc/client'
 import {
   ActionType,
   getDeclarationFields,
@@ -36,7 +37,6 @@ import {
   queryClient,
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
-import { TRPCClientError } from '@trpc/client'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
