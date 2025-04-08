@@ -53,7 +53,7 @@ export const EnableConditional = z.object({
  * errors when compiling
  */
 /** @knipignore */
-export type AllActionConditionalFields =
+export type TActionConditional =
   | typeof ShowConditional
   | typeof EnableConditional
 
@@ -67,7 +67,7 @@ export const ActionConditional = z.discriminatedUnion('type', [
   ShowConditional,
   // Action can be shown to the user in the list but as disabled
   EnableConditional
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConditionalFields[]>
+]) as unknown as z.ZodDiscriminatedUnion<'type', TActionConditional[]>
 
 export type ActionConditional = InferredActionConditional
 
@@ -83,7 +83,7 @@ export const DisplayOnReviewConditional = z.object({
  * errors when compiling
  */
 /** @knipignore */
-export type AllFieldConditionalFields =
+export type TFieldConditional =
   | typeof ShowConditional
   | typeof EnableConditional
   | typeof DisplayOnReviewConditional
@@ -101,6 +101,6 @@ export const FieldConditional = z.discriminatedUnion('type', [
   EnableConditional,
   // Field result can be shown / hidden on the review page
   DisplayOnReviewConditional
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllFieldConditionalFields[]>
+]) as unknown as z.ZodDiscriminatedUnion<'type', TFieldConditional[]>
 
 export type FieldConditional = z.infer<typeof FieldConditional>
