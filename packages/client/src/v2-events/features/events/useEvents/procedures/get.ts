@@ -19,12 +19,15 @@ import {
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 import { setQueryDefaults } from './utils'
 
 /*
  * This logic overrides the default behaviour of "api.event.get"
  * by making it so all "FILE" or "FILE_WITH_OPTIONS" type data points
  * are parsed from the received event document and prefetched as part of fetching the record
+ *
+ * Additionally, all users referenced in the event document are prefetched.
  *
  * This ensures the full record can be browsed even when the user goes offline
  */
@@ -52,7 +55,10 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 
     const eventDocument = EventDocument.parse(response)
 
-    await cacheFiles(eventDocument)
+    await Promise.all([
+      cacheFiles(eventDocument),
+      cacheUsersFromEventDocument(eventDocument)
+    ])
     return eventDocument
   }
 })
