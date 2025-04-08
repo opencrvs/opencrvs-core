@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
-          ref: '${{ github.event.inputs.branch_name }}'
+          ref: ${{ github.event.inputs.branch_name }}
 
       - uses: actions/checkout@v4
         if: github.event_name == 'push' || github.event_name == 'pull_request'
