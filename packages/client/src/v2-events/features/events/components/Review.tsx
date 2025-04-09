@@ -341,8 +341,10 @@ function FormReview({
             return <></>
           }
 
+          // Only display fields that have a non-undefined/null value or have an validation error
           const displayedFields = fields.filter(
             ({ valueDisplay, errorDisplay }) => {
+              // Explicitly check for undefined and null, so that e.g. number 0 and empty string outputs are shown
               const hasValue =
                 valueDisplay !== undefined && valueDisplay !== null
               return hasValue || Boolean(errorDisplay)
