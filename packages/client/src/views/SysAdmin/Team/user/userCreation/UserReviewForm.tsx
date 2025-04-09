@@ -63,7 +63,6 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
-import { SCOPES } from '@opencrvs/commons/client'
 import { UserRole } from '@client/utils/gateway'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { draftToGqlTransformer } from '@client/transformer'
@@ -136,16 +135,14 @@ interface ICommonProps {
 interface ISectionDataProps {
   userFormSection: IFormSection
   userId: string | undefined
-  hasUpdateUserScope: boolean
-  hasCreateUserScope: boolean
+  canChangeLocation: boolean
   navigate: ReturnType<typeof useNavigate>
 }
 
 const transformSectionData = ({
   userFormSection,
   userId,
-  hasUpdateUserScope,
-  hasCreateUserScope,
+  canChangeLocation,
   navigate,
   ...props
 }: ISectionDataProps & ICommonProps) => {
@@ -198,13 +195,8 @@ const transformSectionData = ({
               label: <Label>{label}</Label>,
               value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
               actions:
-                !(
-                  field.name === 'registrationOffice' &&
-                  !(
-                    (userId && hasUpdateUserScope) ||
-                    (!userId && hasCreateUserScope)
-                  )
-                ) && !field.readonly ? (
+                !(field.name === 'registrationOffice' && !canChangeLocation) &&
+                !field.readonly ? (
                   <Link
                     id={`btn_change_${field.name}`}
                     onClick={() => {
@@ -309,11 +301,7 @@ const UserReviewFormComponent = ({
 }: IFullProps & IDispatchProps & IStateProps) => {
   const navigate = useNavigate()
 
-  const { hasAnyScope, canCreateUser } = usePermissions()
-  const hasUpdateUserScope = hasAnyScope([
-    SCOPES.USER_UPDATE,
-    SCOPES.USER_UPDATE_MY_JURISDICTION
-  ])
+  const { canAccessOffice } = usePermissions()
 
   let title: string | undefined
   let actionComponent: JSX.Element
@@ -324,6 +312,9 @@ const UserReviewFormComponent = ({
     offlineCountryConfiguration['offices'][locationId]
 
   const userRole = userRoles.find(({ id }) => id === formData.role)
+  const offlineOffices = Object.values(offlineCountryConfiguration['offices'])
+  const isMultipleOfficeUnderJurisdiction =
+    offlineOffices.filter(canAccessOffice).length > 1
 
   const handleSubmit = () => {
     const variables = draftToGqlTransformer(
@@ -412,8 +403,7 @@ const UserReviewFormComponent = ({
             formData,
             intl,
             userId,
-            hasUpdateUserScope,
-            hasCreateUserScope: canCreateUser,
+            canChangeLocation: isMultipleOfficeUnderJurisdiction,
             userRoles,
             userDetails,
             offlineCountryConfiguration,
