@@ -10,6 +10,7 @@
 
 
 HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
+EVENTS_CONFIG=./build/dist/src/migrate-mongo-config-events.js
 OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
 APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
@@ -22,6 +23,13 @@ for ((n=0;n<$HEARTH_FILES;n++)); do
   yarn --cwd $SCRIPT_PATH migrate-mongo down --file $HEARTH_CONFIG
 done
 yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
+
+# Revert events migrations
+EVENTS_FILES=$(ls ./build/dist/src/migrations/events | wc -l)
+for ((n=0;n<$EVENTS_FILES;n++)); do
+  yarn --cwd $SCRIPT_PATH migrate-mongo down --file $EVENTS_CONFIG
+done
+yarn --cwd $SCRIPT_PATH migrate-mongo status --file $EVENTS_CONFIG
 
 ## Revert openhim migrations
 OPENHIM_FILES=$(ls ./build/dist/src/migrations/openhim | wc -l)

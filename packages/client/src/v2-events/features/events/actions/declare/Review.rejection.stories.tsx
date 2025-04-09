@@ -65,6 +65,18 @@ const callTracker = {
   'event.actions.reject': 0
 }
 
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  role: 'SOCIAL_WORKER'
+}
+
 export const Archive: Story = {
   parameters: {
     reactRouter: {
@@ -152,6 +164,9 @@ export const Archive: Story = {
                 getUser: generator.user.localRegistrar()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -314,6 +329,9 @@ export const SendForUpdate: Story = {
                 getUser: generator.user.localRegistrar()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }

@@ -85,8 +85,7 @@ export function Review() {
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
-    useActionAnnotation()
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
 
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
@@ -96,7 +95,7 @@ export function Review() {
     drafts: []
   })
 
-  const annotation = getMetadata(previousAnnotation)
+  const annotation = getAnnotation(previousAnnotation)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -207,7 +206,7 @@ export function Review() {
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        onAnnotationChange={(values) => setMetadata(values)}
+        onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions

@@ -120,26 +120,23 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
  * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
-  if (!_.isObject(obj)) {
-    return obj
+export function deepDropNulls<T>(obj: T): T {
+  if (Array.isArray(obj)) {
+    return obj as T
   }
 
-  return Object.entries(obj).reduce((acc: T, [key, value]) => {
-    if (_.isObject(value)) {
-      value = deepDropNulls(value)
-    }
-
-    if (value !== null) {
-      return {
-        ...acc,
-        [key]: value
+  if (obj !== null && typeof obj === 'object') {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+      const cleanedValue = deepDropNulls(value)
+      if (cleanedValue !== null) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(acc as any)[key] = cleanedValue
       }
-    }
+      return acc
+    }, {} as T)
+  }
 
-    return acc
-  }, {} as T)
+  return obj
 }
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
@@ -246,6 +243,22 @@ export function applyDraftsToEventIndex(
       ...activeDrafts[activeDrafts.length - 1].declaration
     }
   }
+}
+
+/**
+ * Annotation is always specific to the action. when action with annotation is triggered multiple times,
+ * previous annotations should have no effect on the new action annotation. (e.g. printing once should not pre-select print form fields)
+ *
+ * @returns annotation generated from drafts
+ */
+export function getAnnotationFromDrafts(drafts: Draft[]) {
+  const actions = drafts.map((draft) => draft.action)
+
+  const annotation = actions.reduce((ann, action) => {
+    return deepMerge(ann, action.annotation ?? {})
+  }, {})
+
+  return deepDropNulls(annotation)
 }
 
 export function getActionAnnotation({

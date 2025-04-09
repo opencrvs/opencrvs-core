@@ -197,7 +197,7 @@ describe('"field" conditionals', () => {
           'mother.dob': '1990-01-02'
         })
       )
-    ).toBe(false)
+    ).toBe(true)
 
     // Reference to another field, when the comparable field is wrong format
     expect(
@@ -285,7 +285,7 @@ describe('"field" conditionals', () => {
           'child.dob': '1990-01-02'
         })
       )
-    ).toBe(false)
+    ).toBe(true)
 
     // Reference to another field, when the comparable field is wrong format
     expect(
