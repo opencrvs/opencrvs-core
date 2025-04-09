@@ -12,7 +12,7 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { getUUID } from '@opencrvs/commons/client'
-import { trpcClient, useTRPC } from '@client/v2-events/trpc'
+import { useTRPC } from '@client/v2-events/trpc'
 import { useGetEvent, useGetEventState } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -80,12 +80,16 @@ export function useEvents() {
         assign: {
           mutate: async ({
             eventId,
-            assignedTo
+            assignedTo,
+            refetchEvent
           }: {
             eventId: string
             assignedTo: string
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            refetchEvent: () => Promise<any>
           }) => {
-            await trpcClient.event.get.query(eventId)
+            await refetchEvent()
+
             return assignMutation.mutate({
               eventId,
               transactionId: getUUID(),

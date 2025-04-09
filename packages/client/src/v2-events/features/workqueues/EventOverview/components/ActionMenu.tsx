@@ -21,7 +21,8 @@ import {
   EventDocument,
   type ActionConfig,
   getCurrentEventStateWithDrafts,
-  getUUID
+  getUUID,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -75,6 +76,8 @@ function AssignmentActions({ eventId }: { eventId: string }) {
   const events = useEvents()
   const authentication = useAuthentication()
 
+  const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
+
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
   }
@@ -86,7 +89,8 @@ function AssignmentActions({ eventId }: { eventId: string }) {
         onClick={async () => {
           await events.actions.assignment.assign.mutate({
             eventId,
-            assignedTo: authentication.sub
+            assignedTo: authentication.sub,
+            refetchEvent
           })
         }}
       >
