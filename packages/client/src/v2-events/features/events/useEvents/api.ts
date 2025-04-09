@@ -30,6 +30,12 @@ export function setEventData(id: string, data: EventDocument) {
   return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
 }
 
+function deleteEventData(id: string) {
+  queryClient.removeQueries({
+    queryKey: trpcOptionsProxy.event.get.queryKey(id)
+  })
+}
+
 export function setEventListData(
   updater: (eventIndices: EventIndex[] | undefined) => EventIndex[] | undefined
 ) {
@@ -57,9 +63,10 @@ export async function invalidateDraftsList() {
 }
 
 export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
-  setDraftData((drafts) =>
-    drafts.filter(({ eventId }) => eventId !== updatedEvent.id)
-  )
+  const { id } = updatedEvent
+  setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
+  deleteEventData(id)
+
   await removeCachedFiles(updatedEvent)
   await updateLocalEvent(updatedEvent)
 }
