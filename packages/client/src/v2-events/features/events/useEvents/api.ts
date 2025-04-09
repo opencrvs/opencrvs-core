@@ -57,6 +57,9 @@ export async function invalidateDraftsList() {
 }
 
 export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
+  setDraftData((drafts) =>
+    drafts.filter(({ eventId }) => eventId !== updatedEvent.id)
+  )
   await removeCachedFiles(updatedEvent)
   await updateLocalEvent(updatedEvent)
 }
