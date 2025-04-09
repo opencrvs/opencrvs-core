@@ -127,7 +127,7 @@ const FetchButton = (props: IFullProps) => {
     setError(false)
     setNetworkError(false)
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const performQuery = async (client: ApolloClient<any>) => {
     const { query, variables, responseTransformer } = queryData as IQuery
     try {
@@ -170,6 +170,7 @@ const FetchButton = (props: IFullProps) => {
   return (
     <Container {...props}>
       <ApolloConsumer>
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
         {(client: ApolloClient<any>) => {
           return (
             <div>

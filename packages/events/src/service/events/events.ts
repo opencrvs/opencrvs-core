@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 import {
   ActionDocument,
   ActionInputWithType,
@@ -26,13 +28,11 @@ import {
   AsyncRejectActionDocument,
   ActionType
 } from '@opencrvs/commons/events'
+import { getUUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
-import { getUUID } from '@opencrvs/commons'
-import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {

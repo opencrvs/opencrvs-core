@@ -12,11 +12,11 @@
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
-  ActionType,
   createEmptyDraft,
   findActiveDrafts,
   getCurrentEventStateWithDrafts,
-  getActionAnnotation
+  getActionAnnotation,
+  DeclarationUpdateActionType
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -28,8 +28,18 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
-type Props = PropsWithChildren<{ actionType: ActionType }>
-function ActionComponent({ children, actionType }: Props) {
+type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
+
+/**
+ * Creates a wrapper component for the declaration action.
+ * Manages the state of the declaration action and its local draft.
+ *
+ * Declaration action modifies the declaration. The action can add annotation to the declaration.
+ * Declaration action is triggered only once. Declaration state is generated from series of declaration actions and drafts.
+ *
+ * This differs from AnnotationAction, which modify the annotation, and can be triggered multiple times.
+ */
+function DeclarationActionComponent({ children, actionType }: Props) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const { getEvent } = useEvents()
@@ -140,4 +150,4 @@ function ActionComponent({ children, actionType }: Props) {
   return <NavigationStack>{children}</NavigationStack>
 }
 
-export const Action = withSuspense(ActionComponent)
+export const DeclarationAction = withSuspense(DeclarationActionComponent)

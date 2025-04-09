@@ -371,6 +371,7 @@ export const appendGqlMetadataFromDraft = (
 
 export const gqlToDraftTransformer = (
   formDefinition: IForm,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   offlineData?: IOfflineData,
   userDetails?: UserDetails

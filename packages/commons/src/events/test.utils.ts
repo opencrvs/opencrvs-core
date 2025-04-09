@@ -19,10 +19,12 @@ import {
 } from './ActionDocument'
 import {
   ArchiveActionInput,
+  AssignActionInput,
   DeclareActionInput,
   RegisterActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
+  UnassignActionInput,
   ValidateActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
@@ -81,7 +83,7 @@ export function generateActionMetadataInput(
   action: ActionType
 ) {
   const actionConfig: ActionConfig | undefined = configuration.actions.find(
-    (actionConfig) => actionConfig.type === action
+    (ac) => ac.type === action
   )
 
   const annotationFields = actionConfig
@@ -90,11 +92,13 @@ export function generateActionMetadataInput(
 
   const annotation = fieldConfigsToActionAnnotation(annotationFields)
 
-  const visibleVerificationPageIds =
-    (findRecordActionPages(configuration, action) ?? [])
-      .filter((page) => isVerificationPage(page))
-      .filter((page) => isPageVisible(page, annotation))
-      .map((page) => page.id) ?? []
+  const visibleVerificationPageIds = findRecordActionPages(
+    configuration,
+    action
+  )
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, annotation))
+    .map((page) => page.id)
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
@@ -122,7 +126,10 @@ export const eventPayloadGenerator = {
     type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
     id
   }),
-  draft: (eventId: string, input: Partial<Draft> = {}) =>
+  draft: (
+    { eventId, actionType }: { eventId: string; actionType: ActionType },
+    input: Partial<Draft> = {}
+  ): Draft =>
     merge(
       {
         id: getUUID(),
@@ -130,7 +137,8 @@ export const eventPayloadGenerator = {
         createdAt: new Date().toISOString(),
         transactionId: getUUID(),
         action: {
-          type: ActionType.REQUEST_CORRECTION,
+          type: actionType,
+          status: ActionStatus.Accepted,
           declaration: {
             'applicant.firstname': 'Max',
             'applicant.surname': 'McLaren',
@@ -145,7 +153,7 @@ export const eventPayloadGenerator = {
           createdBy: '@todo',
           createdAtLocation: '@todo'
         }
-      },
+      } satisfies Draft,
       input
     ),
   actions: {
@@ -218,6 +226,28 @@ export const eventPayloadGenerator = {
           ActionType.VALIDATE
         ),
       duplicates: [],
+      eventId
+    }),
+    assign: (
+      eventId: string,
+      input: Partial<
+        Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
+      > = {}
+    ) => ({
+      type: ActionType.ASSIGN,
+      transactionId: input.transactionId ?? getUUID(),
+      declaration: {},
+      assignedTo: input.assignedTo ?? getUUID(),
+      eventId
+    }),
+    unassign: (
+      eventId: string,
+      input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
+    ) => ({
+      type: ActionType.UNASSIGN,
+      transactionId: input.transactionId ?? getUUID(),
+      declaration: {},
+      assignedTo: null,
       eventId
     }),
     archive: (
@@ -383,6 +413,10 @@ export function generateActionDocument({
   } satisfies ActionBase
 
   switch (action) {
+    case ActionType.READ:
+      return { ...actionBase, type: action }
+    case ActionType.MARKED_AS_DUPLICATE:
+      return { ...actionBase, type: action }
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
@@ -413,6 +447,8 @@ export function generateActionDocument({
         type: action
       }
 
+    case ActionType.DELETE:
+    case ActionType.DETECT_DUPLICATE:
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }

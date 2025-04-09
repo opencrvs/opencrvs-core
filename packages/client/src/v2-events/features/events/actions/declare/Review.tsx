@@ -56,9 +56,8 @@ export function Review() {
 
   const form = useEventFormData((state) => state.getFormValues())
 
-  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
-    useActionAnnotation()
-  const annotation = getMetadata()
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
 
   const scopes = useSelector(getScope) ?? undefined
 
@@ -139,12 +138,12 @@ export function Review() {
         formConfig={formConfig}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        onAnnotationChange={(values) => setMetadata(values)}
+        onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
           canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
-          isPrimaryActionDisabled={reviewActionConfiguration.isDisabled}
+          incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}

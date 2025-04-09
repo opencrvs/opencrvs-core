@@ -11,7 +11,11 @@
 
 import { flattenDeep, omitBy, mergeWith, isArray, isObject } from 'lodash'
 import { workqueues } from '../workqueues'
-import { ActionType, DeclarationAction, DeclarationActions } from './ActionType'
+import {
+  ActionType,
+  DeclarationActionType,
+  DeclarationActions
+} from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
@@ -27,18 +31,24 @@ import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 
-/**
- * @returns All the fields in the event configuration.
- */
-export const findAllFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep([
-    ...getDeclarationFields(config),
-    ...getAllAnnotationFields(config)
-  ])
+function isDeclarationActionConfig(
+  action: ActionConfig
+): action is DeclarationActionConfig {
+  return DeclarationActions.safeParse(action.type).success
 }
 
-export const getAllAnnotationFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep(config.actions.map(getActionAnnotationFields))
+export function getDeclarationFields(
+  configuration: EventConfig
+): FieldConfig[] {
+  return configuration.declaration.pages.flatMap(({ fields }) => fields)
+}
+
+export function getDeclarationPages(configuration: EventConfig) {
+  return configuration.declaration.pages
+}
+
+export function getDeclaration(configuration: EventConfig) {
+  return configuration.declaration
 }
 
 export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
@@ -50,14 +60,28 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
-    return actionConfig?.printForm.pages.flatMap(({ fields }) => fields) ?? []
+    return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
   }
 
   if (isDeclarationActionConfig(actionConfig)) {
-    return actionConfig?.review.fields ?? []
+    return actionConfig.review.fields
   }
 
   return []
+}
+
+export const getAllAnnotationFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep(config.actions.map(getActionAnnotationFields))
+}
+
+/**
+ * @returns All the fields in the event configuration.
+ */
+export const findAllFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep([
+    ...getDeclarationFields(config),
+    ...getAllAnnotationFields(config)
+  ])
 }
 
 /**
@@ -80,33 +104,6 @@ export const findRecordActionPages = (
   return []
 }
 
-function isDeclarationActionConfig(
-  action: ActionConfig
-): action is DeclarationActionConfig {
-  return DeclarationActions.safeParse(action.type).success
-}
-
-export function getDeclarationFields(
-  configuration: EventConfig
-): FieldConfig[] {
-  return configuration.declaration.pages.flatMap(({ fields }) => fields)
-}
-
-export function getDeclarationPages(configuration: EventConfig) {
-  return configuration.declaration.pages
-}
-
-export function getDeclaration(configuration: EventConfig) {
-  return configuration.declaration
-}
-
-export function getActionReviewFields(
-  configuration: EventConfig,
-  actionType: DeclarationAction
-) {
-  return getActionReview(configuration, actionType).fields
-}
-
 export function getActionReview(
   configuration: EventConfig,
   actionType: ActionType
@@ -116,9 +113,16 @@ export function getActionReview(
   )
 
   return getOrThrow(
-    actionConfig?.review,
+    actionConfig.review,
     `No review config found for ${actionType}`
   )
+}
+
+export function getActionReviewFields(
+  configuration: EventConfig,
+  actionType: DeclarationActionType
+) {
+  return getActionReview(configuration, actionType).fields
 }
 
 export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {

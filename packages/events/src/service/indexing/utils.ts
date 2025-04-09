@@ -8,10 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventSearchIndex, EventIndex } from '@opencrvs/commons/events'
 import { estypes } from '@elastic/elasticsearch'
+import { EventSearchIndex, EventIndex } from '@opencrvs/commons/events'
 
 export type EncodedEventIndex = EventIndex
+export const FIELD_ID_SEPARATOR = '____'
+
+export function encodeFieldId(fieldId: string) {
+  return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
+}
+
+function decodeFieldId(fieldId: string) {
+  return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
+}
+
+export const DEFAULT_SIZE = 10
 
 export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
   return {
@@ -38,17 +49,6 @@ export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
     )
   }
 }
-
-export function encodeFieldId(fieldId: string) {
-  return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
-}
-
-function decodeFieldId(fieldId: string) {
-  return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
-}
-
-export const FIELD_ID_SEPARATOR = '____'
-export const DEFAULT_SIZE = 10
 
 export function declarationReference(fieldName: string) {
   return `declaration.${fieldName}`
