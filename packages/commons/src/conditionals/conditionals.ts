@@ -117,6 +117,15 @@ export function not(condition: AjvJSONSchema): JSONSchema {
 }
 
 /**
+ * Returns an JSON Schema object, which is treated as always invalid.
+ *
+ * @returns {JSONSchema} An schema object that always evaluates to false.
+ */
+export function never(): JSONSchema {
+  return not(alwaysTrue())
+}
+
+/**
  *
  * Generate conditional rules for user.
  */

@@ -33,7 +33,7 @@ import {
   FieldType,
   FormConfig,
   getFieldValidationErrors,
-  isFieldVisible,
+  isFieldDisplayedOnReview,
   isPageVisible,
   SCOPES
 } from '@opencrvs/commons/client'
@@ -296,7 +296,7 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldVisible(field, form))
+            .filter((field) => isFieldDisplayedOnReview(field, form))
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
