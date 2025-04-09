@@ -341,6 +341,14 @@ function FormReview({
             return <></>
           }
 
+          const displayedFields = fields.filter(
+            ({ valueDisplay, errorDisplay }) => {
+              const hasValue =
+                valueDisplay !== undefined && valueDisplay !== null
+              return hasValue || Boolean(errorDisplay)
+            }
+          )
+
           return (
             <DeclarationDataContainer
               key={'Section_' + page.title.defaultMessage}
@@ -365,13 +373,8 @@ function FormReview({
                 name={'Accordion_' + page.id}
               >
                 <ListReview id={'Section_' + page.id}>
-                  {fields
-                    .filter(({ valueDisplay, errorDisplay }) => {
-                      const hasValue =
-                        valueDisplay !== undefined && valueDisplay !== null
-                      return hasValue || Boolean(errorDisplay)
-                    })
-                    .map(({ id, label, errorDisplay, valueDisplay }) => (
+                  {displayedFields.map(
+                    ({ id, label, errorDisplay, valueDisplay }) => (
                       <ListReview.Row
                         key={id}
                         actions={
@@ -395,7 +398,8 @@ function FormReview({
                         label={intl.formatMessage(label)}
                         value={errorDisplay || valueDisplay}
                       />
-                    ))}
+                    )
+                  )}
                 </ListReview>
               </Accordion>
             </DeclarationDataContainer>
