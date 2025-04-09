@@ -4,7 +4,7 @@
 
 ### New features
 
-- Kubernetes support for local development
+- **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
 
 ### Improvements
 
