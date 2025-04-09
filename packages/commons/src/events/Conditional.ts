@@ -58,7 +58,7 @@ export const EnableConditional = z
  * errors when compiling
  */
 /** @knipignore */
-export type TActionConditional =
+export type ActionConditionalType =
   | typeof ShowConditional
   | typeof EnableConditional
 
@@ -72,7 +72,7 @@ export const ActionConditional = z.discriminatedUnion('type', [
   ShowConditional,
   // Action can be shown to the user in the list but as disabled
   EnableConditional
-]) as unknown as z.ZodDiscriminatedUnion<'type', TActionConditional[]>
+]) as unknown as z.ZodDiscriminatedUnion<'type', ActionConditionalType[]>
 
 export type ActionConditional = InferredActionConditional
 
@@ -92,7 +92,7 @@ export const DisplayOnReviewConditional = z
  * errors when compiling
  */
 /** @knipignore */
-export type TFieldConditional =
+export type FieldConditionalType =
   | typeof ShowConditional
   | typeof EnableConditional
   | typeof DisplayOnReviewConditional
@@ -110,6 +110,6 @@ export const FieldConditional = z.discriminatedUnion('type', [
   EnableConditional,
   // Field output can be shown / hidden on the review page
   DisplayOnReviewConditional
-]) as unknown as z.ZodDiscriminatedUnion<'type', TFieldConditional[]>
+]) as unknown as z.ZodDiscriminatedUnion<'type', FieldConditionalType[]>
 
 export type FieldConditional = z.infer<typeof FieldConditional>

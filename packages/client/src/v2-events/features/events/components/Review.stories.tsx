@@ -14,6 +14,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { fireEvent, within } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
+import { noop } from 'lodash'
 import {
   AddressFieldValue,
   AddressType,
@@ -54,7 +55,7 @@ const meta: Meta<typeof Review.Body> = {
   args: {
     formConfig: TENNIS_CLUB_DECLARATION_FORM,
     form: mockDeclaration,
-    onEdit: () => undefined,
+    onEdit: noop,
     title: 'Member declaration for John Doe'
   },
   decorators: [
@@ -221,12 +222,12 @@ export const ReviewWithValidationErrors: Story = {
         form={this.args?.form || {}}
         formConfig={TENNIS_CLUB_DECLARATION_FORM}
         title="My test action"
-        onEdit={() => undefined}
+        onEdit={noop}
       >
         <Review.Actions
           incomplete={false}
           messages={reviewActionMessages}
-          onConfirm={() => undefined}
+          onConfirm={noop}
           onReject={handleRejection}
         />
         {modal}
@@ -363,12 +364,12 @@ export const ReviewWithConditionallyHiddenFields: Story = {
           ]
         })}
         title="My review page for testing conditionally hidden fields"
-        onEdit={() => undefined}
+        onEdit={noop}
       >
         <Review.Actions
           incomplete={false}
           messages={reviewActionMessages}
-          onConfirm={() => undefined}
+          onConfirm={noop}
           onReject={handleRejection}
         />
         {modal}
