@@ -75,7 +75,10 @@ function AssignmentActions({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
   const authentication = useAuthentication()
-
+  /**
+   * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
+   * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
+   */
   const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
 
   if (!authentication) {

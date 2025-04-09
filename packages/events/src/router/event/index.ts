@@ -105,6 +105,7 @@ export const eventRouter = router({
         transactionId: options.input.transactionId
       })
     }),
+  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .input(z.string())
@@ -129,7 +130,6 @@ export const eventRouter = router({
 
       return updatedEvent
     }),
-  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   delete: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
     .input(z.object({ eventId: z.string() }))
