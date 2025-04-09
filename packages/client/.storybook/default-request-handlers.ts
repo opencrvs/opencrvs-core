@@ -244,6 +244,7 @@ export const handlers = {
                 __typename: 'I18nMessage'
               },
               scopes: [
+                'record.read',
                 'record.declare-birth',
                 'record.declare-death',
                 'record.declare-marriage',
@@ -681,6 +682,7 @@ export const handlers = {
                 __typename: 'I18nMessage'
               },
               scopes: [
+                'record.read',
                 'record.declare-birth',
                 'record.declare-death',
                 'record.declare-marriage',
