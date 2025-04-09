@@ -76,9 +76,10 @@ const declarationActionValues = [
   ActionTypes.enum.VALIDATE,
   ActionTypes.enum.REGISTER
 ] as const
+
 /** Actions which change event data (declaration) before registration / during declaration. */
 export const DeclarationActions = ActionTypes.extract(declarationActionValues)
-export type DeclarationAction = z.infer<typeof DeclarationActions>
+export type DeclarationActionType = z.infer<typeof DeclarationActions>
 
 const declarationUpdateActionValues = [
   ...declarationActionValues,
@@ -88,8 +89,10 @@ const declarationUpdateActionValues = [
 export const DeclarationUpdateActions = ActionTypes.extract(
   declarationUpdateActionValues
 )
-export type DeclarationUpdateAction = z.infer<typeof DeclarationUpdateActions>
+export type DeclarationUpdateActionType = z.infer<
+  typeof DeclarationUpdateActions
+>
 
 /** Actions which update annotation or status of an event. */
 export const annotationActions = ActionTypes.exclude(declarationActionValues)
-export type MetadataAction = z.infer<typeof annotationActions>
+export type AnnotationActionType = z.infer<typeof annotationActions>

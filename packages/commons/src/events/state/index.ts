@@ -246,6 +246,22 @@ export function applyDraftsToEventIndex(
   }
 }
 
+/**
+ * Annotation is always specific to the action. when action with annotation is triggered multiple times,
+ * previous annotations should have no effect on the new action annotation. (e.g. printing once should not pre-select print form fields)
+ *
+ * @returns annotation generated from drafts
+ */
+export function getAnnotationFromDrafts(drafts: Draft[]) {
+  const actions = drafts.map((draft) => draft.action)
+
+  const annotation = actions.reduce((ann, action) => {
+    return deepMerge(ann, action.annotation ?? {})
+  }, {})
+
+  return deepDropNulls(annotation)
+}
+
 export function getActionAnnotation({
   event,
   actionType,

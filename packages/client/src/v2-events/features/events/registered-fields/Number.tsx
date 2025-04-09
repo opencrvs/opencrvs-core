@@ -19,12 +19,15 @@ interface NumberInputProps
   extends Omit<TextInputProps, 'type' | 'maxLength' | 'onChange'> {
   onChange(val: number | undefined): void
   value: number | undefined
+  min?: number
 }
 
 function NumberInput({ value, disabled, ...props }: NumberInputProps) {
   const [inputValue, setInputValue] = React.useState(
     value && isNaN(value) ? undefined : value
   )
+
+  const allowOnlyPositive = props.min !== undefined && props.min >= 0
 
   return (
     <TextInputComponent
@@ -45,6 +48,11 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
         isNaN(updatedValue)
           ? setInputValue(undefined)
           : setInputValue(updatedValue)
+      }}
+      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (allowOnlyPositive && e.key === '-') {
+          e.preventDefault()
+        }
       }}
     />
   )

@@ -24,7 +24,7 @@ export const useCertificateTemplateSelectorFieldConfig = (
     label: {
       defaultMessage: 'Type',
       description: 'This is the label for the field',
-      id: 'v2.event.default.action.certificate.form.section.who.field.surname.label'
+      id: 'v2.event.default.action.certificate.template.type.label'
     },
     defaultValue: certificateTemplates.find(
       (x) => x.event === eventType && x.isDefault

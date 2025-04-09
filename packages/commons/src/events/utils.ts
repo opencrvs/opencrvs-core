@@ -11,7 +11,11 @@
 
 import { flattenDeep, omitBy, mergeWith, isArray, isObject } from 'lodash'
 import { workqueues } from '../workqueues'
-import { ActionType, DeclarationAction, DeclarationActions } from './ActionType'
+import {
+  ActionType,
+  DeclarationActionType,
+  DeclarationActions
+} from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
@@ -116,7 +120,7 @@ export function getActionReview(
 
 export function getActionReviewFields(
   configuration: EventConfig,
-  actionType: DeclarationAction
+  actionType: DeclarationActionType
 ) {
   return getActionReview(configuration, actionType).fields
 }
