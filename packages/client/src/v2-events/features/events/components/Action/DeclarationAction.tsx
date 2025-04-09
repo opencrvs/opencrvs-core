@@ -46,12 +46,10 @@ function DeclarationActionComponent({ children, actionType }: Props) {
 
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
-  const drafts = getRemoteDrafts()
-
   const [event] = getEvent.useSuspenseQuery(params.eventId)
 
+  const drafts = getRemoteDrafts()
   const activeDraft = findActiveDrafts(event, drafts)[0]
-
   const localDraft = getLocalDraftOrDefault(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     activeDraft ||
