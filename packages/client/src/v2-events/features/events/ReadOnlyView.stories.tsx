@@ -12,6 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
+import { within } from '@testing-library/dom'
 import {
   ActionType,
   generateEventDocument,
@@ -21,7 +22,10 @@ import {
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventIndex
+} from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -54,6 +58,66 @@ const eventDocument = generateEventDocument({
 
 const eventId = eventDocument.id
 const draft = generateEventDraftDocument(eventId)
+
+export const ViewRecordMenuItemInsideActionMenus: Story = {
+  beforeEach: () => {
+    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    const dropdown = await canvas.findAllByTestId('action-dropdownMenu')
+    dropdown[0].click()
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument(
+                tennisClubMembershipEventDocument.id,
+                ActionType.REGISTER,
+                {
+                  'applicant.firstname': 'Riku',
+                  'applicant.surname': 'This value is from a draft'
+                }
+              )
+            ]
+          })
+        ],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.localRegistrar()
+              }
+            })
+          }),
+          tRPCMsw.user.list.query(() => {
+            return [
+              {
+                id: '6780dbf7a263c6515c7b97d2',
+                name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+                role: 'LOCAL_REGISTRAR'
+              }
+            ]
+          })
+        ]
+      }
+    }
+  }
+}
 
 export const ReadOnlyViewForUserWithReadPermission: Story = {
   parameters: {
