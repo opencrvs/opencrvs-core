@@ -368,8 +368,9 @@ function FormReview({
                   {fields
                     .filter(
                       ({ valueDisplay, errorDisplay }) =>
-                        // Explicitly check for undefined, so that e.g. number 0 and empty string is considered a value
-                        valueDisplay !== undefined || errorDisplay
+                        // Explicitly check for undefined and null, so that e.g. number 0 and empty string is considered a value
+                        (valueDisplay !== undefined && valueDisplay !== null) ||
+                        errorDisplay
                     )
                     .map(({ id, label, errorDisplay, valueDisplay }) => (
                       <ListReview.Row
