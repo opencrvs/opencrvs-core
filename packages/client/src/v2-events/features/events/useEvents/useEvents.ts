@@ -88,6 +88,7 @@ export function useEvents() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             refetchEvent: () => Promise<any>
           }) => {
+            /**This makes sure all the files and users referenced in the event document is prefetched to be used even in offline */
             await refetchEvent()
 
             return assignMutation.mutate({
