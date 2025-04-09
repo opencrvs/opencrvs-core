@@ -366,12 +366,11 @@ function FormReview({
               >
                 <ListReview id={'Section_' + page.id}>
                   {fields
-                    .filter(
-                      ({ valueDisplay, errorDisplay }) =>
-                        // Explicitly check for undefined and null, so that e.g. number 0 and empty string is considered a value
-                        (valueDisplay !== undefined && valueDisplay !== null) ||
-                        errorDisplay
-                    )
+                    .filter(({ valueDisplay, errorDisplay }) => {
+                      const hasValue =
+                        valueDisplay !== undefined && valueDisplay !== null
+                      return hasValue || Boolean(errorDisplay)
+                    })
                     .map(({ id, label, errorDisplay, valueDisplay }) => (
                       <ListReview.Row
                         key={id}
