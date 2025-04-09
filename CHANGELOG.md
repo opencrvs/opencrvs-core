@@ -2,6 +2,10 @@
 
 ## 1.8.0 Release candidate
 
+### New features
+
+- Kubernetes support for local development
+
 ### Improvements
 
 - Improved text color for disabled text inputs and dropdowns
