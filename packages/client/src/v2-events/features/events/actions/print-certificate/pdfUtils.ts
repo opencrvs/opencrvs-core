@@ -154,16 +154,85 @@ export function compileSvg({
     return user ? getUsersFullName(user.name, 'en') : ''
   })
 
+  Handlebars.registerHelper(
+    'findLocationById',
+    function (l: Location[], id: string) {
+      const location = l.find((loc) => loc.id === id)
+
+      return location ? location.name : ''
+    }
+  )
+
+  Handlebars.registerHelper(
+    'findAddressByLocationById',
+    function (
+      l: Location[],
+      id: string
+    ): {
+      country: string
+      province: string
+      district: string
+      location: string
+    } {
+      const address = { country: '', province: '', district: '', location: '' }
+      const location = l.find((loc) => loc.id === id)
+      address.location = location ? location.name : ''
+
+      const province = l.find((loc) => loc.id === id)
+      address.province = province ? province.name : ''
+
+      const district = l.find((loc) => loc.id === id)
+      address.district = district ? district.name : ''
+      //getLocationNameMapOfFacility
+      return address
+    }
+  )
+
+  Handlebars.registerHelper(
+    'ifCond',
+    function (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      this: any,
+      v1: string,
+      operator: string,
+      v2: string,
+      options: Handlebars.HelperOptions
+    ) {
+      switch (operator) {
+        case '===':
+          return v1 === v2 ? options.fn(this) : options.inverse(this)
+        case '!==':
+          return v1 !== v2 ? options.fn(this) : options.inverse(this)
+        case '<':
+          return v1 < v2 ? options.fn(this) : options.inverse(this)
+        case '<=':
+          return v1 <= v2 ? options.fn(this) : options.inverse(this)
+        case '>':
+          return v1 > v2 ? options.fn(this) : options.inverse(this)
+        case '>=':
+          return v1 >= v2 ? options.fn(this) : options.inverse(this)
+        case '&&':
+          return v1 && v2 ? options.fn(this) : options.inverse(this)
+        case '||':
+          return v1 || v2 ? options.fn(this) : options.inverse(this)
+        default:
+          return options.inverse(this)
+      }
+    }
+  )
+
   const template = Handlebars.compile(templateString)
   $declaration = formatAllNonStringValues($declaration, intl)
-  const output = template({
+  const data = {
     $declaration,
     $state,
     $references: {
       locations,
       users
     }
-  })
+  }
+  console.log('data', data)
+  const output = template(data)
   return output
 }
 
@@ -191,6 +260,7 @@ src: url("${url}") format("truetype");
   const serializer = new XMLSerializer()
   return serializer.serializeToString(svg)
 }
+
 export function svgToPdfTemplate(
   svg: string,
   certificateFonts: CertificateConfiguration
