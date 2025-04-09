@@ -41,6 +41,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
+import { UUID } from '@opencrvs/commons/client'
 
 type IUserProps = {
   userId?: string
@@ -196,19 +197,49 @@ function getNextSectionIds(
   }
 }
 
+function addJurisdictionFilterToLocationSearchInput(
+  section: IFormSection,
+  userOfficeId: UUID
+): IFormSection {
+  return {
+    ...section,
+    groups: section.groups.map((group) => ({
+      ...group,
+      fields: group.fields.map((field) => {
+        if (field.type !== 'LOCATION_SEARCH_INPUT') {
+          return field
+        }
+        return {
+          ...field,
+          userOfficeId
+        }
+      })
+    }))
+  }
+}
+
 const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
   const config = getOfflineData(state)
   const user = getUserDetails(state)
   const sectionId =
     props.router.params.sectionId || state.userForm.userForm!.sections[0].id
 
-  const section = state.userForm.userForm.sections.find(
+  let section = state.userForm.userForm.sections.find(
     (section) => section.id === sectionId
-  ) as IFormSection
+  )
 
   if (!section) {
     throw new Error(`No section found ${sectionId}`)
   }
+
+  if (!user?.primaryOffice.id) {
+    throw new Error(`No primary office found for user`)
+  }
+
+  section = addJurisdictionFilterToLocationSearchInput(
+    section,
+    user.primaryOffice.id as UUID
+  )
 
   let formData = { ...state.userForm.userFormData }
   if (props.router.params.locationId) {
