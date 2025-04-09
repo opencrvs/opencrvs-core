@@ -11,6 +11,7 @@
 
 import { Draft, EventDocument, EventIndex } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { removeCachedFiles } from '../../files/cache'
 
 export function findLocalEventData(eventId: string) {
   return queryClient.getQueryData(
@@ -53,4 +54,9 @@ export async function invalidateDraftsList() {
   return queryClient.invalidateQueries({
     queryKey: trpcOptionsProxy.event.draft.list.queryKey()
   })
+}
+
+export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
+  await removeCachedFiles(updatedEvent)
+  await updateLocalEvent(updatedEvent)
 }

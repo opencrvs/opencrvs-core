@@ -115,7 +115,7 @@ async function cacheFile(filename: string, file: File) {
   )
 }
 
-async function removeCached(filename: string) {
+export async function removeCached(filename: string) {
   const cacheKeys = await caches.keys()
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
@@ -128,6 +128,9 @@ async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
+
+  console.log('Deleting', getFullUrl(filename))
+
   return cache.delete(getFullUrl(filename))
 }
 
