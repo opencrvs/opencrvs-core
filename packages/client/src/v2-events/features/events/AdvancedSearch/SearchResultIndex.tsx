@@ -50,21 +50,19 @@ function buildDataConditionFromSearchKeys(
   }[],
   rawInput: Record<string, string> // values from UI or query string
 ): Record<string, Condition> {
-  const result: Record<string, Condition> = {}
+  return searchKeys.reduce(
+    (result: Record<string, Condition>, { fieldId, config }) => {
+      const value = rawInput[fieldId]
+      if (value) {
+        const condition = buildCondition(config?.type ?? 'EXACT', value)
 
-  for (const { fieldId, config } of searchKeys) {
-    const value = rawInput[fieldId]
-    if (!value) {
-      continue
-    }
-
-    const condition = buildCondition(config?.type ?? 'EXACT', value)
-
-    // Use the fieldId directly as the key in the result (flat structure)
-    result[fieldId] = condition
-  }
-
-  return result
+        const transformedKey = fieldId.replace(/\./g, '____')
+        result[transformedKey] = condition
+      }
+      return result
+    },
+    {}
+  )
 }
 
 function buildDataCondition(
@@ -93,8 +91,11 @@ export const SearchResultIndex = () => {
     arrayFormat: 'comma'
   }) as Record<string, string>
 
-  const data = buildDataCondition(searchParams, currentEvent)
-  const queryData = searchEvent.useSuspenseQuery(eventType, searchParams)
+  const formattedSearchParams = buildDataCondition(searchParams, currentEvent)
+  const queryData = searchEvent.useSuspenseQuery(
+    eventType,
+    formattedSearchParams
+  )
   const workqueueId = 'all'
   const workqueueConfig =
     workqueueId in workqueues
