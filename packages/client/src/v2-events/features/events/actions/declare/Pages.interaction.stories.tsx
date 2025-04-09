@@ -61,6 +61,7 @@ function createDraftHandlers() {
         action: {
           status: ActionStatus.Accepted,
           ...req,
+          declaration: req.declaration || {},
           createdBy: 'test-user',
           createdAtLocation: 'test-location',
           createdAt: new Date().toISOString()

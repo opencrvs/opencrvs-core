@@ -14,6 +14,7 @@ import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
+import { TRPCClientError } from '@trpc/client'
 import {
   ActionType,
   getDeclarationFields,
@@ -31,7 +32,11 @@ import {
   setMutationDefaults,
   waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
-import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  queryClient,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
@@ -149,6 +154,32 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
   onSuccess: updateLocalEvent,
   meta: {
     actionType: ActionType.REJECT_CORRECTION
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.assignment.assign
+  ),
+  retry: (_, error: TRPCClientError<AppRouter>) =>
+    error.data?.httpStatus !== 409,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.ASSIGN
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.assignment.unassign
+  ),
+  retry: (_, error: TRPCClientError<AppRouter>) =>
+    error.data?.httpStatus !== 403,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  meta: {
+    actionType: ActionType.UNASSIGN
   }
 })
 
