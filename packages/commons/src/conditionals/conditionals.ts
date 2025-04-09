@@ -117,6 +117,15 @@ export function not(condition: AjvJSONSchema): JSONSchema {
 }
 
 /**
+ * Returns an JSON Schema object, which is treated as always invalid.
+ *
+ * @returns {JSONSchema} An schema object that always evaluates to false.
+ */
+export function never(): JSONSchema {
+  return not(alwaysTrue())
+}
+
+/**
  *
  * Generate conditional rules for user.
  */
@@ -180,29 +189,27 @@ function getDateFromNow(days: number) {
     .toISOString()
     .split('T')[0]
 }
-
-/* This function will output JSONSchema which looks for example like this:
-{
-  "type": "object",
-  "properties": {
-    "mother.dob": {
-      "type": "string",
-      "format": "date",
-      "formatMaximum": {
-        "$data": "1/child.dob"
-      }
-    },
-    "child.dob": {
-      "type": "string",
-      "format": "date"
-    }
-  },
-  "required": [
-    "mother.dob",
-    "child.dob"
-  ]
-}
-*/
+/**
+ * This function will output JSONSchema which looks for example like this:
+ * @example
+ * {
+ *   "type": "object",
+ *   "properties": {
+ *     "mother.dob": {
+ *       "type": "string",
+ *       "format": "date",
+ *       "formatMinimum": {
+ *         "$data": "1/child.dob"
+ *       }
+ *     },
+ *     "child.dob": {
+ *       "type": "string",
+ *       "format": "date"
+ *     }
+ *   },
+ *   "required": ["mother.dob"]
+ * }
+ */
 function getDateRangeToFieldReference(
   fieldId: string,
   comparedFieldId: string,
@@ -218,7 +225,7 @@ function getDateRangeToFieldReference(
       },
       [comparedFieldId]: { type: 'string', format: 'date' }
     },
-    required: [fieldId, comparedFieldId]
+    required: [fieldId]
   }
 }
 
