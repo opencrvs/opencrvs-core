@@ -12,6 +12,11 @@
 import { JSONSchema } from '../conditionals/conditionals'
 import { z } from 'zod'
 
+/*
+ * Using JSONSchema directly here would cause a
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize."
+ * error, so I've copied the type here
+ */
 export const Conditional = z.custom<JSONSchema>(
   (val) => typeof val === 'object' && val !== null
 )
