@@ -21,7 +21,7 @@ import { tennisClubMembershipEventIndex } from '../../v2-events/features/events/
 /**
  * Create a spy function that tracks if a handler was called and with what input.
  */
-export function createSpy<Args extends unknown[], Result>(
+function createSpy<Args extends unknown[], Result>(
   handler: (...args: Args) => Result
 ) {
   let called = false
@@ -51,7 +51,7 @@ export function createSpy<Args extends unknown[], Result>(
  *
  * @returns handlers with spy methods
  */
-export function wrapHandlersWithSpies<
+function wrapHandlersWithSpies<
   Handlers extends {
     name: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

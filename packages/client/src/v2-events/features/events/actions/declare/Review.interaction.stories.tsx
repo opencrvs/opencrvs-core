@@ -120,7 +120,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 
       const modal = within(await canvas.findByRole('dialog'))
 
-      await modal.findByText('Register?')
+      await modal.findByText('Register the tennis club membership application?')
       await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
         await modal.findByRole('button', { name: 'Register' })
