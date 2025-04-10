@@ -10,7 +10,7 @@
  */
 
 import React, { useMemo } from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import formatISO from 'date-fns/formatISO'
 import {
@@ -20,7 +20,9 @@ import {
   SCOPES,
   EventDocument,
   type ActionConfig,
-  getCurrentEventStateWithDrafts
+  getCurrentEventStateWithDrafts,
+  getUUID,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -56,11 +58,70 @@ function ReadOnlyViewOption({ event }: { event: EventDocument }) {
   )
 }
 
+const actionMessages = defineMessages({
+  assignLabel: {
+    defaultMessage: 'Assign',
+    description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
+    id: 'v2.action.assign.label'
+  },
+  unassignLabel: {
+    defaultMessage: 'Unassign',
+    description: `Label for the ${ActionType.UNASSIGN} action in the action menu`,
+    id: 'v2.action.unassign.label'
+  }
+})
+
+function AssignmentActions({ eventId }: { eventId: string }) {
+  const intl = useIntl()
+  const events = useEvents()
+  const authentication = useAuthentication()
+  /**
+   * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
+   * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
+   */
+  const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
+
+  if (!authentication) {
+    throw new Error('Authentication is not available but is required')
+  }
+
+  return (
+    <>
+      <DropdownMenu.Item
+        key={ActionType.ASSIGN}
+        onClick={async () => {
+          await events.actions.assignment.assign.mutate({
+            eventId,
+            assignedTo: authentication.sub,
+            refetchEvent
+          })
+        }}
+      >
+        {intl.formatMessage(actionMessages.assignLabel)}
+      </DropdownMenu.Item>
+
+      <DropdownMenu.Item
+        key={ActionType.UNASSIGN}
+        onClick={() => {
+          events.actions.assignment.unassign.mutate({
+            eventId,
+            transactionId: getUUID(),
+            assignedTo: null
+          })
+        }}
+      >
+        {intl.formatMessage(actionMessages.unassignLabel)}
+      </DropdownMenu.Item>
+    </>
+  )
+}
+
 export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
+
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { getRemoteDrafts } = useDrafts()
@@ -145,6 +206,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               </DropdownMenu.Item>
             )
           })}
+          <AssignmentActions eventId={eventId} />
         </DropdownMenu.Content>
       </DropdownMenu>
     </>

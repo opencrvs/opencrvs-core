@@ -48,7 +48,7 @@ function getConditionalActionsForField(
 function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
+  conditionalType: ConditionalType
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -80,6 +80,17 @@ export function isFieldEnabled(
   form: ActionUpdate | EventState
 ) {
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
+}
+
+// Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
+export function isFieldDisplayedOnReview(
+  field: FieldConfig,
+  form: ActionUpdate | EventState
+) {
+  return (
+    isFieldVisible(field, form) &&
+    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW)
+  )
 }
 
 export const errorMessages = {
