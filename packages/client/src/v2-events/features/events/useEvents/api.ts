@@ -68,5 +68,11 @@ export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
   deleteEventData(id)
 
   await removeCachedFiles(updatedEvent)
+
+  
+/**
+ * deleteEventData() is overridden by updateLocalEvent().
+ * We should instead update the query that returns a specific eventIndex when it's implemented.
+ */
   await updateLocalEvent(updatedEvent)
 }
