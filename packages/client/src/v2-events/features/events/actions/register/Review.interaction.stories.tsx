@@ -26,11 +26,6 @@ import { Review } from './index'
 
 const generator = testDataGenerator()
 
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
-})
-
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -39,16 +34,12 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
-
 const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof Review> = {
-  title: 'Validate/Review/Interaction/Registration Agent',
+  title: 'Register/Review/Interaction/Local Registrar',
   beforeEach: () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
+    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
     declarationTrpcMsw.events.reset()
     declarationTrpcMsw.drafts.reset()
   }
@@ -77,12 +68,12 @@ const mockUser = {
   role: 'SOCIAL_WORKER'
 }
 
-export const ReviewForRegistrationAgentCompleteInteraction: Story = {
+export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+      initialPath: ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
+        eventId
       })
     },
     chromatic: { disableSnapshot: true },
@@ -94,11 +85,11 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.localRegistrar()
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [mockUser]
           })
         ]
@@ -106,18 +97,18 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     }
   },
   play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
+    await step('Modal has scope based on content', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for approval' })
+        await canvas.findByRole('button', { name: 'Register' })
       )
 
       const modal = within(await canvas.findByRole('dialog'))
 
-      await modal.findByText('Send for approval?')
+      await modal.findByText('Register?')
       await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await modal.findByRole('button', { name: 'Register' })
       )
     })
 
@@ -130,7 +121,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           'event.actions.notify.request': false,
           'event.actions.declare.request': false,
           'event.actions.validate.request': true,
-          'event.actions.register.request': false,
+          'event.actions.register.request': true,
           'event.actions.archive.request': false,
           'event.actions.reject.request': false
         })
@@ -139,12 +130,12 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   }
 }
 
-export const ReviewForRegistrationAgentArchiveInteraction: Story = {
+export const ReviewForLocalRegistrarArchiveInteraction: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+      initialPath: ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
+        eventId
       })
     },
     chromatic: { disableSnapshot: true },
@@ -156,11 +147,11 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.localRegistrar()
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [mockUser]
           })
         ]
@@ -236,11 +227,11 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
   }
 }
 
-export const ReviewForRegistratinAgentRejectInteraction: Story = {
+export const ReviewForLocalRegistrarRejectInteraction: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
         eventId
       })
     },
