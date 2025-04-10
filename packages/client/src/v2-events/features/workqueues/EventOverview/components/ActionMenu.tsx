@@ -34,6 +34,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { AssignmentStatus, isAssignedToUser } from '@client/v2-events/utils'
 
 const viewRecordMessage = {
   id: 'v2.view.record',
@@ -174,6 +175,10 @@ export function ActionMenu({ eventId }: { eventId: string }) {
             return (
               <DropdownMenu.Item
                 key={action.type}
+                disabled={
+                  isAssignedToUser(event, authentication?.sub) !==
+                  AssignmentStatus.ASSIGNED_TO_SELF
+                }
                 onClick={() => {
                   if (
                     action.type === ActionType.REJECT ||

@@ -24,7 +24,11 @@ import {
   mapFieldTypeToZod,
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
-  getDeclarationFields
+  getDeclarationFields,
+  ActionType,
+  WriteActions,
+  findLastAssignmentAction,
+  EventDocument
 } from '@opencrvs/commons/client'
 
 /**
@@ -178,4 +182,33 @@ export function replacePlaceholders({
   throw new Error(
     `Could not resolve ${fieldType}: ${JSON.stringify(defaultValue)}`
   )
+}
+
+export function isWriteAction(actionType: ActionType): boolean {
+  return WriteActions.some((writeAction) => actionType === writeAction)
+}
+
+export enum AssignmentStatus {
+  ASSIGNED_TO_SELF = 'ASSIGNED_TO_SELF',
+  ASSIGNED_TO_OTHERS = 'ASSIGNED_TO_OTHERS',
+  UNASSIGNED = 'UNASSIGNED'
+}
+
+export function isAssignedToUser(
+  event: EventDocument,
+  userId: string | undefined
+): AssignmentStatus {
+  const lastAssignmentAction = findLastAssignmentAction(event.actions)
+
+  if (!lastAssignmentAction) {
+    return AssignmentStatus.UNASSIGNED
+  }
+
+  if (lastAssignmentAction.type === ActionType.ASSIGN) {
+    return lastAssignmentAction.assignedTo == userId
+      ? AssignmentStatus.ASSIGNED_TO_SELF
+      : AssignmentStatus.ASSIGNED_TO_OTHERS
+  }
+
+  return AssignmentStatus.UNASSIGNED
 }
