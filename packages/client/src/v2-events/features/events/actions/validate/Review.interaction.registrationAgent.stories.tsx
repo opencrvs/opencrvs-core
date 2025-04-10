@@ -16,12 +16,14 @@ import { userEvent, within, expect, waitFor, fireEvent } from '@storybook/test'
 import {
   ActionType,
   tennisClubMembershipEvent,
-  generateEventDocument
+  generateEventDocument,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { Review } from './index'
 
 const generator = testDataGenerator()
@@ -78,6 +80,11 @@ const mockUser = {
 }
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      formValues: getCurrentEventState(declareEventDocument).declaration
+    })
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
