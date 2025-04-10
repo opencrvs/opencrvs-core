@@ -25,6 +25,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import {
   cleanUpOnUnassign,
   findLocalEventData,
+  onAssign,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
@@ -165,7 +166,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
   retry: (_, error: TRPCClientError<AppRouter>) =>
     error.data?.httpStatus !== 409,
   retryDelay: 10000,
-  onSuccess: updateLocalEvent,
+  onSuccess: onAssign,
   meta: {
     actionType: ActionType.ASSIGN
   }

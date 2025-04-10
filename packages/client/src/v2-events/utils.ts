@@ -27,9 +27,7 @@ import {
   compositeFieldTypes,
   getDeclarationFields,
   ActionType,
-  WriteActions,
-  findLastAssignmentAction,
-  EventDocument
+  WriteActions
 } from '@opencrvs/commons/client'
 import { getLocations } from '@client/offline/selectors'
 import { countries } from '@client/utils/countries'
@@ -236,20 +234,14 @@ export enum AssignmentStatus {
 }
 
 export function isAssignedToUser(
-  event: EventDocument,
+  eventState: EventIndex,
   userId: string | undefined
 ): AssignmentStatus {
-  const lastAssignmentAction = findLastAssignmentAction(event.actions)
-
-  if (!lastAssignmentAction) {
+  if (!eventState.assignedTo) {
     return AssignmentStatus.UNASSIGNED
   }
 
-  if (lastAssignmentAction.type === ActionType.ASSIGN) {
-    return lastAssignmentAction.assignedTo == userId
-      ? AssignmentStatus.ASSIGNED_TO_SELF
-      : AssignmentStatus.ASSIGNED_TO_OTHERS
-  }
-
-  return AssignmentStatus.UNASSIGNED
+  return eventState.assignedTo == userId
+    ? AssignmentStatus.ASSIGNED_TO_SELF
+    : AssignmentStatus.ASSIGNED_TO_OTHERS
 }

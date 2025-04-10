@@ -22,7 +22,8 @@ import {
   type ActionConfig,
   getCurrentEventStateWithDrafts,
   getUUID,
-  EventConfig
+  EventConfig,
+  EventIndex
 } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -81,38 +82,47 @@ function AssignmentActions({ eventId }: { eventId: string }) {
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
   const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
+  const eventState = events.getEventState.useSuspenseQuery(eventId)
 
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
   }
 
+  const assignmentStatus = isAssignedToUser(eventState, authentication.sub)
+
   return (
     <>
-      <DropdownMenu.Item
-        key={ActionType.ASSIGN}
-        onClick={async () => {
-          await events.actions.assignment.assign.mutate({
-            eventId,
-            assignedTo: authentication.sub,
-            refetchEvent
-          })
-        }}
-      >
-        {intl.formatMessage(actionMessages.assignLabel)}
-      </DropdownMenu.Item>
+      {assignmentStatus === AssignmentStatus.UNASSIGNED && (
+        <DropdownMenu.Item
+          key={ActionType.ASSIGN}
+          onClick={async () => {
+            await events.actions.assignment.assign.mutate({
+              eventId,
+              assignedTo: authentication.sub,
+              refetchEvent
+            })
+          }}
+        >
+          {intl.formatMessage(actionMessages.assignLabel)}
+        </DropdownMenu.Item>
+      )}
 
-      <DropdownMenu.Item
-        key={ActionType.UNASSIGN}
-        onClick={() => {
-          events.actions.assignment.unassign.mutate({
-            eventId,
-            transactionId: getUUID(),
-            assignedTo: null
-          })
-        }}
-      >
-        {intl.formatMessage(actionMessages.unassignLabel)}
-      </DropdownMenu.Item>
+      {(assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ||
+        (assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
+          authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS))) && (
+        <DropdownMenu.Item
+          key={ActionType.UNASSIGN}
+          onClick={() => {
+            events.actions.assignment.unassign.mutate({
+              eventId,
+              transactionId: getUUID(),
+              assignedTo: null
+            })
+          }}
+        >
+          {intl.formatMessage(actionMessages.unassignLabel)}
+        </DropdownMenu.Item>
+      )}
     </>
   )
 }
@@ -124,6 +134,8 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   const authentication = useAuthentication()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
+
+  const eventState = events.getEventState.useSuspenseQuery(eventId)
 
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
@@ -176,7 +188,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               <DropdownMenu.Item
                 key={action.type}
                 disabled={
-                  isAssignedToUser(event, authentication?.sub) !==
+                  isAssignedToUser(eventState, authentication?.sub) !==
                   AssignmentStatus.ASSIGNED_TO_SELF
                 }
                 onClick={() => {

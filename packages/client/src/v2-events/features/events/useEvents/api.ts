@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Draft, EventDocument, EventIndex } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  Draft,
+  EventDocument,
+  EventIndex,
+  findLastAssignmentAction
+} from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 
@@ -54,6 +60,27 @@ export async function invalidateEventsList() {
 export async function updateLocalEvent(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
   return invalidateEventsList()
+}
+
+export function onAssign(updatedEvent: EventDocument) {
+  setEventData(updatedEvent.id, updatedEvent)
+
+  const foo = findLastAssignmentAction(updatedEvent.actions)
+
+  if (!foo) {
+    return
+  }
+
+  if (foo.type === ActionType.ASSIGN) {
+    const { assignedTo } = foo
+    return setEventListData((eventIndices) =>
+      eventIndices?.map((eventIndex) =>
+        eventIndex.id === updatedEvent.id
+          ? { ...eventIndex, assignedTo }
+          : eventIndex
+      )
+    )
+  }
 }
 
 export async function invalidateDraftsList() {
