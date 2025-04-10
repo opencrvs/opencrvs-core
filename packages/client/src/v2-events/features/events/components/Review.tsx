@@ -691,23 +691,29 @@ function EditModal({
 function AcceptActionModal({
   copy,
   close,
-  action,
-  incomplete
+  action
 }: {
   copy?: {
     onCancel?: MessageDescriptor
     onConfirm?: MessageDescriptor
     title?: MessageDescriptor
     description?: MessageDescriptor
+    eventLabel?: MessageDescriptor
   }
   close: (result: boolean | null) => void
   action: string
-  incomplete?: boolean
 }) {
   const intl = useIntl()
+
+  const eventName = copy?.eventLabel
+    ? // @TODO: Revisit this. There must be a better way to have the event name as part of string.
+      intl.formatMessage(copy.eventLabel).toLocaleLowerCase()
+    : ''
+
   return (
     <ResponsiveModal
       autoHeight
+      show
       showHeaderBorder
       actions={[
         <Button
@@ -739,18 +745,17 @@ function AcceptActionModal({
         </Button>
       ]}
       handleClose={() => close(null)}
-      show={true}
       title={intl.formatMessage(
         copy?.title || reviewMessages.actionModalTitle,
-        { action }
+        // @TODO: Consider whether every formatted message should have access to global variables
+        // currently it seems we are arbitrarily deciding which ones do.
+        { action, event: eventName }
       )}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(
-            incomplete
-              ? reviewMessages.actionModalIncompleteDescription
-              : copy?.description || reviewMessages.actionModalDescription
+            copy?.description || reviewMessages.actionModalDescription
           )}
         </Text>
       </Stack>

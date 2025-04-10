@@ -120,8 +120,10 @@ export function Review() {
       <ReviewComponent.ActionModal.Accept
         action="Validate"
         close={close}
-        copy={reviewActionConfiguration.messages.modal}
-        incomplete={reviewActionConfiguration.incomplete}
+        copy={{
+          ...reviewActionConfiguration.messages.modal,
+          eventLabel: config.label
+        }}
       />
     ))
     if (confirmedValidation) {

@@ -63,12 +63,12 @@ export const confirmModalMessages = {
     register: {
       title: {
         id: 'v2.review.register.confirmModal.title',
-        defaultMessage: 'Register?',
+        defaultMessage: 'Register the {event}?',
         description: 'The title for review action modal when registering'
       },
       description: {
         id: 'v2.review.register.confirmModal.description',
-        defaultMessage: '‎', // intentionally empty, as the description is not used in v1
+        defaultMessage: '', // intentionally empty, as the description is not used in v1
         description: 'The description for review action modal when registering'
       },
       onConfirm: {

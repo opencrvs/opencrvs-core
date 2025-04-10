@@ -121,7 +121,11 @@ export function Review() {
 
   async function handleRegistration() {
     const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal.Accept action="Register" close={close} />
+      <ReviewComponent.ActionModal.Accept
+        action="Register"
+        close={close}
+        copy={messages.modal}
+      />
     ))
     if (confirmedRegistration) {
       registerMutation.mutate({

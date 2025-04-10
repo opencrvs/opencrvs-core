@@ -112,7 +112,6 @@ export function Review() {
         action="Declare"
         close={close}
         copy={reviewActionConfiguration.messages.modal}
-        incomplete={hasValidationErrors}
       />
     ))
     if (confirmedDeclaration) {
