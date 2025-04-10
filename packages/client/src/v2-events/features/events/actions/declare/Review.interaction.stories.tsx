@@ -57,8 +57,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
-const foo = declarationTrpcMsw.events.handlers[0]
-
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE]

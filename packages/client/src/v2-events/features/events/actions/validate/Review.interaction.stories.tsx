@@ -12,7 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { graphql, HttpResponse } from 'msw'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, within, expect, waitFor, fireEvent } from '@storybook/test'
 import {
   ActionType,
   tennisClubMembershipEvent,
@@ -25,6 +25,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
+import { createDeclarationTrpcMsw } from '../../../../../tests/v2-events/declaration.utils'
 import { Review } from './index'
 
 const generator = testDataGenerator()
@@ -60,19 +61,17 @@ const callTracker = {
     'event.create': 0,
     'event.actions.declare': 0,
     'event.actions.validate': 0,
-    'event.actions.register': 0
+    'event.actions.register': 0,
+    'event.actions.archive': 0,
+    'event.actions.reject': 0
   },
   registrationAgent: {
     'event.create': 0,
     'event.actions.declare': 0,
     'event.actions.validate': 0,
-    'event.actions.register': 0
-  },
-  fieldAgent: {
-    'event.create': 0,
-    'event.actions.declare': 0,
-    'event.actions.validate': 0,
-    'event.actions.register': 0
+    'event.actions.register': 0,
+    'event.actions.archive': 0,
+    'event.actions.reject': 0
   }
 }
 
@@ -97,7 +96,14 @@ const mockUser = {
   role: 'SOCIAL_WORKER'
 }
 
+const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
+
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
+  beforeEach: () => {
+    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -108,60 +114,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return [draft]
-          })
-        ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
-          tRPCMsw.event.create.mutation(() => {
-            callTracker.localRegistrar['event.create']++
-
-            return eventDocument
-          }),
-          tRPCMsw.event.actions.declare.request.mutation(() => {
-            callTracker.localRegistrar['event.actions.declare']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE, ActionType.DECLARE]
-            })
-          }),
-          tRPCMsw.event.actions.validate.request.mutation(() => {
-            callTracker.localRegistrar['event.actions.validate']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.request.mutation(() => {
-            callTracker.localRegistrar['event.actions.register']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE,
-                ActionType.REGISTER
-              ]
-            })
-          })
-        ],
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers,
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -195,17 +149,17 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 
     await step('Confirm action triggers scope based actions', async () => {
       await within(canvasElement).findByText('All events')
+
       await waitFor(async () => {
-        await expect(callTracker.localRegistrar['event.create']).toBe(0)
-        await expect(callTracker.localRegistrar['event.actions.declare']).toBe(
-          0
-        )
-        await expect(callTracker.localRegistrar['event.actions.validate']).toBe(
-          1
-        )
-        await expect(callTracker.localRegistrar['event.actions.register']).toBe(
-          1
-        )
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
+          'event.actions.notify.request': false,
+          'event.actions.declare.request': false,
+          'event.actions.validate.request': true,
+          'event.actions.register.request': true,
+          'event.actions.archive.request': false,
+          'event.actions.reject.request': false
+        })
       })
     })
   }
@@ -213,14 +167,12 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
-    })
-
     window.localStorage.setItem(
       'opencrvs',
       generator.user.token.registrationAgent
     )
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
   },
   parameters: {
     reactRouter: {
@@ -232,60 +184,8 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return [draft]
-          })
-        ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
-          tRPCMsw.event.create.mutation(() => {
-            callTracker.registrationAgent['event.create']++
-
-            return eventDocument
-          }),
-          tRPCMsw.event.actions.declare.request.mutation(() => {
-            callTracker.registrationAgent['event.actions.declare']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE, ActionType.DECLARE]
-            })
-          }),
-          tRPCMsw.event.actions.validate.request.mutation(() => {
-            callTracker.registrationAgent['event.actions.validate']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.request.mutation(() => {
-            callTracker.registrationAgent['event.actions.register']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE,
-                ActionType.REGISTER
-              ]
-            })
-          })
-        ],
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers,
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -319,17 +219,232 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 
     await step('Confirm action triggers scope based actions', async () => {
       await within(canvasElement).findByText('All events')
+
       await waitFor(async () => {
-        await expect(callTracker.registrationAgent['event.create']).toBe(0)
-        await expect(
-          callTracker.registrationAgent['event.actions.declare']
-        ).toBe(0)
-        await expect(
-          callTracker.registrationAgent['event.actions.validate']
-        ).toBe(1)
-        await expect(
-          callTracker.registrationAgent['event.actions.register']
-        ).toBe(0)
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
+          'event.actions.notify.request': false,
+          'event.actions.declare.request': false,
+          'event.actions.validate.request': true,
+          'event.actions.register.request': false,
+          'event.actions.archive.request': false,
+          'event.actions.reject.request': false
+        })
+      })
+    })
+  }
+}
+
+export const ReviewForLocalRegistrarArchiveInteraction: Story = {
+  beforeEach: () => {
+    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
+        eventId
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
+        events: declarationTrpcMsw.events.handlers,
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.localRegistrar()
+              }
+            })
+          }),
+          tRPCMsw.user.list.query(() => {
+            return [mockUser]
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Open reject modal', async () => {
+      const rejectButton = await canvas.findByRole('button', {
+        name: 'Reject'
+      })
+      await userEvent.click(rejectButton)
+    })
+
+    const modal = within(await canvas.findByRole('dialog'))
+
+    await step('Archive is disabled', async () => {
+      const archiveButton = await modal.findByRole('button', {
+        name: 'Archive'
+      })
+
+      await expect(archiveButton).toBeDisabled()
+    })
+
+    await step('Add description', async () => {
+      const descriptionInput = await modal.findByRole('textbox')
+
+      await fireEvent.change(descriptionInput, {
+        target: { value: 'Wrong data' }
+      })
+    })
+
+    await step('Archive is not disabled', async () => {
+      const archiveButton = await modal.findByRole('button', {
+        name: 'Archive'
+      })
+
+      await expect(archiveButton).not.toBeDisabled()
+    })
+
+    await step('Mark as a duplicate', async () => {
+      const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
+        name: 'Mark as a duplicate'
+      })
+
+      await userEvent.click(markAsDuplicateCheckbox)
+    })
+
+    await step('Archive is not disabled', async () => {
+      const archiveButton = await modal.findByRole('button', {
+        name: 'Archive'
+      })
+
+      await expect(archiveButton).not.toBeDisabled()
+
+      await userEvent.click(archiveButton)
+      await within(canvasElement).findByText('All events')
+
+      await waitFor(async () => {
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
+          'event.actions.notify.request': false,
+          'event.actions.declare.request': false,
+          'event.actions.validate.request': false,
+          'event.actions.register.request': false,
+          'event.actions.archive.request': true,
+          'event.actions.reject.request': false
+        })
+      })
+    })
+  }
+}
+
+export const ReviewForRegistrationAgentArchiveInteraction: Story = {
+  beforeEach: () => {
+    window.localStorage.setItem(
+      'opencrvs',
+      generator.user.token.registrationAgent
+    )
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
+        eventId: declareEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [draft]
+          })
+        ],
+        events: declarationTrpcMsw.events.handlers,
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.registrationAgent()
+              }
+            })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Open reject modal', async () => {
+      const rejectButton = await canvas.findByRole('button', {
+        name: 'Reject'
+      })
+      await userEvent.click(rejectButton)
+    })
+
+    const modal = within(await canvas.findByRole('dialog'))
+
+    await step('Archive is disabled', async () => {
+      const archiveButton = await modal.findByRole('button', {
+        name: 'Archive'
+      })
+
+      await expect(archiveButton).toBeDisabled()
+    })
+
+    await step('Add description', async () => {
+      const descriptionInput = await modal.findByRole('textbox')
+
+      await fireEvent.change(descriptionInput, {
+        target: { value: 'Wrong data' }
+      })
+    })
+
+    await step('Archive is not disabled', async () => {
+      const archiveButton = await modal.findByRole('button', {
+        name: 'Archive'
+      })
+
+      await expect(archiveButton).not.toBeDisabled()
+    })
+
+    await step('Mark as a duplicate', async () => {
+      const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
+        name: 'Mark as a duplicate'
+      })
+
+      await userEvent.click(markAsDuplicateCheckbox)
+    })
+
+    await step('Archive is not disabled', async () => {
+      const archiveButton = await modal.findByRole('button', {
+        name: 'Archive'
+      })
+
+      await expect(archiveButton).not.toBeDisabled()
+
+      await userEvent.click(archiveButton)
+      await within(canvasElement).findByText('All events')
+
+      await waitFor(async () => {
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
+          'event.actions.notify.request': false,
+          'event.actions.declare.request': false,
+          'event.actions.validate.request': false,
+          'event.actions.register.request': false,
+          'event.actions.archive.request': true,
+          'event.actions.reject.request': false
+        })
       })
     })
   }

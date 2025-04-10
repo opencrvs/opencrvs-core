@@ -63,11 +63,12 @@ export function useReviewActionConfig({
       buttonType: 'positive' as const,
       incomplete,
       onConfirm: (eventId: string) =>
-        events.actions.declare.mutate({
+        events.actions.validate.mutate({
           eventId,
           declaration,
           annotation,
-          transactionId: uuid()
+          transactionId: uuid(),
+          duplicates: []
         }),
       messages: incomplete
         ? reviewMessages.incomplete.validate
