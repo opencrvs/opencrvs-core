@@ -76,7 +76,8 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
         createdAt: new Date().toISOString(),
         createdBy: '@todo',
         createdAtLocation: '@todo',
-        ...variables
+        ...variables,
+        declaration: variables.declaration || {}
       },
       createdAt: new Date().toISOString()
     }

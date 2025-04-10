@@ -33,7 +33,7 @@ import {
   FieldType,
   FormConfig,
   getFieldValidationErrors,
-  isFieldVisible,
+  isFieldDisplayedOnReview,
   isPageVisible,
   SCOPES
 } from '@opencrvs/commons/client'
@@ -296,7 +296,7 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldVisible(field, form))
+            .filter((field) => isFieldDisplayedOnReview(field, form))
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
@@ -341,6 +341,16 @@ function FormReview({
             return <></>
           }
 
+          // Only display fields that have a non-undefined/null value or have an validation error
+          const displayedFields = fields.filter(
+            ({ valueDisplay, errorDisplay }) => {
+              // Explicitly check for undefined and null, so that e.g. number 0 and empty string outputs are shown
+              const hasValue =
+                valueDisplay !== undefined && valueDisplay !== null
+              return hasValue || Boolean(errorDisplay)
+            }
+          )
+
           return (
             <DeclarationDataContainer
               key={'Section_' + page.title.defaultMessage}
@@ -365,12 +375,8 @@ function FormReview({
                 name={'Accordion_' + page.id}
               >
                 <ListReview id={'Section_' + page.id}>
-                  {fields
-                    .filter(
-                      ({ valueDisplay, errorDisplay }) =>
-                        valueDisplay || errorDisplay
-                    )
-                    .map(({ id, label, errorDisplay, valueDisplay }) => (
+                  {displayedFields.map(
+                    ({ id, label, errorDisplay, valueDisplay }) => (
                       <ListReview.Row
                         key={id}
                         actions={
@@ -394,7 +400,8 @@ function FormReview({
                         label={intl.formatMessage(label)}
                         value={errorDisplay || valueDisplay}
                       />
-                    ))}
+                    )
+                  )}
                 </ListReview>
               </Accordion>
             </DeclarationDataContainer>
