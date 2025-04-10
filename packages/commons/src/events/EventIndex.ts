@@ -41,14 +41,14 @@ function Condition<T extends z.ZodTypeAny>(type: T) {
 }
 
 // Recursive DataCondition
-type ZDataCondition = z.ZodType<unknown>
-const DataCondition: ZDataCondition = z.lazy(() =>
-  z.record(z.union([Condition(z.any()), DataCondition]))
+const DataConditionSchema: z.ZodType<any> = z.lazy(() =>
+  z.record(z.union([Condition(z.any()), DataConditionSchema]))
 )
+export type DataCondition = z.infer<typeof DataConditionSchema>
 
 const QueryExpression = z
   .object({
-    type: z.optional(z.union([OneOf(z.string()), Exact])),
+    searchType: z.optional(z.union([OneOf(z.string()), Exact])),
     eventType: z.string(),
     status: z.optional(z.union([OneOf(z.string()), Exact])),
     createdAt: z.optional(DateCondition),
@@ -58,14 +58,16 @@ const QueryExpression = z
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
-    data: z.optional(z.record(DataCondition))
+    data: z.optional(z.record(DataConditionSchema))
   })
   .partial()
 
-const Or = z.object({
-  type: z.literal('or'),
-  clauses: z.array(QueryExpression)
-})
+const Or = z
+  .object({
+    type: z.literal('or'),
+    clauses: z.array(QueryExpression)
+  })
+  .partial()
 
 export const QueryType = z.union([QueryExpression, Or])
 export type QueryType = z.infer<typeof QueryType>

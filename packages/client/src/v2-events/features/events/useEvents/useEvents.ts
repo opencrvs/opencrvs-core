@@ -11,7 +11,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { getUUID } from '@opencrvs/commons/client'
+import { DataCondition, getUUID } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useGetEvent, useGetEventState } from './procedures/get'
 import { useOutbox } from './outbox'
@@ -44,25 +44,26 @@ export function useEvents() {
       useQuery: (type: string, searchParams: Record<string, string>) =>
         useQuery({
           ...trpc.event.search.queryOptions({
-            ...searchParams,
+            data: searchParams,
             eventType: type
           }),
           queryKey: trpc.event.search.queryKey({
-            ...searchParams,
+            data: searchParams,
             eventType: type
           })
         }),
-      useSuspenseQuery: (type: string, searchParams: Record<string, string>) =>
-        useSuspenseQuery({
+      useSuspenseQuery: (type: string, searchParams: DataCondition) => {
+        return useSuspenseQuery({
           ...trpc.event.search.queryOptions({
-            ...searchParams,
+            data: searchParams,
             eventType: type
           }),
           queryKey: trpc.event.search.queryKey({
-            ...searchParams,
+            data: searchParams,
             eventType: type
           })
         }).data
+      }
     },
     actions: {
       validate: useEventAction(trpc.event.actions.validate.request),
