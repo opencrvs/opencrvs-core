@@ -68,7 +68,7 @@ export const confirmModalMessages = {
       },
       description: {
         id: 'v2.review.register.confirmModal.description',
-        defaultMessage: '', // intentionally empty, as the description is not used in v1
+        defaultMessage: '‎', // intentionally empty, as the description is not used in v1
         description: 'The description for review action modal when registering'
       },
       onConfirm: {
@@ -208,7 +208,7 @@ export const reviewMessages = {
       },
       onConfirm: registerMessages.onConfirm,
       onReject: registerMessages.onReject,
-      modal: {}
+      modal: undefined
     },
     validate: {
       title: validateMessages.title,
@@ -220,7 +220,7 @@ export const reviewMessages = {
       },
       onConfirm: validateMessages.onConfirm,
       onReject: validateMessages.onReject,
-      modal: {}
+      modal: undefined
     },
     declare: {
       title: {

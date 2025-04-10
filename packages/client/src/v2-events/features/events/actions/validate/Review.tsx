@@ -116,16 +116,27 @@ export function Review() {
   }
 
   async function handleValidation() {
-    const confirmedValidation = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal.Accept
-        action="Validate"
-        close={close}
-        copy={{
-          ...reviewActionConfiguration.messages.modal,
-          eventLabel: config.label
-        }}
-      />
-    ))
+    const confirmedValidation = await openModal<boolean | null>((close) => {
+      if (reviewActionConfiguration.messages.modal === undefined) {
+        // eslint-disable-next-line no-console
+        console.error(
+          'Tried to render validate modal without message definitions. '
+        )
+        return null
+      }
+
+      return (
+        <ReviewComponent.ActionModal.Accept
+          action="Validate"
+          close={close}
+          copy={{
+            ...reviewActionConfiguration.messages.modal,
+            eventLabel: config.label
+          }}
+        />
+      )
+    })
+
     if (confirmedValidation) {
       reviewActionConfiguration.onConfirm(eventId)
 

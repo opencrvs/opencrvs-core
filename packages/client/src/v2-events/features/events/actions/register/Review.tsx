@@ -45,6 +45,7 @@ function getTranslations(hasErrors: boolean) {
 
   return reviewMessages[state].register
 }
+
 /**
  *
  * Preview of event to be registered.
@@ -120,13 +121,23 @@ export function Review() {
   }
 
   async function handleRegistration() {
-    const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal.Accept
-        action="Register"
-        close={close}
-        copy={messages.modal}
-      />
-    ))
+    const confirmedRegistration = await openModal<boolean | null>((close) => {
+      if (messages.modal === undefined) {
+        // eslint-disable-next-line no-console
+        console.error(
+          'Tried to render register modal without message definitions.'
+        )
+        return
+      }
+
+      return (
+        <ReviewComponent.ActionModal.Accept
+          action="Register"
+          close={close}
+          copy={{ ...messages.modal, eventLabel: config.label }}
+        />
+      )
+    })
     if (confirmedRegistration) {
       registerMutation.mutate({
         eventId,

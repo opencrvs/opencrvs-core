@@ -340,7 +340,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
       await within(canvasElement).findByText('All events')
 
       await waitFor(async () => {
-        await expect(declarationTrpcMsw.events).toMatchObject({
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
           'event.create': false,
           'event.actions.notify.request': true,
           'event.actions.declare.request': false,

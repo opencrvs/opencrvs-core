@@ -55,7 +55,7 @@ export function useReviewActionConfig({
       messages: incomplete
         ? reviewMessages.incomplete.register
         : reviewMessages.complete.register
-    }
+    } as const
   }
 
   if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
@@ -73,7 +73,7 @@ export function useReviewActionConfig({
       messages: incomplete
         ? reviewMessages.incomplete.validate
         : reviewMessages.complete.validate
-    }
+    } as const
   }
 
   throw new Error('No valid scope found for the action')

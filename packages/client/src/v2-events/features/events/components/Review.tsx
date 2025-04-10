@@ -693,22 +693,19 @@ function AcceptActionModal({
   close,
   action
 }: {
-  copy?: {
-    onCancel?: MessageDescriptor
-    onConfirm?: MessageDescriptor
-    title?: MessageDescriptor
-    description?: MessageDescriptor
-    eventLabel?: MessageDescriptor
+  copy: {
+    onCancel: MessageDescriptor
+    onConfirm: MessageDescriptor
+    title: MessageDescriptor
+    description: MessageDescriptor
+    eventLabel: MessageDescriptor
   }
   close: (result: boolean | null) => void
   action: string
 }) {
   const intl = useIntl()
-
-  const eventName = copy?.eventLabel
-    ? // @TODO: Revisit this. There must be a better way to have the event name as part of string.
-      intl.formatMessage(copy.eventLabel).toLocaleLowerCase()
-    : ''
+  // @TODO: Revisit this. There must be a better way to have the event name as part of string.
+  const eventName = intl.formatMessage(copy.eventLabel).toLocaleLowerCase()
 
   return (
     <ResponsiveModal
@@ -724,9 +721,7 @@ function AcceptActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(
-            copy?.onCancel || reviewMessages.actionModalCancel
-          )}
+          {intl.formatMessage(copy.onCancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -736,27 +731,20 @@ function AcceptActionModal({
             close(true)
           }}
         >
-          {intl.formatMessage(
-            copy?.onConfirm || reviewMessages.actionModalPrimaryAction,
-            {
-              action
-            }
-          )}
+          {intl.formatMessage(copy.onConfirm)}
         </Button>
       ]}
       handleClose={() => close(null)}
       title={intl.formatMessage(
-        copy?.title || reviewMessages.actionModalTitle,
+        copy.title,
         // @TODO: Consider whether every formatted message should have access to global variables
         // currently it seems we are arbitrarily deciding which ones do.
-        { action, event: eventName }
+        { event: eventName }
       )}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(
-            copy?.description || reviewMessages.actionModalDescription
-          )}
+          {intl.formatMessage(copy.description)}
         </Text>
       </Stack>
     </ResponsiveModal>
