@@ -12,7 +12,7 @@ import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { IntlProvider } from 'react-intl'
-import { useIntlFormatMessageWithFlattenedParams } from './utils'
+import { EMPTY_TOKEN, useIntlFormatMessageWithFlattenedParams } from './utils'
 
 describe('useIntlFormatMessageWithFlattenedParams', () => {
   describe('formatMessage()', () => {
@@ -78,8 +78,8 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
       ).toBe('Hello,  :)')
     })
 
-    describe('__EMPTY__ token functionality', () => {
-      it('correctly selects __EMPTY__ option if no values given', () => {
+    describe(`${EMPTY_TOKEN} token functionality`, () => {
+      it(`correctly selects ${EMPTY_TOKEN} option if no values given`, () => {
         const message = {
           id: 'test.select',
           defaultMessage: 'Fallback message',
