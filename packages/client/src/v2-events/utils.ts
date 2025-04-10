@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { uniq, isString, get, mapKeys, uniqBy } from 'lodash'
-
 import { v4 as uuid } from 'uuid'
+import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import {
   ResolvedUser,
   ActionDocument,
@@ -30,6 +31,8 @@ import {
   findLastAssignmentAction,
   EventDocument
 } from '@opencrvs/commons/client'
+import { getLocations } from '@client/offline/selectors'
+import { countries } from '@client/utils/countries'
 
 /**
  *
@@ -181,6 +184,44 @@ export function replacePlaceholders({
   }
   throw new Error(
     `Could not resolve ${fieldType}: ${JSON.stringify(defaultValue)}`
+  )
+}
+
+/** Does not have parent */
+const ROOT_LOCATION_ID = '0'
+
+/** Given location id, returns full name of the location by resolving the hierarchy values all the way to country name. */
+export function useResolveLocationFullName(
+  locationId: string | undefined,
+  name: string = ''
+) {
+  const locations = useSelector(getLocations)
+  const intl = useIntl()
+
+  if (!locationId) {
+    return name
+  }
+
+  const location = locations[locationId]
+
+  if (!location) {
+    if (locationId === ROOT_LOCATION_ID) {
+      const country = countries.find(
+        (c) => c.value === window.config.COUNTRY
+      )?.label
+
+      const countryName = country ? intl.formatMessage(country) : ''
+
+      return joinValues([name, countryName], ', ')
+    }
+
+    return name
+  }
+
+  const partOf = location.partOf.split('/')[1]
+  return useResolveLocationFullName(
+    partOf,
+    joinValues([name, location.name], ', ')
   )
 }
 

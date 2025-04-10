@@ -68,7 +68,7 @@ export const handlers = {
     tRPCMsw.locations.get.query(() => {
       return [
         {
-          id: '93897b67-29af-4a00-8381-42a694187666',
+          id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
           externalId: 'AWn3s2RqgAN',
           name: 'Central',
           partOf: null
@@ -1160,78 +1160,6 @@ export const handlers = {
         entry: [
           {
             fullUrl:
-              'http://localhost:2021/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/115c7e08-cefe-4640-8818-15d904211e77',
-            resource: {
-              resourceType: 'Location',
-              identifier: [
-                {
-                  system: 'http://opencrvs.org/specs/id/statistical-code',
-                  value: 'ADMIN_STRUCTURE_AWn3s2RqgAN'
-                },
-                {
-                  system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                  value: 'STATE'
-                }
-              ],
-              name: 'Central',
-              alias: ['Central'],
-              description: 'AWn3s2RqgAN',
-              status: 'active',
-              mode: 'instance',
-              partOf: { reference: 'Location/0' },
-              type: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/location-type',
-                    code: 'ADMIN_STRUCTURE'
-                  }
-                ]
-              },
-              physicalType: {
-                coding: [{ code: 'jdn', display: 'Jurisdiction' }]
-              },
-              extension: [
-                {
-                  url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
-                  valueAttachment: {
-                    contentType: 'application/geo+json',
-                    data: '<base64>'
-                  }
-                },
-                {
-                  url: 'http://opencrvs.org/specs/id/statistics-male-populations',
-                  valueString:
-                    '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
-                },
-                {
-                  url: 'http://opencrvs.org/specs/id/statistics-female-populations',
-                  valueString:
-                    '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
-                },
-                {
-                  url: 'http://opencrvs.org/specs/id/statistics-total-populations',
-                  valueString:
-                    '[{"2007":40000},{"2008":40000},{"2009":40000},{"2010":40000},{"2011":40000},{"2012":40000},{"2013":40000},{"2014":40000},{"2015":40000},{"2016":40000},{"2017":40000},{"2018":40000},{"2019":40000},{"2020":40000},{"2021":40000},{"2022":60000},{"2023":80000}]'
-                },
-                {
-                  url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-                  valueString:
-                    '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
-                }
-              ],
-              meta: {
-                lastUpdated: '2025-02-05T07:52:42.266+00:00',
-                versionId: '115c7e08-cefe-4640-8818-15d904211e77'
-              },
-              id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
-            },
-            request: {
-              method: 'PUT',
-              url: 'Location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
-            }
-          },
-          {
-            fullUrl:
               'http://localhost:2021/location/5ef450bc-712d-48ad-93f3-8da0fa453baa/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
             resource: {
               resourceType: 'Location',
@@ -1938,6 +1866,209 @@ export const handlers = {
               id: 'e8d52f39-6792-4f61-b247-9a1177fe074c'
             },
             request: { method: 'POST', url: 'Location' }
+          },
+          {
+            fullUrl:
+              'http://localhost:2021/location/465c448a-2c85-45f5-80f0-967e91f51de9/_history/b7990a30-5093-409e-9a61-8cba9906687f',
+            resource: {
+              resourceType: 'Location',
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/internal-id',
+                  value: 'HEALTH_FACILITY_di3U5u7F8Y3'
+                }
+              ],
+              name: 'Ibombo Rural Health Centre',
+              alias: ['Ibombo Rural Health Centre'],
+              status: 'active',
+              mode: 'instance',
+              partOf: {
+                reference: 'Location/671747f2-79d3-4911-9600-046d6d4b4496'
+              },
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/location-type',
+                    code: 'HEALTH_FACILITY'
+                  }
+                ]
+              },
+              physicalType: {
+                coding: [
+                  {
+                    code: 'bu',
+                    display: 'Building'
+                  }
+                ]
+              },
+              meta: {
+                lastUpdated: '2025-03-18T09:29:59.674+00:00',
+                versionId: 'b7990a30-5093-409e-9a61-8cba9906687f'
+              },
+              id: '465c448a-2c85-45f5-80f0-967e91f51de9'
+            },
+            request: {
+              method: 'PUT',
+              url: 'Location/465c448a-2c85-45f5-80f0-967e91f51de9'
+            }
+          },
+          {
+            fullUrl:
+              'http://localhost:2021/location/671747f2-79d3-4911-9600-046d6d4b4496/_history/4b4ae478-0088-4156-a63f-55e0507aeed0',
+            resource: {
+              resourceType: 'Location',
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/statistical-code',
+                  value: 'ADMIN_STRUCTURE_oEBf29y8JP8'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+                  value: 'DISTRICT'
+                }
+              ],
+              name: 'Ibombo',
+              alias: ['Ibombo'],
+              description: 'oEBf29y8JP8',
+              status: 'active',
+              mode: 'instance',
+              partOf: {
+                reference: 'Location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+              },
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/location-type',
+                    code: 'ADMIN_STRUCTURE'
+                  }
+                ]
+              },
+              physicalType: {
+                coding: [
+                  {
+                    code: 'jdn',
+                    display: 'Jurisdiction'
+                  }
+                ]
+              },
+              extension: [
+                {
+                  url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+                  valueAttachment: {
+                    contentType: 'application/geo+json',
+                    data: '<base64>'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+                  valueString:
+                    '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+                  valueString:
+                    '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+                  valueString:
+                    '[{"2007":10000},{"2008":10000},{"2009":10000},{"2010":10000},{"2011":10000},{"2012":10000},{"2013":10000},{"2014":10000},{"2015":10000},{"2016":10000},{"2017":10000},{"2018":10000},{"2019":10000},{"2020":10000},{"2021":10000},{"2022":15000},{"2023":20000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+                  valueString:
+                    '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
+                }
+              ],
+              meta: {
+                lastUpdated: '2025-03-18T09:35:41.333+00:00',
+                versionId: '4b4ae478-0088-4156-a63f-55e0507aeed0'
+              },
+              id: '671747f2-79d3-4911-9600-046d6d4b4496'
+            },
+            request: {
+              method: 'PUT',
+              url: 'Location/671747f2-79d3-4911-9600-046d6d4b4496'
+            }
+          },
+          {
+            fullUrl:
+              'http://localhost:2021/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
+            resource: {
+              resourceType: 'Location',
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/statistical-code',
+                  value: 'ADMIN_STRUCTURE_AWn3s2RqgAN'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+                  value: 'STATE'
+                }
+              ],
+              name: 'Central',
+              alias: ['Central'],
+              description: 'AWn3s2RqgAN',
+              status: 'active',
+              mode: 'instance',
+              partOf: {
+                reference: 'Location/0'
+              },
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/location-type',
+                    code: 'ADMIN_STRUCTURE'
+                  }
+                ]
+              },
+              physicalType: {
+                coding: [
+                  {
+                    code: 'jdn',
+                    display: 'Jurisdiction'
+                  }
+                ]
+              },
+              extension: [
+                {
+                  url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+                  valueAttachment: {
+                    contentType: 'application/geo+json',
+                    data: '<base64>'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+                  valueString:
+                    '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+                  valueString:
+                    '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+                  valueString:
+                    '[{"2007":40000},{"2008":40000},{"2009":40000},{"2010":40000},{"2011":40000},{"2012":40000},{"2013":40000},{"2014":40000},{"2015":40000},{"2016":40000},{"2017":40000},{"2018":40000},{"2019":40000},{"2020":40000},{"2021":40000},{"2022":60000},{"2023":80000}]'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+                  valueString:
+                    '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
+                }
+              ],
+              meta: {
+                lastUpdated: '2025-03-18T09:35:41.337+00:00',
+                versionId: '790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf'
+              },
+              id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+            },
+            request: {
+              method: 'PUT',
+              url: 'Location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+            }
           }
         ]
       })
@@ -1988,6 +2119,7 @@ export const handlers = {
     http.get('http://localhost:2021/config', () => {
       return HttpResponse.json({
         systems: [],
+
         config: mockOfflineData.config,
         certificates: [
           {
