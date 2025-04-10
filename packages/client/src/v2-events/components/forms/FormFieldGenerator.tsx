@@ -78,10 +78,7 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
-import {
-  Data,
-  getFieldFromDataEntry
-} from '@client/v2-events/features/events/registered-fields/Data'
+import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 import { Errors, getValidationErrorsForForm } from './validation'
