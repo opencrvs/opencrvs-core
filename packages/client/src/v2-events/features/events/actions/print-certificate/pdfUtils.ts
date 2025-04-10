@@ -155,37 +155,81 @@ export function compileSvg({
   })
 
   Handlebars.registerHelper(
-    'findLocationById',
-    function (l: Location[], id: string) {
-      const location = l.find((loc) => loc.id === id)
+    'findAddressByJsonString',
+    function (
+      jsonString: string,
+      addressPartName:
+        | 'country'
+        | 'addressType'
+        | 'province'
+        | 'district'
+        | 'urbanOrRural'
+        | 'town'
+        | 'village'
+        | 'residentialArea'
+        | 'street'
+        | 'number'
+        | 'zipCode'
+    ) {
+      const address = JSON.parse(jsonString)
 
-      return location ? location.name : ''
+      address.district =
+        locations.find((loc) => loc.id === address.district)?.name ?? ''
+      address.province =
+        locations.find((loc) => loc.id === address.province)?.name ?? ''
+
+      address.country = intl.formatMessage({
+        id: `countries.${address.country}`,
+        defaultMessage: 'Farajaland',
+        description: 'Country name'
+      })
+      return address[addressPartName]
     }
   )
 
   Handlebars.registerHelper(
     'findAddressByLocationById',
     function (
-      l: Location[],
-      id: string
-    ): {
-      country: string
-      province: string
-      district: string
-      location: string
-    } {
+      id: string,
+      addressPartName: 'location' | 'district' | 'province' | 'country'
+    ) {
       const address = { country: '', province: '', district: '', location: '' }
-      const location = l.find((loc) => loc.id === id)
+      const location = locations.find((loc) => loc.id === id)
       address.location = location ? location.name : ''
 
-      const province = l.find((loc) => loc.id === id)
+      const district = locations.find((loc) => loc.id === location?.partOf)
+      address.district = district ? district.name : ''
+
+      const province = locations.find((loc) => loc.id === district?.partOf)
       address.province = province ? province.name : ''
 
-      const district = l.find((loc) => loc.id === id)
-      address.district = district ? district.name : ''
-      //getLocationNameMapOfFacility
-      return address
+      address.country = intl.formatMessage({
+        id: `countries.${window.config.COUNTRY}`,
+        defaultMessage: 'Farajaland',
+        description: 'Country name'
+      })
+      return address[addressPartName]
     }
+  )
+
+  Handlebars.registerHelper(
+    'intl',
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
+      // If even one of the parts is undefined, then return empty string
+      const idParts = args.slice(0, -1)
+      if (idParts.some((part) => part === undefined)) {
+        return ''
+      }
+
+      const id = idParts.join('.')
+
+      return intl.formatMessage({
+        id,
+        defaultMessage: 'Missing translation for ' + id
+      })
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
 
   Handlebars.registerHelper(
@@ -231,7 +275,6 @@ export function compileSvg({
       users
     }
   }
-  console.log('data', data)
   const output = template(data)
   return output
 }

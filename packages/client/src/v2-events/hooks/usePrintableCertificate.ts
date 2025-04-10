@@ -12,7 +12,6 @@
 import { Location } from '@events/service/locations/locations'
 import {
   EventDocument,
-  EventState,
   getCurrentEventState,
   isMinioUrl,
   User,
