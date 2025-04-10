@@ -50,6 +50,8 @@ function AdministrativeAreaInput({
 }) {
   const options = useAdminLocations(partOf ?? '0')
 
+  console.log({ options, value })
+
   return (
     <Select.Input
       {...props}
@@ -73,7 +75,7 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
 function useStringifier() {
   const locations = useSelector(getLocations)
   return (value: string): string => {
-    const name = locations[value]?.name
+    const name = locations[value].name
     return name ?? EMPTY_TOKEN
   }
 }

@@ -86,6 +86,8 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
   },
   render: function Component(args) {
     const [formData, setFormData] = React.useState({})
+    console.log({ formData })
+
     return (
       <StyledFormFieldGenerator
         fields={[

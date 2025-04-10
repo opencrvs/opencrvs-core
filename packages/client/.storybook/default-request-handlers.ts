@@ -68,7 +68,7 @@ export const handlers = {
     tRPCMsw.locations.get.query(() => {
       return [
         {
-          id: '93897b67-29af-4a00-8381-42a694187666',
+          id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
           externalId: 'AWn3s2RqgAN',
           name: 'Central',
           partOf: null
@@ -1933,7 +1933,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/93897b67-29af-4a00-8381-42a694187666'
+                reference: 'Location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
               },
               type: {
                 coding: [
@@ -1993,7 +1993,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://localhost:2021/location/93897b67-29af-4a00-8381-42a694187666/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
+              'http://localhost:2021/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2063,11 +2063,11 @@ export const handlers = {
                 lastUpdated: '2025-03-18T09:35:41.337+00:00',
                 versionId: '790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf'
               },
-              id: '93897b67-29af-4a00-8381-42a694187666'
+              id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
             },
             request: {
               method: 'PUT',
-              url: 'Location/93897b67-29af-4a00-8381-42a694187666'
+              url: 'Location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
             }
           }
         ]
