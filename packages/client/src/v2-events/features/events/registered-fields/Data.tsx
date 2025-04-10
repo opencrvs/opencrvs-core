@@ -23,9 +23,9 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 
 function getFieldFromDataEntry(
   formData: EventState,
-  dataEntry: { value: string; label: TranslationConfig }
+  value: string,
+  label: TranslationConfig
 ) {
-  const { value, label } = dataEntry
   let resolvedValue = value
 
   const keys = value.match(/{([^}]+)}/g)
@@ -88,7 +88,6 @@ function DataInput({
   formData,
   declarationFields
 }: FieldProps<'DATA'> & {
-  // Unfortunately we need to include the field config in the field object, since it is required by <Output />
   formData: EventState
   declarationFields: Inferred[]
 }) {
@@ -104,7 +103,7 @@ function DataInput({
       }
     }
 
-    return getFieldFromDataEntry(formData, entry)
+    return getFieldFromDataEntry(formData, entry.value, entry.label)
   })
 
   return (
