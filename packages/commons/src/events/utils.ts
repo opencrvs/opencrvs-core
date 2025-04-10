@@ -19,7 +19,7 @@ import {
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { ActionUpdate, EventState } from './ActionDocument'
+import { Action, ActionUpdate, EventState } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
 import { FieldType } from './FieldType'
@@ -249,4 +249,14 @@ export function deepMerge(
       return incomingValue // Override with latest value
     }
   )
+}
+
+export function findLastAssignmentAction(actions: Action[]) {
+  return actions
+    .filter(
+      ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
+    )
+    .reduce<
+      Action | undefined
+    >((latestAction, action) => (!latestAction || action.createdAt > latestAction.createdAt ? action : latestAction), undefined)
 }
