@@ -22,7 +22,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import * as Validate from './index'
 
 const meta: Meta<typeof Validate.Pages> = {
-  title: 'Validate'
+  title: 'Validate/Pages'
 }
 
 export default meta
@@ -51,59 +51,6 @@ export const Page: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const ReviewIncomplete: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const ReviewComplete: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
           }),
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
