@@ -522,15 +522,12 @@ const GeneratedInputField = React.memo(
         return null
       }
 
-      // Data input requires field configs
-      const declarationFields = getDeclarationFields(eventConfig)
-      const fields = field.config.configuration.data.map((entry) =>
-        getFieldFromDataEntry(formData, entry, declarationFields)
-      )
-
-      // TODO CIHAN: refactor
       return (
-        <Data.Input {...field.config} fields={fields} formData={formData} />
+        <Data.Input
+          {...field.config}
+          declarationFields={getDeclarationFields(eventConfig)}
+          formData={formData}
+        />
       )
     }
 
