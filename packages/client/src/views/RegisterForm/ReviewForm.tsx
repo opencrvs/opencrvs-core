@@ -116,6 +116,7 @@ function getEvent(eventType: string) {
 }
 
 interface IReviewFormState {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 }
 
@@ -154,6 +155,7 @@ function mapStatetoProps(
 }
 
 export const ReviewForm = withRouter(
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   connect<any, {}, any, IStoreState>(mapStatetoProps)(
     injectIntl(withTheme(ReviewFormView))
   )

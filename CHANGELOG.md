@@ -2,6 +2,10 @@
 
 ## 1.8.0 Release candidate
 
+### New features
+
+- **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
+
 ### Improvements
 
 - Improved text color for disabled text inputs and dropdowns

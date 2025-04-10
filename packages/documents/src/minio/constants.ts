@@ -21,4 +21,4 @@ export const MINIO_ACCESS_KEY = process.env.MINIO_ACCESS_KEY || 'minioadmin'
 export const MINIO_SECRET_KEY = process.env.MINIO_SECRET_KEY || 'minioadmin'
 
 export const MINIO_PRESIGNED_URL_EXPIRY_IN_SECOND = PRODUCTION ? 3600 : 259200
-export const MINIO_PROTOCOL = PRODUCTION ? 'https:' : 'http:'
+export const MINIO_PROTOCOL = process.env.MINIO_PROTOCOL ?? (PRODUCTION ? 'https:' : 'http:');

@@ -14,9 +14,14 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { fireEvent, within } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
+import { noop } from 'lodash'
 import {
   AddressFieldValue,
   AddressType,
+  ConditionalType,
+  defineDeclarationForm,
+  field,
+  FieldType,
   TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -50,7 +55,7 @@ const meta: Meta<typeof Review.Body> = {
   args: {
     formConfig: TENNIS_CLUB_DECLARATION_FORM,
     form: mockDeclaration,
-    onEdit: () => undefined,
+    onEdit: noop,
     title: 'Member declaration for John Doe'
   },
   decorators: [
@@ -88,8 +93,30 @@ export const ReviewWithoutChanges: Story = {
   }
 }
 
-export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
-  name: 'Review Button Test',
+const reviewActionMessages = {
+  title: {
+    id: 'v2.changeModal.title',
+    defaultMessage: 'This is a title',
+    description: 'The title for review action'
+  },
+  description: {
+    id: 'v2.changeModal.description',
+    defaultMessage: 'This is a description',
+    description: 'The title for review action'
+  },
+  onConfirm: {
+    id: 'ourOnConfirm',
+    defaultMessage: 'Confirm test',
+    description: 'The title for review action'
+  },
+  onReject: {
+    id: 'ourOnReject',
+    defaultMessage: 'Reject test',
+    description: 'The title for review action'
+  }
+}
+
+export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -141,29 +168,8 @@ export const ReviewButtonTest: StoryObj<typeof Review.Body> = {
           onEdit={handleEdit}
         >
           <Review.Actions
-            isPrimaryActionDisabled={false}
-            messages={{
-              title: {
-                id: 'v2.changeModal.title',
-                defaultMessage: 'This is a title',
-                description: 'The title for review action'
-              },
-              description: {
-                id: 'v2.changeModal.description',
-                defaultMessage: 'This is a description',
-                description: 'The title for review action'
-              },
-              onConfirm: {
-                id: 'ourOnConfirm',
-                defaultMessage: 'Confirm test',
-                description: 'The title for review action'
-              },
-              onReject: {
-                id: 'ourOnReject',
-                defaultMessage: 'Reject test',
-                description: 'The title for review action'
-              }
-            }}
+            incomplete={false}
+            messages={reviewActionMessages}
             onConfirm={handleDeclaration}
             onReject={handleRejection}
           />
@@ -216,33 +222,154 @@ export const ReviewWithValidationErrors: Story = {
         form={this.args?.form || {}}
         formConfig={TENNIS_CLUB_DECLARATION_FORM}
         title="My test action"
-        onEdit={() => undefined}
+        onEdit={noop}
       >
         <Review.Actions
-          isPrimaryActionDisabled={false}
-          messages={{
-            title: {
-              id: 'v2.changeModal.title',
-              defaultMessage: 'This is a title',
-              description: 'The title for review action'
-            },
-            description: {
-              id: 'v2.changeModal.description',
-              defaultMessage: 'This is a description',
-              description: 'The title for review action'
-            },
-            onConfirm: {
-              id: 'ourOnConfirm',
-              defaultMessage: 'Confirm test',
-              description: 'The title for review action'
-            },
-            onReject: {
-              id: 'ourOnReject',
-              defaultMessage: 'Reject test',
-              description: 'The title for review action'
+          incomplete={false}
+          messages={reviewActionMessages}
+          onConfirm={noop}
+          onReject={handleRejection}
+        />
+        {modal}
+      </Review.Body>
+    )
+  }
+}
+
+export const ReviewWithConditionallyHiddenFields: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          })
+        ]
+      }
+    }
+  },
+  args: {
+    form: {
+      firstname: 'Mia∞$∞©@£$',
+      'favourite-animal': 'cat',
+      'are-you-feeling-all-right': true
+    }
+  },
+  render: function Component() {
+    const [modal, openModal] = useModal()
+
+    async function handleRejection() {
+      await openModal<RejectionState | null>((close) => (
+        <Review.ActionModal.Reject close={close} />
+      ))
+    }
+    return (
+      <Review.Body
+        form={this.args?.form || {}}
+        formConfig={defineDeclarationForm({
+          label: {
+            id: 'declaration.form.label',
+            defaultMessage:
+              'Form for testing conditionally hidden fields on review page',
+            description: ''
+          },
+          pages: [
+            {
+              id: 'page1',
+              title: {
+                id: 'page1.title',
+                defaultMessage: 'Page 1 Title',
+                description: ''
+              },
+              fields: [
+                // This field should be hidden, since condition is not met
+                {
+                  id: 'firstname',
+                  type: FieldType.TEXT,
+                  conditionals: [
+                    {
+                      type: ConditionalType.DISPLAY_ON_REVIEW,
+                      conditional: field('firstname').isValidEnglishName()
+                    }
+                  ],
+                  label: {
+                    defaultMessage: 'First name',
+                    description: '',
+                    id: 'firstname.label'
+                  }
+                },
+                {
+                  id: 'favourite-animal',
+                  type: FieldType.RADIO_GROUP,
+                  // This field should be shown, since both conditions are met
+                  conditionals: [
+                    {
+                      type: ConditionalType.SHOW,
+                      conditional: field('firstname').isEqualTo('Mia∞$∞©@£$')
+                    },
+                    {
+                      type: ConditionalType.DISPLAY_ON_REVIEW,
+                      conditional: field('favourite-animal').isEqualTo('cat')
+                    }
+                  ],
+                  label: {
+                    defaultMessage: 'Favourite animal',
+                    description: '',
+                    id: 'favourite-animal.label'
+                  },
+                  options: [
+                    {
+                      value: 'dog',
+                      label: {
+                        id: 'favourite-animal.dog',
+                        defaultMessage: 'Dog',
+                        description: ''
+                      }
+                    },
+                    {
+                      value: 'cat',
+                      label: {
+                        id: 'favourite-animal.cat',
+                        defaultMessage: 'Cat',
+                        description: ''
+                      }
+                    }
+                  ]
+                },
+                // By default, checkboxes are hidden unless selected
+                // I.e. this should be hidden
+                {
+                  id: 'has-it-been-a-nice-day',
+                  type: FieldType.CHECKBOX,
+                  conditionals: [],
+                  label: {
+                    defaultMessage: 'Has it been a nice day?',
+                    description: '',
+                    id: 'has-it-been-a-nice-day.label'
+                  }
+                },
+                // This field should be shown, since its selected
+                {
+                  id: 'are-you-feeling-all-right',
+                  type: FieldType.CHECKBOX,
+                  conditionals: [],
+                  label: {
+                    defaultMessage: 'Are you feeling all right?',
+                    description: '',
+                    id: 'are-you-feeling-all-right.label'
+                  }
+                }
+              ]
             }
-          }}
-          onConfirm={() => undefined}
+          ]
+        })}
+        title="My review page for testing conditionally hidden fields"
+        onEdit={noop}
+      >
+        <Review.Actions
+          incomplete={false}
+          messages={reviewActionMessages}
+          onConfirm={noop}
           onReject={handleRejection}
         />
         {modal}

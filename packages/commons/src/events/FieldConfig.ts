@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Conditional, ActionConditional } from './Conditional'
+import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
@@ -44,7 +44,7 @@ const BaseField = z.object({
       DependencyExpression
     ])
     .optional(),
-  conditionals: z.array(ActionConditional).default([]).optional(),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
   disabled: z.boolean().default(false).optional(),
   hidden: z.boolean().default(false).optional(),
@@ -52,7 +52,7 @@ const BaseField = z.object({
   validation: z
     .array(
       z.object({
-        validator: Conditional(),
+        validator: Conditional,
         message: TranslationConfig
       })
     )
@@ -501,6 +501,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   EmailField,
   FileUploadWithOptions,
   DataField
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ]) as unknown as z.ZodType<Inferred, any, InferredInput>
 
 export type SelectField = z.infer<typeof Select>

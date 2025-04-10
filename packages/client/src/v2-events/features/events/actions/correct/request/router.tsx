@@ -12,16 +12,16 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { ActionType } from '@opencrvs/commons/client'
+import { DeclarationAction } from '@client/v2-events/features/events/components/Action/DeclarationAction'
 import * as RequestCorrection from '@client/v2-events/features/events/actions/correct/request'
 import { ROUTES } from '@client/v2-events/routes'
-import { Action } from '@client/v2-events/features/events/components/Action'
 
 export const router = {
   path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.path,
   element: (
-    <Action actionType={ActionType.REQUEST_CORRECTION}>
+    <DeclarationAction actionType={ActionType.REQUEST_CORRECTION}>
       <Outlet />
-    </Action>
+    </DeclarationAction>
   ),
   children: [
     {

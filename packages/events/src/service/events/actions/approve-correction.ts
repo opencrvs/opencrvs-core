@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { addAction, getEventById } from '@events/service/events/events'
 import {
   ActionStatus,
   ApproveCorrectionActionInput
 } from '@opencrvs/commons/events'
+import { addAction, getEventById } from '@events/service/events/events'
 import { RequestNotFoundError } from './correction'
 
 export async function approveCorrection(

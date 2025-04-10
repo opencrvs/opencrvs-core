@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { TRPCError } from '@trpc/server'
+import { ActionType, DraftInput, SCOPES } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { ActionType, DraftInput, SCOPES } from '@opencrvs/commons'
-import { TRPCError } from '@trpc/server'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()

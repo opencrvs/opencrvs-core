@@ -40,6 +40,8 @@ import {
 import { IconProps } from '@opencrvs/components/lib'
 import { UUID } from '@opencrvs/commons/client'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'

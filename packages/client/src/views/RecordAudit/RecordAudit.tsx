@@ -655,6 +655,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
       (tab !== 'search' &&
         // @ts-ignore
         state.workqueueState.workqueue.data[tab]?.results?.find(
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           (gqlSearchSet: any) => gqlSearchSet?.id === declarationId
         )) ||
       null,

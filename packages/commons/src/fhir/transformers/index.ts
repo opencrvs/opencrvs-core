@@ -1025,8 +1025,8 @@ function createQuestionnaireBuilder(): IFieldBuilders<
         context.event === EVENT_TYPE.BIRTH
           ? BIRTH_ENCOUNTER_CODE
           : context.event === EVENT_TYPE.DEATH
-          ? DEATH_ENCOUNTER_CODE
-          : MARRIAGE_ENCOUNTER_CODE,
+            ? DEATH_ENCOUNTER_CODE
+            : MARRIAGE_ENCOUNTER_CODE,
         fhirBundle,
         context
       )
@@ -1037,8 +1037,8 @@ function createQuestionnaireBuilder(): IFieldBuilders<
         context.event === EVENT_TYPE.BIRTH
           ? BIRTH_ENCOUNTER_CODE
           : context.event === EVENT_TYPE.DEATH
-          ? DEATH_ENCOUNTER_CODE
-          : MARRIAGE_ENCOUNTER_CODE,
+            ? DEATH_ENCOUNTER_CODE
+            : MARRIAGE_ENCOUNTER_CODE,
         fhirBundle,
         context
       )
@@ -1248,8 +1248,8 @@ const builders: IFieldBuilders = {
         context.event === EVENT_TYPE.BIRTH
           ? BIRTH_ENCOUNTER_CODE
           : context.event === EVENT_TYPE.DEATH
-          ? DEATH_ENCOUNTER_CODE
-          : MARRIAGE_ENCOUNTER_CODE,
+            ? DEATH_ENCOUNTER_CODE
+            : MARRIAGE_ENCOUNTER_CODE,
         fhirBundle,
         context
       )
@@ -2832,8 +2832,8 @@ const builders: IFieldBuilders = {
         context.event === EVENT_TYPE.BIRTH
           ? BIRTH_ENCOUNTER_CODE
           : context.event === EVENT_TYPE.DEATH
-          ? DEATH_ENCOUNTER_CODE
-          : MARRIAGE_ENCOUNTER_CODE,
+            ? DEATH_ENCOUNTER_CODE
+            : MARRIAGE_ENCOUNTER_CODE,
         fhirBundle,
         context
       )

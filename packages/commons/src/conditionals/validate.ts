@@ -23,7 +23,8 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType } from '../events/Conditional'
 
 const ajv = new Ajv({
-  $data: true
+  $data: true,
+  allowUnionTypes: true
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -47,7 +48,7 @@ function getConditionalActionsForField(
 function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
+  conditionalType: ConditionalType
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -81,6 +82,17 @@ export function isFieldEnabled(
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
 
+// Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
+export function isFieldDisplayedOnReview(
+  field: FieldConfig,
+  form: ActionUpdate | EventState
+) {
+  return (
+    isFieldVisible(field, form) &&
+    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW)
+  )
+}
+
 export const errorMessages = {
   hiddenField: {
     id: 'v2.error.hidden',
@@ -110,20 +122,20 @@ export const errorMessages = {
   }
 }
 
-const createIntlError = (message: TranslationConfig) => ({
-  message: {
-    message
+function createIntlError(message: TranslationConfig) {
+  return {
+    message: {
+      message
+    }
   }
-})
+}
 
 /**
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
  */
-const zodToIntlErrorMap = (
-  issue: ZodIssueOptionalMessage,
-  _ctx: ErrorMapCtx
-) => {
+function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (issue.code) {
     case 'invalid_string': {
       if (_ctx.data === '') {
@@ -185,6 +197,54 @@ export type CustomZodToIntlErrorMap = {
 }
 
 /**
+ * Each field can have custom validations defined in the field configuration.
+ * It is separate from standard field type validations. e.g. "is this a valid date" vs "is this date in the future"
+ * @see validateFieldInput
+ * @returns list of error messages for the field
+ *
+ */
+function runCustomFieldValidations({
+  field,
+  conditionalParameters
+}: {
+  field: FieldConfig
+  conditionalParameters: ConditionalParameters
+}) {
+  return (field.validation ?? [])
+    .filter((validation) => {
+      return !validate(validation.validator, conditionalParameters)
+    })
+    .map((validation) => ({ message: validation.message }))
+}
+
+/**
+ * Validates primitive fields defined by the FieldConfig type.
+ * e.g. email is proper format, date is a valid date, etc.
+ * for custom validations @see runCustomFieldValidations
+ */
+export function validateFieldInput({
+  field,
+  value
+}: {
+  field: FieldConfig
+  value: FieldUpdateValue
+}) {
+  const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
+    value,
+    {
+      // @ts-expect-error
+      errorMap: zodToIntlErrorMap
+    }
+  )
+
+  // We have overridden the standard error messages
+  return (rawError.error?.issues.map((issue) => issue.message) ??
+    []) as unknown as {
+    message: TranslationConfig
+  }[]
+}
+
+/**
  * Checks if a field has validation errors based on its type and custom conditionals.
  *
  * @returns an array of error messages for the field
@@ -232,52 +292,4 @@ export function getFieldValidationErrors({
     // Assumes that custom validation errors are based on the field type, and extend the validation.
     errors: [...fieldValidationResult, ...customValidationResults]
   }
-}
-
-/**
- * Each field can have custom validations defined in the field configuration.
- * It is separate from standard field type validations. e.g. "is this a valid date" vs "is this date in the future"
- * @see validateFieldInput
- * @returns list of error messages for the field
- *
- */
-function runCustomFieldValidations({
-  field,
-  conditionalParameters
-}: {
-  field: FieldConfig
-  conditionalParameters: ConditionalParameters
-}) {
-  return (field.validation ?? [])
-    .filter((validation) => {
-      return !validate(validation.validator, conditionalParameters)
-    })
-    .map((validation) => ({ message: validation.message }))
-}
-
-/**
- * Validates primitive fields defined by the FieldConfig type.
- * e.g. email is proper format, date is a valid date, etc.
- * for custom validations @see runCustomFieldValidations
- */
-export function validateFieldInput({
-  field,
-  value
-}: {
-  field: FieldConfig
-  value: FieldUpdateValue
-}) {
-  const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
-    value,
-    {
-      // @ts-expect-error
-      errorMap: zodToIntlErrorMap
-    }
-  )
-
-  // We have overridden the standard error messages
-  return (rawError.error?.issues.map((issue) => issue.message) ??
-    []) as unknown as {
-    message: TranslationConfig
-  }[]
 }

@@ -10,11 +10,6 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-// import {
-//   IFormFieldValue,
-//   IFormData,
-//   IFormSectionData
-// } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
@@ -39,8 +34,11 @@ export function getListOfLocations(
 // @TODO: Importing from forms breaks the tests. Basically the references are not resolved correctly
 // and @opencrvs/client/src/forms causes recursion in this branch.
 // https://github.com/vitest-dev/vitest/issues/546
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type IFormFieldValue = any
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type IFormData = any
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type IFormSectionData = any
 /**
  * NOTE! When amending validators in this file, remember to also update country configuration typings to reflect the changes
@@ -48,6 +46,7 @@ type IFormSectionData = any
 
 export interface IValidationResult {
   message: MessageDescriptor
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   props?: { [key: string]: any }
 }
 
@@ -67,6 +66,7 @@ export type Validation = (
   form?: IFormSectionData
 ) => IValidationResult | undefined
 
+/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export type ValidationInitializer = (...value: any[]) => Validation
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
@@ -671,6 +671,7 @@ export const isAValidNIDNumberFormat = (value: string): boolean => {
 
 export const validIDNumber =
   (typeOfID: string): Validation =>
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   (value: any) => {
     value = (value && value.toString()) || ''
 

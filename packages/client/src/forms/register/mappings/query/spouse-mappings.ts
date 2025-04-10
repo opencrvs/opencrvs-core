@@ -12,6 +12,7 @@ import { IFormData } from '@client/forms'
 
 export function emptySpouseSectionTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string
 ) {

@@ -251,6 +251,7 @@ export function getEventDate(data: IFormData, event: EventType) {
 }
 
 export function getRegisteredDate(data: IFormData) {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const historyList = data.history as unknown as { [key: string]: any }[]
   const regHistory = historyList.find(
     (history) => history.regStatus === 'REGISTERED'
