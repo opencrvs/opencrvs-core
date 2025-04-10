@@ -36,12 +36,12 @@ import { gqlToDraftTransformer } from '@client/transformer'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 import { getOfflineData } from '@client/offline/selectors'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
-import { UUID } from '@opencrvs/commons/client'
+import { Scope, SCOPES, UUID } from '@opencrvs/commons/client'
 
 type IUserProps = {
   userId?: string
@@ -221,6 +221,7 @@ function addJurisdictionFilterToLocationSearchInput(
 const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
   const config = getOfflineData(state)
   const user = getUserDetails(state)
+  const scopes = getScope(state) ?? []
   const sectionId =
     props.router.params.sectionId || state.userForm.userForm!.sections[0].id
 
@@ -236,10 +237,19 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
     throw new Error(`No primary office found for user`)
   }
 
-  section = addJurisdictionFilterToLocationSearchInput(
-    section,
-    user.primaryOffice.id as UUID
+  section = scopes.some((scope) =>
+    (
+      [
+        SCOPES.USER_CREATE_MY_JURISDICTION,
+        SCOPES.USER_UPDATE_MY_JURISDICTION
+      ] as Scope[]
+    ).includes(scope)
   )
+    ? addJurisdictionFilterToLocationSearchInput(
+        section,
+        user.primaryOffice.id as UUID
+      )
+    : section
 
   let formData = { ...state.userForm.userFormData }
   if (props.router.params.locationId) {
