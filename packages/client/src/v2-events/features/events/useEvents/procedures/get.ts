@@ -66,13 +66,14 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 export function useGetEvent() {
   const trpc = useTRPC()
   return {
-    useQuery: (id: string) => {
+    useQuery: (id: string, enabled?: boolean) => {
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
       const { queryFn, ...options } = trpc.event.get.queryOptions(id)
 
       return useQuery({
         ...options,
+        enabled: enabled || true,
         queryKey: trpc.event.get.queryKey(id),
         meta: {
           eventConfig

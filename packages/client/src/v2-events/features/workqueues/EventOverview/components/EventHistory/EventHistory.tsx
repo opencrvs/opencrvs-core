@@ -14,7 +14,7 @@ import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
-import { Link } from '@opencrvs/components'
+import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
@@ -63,6 +63,8 @@ const messages = defineMessages({
  *  Renders the event history table. Used for audit trail.
  */
 export function EventHistory({ history }: { history: ActionDocument[] }) {
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+
   const intl = useIntl()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
@@ -74,8 +76,15 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
     ))
   }
 
-  const historyRows = history
-    .filter(({ type }) => type !== ActionType.CREATE)
+  const visibleHistory = history.filter(
+    ({ type }) => type !== ActionType.CREATE
+  )
+
+  const historyRows = visibleHistory
+    .slice(
+      (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
+      currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
+    )
     .map((item) => {
       const user = getUser(item.createdBy)
       const location = getLocation(item.createdAtLocation)
@@ -132,7 +141,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
               })
             }}
           >
-            {location?.name ?? '-'}
+            {location?.name}
           </Link>
         )
       }
@@ -183,6 +192,15 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
+        {visibleHistory.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+          <Pagination
+            currentPage={currentPageNumber}
+            totalPages={Math.ceil(
+              visibleHistory.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+            )}
+            onPageChange={(page) => setCurrentPageNumber(page)}
+          />
+        )}
       </TableDiv>
       {modal}
     </>
