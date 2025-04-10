@@ -13,10 +13,11 @@ import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons/client'
-import { getLocations, getOfflineData } from '@client/offline/selectors'
+import { getOfflineData } from '@client/offline/selectors'
 import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { useResolveLocationFullName } from '@client/v2-events/utils'
 
 interface SearchLocation {
   id: string
@@ -71,11 +72,7 @@ function LocationSearchInput({
 }
 
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
-  const locations = useSelector(getLocations)
-
-  const location = value.toString() && locations[value.toString()]
-
-  return location ? location.name : ''
+  return useResolveLocationFullName(value.toString())
 }
 
 export const LocationSearch = {
