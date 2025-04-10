@@ -24,6 +24,7 @@
     "**/.DS_Store",
     "AUTHORS",
     "LICENSE",
+    "Tiltfile",
     "license-header.txt",
     "**/*Dockerfile*",
     "**/packages/components/lib",
