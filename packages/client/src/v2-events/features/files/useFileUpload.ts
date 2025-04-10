@@ -128,7 +128,6 @@ export async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
-
   return cache.delete(getFullUrl(filename))
 }
 

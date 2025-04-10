@@ -50,8 +50,6 @@ function AdministrativeAreaInput({
 }) {
   const options = useAdminLocations(partOf ?? '0')
 
-  console.log({ options, value })
-
   return (
     <Select.Input
       {...props}
