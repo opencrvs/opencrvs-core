@@ -27,30 +27,41 @@ export type EventIndex = z.infer<typeof EventIndex>
 
 const Fuzzy = z.object({ type: z.literal('fuzzy'), term: z.string() })
 const Exact = z.object({ type: z.literal('exact'), term: z.string() })
-function AnyOf<T extends z.ZodTypeAny>(type: T) {
-  return z.object({ type: z.literal('anyOf'), terms: z.array(type) })
-}
-function Range<T extends z.ZodTypeAny>(type: T) {
-  return z.object({ type: z.literal('range'), gte: type, lte: type })
-}
+const AnyOf = z.object({
+  type: z.literal('anyOf'),
+  terms: z.array(z.string())
+})
+
+const Range = z.object({
+  type: z.literal('range'),
+  gte: z.string(),
+  lte: z.string()
+})
+
 const Within = z.object({ type: z.literal('within'), location: z.string() })
 
-const DateCondition = z.union([Exact, Range(z.string())])
-function Condition<T extends z.ZodTypeAny>(type: T) {
-  return z.union([Fuzzy, Exact, AnyOf(type), Range(type)])
-}
+const DateCondition = z.union([Exact, Range])
 
-// Recursive DataCondition
-const DataConditionSchema: z.ZodType<any> = z.lazy(() =>
-  z.record(z.union([Condition(z.any()), DataConditionSchema]))
+export const QueryInput: z.ZodType<QueryInputType> = z.lazy(() =>
+  z.union([
+    z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf]),
+    z.record(z.string(), QueryInput)
+  ])
 )
-export type DataCondition = z.infer<typeof DataConditionSchema>
+// @ts-expect-error - recursive type definition
+export type QueryInputType =
+  | z.infer<typeof Fuzzy>
+  | z.infer<typeof Exact>
+  | z.infer<typeof Range>
+  | z.infer<typeof Within>
+  | z.infer<typeof AnyOf>
+  | Record<string, QueryInputType>
 
 const QueryExpression = z
   .object({
-    searchType: z.optional(z.union([AnyOf(z.string()), Exact])),
     eventType: z.string(),
-    status: z.optional(z.union([AnyOf(z.string()), Exact])),
+    searchType: z.optional(z.union([AnyOf, Exact])),
+    status: z.optional(z.union([AnyOf, Exact])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     createAtLocation: z.optional(z.union([Within, Exact])),
@@ -58,7 +69,7 @@ const QueryExpression = z
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
-    data: z.optional(z.record(DataConditionSchema))
+    data: QueryInput
   })
   .partial()
 
