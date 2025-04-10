@@ -111,28 +111,27 @@ function DataInput({
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
       <dl>
-        {fields.map(({ config, value }) => {
-          if (
-            !config ||
-            // We don't want to display fields that are conditionally hidden in the original form configuration
-            !isFieldVisible(config, formData)
-          ) {
-            return null
-          }
+        {fields
+          // We don't want to display fields that are conditionally hidden in the original form configuration
+          .filter(({ config }) => config && isFieldVisible(config, formData))
+          .map(({ config, value }) => {
+            if (!config) {
+              return null
+            }
 
-          return (
-            <React.Fragment key={config.id}>
-              <dt>{intl.formatMessage(config.label)}</dt>
-              <dd>
-                <Output
-                  field={config}
-                  showPreviouslyMissingValuesAsChanged={false}
-                  value={value}
-                />
-              </dd>
-            </React.Fragment>
-          )
-        })}
+            return (
+              <React.Fragment key={config.id}>
+                <dt>{intl.formatMessage(config.label)}</dt>
+                <dd>
+                  <Output
+                    field={config}
+                    showPreviouslyMissingValuesAsChanged={false}
+                    value={value}
+                  />
+                </dd>
+              </React.Fragment>
+            )
+          })}
       </dl>
     </Container>
   )
