@@ -17,7 +17,8 @@ import {
   FieldProps,
   FieldType,
   FieldValue,
-  Inferred
+  Inferred,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
@@ -55,10 +56,12 @@ const Subtitle = styled.div`
 function DataInput({
   configuration,
   label,
-  fields
+  fields,
+  formData
 }: FieldProps<'DATA'> & {
   // Unfortunately we need to include the field config in the field object, since it is required by <Output />
   fields: { value: FieldValue; config?: Inferred }[]
+  formData: EventState
 }) {
   const intl = useIntl()
   const { data, subtitle } = configuration
@@ -74,7 +77,12 @@ function DataInput({
             'fieldId' in dataEntry ? dataEntry.fieldId : dataEntry.label.id
           const field = fields.find((f) => f.config?.id === fieldId)
 
-          if (!field || !field.config) {
+          if (
+            !field ||
+            !field.config ||
+            // We don't want to display fields that are conditionally hidden in the original form configuration
+            !isFieldVisible(field.config, formData)
+          ) {
             return null
           }
 
@@ -101,15 +109,11 @@ export const Data = {
   Output: null
 }
 
-export function getFieldFromDataEntry({
-  formData,
-  dataEntry,
-  declarationFields
-}: {
-  formData: EventState
-  dataEntry: DataEntry
+export function getFieldFromDataEntry(
+  formData: EventState,
+  dataEntry: DataEntry,
   declarationFields: Inferred[]
-}): { value: FieldValue; config?: Inferred } {
+): { value: FieldValue; config?: Inferred } {
   if ('fieldId' in dataEntry) {
     return {
       value: formData[dataEntry.fieldId],

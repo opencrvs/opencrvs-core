@@ -524,12 +524,14 @@ const GeneratedInputField = React.memo(
 
       // Data input requires field configs
       const declarationFields = getDeclarationFields(eventConfig)
-
       const fields = field.config.configuration.data.map((entry) =>
-        getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })
+        getFieldFromDataEntry(formData, entry, declarationFields)
       )
 
-      return <Data.Input {...field.config} fields={fields} />
+      // TODO CIHAN: refactor
+      return (
+        <Data.Input {...field.config} fields={fields} formData={formData} />
+      )
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
