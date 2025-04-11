@@ -1063,12 +1063,8 @@ describe('User root resolvers', () => {
   })
 
   describe('createOrUpdateUser mutation', () => {
-    let authHeaderSysAdmin: { Authorization: string }
-    let authHeaderRegister: { Authorization: string }
-    beforeEach(() => {
-      fetch.resetMocks()
-      fetchJSONMock.mockReset()
-      const sysAdminToken = jwt.sign(
+    const authHeaderSysAdmin = {
+      Authorization: `Bearer ${jwt.sign(
         { scope: [SCOPES.USER_CREATE] },
         readFileSync('./test/cert.key'),
         {
@@ -1077,11 +1073,22 @@ describe('User root resolvers', () => {
           issuer: 'opencrvs:auth-service',
           audience: 'opencrvs:gateway-user'
         }
-      )
-      authHeaderSysAdmin = {
-        Authorization: `Bearer ${sysAdminToken}`
-      }
-      const regsiterToken = jwt.sign(
+      )}`
+    }
+    const authHeaderLocalSysAdmin = {
+      Authorization: `Bearer ${jwt.sign(
+        { scope: [SCOPES.USER_CREATE_MY_JURISDICTION] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )}`
+    }
+    const authHeaderRegister = {
+      Authorization: `Bearer ${jwt.sign(
         { scope: ['register'] },
         readFileSync('./test/cert.key'),
         {
@@ -1090,11 +1097,8 @@ describe('User root resolvers', () => {
           issuer: 'opencrvs:auth-service',
           audience: 'opencrvs:gateway-user'
         }
-      )
-      authHeaderRegister = {
-        Authorization: `Bearer ${regsiterToken}`
-      }
-    })
+      )}`
+    }
     const user = {
       name: [{ use: 'en', given: ['Mohammad'], family: 'Ashraful' }],
       identifiers: [{ system: 'NATIONAL_ID', value: '1014881922' }],
@@ -1103,8 +1107,13 @@ describe('User root resolvers', () => {
       email: 'test@test.org',
       role: 'LOCAL_REGISTRAR',
       status: 'active',
-      primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
+      primaryOffice: '79776844-b606-40e9-8358-7d82147f702a'
     }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      fetchJSONMock.mockReset()
+    })
 
     it('creates user for sysadmin', async () => {
       fetchJSONMock.mockReturnValueOnce(
@@ -1126,6 +1135,96 @@ describe('User root resolvers', () => {
       expect(response).toEqual({
         username: 'someUser123'
       })
+    })
+
+    it('allows creating users in offices under the jurisdiction of the local sysadmin', async () => {
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            primaryOfficeId: 'requesting-user-primary-office-id'
+          })
+        ],
+        [
+          JSON.stringify({
+            partOf: {
+              reference: 'Location/primary-office-parent-id'
+            }
+          })
+        ],
+        [
+          JSON.stringify([
+            {
+              id: '79776844-b606-40e9-8358-7d82147f702a'
+            },
+            {
+              id: 'primary-office-parent-id'
+            }
+          ])
+        ],
+        [
+          JSON.stringify({
+            username: 'someUser123'
+          }),
+          { status: 201 }
+        ]
+      )
+      const response = await resolvers.Mutation!.createOrUpdateUser(
+        {},
+        { user: { id: '123', ...user } },
+        { headers: authHeaderLocalSysAdmin }
+      )
+
+      expect(response).toEqual({
+        username: 'someUser123'
+      })
+    })
+
+    it('does not allow creating users in offices not under the jurisdiction of the local sysadmin', async () => {
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            primaryOfficeId: 'requesting-user-primary-office-id'
+          })
+        ],
+        [
+          JSON.stringify({
+            partOf: {
+              reference: 'Location/primary-office-parent-id'
+            }
+          })
+        ],
+        [
+          JSON.stringify([
+            {
+              id: '79776844-b606-40e9-8358-7d82147f702a'
+            },
+            {
+              id: 'some-other-primary-office-parent-id'
+            }
+          ])
+        ],
+        [
+          JSON.stringify({
+            username: 'someUser123'
+          }),
+          { status: 201 }
+        ]
+      )
+      expect(
+        resolvers.Mutation!.createOrUpdateUser(
+          {},
+          { user: { id: '123', ...user } },
+          { headers: authHeaderLocalSysAdmin }
+        )
+      ).rejects.toThrowError(
+        'Cannot create or update user in offices not under jurisdiction'
+      )
     })
 
     it('updates an user for sysadmin', async () => {

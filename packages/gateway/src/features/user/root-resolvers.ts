@@ -14,7 +14,8 @@ import {
   logger,
   isBase64FileString,
   joinURL,
-  fetchJSON
+  fetchJSON,
+  UUID
 } from '@opencrvs/commons'
 import {
   IUserModelData,
@@ -25,7 +26,9 @@ import {
   getFullName,
   inScope,
   isTokenOwner,
-  getUserId
+  getUserId,
+  isOfficeUnderJurisdiction,
+  getUserFromHeader
 } from '@gateway/features/user/utils'
 import {
   GQLHumanNameInput,
@@ -310,6 +313,24 @@ export const resolvers: GQLResolver = {
         ])
       ) {
         throw new Error('Create or update user is not allowed for this user')
+      }
+      if (
+        inScope(authHeader, [
+          SCOPES.USER_CREATE_MY_JURISDICTION,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ]) &&
+        user.primaryOffice
+      ) {
+        const requestingUser = await getUserFromHeader(authHeader)
+        const isUnderJurisdiction = await isOfficeUnderJurisdiction(
+          requestingUser.primaryOfficeId as UUID,
+          user.primaryOffice as UUID
+        )
+        if (!isUnderJurisdiction) {
+          throw new Error(
+            'Cannot create or update user in offices not under jurisdiction'
+          )
+        }
       }
 
       try {
