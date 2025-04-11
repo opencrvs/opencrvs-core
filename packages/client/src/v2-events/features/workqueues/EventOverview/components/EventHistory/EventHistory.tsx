@@ -143,7 +143,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
               })
             }}
           >
-            {location.name}
+            {location?.name}
           </Link>
         )
       }
