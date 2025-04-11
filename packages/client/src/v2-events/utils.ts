@@ -227,11 +227,13 @@ export function isWriteAction(actionType: ActionType): boolean {
   return WriteActions.some((writeAction) => actionType === writeAction)
 }
 
-export enum AssignmentStatus {
-  ASSIGNED_TO_SELF = 'ASSIGNED_TO_SELF',
-  ASSIGNED_TO_OTHERS = 'ASSIGNED_TO_OTHERS',
-  UNASSIGNED = 'UNASSIGNED'
-}
+export const AssignmentStatus = {
+  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
+  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
+  UNASSIGNED: 'UNASSIGNED'
+} as const
+
+type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
 
 export function getAssignmentStatus(
   eventState: EventIndex,
