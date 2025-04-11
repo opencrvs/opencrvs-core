@@ -39,7 +39,7 @@ const mockDeclaration = {
   'applicant.address': {
     country: 'FAR',
     addressType: AddressType.DOMESTIC,
-    province: '93897b67-29af-4a00-8381-42a694187666',
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
     street: '123 Tennis Club Avenue',
     number: '123',
@@ -217,7 +217,7 @@ export const ReviewWithValidationErrors: Story = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: '93897b67-29af-4a00-8381-42a694187666',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         urbanOrRural: 'RURAL',
         village: 'Tennisville'
       } as AddressFieldValue
