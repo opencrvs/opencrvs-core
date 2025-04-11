@@ -12,10 +12,7 @@
 import React from 'react'
 import { Field, FieldProps, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  MessageDescriptor
-} from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -24,7 +21,6 @@ import {
   FieldValue,
   isFieldEnabled,
   isFieldVisible,
-  EventConfig,
   AddressType,
   TranslationConfig
 } from '@opencrvs/commons/client'
@@ -37,31 +33,18 @@ import {
   makeFormFieldIdFormikCompatible
 } from '@client/v2-events/components/forms/utils'
 import {
+  FormGeneratorProps,
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
 import { GeneratedInputField } from './GeneratedInputField'
 
-interface ExposedProps {
-  fields: FieldConfig[]
-  id: string
-  fieldsToShowValidationErrors?: FieldConfig[]
-  setAllFieldsDirty: boolean
-  onChange: (values: EventState) => void
-  formData: Record<string, FieldValue>
-  requiredErrorMessage?: MessageDescriptor
-  onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: EventState
-  eventConfig?: EventConfig
-  declaration?: EventState
-  readonlyMode?: boolean
-  errors: Record<string, { errors: { message: TranslationConfig }[] }>
-}
-
 type AllProps = FormikProps<EventState> & {
   className?: string
-} & ExposedProps &
-  IntlShapeProps
+} & FormGeneratorProps &
+  IntlShapeProps & {
+    errors: Record<string, { errors: { message: TranslationConfig }[] }>
+  }
 
 const fadeIn = keyframes`
   from { opacity: 0; }

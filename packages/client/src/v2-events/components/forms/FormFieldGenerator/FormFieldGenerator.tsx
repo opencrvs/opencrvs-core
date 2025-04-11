@@ -13,13 +13,12 @@ import React, { useEffect } from 'react'
 
 import { Formik } from 'formik'
 import { isEqual, noop } from 'lodash'
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
   EventState,
   FieldConfig,
   FieldValue,
-  EventConfig,
-  MetaFields
+  SystemVariables
 } from '@opencrvs/commons/client'
 
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -27,6 +26,7 @@ import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 import { handleDefaultValue } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import {
+  FormGeneratorProps,
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
@@ -34,31 +34,20 @@ import { FormSectionComponent } from './FormSectionComponent'
 
 function mapFieldsToValues(
   fields: FieldConfig[],
-  form: EventState,
-  meta: MetaFields
+  declaration: EventState,
+  systemVariables: SystemVariables
 ) {
   return fields.reduce((memo, field) => {
-    const fieldInitialValue = handleDefaultValue(field, form, meta)
+    const fieldInitialValue = handleDefaultValue({
+      field,
+      declaration,
+      systemVariables
+    })
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
 }
 
-interface FormFieldGeneratorProps {
-  fields: FieldConfig[]
-  id: string
-  fieldsToShowValidationErrors?: FieldConfig[]
-  setAllFieldsDirty: boolean
-  onChange: (values: EventState) => void
-  formData: Record<string, FieldValue>
-  requiredErrorMessage?: MessageDescriptor
-  onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: EventState
-  eventConfig?: EventConfig
-  declaration?: EventState
-  readonlyMode?: boolean
-}
-
-export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
+export const FormFieldGenerator: React.FC<FormGeneratorProps> = React.memo(
   (props) => {
     const { eventConfig, formData, fields, declaration } = props
 

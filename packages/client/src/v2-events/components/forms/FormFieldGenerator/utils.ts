@@ -9,6 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { MessageDescriptor } from 'react-intl'
+import {
+  EventState,
+  FieldConfig,
+  FieldValue,
+  EventConfig
+} from '@opencrvs/commons/client'
 import { IndexMap } from '@client/utils'
 import {
   FIELD_SEPARATOR,
@@ -40,4 +47,20 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
       value
     ])
   )
+}
+
+/** Shared between multiple components */
+export interface FormGeneratorProps {
+  fields: FieldConfig[]
+  id: string
+  fieldsToShowValidationErrors?: FieldConfig[]
+  setAllFieldsDirty: boolean
+  onChange: (values: EventState) => void
+  formData: Record<string, FieldValue>
+  requiredErrorMessage?: MessageDescriptor
+  onUploadingStateChanged?: (isUploading: boolean) => void
+  initialValues?: EventState
+  eventConfig?: EventConfig
+  declaration?: EventState
+  readonlyMode?: boolean
 }

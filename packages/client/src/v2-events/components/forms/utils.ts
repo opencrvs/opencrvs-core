@@ -13,7 +13,7 @@ import {
   FieldConfig,
   Inferred,
   FieldValue,
-  MetaFields,
+  SystemVariables,
   isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
@@ -47,16 +47,20 @@ export function hasDefaultValueDependencyInfo(
   return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
 }
 
-export function handleDefaultValue(
-  field: FieldConfig,
-  formData: EventState,
-  meta: MetaFields
-) {
+export function handleDefaultValue({
+  field,
+  declaration,
+  systemVariables
+}: {
+  field: FieldConfig
+  declaration: EventState
+  systemVariables: SystemVariables
+}) {
   const defaultValue = field.defaultValue
 
   if (hasDefaultValueDependencyInfo(defaultValue)) {
     return evalExpressionInFieldDefinition(defaultValue.expression, {
-      $form: formData
+      $form: declaration
     })
   }
 
@@ -64,7 +68,7 @@ export function handleDefaultValue(
     return replacePlaceholders({
       fieldType: field.type,
       defaultValue,
-      meta: meta
+      systemVariables
     })
   }
   return defaultValue
