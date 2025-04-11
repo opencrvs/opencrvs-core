@@ -16,7 +16,7 @@ import React from 'react'
 import * as selectEvent from 'react-select-event'
 import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 
 const meta: Meta<typeof FormFieldGenerator> = {

@@ -17,7 +17,7 @@ import {
   FieldType,
   TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Review } from '@client/v2-events/features/events/components/Review'
 

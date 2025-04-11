@@ -15,7 +15,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { userEvent } from '@storybook/testing-library'
 import { FieldType, MimeType } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 
 const meta: Meta<typeof FormFieldGenerator> = {

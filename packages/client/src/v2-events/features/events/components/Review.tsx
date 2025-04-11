@@ -37,7 +37,7 @@ import {
   isPageVisible,
   SCOPES
 } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { getScope } from '@client/profile/profileSelectors'
 import { Output } from './Output'
