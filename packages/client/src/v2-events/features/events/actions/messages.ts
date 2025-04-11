@@ -13,7 +13,7 @@
  * Translations for declaration action review pages.
  */
 
-export const confirmModalMessages = {
+const confirmModalMessages = {
   complete: {
     declare: {
       title: {
