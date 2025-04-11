@@ -32,7 +32,7 @@ export function makeFormFieldIdsFormikCompatible<T>(
 }
 
 export function makeFormikFieldIdsOpenCRVSCompatible<T>(
-  data: Record<string, T | undefined>
+  data: Record<string, T>
 ): IndexMap<T> {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
