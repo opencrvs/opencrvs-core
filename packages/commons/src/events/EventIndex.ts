@@ -61,6 +61,7 @@ export type QueryInputType =
 
 const QueryExpression = z
   .object({
+    type: z.literal('and'),
     eventType: z.string(),
     searchType: z.optional(z.union([AnyOf, Exact])),
     status: z.optional(z.union([AnyOf, Exact])),
@@ -75,12 +76,10 @@ const QueryExpression = z
   })
   .partial()
 
-const Or = z
-  .object({
-    type: z.literal('or'),
-    clauses: z.array(QueryExpression)
-  })
-  .partial()
+const Or = z.object({
+  type: z.literal('or'),
+  clauses: z.array(QueryExpression)
+})
 
-export const QueryType = z.union([QueryExpression, Or])
+export const QueryType = z.discriminatedUnion('type', [QueryExpression, Or])
 export type QueryType = z.infer<typeof QueryType>

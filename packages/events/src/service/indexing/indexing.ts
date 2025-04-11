@@ -302,34 +302,37 @@ export async function getIndex(eventParams: QueryType) {
   if ('type' in eventParams && eventParams.type === 'or') {
     const { clauses } = eventParams
     console.log({ clauses })
-    return
+    return []
   }
 
-  const { eventType, ...queryParams } = eventParams
+  if ('eventType' in eventParams) {
+    const { eventType, ...queryParams } = eventParams
+    if (Object.values(eventParams).length === 0) {
+      throw new Error('No search params provided')
+    }
 
-  if (Object.values(queryParams).length === 0) {
-    throw new Error('No search params provided')
+    const query = generateQuery(queryParams)
+
+    if (!eventType) {
+      throw new Error('No eventType provided')
+    }
+
+    const response = await esClient.search<EncodedEventIndex>({
+      index: getEventIndexName(eventType),
+      size: DEFAULT_SIZE,
+      request_cache: false,
+      query
+    })
+
+    const events = z.array(EventIndex).parse(
+      response.hits.hits
+        .map((hit) => hit._source)
+        .filter((event): event is EncodedEventIndex => event !== undefined)
+        .map((event) => decodeEventIndex(event))
+    )
+
+    return events
   }
 
-  const query = generateQuery(queryParams)
-
-  if (!eventType) {
-    throw new Error('No eventType provided')
-  }
-
-  const response = await esClient.search<EncodedEventIndex>({
-    index: getEventIndexName(eventType),
-    size: DEFAULT_SIZE,
-    request_cache: false,
-    query
-  })
-
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
-  )
-
-  return events
+  return []
 }
