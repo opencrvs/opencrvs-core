@@ -233,7 +233,7 @@ export enum AssignmentStatus {
   UNASSIGNED = 'UNASSIGNED'
 }
 
-export function isAssignedToUser(
+export function getAssignmentStatus(
   eventState: EventIndex,
   userId: string | undefined
 ): AssignmentStatus {

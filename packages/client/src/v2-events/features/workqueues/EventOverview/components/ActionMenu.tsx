@@ -35,7 +35,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { AssignmentStatus, isAssignedToUser } from '@client/v2-events/utils'
+import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 
 const viewRecordMessage = {
   id: 'v2.view.record',
@@ -88,7 +88,7 @@ function AssignmentActions({ eventId }: { eventId: string }) {
     throw new Error('Authentication is not available but is required')
   }
 
-  const assignmentStatus = isAssignedToUser(eventState, authentication.sub)
+  const assignmentStatus = getAssignmentStatus(eventState, authentication.sub)
 
   return (
     <>
@@ -188,7 +188,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               <DropdownMenu.Item
                 key={action.type}
                 disabled={
-                  isAssignedToUser(eventState, authentication?.sub) !==
+                  getAssignmentStatus(eventState, authentication?.sub) !==
                   AssignmentStatus.ASSIGNED_TO_SELF
                 }
                 onClick={() => {
