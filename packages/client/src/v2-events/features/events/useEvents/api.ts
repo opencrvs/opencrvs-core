@@ -65,14 +65,14 @@ export async function updateLocalEvent(updatedEvent: EventDocument) {
 export function onAssign(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
 
-  const foo = findLastAssignmentAction(updatedEvent.actions)
+  const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
 
-  if (!foo) {
+  if (!lastAssignment) {
     return
   }
 
-  if (foo.type === ActionType.ASSIGN) {
-    const { assignedTo } = foo
+  if (lastAssignment.type === ActionType.ASSIGN) {
+    const { assignedTo } = lastAssignment
     return setEventListData((eventIndices) =>
       eventIndices?.map((eventIndex) =>
         eventIndex.id === updatedEvent.id
