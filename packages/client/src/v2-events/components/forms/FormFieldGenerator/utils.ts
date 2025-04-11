@@ -9,8 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IndexMap } from '../../../utils'
-import { FIELD_SEPARATOR, makeFormFieldIdFormikCompatible } from '../utils'
+import { IndexMap } from '@client/utils'
+import {
+  FIELD_SEPARATOR,
+  makeFormFieldIdFormikCompatible
+} from '@client/v2-events/components/forms/utils'
 
 /*
  * Formik has a feature that automatically nests all form keys that have a dot in them.

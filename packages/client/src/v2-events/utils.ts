@@ -220,10 +220,3 @@ export function useResolveLocationFullName(
     joinValues([name, location.name], ', ')
   )
 }
-
-/** Tell compiler that accessing record with arbitrary key might result to undefined
- * Use when you **cannot guarantee**  that key exists in the record
- */
-export interface IndexMap<T> {
-  [id: string]: T | undefined
-}
