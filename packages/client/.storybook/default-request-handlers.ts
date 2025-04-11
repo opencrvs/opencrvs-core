@@ -1883,7 +1883,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/671747f2-79d3-4911-9600-046d6d4b4496'
+                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
               },
               type: {
                 coding: [
