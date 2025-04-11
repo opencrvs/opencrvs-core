@@ -12,10 +12,11 @@
 import React, { createContext, useContext } from 'react'
 import { ResolvedUser } from '@opencrvs/commons/client'
 import { ILocation } from '@client/offline/reducer'
+import { IndexMap } from '@client/utils'
 
 const EventOverviewContext = createContext<{
   getUser: (id: string) => ResolvedUser
-  getLocation: (id: string) => ILocation
+  getLocation: (id: string) => ILocation | undefined
 } | null>(null)
 
 const MISSING_USER = {
@@ -40,7 +41,7 @@ export const EventOverviewProvider = ({
 }: {
   children: React.ReactNode
   users: ResolvedUser[]
-  locations: Record<string, ILocation>
+  locations: IndexMap<ILocation>
 }) => {
   const getUser = (id: string) => {
     const user = users.find((u) => u.id === id)
@@ -56,8 +57,7 @@ export const EventOverviewProvider = ({
   }
 
   const getLocation = (id: string) => {
-    // @TODO: Remove this fallback once  developers have had time to update their data.
-    return locations[id] ?? { id, name: 'Unknown location' }
+    return locations[id]
   }
 
   return (

@@ -11,6 +11,7 @@
 
 import { Draft, EventDocument, EventIndex } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { removeCachedFiles } from '../../files/cache'
 
 export function findLocalEventData(eventId: string) {
   return queryClient.getQueryData(
@@ -27,6 +28,12 @@ export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
 
 export function setEventData(id: string, data: EventDocument) {
   return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
+}
+
+function deleteEventData(id: string) {
+  queryClient.removeQueries({
+    queryKey: trpcOptionsProxy.event.get.queryKey(id)
+  })
 }
 
 export function setEventListData(
@@ -53,4 +60,18 @@ export async function invalidateDraftsList() {
   return queryClient.invalidateQueries({
     queryKey: trpcOptionsProxy.event.draft.list.queryKey()
   })
+}
+
+export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
+  const { id } = updatedEvent
+  setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
+  deleteEventData(id)
+
+  await removeCachedFiles(updatedEvent)
+
+  /**
+   * deleteEventData() is overridden by updateLocalEvent().
+   * We should instead update the query that returns a specific eventIndex when it's implemented.
+   */
+  await updateLocalEvent(updatedEvent)
 }
