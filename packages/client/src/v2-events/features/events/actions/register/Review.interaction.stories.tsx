@@ -70,15 +70,15 @@ const mockUser = {
   role: 'SOCIAL_WORKER'
 }
 
-const declareEventDocument = generateEventDocument({
+const validateEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
 })
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
+      formValues: getCurrentEventState(validateEventDocument).declaration
     })
   },
   parameters: {
@@ -132,7 +132,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': false,
-          'event.actions.validate.request': true,
+          'event.actions.validate.request': false,
           'event.actions.register.request': true,
           'event.actions.archive.request': false,
           'event.actions.reject.request': false
