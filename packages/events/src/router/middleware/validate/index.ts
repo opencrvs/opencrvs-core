@@ -11,11 +11,10 @@
 
 import { TRPCError } from '@trpc/server'
 import {
-  ActionInputWithType,
   ActionType,
   ActionUpdate,
   DeclarationUpdateActions,
-  MetadataAction,
+  AnnotationActionType,
   EventConfig,
   FieldConfig,
   FieldUpdateValue,
@@ -25,7 +24,7 @@ import {
   isVerificationPage,
   annotationActions,
   findRecordActionPages,
-  DeclarationUpdateAction,
+  DeclarationUpdateActionType,
   getActionReviewFields,
   getDeclaration,
   getVisiblePagesFormFields,
@@ -33,9 +32,9 @@ import {
   getCurrentEventState,
   deepMerge
 } from '@opencrvs/commons/events'
-import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
+import { ActionMiddlewareOptions } from '@events/router/middleware/utils'
 
 function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
   return formFields.reduce(
@@ -87,10 +86,6 @@ function getVerificationPageErrors(
     .filter((error) => error !== null)
 }
 
-type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
-  input: ActionInputWithType
-}
-
 function throwWhenNotEmpty(errors: unknown[]) {
   if (errors.length > 0) {
     throw new TRPCError({
@@ -107,7 +102,7 @@ function validateDeclarationUpdateAction({
   annotation
 }: {
   eventConfig: EventConfig
-  actionType: DeclarationUpdateAction
+  actionType: DeclarationUpdateActionType
   declaration: ActionUpdate
   annotation?: ActionUpdate
 }) {
@@ -135,7 +130,7 @@ function validateActionAnnotation({
   annotation = {}
 }: {
   eventConfig: EventConfig
-  actionType: MetadataAction
+  actionType: AnnotationActionType
   annotation?: ActionUpdate
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)

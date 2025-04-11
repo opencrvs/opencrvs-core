@@ -14,12 +14,10 @@ import { FieldType } from '../events/FieldType'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { errorMessages, validateFieldInput } from './validate'
-
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
  * We should be able to trust zod validation for the rest.
  */
-
 type TestCase = {
   input: { field: FieldConfig; value: FieldUpdateValue }
   output: { message: TranslationConfig }[]

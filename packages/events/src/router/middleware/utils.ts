@@ -10,7 +10,7 @@
  */
 
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
-import { TokenWithBearer } from '@opencrvs/commons'
+import { ActionInputWithType, TokenWithBearer } from '@opencrvs/commons'
 
 export interface Context {
   user: {
@@ -28,3 +28,7 @@ export type MiddlewareOptions = Omit<
   Parameters<AnyTRPCMiddlewareFunction>[0],
   'ctx'
 > & { ctx: Context }
+
+export type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
+  input: ActionInputWithType
+}

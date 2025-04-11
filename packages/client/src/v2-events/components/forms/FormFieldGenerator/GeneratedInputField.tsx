@@ -64,10 +64,7 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
-import {
-  Data,
-  getFieldFromDataEntry
-} from '@client/v2-events/features/events/registered-fields/Data'
+import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '../inputs/FileInput/FileInput'
 import { FileWithOption } from '../inputs/FileInput/DocumentUploaderWithOption'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
@@ -476,14 +473,13 @@ export const GeneratedInputField = React.memo(
         return null
       }
 
-      // Data input requires field configs
-      const declarationFields = getDeclarationFields(eventConfig)
-
-      const fields = field.config.configuration.data.map((entry) =>
-        getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })
+      return (
+        <Data.Input
+          {...field.config}
+          declarationFields={getDeclarationFields(eventConfig)}
+          formData={formData}
+        />
       )
-
-      return <Data.Input {...field.config} fields={fields} />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)

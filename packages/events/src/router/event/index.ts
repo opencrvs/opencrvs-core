@@ -23,7 +23,9 @@ import {
   ApproveCorrectionActionInput,
   EventConfig,
   RejectCorrectionActionInput,
-  RequestCorrectionActionInput
+  RequestCorrectionActionInput,
+  AssignActionInput,
+  UnassignActionInput
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -39,6 +41,8 @@ import {
   getEventById
 } from '@events/service/events/events'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import { assignRecord } from '@events/service/events/actions/assign'
+import { unassignRecord } from '@events/service/events/actions/unassign'
 import { getDefaultActionProcedures } from './actions'
 
 function validateEventType({
@@ -101,6 +105,7 @@ export const eventRouter = router({
         transactionId: options.input.transactionId
       })
     }),
+  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .input(z.string())
@@ -157,6 +162,31 @@ export const eventRouter = router({
     printCertificate: router(
       getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
     ),
+    assignment: router({
+      assign: publicProcedure
+        .input(AssignActionInput)
+        .use(middleware.validateAction(ActionType.ASSIGN))
+        .mutation(async (options) => {
+          return assignRecord({
+            input: options.input,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token
+          })
+        }),
+      unassign: publicProcedure
+        .input(UnassignActionInput)
+        .use(middleware.validateAction(ActionType.UNASSIGN))
+        .mutation(async (options) => {
+          return unassignRecord(options.input, {
+            eventId: options.input.eventId,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token,
+            transactionId: options.input.transactionId
+          })
+        })
+    }),
     correction: router({
       request: publicProcedure
         .use(

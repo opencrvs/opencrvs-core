@@ -13,7 +13,12 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  generateActionDocument,
+  generateEventDocument,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventIndex,
   tennisClubMembershipEventDocument
@@ -21,7 +26,8 @@ import {
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { useDrafts } from '../../../drafts/useDrafts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { CERT_TEMPLATE_ID } from '../../useCertificateTemplateSelectorFieldConfig'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Review> = {
@@ -71,10 +77,13 @@ export const CollectorForm: Story = {
  * Clears and sets the local draft with the event data.
  * Since Action.tsx runs before the component is mounted (and sets up both declaration & annotation form), we need to set the "test case" as draft.
  */
-function SetAnnotationDraft() {
+function SetAnnotationDraft({ eventId }: { eventId: string }) {
   const generator = testDataGenerator()
   const drafts = useDrafts()
-  const draft = generator.event.draft(tennisClubMembershipEventDocument.id)
+  const draft = generator.event.draft({
+    eventId,
+    actionType: ActionType.PRINT_CERTIFICATE
+  })
 
   useEffect(() => {
     drafts.setLocalDraft({
@@ -82,9 +91,10 @@ function SetAnnotationDraft() {
       action: {
         ...draft.action,
         annotation: {
-          'correction.requester.relationship': 'ANOTHER_AGENT',
-          'correction.request.reason': "Child's name was incorrect",
-          'collector.requesterId': 'INFORMANT'
+          [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
+          'collector.requesterId': 'INFORMANT',
+          'collector.identity.verify': true,
+          templateId: 'v2.tennis-club-membership-certified-certificate'
         }
       }
     })
@@ -95,12 +105,102 @@ function SetAnnotationDraft() {
   return <Outlet />
 }
 
+const registeredEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    ActionType.CREATE,
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER,
+    ActionType.PRINT_CERTIFICATE
+  ]
+})
+
+const printActionWithSelections = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.PRINT_CERTIFICATE,
+  defaults: {
+    annotation: {
+      [CERT_TEMPLATE_ID]: 'tennis-club-membership-certificate',
+      'collector.requesterId': 'OTHER',
+      'collector.identity.verify': true,
+      templateId: 'v2.tennis-club-membership-certificate'
+    }
+  }
+})
+
+const alreadyPrintedEvent = {
+  ...registeredEvent,
+  actions: registeredEvent.actions.concat(printActionWithSelections)
+}
+
+export const FormSetup: Story = {
+  name: 'Form is empty when printing second time',
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
+        eventId: alreadyPrintedEvent.id,
+        pageId: 'collector'
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return alreadyPrintedEvent
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          })
+        ]
+      }
+    }
+  }
+}
+export const FormSetupWithDraft: Story = {
+  name: 'Form is filled from draft data',
+  parameters: {
+    reactRouter: {
+      router: {
+        initialPath: '/',
+        element: <SetAnnotationDraft eventId={alreadyPrintedEvent.id} />,
+        children: [routesConfig]
+      },
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
+        eventId: alreadyPrintedEvent.id,
+        pageId: 'collector'
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return alreadyPrintedEvent
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          })
+        ]
+      }
+    }
+  }
+}
+
 export const Review: Story = {
   parameters: {
     reactRouter: {
       router: {
         initialPath: '/',
-        element: <SetAnnotationDraft />,
+        element: (
+          <SetAnnotationDraft eventId={tennisClubMembershipEventDocument.id} />
+        ),
         children: [routesConfig]
       },
       initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(

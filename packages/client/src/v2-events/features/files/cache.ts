@@ -12,10 +12,10 @@
 import {
   EventDocument,
   FileFieldValue,
-  FileFieldWithOptionValue
+  FileFieldWithOptionValue,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
-import { getAcceptedActions } from '@opencrvs/commons/client'
-import { precacheFile } from './useFileUpload'
+import { precacheFile, removeCached } from './useFileUpload'
 
 export async function cacheFiles(eventDocument: EventDocument) {
   const promises: Promise<void>[] = []
@@ -32,6 +32,29 @@ export async function cacheFiles(eventDocument: EventDocument) {
       if (fileOptionParsed.success) {
         fileOptionParsed.data.forEach((val) =>
           promises.push(precacheFile(val.filename))
+        )
+      }
+    })
+  )
+
+  await Promise.all(promises)
+}
+
+export async function removeCachedFiles(eventDocument: EventDocument) {
+  const promises: Promise<boolean | undefined>[] = []
+  const actions = getAcceptedActions(eventDocument)
+
+  actions.forEach((action) =>
+    Object.entries(action.declaration).forEach(([, value]) => {
+      const fileParsed = FileFieldValue.safeParse(value)
+      if (fileParsed.success) {
+        promises.push(removeCached(fileParsed.data.filename))
+      }
+
+      const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
+      if (fileOptionParsed.success) {
+        fileOptionParsed.data.forEach((val) =>
+          promises.push(removeCached(val.filename))
         )
       }
     })
