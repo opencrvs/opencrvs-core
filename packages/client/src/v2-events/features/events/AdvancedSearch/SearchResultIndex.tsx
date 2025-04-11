@@ -13,7 +13,7 @@ import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
-  DataCondition,
+  QueryInputType,
   EventConfig,
   workqueues
 } from '@opencrvs/commons/client'
@@ -68,7 +68,7 @@ function buildDataConditionFromSearchKeys(
 function buildDataCondition(
   flat: Record<string, string>,
   eventConfig: EventConfig
-): DataCondition {
+): QueryInputType {
   const advancedSearch = eventConfig.advancedSearch
 
   // Flatten all fields into a single list of search keys
@@ -109,7 +109,7 @@ export const SearchResultIndex = () => {
   return (
     <SearchResult
       currentEvent={currentEvent}
-      queryData={queryData ?? []}
+      queryData={queryData}
       searchParams={searchParams}
       workqueueConfig={workqueueConfig}
     />
