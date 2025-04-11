@@ -320,16 +320,17 @@ export const resolvers: GQLResolver = {
       )
       const userId = tokenPayload.sub
       const requestingUser = await getUser({ userId }, authHeader)
+      const isUnderJurisdiction = await isOfficeUnderJurisdiction(
+        requestingUser.primaryOfficeId as UUID,
+        user.primaryOffice as UUID
+      )
       if (
         inScope(authHeader, [
           SCOPES.USER_CREATE_MY_JURISDICTION,
           SCOPES.USER_UPDATE_MY_JURISDICTION
         ]) &&
         user.primaryOffice &&
-        !isOfficeUnderJurisdiction(
-          requestingUser.primaryOfficeId as UUID,
-          user.primaryOffice as UUID
-        )
+        !isUnderJurisdiction
       ) {
         throw new Error(
           'Cannot create or update user in offices not under jurisdiction'
