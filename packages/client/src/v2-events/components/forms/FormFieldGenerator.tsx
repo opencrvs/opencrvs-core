@@ -78,10 +78,7 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
-import {
-  Data,
-  getFieldFromDataEntry
-} from '@client/v2-events/features/events/registered-fields/Data'
+import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 import { Errors, getValidationErrorsForForm } from './validation'
@@ -522,14 +519,13 @@ const GeneratedInputField = React.memo(
         return null
       }
 
-      // Data input requires field configs
-      const declarationFields = getDeclarationFields(eventConfig)
-
-      const fields = field.config.configuration.data.map((entry) =>
-        getFieldFromDataEntry({ dataEntry: entry, declarationFields, formData })
+      return (
+        <Data.Input
+          {...field.config}
+          declarationFields={getDeclarationFields(eventConfig)}
+          formData={formData}
+        />
       )
-
-      return <Data.Input {...field.config} fields={fields} />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)

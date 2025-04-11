@@ -23,6 +23,7 @@ import {
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
+  cleanUpOnUnassign,
   findLocalEventData,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
@@ -177,7 +178,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
   retry: (_, error: TRPCClientError<AppRouter>) =>
     error.data?.httpStatus !== 403,
   retryDelay: 10000,
-  onSuccess: updateLocalEvent,
+  onSuccess: cleanUpOnUnassign,
   meta: {
     actionType: ActionType.UNASSIGN
   }
