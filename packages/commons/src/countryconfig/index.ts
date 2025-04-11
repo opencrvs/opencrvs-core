@@ -31,23 +31,25 @@ export const countryConfigAPI = makeApi([
     description: 'Receive a notification of an action',
     parameters: [
       {
-        name: 'action',
+        name: 'body',
         type: 'Body',
-        schema: z.object({
-          actionId: z.string(),
-          event: EventDocument,
-          action: ActionInput
-        })
+        schema: z
+          .object({
+            actionId: z.string(),
+            event: EventDocument,
+            action: ActionInput
+          })
+          .openapi({ ref: 'a', description: 'moi' })
       },
       {
         name: 'eventType',
         type: 'Path',
-        schema: z.string()
+        schema: z.string().openapi({ ref: 'b', description: 'moi' })
       },
       {
         name: 'actionType',
         type: 'Path',
-        schema: ActionTypes
+        schema: ActionTypes.openapi({ ref: 'c', description: 'moi' })
       }
     ],
     response: z.array(EventConfig),
