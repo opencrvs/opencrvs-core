@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import { z, ZodType } from 'zod'
 import { EventMetadata } from './EventMetadata'
 
 export const EventIndex = EventMetadata.extend({
@@ -42,7 +42,9 @@ const Within = z.object({ type: z.literal('within'), location: z.string() })
 
 const DateCondition = z.union([Exact, Range])
 
-export const QueryInput: z.ZodType<QueryInputType> = z.lazy(() =>
+// Use `ZodType` here to avoid locking the output type prematurely —
+// this keeps recursive inference intact and allows `z.infer<typeof QueryInput>` to work correctly.
+export const QueryInput: ZodType = z.lazy(() =>
   z.union([
     z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf]),
     z.record(z.string(), QueryInput)
