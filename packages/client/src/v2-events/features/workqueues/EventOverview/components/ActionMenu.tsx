@@ -73,69 +73,25 @@ const actionMessages = defineMessages({
   }
 })
 
-function AssignmentActions({ eventId }: { eventId: string }) {
-  const intl = useIntl()
-  const events = useEvents()
-  const authentication = useAuthentication()
-  /**
-   * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
-   * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
-   */
-  const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
-  const eventState = events.getEventState.useSuspenseQuery(eventId)
-
-  if (!authentication) {
-    throw new Error('Authentication is not available but is required')
-  }
-
-  const assignmentStatus = getAssignmentStatus(eventState, authentication.sub)
-
-  return (
-    <>
-      {assignmentStatus === AssignmentStatus.UNASSIGNED && (
-        <DropdownMenu.Item
-          key={ActionType.ASSIGN}
-          onClick={async () => {
-            await events.actions.assignment.assign.mutate({
-              eventId,
-              assignedTo: authentication.sub,
-              refetchEvent
-            })
-          }}
-        >
-          {intl.formatMessage(actionMessages.assignLabel)}
-        </DropdownMenu.Item>
-      )}
-
-      {(assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ||
-        (assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
-          authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS))) && (
-        <DropdownMenu.Item
-          key={ActionType.UNASSIGN}
-          onClick={() => {
-            events.actions.assignment.unassign.mutate({
-              eventId,
-              transactionId: getUUID(),
-              assignedTo: null
-            })
-          }}
-        >
-          {intl.formatMessage(actionMessages.unassignLabel)}
-        </DropdownMenu.Item>
-      )}
-    </>
-  )
-}
-
 export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
 
+  /**
+   * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
+   * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
+   */
+  const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
+  const eventState = events.getEventState.useSuspenseQuery(eventId)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const eventState = events.getEventState.useSuspenseQuery(eventId)
+  if (!authentication) {
+    throw new Error('Authentication is not available but is required')
+  }
+
+  const assignmentStatus = getAssignmentStatus(eventState, authentication.sub)
 
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
@@ -188,8 +144,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               <DropdownMenu.Item
                 key={action.type}
                 disabled={
-                  getAssignmentStatus(eventState, authentication?.sub) !==
-                  AssignmentStatus.ASSIGNED_TO_SELF
+                  assignmentStatus !== AssignmentStatus.ASSIGNED_TO_SELF
                 }
                 onClick={() => {
                   if (
@@ -223,7 +178,38 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               </DropdownMenu.Item>
             )
           })}
-          <AssignmentActions eventId={eventId} />
+          {assignmentStatus === AssignmentStatus.UNASSIGNED && (
+            <DropdownMenu.Item
+              key={ActionType.ASSIGN}
+              onClick={async () => {
+                await events.actions.assignment.assign.mutate({
+                  eventId,
+                  assignedTo: authentication.sub,
+                  refetchEvent
+                })
+              }}
+            >
+              {intl.formatMessage(actionMessages.assignLabel)}
+            </DropdownMenu.Item>
+          )}
+          {(assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ||
+            (assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
+              authentication.scope.includes(
+                SCOPES.RECORD_UNASSIGN_OTHERS
+              ))) && (
+            <DropdownMenu.Item
+              key={ActionType.UNASSIGN}
+              onClick={() => {
+                events.actions.assignment.unassign.mutate({
+                  eventId,
+                  transactionId: getUUID(),
+                  assignedTo: null
+                })
+              }}
+            >
+              {intl.formatMessage(actionMessages.unassignLabel)}
+            </DropdownMenu.Item>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>
