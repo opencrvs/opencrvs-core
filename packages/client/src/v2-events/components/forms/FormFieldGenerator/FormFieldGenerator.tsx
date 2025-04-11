@@ -13,8 +13,9 @@ import React, { useEffect } from 'react'
 
 import { Formik } from 'formik'
 import { isEqual, noop } from 'lodash'
-import { useIntl } from 'react-intl'
+import { MessageDescriptor, useIntl } from 'react-intl'
 import {
+  EventConfig,
   EventState,
   FieldConfig,
   FieldValue,
@@ -26,7 +27,6 @@ import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 import { handleDefaultValue } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import {
-  FormGeneratorProps,
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
@@ -47,33 +47,60 @@ function mapFieldsToValues(
   }, {})
 }
 
-export const FormFieldGenerator: React.FC<FormGeneratorProps> = React.memo(
-  (props) => {
-    const { eventConfig, formData, fields, declaration } = props
+/** Shared between multiple components */
+export interface FormFieldGeneratorProps {
+  // form specific config stuff
+  id: string
+  fieldsToShowValidationErrors?: FieldConfig[]
+  setAllFieldsDirty: boolean
+  onChange: (values: EventState) => void
+  requiredErrorMessage?: MessageDescriptor
+  onUploadingStateChanged?: (isUploading: boolean) => void
+  readonlyMode?: boolean
 
+  // events
+  fields: FieldConfig[]
+  eventConfig?: EventConfig
+  // See if we need all of these
+  // @TODO: Remove the null from initial state
+  form: EventState | null
+  declaration?: EventState
+  initialValues?: EventState
+}
+
+export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
+  (props) => {
     const intl = useIntl()
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
-    const nestedFormData = makeFormFieldIdsFormikCompatible(formData)
 
-    const onChange = (values: EventState) => {
+    // @todo: does this need to be done separately from initial values?
+    const formikCompatibleForm = makeFormFieldIdsFormikCompatible(
+      props.form ?? {}
+    )
+
+    const formikOnChange = (values: EventState) => {
       props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
     }
+
     const user = useUserAddress()
 
-    const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>({
-      ...mapFieldsToValues(props.fields, nestedFormData, { $user: user }),
-      ...props.initialValues
-    })
+    const formikCompatibleInitialValues =
+      makeFormFieldIdsFormikCompatible<FieldValue>({
+        ...mapFieldsToValues(props.fields, formikCompatibleForm, {
+          $user: user
+        }),
+        ...props.initialValues
+      })
 
     return (
       <Formik<EventState>
         enableReinitialize={true}
         initialTouched={initialTouchedFields}
-        initialValues={initialValues}
+        initialValues={formikCompatibleInitialValues}
         validate={(values) =>
           getValidationErrorsForForm(
-            fields,
+            props.fields,
             makeFormikFieldIdsOpenCRVSCompatible(values)
           )
         }
@@ -103,17 +130,23 @@ export const FormFieldGenerator: React.FC<FormGeneratorProps> = React.memo(
           }, [touched])
           return (
             <FormSectionComponent
-              {...props}
-              {...formikProps}
-              declaration={declaration}
+              declaration={props.declaration}
               // @TODO: Formik does not type errors well. Actual error message differs from the type.
               // This was previously cast on FormSectionComponent level.
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               errors={formikProps.errors as any}
-              eventConfig={eventConfig}
-              formData={nestedFormData}
+              eventConfig={props.eventConfig}
+              fields={props.fields}
+              id={props.id}
               intl={intl}
-              onChange={onChange}
+              resetForm={formikProps.resetForm}
+              setAllFieldsDirty={props.setAllFieldsDirty}
+              setAllTouchedFields={setAllTouchedFields}
+              setFieldValue={formikProps.setFieldValue}
+              setTouched={formikProps.setTouched}
+              setValues={formikProps.setValues}
+              touched={formikProps.touched}
+              values={formikProps.values}
+              onChange={formikOnChange}
             />
           )
         }}

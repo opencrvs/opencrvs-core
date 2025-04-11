@@ -30,6 +30,7 @@ import { formatISO } from 'date-fns'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
+import { FieldValue } from './FieldValue'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -228,10 +229,10 @@ export function isVerificationPage(
   return page.type === PageTypes.enum.VERIFICATION
 }
 
-export function deepMerge(
-  currentDocument: ActionUpdate,
-  actionDocument: ActionUpdate
-) {
+export function deepMerge<T extends Record<string, FieldValue>>(
+  currentDocument: T,
+  actionDocument: T
+): T {
   return mergeWith(
     currentDocument,
     actionDocument,
