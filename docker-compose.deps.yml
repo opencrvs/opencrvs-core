@@ -13,9 +13,11 @@ services:
     image: mongo:4.4
     restart: unless-stopped
 
-  redis:
-    image: redis:5
+  valkey:
+    image: docker.io/bitnami/valkey:8.1
     restart: unless-stopped
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.16.4
