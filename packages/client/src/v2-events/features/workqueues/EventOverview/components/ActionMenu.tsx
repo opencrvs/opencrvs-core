@@ -182,6 +182,11 @@ export function ActionMenu({ eventId }: { eventId: string }) {
             <DropdownMenu.Item
               key={ActionType.ASSIGN}
               onClick={async () => {
+                /**
+                 * Mutations typically follow a “fire-and-forget” approach and do not need to be awaited.
+                 * However, in this case, we need to finish refetching the event first before mutating.
+                 * Hence, awaiting is required.
+                 */
                 await events.actions.assignment.assign.mutate({
                   eventId,
                   assignedTo: authentication.sub,
