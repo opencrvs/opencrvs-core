@@ -24,8 +24,8 @@ import {
 
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
-import { getValidationErrorsForForm } from '../validation'
-import { handleDefaultValue } from '../utils'
+import { handleDefaultValue } from '@client/v2-events/components/forms/utils'
+import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible

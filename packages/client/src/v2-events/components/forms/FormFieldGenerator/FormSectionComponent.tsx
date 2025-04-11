@@ -28,20 +28,21 @@ import {
   AddressType
 } from '@opencrvs/commons/client'
 import { TEXT } from '@client/forms'
-
-import { Errors } from '../validation'
 import {
   evalExpressionInFieldDefinition,
   getDependentFields,
   hasDefaultValueDependencyInfo,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible
-} from '../utils'
+} from '@client/v2-events/components/forms/utils'
+import { Errors } from '@client/v2-events/components/forms/validation'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
 import { GeneratedInputField } from './GeneratedInputField'
+
+/* eslint-disable */
 
 interface ExposedProps {
   fields: FieldConfig[]

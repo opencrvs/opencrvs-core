@@ -65,9 +65,11 @@ import {
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
-import { File } from '../inputs/FileInput/FileInput'
-import { FileWithOption } from '../inputs/FileInput/DocumentUploaderWithOption'
+import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
+
+/* eslint-disable */
 
 interface ExposedProps {
   fields: FieldConfig[]
