@@ -16,7 +16,7 @@ import {
   generateEventDraftDocument
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
-import { tennisClubMembershipEventIndex } from '../../v2-events/features/events/fixtures'
+import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 
 /**
  * Create a spy function that tracks if a handler was called and with what input.
