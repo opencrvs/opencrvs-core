@@ -15,7 +15,7 @@ const testCases = [
   {
     currentValue: undefined,
     defaultValue: undefined,
-    meta: {
+    systemVariables: {
       $user: {
         district: '',
         province: ''
@@ -27,7 +27,7 @@ const testCases = [
   {
     currentValue: undefined,
     defaultValue: 'Hello',
-    meta: {
+    systemVariables: {
       $user: {
         district: '',
         province: ''
@@ -39,7 +39,7 @@ const testCases = [
   {
     currentValue: undefined,
     defaultValue: '$user.district',
-    meta: {
+    systemVariables: {
       $user: {
         district: 'Ibombo',
         province: ''
@@ -51,7 +51,7 @@ const testCases = [
   {
     currentValue: 'Hello world',
     defaultValue: '$user.district',
-    meta: {
+    systemVariables: {
       $user: {
         district: 'Ibombo',
         province: ''
@@ -69,7 +69,7 @@ const testCases = [
       province: '$user.province',
       urbanOrRural: 'URBAN'
     },
-    meta: {
+    systemVariables: {
       $user: {
         district: 'Ibombo',
         province: 'Central'
