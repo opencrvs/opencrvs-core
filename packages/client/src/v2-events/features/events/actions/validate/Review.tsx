@@ -120,7 +120,7 @@ export function Review() {
       if (reviewActionConfiguration.messages.modal === undefined) {
         // eslint-disable-next-line no-console
         console.error(
-          'Tried to render validate modal without message definitions. '
+          'Tried to render validate modal without message definitions.'
         )
         return null
       }
