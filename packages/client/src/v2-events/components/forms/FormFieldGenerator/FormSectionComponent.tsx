@@ -42,8 +42,6 @@ import {
 } from './utils'
 import { GeneratedInputField } from './GeneratedInputField'
 
-/* eslint-disable */
-
 interface ExposedProps {
   fields: FieldConfig[]
   id: string
@@ -60,7 +58,7 @@ interface ExposedProps {
   errors: Record<string, { errors: { message: TranslationConfig }[] }>
 }
 
-type AllProps = Omit<FormikProps<EventState>, 'errors'> & {
+type AllProps = FormikProps<EventState> & {
   className?: string
 } & ExposedProps &
   IntlShapeProps
@@ -240,7 +238,7 @@ export class FormSectionComponent extends React.Component<AllProps> {
             >
               <Field name={field.id}>
                 {}
-                {(formikFieldProps: FieldProps<any>) => {
+                {(formikFieldProps: FieldProps) => {
                   return (
                     <GeneratedInputField
                       fieldDefinition={field}
