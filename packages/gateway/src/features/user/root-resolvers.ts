@@ -27,9 +27,8 @@ import {
   inScope,
   isTokenOwner,
   getUserId,
-  getTokenPayload,
-  getUser,
-  isOfficeUnderJurisdiction
+  isOfficeUnderJurisdiction,
+  getUserFromHeader
 } from '@gateway/features/user/utils'
 import {
   GQLHumanNameInput,
@@ -322,11 +321,7 @@ export const resolvers: GQLResolver = {
         ]) &&
         user.primaryOffice
       ) {
-        const tokenPayload = getTokenPayload(
-          authHeader.Authorization.split(' ')[1]
-        )
-        const userId = tokenPayload.sub
-        const requestingUser = await getUser({ userId }, authHeader)
+        const requestingUser = await getUserFromHeader(authHeader)
         const isUnderJurisdiction = await isOfficeUnderJurisdiction(
           requestingUser.primaryOfficeId as UUID,
           user.primaryOffice as UUID

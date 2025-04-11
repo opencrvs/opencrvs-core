@@ -136,6 +136,11 @@ export const getUserId = (authHeader: IAuthHeader): string => {
   return tokenPayload.sub
 }
 
+export function getUserFromHeader(header: IAuthHeader) {
+  const userId = getUserId(header)
+  return getUser({ userId }, header)
+}
+
 export function getFullName(user: IUserModelData, language: string) {
   const localName = user.name.find((name) => name.use === language)
   return `${localName?.given.join(' ') || ''} ${localName?.family || ''}`.trim()
