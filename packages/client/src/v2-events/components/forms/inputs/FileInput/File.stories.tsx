@@ -101,7 +101,7 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
             ]
           }
         ]}
-        formData={formData}
+        form={formData}
         id="my-form"
         setAllFieldsDirty={false}
         onChange={(data) => {
@@ -138,7 +138,7 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
               }
             }
           ]}
-          formData={formData}
+          form={formData}
           id="my-form"
           setAllFieldsDirty={false}
           onChange={(data) => {

@@ -13,6 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fn, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
+import { noop } from 'lodash'
 import {
   FieldType,
   TENNIS_CLUB_DECLARATION_FORM
@@ -59,7 +60,7 @@ export const CheckboxInput: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        formData={formData}
+        form={formData}
         id="my-form"
         setAllFieldsDirty={false}
         onChange={(data) => {
@@ -114,8 +115,7 @@ export const UncheckedCheckboxShouldNotAppearOnReview: StoryObj<typeof Review> =
             form={{}}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}
             title="Checkbox review"
-            // eslint-disable-next-line no-console
-            onEdit={(values) => console.log(values)}
+            onEdit={noop}
           >
             <div />
           </Review.Body>
