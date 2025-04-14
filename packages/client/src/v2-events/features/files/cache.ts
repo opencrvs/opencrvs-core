@@ -18,7 +18,7 @@ import {
 } from '@opencrvs/commons/client'
 import { precacheFile, removeCached } from './useFileUpload'
 
-function getFilesToCache(actions: ActionDocument[]): string[] {
+function getFileNames(actions: ActionDocument[]): string[] {
   return actions.flatMap((action) =>
     Object.values(action.declaration).flatMap((value) => {
       // Handle single file field
@@ -40,14 +40,14 @@ function getFilesToCache(actions: ActionDocument[]): string[] {
 
 export async function cacheFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
-  const fileNames = getFilesToCache(actions)
+  const fileNames = getFileNames(actions)
 
   return Promise.all(fileNames.map(precacheFile))
 }
 
 export async function removeCachedFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
-  const fileNames = getFilesToCache(actions)
+  const fileNames = getFileNames(actions)
 
   return Promise.all(fileNames.map(removeCached))
 }
