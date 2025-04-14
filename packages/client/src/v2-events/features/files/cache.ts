@@ -10,6 +10,7 @@
  */
 
 import {
+  ActionDocument,
   EventDocument,
   FileFieldValue,
   FileFieldWithOptionValue,
@@ -17,48 +18,32 @@ import {
 } from '@opencrvs/commons/client'
 import { precacheFile, removeCached } from './useFileUpload'
 
-export async function cacheFiles(eventDocument: EventDocument) {
-  const promises: Promise<void>[] = []
-  const actions = getAcceptedActions(eventDocument)
-
-  actions.forEach((action) =>
-    Object.entries(action.declaration).forEach(([, value]) => {
+function getFilesToCache(actions: ActionDocument[]): string[] {
+  return actions.flatMap((action) => {
+    return Object.values(action.declaration).flatMap((value) => {
       const fileParsed = FileFieldValue.safeParse(value)
       if (fileParsed.success) {
-        promises.push(precacheFile(fileParsed.data.filename))
+        return [fileParsed.data.filename]
       }
-
       const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
       if (fileOptionParsed.success) {
-        fileOptionParsed.data.forEach((val) =>
-          promises.push(precacheFile(val.filename))
-        )
+        return fileOptionParsed.data.map((val) => val.filename)
       }
+      return []
     })
-  )
+  })
+}
 
-  await Promise.all(promises)
+export async function cacheFiles(eventDocument: EventDocument) {
+  const actions = getAcceptedActions(eventDocument)
+  const filesToCache = getFilesToCache(actions)
+
+  return Promise.all(filesToCache.map(precacheFile))
 }
 
 export async function removeCachedFiles(eventDocument: EventDocument) {
-  const promises: Promise<boolean | undefined>[] = []
   const actions = getAcceptedActions(eventDocument)
+  const filesToRemove = getFilesToCache(actions)
 
-  actions.forEach((action) =>
-    Object.entries(action.declaration).forEach(([, value]) => {
-      const fileParsed = FileFieldValue.safeParse(value)
-      if (fileParsed.success) {
-        promises.push(removeCached(fileParsed.data.filename))
-      }
-
-      const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
-      if (fileOptionParsed.success) {
-        fileOptionParsed.data.forEach((val) =>
-          promises.push(removeCached(val.filename))
-        )
-      }
-    })
-  )
-
-  await Promise.all(promises)
+  return Promise.all(filesToRemove.map(removeCached))
 }
