@@ -19,19 +19,23 @@ import {
 import { precacheFile, removeCached } from './useFileUpload'
 
 function getFilesToCache(actions: ActionDocument[]): string[] {
-  return actions.flatMap((action) => {
-    return Object.values(action.declaration).flatMap((value) => {
+  return actions.flatMap((action) =>
+    Object.values(action.declaration).flatMap((value) => {
+      // Handle single file field
       const fileParsed = FileFieldValue.safeParse(value)
       if (fileParsed.success) {
         return [fileParsed.data.filename]
       }
+
+      // Handle multiple file field (file with options)
       const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
       if (fileOptionParsed.success) {
         return fileOptionParsed.data.map((val) => val.filename)
       }
+
       return []
     })
-  })
+  )
 }
 
 export async function cacheFiles(eventDocument: EventDocument) {
