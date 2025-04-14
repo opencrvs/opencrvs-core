@@ -13,7 +13,7 @@ services:
     image: mongo:4.4
     restart: unless-stopped
 
-  valkey:
+  redis:
     image: docker.io/bitnami/valkey:8.1
     restart: unless-stopped
     environment:
