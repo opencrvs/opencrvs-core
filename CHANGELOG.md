@@ -52,6 +52,7 @@
 - Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 - Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
+- Fix the checkbox input by setting the correct selected value type [#9225](https://github.com/opencrvs/opencrvs-core/issues/9225)
 
 ## 1.6.3 Release candidate
 
