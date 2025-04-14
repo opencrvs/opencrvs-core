@@ -210,3 +210,39 @@ test('Action other than READ deletes draft', async () => {
 
   expect(draftEventsAfterRead.length).toBe(0)
 })
+
+test('partial declaration update accounts for conditionals not in payload', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const declaration = {
+    type: ActionType.DECLARE,
+    declaration: {
+      ...generator.event.actions.declare(originalEvent.id).declaration,
+      'applicant.age': 20,
+      'applicant.dob': undefined,
+      'applicant.dobUnknown': true
+    },
+    eventId: originalEvent.id,
+    transactionId: '123-123-123'
+  }
+
+  await client.event.actions.declare.request(declaration)
+
+  await client.event.actions.validate.request({
+    type: ActionType.VALIDATE,
+    duplicates: [],
+    declaration: {
+      'applicant.dobUnknown': false,
+      'applicant.dob': '2000-11-30'
+    },
+    eventId: originalEvent.id,
+    transactionId: '123-123-124'
+  })
+
+  const event = await client.event.get(originalEvent.id)
+
+  console.log(JSON.stringify(event))
+})

@@ -13,7 +13,7 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   AddressType,
-  generateActionInput,
+  generateActionDeclarationInput,
   getAcceptedActions,
   SCOPES
 } from '@opencrvs/commons'
@@ -176,7 +176,10 @@ test('validation prevents including hidden fields', async () => {
 
   const data = generator.event.actions.validate(event.id, {
     declaration: {
-      ...generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
+      ...generateActionDeclarationInput(
+        tennisClubMembershipEvent,
+        ActionType.VALIDATE
+      ),
       'recommender.firstname': 'this should not be here'
     }
   })

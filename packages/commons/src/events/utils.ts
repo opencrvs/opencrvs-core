@@ -30,7 +30,6 @@ import { formatISO } from 'date-fns'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
-import { FieldValue } from './FieldValue'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -229,10 +228,10 @@ export function isVerificationPage(
   return page.type === PageTypes.enum.VERIFICATION
 }
 
-export function deepMerge<T extends Record<string, FieldValue>>(
-  currentDocument: T,
-  actionDocument: T
-): T {
+export function deepMerge(
+  currentDocument: ActionUpdate,
+  actionDocument: ActionUpdate
+) {
   return mergeWith(
     currentDocument,
     actionDocument,
@@ -250,4 +249,11 @@ export function deepMerge<T extends Record<string, FieldValue>>(
       return incomingValue // Override with latest value
     }
   )
+}
+
+/** Tell compiler that accessing record with arbitrary key might result to undefined
+ * Use when you **cannot guarantee**  that key exists in the record
+ */
+export type IndexMap<T> = {
+  [id: string]: T | undefined
 }

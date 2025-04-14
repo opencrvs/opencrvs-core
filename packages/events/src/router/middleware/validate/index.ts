@@ -30,7 +30,12 @@ import {
   getVisiblePagesFormFields,
   DeclarationActions,
   getCurrentEventState,
-  deepMerge
+  stripHiddenFields,
+  EventDocument,
+  getDeclarationFields,
+  deepMerge,
+  IndexMap,
+  deepDropNulls
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
@@ -97,31 +102,99 @@ function throwWhenNotEmpty(errors: unknown[]) {
 
 function validateDeclarationUpdateAction({
   eventConfig,
+  event,
   actionType,
-  declaration,
+  declarationUpdate,
   annotation
 }: {
   eventConfig: EventConfig
+  event: EventDocument
   actionType: DeclarationUpdateActionType
-  declaration: ActionUpdate
+  declarationUpdate: ActionUpdate
+  // @TODO: annotation is always specific to action. Is there ever a need for nulls?
   annotation?: ActionUpdate
 }) {
-  const declarationConfig = getDeclaration(eventConfig)
+  /* Declaration update is a partial update. We validate updates based on conditional rules and data type rules.
+   * There might be a case where update includes bad data [say, a date not following zod.string().date()].
+   * When data is visible based on conditional rules, it might be that the data point gets hidden. Hidden data points are ignored
+   */
 
-  const declarationFields = getVisiblePagesFormFields(
-    declarationConfig,
-    declaration
+  // 1. validate declaration update data types
+  const allDeclarationFields = getDeclarationFields(eventConfig)
+
+  // 1.1. Create a map of all fields to validate against. For example, in birth there are > 100 fields.
+  const fieldMap = allDeclarationFields.reduce(
+    (acc: IndexMap<FieldConfig>, field) => ({
+      ...acc,
+      [field.id]: field
+    }),
+    {}
   )
 
+  const validationErrors = Object.entries(declarationUpdate).flatMap(
+    ([key, value]) => {
+      const field = fieldMap[key]
+      if (!field) {
+        return [
+          {
+            message: `Field ${key} not found in declaration`,
+            id: key,
+            value
+          }
+        ]
+      }
+
+      return getFieldValidationErrors({
+        field,
+        values: declarationUpdate,
+        ignoreHiddenFields: true
+      }).errors.map((error) => ({
+        message: error.message.defaultMessage,
+        id: field.id,
+        value
+      }))
+    }
+  )
+
+  if (validationErrors.length > 0) {
+    return validationErrors
+  }
+
+  // 2. Merge declaration update with previous declaration to validate based on conditional rules
+  const previousDeclaration = getCurrentEventState(event).declaration
+  const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
+
+  const declarationConfig = getDeclaration(eventConfig)
+
+  // 3. Clean declaration to remove hidden fields. Without additional checks, client could send an update, that would include only hidden fields. (e.g. conditional toggle between 2 fields, where the value is updated but not the toggle)
+  const cleanedDeclaration = stripHiddenFields(
+    getVisiblePagesFormFields(declarationConfig, completeDeclaration),
+    deepDropNulls(completeDeclaration)
+  )
+
+  // 4. Validate declaration update against conditional rules, taking into account conditional pages.
+  const declarationErrors = declarationConfig.pages
+    .filter((page) => isPageVisible(page, cleanedDeclaration))
+    .flatMap((page) => getFormFieldErrors(page.fields, cleanedDeclaration))
+
   const declarationActionParse = DeclarationActions.safeParse(actionType)
+
+  // 5. Validate against action review fields, if applicable
   const reviewFields = declarationActionParse.success
     ? getActionReviewFields(eventConfig, declarationActionParse.data)
     : []
 
-  const fields = [...declarationFields, ...reviewFields]
+  const visibleAnnotationFields = stripHiddenFields(
+    reviewFields,
+    deepDropNulls(annotation ?? {})
+  )
 
-  // @TODO: Separate validations for annotation and declaration
-  return getFormFieldErrors(fields, { ...declaration, ...annotation })
+  const annotationErrors = getFormFieldErrors(
+    reviewFields,
+    visibleAnnotationFields
+  )
+
+  return [...declarationErrors, ...annotationErrors]
 }
 
 function validateActionAnnotation({
@@ -165,16 +238,10 @@ export function validateAction(actionType: ActionType) {
       DeclarationUpdateActions.safeParse(actionType)
 
     if (declarationUpdateAction.success) {
-      const previousDeclaration = getCurrentEventState(event)
-      // since partial updates are allowed, full declaration is needed to resolve validations
-      const completeDeclaration = deepMerge(
-        previousDeclaration.declaration,
-        input.declaration
-      )
-
       const errors = validateDeclarationUpdateAction({
         eventConfig,
-        declaration: completeDeclaration,
+        event,
+        declarationUpdate: input.declaration,
         annotation: input.annotation,
         actionType: declarationUpdateAction.data
       })

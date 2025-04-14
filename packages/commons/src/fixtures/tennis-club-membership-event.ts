@@ -768,9 +768,8 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         },
         {
           id: 'applicant.dob',
-          type: 'DATE',
+          type: FieldType.DATE,
           required: true,
-          conditionals: [],
           validation: [
             {
               message: {
@@ -781,11 +780,42 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               validator: field('applicant.dob').isBefore().now()
             }
           ],
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: not(field('applicant.dobUnknown').isEqualTo(true))
+            }
+          ],
           label: {
             defaultMessage: "Applicant's date of birth",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
           }
+        },
+        {
+          id: 'applicant.dobUnknown',
+          type: FieldType.CHECKBOX,
+          label: {
+            defaultMessage: 'Exact date of birth unknown',
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dobUnknown.label'
+          }
+        },
+        {
+          id: 'applicant.age',
+          type: FieldType.NUMBER,
+          required: true,
+          label: {
+            defaultMessage: 'Age of tennis-member',
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.age.label'
+          },
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: field('applicant.dobUnknown').isEqualTo(true)
+            }
+          ]
         },
         {
           id: 'applicant.image',

@@ -15,7 +15,7 @@ import {
   ActionType,
   AddressType,
   EventDocument,
-  generateActionInput,
+  generateActionDeclarationInput,
   getAcceptedActions,
   getUUID,
   SCOPES
@@ -282,7 +282,10 @@ describe('when a correction request exists', () => {
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(registeredEvent.id, {
         declaration: {
-          ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
+          ...generateActionDeclarationInput(
+            tennisClubMembershipEvent,
+            ActionType.DECLARE
+          ),
           'applicant.firstName': 'Johnny'
         }
       })

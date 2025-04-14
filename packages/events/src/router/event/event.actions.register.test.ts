@@ -52,6 +52,7 @@ test('Validation error message contains all the offending fields', async () => {
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
+
   await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )
@@ -60,7 +61,8 @@ test('Validation error message contains all the offending fields', async () => {
   const data = generator.event.actions.register(event.id, {
     declaration: {
       'applicant.dob': '02-02',
-      'recommender.none': true
+      'recommender.none': true,
+      'applicant.dobUnknown': false
     }
   })
 

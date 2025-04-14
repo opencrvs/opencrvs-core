@@ -37,7 +37,9 @@ import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
   findRecordActionPages,
   getActionAnnotationFields,
+  getDeclaration,
   getDeclarationFields,
+  getVisiblePagesFormFields,
   isPageVisible,
   isVerificationPage,
   stripHiddenFields
@@ -47,7 +49,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
 
-function fieldConfigsToActionAnnotation(fields: FieldConfig[]) {
+function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
@@ -57,7 +59,7 @@ function fieldConfigsToActionAnnotation(fields: FieldConfig[]) {
   )
 }
 
-export function generateActionInput(
+export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType
 ) {
@@ -65,11 +67,16 @@ export function generateActionInput(
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)
 
-    const annotation = fieldConfigsToActionAnnotation(fields)
+    const declarationConfig = getDeclaration(configuration)
 
-    // Strip away hidden or disabled fields from mock action annotation
+    const declaration = fieldConfigsToActionPayload(fields)
+
+    // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return stripHiddenFields(fields, annotation)
+    return stripHiddenFields(
+      getVisiblePagesFormFields(declarationConfig, declaration),
+      declaration
+    )
   }
 
   // eslint-disable-next-line no-console
@@ -78,7 +85,7 @@ export function generateActionInput(
   return {}
 }
 
-export function generateActionMetadataInput(
+export function generateActionAnnotationInput(
   configuration: EventConfig,
   action: ActionType
 ) {
@@ -90,7 +97,7 @@ export function generateActionMetadataInput(
     ? getActionAnnotationFields(actionConfig)
     : []
 
-  const annotation = fieldConfigsToActionAnnotation(annotationFields)
+  const annotation = fieldConfigsToActionPayload(annotationFields)
 
   const visibleVerificationPageIds = findRecordActionPages(
     configuration,
@@ -167,10 +174,13 @@ export const eventPayloadGenerator = {
       transactionId: input.transactionId ?? getUUID(),
       declaration:
         input.declaration ??
-        generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
+        generateActionDeclarationInput(
+          tennisClubMembershipEvent,
+          ActionType.DECLARE
+        ),
       annotation:
         input.annotation ??
-        generateActionMetadataInput(
+        generateActionAnnotationInput(
           tennisClubMembershipEvent,
           ActionType.DECLARE
         ),
@@ -190,7 +200,10 @@ export const eventPayloadGenerator = {
       if (!declaration) {
         // Remove some fields to simulate incomplete data
         const partialDeclaration = omitBy(
-          generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
+          generateActionDeclarationInput(
+            tennisClubMembershipEvent,
+            ActionType.DECLARE
+          ),
           isString
         )
 
@@ -218,10 +231,13 @@ export const eventPayloadGenerator = {
       transactionId: input.transactionId ?? getUUID(),
       declaration:
         input.declaration ??
-        generateActionInput(tennisClubMembershipEvent, ActionType.VALIDATE),
+        generateActionDeclarationInput(
+          tennisClubMembershipEvent,
+          ActionType.VALIDATE
+        ),
       annotation:
         input.annotation ??
-        generateActionMetadataInput(
+        generateActionAnnotationInput(
           tennisClubMembershipEvent,
           ActionType.VALIDATE
         ),
@@ -276,7 +292,7 @@ export const eventPayloadGenerator = {
       declaration: {},
       annotation:
         input.annotation ??
-        generateActionMetadataInput(
+        generateActionAnnotationInput(
           tennisClubMembershipEvent,
           ActionType.REJECT
         ),
@@ -296,10 +312,13 @@ export const eventPayloadGenerator = {
       transactionId: input.transactionId ?? getUUID(),
       declaration:
         input.declaration ??
-        generateActionInput(tennisClubMembershipEvent, ActionType.REGISTER),
+        generateActionDeclarationInput(
+          tennisClubMembershipEvent,
+          ActionType.REGISTER
+        ),
       annotation:
         input.annotation ??
-        generateActionMetadataInput(
+        generateActionAnnotationInput(
           tennisClubMembershipEvent,
           ActionType.REGISTER
         ),
@@ -316,7 +335,7 @@ export const eventPayloadGenerator = {
       declaration: {},
       annotation:
         input.annotation ??
-        generateActionMetadataInput(
+        generateActionAnnotationInput(
           tennisClubMembershipEvent,
           ActionType.PRINT_CERTIFICATE
         ),
@@ -336,13 +355,13 @@ export const eventPayloadGenerator = {
         transactionId: input.transactionId ?? getUUID(),
         declaration:
           input.declaration ??
-          generateActionInput(
+          generateActionDeclarationInput(
             tennisClubMembershipEvent,
             ActionType.REQUEST_CORRECTION
           ),
         annotation:
           input.annotation ??
-          generateActionMetadataInput(
+          generateActionAnnotationInput(
             tennisClubMembershipEvent,
             ActionType.REQUEST_CORRECTION
           ),
@@ -360,7 +379,7 @@ export const eventPayloadGenerator = {
         declaration: {},
         annotation:
           input.annotation ??
-          generateActionMetadataInput(
+          generateActionAnnotationInput(
             tennisClubMembershipEvent,
             ActionType.APPROVE_CORRECTION
           ),
@@ -379,7 +398,7 @@ export const eventPayloadGenerator = {
         declaration: {},
         annotation:
           input.annotation ??
-          generateActionMetadataInput(
+          generateActionAnnotationInput(
             tennisClubMembershipEvent,
             ActionType.REJECT_CORRECTION
           ),
@@ -406,7 +425,7 @@ export function generateActionDocument({
     createdBy: getUUID(),
     id: getUUID(),
     createdAtLocation: 'TODO',
-    declaration: generateActionInput(configuration, action),
+    declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
     ...defaults,
     status: ActionStatus.Accepted
