@@ -87,8 +87,8 @@ export function Pages({
 
   const fields = (
     <FormFieldGenerator
+      declaration={declaration}
       eventConfig={eventConfig}
-      eventDeclarationData={declaration}
       fields={page.fields}
       formData={form}
       id="locationForm"
