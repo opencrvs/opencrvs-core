@@ -40,14 +40,14 @@ function getFilesToCache(actions: ActionDocument[]): string[] {
 
 export async function cacheFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
-  const filesToCache = getFilesToCache(actions)
+  const fileNames = getFilesToCache(actions)
 
-  return Promise.all(filesToCache.map(precacheFile))
+  return Promise.all(fileNames.map(precacheFile))
 }
 
 export async function removeCachedFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
-  const filesToRemove = getFilesToCache(actions)
+  const fileNames = getFilesToCache(actions)
 
-  return Promise.all(filesToRemove.map(removeCached))
+  return Promise.all(fileNames.map(removeCached))
 }
