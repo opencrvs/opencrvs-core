@@ -13,7 +13,7 @@ import React, { useEffect } from 'react'
 
 import { Formik } from 'formik'
 import { isEqual, noop } from 'lodash'
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
   EventConfig,
   EventState,
@@ -43,28 +43,28 @@ function mapFieldsToValues(
       declaration,
       systemVariables
     })
+
     return { ...memo, [field.id]: fieldInitialValue }
   }, {})
 }
 
-/** Shared between multiple components */
 export interface FormFieldGeneratorProps {
-  // form specific config stuff
+  /** form id */
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
   setAllFieldsDirty: boolean
   onChange: (values: EventState) => void
-  requiredErrorMessage?: MessageDescriptor
-  onUploadingStateChanged?: (isUploading: boolean) => void
   readonlyMode?: boolean
 
-  // events
+  /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
   // See if we need all of these
-  // @TODO: Remove the null from initial state
-  form: EventState | null
+  /** Current active form that is in edit mode. */
+  form: EventState
+  /** Latest declaration before any editing has happened. Used for context. */
   declaration?: EventState
+  /** Default values for fields. */
   initialValues?: EventState
 }
 
@@ -75,9 +75,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
       useEventFormData()
 
     // @todo: does this need to be done separately from initial values?
-    const formikCompatibleForm = makeFormFieldIdsFormikCompatible(
-      props.form ?? {}
-    )
+    const formikCompatibleForm = makeFormFieldIdsFormikCompatible(props.form)
 
     const formikOnChange = (values: EventState) => {
       props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
@@ -136,8 +134,10 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               errors={formikProps.errors as any}
               eventConfig={props.eventConfig}
               fields={props.fields}
+              fieldsToShowValidationErrors={props.fieldsToShowValidationErrors}
               id={props.id}
               intl={intl}
+              readonlyMode={props.readonlyMode}
               resetForm={formikProps.resetForm}
               setAllFieldsDirty={props.setAllFieldsDirty}
               setAllTouchedFields={setAllTouchedFields}
