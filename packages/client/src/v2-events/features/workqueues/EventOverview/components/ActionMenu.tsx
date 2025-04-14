@@ -21,8 +21,7 @@ import {
   EventDocument,
   type ActionConfig,
   getCurrentEventStateWithDrafts,
-  getUUID,
-  EventConfig
+  getUUID
 } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
