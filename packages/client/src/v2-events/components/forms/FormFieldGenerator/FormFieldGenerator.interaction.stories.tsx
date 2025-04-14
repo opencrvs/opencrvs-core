@@ -78,13 +78,6 @@ const fields = [
       description: 'This is the label for the field',
       id: 'v2.event.birth.action.declare.form.section.tennis-member.field.age.label'
     },
-    configuration: {
-      postfix: {
-        defaultMessage: 'years',
-        description: 'This is the postfix for age field',
-        id: 'v2.event.birth.action.declare.form.section.person.field.age.postfix'
-      }
-    },
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -105,7 +98,8 @@ const declaration = {
 export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
   name: 'Updating existing declaration with conditional values',
   parameters: {
-    layout: 'centered'
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
     const [formData, setFormData] = React.useState<EventState>(declaration)

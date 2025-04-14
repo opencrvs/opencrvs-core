@@ -45,7 +45,6 @@ type AllProps = {
   declaration?: EventState
   eventConfig?: EventConfig
   fields: FieldConfig[]
-
   className?: string
   readonlyMode?: boolean
   errors: Record<string, { errors: { message: TranslationConfig }[] }>

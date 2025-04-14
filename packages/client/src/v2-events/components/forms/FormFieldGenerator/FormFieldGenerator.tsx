@@ -62,9 +62,9 @@ export interface FormFieldGeneratorProps {
   // See if we need all of these
   /** Current active form that is in edit mode. */
   form: EventState
-  /** Latest declaration before any editing has happened. Used for context. */
+  /** Latest declaration before any editing has happened. Used for context. @TODO: Check whether declaration and initialValues could be mutually exclusive. */
   declaration?: EventState
-  /** Default values for fields. */
+  /** Default field values. Might equal to declaration, when a declaration form is rendered. */
   initialValues?: EventState
 }
 
@@ -131,6 +131,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               declaration={props.declaration}
               // @TODO: Formik does not type errors well. Actual error message differs from the type.
               // This was previously cast on FormSectionComponent level.
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               errors={formikProps.errors as any}
               eventConfig={props.eventConfig}
               fields={props.fields}
