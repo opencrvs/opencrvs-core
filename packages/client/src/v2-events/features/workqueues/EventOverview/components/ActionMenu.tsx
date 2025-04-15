@@ -22,7 +22,6 @@ import {
   type ActionConfig,
   getCurrentEventStateWithDrafts,
   getUUID,
-  EventConfig,
   EventIndex
 } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
