@@ -10,6 +10,7 @@
  */
 
 import { Location } from '@events/service/locations/locations'
+import { useSelector } from 'react-redux'
 import {
   EventDocument,
   getCurrentEventState,
@@ -28,6 +29,7 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,6 +73,7 @@ export const usePrintableCertificate = ({
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
+  const userDetails = useSelector(getUserDetails)
   const currentState = getCurrentEventState(event)
   const modifiedState = {
     ...currentState,
@@ -84,16 +87,13 @@ export const usePrintableCertificate = ({
   if (!language || !certificateConfig) {
     return { svgCode: null }
   }
-
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $state: {
       ...modifiedState,
       // this field is used in certificate to show the place of certification
-      updatedAtLocation: event.actions.find(
-        (a) => a.type === ActionType.CREATE && 'createdAtLocation' in a
-      )?.createdAtLocation
+      updatedAtLocation: userDetails?.primaryOffice.id
     },
     $declaration: currentState.declaration,
     locations,
