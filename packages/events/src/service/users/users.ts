@@ -10,6 +10,7 @@
  */
 
 import { ObjectId } from 'mongodb'
+import fetch from 'node-fetch'
 import { ResolvedUser } from '@opencrvs/commons'
 import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
 import { env } from '@events/environment'
@@ -61,6 +62,7 @@ export const getUsersById = async (ids: string[], token: string) => {
           )
           user.signatureFile = presignedURL || user.signatureFile
         } catch (err) {
+          // eslint-disable-next-line no-console
           console.error(
             `Failed to get presigned URL for ${user.signatureFile}`,
             err

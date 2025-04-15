@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { sign } from 'crypto'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
@@ -59,7 +60,8 @@ const mockUser = {
       family: 'Bwalya'
     }
   ],
-  role: 'SOCIAL_WORKER'
+  role: 'SOCIAL_WORKER',
+  signatureFile: 'signature.png'
 }
 
 export const ReviewForLocalRegistrarComplete: Story = {
