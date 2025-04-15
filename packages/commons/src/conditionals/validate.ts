@@ -279,21 +279,13 @@ function runFieldValidations({
  */
 export function getFieldValidationErrors({
   field,
-  values,
-  ignoreHiddenFields
+  values
 }: {
   // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
   field: FieldConfig
   values: ActionUpdate
-  /**
-   * Ignore hidden fields when validating. Useful when validating partial payloads. By default, you should not ignore hidden fields.
-   */
-  ignoreHiddenFields?: boolean
 }) {
-  if (
-    !ignoreHiddenFields &&
-    (!isFieldVisible(field, values) || !isFieldEnabled(field, values))
-  ) {
+  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
     if (values[field.id]) {
       return {
         errors: [
@@ -305,7 +297,6 @@ export function getFieldValidationErrors({
     }
 
     return {
-      // @TODO: should this actually throw?
       errors: []
     }
   }

@@ -22,13 +22,13 @@ import {
   DeclarationUpdateActionType,
   getActionReviewFields,
   getDeclaration,
-  getVisiblePagesFormFields,
   DeclarationActions,
   getCurrentEventState,
-  stripHiddenFields,
+  omitHiddenPaginatedFields,
   EventDocument,
   deepMerge,
-  deepDropNulls
+  deepDropNulls,
+  omitHiddenFields
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
@@ -66,8 +66,8 @@ function validateDeclarationUpdateAction({
   const declarationConfig = getDeclaration(eventConfig)
 
   // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed (e.g. conditional toggle between 2 fields, where the value is updated but not the toggle).
-  const cleanedDeclaration = stripHiddenFields(
-    getVisiblePagesFormFields(declarationConfig, completeDeclaration),
+  const cleanedDeclaration = omitHiddenPaginatedFields(
+    declarationConfig,
     completeDeclaration
   )
 
@@ -93,7 +93,7 @@ function validateDeclarationUpdateAction({
     ? getActionReviewFields(eventConfig, declarationActionParse.data)
     : []
 
-  const visibleAnnotationFields = stripHiddenFields(
+  const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
     deepDropNulls(annotation ?? {})
   )

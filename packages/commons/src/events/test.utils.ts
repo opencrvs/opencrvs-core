@@ -39,10 +39,10 @@ import {
   getActionAnnotationFields,
   getDeclaration,
   getDeclarationFields,
-  getVisiblePagesFormFields,
   isPageVisible,
   isVerificationPage,
-  stripHiddenFields
+  omitHiddenFields,
+  omitHiddenPaginatedFields
 } from './utils'
 import { FieldValue } from './FieldValue'
 import { TranslationConfig } from './TranslationConfig'
@@ -73,10 +73,7 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return stripHiddenFields(
-      getVisiblePagesFormFields(declarationConfig, declaration),
-      declaration
-    )
+    return omitHiddenPaginatedFields(declarationConfig, declaration)
   }
 
   // eslint-disable-next-line no-console
@@ -115,7 +112,7 @@ export function generateActionAnnotationInput(
     {}
   )
 
-  const fieldBasedPayload = stripHiddenFields(annotationFields, annotation)
+  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation)
 
   return {
     ...fieldBasedPayload,
