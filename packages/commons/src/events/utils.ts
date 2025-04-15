@@ -158,14 +158,6 @@ export const getVisiblePagesFormFields = (
     .flatMap((p) => p.fields)
 }
 
-function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
-  if (field.type !== FieldType.CHECKBOX || field.required) {
-    return false
-  }
-
-  return !form[field.id]
-}
-
 export function stripHiddenFields(
   fields: FieldConfig[],
   declaration: EventState
@@ -175,10 +167,6 @@ export function stripHiddenFields(
 
     if (!field) {
       return true
-    }
-
-    if (isOptionalUncheckedCheckbox(field, declaration)) {
-      // return true
     }
 
     return !isFieldVisible(field, declaration)
