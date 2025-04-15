@@ -59,16 +59,14 @@ export const LinkButtonField = ({
   const { declarationId = '', pageId: section } = useParams()
   const declaration = useDeclaration(declarationId)
   const dispatch = useDispatch()
+  const redirectKey = ['redirect', section, declarationId].join('.')
   const onChange: Parameters<typeof useHttp>[1] = ({
     data,
     error,
     loading
   }) => {
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
-    localStorage.setItem(
-      ['redirect', section, declarationId].join('.'),
-      JSON.stringify({ loading, data, error })
-    )
+    localStorage.setItem(redirectKey, JSON.stringify({ loading, data, error }))
     if (data || error) {
       // remove query parameters from the URL after successful or failed callback request
       const url = new URL(window.location.href)
@@ -89,13 +87,12 @@ export const LinkButtonField = ({
   )
 
   useEffect(() => {
-    const redirectKey = ['redirect', section, declarationId].join('.')
     const redirectData = localStorage.getItem(redirectKey)
     if (redirectData) {
       setFieldValue(trigger.name, JSON.parse(redirectData))
       localStorage.removeItem(redirectKey)
     }
-  }, [declarationId, form, section, setFieldValue, trigger.name])
+  }, [redirectKey, setFieldValue, trigger.name])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
