@@ -71,6 +71,15 @@ const RECORD_READ_SCOPES = [
   SCOPES.RECORD_EXPORT_RECORDS
 ]
 
+const RECORD_SEARCH_SCOPES = [
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_MARRIAGE,
+  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+]
+
 export const eventRouter = router({
   config: router({
     get: publicProcedure
@@ -236,6 +245,7 @@ export const eventRouter = router({
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
   search: publicProcedure
+    .use(requiresAnyOfScopes(RECORD_SEARCH_SCOPES))
     .input(QueryType)
     .query(async ({ input }) => getIndex(input))
 })
