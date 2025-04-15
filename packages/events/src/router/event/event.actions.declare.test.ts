@@ -51,6 +51,7 @@ test('Validation error message contains all the offending fields', async () => {
   const data = generator.event.actions.declare(event.id, {
     declaration: {
       'applicant.dob': '02-02',
+      'applicant.dobUnknown': false,
       'recommender.none': true
     }
   })
@@ -69,6 +70,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   const data = generator.event.actions.declare(event.id, {
     declaration: {
       'applicant.dob': '02-1-2024',
+      'applicant.dobUnknown': false,
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
       'recommender.none': true,
@@ -96,6 +98,7 @@ test('Skips required field validation when they are conditionally hidden', async
 
   const form = {
     'applicant.dob': '2024-02-01',
+    'applicant.dobUnknown': false,
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'recommender.none': true,
@@ -197,6 +200,7 @@ test('Prevents adding birth date in future', async () => {
 
   const form = {
     'applicant.dob': '2040-02-01',
+    'applicant.dobUnknown': false,
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'recommender.none': true,

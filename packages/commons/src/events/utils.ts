@@ -178,7 +178,7 @@ export function stripHiddenFields(
     }
 
     if (isOptionalUncheckedCheckbox(field, declaration)) {
-      return true
+      // return true
     }
 
     return !isFieldVisible(field, declaration)

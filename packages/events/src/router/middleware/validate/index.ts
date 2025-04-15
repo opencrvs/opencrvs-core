@@ -9,17 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   ActionUpdate,
   DeclarationUpdateActions,
   AnnotationActionType,
   EventConfig,
-  FieldConfig,
-  FieldUpdateValue,
-  getFieldValidationErrors,
-  Inferred,
   isPageVisible,
   isVerificationPage,
   annotationActions,
@@ -32,73 +27,18 @@ import {
   getCurrentEventState,
   stripHiddenFields,
   EventDocument,
-  getDeclarationFields,
   deepMerge,
-  IndexMap,
   deepDropNulls
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
 import { ActionMiddlewareOptions } from '@events/router/middleware/utils'
-
-function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
-  return formFields.reduce(
-    (
-      errorResults: {
-        message: string
-        id: string
-        value: FieldUpdateValue
-      }[],
-      field: FieldConfig
-    ) => {
-      const fieldErrors = getFieldValidationErrors({
-        field,
-        values: data
-      }).errors
-
-      if (fieldErrors.length === 0) {
-        return errorResults
-      }
-
-      // For backend, use the default message without translations.
-      const errormessageWithId = fieldErrors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value: data[field.id as keyof typeof data]
-      }))
-
-      return [...errorResults, ...errormessageWithId]
-    },
-    []
-  )
-}
-
-function getVerificationPageErrors(
-  verificationPageIds: string[],
-  data: ActionUpdate
-) {
-  return verificationPageIds
-    .map((pageId) => {
-      const value = data[pageId]
-      return typeof value !== 'boolean'
-        ? {
-            message: 'Verification page result is required',
-            id: pageId,
-            value
-          }
-        : null
-    })
-    .filter((error) => error !== null)
-}
-
-function throwWhenNotEmpty(errors: unknown[]) {
-  if (errors.length > 0) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: JSON.stringify(errors)
-    })
-  }
-}
+import {
+  getFormFieldErrors,
+  getInvalidUpdateKeys,
+  getVerificationPageErrors,
+  throwWhenNotEmpty
+} from './utils'
 
 function validateDeclarationUpdateAction({
   eventConfig,
@@ -111,66 +51,35 @@ function validateDeclarationUpdateAction({
   event: EventDocument
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
-  // @TODO: annotation is always specific to action. Is there ever a need for nulls?
+  // @TODO: annotation is always specific to action. Is there ever a need for null?
   annotation?: ActionUpdate
 }) {
-  /* Declaration update is a partial update. We validate updates based on conditional rules and data type rules.
-   * There might be a case where update includes bad data [say, a date not following zod.string().date()].
-   * When data is visible based on conditional rules, it might be that the data point gets hidden. Hidden data points are ignored
+  /*
+   * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
+   * We need to validate the update against the cleaned declaration, which is a merged version of the previous declaration and the update.
    */
 
-  // 1. validate declaration update data types
-  const allDeclarationFields = getDeclarationFields(eventConfig)
-
-  // 1.1. Create a map of all fields to validate against. For example, in birth there are > 100 fields.
-  const fieldMap = allDeclarationFields.reduce(
-    (acc: IndexMap<FieldConfig>, field) => ({
-      ...acc,
-      [field.id]: field
-    }),
-    {}
-  )
-
-  const validationErrors = Object.entries(declarationUpdate).flatMap(
-    ([key, value]) => {
-      const field = fieldMap[key]
-      if (!field) {
-        return [
-          {
-            message: `Field ${key} not found in declaration`,
-            id: key,
-            value
-          }
-        ]
-      }
-
-      return getFieldValidationErrors({
-        field,
-        values: declarationUpdate,
-        ignoreHiddenFields: true
-      }).errors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value
-      }))
-    }
-  )
-
-  if (validationErrors.length > 0) {
-    return validationErrors
-  }
-
-  // 2. Merge declaration update with previous declaration to validate based on conditional rules
+  // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
   const previousDeclaration = getCurrentEventState(event).declaration
   const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
   const declarationConfig = getDeclaration(eventConfig)
 
-  // 3. Clean declaration to remove hidden fields. Without additional checks, client could send an update, that would include only hidden fields. (e.g. conditional toggle between 2 fields, where the value is updated but not the toggle)
+  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed (e.g. conditional toggle between 2 fields, where the value is updated but not the toggle).
   const cleanedDeclaration = stripHiddenFields(
     getVisiblePagesFormFields(declarationConfig, completeDeclaration),
-    deepDropNulls(completeDeclaration)
+    completeDeclaration
   )
+
+  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid. Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
+  const invalidKeys = getInvalidUpdateKeys({
+    update: declarationUpdate,
+    cleaned: cleanedDeclaration
+  })
+
+  if (invalidKeys.length > 0) {
+    return invalidKeys
+  }
 
   // 4. Validate declaration update against conditional rules, taking into account conditional pages.
   const declarationErrors = declarationConfig.pages

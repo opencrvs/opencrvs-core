@@ -211,7 +211,7 @@ test('Action other than READ deletes draft', async () => {
   expect(draftEventsAfterRead.length).toBe(0)
 })
 
-test('partial declaration update accounts for conditionals not in payload', async () => {
+test('partial declaration update accounts for conditional field values not in payload', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -221,22 +221,25 @@ test('partial declaration update accounts for conditionals not in payload', asyn
     type: ActionType.DECLARE,
     declaration: {
       ...generator.event.actions.declare(originalEvent.id).declaration,
-      'applicant.age': 20,
-      'applicant.dob': undefined,
-      'applicant.dobUnknown': true
+      // overrides
+      'applicant.age': undefined,
+      'applicant.dob': '2000-11-30',
+      'applicant.dobUnknown': false
     },
     eventId: originalEvent.id,
     transactionId: '123-123-123'
   }
 
-  await client.event.actions.declare.request(declaration)
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id)
+  )
 
   await client.event.actions.validate.request({
     type: ActionType.VALIDATE,
     duplicates: [],
     declaration: {
-      'applicant.dobUnknown': false,
-      'applicant.dob': '2000-11-30'
+      'applicant.dobUnknown': true,
+      'applicant.age': 25
     },
     eventId: originalEvent.id,
     transactionId: '123-123-124'
@@ -244,5 +247,7 @@ test('partial declaration update accounts for conditionals not in payload', asyn
 
   const event = await client.event.get(originalEvent.id)
 
-  console.log(JSON.stringify(event))
+  const eventState = getCurrentEventState(event)
+
+  expect(eventState.declaration).toMatchSnapshot()
 })

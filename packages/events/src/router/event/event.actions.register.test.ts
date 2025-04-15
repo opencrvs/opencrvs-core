@@ -79,6 +79,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   const data = generator.event.actions.register(event.id, {
     declaration: {
       'applicant.dob': '02-1-2024',
+      'applicant.dobUnknown': false,
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
       'recommender.none': true,
@@ -140,6 +141,7 @@ test('Prevents adding birth date in future', async () => {
 
   const form = {
     'applicant.dob': '2040-02-01',
+    'applicant.dobUnknown': false,
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'recommender.none': true,

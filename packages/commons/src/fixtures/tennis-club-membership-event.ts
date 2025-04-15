@@ -783,7 +783,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: not(field('applicant.dobUnknown').isEqualTo(true))
+              conditional: field('applicant.dobUnknown').isFalsy()
             }
           ],
           label: {
@@ -795,6 +795,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         {
           id: 'applicant.dobUnknown',
           type: FieldType.CHECKBOX,
+          required: false,
           label: {
             defaultMessage: 'Exact date of birth unknown',
             description: 'This is the label for the field',
