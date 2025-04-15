@@ -16,7 +16,8 @@ import {
   isMinioUrl,
   User,
   CertificateTemplateConfig,
-  LanguageConfig
+  LanguageConfig,
+  EventConfig
 } from '@opencrvs/commons/client'
 
 import {
@@ -27,40 +28,42 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function replaceMinioUrlWithBase64(template: Record<string, any>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function recursiveTransform(obj: any) {
-    if (typeof obj !== 'object' || obj === null) {
-      return obj
+async function replaceMinioUrlWithBase64(
+  declaration: Record<string, any>,
+  config: EventConfig
+) {
+  const fileFieldIds = config.declaration.pages
+    .flatMap((page) => page.fields)
+    .filter((field) => field.type === 'FILE')
+    .map((field) => field.id)
+
+  for (const fieldId of fileFieldIds) {
+    const fieldValue = declaration[fieldId]
+    if (
+      fieldValue &&
+      typeof fieldValue === 'object' &&
+      'filename' in fieldValue &&
+      isMinioUrl(fieldValue.filename)
+    ) {
+      declaration[fieldId].filename = await fetchImageAsBase64(
+        // this should be a presigned minio url
+        fieldValue.filename
+      )
     }
-
-    const transformedObject = Array.isArray(obj) ? [...obj] : { ...obj }
-
-    for (const key in obj) {
-      const value = obj[key]
-      if (typeof value === 'string' && isMinioUrl(value)) {
-        transformedObject[key] = await fetchImageAsBase64(value)
-      } else if (typeof value === 'object') {
-        transformedObject[key] = await recursiveTransform(value)
-      } else {
-        transformedObject[key] = value
-      }
-    }
-
-    return transformedObject
   }
-  return recursiveTransform(template)
+  return declaration
 }
 
 export const usePrintableCertificate = ({
   event,
+  config,
   locations,
   users,
   certificateConfig,
   language
 }: {
   event: EventDocument
+  config: EventConfig
   locations: Location[]
   users: User[]
   certificateConfig?: CertificateTemplateConfig
@@ -95,7 +98,21 @@ export const usePrintableCertificate = ({
   const handleCertify = async (updatedEvent: EventDocument) => {
     const currentEventState = getCurrentEventState(updatedEvent)
     const base64ReplacedTemplate = await replaceMinioUrlWithBase64(
-      currentEventState.declaration
+      currentEventState.declaration,
+      config
+    )
+
+    const base64ReplacedUsersWithSignature = await Promise.all(
+      users.map(async (user) => {
+        if (user.signatureFile && isMinioUrl(user.signatureFile)) {
+          const base64Signature = await fetchImageAsBase64(user.signatureFile)
+          return {
+            ...user,
+            signatureFile: base64Signature
+          }
+        }
+        return user
+      })
     )
 
     const compiledSvg = compileSvg({
@@ -106,7 +123,7 @@ export const usePrintableCertificate = ({
         preview: false
       },
       locations,
-      users,
+      users: base64ReplacedUsersWithSignature,
       language
     })
 

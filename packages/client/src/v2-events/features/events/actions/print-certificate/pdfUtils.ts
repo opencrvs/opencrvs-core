@@ -29,7 +29,8 @@ import {
   EventIndex,
   EventState,
   User,
-  LanguageConfig
+  LanguageConfig,
+  AddressFieldValue
 } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -148,53 +149,96 @@ export function compileSvg({
     }
   )
 
-  Handlebars.registerHelper('findUserById', function (u: User[], id: string) {
-    const user = u.find((usr) => usr.id === id)
-
-    return user ? getUsersFullName(user.name, 'en') : ''
-  })
-
   Handlebars.registerHelper(
-    'findAddressByJsonString',
-    function (
-      jsonString: string,
-      addressPartName:
-        | 'country'
-        | 'addressType'
-        | 'province'
-        | 'district'
-        | 'urbanOrRural'
-        | 'town'
-        | 'village'
-        | 'residentialArea'
-        | 'street'
-        | 'number'
-        | 'zipCode'
-    ) {
-      const address = JSON.parse(jsonString)
-
-      address.district =
-        locations.find((loc) => loc.id === address.district)?.name ?? ''
-      address.province =
-        locations.find((loc) => loc.id === address.province)?.name ?? ''
-
-      address.country = intl.formatMessage({
-        id: `countries.${address.country}`,
-        defaultMessage: 'Farajaland',
-        description: 'Country name'
-      })
-      return address[addressPartName]
+    'findUserById',
+    function (id: string, propertyName: keyof User) {
+      const user = users.find((usr) => usr.id === id)
+      // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+      switch (propertyName) {
+        case 'name':
+          return user ? getUsersFullName(user.name, 'en') : ''
+        default:
+          return user ? user[propertyName] : ''
+      }
     }
   )
 
   Handlebars.registerHelper(
-    'findAddressByLocationById',
+    'pickAddressPartByJsonString',
     function (
-      id: string,
+      jsonString: string,
+      addressPartName: keyof AddressFieldValue,
+      optionalAddressPartName: keyof AddressFieldValue
+    ) {
+      function resolveLocation(id: string): string {
+        return locations.find((loc) => loc.id === id)?.name ?? ''
+      }
+      const address: AddressFieldValue = JSON.parse(jsonString)
+      let addressFieldWithResolvedValue: AddressFieldValue
+      const base = {
+        country: intl.formatMessage({
+          id: `countries.${address.country}`,
+          defaultMessage: 'Farajaland',
+          description: 'Country name'
+        }),
+        addressType: address.addressType
+      }
+
+      if (address.addressType === 'DOMESTIC') {
+        const common = {
+          ...base,
+          province: resolveLocation(address.province),
+          district: resolveLocation(address.district),
+          urbanOrRural: address.urbanOrRural
+        }
+
+        if (address.urbanOrRural === 'URBAN') {
+          addressFieldWithResolvedValue = {
+            ...common,
+            town: address.town ?? '',
+            residentialArea: address.residentialArea ?? '',
+            street: address.street ?? '',
+            number: address.number ?? '',
+            zipCode: address.zipCode ?? '',
+            addressType: 'DOMESTIC'
+          }
+        } else {
+          // RURAL
+          addressFieldWithResolvedValue = {
+            ...common,
+            village: address.village ?? '',
+            addressType: 'DOMESTIC'
+          }
+        }
+      } else {
+        // International
+        addressFieldWithResolvedValue = {
+          ...base,
+          state: resolveLocation(address.state),
+          district2: resolveLocation(address.district2),
+          cityOrTown: address.cityOrTown ?? '',
+          addressLine1: address.addressLine1 ?? '',
+          addressLine2: address.addressLine2 ?? '',
+          addressLine3: address.addressLine3 ?? '',
+          postcodeOrZip: address.postcodeOrZip ?? '',
+          addressType: 'INTERNATIONAL'
+        }
+      }
+      return (
+        addressFieldWithResolvedValue[addressPartName] ||
+        addressFieldWithResolvedValue[optionalAddressPartName]
+      )
+    }
+  )
+
+  Handlebars.registerHelper(
+    'pickAddressPartByLocationId',
+    function (
+      locationId: string,
       addressPartName: 'location' | 'district' | 'province' | 'country'
     ) {
       const address = { country: '', province: '', district: '', location: '' }
-      const location = locations.find((loc) => loc.id === id)
+      const location = locations.find((loc) => loc.id === locationId)
       address.location = location ? location.name : ''
 
       const district = locations.find((loc) => loc.id === location?.partOf)
