@@ -15,10 +15,6 @@ services:
       - './data/mongo:/data/db'
 
   redis:
-    image: docker.io/bitnami/valkey:8.1
-    restart: unless-stopped
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - '6379:6379'
 

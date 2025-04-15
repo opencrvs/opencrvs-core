@@ -16,11 +16,7 @@ services:
     logging:
       driver: 'none'
 
-  valkey:
-    image: docker.io/bitnami/valkey:8.1
-    restart: unless-stopped
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+  redis:
     ports:
       - '6379:6379'
     logging:
