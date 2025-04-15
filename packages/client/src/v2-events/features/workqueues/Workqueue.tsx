@@ -33,7 +33,7 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
-import { Link as TextButton } from '@opencrvs/components'
+import { Pagination, Link as TextButton } from '@opencrvs/components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -115,6 +115,7 @@ function Workqueue({
   offset: number
   eventConfigs: EventConfig[]
 }) {
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
@@ -135,6 +136,7 @@ function Workqueue({
   }
 
   const workqueue = validEvents
+    .slice((currentPageNumber - 1) * limit, currentPageNumber * limit)
     .filter((event) => eventConfigs.some((e) => e.id === event.type))
     /*
      * Apply pending drafts to the event index.
@@ -299,6 +301,13 @@ function Workqueue({
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
       />
+      {validEvents.length > limit && (
+        <Pagination
+          currentPage={currentPageNumber}
+          totalPages={Math.ceil(validEvents.length / limit)}
+          onPageChange={(page) => setCurrentPageNumber(page)}
+        />
+      )}
       <FabContainer>
         <Link to={ROUTES.V2.EVENTS.CREATE.path}>
           <FloatingActionButton
