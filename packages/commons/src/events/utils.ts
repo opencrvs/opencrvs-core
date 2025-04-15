@@ -228,10 +228,10 @@ export function isVerificationPage(
   return page.type === PageTypes.enum.VERIFICATION
 }
 
-export function deepMerge(
-  currentDocument: ActionUpdate,
-  actionDocument: ActionUpdate
-) {
+export function deepMerge<T extends Record<string, unknown>>(
+  currentDocument: T,
+  actionDocument: T
+): T {
   return mergeWith(
     currentDocument,
     actionDocument,
