@@ -768,7 +768,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         },
         {
           id: 'applicant.dob',
-          type: 'DATE',
+          type: FieldType.DATE,
           required: true,
           conditionals: [],
           validation: [

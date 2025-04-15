@@ -55,6 +55,9 @@ type AllProps = {
 } & IntlShapeProps &
   UsedFormikProps
 
+/**
+ * Fields are explicitly defined here to avoid confusion between what is actually used out of all the passed props.
+ */
 type UsedFormikProps = Pick<
   FormikProps<EventState>,
   | 'values'

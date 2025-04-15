@@ -59,7 +59,6 @@ export interface FormFieldGeneratorProps {
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
-  // See if we need all of these
   /** Current active form that is in edit mode. */
   form: EventState
   /** Latest declaration before any editing has happened. Used for context. @TODO: Check whether declaration and initialValues could be mutually exclusive. */
@@ -74,7 +73,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
 
-    // @todo: does this need to be done separately from initial values?
     const formikCompatibleForm = makeFormFieldIdsFormikCompatible(props.form)
 
     const formikOnChange = (values: EventState) => {
