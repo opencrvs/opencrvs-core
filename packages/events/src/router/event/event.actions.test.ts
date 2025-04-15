@@ -217,19 +217,6 @@ test('partial declaration update accounts for conditional field values not in pa
 
   const originalEvent = await client.event.create(generator.event.create())
 
-  const declaration = {
-    type: ActionType.DECLARE,
-    declaration: {
-      ...generator.event.actions.declare(originalEvent.id).declaration,
-      // overrides
-      'applicant.age': undefined,
-      'applicant.dob': '2000-11-30',
-      'applicant.dobUnknown': false
-    },
-    eventId: originalEvent.id,
-    transactionId: '123-123-123'
-  }
-
   await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id)
   )
