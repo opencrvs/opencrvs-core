@@ -12,8 +12,23 @@
 import { ObjectId } from 'mongodb'
 import { ResolvedUser } from '@opencrvs/commons'
 import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
+import { env } from '@events/environment'
 
-export const getUsersById = async (ids: string[]) => {
+export async function getPresignedSingleUrl(filename: string, token: string) {
+  const url = `${env.DOCUMENTS_URL}/presigned-url`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ fileUri: filename }),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  const res = (await response.json()) as { presignedURL: string }
+  return res
+}
+
+export const getUsersById = async (ids: string[], token: string) => {
   const db = await userMgntDb.getClient()
 
   if (ids.length === 0) {
@@ -25,6 +40,7 @@ export const getUsersById = async (ids: string[]) => {
       _id: ObjectId
       name: ResolvedUser['name']
       role: string
+      signatureFile?: string
     }>('users')
     .find({
       _id: {
@@ -35,9 +51,29 @@ export const getUsersById = async (ids: string[]) => {
     })
     .toArray()
 
+  await Promise.all(
+    results.map(async (user) => {
+      if (user.signatureFile) {
+        try {
+          const { presignedURL } = await getPresignedSingleUrl(
+            user.signatureFile,
+            token
+          )
+          user.signatureFile = presignedURL || user.signatureFile
+        } catch (err) {
+          console.error(
+            `Failed to get presigned URL for ${user.signatureFile}`,
+            err
+          )
+        }
+      }
+    })
+  )
+
   return results.map((user) => ({
     id: user._id.toString(),
     name: user.name,
-    role: user.role
+    role: user.role,
+    signatureFile: user.signatureFile
   }))
 }
