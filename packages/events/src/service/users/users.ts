@@ -41,7 +41,7 @@ export const getUsersById = async (ids: string[], token: string) => {
       _id: ObjectId
       name: ResolvedUser['name']
       role: string
-      signatureFile?: string
+      signatureUrl?: string
     }>('users')
     .find({
       _id: {
@@ -54,17 +54,17 @@ export const getUsersById = async (ids: string[], token: string) => {
 
   await Promise.all(
     results.map(async (user) => {
-      if (user.signatureFile) {
+      if (user.signatureUrl) {
         try {
           const { presignedURL } = await getPresignedSingleUrl(
-            user.signatureFile,
+            user.signatureUrl,
             token
           )
-          user.signatureFile = presignedURL || user.signatureFile
+          user.signatureUrl = presignedURL || user.signatureUrl
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error(
-            `Failed to get presigned URL for ${user.signatureFile}`,
+            `Failed to get presigned URL for ${user.signatureUrl}`,
             err
           )
         }
@@ -76,6 +76,6 @@ export const getUsersById = async (ids: string[], token: string) => {
     id: user._id.toString(),
     name: user.name,
     role: user.role,
-    signatureFile: user.signatureFile
+    signatureUrl: user.signatureUrl
   }))
 }

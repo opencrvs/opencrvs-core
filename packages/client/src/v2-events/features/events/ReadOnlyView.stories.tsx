@@ -110,7 +110,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 id: '6780dbf7a263c6515c7b97d2',
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
-                signatureFile: undefined
+                signatureUrl: undefined
               }
             ]
           })
@@ -166,7 +166,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                   }
                 ],
                 role: 'SOCIAL_WORKER',
-                signatureFile: undefined
+                signatureUrl: undefined
               }
             ]
           })

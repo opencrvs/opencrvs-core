@@ -90,6 +90,7 @@ export const usePrintableCertificate = ({
     templateString: certificateConfig.svg,
     $state: {
       ...modifiedState,
+      // this field is used in certificate to show the place of certification
       updatedAtLocation: event.actions.find(
         (a) => a.type === ActionType.CREATE && 'createdAtLocation' in a
       )?.createdAtLocation
@@ -111,11 +112,11 @@ export const usePrintableCertificate = ({
 
     const base64ReplacedUsersWithSignature = await Promise.all(
       users.map(async (user) => {
-        if (user.signatureFile && isMinioUrl(user.signatureFile)) {
-          const base64Signature = await fetchImageAsBase64(user.signatureFile)
+        if (user.signatureUrl && isMinioUrl(user.signatureUrl)) {
+          const base64Signature = await fetchImageAsBase64(user.signatureUrl)
           return {
             ...user,
-            signatureFile: base64Signature
+            signatureUrl: base64Signature
           }
         }
         return user
@@ -126,6 +127,7 @@ export const usePrintableCertificate = ({
       templateString: certificateConfig.svg,
       $state: {
         ...currentEventState,
+        // this field is used in certificate to show the place of certification
         updatedAtLocation: event.actions
           .reverse()
           .find(

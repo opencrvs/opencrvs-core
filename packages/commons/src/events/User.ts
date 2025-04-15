@@ -13,5 +13,5 @@ export type User = {
   id: string
   name: { use: string; given: string[]; family: string }[]
   role: string
-  signatureFile?: string
+  signatureUrl?: string
 }
