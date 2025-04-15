@@ -61,11 +61,12 @@ function validateDeclarationUpdateAction({
 
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
   const previousDeclaration = getCurrentEventState(event).declaration
+  // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
   const declarationConfig = getDeclaration(eventConfig)
 
-  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed (e.g. conditional toggle between 2 fields, where the value is updated but not the toggle).
+  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed (e.g. when dob is unknown anduser has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
     completeDeclaration
