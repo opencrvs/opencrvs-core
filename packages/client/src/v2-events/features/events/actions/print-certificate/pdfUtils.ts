@@ -30,7 +30,12 @@ import {
   EventState,
   User,
   LanguageConfig,
-  AddressFieldValue
+  AddressFieldValue,
+  GeographicalArea,
+  AddressType,
+  GenericAddressUpdateValue,
+  UrbanAddressUpdateValue,
+  RuralAddressUpdateValue
 } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -113,7 +118,7 @@ export function compileSvg({
   language
 }: {
   templateString: string
-  $state: EventIndex & { updatedAtLocation?: string }
+  $state: EventIndex
   $declaration: EventState
   locations: Location[]
   users: User[]
@@ -153,13 +158,12 @@ export function compileSvg({
     'findUserById',
     function (id: string, propertyName: keyof User) {
       const user = users.find((usr) => usr.id === id)
-      // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
-      switch (propertyName) {
-        case 'name':
-          return user ? getUsersFullName(user.name, 'en') : ''
-        default:
-          return user ? user[propertyName] : ''
+      if (!user) {
+        return ''
+      } else if (propertyName === 'name') {
+        return getUsersFullName(user.name, 'en')
       }
+      return user[propertyName]
     }
   )
 
@@ -184,7 +188,7 @@ export function compileSvg({
         addressType: address.addressType
       }
 
-      if (address.addressType === 'DOMESTIC') {
+      if (address.addressType === AddressType.DOMESTIC) {
         const common = {
           ...base,
           province: resolveLocation(address.province),
@@ -192,7 +196,7 @@ export function compileSvg({
           urbanOrRural: address.urbanOrRural
         }
 
-        if (address.urbanOrRural === 'URBAN') {
+        if (address.urbanOrRural === GeographicalArea.URBAN) {
           addressFieldWithResolvedValue = {
             ...common,
             town: address.town ?? '',
@@ -200,15 +204,17 @@ export function compileSvg({
             street: address.street ?? '',
             number: address.number ?? '',
             zipCode: address.zipCode ?? '',
-            addressType: 'DOMESTIC'
-          }
+            addressType: AddressType.DOMESTIC,
+            urbanOrRural: GeographicalArea.URBAN
+          } satisfies UrbanAddressUpdateValue
         } else {
           // RURAL
           addressFieldWithResolvedValue = {
             ...common,
             village: address.village ?? '',
-            addressType: 'DOMESTIC'
-          }
+            addressType: AddressType.DOMESTIC,
+            urbanOrRural: GeographicalArea.RURAL
+          } satisfies RuralAddressUpdateValue
         }
       } else {
         // International
@@ -221,8 +227,8 @@ export function compileSvg({
           addressLine2: address.addressLine2 ?? '',
           addressLine3: address.addressLine3 ?? '',
           postcodeOrZip: address.postcodeOrZip ?? '',
-          addressType: 'INTERNATIONAL'
-        }
+          addressType: AddressType.INTERNATIONAL
+        } satisfies GenericAddressUpdateValue
       }
       return (
         addressFieldWithResolvedValue[addressPartName] ||
@@ -256,6 +262,8 @@ export function compileSvg({
     }
   )
 
+  // This helper is used to print translated message in certificate svg template.
+  // ex: <tspan>{{ intl 'constants' (lookup $declaration "child.gender") }}</tspan>
   Handlebars.registerHelper(
     'intl',
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -277,6 +285,8 @@ export function compileSvg({
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
 
+  // This helper is used to compare two values and return true or false.
+  // It is used in the template to conditionally render content based on the comparison.
   Handlebars.registerHelper(
     'ifCond',
     function (

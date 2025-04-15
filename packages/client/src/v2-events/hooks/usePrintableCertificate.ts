@@ -10,7 +10,6 @@
  */
 
 import { Location } from '@events/service/locations/locations'
-import { useSelector } from 'react-redux'
 import {
   EventDocument,
   getCurrentEventState,
@@ -18,7 +17,8 @@ import {
   User,
   CertificateTemplateConfig,
   LanguageConfig,
-  EventConfig
+  EventConfig,
+  FieldType
 } from '@opencrvs/commons/client'
 
 import { ActionType } from '@opencrvs/commons/client'
@@ -38,7 +38,7 @@ async function replaceMinioUrlWithBase64(
 ) {
   const fileFieldIds = config.declaration.pages
     .flatMap((page) => page.fields)
-    .filter((field) => field.type === 'FILE')
+    .filter((field) => field.type === FieldType.FILE)
     .map((field) => field.id)
 
   for (const fieldId of fileFieldIds) {
@@ -73,7 +73,6 @@ export const usePrintableCertificate = ({
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
-  const userDetails = useSelector(getUserDetails)
   const currentState = getCurrentEventState(event)
   const modifiedState = {
     ...currentState,
@@ -90,11 +89,7 @@ export const usePrintableCertificate = ({
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
-    $state: {
-      ...modifiedState,
-      // this field is used in certificate to show the place of certification
-      updatedAtLocation: userDetails?.primaryOffice.id
-    },
+    $state: modifiedState,
     $declaration: currentState.declaration,
     locations,
     users,
@@ -125,17 +120,7 @@ export const usePrintableCertificate = ({
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
-      $state: {
-        ...currentEventState,
-        // this field is used in certificate to show the place of certification
-        updatedAtLocation: event.actions
-          .reverse()
-          .find(
-            (a) =>
-              a.type === ActionType.PRINT_CERTIFICATE &&
-              'createdAtLocation' in a
-          )?.createdAtLocation
-      },
+      $state: currentEventState,
       $declaration: {
         ...base64ReplacedTemplate,
         preview: false

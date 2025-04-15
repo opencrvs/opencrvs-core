@@ -254,19 +254,8 @@ export function Review() {
             transactionId: uuid(),
             type: ActionType.PRINT_CERTIFICATE
           })
-        const printAction = response.actions
-          .reverse()
-          .find((a) => a.type === ActionType.PRINT_CERTIFICATE)
-
-        if (printAction) {
-          await handleCertify({
-            ...fullEvent,
-            actions: [...fullEvent.actions, printAction]
-          })
-          navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-        } else {
-          throw new Error('Print action not found in the response')
-        }
+        await handleCertify(fullEvent)
+        navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console
