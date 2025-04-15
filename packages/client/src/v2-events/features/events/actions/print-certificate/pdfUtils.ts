@@ -262,6 +262,7 @@ export function compileSvg({
     function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
       // If even one of the parts is undefined, then return empty string
       const idParts = args.slice(0, -1)
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (idParts.some((part) => part === undefined)) {
         return ''
       }

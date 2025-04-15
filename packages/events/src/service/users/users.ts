@@ -15,7 +15,7 @@ import { ResolvedUser } from '@opencrvs/commons'
 import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
 import { env } from '@events/environment'
 
-export async function getPresignedSingleUrl(filename: string, token: string) {
+async function getPresignedSingleUrl(filename: string, token: string) {
   const url = `${env.DOCUMENTS_URL}/presigned-url`
   const response = await fetch(url, {
     method: 'POST',
