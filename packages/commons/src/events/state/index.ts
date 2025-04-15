@@ -74,6 +74,7 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.UNASSIGN) {
       return null
     }
+
     return user
   }, null)
 }

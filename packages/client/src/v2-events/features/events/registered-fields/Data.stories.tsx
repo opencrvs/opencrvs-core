@@ -42,13 +42,13 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        eventConfig={tennisClubMembershipEvent}
-        eventDeclarationData={{
+        declaration={{
           'applicant.firstname': 'Tanya',
           'applicant.id': '2370934578',
           'applicant.surname': 'McQuaid',
           'applicant.dob': '1975-01-02'
         }}
+        eventConfig={tennisClubMembershipEvent}
         fields={[
           {
             id: 'storybook.data',
@@ -107,12 +107,12 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        eventConfig={tennisClubMembershipEvent}
-        eventDeclarationData={{
+        declaration={{
           'recommender.none': true,
           'recommender.firstname': 'John',
           'applicant.firstname': 'Rasheed'
         }}
+        eventConfig={tennisClubMembershipEvent}
         fields={[
           {
             id: 'storybook.data',
@@ -161,12 +161,12 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        eventConfig={tennisClubMembershipEvent}
-        eventDeclarationData={{
+        declaration={{
           'recommender.none': false,
           'recommender.firstname': 'John',
           'applicant.firstname': 'Rasheed'
         }}
+        eventConfig={tennisClubMembershipEvent}
         fields={[
           {
             id: 'storybook.data',

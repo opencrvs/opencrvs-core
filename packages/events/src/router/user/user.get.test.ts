@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { TRPCError } from '@trpc/server'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Throws error if user not found with id', async () => {
   const { user } = await setupTestCase()
