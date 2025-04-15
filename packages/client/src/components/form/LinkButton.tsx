@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHttp } from './http'
 import { Button, getTheme, Icon } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
-import { redirect, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useDeclaration } from '@client/declarations/selectors'
 import { writeDeclaration } from '@client/declarations'
 
