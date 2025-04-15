@@ -16,6 +16,7 @@ import {
   getLocations
 } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { Select } from './Select'
 
 function useAdminLocations(partOf: string) {
@@ -71,7 +72,10 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
 
 function useStringifier() {
   const locations = useSelector(getLocations)
-  return (value: string) => (value ? locations[value].name : '__EMPTY__')
+  return (value: string): string => {
+    const name = locations[value]?.name
+    return name ?? EMPTY_TOKEN
+  }
 }
 
 export const AdministrativeArea = {
