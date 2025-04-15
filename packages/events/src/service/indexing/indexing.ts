@@ -31,12 +31,12 @@ import {
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import {
+  buildElasticQueryFromSearchPayload,
   decodeEventIndex,
   DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId,
-  generateQuery
+  encodeFieldId
 } from './utils'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
@@ -311,7 +311,7 @@ export async function getIndex(eventParams: QueryType) {
       throw new Error('No search params provided')
     }
 
-    const query = generateQuery(queryParams)
+    const query = buildElasticQueryFromSearchPayload(queryParams)
 
     if (!eventType) {
       throw new Error('No eventType provided')

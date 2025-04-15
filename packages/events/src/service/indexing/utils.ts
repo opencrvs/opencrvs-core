@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { estypes } from '@elastic/elasticsearch'
-import {
-  EventSearchIndex,
-  EventIndex,
-  QueryType
-} from '@opencrvs/commons/events'
+import { EventIndex, QueryType } from '@opencrvs/commons/events'
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -62,25 +58,70 @@ export function declarationReference(fieldName: string) {
  * Generates an Elasticsearch query to search within `document.declaration`
  * using the provided search payload.
  */
-export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
+export function generateQuery(
+  event: Record<
+    string,
+    | { type: 'exact' | 'fuzzy'; term: string }
+    | { type: 'anyOf'; terms: string[] }
+    | { type: 'range'; gte: string; lte: string }
+  >
+): estypes.QueryDslQueryContainer {
   const must: estypes.QueryDslQueryContainer[] = Object.entries(event).map(
-    ([key, value]) => ({
-      match: {
-        [declarationReference(encodeFieldId(key))]: value
+    ([key, value]) => {
+      const field = `declaration.${encodeFieldId(key)}`
+
+      if (value.type === 'exact') {
+        return {
+          match: {
+            [field]: value.term
+          }
+        }
       }
-    })
+
+      if (value.type === 'fuzzy') {
+        return {
+          fuzzy: {
+            [field]: {
+              value: value.term
+            }
+          }
+        }
+      }
+
+      if (value.type === 'anyOf') {
+        return {
+          terms: {
+            [field]: value.terms
+          }
+        }
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (value.type === 'range') {
+        return {
+          range: {
+            [field]: {
+              gte: value.gte,
+              lte: value.lte
+            }
+          }
+        }
+      }
+
+      throw new Error(`Unsupported query type: ${value.type}`)
+    }
   )
 
   return {
     bool: {
       must
     }
-  } as estypes.SearchRequest['query']
+  } as estypes.QueryDslQueryContainer
 }
 
 export function buildElasticQueryFromSearchPayload(input: QueryType) {
   const buildClause = (clause: any) => {
-    const must: any[] = []
+    const must: estypes.QueryDslQueryContainer[] = []
 
     if (clause.status) {
       if (clause.status.type === 'anyOf') {
@@ -165,17 +206,15 @@ export function buildElasticQueryFromSearchPayload(input: QueryType) {
 
     if (clause.data) {
       const dataQuery = generateQuery(clause.data)
-      if (dataQuery && 'bool' in dataQuery) {
-        const innerMust = dataQuery.bool?.must
-        if (Array.isArray(innerMust)) {
-          must.push(...innerMust)
-        } else if (innerMust) {
-          must.push(innerMust)
-        }
+      const innerMust = dataQuery.bool?.must
+      if (Array.isArray(innerMust)) {
+        must.push(...innerMust)
+      } else if (innerMust) {
+        must.push(innerMust)
       }
     }
 
-    return { bool: { must } }
+    return { bool: { must } } as estypes.QueryDslQueryContainer
   }
 
   if (input.type === 'and') {

@@ -27,6 +27,8 @@ type Condition =
   | { type: 'exact'; term: string }
   | { type: 'range'; gte: string; lte: string }
 
+const ADVANCED_SEARCH_KEY = 'and'
+
 function buildCondition(type: string, value: string): Condition {
   switch (type) {
     case 'FUZZY':
@@ -94,7 +96,8 @@ export const SearchResultIndex = () => {
   const formattedSearchParams = buildDataCondition(searchParams, currentEvent)
   const queryData = searchEvent.useSuspenseQuery(
     eventType,
-    formattedSearchParams
+    formattedSearchParams,
+    ADVANCED_SEARCH_KEY
   )
   const workqueueId = 'all'
   const workqueueConfig =
