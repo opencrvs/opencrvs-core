@@ -12,10 +12,7 @@
 import React from 'react'
 import { Field, FieldProps, FormikProps } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  MessageDescriptor
-} from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -24,8 +21,8 @@ import {
   FieldValue,
   isFieldEnabled,
   isFieldVisible,
-  EventConfig,
-  AddressType
+  AddressType,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { TEXT } from '@client/forms'
 import {
@@ -35,34 +32,18 @@ import {
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible
 } from '@client/v2-events/components/forms/utils'
-import { Errors } from '@client/v2-events/components/forms/validation'
 import {
+  FormGeneratorProps,
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
 import { GeneratedInputField } from './GeneratedInputField'
 
-/* eslint-disable */
-
-interface ExposedProps {
-  fields: FieldConfig[]
-  id: string
-  fieldsToShowValidationErrors?: FieldConfig[]
-  setAllFieldsDirty: boolean
-  onChange: (values: EventState) => void
-  formData: Record<string, FieldValue>
-  requiredErrorMessage?: MessageDescriptor
-  onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: EventState
-  eventConfig?: EventConfig
-  declaration?: EventState
-  readonlyMode?: boolean
-}
-
-type AllProps = ExposedProps &
-  IntlShapeProps &
-  FormikProps<EventState> & {
-    className?: string
+type AllProps = FormikProps<EventState> & {
+  className?: string
+} & FormGeneratorProps &
+  IntlShapeProps & {
+    errors: Record<string, { errors: { message: TranslationConfig }[] }>
   }
 
 const fadeIn = keyframes`
@@ -100,7 +81,7 @@ export class FormSectionComponent extends React.Component<AllProps> {
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     if (this.props.setAllFieldsDirty) {
       this.showValidationErrors(this.props.fields)
     }
@@ -113,16 +94,18 @@ export class FormSectionComponent extends React.Component<AllProps> {
         const focusedElementId = window.location.hash.replace('#', '')
         let focusedElement = document.querySelector(
           `input[id*="${focusedElementId}"]`
-        ) as HTMLElement
+        ) as HTMLElement | null
+
         if (focusedElement === null) {
           // Handling for Select
           focusedElement = document.querySelector(
             `${window.location.hash} input`
-          ) as HTMLElement
-          focusedElement && focusedElement.focus()
+          ) as HTMLElement | null
+
+          focusedElement?.focus()
         } else {
           // Handling for Input
-          focusedElement && focusedElement.focus()
+          focusedElement.focus()
         }
       }, 0)
     }
@@ -137,13 +120,13 @@ export class FormSectionComponent extends React.Component<AllProps> {
   }
 
   setFieldValuesWithDependency = (
-    fieldName: string,
+    fieldId: string,
     value: FieldValue | undefined
   ) => {
     const updatedValues = cloneDeep(this.props.values)
-    set(updatedValues, fieldName, value)
+    set(updatedValues, fieldId, value)
 
-    if (fieldName === 'country') {
+    if (fieldId === 'country') {
       set(
         updatedValues,
         'addressType',
@@ -152,8 +135,8 @@ export class FormSectionComponent extends React.Component<AllProps> {
           : AddressType.INTERNATIONAL
       )
     }
-    const updateDependentFields = (fieldName: string) => {
-      const dependentFields = getDependentFields(this.props.fields, fieldName)
+    const updateDependentFields = (id: string) => {
+      const dependentFields = getDependentFields(this.props.fields, id)
       for (const field of dependentFields) {
         if (
           !field.defaultValue ||
@@ -169,15 +152,16 @@ export class FormSectionComponent extends React.Component<AllProps> {
         updateDependentFields(field.id)
       }
     }
-    updateDependentFields(fieldName)
+
+    updateDependentFields(fieldId)
 
     void this.props.setValues(updatedValues)
   }
 
-  resetDependentSelectValues = (fieldName: string) => {
+  resetDependentSelectValues = (fieldId: string) => {
     const fields = this.props.fields
     const fieldsToReset = fields.filter(
-      (field) => field.type === TEXT && field.dependsOn?.includes(fieldName)
+      (field) => field.type === TEXT && field.dependsOn?.includes(fieldId)
     )
 
     fieldsToReset.forEach((fieldToReset) => {
@@ -199,25 +183,23 @@ export class FormSectionComponent extends React.Component<AllProps> {
 
     const language = this.props.intl.locale
 
-    const errors = makeFormFieldIdsFormikCompatible(
-      this.props.errors as unknown as Errors
-    )
+    const errors = makeFormFieldIdsFormikCompatible(this.props.errors)
 
     const fields = fieldsWithDotIds.map((field) => ({
       ...field,
       id: makeFormFieldIdFormikCompatible(field.id)
     }))
+
     const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
 
     return (
       <section className={className}>
         {fields.map((field) => {
           let error: string
-          const fieldErrors = errors[field.id] && errors[field.id].errors
+          const visibleError = errors[field.id]?.errors[0]?.message
 
-          if (fieldErrors && fieldErrors.length > 0) {
-            const [firstError] = fieldErrors
-            error = intl.formatMessage(firstError.message)
+          if (visibleError) {
+            error = intl.formatMessage(visibleError)
           }
 
           const formData = makeFormikFieldIdsOpenCRVSCompatible(
@@ -239,26 +221,18 @@ export class FormSectionComponent extends React.Component<AllProps> {
             >
               <Field name={field.id}>
                 {}
-                {(formikFieldProps: FieldProps<any>) => {
+                {(formikFieldProps: FieldProps) => {
                   return (
                     <GeneratedInputField
                       fieldDefinition={field}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
                       setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
                       disabled={isDisabled}
                       error={isDisabled ? '' : error}
                       eventConfig={this.props.eventConfig}
-                      fields={fields}
                       formData={allData}
                       readonlyMode={readonlyMode}
                       touched={touched[field.id] ?? false}
-                      values={values}
-                      onUploadingStateChanged={
-                        this.props.onUploadingStateChanged
-                      }
                     />
                   )
                 }}

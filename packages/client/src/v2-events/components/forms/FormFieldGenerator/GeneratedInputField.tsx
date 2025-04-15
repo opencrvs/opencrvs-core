@@ -10,7 +10,7 @@
  */
 
 import React, { useCallback } from 'react'
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
   EventState,
   FieldConfig,
@@ -40,7 +40,6 @@ import {
   isEmailFieldType,
   isDataFieldType,
   EventConfig,
-  EventIndex,
   getDeclarationFields
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -69,27 +68,8 @@ import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileIn
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 
-/* eslint-disable */
-
-interface ExposedProps {
-  fields: FieldConfig[]
-  id: string
-  fieldsToShowValidationErrors?: FieldConfig[]
-  setAllFieldsDirty: boolean
-  onChange: (values: EventState) => void
-  formData: Record<string, FieldValue>
-  requiredErrorMessage?: MessageDescriptor
-  onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: EventState
-  eventConfig?: EventConfig
-  declaration?: EventState
-  readonlyMode?: boolean
-}
-
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
-  fields: FieldConfig[]
-  values: EventState
   /**@todo - figure out when to use this rather than onChange handler */
   setFieldValue: (name: string, value: FieldValue | undefined) => void
   onClick?: () => void
@@ -103,7 +83,6 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
    * onChange doesn't set the touched state
    */
   onBlur: (e: React.FocusEvent) => void
-  resetDependentSelectValues: (name: string) => void
   value: FieldValue
   touched: boolean
   /**
@@ -112,10 +91,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   error: string
   formData: EventState
   disabled?: boolean
-  onUploadingStateChanged?: (isUploading: boolean) => void
-  requiredErrorMessage?: MessageDescriptor
   eventConfig?: EventConfig
-  event?: EventIndex
   readonlyMode?: boolean
 }
 
@@ -134,14 +110,16 @@ export const GeneratedInputField = React.memo(
     readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
+    // If label is hidden or default message is empty, we don't need to render label
+    const label =
+      fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
+        ? undefined
+        : intl.formatMessage(fieldDefinition.label)
 
     const inputFieldProps = {
       id: fieldDefinition.id,
       // If label is hidden or default message is empty, we don't need to render label
-      label:
-        fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
-          ? undefined
-          : intl.formatMessage(fieldDefinition.label),
+      label,
       required: fieldDefinition.required,
       disabled: fieldDefinition.disabled || readonlyMode,
       error,
@@ -156,7 +134,7 @@ export const GeneratedInputField = React.memo(
       value,
       disabled: disabled || fieldDefinition.disabled || readonlyMode,
       error: Boolean(error),
-      touched: Boolean(touched),
+      touched,
       placeholder:
         fieldDefinition.placeholder &&
         intl.formatMessage(fieldDefinition.placeholder)
@@ -204,13 +182,8 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isParagraphFieldType(field)) {
-      const label = fieldDefinition.label as unknown as MessageDescriptor & {
-        values: Record<string, string>
-      }
-      const values = label.values || {}
-
-      const message = intl.formatMessage(label, {
-        ...values,
+      // @todo: is this even needed?
+      const message = intl.formatMessage(fieldDefinition.label, {
         [fieldDefinition.id]: field.value
       })
 
@@ -384,9 +357,7 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isSignatureFieldType(field)) {
-      return readonlyMode ? (
-        <></>
-      ) : (
+      return readonlyMode ? null : (
         <InputField {...inputFieldProps}>
           <SignatureUploader
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
@@ -399,17 +370,16 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isAdministrativeAreaFieldType(field)) {
+      const partOfRef = field.config.configuration.partOf?.$declaration
+
+      const partOf =
+        partOfRef && makeFormikFieldIdsOpenCRVSCompatible(formData)[partOfRef]
+
       return (
         <InputField {...inputFieldProps}>
           <AdministrativeArea.Input
             {...field.config}
-            partOf={
-              (field.config.configuration.partOf?.$declaration &&
-                (makeFormikFieldIdsOpenCRVSCompatible(formData)[
-                  field.config.configuration.partOf.$declaration
-                ] as string | undefined | null)) ??
-              null
-            }
+            partOf={typeof partOf === 'string' ? partOf : null}
             setFieldValue={setFieldValue}
             value={field.value}
           />
@@ -461,6 +431,7 @@ export const GeneratedInputField = React.memo(
             error={inputFieldProps.error}
             maxFileSize={field.config.configuration.maxFileSize}
             options={field.config.options}
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />
