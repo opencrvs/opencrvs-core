@@ -46,7 +46,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 const fields = [
   {
     id: 'tennis-member.dob',
-    type: 'DATE',
+    type: FieldType.DATE,
     required: true,
     label: {
       defaultMessage: 'Date of birth',
