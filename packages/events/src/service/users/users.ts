@@ -11,6 +11,7 @@
 
 import { ObjectId } from 'mongodb'
 import fetch from 'node-fetch'
+import { z } from 'zod'
 import { ResolvedUser } from '@opencrvs/commons'
 import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
 import { env } from '@events/environment'
@@ -25,8 +26,17 @@ async function getPresignedSingleUrl(filename: string, token: string) {
       'Content-Type': 'application/json'
     }
   })
-  const res = (await response.json()) as { presignedURL: string }
-  return res
+  if (!response.ok) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Failed to get presigned URL for ${filename}: ${response.statusText}`
+    )
+    return undefined
+  }
+  const res = z
+    .object({ presignedURL: z.string() })
+    .safeParse(await response.json())
+  return res.data?.presignedURL
 }
 
 export const getUsersById = async (ids: string[], token: string) => {
@@ -56,7 +66,7 @@ export const getUsersById = async (ids: string[], token: string) => {
     results.map(async (user) => {
       if (user.signatureUrl) {
         try {
-          const { presignedURL } = await getPresignedSingleUrl(
+          const presignedURL = await getPresignedSingleUrl(
             user.signatureUrl,
             token
           )

@@ -186,6 +186,7 @@ export async function createEvent({
     transactionId,
     createdAt: now,
     updatedAt: now,
+    updatedAtLocation: createdAtLocation,
     trackingId,
     actions: [
       {
@@ -324,12 +325,13 @@ export async function addAction(
     status: status
   }
 
-  await db
-    .collection<EventDocument>('events')
-    .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: transactionId } },
-      { $push: { actions: action }, $set: { updatedAt: now } }
-    )
+  await db.collection<EventDocument>('events').updateOne(
+    { id: eventId, 'actions.transactionId': { $ne: transactionId } },
+    {
+      $push: { actions: action },
+      $set: { updatedAt: now, updatedAtLocation: createdAtLocation }
+    }
+  )
 
   const drafts = await getDraftsForAction(eventId, createdBy, input.type)
 
