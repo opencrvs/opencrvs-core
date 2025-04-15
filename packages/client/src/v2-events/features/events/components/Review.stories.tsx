@@ -22,7 +22,9 @@ import {
   defineDeclarationForm,
   field,
   FieldType,
-  TENNIS_CLUB_DECLARATION_FORM
+  generateTranslationConfig,
+  TENNIS_CLUB_DECLARATION_FORM,
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -140,9 +142,21 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
     const [modal, openModal] = useModal()
 
     async function handleDeclaration() {
-      await openModal<boolean | null>((close) => (
-        <Review.ActionModal.Accept action="Declare" close={close} />
-      ))
+      await openModal<boolean | null>((close) => {
+        return (
+          <Review.ActionModal.Accept
+            action="Declare"
+            close={close}
+            copy={{
+              description: generateTranslationConfig('description'),
+              title: generateTranslationConfig('title'),
+              onCancel: generateTranslationConfig('onCancel'),
+              onConfirm: generateTranslationConfig('onConfirm'),
+              eventLabel: tennisClubMembershipEvent.label
+            }}
+          />
+        )
+      })
     }
 
     async function handleRejection() {

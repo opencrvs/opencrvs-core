@@ -48,7 +48,7 @@ function mapFieldsToValues(
   }, {})
 }
 
-export interface FormFieldGeneratorProps {
+interface FormFieldGeneratorProps {
   /** form id */
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
