@@ -55,7 +55,7 @@ interface FormFieldGeneratorProps {
   setAllFieldsDirty: boolean
   onChange: (values: EventState) => void
   readonlyMode?: boolean
-
+  className?: string
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -126,6 +126,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           }, [touched])
           return (
             <FormSectionComponent
+              className={props.className}
               declaration={props.declaration}
               // @TODO: Formik does not type errors well. Actual error message differs from the type.
               // This was previously cast on FormSectionComponent level.

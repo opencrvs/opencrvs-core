@@ -26,7 +26,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { TRPCProvider } from '@client/v2-events/trpc'
 
 const meta: Meta<typeof FormFieldGenerator> = {
-  title: 'FormFieldGenerator/interaction',
+  title: 'FormFieldGenerator/Interaction',
   args: { onChange: fn() },
   decorators: [
     (Story) => (
