@@ -20,6 +20,7 @@ import {
   EventConfig
 } from '@opencrvs/commons/client'
 
+import { ActionType } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
   compileSvg,
@@ -29,6 +30,7 @@ import {
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
 async function replaceMinioUrlWithBase64(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   declaration: Record<string, any>,
   config: EventConfig
 ) {
@@ -86,7 +88,12 @@ export const usePrintableCertificate = ({
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
-    $state: modifiedState,
+    $state: {
+      ...modifiedState,
+      updatedAtLocation: event.actions.find(
+        (a) => a.type === ActionType.CREATE && 'createdAtLocation' in a
+      )?.createdAtLocation
+    },
     $declaration: currentState.declaration,
     locations,
     users,
@@ -117,7 +124,16 @@ export const usePrintableCertificate = ({
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
-      $state: currentEventState,
+      $state: {
+        ...currentEventState,
+        updatedAtLocation: event.actions
+          .reverse()
+          .find(
+            (a) =>
+              a.type === ActionType.PRINT_CERTIFICATE &&
+              'createdAtLocation' in a
+          )?.createdAtLocation
+      },
       $declaration: {
         ...base64ReplacedTemplate,
         preview: false

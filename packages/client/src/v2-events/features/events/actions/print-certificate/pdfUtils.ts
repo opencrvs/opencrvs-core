@@ -113,7 +113,7 @@ export function compileSvg({
   language
 }: {
   templateString: string
-  $state: EventIndex
+  $state: EventIndex & { updatedAtLocation?: string }
   $declaration: EventState
   locations: Location[]
   users: User[]

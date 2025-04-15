@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable import/no-relative-parent-imports */
 import { ActionType } from '../ActionType'
 import {
   Action,
@@ -178,7 +177,6 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     modifiedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
-    updatedAtLocation: latestAction.createdAtLocation,
     declaration: aggregateActionDeclarations(activeActions),
     trackingId: event.trackingId,
     registrationNumber
