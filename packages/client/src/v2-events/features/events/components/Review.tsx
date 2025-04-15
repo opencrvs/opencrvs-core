@@ -691,23 +691,26 @@ function EditModal({
 function AcceptActionModal({
   copy,
   close,
-  action,
-  incomplete
+  action
 }: {
-  copy?: {
-    onCancel?: MessageDescriptor
-    onConfirm?: MessageDescriptor
-    title?: MessageDescriptor
-    description?: MessageDescriptor
+  copy: {
+    onCancel: MessageDescriptor
+    onConfirm: MessageDescriptor
+    title: MessageDescriptor
+    description: MessageDescriptor
+    eventLabel: MessageDescriptor
   }
   close: (result: boolean | null) => void
   action: string
-  incomplete?: boolean
 }) {
   const intl = useIntl()
+  // @TODO: Revisit this. There must be a better way to have the event name as part of string.
+  const eventName = intl.formatMessage(copy.eventLabel).toLocaleLowerCase()
+
   return (
     <ResponsiveModal
       autoHeight
+      show
       showHeaderBorder
       actions={[
         <Button
@@ -718,9 +721,7 @@ function AcceptActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(
-            copy?.onCancel || reviewMessages.actionModalCancel
-          )}
+          {intl.formatMessage(copy.onCancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -730,28 +731,20 @@ function AcceptActionModal({
             close(true)
           }}
         >
-          {intl.formatMessage(
-            copy?.onConfirm || reviewMessages.actionModalPrimaryAction,
-            {
-              action
-            }
-          )}
+          {intl.formatMessage(copy.onConfirm)}
         </Button>
       ]}
       handleClose={() => close(null)}
-      show={true}
       title={intl.formatMessage(
-        copy?.title || reviewMessages.actionModalTitle,
-        { action }
+        copy.title,
+        // @TODO: Consider whether every formatted message should have access to global variables
+        // currently it seems we are arbitrarily deciding which ones do.
+        { event: eventName }
       )}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(
-            incomplete
-              ? reviewMessages.actionModalIncompleteDescription
-              : copy?.description || reviewMessages.actionModalDescription
-          )}
+          {intl.formatMessage(copy.description)}
         </Text>
       </Stack>
     </ResponsiveModal>
