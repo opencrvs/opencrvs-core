@@ -54,30 +54,30 @@ export function Pages({
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
-  const currentPageIdx = visiblePages.findIndex((p) => p.id === pageId)
-
-  const page = visiblePages.find((p) => p.id === pageId)
+  const page = visiblePages[pageIdx]
 
   if (!page) {
     throw new Error('Page not found.')
   }
 
   function onNextPage() {
-    const nextPage = visiblePages[currentPageIdx + 1]
+    const nextPage = visiblePages[pageIdx + 1]
 
+    // If there is a next page on the form available, navigate to it
     if (nextPage) {
       onPageChange(nextPage.id)
       document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
       return
     }
 
+    // If we are continuing on the last page, we should submit
     onSubmit()
     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
     return
   }
 
   function onPreviousPage() {
-    const previousPage = visiblePages[currentPageIdx - 1]
+    const previousPage = visiblePages[pageIdx - 1]
 
     if (previousPage) {
       onPageChange(previousPage.id)
