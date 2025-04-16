@@ -27,7 +27,7 @@ import {
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { createFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -488,14 +488,15 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
   )
 }
 
-function useStringifier() {
+function useStringifier(
+  formDataStringifier: ReturnType<typeof createFormDataStringifier>
+) {
   return function useAddressStringifier(value: AddressFieldValue) {
     /*
      * As address is just a collection of other form fields, its string formatter just redirects the data back to
      * form data stringifier so location and other form fields can handle stringifying their own data
      */
-    const stringifier = useFormDataStringifier()
-    return stringifier(ALL_ADDRESS_FIELDS, value as EventState)
+    return formDataStringifier(ALL_ADDRESS_FIELDS, value as EventState)
   }
 }
 

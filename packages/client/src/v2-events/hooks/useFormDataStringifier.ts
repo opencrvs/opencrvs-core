@@ -27,9 +27,11 @@ import {
   SelectCountry as Country
 } from '@client/v2-events/features/events/registered-fields'
 
-function useFieldStringifier() {
+function useFieldStringifier(
+  formDataStringifier: ReturnType<typeof createFormDataStringifier>
+) {
   const stringifyLocation = AdministrativeArea.useStringifier()
-  const stringifyAddress = Address.useStringifier()
+  const stringifyAddress = Address.useStringifier(formDataStringifier)
   const stringifyRadioGroup = RadioGroup.useStringifier()
   const stringifyCountry = Country.useStringifier()
 
@@ -64,12 +66,12 @@ export interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
 
-/**
- *
- * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
- */
-export const useFormDataStringifier = () => {
-  const stringifier = useFieldStringifier()
+export function createFormDataStringifier(
+  fieldStringifier: (
+    fieldConfig: FieldConfig,
+    value: FieldValue
+  ) => string | RecursiveStringRecord
+) {
   return (
     formFields: FieldConfig[],
     values: EventState
@@ -81,9 +83,24 @@ export const useFormDataStringifier = () => {
       if (!fieldConfig) {
         throw new Error(`Field ${key} not found in form config`)
       }
-      stringifiedValues[key] = stringifier(fieldConfig, value)
+      stringifiedValues[key] = fieldStringifier(fieldConfig, value)
     }
 
     return stringifiedValues
   }
+}
+
+/**
+ *
+ * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
+ */
+export const useFormDataStringifier = () => {
+  const formDataStringifier = createFormDataStringifier(
+    (fieldConfig, value) => {
+      return 'placeholder function'
+    }
+  )
+  const fieldStringifier = useFieldStringifier(formDataStringifier)
+  const finalFormDataStringifier = createFormDataStringifier(fieldStringifier)
+  return finalFormDataStringifier
 }
