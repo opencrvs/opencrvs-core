@@ -10,22 +10,19 @@
  */
 
 import { MessageDescriptor } from 'react-intl'
-import {
-  EventState,
-  FieldConfig,
-  FieldValue,
-  EventConfig
-} from '@opencrvs/commons/client'
+import { EventState, FieldConfig, EventConfig } from '@opencrvs/commons/client'
 import { IndexMap } from '@client/utils'
 import {
   FIELD_SEPARATOR,
   makeFormFieldIdFormikCompatible
 } from '@client/v2-events/components/forms/utils'
 
-/*
+/**
  * Formik has a feature that automatically nests all form keys that have a dot in them.
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
+ *
+ * @example {'foo.bar.baz': 'quix' } => {'foo____bar____baz': 'quix' }
  */
 export function makeFormFieldIdsFormikCompatible<T>(
   data: Record<string, T>
@@ -47,20 +44,4 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
       value
     ])
   )
-}
-
-/** Shared between multiple components */
-export interface FormGeneratorProps {
-  fields: FieldConfig[]
-  id: string
-  fieldsToShowValidationErrors?: FieldConfig[]
-  setAllFieldsDirty: boolean
-  onChange: (values: EventState) => void
-  formData: Record<string, FieldValue>
-  requiredErrorMessage?: MessageDescriptor
-  onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: EventState
-  eventConfig?: EventConfig
-  declaration?: EventState
-  readonlyMode?: boolean
 }

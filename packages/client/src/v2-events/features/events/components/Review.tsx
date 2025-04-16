@@ -484,7 +484,7 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
-                  formData={annotation}
+                  form={annotation}
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
