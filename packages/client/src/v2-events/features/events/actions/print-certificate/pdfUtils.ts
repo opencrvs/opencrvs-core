@@ -30,17 +30,13 @@ import {
   EventState,
   User,
   LanguageConfig,
-  AddressFieldValue,
-  GeographicalArea,
-  AddressType,
-  GenericAddressUpdateValue,
-  UrbanAddressUpdateValue,
-  RuralAddressUpdateValue
+  AddressFieldValue
 } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
+import { Address } from '@client/v2-events/features/events/registered-fields'
 
 interface FontFamilyTypes {
   normal: string
@@ -168,68 +164,15 @@ export function compileSvg({
   )
 
   Handlebars.registerHelper(
-    'pickAddressPartByJsonString',
+    'addressLookup',
     function (
-      jsonString: string,
+      addressJson: string,
       addressPartName: keyof AddressFieldValue,
       optionalAddressPartName: keyof AddressFieldValue
     ) {
-      function resolveLocation(id: string): string {
-        return locations.find((loc) => loc.id === id)?.name ?? ''
-      }
-      const address: AddressFieldValue = JSON.parse(jsonString)
-      let addressFieldWithResolvedValue: AddressFieldValue
-      const base = {
-        country: intl.formatMessage({
-          id: `countries.${address.country}`,
-          defaultMessage: 'Farajaland',
-          description: 'Country name'
-        }),
-        addressType: address.addressType
-      }
-
-      if (address.addressType === AddressType.DOMESTIC) {
-        const common = {
-          ...base,
-          province: resolveLocation(address.province),
-          district: resolveLocation(address.district),
-          urbanOrRural: address.urbanOrRural
-        }
-
-        if (address.urbanOrRural === GeographicalArea.URBAN) {
-          addressFieldWithResolvedValue = {
-            ...common,
-            town: address.town ?? '',
-            residentialArea: address.residentialArea ?? '',
-            street: address.street ?? '',
-            number: address.number ?? '',
-            zipCode: address.zipCode ?? '',
-            addressType: AddressType.DOMESTIC,
-            urbanOrRural: GeographicalArea.URBAN
-          } satisfies UrbanAddressUpdateValue
-        } else {
-          // RURAL
-          addressFieldWithResolvedValue = {
-            ...common,
-            village: address.village ?? '',
-            addressType: AddressType.DOMESTIC,
-            urbanOrRural: GeographicalArea.RURAL
-          } satisfies RuralAddressUpdateValue
-        }
-      } else {
-        // International
-        addressFieldWithResolvedValue = {
-          ...base,
-          state: resolveLocation(address.state),
-          district2: resolveLocation(address.district2),
-          cityOrTown: address.cityOrTown ?? '',
-          addressLine1: address.addressLine1 ?? '',
-          addressLine2: address.addressLine2 ?? '',
-          addressLine3: address.addressLine3 ?? '',
-          postcodeOrZip: address.postcodeOrZip ?? '',
-          addressType: AddressType.INTERNATIONAL
-        } satisfies GenericAddressUpdateValue
-      }
+      const stringifyAddress = Address.useStringifier()
+      const address = JSON.parse(addressJson)
+      const addressFieldWithResolvedValue = stringifyAddress(address)
       return (
         addressFieldWithResolvedValue[addressPartName] ||
         addressFieldWithResolvedValue[optionalAddressPartName]
