@@ -497,9 +497,9 @@ function useStringifier() {
    * As address is just a collection of other form fields, its string formatter just redirects the data back to
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
-  const stringifier = formDataStringifierFactory(fieldStringifier)
+  const formStringifier = formDataStringifierFactory(fieldStringifier)
   return (value: AddressFieldValue) => {
-    return stringifier(ALL_ADDRESS_FIELDS, value as EventState)
+    return formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
   }
 }
 
