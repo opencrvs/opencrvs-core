@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`allows sending partial payload as NOTIFY action 1`] = `
+exports[`partial declaration update accounts for conditional field values not in payload 1`] = `
 {
   "applicant.address": {
     "addressType": "DOMESTIC",
@@ -14,13 +14,16 @@ exports[`allows sending partial payload as NOTIFY action 1`] = `
     "urbanOrRural": "URBAN",
     "zipCode": "123456",
   },
-  "applicant.age": 19,
+  "applicant.age": 25,
   "applicant.dobUnknown": true,
+  "applicant.email": "test@opencrvs.org",
+  "applicant.firstname": "applicant.firstname-TEXT-0",
   "applicant.image": {
     "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     "originalFilename": "abcd.png",
     "type": "image/png",
   },
+  "applicant.surname": "applicant.surname-TEXT-1",
   "recommender.none": true,
 }
 `;

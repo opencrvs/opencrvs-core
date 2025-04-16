@@ -65,7 +65,7 @@ export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        formData={formData}
+        form={formData}
         id="my-form"
         setAllFieldsDirty={false}
         onChange={(data) => {
@@ -106,7 +106,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             }
           }
         ]}
-        formData={formData}
+        form={formData}
         id="my-form"
         setAllFieldsDirty={false}
         onChange={(data) => {
