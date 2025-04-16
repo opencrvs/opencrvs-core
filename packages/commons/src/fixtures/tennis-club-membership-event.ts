@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConditional, field, not } from '../conditionals/conditionals'
+import {
+  defineConditional,
+  field,
+  never,
+  not
+} from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
 import {
   defineActionForm,
@@ -800,7 +805,13 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             defaultMessage: 'Exact date of birth unknown',
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dobUnknown.label'
-          }
+          },
+          conditionals: [
+            {
+              type: ConditionalType.DISPLAY_ON_REVIEW,
+              conditional: never()
+            }
+          ]
         },
         {
           id: 'applicant.age',
