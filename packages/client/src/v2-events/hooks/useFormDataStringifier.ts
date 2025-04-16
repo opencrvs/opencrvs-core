@@ -97,7 +97,11 @@ export function createFormDataStringifier(
 export const useFormDataStringifier = () => {
   const formDataStringifier = createFormDataStringifier(
     (fieldConfig, value) => {
-      return 'placeholder function'
+      /**
+       * This would only trigger if an `Address` field exists within an `AddressFieldValue`.
+       * However, `AddressFieldValue` does not contain an `Address` field. Therefore, this should never be triggered.
+       */
+      return 'Should never trigger'
     }
   )
   const fieldStringifier = useFieldStringifier(formDataStringifier)
