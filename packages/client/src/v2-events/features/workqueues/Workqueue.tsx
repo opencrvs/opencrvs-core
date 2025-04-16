@@ -128,7 +128,7 @@ function Workqueue({
 
   const validEvents = orderBy(
     events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
-    ['updatedAt'],
+    ['modifiedAt'],
     ['desc']
   )
 
@@ -226,7 +226,7 @@ function Workqueue({
       }
     })
 
-  const [sortedCol, setSortedCol] = useState('updatedAt')
+  const [sortedCol, setSortedCol] = useState('modifiedAt')
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
   function onColumnClick(columnName: string) {
