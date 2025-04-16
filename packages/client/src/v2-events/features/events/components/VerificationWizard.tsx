@@ -40,7 +40,6 @@ const messages = defineMessages({
 export const VerificationWizard = ({
   children,
   currentPage,
-  totalPages,
   onSubmit,
   pageTitle,
   onNextPage,
@@ -54,9 +53,6 @@ export const VerificationWizard = ({
 }) => {
   const intl = useIntl()
   const [cancelModal, openCancelModal] = useModal()
-
-  const onContinue =
-    currentPage + 1 < totalPages && onNextPage ? onNextPage : onSubmit
 
   const onCancelButtonClick = () => {
     void openCancelModal<void>((close) => (
@@ -77,7 +73,7 @@ export const VerificationWizard = ({
             onClick={() => {
               onVerifyAction(false)
               close()
-              return onContinue()
+              return onNextPage()
             }}
           >
             {intl.formatMessage(messages.confirm)}
@@ -128,7 +124,7 @@ export const VerificationWizard = ({
               type="positive"
               onClick={() => {
                 onVerifyAction(true)
-                onContinue()
+                onNextPage()
               }}
             >
               <Check color="white" />

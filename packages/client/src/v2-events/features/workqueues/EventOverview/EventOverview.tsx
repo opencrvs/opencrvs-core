@@ -35,11 +35,9 @@ import {
   flattenEventIndex,
   getUserIdsFromActions
 } from '@client/v2-events/utils'
-import {
-  RecursiveStringRecord,
-  useFormDataStringifier
-} from '@client/v2-events/hooks/useFormDataStringifier'
+import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { RecursiveStringRecord } from '@client/v2-events/hooks/useSimpleFieldStringifier'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 

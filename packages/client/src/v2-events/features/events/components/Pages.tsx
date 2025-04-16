@@ -20,7 +20,6 @@ import {
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { usePagination } from '@client/v2-events/hooks/usePagination'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
 /**
@@ -29,11 +28,11 @@ import { FormWizard } from './FormWizard'
  */
 export function Pages({
   form,
-  pageId,
   showReviewButton,
   formPages,
   onPageChange,
   onSubmit,
+  pageId,
   continueButtonText,
   setFormData,
   disableContinue = false,
@@ -55,33 +54,39 @@ export function Pages({
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
+  const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
 
-  const {
-    page: currentPage,
-    next,
-    previous,
-    total
-  } = usePagination(visiblePages.length, Math.max(pageIdx, 0))
-  const page = visiblePages[currentPage]
-
+  // If page changes, scroll to the top of the page using the anchor element ID
   useEffect(() => {
-    const pageChanged = visiblePages[currentPage].id !== pageId
+    document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+  }, [pageId])
 
-    if (pageChanged) {
-      onPageChange(visiblePages[currentPage].id)
+  function onNextPage() {
+    const nextPageIdx = pageIdx + 1
+    const nextPage =
+      nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
 
-      // We use the main content anchor id to scroll to the top of the frame when page changes
-      document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+    // If there is a next page on the form available, navigate to it.
+    // Otherwise, submit the form.
+    return nextPage ? onPageChange(nextPage.id) : onSubmit()
+  }
+
+  function onPreviousPage() {
+    const previousPageIdx = pageIdx - 1
+    const previousPage =
+      previousPageIdx >= 0 ? visiblePages[previousPageIdx] : undefined
+
+    if (previousPage) {
+      return onPageChange(previousPage.id)
     }
-  }, [pageId, currentPage, visiblePages, onPageChange])
+  }
 
   const wizardProps = {
-    currentPage,
+    currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
     showReviewButton,
-    totalPages: total,
-    onNextPage: next,
-    onPreviousPage: previous,
+    onNextPage,
+    onPreviousPage,
     onSubmit
   }
 

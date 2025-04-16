@@ -62,6 +62,21 @@ test('stored events can be deleted', async () => {
   )
 })
 
+test('declared event can not be deleted', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  await expect(
+    client.event.delete({ eventId: event.id })
+  ).rejects.toThrowErrorMatchingSnapshot()
+})
+
 describe('check unreferenced draft attachments are deleted while final action submission', () => {
   const deleteUnreferencedDraftAttachmentsMock = vi.fn()
   const fileExistMock = vi.fn()
