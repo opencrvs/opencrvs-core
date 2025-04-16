@@ -54,14 +54,12 @@ export function Pages({
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
-  const page = visiblePages[pageIdx]
-
-  if (!page) {
-    throw new Error('Page not found.')
-  }
+  const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
 
   function onNextPage() {
-    const nextPage = visiblePages[pageIdx + 1]
+    const nextPageIdx = pageIdx + 1
+    const nextPage =
+      nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
 
     // If there is a next page on the form available, navigate to it
     if (nextPage) {
@@ -77,7 +75,9 @@ export function Pages({
   }
 
   function onPreviousPage() {
-    const previousPage = visiblePages[pageIdx - 1]
+    const previousPageIdx = pageIdx - 1
+    const previousPage =
+      previousPageIdx >= 0 ? visiblePages[previousPageIdx] : undefined
 
     if (previousPage) {
       onPageChange(previousPage.id)
