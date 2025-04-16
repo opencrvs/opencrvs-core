@@ -1,0 +1,155 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { useNavigate } from 'react-router-dom'
+import {
+  ActionType,
+  TranslationConfig,
+  getActionsByStatus,
+  getAvailableActionsByScopes,
+  Scope,
+  EventIndex,
+  getUUID
+} from '@opencrvs/commons/client'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { ROUTES } from '@client/v2-events/routes'
+import { useAuthentication } from '@client/utils/userUtils'
+
+/**
+ * @returns a list of action menu items based on the event state and scopes provided.
+ */
+export function useGetActionMenuItems({
+  event,
+  scopes
+}: {
+  event: EventIndex
+  scopes: Scope[]
+}) {
+  const events = useEvents()
+  const navigate = useNavigate()
+  const authentication = useAuthentication()
+  /**
+   * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
+   * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
+   */
+  const { refetch: refetchEvent } = events.getEvent.useQuery(event.id, false)
+
+  if (!authentication) {
+    throw new Error('Authentication is not available but is required')
+  }
+
+  const actionsByStatus = getActionsByStatus(event)
+  const availableActions = getAvailableActionsByScopes(actionsByStatus, scopes)
+
+  const config = {
+    [ActionType.READ]: {
+      label: {
+        id: 'v2.action.view.record',
+        description: 'Label for view record',
+        defaultMessage: 'View record'
+      },
+      onClick: (eventId: string) =>
+        navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
+    },
+    [ActionType.ASSIGN]: {
+      label: {
+        defaultMessage: 'Assign',
+        description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
+        id: 'v2.action.assign.label'
+      },
+      onClick: async (eventId: string) => {
+        await events.actions.assignment.assign.mutate({
+          eventId,
+          assignedTo: authentication.sub,
+          refetchEvent
+        })
+      }
+    },
+    [ActionType.UNASSIGN]: {
+      label: {
+        defaultMessage: 'Unassign',
+        description: `Label for the ${ActionType.UNASSIGN} action in the action menu`,
+        id: 'v2.action.unassign.label'
+      },
+      onClick: (eventId: string) => {
+        events.actions.assignment.unassign.mutate({
+          eventId,
+          transactionId: getUUID(),
+          assignedTo: null
+        })
+      }
+    },
+    [ActionType.DECLARE]: {
+      label: {
+        defaultMessage: 'Declare',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'v2.event.birth.action.declare.label'
+      },
+      onClick: (eventId: string) =>
+        navigate(ROUTES.V2.EVENTS.DECLARE.buildPath({ eventId }))
+    },
+    [ActionType.VALIDATE]: {
+      label: {
+        defaultMessage: 'Validate',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'v2.event.birth.action.validate.label'
+      },
+      onClick: (eventId: string) =>
+        navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
+    },
+    [ActionType.REGISTER]: {
+      label: {
+        defaultMessage: 'Register',
+        description: 'Label for review record button in dropdown menu',
+        id: 'v2.event.birth.action.register.label'
+      },
+      onClick: (eventId: string) =>
+        navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
+    },
+    [ActionType.PRINT_CERTIFICATE]: {
+      label: {
+        defaultMessage: 'Print certificate',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'v2.event.birth.action.collect-certificate.label'
+      },
+      onClick: (eventId: string) =>
+        navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId }))
+    }
+  } satisfies Record<
+    string,
+    {
+      label: TranslationConfig
+      onClick: (eventId: string) => void | Promise<void>
+    }
+  >
+
+  return availableActions.reduce(
+    (
+      acc: {
+        label: TranslationConfig
+        onClick: (eventId: string) => void
+        type: ActionType
+      }[],
+      action
+    ) => {
+      // @ts-expect-error --
+      const actionItemConfig = config[action as string]
+      if (!actionItemConfig) {
+        return acc
+      }
+
+      return [...acc, { ...actionItemConfig, actionType: action }]
+    },
+    []
+  )
+}
