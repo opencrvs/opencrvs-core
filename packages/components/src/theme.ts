@@ -11,6 +11,7 @@
 import { colors, gradients, shadows } from './colors'
 import { fonts, family as fontFamily } from './fonts'
 import { grid } from './grid'
+import { spacing } from './spacing'
 
 export const getTheme = () => ({
   colors,
@@ -18,7 +19,8 @@ export const getTheme = () => ({
   shadows,
   fonts,
   fontFamily,
-  grid
+  grid,
+  spacing
 })
 
 export type ITheme = ReturnType<typeof getTheme>
