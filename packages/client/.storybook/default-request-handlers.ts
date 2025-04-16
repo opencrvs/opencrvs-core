@@ -1127,7 +1127,7 @@ export const handlers = {
           id: '6780dbf7a263c6515c7b97d2',
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
           role: 'LOCAL_REGISTRAR',
-          signatureUrl: undefined
+          signatureFileName: undefined
         }
       ]
     })
