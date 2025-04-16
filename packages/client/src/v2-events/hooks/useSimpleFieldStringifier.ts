@@ -28,7 +28,7 @@ export interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
 
-export type FieldStringifier = (
+type FieldStringifier = (
   fieldConfig: FieldConfig,
   value: FieldValue
 ) => string | RecursiveStringRecord
