@@ -10,36 +10,10 @@
  */
 
 import { ObjectId } from 'mongodb'
-import fetch from 'node-fetch'
-import { z } from 'zod'
 import { ResolvedUser } from '@opencrvs/commons'
 import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
-import { env } from '@events/environment'
 
-async function getPresignedSingleUrl(filename: string, token: string) {
-  const url = `${env.DOCUMENTS_URL}/presigned-url`
-  const response = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ fileUri: filename }),
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  if (!response.ok) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Failed to get presigned URL for ${filename}: ${response.statusText}`
-    )
-    return undefined
-  }
-  const res = z
-    .object({ presignedURL: z.string() })
-    .safeParse(await response.json())
-  return res.data?.presignedURL
-}
-
-export const getUsersById = async (ids: string[], token: string) => {
+export const getUsersById = async (ids: string[]) => {
   const db = await userMgntDb.getClient()
 
   if (ids.length === 0) {
@@ -51,7 +25,7 @@ export const getUsersById = async (ids: string[], token: string) => {
       _id: ObjectId
       name: ResolvedUser['name']
       role: string
-      signatureUrl?: string
+      signatureFileName?: string
     }>('users')
     .find({
       _id: {
@@ -62,30 +36,10 @@ export const getUsersById = async (ids: string[], token: string) => {
     })
     .toArray()
 
-  await Promise.all(
-    results.map(async (user) => {
-      if (user.signatureUrl) {
-        try {
-          const presignedURL = await getPresignedSingleUrl(
-            user.signatureUrl,
-            token
-          )
-          user.signatureUrl = presignedURL || user.signatureUrl
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error(
-            `Failed to get presigned URL for ${user.signatureUrl}`,
-            err
-          )
-        }
-      }
-    })
-  )
-
   return results.map((user) => ({
     id: user._id.toString(),
     name: user.name,
     role: user.role,
-    signatureUrl: user.signatureUrl
+    signatureFileName: user.signatureFileName
   }))
 }

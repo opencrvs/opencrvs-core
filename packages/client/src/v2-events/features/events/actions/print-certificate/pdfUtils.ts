@@ -266,11 +266,14 @@ export function compileSvg({
   // ex: <tspan>{{ intl 'constants' (lookup $declaration "child.gender") }}</tspan>
   Handlebars.registerHelper(
     'intl',
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
+
+    function (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this: any,
+      ...args: [...(string | undefined)[], Handlebars.HelperOptions]
+    ) {
       // If even one of the parts is undefined, then return empty string
       const idParts = args.slice(0, -1)
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (idParts.some((part) => part === undefined)) {
         return ''
       }

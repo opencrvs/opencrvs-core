@@ -68,7 +68,7 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureUrl: 'signature.png'
+  signatureFileName: 'signature.png'
 }
 
 const declareEventDocument = generateEventDocument({

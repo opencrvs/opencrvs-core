@@ -15,8 +15,8 @@ import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 
 export const userRouter = router({
-  get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-    const [user] = await getUsersById([input], ctx.token)
+  get: publicProcedure.input(z.string()).query(async ({ input }) => {
+    const [user] = await getUsersById([input])
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!user) {
@@ -27,5 +27,5 @@ export const userRouter = router({
   }),
   list: publicProcedure
     .input(z.array(z.string()))
-    .query(async ({ input, ctx }) => getUsersById(input, ctx.token))
+    .query(async ({ input }) => getUsersById(input))
 })
