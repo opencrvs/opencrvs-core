@@ -66,7 +66,8 @@ export function Pages({
     const nextPage =
       nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
 
-    // If there is a next page on the form available, navigate to it
+    // If there is a next page on the form available, navigate to it.
+    // Otherwise, submit the form.
     return nextPage ? onPageChange(nextPage.id) : onSubmit()
   }
 
