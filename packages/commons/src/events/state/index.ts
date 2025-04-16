@@ -114,6 +114,12 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
   }, {})
 }
 
+type NonNullableDeep<T> = T extends (infer U)[]
+  ? NonNullableDeep<U>[]
+  : T extends object
+    ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+    : NonNullable<T>
+
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values
  *
@@ -121,9 +127,9 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
  * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
  *
  */
-export function deepDropNulls<T>(obj: T): T {
+export function deepDropNulls<T>(obj: T): NonNullableDeep<T> {
   if (Array.isArray(obj)) {
-    return obj as T
+    return obj.map(deepDropNulls) as NonNullableDeep<T>
   }
 
   if (obj !== null && typeof obj === 'object') {
@@ -134,10 +140,10 @@ export function deepDropNulls<T>(obj: T): T {
         ;(acc as any)[key] = cleanedValue
       }
       return acc
-    }, {} as T)
+    }, {} as NonNullableDeep<T>)
   }
 
-  return obj
+  return obj as NonNullableDeep<T>
 }
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
