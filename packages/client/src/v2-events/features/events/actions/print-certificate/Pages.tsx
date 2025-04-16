@@ -85,8 +85,6 @@ export function Pages() {
         }),
         { replace: true }
       )
-
-      document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
     }
   }, [pageId, currentPageId, navigate, eventId])
 
