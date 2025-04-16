@@ -102,7 +102,7 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        formData={formData}
+        form={formData}
         id="my-form"
         setAllFieldsDirty={false}
         onChange={(data) => {
@@ -176,7 +176,7 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        formData={formData}
+        form={formData}
         id="my-form"
         setAllFieldsDirty={false}
         onChange={(data) => {
