@@ -357,7 +357,10 @@ export async function addAction(
 
   if (action.type !== ActionType.READ) {
     await indexEvent(updatedEvent)
-    await deleteDraftsByEventId(eventId)
+
+    if (action.type !== ActionType.ASSIGN) {
+      await deleteDraftsByEventId(eventId)
+    }
   }
 
   return updatedEvent
