@@ -207,6 +207,10 @@ export const DraftShownInForm: Story = {
     await userEvent.click(await canvas.findByText(/Assign/))
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
+
+    // Giving some time for local state to update
+    await new Promise((resolve) => setTimeout(resolve, 1 * 1000))
+
     await userEvent.click(await canvas.findByText(/Send an application/))
 
     await expect(
