@@ -120,6 +120,7 @@ export function generateQuery(
 }
 
 export function buildElasticQueryFromSearchPayload(input: QueryType) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buildClause = (clause: any) => {
     const must: estypes.QueryDslQueryContainer[] = []
 
