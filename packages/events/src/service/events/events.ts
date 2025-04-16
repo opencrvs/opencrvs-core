@@ -198,6 +198,21 @@ export async function createEvent({
     ]
   })
 
+  const action: ActionDocument = {
+    type: ActionType.ASSIGN,
+    assignedTo: createdBy,
+    declaration: {},
+    createdBy,
+    createdAt: now,
+    createdAtLocation,
+    id,
+    status: ActionStatus.Accepted
+  }
+
+  await db
+    .collection<EventDocument>('events')
+    .updateOne({ id }, { $push: { actions: action }, $set: { updatedAt: now } })
+
   const event = await getEventById(id)
   await indexEvent(event)
 
