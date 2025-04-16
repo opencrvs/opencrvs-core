@@ -63,6 +63,7 @@ const fields = [
   {
     id: 'tennis-member.dobUnknown',
     type: FieldType.CHECKBOX,
+    required: false,
     label: {
       defaultMessage: 'Exact date of birth unknown',
       description: 'This is the label for the field',
@@ -74,7 +75,7 @@ const fields = [
     type: FieldType.NUMBER,
     required: true,
     label: {
-      defaultMessage: 'Age of tennis-member',
+      defaultMessage: 'Age of the member',
       description: 'This is the label for the field',
       id: 'v2.event.birth.action.declare.form.section.tennis-member.field.age.label'
     },
@@ -137,7 +138,7 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
           await canvas.findByText('Exact date of birth unknown')
         )
 
-        await canvas.findByText('Age of tennis-member')
+        await canvas.findByText('Age of the member')
 
         await expect(
           canvas.queryByText('Date of birth')
