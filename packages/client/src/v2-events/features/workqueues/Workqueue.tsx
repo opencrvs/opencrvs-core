@@ -126,8 +126,10 @@ function Workqueue({
   const navigate = useNavigate()
   const { width } = useWindowSize()
 
-  const validEvents = events.filter((event) =>
-    eventConfigs.some((e) => e.id === event.type)
+  const validEvents = orderBy(
+    events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
+    ['updatedAt'],
+    ['desc']
   )
 
   if (validEvents.length !== events.length) {
@@ -224,7 +226,7 @@ function Workqueue({
       }
     })
 
-  const [sortedCol, setSortedCol] = useState('createdAt')
+  const [sortedCol, setSortedCol] = useState('updatedAt')
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
   function onColumnClick(columnName: string) {
