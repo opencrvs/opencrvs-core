@@ -159,10 +159,7 @@ const Icon = styled.div`
 `
 
 const Contents = styled.div<{ noPadding?: boolean }>`
-  padding: ${(props) => (props.noPadding ? 0 : '24px')};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: ${(props) => (props.noPadding ? 0 : '16px')};
-  }
+  padding: ${(props) => (props.noPadding ? 0 : props.theme.spacing.m)};
 `
 
 export enum ContentSize {
