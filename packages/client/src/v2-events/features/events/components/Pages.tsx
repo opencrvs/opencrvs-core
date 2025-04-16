@@ -54,8 +54,13 @@ export function Pages({
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
-
   const currentPageIdx = visiblePages.findIndex((p) => p.id === pageId)
+
+  const page = visiblePages.find((p) => p.id === pageId)
+
+  if (!page) {
+    throw new Error('Page not found.')
+  }
 
   function onNextPage() {
     const nextPage = visiblePages[currentPageIdx + 1]
@@ -80,21 +85,12 @@ export function Pages({
     }
   }
 
-  const page = visiblePages.find((p) => p.id === pageId)
-
-  if (!page) {
-    // TODO CIHAN: handle this error nicely
-    throw new Error('Page not found')
-  }
-
   const wizardProps = {
     currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
     showReviewButton,
-    // CIHAN TODO: ONKS TÄÄ OK?
-    totalPages: visiblePages.length,
-    onNextPage: onNextPage,
-    onPreviousPage: onPreviousPage,
+    onNextPage,
+    onPreviousPage,
     onSubmit
   }
 

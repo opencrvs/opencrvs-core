@@ -31,9 +31,8 @@ export const messages = defineMessages({
 
 export type FormWizardProps = PropsWithChildren<{
   currentPage: number
-  totalPages: number
   /** Callback when the user clicks the "Continue" button */
-  onNextPage?: () => void
+  onNextPage: () => void
   onPreviousPage?: () => void
 
   /** Callback when the user submits the form wizard */
@@ -46,7 +45,6 @@ export type FormWizardProps = PropsWithChildren<{
 export const FormWizard = ({
   children,
   currentPage,
-  totalPages,
   onSubmit,
   pageTitle,
   onNextPage,
@@ -80,7 +78,7 @@ export const FormWizard = ({
               role="button"
               size="large"
               type="primary"
-              onClick={currentPage + 1 < totalPages ? onNextPage : onSubmit}
+              onClick={onNextPage}
             >
               {continueButtonText}
             </Button>
