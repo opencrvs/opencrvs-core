@@ -137,9 +137,16 @@ const PageFooter = styled.div`
   height: 200px;
 `
 
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg16};
+const SpinnerWrapper = styled.div`
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`
+
+const ErrorText = styled(Text)`
   text-align: center;
   margin-top: 100px;
 `
@@ -1104,7 +1111,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
           )}
         >
           {isErrorOccured && (
-            <ErrorText id="error_message_section">
+            <ErrorText
+              id="error_message_section"
+              variant="reg16"
+              color="negative"
+              element="span"
+            >
               {intl.formatMessage(messages.registerFormQueryError)}
             </ErrorText>
           )}

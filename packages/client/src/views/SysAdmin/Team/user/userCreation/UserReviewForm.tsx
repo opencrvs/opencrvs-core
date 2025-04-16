@@ -63,6 +63,7 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
+import { Text } from '@opencrvs/components/src/Text'
 import { SCOPES } from '@opencrvs/commons/client'
 import { UserRole } from '@client/utils/gateway'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -118,8 +119,7 @@ const SignatureImage = styled.img`
   max-width: 70%;
 `
 
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
+const Label = styled(Text)`
   width: 100%;
 `
 
@@ -196,7 +196,11 @@ const transformSectionData = ({
             }
 
             sections[sections.length - 1].items.push({
-              label: <Label>{label}</Label>,
+              label: (
+                <Label element="p" variant="h4">
+                  {label}
+                </Label>
+              ),
               value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
               actions:
                 !(
