@@ -15,11 +15,7 @@ import type {
   inferInput
 } from '@trpc/tanstack-react-query'
 import { TRPCClientError } from '@trpc/client'
-import {
-  ActionType,
-  getDeclarationFields,
-  stripHiddenFields
-} from '@opencrvs/commons/client'
+import { ActionType, omitHiddenPaginatedFields } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -263,11 +259,12 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         throw new Error('Event configuration not found')
       }
 
-      const declarationFields = getDeclarationFields(eventConfiguration)
-
       return mutation.mutate({
         ...params,
-        declaration: stripHiddenFields(declarationFields, params.declaration)
+        declaration: omitHiddenPaginatedFields(
+          eventConfiguration.declaration,
+          params.declaration
+        )
       })
     },
     mutateAsync: async (params: inferInput<P>) => {
@@ -280,11 +277,12 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         throw new Error('Event configuration not found')
       }
 
-      const fields = getDeclarationFields(eventConfiguration)
-
       return mutation.mutateAsync({
         ...params,
-        declaration: stripHiddenFields(fields, params.declaration)
+        declaration: omitHiddenPaginatedFields(
+          eventConfiguration.declaration,
+          params.declaration
+        )
       })
     }
   }
@@ -306,11 +304,12 @@ export function useEventCustomAction(mutationKey: string[]) {
         throw new Error('Event configuration not found')
       }
 
-      const fields = getDeclarationFields(eventConfiguration)
-
       return mutation.mutate({
         ...params,
-        declaration: stripHiddenFields(fields, params.declaration)
+        declaration: omitHiddenPaginatedFields(
+          eventConfiguration.declaration,
+          params.declaration
+        )
       })
     }
   }

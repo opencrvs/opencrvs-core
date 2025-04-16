@@ -90,7 +90,7 @@ export function Pages({
       declaration={declaration}
       eventConfig={eventConfig}
       fields={page.fields}
-      formData={form}
+      form={form}
       id="locationForm"
       initialValues={form}
       setAllFieldsDirty={false}
