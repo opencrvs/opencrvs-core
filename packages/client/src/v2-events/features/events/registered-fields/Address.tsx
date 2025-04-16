@@ -451,7 +451,7 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
-      formData={value}
+      form={value}
       initialValues={{ ...defaultValue, ...value }}
       setAllFieldsDirty={false}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}

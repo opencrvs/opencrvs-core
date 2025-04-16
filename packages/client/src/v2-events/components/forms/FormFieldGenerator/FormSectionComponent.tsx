@@ -10,19 +10,21 @@
  */
 
 import React from 'react'
-import { Field, FieldProps, FormikProps } from 'formik'
+import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
 import { WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
+  EventConfig,
   FieldConfig,
   FieldType,
   FieldValue,
   isFieldEnabled,
   isFieldVisible,
   AddressType,
-  TranslationConfig
+  TranslationConfig,
+  deepMerge
 } from '@opencrvs/commons/client'
 import { TEXT } from '@client/forms'
 import {
@@ -33,18 +35,38 @@ import {
   makeFormFieldIdFormikCompatible
 } from '@client/v2-events/components/forms/utils'
 import {
-  FormGeneratorProps,
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
 import { GeneratedInputField } from './GeneratedInputField'
 
-type AllProps = FormikProps<EventState> & {
+type AllProps = {
+  id: string
+  declaration?: EventState
+  eventConfig?: EventConfig
+  fields: FieldConfig[]
   className?: string
-} & FormGeneratorProps &
-  IntlShapeProps & {
-    errors: Record<string, { errors: { message: TranslationConfig }[] }>
-  }
+  readonlyMode?: boolean
+  errors: Record<string, { errors: { message: TranslationConfig }[] }>
+  onChange: (values: EventState) => void
+  setAllFieldsDirty: boolean
+  setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
+  fieldsToShowValidationErrors?: FieldConfig[]
+} & IntlShapeProps &
+  UsedFormikProps
+
+/**
+ * Fields are explicitly defined here to avoid confusion between what is actually used out of all the passed props.
+ */
+type UsedFormikProps = Pick<
+  FormikProps<EventState>,
+  | 'values'
+  | 'setTouched'
+  | 'setValues'
+  | 'touched'
+  | 'resetForm'
+  | 'setFieldValue'
+>
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -191,6 +213,11 @@ export class FormSectionComponent extends React.Component<AllProps> {
     }))
 
     const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
+    const form = makeFormikFieldIdsOpenCRVSCompatible(valuesWithFormattedDate)
+
+    // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
+    // Address is the only deep value.
+    const completeForm = { ...(declaration ?? {}), ...form }
 
     return (
       <section className={className}>
@@ -202,17 +229,11 @@ export class FormSectionComponent extends React.Component<AllProps> {
             error = intl.formatMessage(visibleError)
           }
 
-          const formData = makeFormikFieldIdsOpenCRVSCompatible(
-            valuesWithFormattedDate
-          )
-
-          const allData = { ...formData, ...declaration }
-
-          if (!isFieldVisible(field, allData)) {
+          if (!isFieldVisible(field, completeForm)) {
             return null
           }
 
-          const isDisabled = !isFieldEnabled(field, allData)
+          const isDisabled = !isFieldEnabled(field, completeForm)
 
           return (
             <FormItem
@@ -220,18 +241,17 @@ export class FormSectionComponent extends React.Component<AllProps> {
               ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
             >
               <Field name={field.id}>
-                {}
                 {(formikFieldProps: FieldProps) => {
                   return (
                     <GeneratedInputField
-                      fieldDefinition={field}
-                      setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
                       disabled={isDisabled}
                       error={isDisabled ? '' : error}
                       eventConfig={this.props.eventConfig}
-                      formData={allData}
+                      fieldDefinition={field}
+                      form={completeForm}
                       readonlyMode={readonlyMode}
+                      setFieldValue={this.setFieldValuesWithDependency}
                       touched={touched[field.id] ?? false}
                     />
                   )

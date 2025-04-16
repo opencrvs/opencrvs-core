@@ -89,7 +89,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
    * Errors are rendered only when both error and touched are truthy
    */
   error: string
-  formData: EventState
+  form: EventState
   disabled?: boolean
   eventConfig?: EventConfig
   readonlyMode?: boolean
@@ -104,7 +104,7 @@ export const GeneratedInputField = React.memo(
     error,
     touched,
     value,
-    formData,
+    form,
     disabled,
     eventConfig,
     readonlyMode
@@ -373,7 +373,7 @@ export const GeneratedInputField = React.memo(
       const partOfRef = field.config.configuration.partOf?.$declaration
 
       const partOf =
-        partOfRef && makeFormikFieldIdsOpenCRVSCompatible(formData)[partOfRef]
+        partOfRef && makeFormikFieldIdsOpenCRVSCompatible(form)[partOfRef]
 
       return (
         <InputField {...inputFieldProps}>
@@ -450,7 +450,7 @@ export const GeneratedInputField = React.memo(
         <Data.Input
           {...field.config}
           declarationFields={getDeclarationFields(eventConfig)}
-          formData={formData}
+          formData={form}
         />
       )
     }

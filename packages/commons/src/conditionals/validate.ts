@@ -244,38 +244,16 @@ export function validateFieldInput({
   }[]
 }
 
-/**
- * Checks if a field has validation errors based on its type and custom conditionals.
- *
- * @returns an array of error messages for the field
- */
-export function getFieldValidationErrors({
+function runFieldValidations({
   field,
   values
 }: {
-  // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
   field: FieldConfig
   values: ActionUpdate
 }) {
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' })
-  }
-
-  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
-    if (values[field.id]) {
-      return {
-        errors: [
-          {
-            message: errorMessages.hiddenField
-          }
-        ]
-      }
-    }
-
-    return {
-      errors: []
-    }
   }
 
   const fieldValidationResult = validateFieldInput({
@@ -292,4 +270,39 @@ export function getFieldValidationErrors({
     // Assumes that custom validation errors are based on the field type, and extend the validation.
     errors: [...fieldValidationResult, ...customValidationResults]
   }
+}
+
+/**
+ * Gets applicable validation errors based on its type and custom validators.
+ *
+ * @returns an array of error messages for the field
+ */
+export function getFieldValidationErrors({
+  field,
+  values
+}: {
+  // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
+  field: FieldConfig
+  values: ActionUpdate
+}) {
+  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
+    if (values[field.id]) {
+      return {
+        errors: [
+          {
+            message: errorMessages.hiddenField
+          }
+        ]
+      }
+    }
+
+    return {
+      errors: []
+    }
+  }
+
+  return runFieldValidations({
+    field,
+    values
+  })
 }
