@@ -35,7 +35,7 @@ export function Pages({
   formPages,
   onPageChange,
   onSubmit,
-  test,
+  pageId,
   continueButtonText,
   setFormData,
   disableContinue = false,
@@ -44,9 +44,7 @@ export function Pages({
 }: {
   form: EventState
   setFormData: (dec: EventState) => void
-  // TODO CIHAN: type this
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  test: Route<any, any, any, any, any>
+  pageId: string
   showReviewButton?: boolean
   formPages: PageConfig[]
   onPageChange: (nextPageId: string) => void
@@ -58,7 +56,6 @@ export function Pages({
 }) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
-  const { eventId, pageId } = useTypedParams(test)
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
 
   const { page: currentPage } = usePagination(

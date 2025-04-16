@@ -126,7 +126,6 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={searchParams.from === 'review'}
-        test={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES}
         onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
