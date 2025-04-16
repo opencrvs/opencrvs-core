@@ -11,8 +11,6 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { Route } from 'react-router-typesafe-routes'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   EventState,
   EventConfig,
@@ -22,7 +20,6 @@ import {
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { usePagination } from '@client/v2-events/hooks/usePagination'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
 /**
@@ -58,36 +55,10 @@ export function Pages({
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
 
-  const { page: currentPage } = usePagination(
-    visiblePages.length,
-    Math.max(pageIdx, 0)
-  )
-
-  // useEffect(() => {
-  //   console.log('pageId', pageId)
-  // }, [pageId])
-
-  // useEffect(() => {
-  //   console.log('pageId', pageId)
-  // }, [pageId])
-
-  // useEffect(() => {
-  //   const visiblePageId = visiblePages[currentPage].id
-  //   const pageChanged = visiblePageId !== pageId
-
-  //   if (pageChanged) {
-  //     onPageChange(visiblePageId)
-
-  //     // We use the main content anchor id to scroll to the top of the frame when page changes
-  //     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
-  //   }
-  // }, [pageId, currentPage, visiblePages, onPageChange])
-
   const currentPageIdx = visiblePages.findIndex((p) => p.id === pageId)
 
   function onNextPage() {
-    const nextPageIdx = currentPageIdx + 1
-    const nextPage = visiblePages[nextPageIdx]
+    const nextPage = visiblePages[currentPageIdx + 1]
 
     if (nextPage) {
       onPageChange(nextPage.id)
@@ -101,8 +72,12 @@ export function Pages({
   }
 
   function onPreviousPage() {
-    onPageChange(visiblePages[currentPage].id)
-    document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+    const previousPage = visiblePages[currentPageIdx - 1]
+
+    if (previousPage) {
+      onPageChange(previousPage.id)
+      document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+    }
   }
 
   const page = visiblePages.find((p) => p.id === pageId)
