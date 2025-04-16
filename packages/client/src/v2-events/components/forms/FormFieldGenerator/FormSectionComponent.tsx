@@ -215,7 +215,9 @@ export class FormSectionComponent extends React.Component<AllProps> {
     const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
     const form = makeFormikFieldIdsOpenCRVSCompatible(valuesWithFormattedDate)
 
-    const completeForm = deepMerge(declaration ?? {}, form)
+    // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
+    // Address is the only deep value.
+    const completeForm = { ...(declaration ?? {}), ...form }
 
     return (
       <section className={className}>
@@ -239,7 +241,6 @@ export class FormSectionComponent extends React.Component<AllProps> {
               ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
             >
               <Field name={field.id}>
-                {}
                 {(formikFieldProps: FieldProps) => {
                   return (
                     <GeneratedInputField
