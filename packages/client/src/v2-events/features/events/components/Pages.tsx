@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
@@ -56,22 +56,18 @@ export function Pages({
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
 
+  // If page changes, scroll to the top of the page using the anchor element ID
+  useEffect(() => {
+    document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+  }, [pageId])
+
   function onNextPage() {
     const nextPageIdx = pageIdx + 1
     const nextPage =
       nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
 
     // If there is a next page on the form available, navigate to it
-    if (nextPage) {
-      onPageChange(nextPage.id)
-      document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
-      return
-    }
-
-    // If we are continuing on the last page, we should submit
-    onSubmit()
-    document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
-    return
+    return nextPage ? onPageChange(nextPage.id) : onSubmit()
   }
 
   function onPreviousPage() {
@@ -80,8 +76,7 @@ export function Pages({
       previousPageIdx >= 0 ? visiblePages[previousPageIdx] : undefined
 
     if (previousPage) {
-      onPageChange(previousPage.id)
-      document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+      return onPageChange(previousPage.id)
     }
   }
 
