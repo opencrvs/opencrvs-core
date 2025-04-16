@@ -12,9 +12,48 @@
 import { AddressType } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
+test('Throws error without proper scope', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, ['record.declare-birth'])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Unique',
+      'applicant.surname': 'Doe',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  await expect(
+    client.event.search({
+      type: 'and',
+      eventType: 'TENNIS_CLUB_MEMBERSHIP',
+      data: {
+        'applicant.firstname': 'Unique'
+      }
+    })
+  ).rejects.toThrowError('FORBIDDEN')
+})
+
 test('Returns empty list when no events match search criteria', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
 
   const initialData = {
     'applicant.firstname': 'John',
@@ -38,19 +77,25 @@ test('Returns empty list when no events match search criteria', async () => {
       declaration: initialData
     })
   )
-  const searchCriteria = {
-    'applicant.firstname': 'Johnson',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP'
-  }
 
-  const fetchedEvents = await client.event.search(searchCriteria)
+  const fetchedEvents = await client.event.search({
+    type: 'and',
+    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    data: {
+      applicant____firstname: { type: 'exact', term: 'Johnson' }
+    }
+  })
 
   expect(fetchedEvents).toEqual([])
 })
 
 test('Returns events that match the text field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
 
   const record1 = {
     'applicant.firstname': 'John',
@@ -116,20 +161,26 @@ test('Returns events that match the text field criteria of applicant', async () 
       declaration: record3
     })
   )
-  const searchCriteria = {
-    'applicant.firstname': 'John',
-    'applicant.dob': '2000-01-01',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP'
-  }
 
-  const fetchedEvents = await client.event.search(searchCriteria)
+  const fetchedEvents = await client.event.search({
+    type: 'and',
+    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    data: {
+      applicant____firstname: { type: 'exact', term: 'John' },
+      applicant____dob: { type: 'exact', term: '2000-01-01' }
+    }
+  })
 
   expect(fetchedEvents).toHaveLength(2)
 })
 
 test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
 
   const record1 = {
     'applicant.firstname': 'Johnson',
@@ -175,19 +226,24 @@ test('Returns events that match date of birth of applicant', async () => {
     })
   )
 
-  const searchCriteria = {
-    'applicant.dob': '2000-01-01',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP'
-  }
-
-  const fetchedEvents = await client.event.search(searchCriteria)
-  expect(fetchedEvents?.[0].declaration['applicant.firstname']).toBe('Johnson') // fetches first document as result
+  const fetchedEvents = await client.event.search({
+    type: 'and',
+    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    data: {
+      applicant____dob: { type: 'exact', term: '2000-01-01' }
+    }
+  })
+  expect(fetchedEvents[0].declaration['applicant.firstname']).toBe('Johnson') // fetches first document as result
   expect(fetchedEvents).toHaveLength(1)
 })
 
 test('Does not return events when searching with a similar but different date of birth', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
 
   const record1 = {
     'applicant.firstname': 'John',
@@ -233,11 +289,264 @@ test('Does not return events when searching with a similar but different date of
     })
   )
 
-  const searchCriteria = {
-    'applicant.dob': '1999-11-11', // search with same day and month
-    eventType: 'TENNIS_CLUB_MEMBERSHIP'
-  }
-
-  const fetchedEvents = await client.event.search(searchCriteria)
+  const fetchedEvents = await client.event.search({
+    type: 'and',
+    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    data: {
+      applicant____dob: { type: 'exact', term: '1999-11-11' } // search with same day and month
+    }
+  })
   expect(fetchedEvents).toHaveLength(0)
+})
+
+test('Returns single document after creation', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Unique',
+      'applicant.surname': 'Doe',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  const response = await client.event.search({
+    type: 'and',
+    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    data: {
+      applicant____firstname: {
+        type: 'exact',
+        term: 'Unique'
+      }
+    }
+  })
+
+  expect(response).toHaveLength(1)
+})
+
+test('Returns multiple documents after creation', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  const event1 = await client.event.create(generator.event.create())
+  const data1 = generator.event.actions.declare(event1.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Unique',
+      'applicant.surname': 'Lastname',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data1)
+
+  const event2 = await client.event.create(generator.event.create())
+  const data2 = generator.event.actions.declare(event2.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Unique',
+      'applicant.surname': 'Lastname',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+  await client.event.actions.declare.request(data2)
+
+  const event3 = await client.event.create(generator.event.create())
+  const data3 = generator.event.actions.declare(event3.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Different',
+      'applicant.surname': 'Lastname',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data3)
+
+  const response = await client.event.search({
+    type: 'and',
+    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    data: {
+      applicant____firstname: {
+        type: 'exact',
+        term: 'Unique'
+      },
+      applicant____surname: {
+        type: 'exact',
+        term: 'Lastname'
+      }
+    }
+  })
+
+  // event1 and event2 should be returned
+  expect(response).toHaveLength(2)
+})
+
+test('Returns no documents when search params are not matched', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  const event1 = await client.event.create(generator.event.create())
+  const data1 = generator.event.actions.declare(event1.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Unique',
+      'applicant.surname': 'Lastname',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data1)
+
+  const event2 = await client.event.create(generator.event.create())
+  const data2 = generator.event.actions.declare(event2.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Unique',
+      'applicant.surname': 'Lastname',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+  await client.event.actions.declare.request(data2)
+
+  const event3 = await client.event.create(generator.event.create())
+  const data3 = generator.event.actions.declare(event3.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Different',
+      'applicant.surname': 'Lastname',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data3)
+
+  const response = await client.event.search({
+    type: 'and',
+    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    data: {
+      applicant____firstname: {
+        type: 'exact',
+        term: 'Nothing'
+      },
+      applicant____surname: {
+        type: 'exact',
+        term: 'Matching'
+      }
+    }
+  })
+
+  expect(response).toHaveLength(0)
+})
+
+test('Throws error when search params are not matching proper schema', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.firstname': 'Unique',
+      'applicant.surname': 'Lastname',
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  await expect(
+    client.event.search({
+      type: 'and',
+      eventType: 'TENNIS_CLUB_MEMBERSHIP',
+      data: {
+        applicant____firstname: 'Johnny' // invalid schema
+      }
+    })
+  ).rejects.toThrowError()
 })
