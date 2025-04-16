@@ -23,7 +23,6 @@ import {
 } from '@opencrvs/commons/client'
 
 import { Print } from '@opencrvs/components/lib/icons'
-import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
