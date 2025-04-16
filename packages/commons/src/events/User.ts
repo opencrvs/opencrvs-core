@@ -13,5 +13,9 @@ export type User = {
   id: string
   name: { use: string; given: string[]; family: string }[]
   role: string
+  /**
+   * The filename of the user's signature stored in MinIO, ex: 'a552f64a-31c4-4e78-b44f-292c3179e2ef.png'.
+   * This is used to retrieve the signature file from storage.
+   */
   signatureFileName?: string
 }
