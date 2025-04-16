@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // TODO: Paginate with react-router-dom v6 using ?page=1... etc.
 export function usePagination(

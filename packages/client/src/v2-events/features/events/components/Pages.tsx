@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useIntl } from 'react-intl'
+import { Route } from 'react-router-typesafe-routes'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   EventState,
   EventConfig,
@@ -29,11 +31,11 @@ import { FormWizard } from './FormWizard'
  */
 export function Pages({
   form,
-  pageId,
   showReviewButton,
   formPages,
   onPageChange,
   onSubmit,
+  test,
   continueButtonText,
   setFormData,
   disableContinue = false,
@@ -42,7 +44,9 @@ export function Pages({
 }: {
   form: EventState
   setFormData: (dec: EventState) => void
-  pageId: string
+  // TODO CIHAN: type this
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  test: Route<any, any, any, any, any>
   showReviewButton?: boolean
   formPages: PageConfig[]
   onPageChange: (nextPageId: string) => void
@@ -54,34 +58,71 @@ export function Pages({
 }) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
+  const { eventId, pageId } = useTypedParams(test)
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
 
-  const {
-    page: currentPage,
-    next,
-    previous,
-    total
-  } = usePagination(visiblePages.length, Math.max(pageIdx, 0))
-  const page = visiblePages[currentPage]
+  const { page: currentPage } = usePagination(
+    visiblePages.length,
+    Math.max(pageIdx, 0)
+  )
 
-  useEffect(() => {
-    const pageChanged = visiblePages[currentPage].id !== pageId
+  // useEffect(() => {
+  //   console.log('pageId', pageId)
+  // }, [pageId])
 
-    if (pageChanged) {
-      onPageChange(visiblePages[currentPage].id)
+  // useEffect(() => {
+  //   console.log('pageId', pageId)
+  // }, [pageId])
 
-      // We use the main content anchor id to scroll to the top of the frame when page changes
+  // useEffect(() => {
+  //   const visiblePageId = visiblePages[currentPage].id
+  //   const pageChanged = visiblePageId !== pageId
+
+  //   if (pageChanged) {
+  //     onPageChange(visiblePageId)
+
+  //     // We use the main content anchor id to scroll to the top of the frame when page changes
+  //     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+  //   }
+  // }, [pageId, currentPage, visiblePages, onPageChange])
+
+  const currentPageIdx = visiblePages.findIndex((p) => p.id === pageId)
+
+  function onNextPage() {
+    const nextPageIdx = currentPageIdx + 1
+    const nextPage = visiblePages[nextPageIdx]
+
+    if (nextPage) {
+      onPageChange(nextPage.id)
       document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+      return
     }
-  }, [pageId, currentPage, visiblePages, onPageChange])
+
+    onSubmit()
+    document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+    return
+  }
+
+  function onPreviousPage() {
+    onPageChange(visiblePages[currentPage].id)
+    document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
+  }
+
+  const page = visiblePages.find((p) => p.id === pageId)
+
+  if (!page) {
+    // TODO CIHAN: handle this error nicely
+    throw new Error('Page not found')
+  }
 
   const wizardProps = {
-    currentPage,
+    currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
     showReviewButton,
-    totalPages: total,
-    onNextPage: next,
-    onPreviousPage: previous,
+    // CIHAN TODO: ONKS TÄÄ OK?
+    totalPages: visiblePages.length,
+    onNextPage: onNextPage,
+    onPreviousPage: onPreviousPage,
     onSubmit
   }
 
