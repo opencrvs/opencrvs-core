@@ -28,7 +28,8 @@ import {
   AsyncRejectActionDocument,
   ActionType,
   getCurrentEventState,
-  EventStatus
+  EventStatus,
+  isWriteAction
 } from '@opencrvs/commons/events'
 import { getUUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -343,6 +344,26 @@ export async function addAction(
       { id: eventId, 'actions.transactionId': { $ne: transactionId } },
       { $push: { actions: action }, $set: { updatedAt: now } }
     )
+
+  if (isWriteAction(input.type) && !input.keepAssignment) {
+    await db.collection<EventDocument>('events').updateOne(
+      { id: eventId },
+      {
+        $push: {
+          actions: {
+            type: ActionType.UNASSIGN,
+            declaration: {},
+            createdBy,
+            createdAt: now,
+            createdAtLocation,
+            id: actionId,
+            status: status
+          }
+        },
+        $set: { updatedAt: now }
+      }
+    )
+  }
 
   const drafts = await getDraftsForAction(eventId, createdBy, input.type)
 
