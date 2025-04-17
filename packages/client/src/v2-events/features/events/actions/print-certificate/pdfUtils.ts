@@ -168,9 +168,9 @@ export function compileSvg({
   )
 
   /**
-   * Handlebars helper: modifiedLookup
+   * Handlebars helper: $lookup
    *
-   * Usage: {{modifiedLookup 'child.address.other' 'district'}}
+   * Usage: {{$lookup 'child.address.other' 'district'}}
    *
    * Resolves a value from the declaration using a property path,
    * then optionally returns a nested field from the resolved object.
@@ -184,7 +184,7 @@ export function compileSvg({
    * when you want to extract a specific sub-property (e.g., 'district', 'town').
    */
   Handlebars.registerHelper(
-    '$modifiedLookup',
+    '$lookup',
     function (propertyPath: string, finalNode: string) {
       const stringify = useFormDataStringifier()
       const formFieldWithResolvedValue = stringify(
@@ -203,9 +203,9 @@ export function compileSvg({
   )
 
   /**
-   * Handlebars helper: location
+   * Handlebars helper: $location
    *
-   * Usage: {{location locationId propName}}
+   * Usage: {{$location locationId propName}}
    *
    * This helper retrieves a specific part of an address (location, district, province, or country)
    * based on the provided location ID.
@@ -248,10 +248,10 @@ export function compileSvg({
   )
 
   /**
-   * Handlebars helper: intl
+   * Handlebars helper: $intl
    *
    * Usage example in SVG template:
-   *   <tspan>{{ intl 'constants' (lookup $declaration "child.gender") }}</tspan>
+   *   <tspan>{{ $intl 'constants' (lookup $declaration "child.gender") }}</tspan>
    *
    * This helper dynamically constructs a translation key by joining multiple string parts
    * (e.g., 'constants.male') and uses `intl.formatMessage` to fetch the localized translation.
@@ -290,7 +290,7 @@ export function compileSvg({
   )
 
   /**
-   * Handlebars helper: OR
+   * Handlebars helper: $OR
    * Returns the first truthy value between v1 and v2.
    */
   Handlebars.registerHelper(
