@@ -25,8 +25,6 @@ import {
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
   getDeclarationFields,
-  ActionType,
-  writeActions,
   SystemVariables
 } from '@opencrvs/commons/client'
 import { getLocations } from '@client/offline/selectors'
