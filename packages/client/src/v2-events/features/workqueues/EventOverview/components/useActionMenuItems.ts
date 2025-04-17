@@ -16,44 +16,59 @@ import {
   EventIndex,
   getUUID,
   TranslationConfig,
-  EventStatus
+  EventStatus,
+  SCOPES
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
+import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+
+function getAssignmentActions(
+  assignmentStatus: keyof typeof AssignmentStatus,
+  mayUnassignOthers: boolean
+) {
+  if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
+    return [ActionType.ASSIGN]
+  }
+
+  if (
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
+    mayUnassignOthers
+  ) {
+    return [ActionType.UNASSIGN]
+  }
+
+  if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
+    return [ActionType.UNASSIGN]
+  }
+
+  return []
+}
 
 /**
  * Actions that can be performed on an event based on its status, independent of the user scopes.
  *
  */
-function getAvailableActionsByStatus(status: EventStatus): ActionType[] {
+function getAvailableActionsByStatus(
+  status: EventStatus,
+  assignmentActions: ActionType[]
+): ActionType[] {
   switch (status) {
     case EventStatus.CREATED: {
       return [
         ActionType.READ,
         ActionType.DECLARE,
         ActionType.DELETE,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
+        ...assignmentActions
       ]
     }
-
     case EventStatus.NOTIFIED:
     case EventStatus.DECLARED: {
-      return [
-        ActionType.READ,
-        ActionType.VALIDATE,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
-      ]
+      return [ActionType.READ, ActionType.VALIDATE, ...assignmentActions]
     }
     case EventStatus.VALIDATED: {
-      return [
-        ActionType.READ,
-        ActionType.REGISTER,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
-      ]
+      return [ActionType.READ, ActionType.REGISTER, ...assignmentActions]
     }
     case EventStatus.CERTIFIED:
     case EventStatus.REGISTERED: {
@@ -61,8 +76,7 @@ function getAvailableActionsByStatus(status: EventStatus): ActionType[] {
         ActionType.READ,
         ActionType.PRINT_CERTIFICATE,
         ActionType.REQUEST_CORRECTION,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
+        ...assignmentActions
       ]
     }
     case EventStatus.REJECTED: {
@@ -70,8 +84,7 @@ function getAvailableActionsByStatus(status: EventStatus): ActionType[] {
         ActionType.READ,
         ActionType.DECLARE,
         ActionType.VALIDATE,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
+        ...assignmentActions
       ]
     }
     case EventStatus.ARCHIVED:
@@ -181,7 +194,16 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 
-  const availableActions = getAvailableActionsByStatus(event.status)
+  const assignmentActions = getAssignmentActions(
+    getAssignmentStatus(event, authentication.sub),
+    authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
+  )
+
+  const availableActions = getAvailableActionsByStatus(
+    event.status,
+    assignmentActions
+  )
+
   const allowedActions = filterUnallowedActions(availableActions, scopes)
 
   return allowedActions
