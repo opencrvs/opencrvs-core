@@ -13,10 +13,10 @@ import {
   FieldConfig,
   getFieldValidationErrors,
   EventState,
-  stripHiddenFields,
-  getVisiblePagesFormFields,
+  omitHiddenPaginatedFields,
   isPageVisible,
-  FormConfig
+  FormConfig,
+  omitHiddenFields
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -61,12 +61,9 @@ export function validationErrorsInActionFormExist({
   reviewFields?: FieldConfig[]
 }): boolean {
   // We don't want to validate hidden fields
-  const formWithoutHiddenFields = stripHiddenFields(
-    getVisiblePagesFormFields(formConfig, form),
-    form
-  )
+  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
 
-  const visibleAnnotationFields = stripHiddenFields(
+  const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
     annotation ?? {}
   )

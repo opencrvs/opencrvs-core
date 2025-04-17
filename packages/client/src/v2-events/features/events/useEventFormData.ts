@@ -47,7 +47,7 @@ function removeUndefinedKeys(data: EventState) {
  * @property {function} clear - Clears the form values.
  */
 export const useEventFormData = create<EventFormData>()((set, get) => ({
-  formValues: null,
+  formValues: {},
   touchedFields: {},
   getFormValues: (initialValues?: EventState) =>
     get().formValues || initialValues || {},
@@ -65,7 +65,7 @@ export const useEventFormData = create<EventFormData>()((set, get) => ({
     Object.fromEntries(
       Object.entries(get().getFormValues()).map(([key]) => [key, true])
     ),
-  clear: () => set(() => ({ formValues: null, touchedFields: {} }))
+  clear: () => set(() => ({ formValues: {}, touchedFields: {} }))
 }))
 /**
  * Based on https://github.com/pmndrs/zustand?tab=readme-ov-file#transient-updates-for-often-occurring-state-changes
