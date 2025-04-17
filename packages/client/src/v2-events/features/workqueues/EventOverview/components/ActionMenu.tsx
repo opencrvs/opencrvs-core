@@ -14,7 +14,6 @@ import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 
 import { getCurrentEventStateWithDrafts } from '@opencrvs/commons/client'
-
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -22,11 +21,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { messages } from '@client/i18n/messages/views/action'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { getScope } from '@client/profile/profileSelectors'
-import {
-  AssignmentStatus,
-  getAssignmentStatus,
-  isWriteAction
-} from '@client/v2-events/utils'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useActionMenuItems } from './useActionMenuItems'
 
@@ -34,15 +28,12 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
   const scopes = useSelector(getScope)
-  const eventState = events.getEventState.useSuspenseQuery(eventId)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
   const authentication = useAuthentication()
 
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
   }
-
-  const assignmentStatus = getAssignmentStatus(eventState, authentication.sub)
 
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
@@ -69,10 +60,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
             return (
               <DropdownMenu.Item
                 key={action.type}
-                disabled={
-                  assignmentStatus !== AssignmentStatus.ASSIGNED_TO_SELF &&
-                  isWriteAction(action.type)
-                }
+                disabled={'disabled' in action ? action.disabled : false}
                 onClick={() => action.onClick(event.id)}
               >
                 {intl.formatMessage(action.label)}

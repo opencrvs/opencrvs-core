@@ -223,10 +223,6 @@ export function useResolveLocationFullName(
   )
 }
 
-export function isWriteAction(actionType: ActionType): boolean {
-  return writeActions.safeParse(actionType).success
-}
-
 export const AssignmentStatus = {
   ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
   ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',

@@ -96,6 +96,7 @@ function getAvailableActionsByStatus(
 interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
+  disabled?: boolean
 }
 
 /**
@@ -114,6 +115,11 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
   }
+
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+
+  const eventIsAssignedToSelf =
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
 
   const config = {
     [ActionType.READ]: {
@@ -161,7 +167,8 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
         id: 'v2.event.birth.action.declare.label'
       },
       onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.DECLARE.buildPath({ eventId }))
+        navigate(ROUTES.V2.EVENTS.DECLARE.buildPath({ eventId })),
+      disabled: !eventIsAssignedToSelf
     },
     [ActionType.VALIDATE]: {
       label: {
@@ -171,7 +178,8 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
         id: 'v2.event.birth.action.validate.label'
       },
       onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
+        navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId })),
+      disabled: !eventIsAssignedToSelf
     },
     [ActionType.REGISTER]: {
       label: {
@@ -180,7 +188,8 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
         id: 'v2.event.birth.action.register.label'
       },
       onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
+        navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId })),
+      disabled: !eventIsAssignedToSelf
     },
     [ActionType.PRINT_CERTIFICATE]: {
       label: {
@@ -190,7 +199,8 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
         id: 'v2.event.birth.action.collect-certificate.label'
       },
       onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId }))
+        navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })),
+      disabled: !eventIsAssignedToSelf
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 
