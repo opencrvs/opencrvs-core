@@ -471,6 +471,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         <InputField {...inputFieldProps}>
           <TimeField
             {...inputProps}
+            use12HourFormat={fieldDefinition.use12HourFormat}
             ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
             onChange={onChangeGroupInput}
             value={value as string}
