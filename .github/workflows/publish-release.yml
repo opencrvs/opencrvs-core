@@ -11,10 +11,9 @@ name: Publish release
 on:
   workflow_dispatch:
     inputs:
-      branch_name:
-        description: Branch to build from
-        default: develop
-        required: true
+      # release_version:
+      #   This input parameter specifies the release version number for the workflow.
+      #   Value is used to checkout the correct branch or tag
       release_version:
         description: Release version number
         required: true
@@ -34,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
-          ref: '${{ github.event.inputs.branch_name }}'
+          ref: '${{ github.event.inputs.release_version }}'
 
       - uses: actions/checkout@v4
         if: github.event_name == 'push'
@@ -87,7 +86,7 @@ jobs:
       - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
-          ref: '${{ github.event.inputs.branch_name }}'
+          ref: '${{ github.event.inputs.release_version }}'
 
       - uses: actions/checkout@v4
         if: github.event_name == 'push'
