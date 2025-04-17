@@ -147,7 +147,7 @@ export function compileSvg({
   }
 
   Handlebars.registerHelper(
-    'formatDate',
+    '$formatDate',
     function (dateString: string, formatString: string) {
       const date = new Date(dateString)
       return isValid(date) ? format(date, formatString) : ''
@@ -155,7 +155,7 @@ export function compileSvg({
   )
 
   Handlebars.registerHelper(
-    'findUserById',
+    '$findUserById',
     function (id: string, propertyName: keyof User) {
       const user = users.find((usr) => usr.id === id)
       if (!user) {
@@ -184,7 +184,7 @@ export function compileSvg({
    * when you want to extract a specific sub-property (e.g., 'district', 'town').
    */
   Handlebars.registerHelper(
-    'modifiedLookup',
+    '$modifiedLookup',
     function (propertyPath: string, finalNode: string) {
       const stringify = useFormDataStringifier()
       const formFieldWithResolvedValue = stringify(
@@ -221,7 +221,7 @@ export function compileSvg({
    * - The name corresponding to the requested property, or undefined if not available.
    */
   Handlebars.registerHelper(
-    'location',
+    '$location',
     function (
       locationId: string,
       propName: 'location' | 'district' | 'province' | 'country'
@@ -266,7 +266,7 @@ export function compileSvg({
    * need to be translated using i18n keys constructed from user-provided data.
    */
   Handlebars.registerHelper(
-    'intl',
+    '$intl',
 
     function (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -294,7 +294,7 @@ export function compileSvg({
    * Returns the first truthy value between v1 and v2.
    */
   Handlebars.registerHelper(
-    'OR',
+    '$OR',
     function (
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       v1: any,
