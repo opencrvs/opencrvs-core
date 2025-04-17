@@ -25,13 +25,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
-export function useGetActionMenuItems({
-  event,
-  scopes
-}: {
-  event: EventIndex
-  scopes: Scope[]
-}) {
+export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
@@ -46,7 +40,6 @@ export function useGetActionMenuItems({
   }
 
   const actionsByStatus = getActionsByStatus(event)
-  const availableActions = getAvailableActionsByScopes(actionsByStatus, scopes)
 
   const config = {
     [ActionType.READ]: {
@@ -125,31 +118,16 @@ export function useGetActionMenuItems({
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId }))
     }
-  } satisfies Record<
-    string,
-    {
-      label: TranslationConfig
-      onClick: (eventId: string) => void | Promise<void>
-    }
-  >
+  }
 
-  return availableActions.reduce(
-    (
-      acc: {
-        label: TranslationConfig
-        onClick: (eventId: string) => void
-        type: ActionType
-      }[],
-      action
-    ) => {
-      // @ts-expect-error --
-      const actionItemConfig = config[action as string]
-      if (!actionItemConfig) {
-        return acc
+  const availableActions = getAvailableActionsByScopes(actionsByStatus, scopes)
+
+  return availableActions
+    .filter((action) => Object.keys(config).includes(action))
+    .map((action) => {
+      return {
+        ...config[action as keyof typeof config],
+        type: action
       }
-
-      return [...acc, { ...actionItemConfig, actionType: action }]
-    },
-    []
-  )
+    })
 }

@@ -20,7 +20,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { messages } from '@client/i18n/messages/views/action'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { getScope } from '@client/profile/profileSelectors'
-import { useGetActionMenuItems } from './utils'
+import { useActionMenuItems } from './useActionMenuItems'
 
 export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
@@ -37,10 +37,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
     [drafts, event]
   )
 
-  const actionMenuItems = useGetActionMenuItems({
-    event: eventStateWithDrafts,
-    scopes: scopes ?? []
-  })
+  const actionMenuItems = useActionMenuItems(eventStateWithDrafts, scopes ?? [])
 
   return (
     <>
