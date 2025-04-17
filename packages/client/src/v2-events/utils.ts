@@ -26,7 +26,7 @@ import {
   compositeFieldTypes,
   getDeclarationFields,
   ActionType,
-  WriteActions,
+  writeActions,
   SystemVariables
 } from '@opencrvs/commons/client'
 import { getLocations } from '@client/offline/selectors'
@@ -224,7 +224,7 @@ export function useResolveLocationFullName(
 }
 
 export function isWriteAction(actionType: ActionType): boolean {
-  return WriteActions.some((writeAction) => actionType === writeAction)
+  return writeActions.some((writeAction) => actionType === writeAction)
 }
 
 export const AssignmentStatus = {

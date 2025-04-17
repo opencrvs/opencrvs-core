@@ -97,17 +97,7 @@ export type DeclarationUpdateActionType = z.infer<
 export const annotationActions = ActionTypes.exclude(declarationActionValues)
 export type AnnotationActionType = z.infer<typeof annotationActions>
 
-export const WriteActions = [
-  ActionType.ASSIGN,
-  ActionType.UNASSIGN,
-  ActionType.REGISTER,
-  ActionType.VALIDATE,
-  ActionType.REQUEST_CORRECTION,
-  ActionType.REJECT_CORRECTION,
-  ActionType.APPROVE_CORRECTION,
-  ActionType.DECLARE,
-  ActionType.PRINT_CERTIFICATE,
-  ActionType.REJECT,
-  ActionType.MARKED_AS_DUPLICATE,
-  ActionType.ARCHIVE
-]
+export const writeActions = ActionTypes.exclude([
+  ActionType.CREATE,
+  ActionType.READ
+])
