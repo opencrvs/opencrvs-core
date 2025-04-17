@@ -44,8 +44,6 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
     throw new Error('Authentication is not available but is required')
   }
 
-  const actionsByStatus = getActionsByStatus(event)
-
   const config = {
     [ActionType.READ]: {
       label: {
@@ -125,13 +123,16 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 
+  const actionsByStatus = getActionsByStatus(event)
   const availableActions = getAvailableActionsByScopes(actionsByStatus, scopes)
 
   return availableActions
-    .filter((action) => Object.keys(config).includes(action))
+    .filter((action): action is keyof typeof config =>
+      Object.keys(config).includes(action)
+    )
     .map((action) => {
       return {
-        ...config[action as keyof typeof config],
+        ...config[action],
         type: action
       }
     })
