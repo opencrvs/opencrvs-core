@@ -20,8 +20,6 @@ import {
   EventConfig,
   FieldType
 } from '@opencrvs/commons/client'
-
-import { ActionType } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
   compileSvg,
@@ -29,7 +27,6 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
 
 async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -93,7 +90,8 @@ export const usePrintableCertificate = ({
     $declaration: currentState.declaration,
     locations,
     users,
-    language
+    language,
+    config
   })
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
@@ -129,7 +127,8 @@ export const usePrintableCertificate = ({
       },
       locations,
       users: base64ReplacedUsersWithSignature,
-      language
+      language,
+      config
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)

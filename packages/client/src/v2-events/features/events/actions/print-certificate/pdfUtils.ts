@@ -30,13 +30,14 @@ import {
   EventState,
   User,
   LanguageConfig,
-  AddressFieldValue
+  FieldValue,
+  EventConfig
 } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { Address } from '@client/v2-events/features/events/registered-fields'
+import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 interface FontFamilyTypes {
   normal: string
@@ -74,8 +75,8 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 function formatAllNonStringValues(
   templateData: EventState,
   intl: IntlShape
-): Record<string, string> {
-  const formattedData: Record<string, string> = {}
+): Record<string, FieldValue> {
+  const formattedData: Record<string, FieldValue> = {}
 
   for (const key of Object.keys(templateData)) {
     const value = templateData[key]
@@ -92,9 +93,10 @@ function formatAllNonStringValues(
         .join(', ')
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
-      formattedData[key] = JSON.stringify(
-        formatAllNonStringValues(value as EventState, intl)
-      )
+      formattedData[key] = formatAllNonStringValues(
+        value satisfies EventState,
+        intl
+      ) as FieldValue
     } else {
       formattedData[key] = String(value)
     }
@@ -111,7 +113,8 @@ export function compileSvg({
   $declaration,
   locations,
   users,
-  language
+  language,
+  config
 }: {
   templateString: string
   $state: EventIndex
@@ -119,6 +122,7 @@ export function compileSvg({
   locations: Location[]
   users: User[]
   language: LanguageConfig
+  config: EventConfig
 }): string {
   const intl: IntlShape = createIntl(
     {
@@ -163,50 +167,104 @@ export function compileSvg({
     }
   )
 
+  /**
+   * Handlebars helper: modifiedLookup
+   *
+   * Usage: {{modifiedLookup 'child.address.other' 'district'}}
+   *
+   * Resolves a value from the declaration using a property path,
+   * then optionally returns a nested field from the resolved object.
+   *
+   * Behavior:
+   * 1. Resolves the full object/value from the declaration using `propertyPath`.
+   * 2. If the resolved value is an object and `finalNode` is provided, it returns the value at that key.
+   * 3. If not, it falls back to returning the raw resolved value.
+   *
+   * Useful for dereferencing fields like `locationId` or `address.districtId`
+   * when you want to extract a specific sub-property (e.g., 'district', 'town').
+   */
   Handlebars.registerHelper(
-    'addressLookup',
-    function (
-      addressJson: string,
-      addressPartName: keyof AddressFieldValue,
-      optionalAddressPartName: keyof AddressFieldValue
-    ) {
-      const stringifyAddress = Address.useStringifier()
-      const address = JSON.parse(addressJson)
-      const addressFieldWithResolvedValue = stringifyAddress(address)
-      return (
-        addressFieldWithResolvedValue[addressPartName] ||
-        addressFieldWithResolvedValue[optionalAddressPartName]
+    'modifiedLookup',
+    function (propertyPath: string, finalNode: string) {
+      const stringify = useFormDataStringifier()
+      const formFieldWithResolvedValue = stringify(
+        config.declaration.pages.flatMap((x) => x.fields),
+        $declaration
       )
+
+      if (
+        typeof formFieldWithResolvedValue[propertyPath] === 'object' &&
+        finalNode
+      ) {
+        return formFieldWithResolvedValue[propertyPath][finalNode]
+      }
+      return formFieldWithResolvedValue[propertyPath]
     }
   )
 
+  /**
+   * Handlebars helper: location
+   *
+   * Usage: {{location locationId propName}}
+   *
+   * This helper retrieves a specific part of an address (location, district, province, or country)
+   * based on the provided location ID.
+   *
+   * It uses the `useStringifier` function from `LocationSearch` to resolve the full address object,
+   * and returns the value of the requested property.
+   *
+   * Parameters:
+   * - locationId (string): ID of the target location
+   * - propName (string): One of 'location', 'district', 'province', or 'country'
+   *
+   * Returns:
+   * - The name corresponding to the requested property, or undefined if not available.
+   */
   Handlebars.registerHelper(
-    'pickAddressPartByLocationId',
+    'location',
     function (
       locationId: string,
-      addressPartName: 'location' | 'district' | 'province' | 'country'
+      propName: 'location' | 'district' | 'province' | 'country'
     ) {
-      const address = { country: '', province: '', district: '', location: '' }
       const location = locations.find((loc) => loc.id === locationId)
-      address.location = location ? location.name : ''
-
       const district = locations.find((loc) => loc.id === location?.partOf)
-      address.district = district ? district.name : ''
-
       const province = locations.find((loc) => loc.id === district?.partOf)
-      address.province = province ? province.name : ''
 
-      address.country = intl.formatMessage({
+      const country = intl.formatMessage({
         id: `countries.${window.config.COUNTRY}`,
         defaultMessage: 'Farajaland',
         description: 'Country name'
       })
-      return address[addressPartName]
+
+      const address = {
+        location: location?.name || '',
+        district: district?.name || '',
+        province: province?.name || '',
+        country: country
+      }
+
+      return address[propName]
     }
   )
 
-  // This helper is used to print translated message in certificate svg template.
-  // ex: <tspan>{{ intl 'constants' (lookup $declaration "child.gender") }}</tspan>
+  /**
+   * Handlebars helper: intl
+   *
+   * Usage example in SVG template:
+   *   <tspan>{{ intl 'constants' (lookup $declaration "child.gender") }}</tspan>
+   *
+   * This helper dynamically constructs a translation key by joining multiple string parts
+   * (e.g., 'constants.male') and uses `intl.formatMessage` to fetch the localized translation.
+   *
+   * In the example above, `"child.gender"` resolves to a value like `"male"` which forms
+   * part of the translation key: `constants.male`.
+   *
+   * - If any of the parts is undefined (e.g., gender not provided), it returns an empty string to prevent rendering issues.
+   * - If the translation for the constructed ID is missing, it falls back to showing: 'Missing translation for [id]'.
+   *
+   * This is especially useful in templates where dynamic values (like gender, marital status, etc.)
+   * need to be translated using i18n keys constructed from user-provided data.
+   */
   Handlebars.registerHelper(
     'intl',
 
@@ -231,8 +289,43 @@ export function compileSvg({
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
 
-  // This helper is used to compare two values and return true or false.
-  // It is used in the template to conditionally render content based on the comparison.
+  /**
+   * Handlebars helper: OR
+   * Returns the first truthy value between v1 and v2.
+   */
+  Handlebars.registerHelper(
+    'OR',
+    function (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      v1: any,
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      v2: any
+    ) {
+      return !!v1 ? v1 : v2
+    }
+  )
+
+  /**
+   * Handlebars helper: ifCond
+   *
+   * Usage example in template:
+   *   {{#ifCond value1 '===' value2}} ... {{/ifCond}}
+   *
+   * This helper compares two values (`v1` and `v2`) using the specified operator and
+   * conditionally renders a block based on the result of the comparison.
+   *
+   * Supported operators:
+   *   - '===' : strict equality
+   *   - '!==' : strict inequality
+   *   - '<', '<=', '>', '>=' : numeric/string comparisons
+   *   - '&&' : both values must be truthy
+   *   - '||' : at least one value must be truthy
+   *
+   * If the condition is met, it renders the main block (`options.fn(this)`),
+   * otherwise it renders the `else` block (`options.inverse(this)`).
+   *
+   * This helper is useful for adding conditional logic directly within Handlebars templates.
+   */
   Handlebars.registerHelper(
     'ifCond',
     function (
