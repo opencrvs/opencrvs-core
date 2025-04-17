@@ -80,7 +80,8 @@ export async function validateOnDeclare(variables: {
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID()
+    transactionId: getUUID(),
+    keepAssignment: true
   })
 
   const latestResponse = await trpcClient.event.actions.validate.request.mutate(
@@ -90,8 +91,7 @@ export async function validateOnDeclare(variables: {
       annotation,
       eventId,
       transactionId: getUUID(),
-      duplicates: [],
-      keepAssignment: true
+      duplicates: []
     }
   )
 
