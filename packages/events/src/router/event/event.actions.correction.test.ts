@@ -11,7 +11,6 @@
 
 import { TRPCError } from '@trpc/server'
 import {
-  ActionDocument,
   ActionType,
   AddressType,
   EventDocument,
