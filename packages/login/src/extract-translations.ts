@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable */
+/* eslint-disable no-console */
 import * as fs from 'fs'
 import glob from 'glob'
 import chalk from 'chalk'
@@ -187,7 +187,6 @@ async function extractMessages() {
   }
 
   if (missingKeys.length > 0) {
-    // eslint-disable-line no-console
     console.log(chalk.red.bold('Missing translations'))
     console.log(`You are missing the following content keys from your country configuration package:\n
 ${chalk.white(missingKeys.join('\n'))}\n

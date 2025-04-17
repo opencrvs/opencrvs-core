@@ -258,28 +258,31 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
               (data[section.id][field.name] as IFormSectionData).value as string
             ]) ||
           []
-        ).reduce((groupedValues, nestedField) => {
-          // Value of the parentField resembles with IFormData as a nested form
-          const nestedValue =
-            (data[section.id] &&
-              data[section.id][field.name] &&
-              renderValue(
-                data[section.id][field.name] as IFormData,
-                'nestedFields',
-                nestedField,
-                intl,
-                offlineResources,
-                language
-              )) ||
-            ''
-          return (
-            <>
-              {groupedValues}
-              {nestedValue && <div></div>}
-              {nestedValue}
-            </>
-          )
-        }, <>{value}</>)
+        ).reduce(
+          (groupedValues, nestedField) => {
+            // Value of the parentField resembles with IFormData as a nested form
+            const nestedValue =
+              (data[section.id] &&
+                data[section.id][field.name] &&
+                renderValue(
+                  data[section.id][field.name] as IFormData,
+                  'nestedFields',
+                  nestedField,
+                  intl,
+                  offlineResources,
+                  language
+                )) ||
+              ''
+            return (
+              <>
+                {groupedValues}
+                {nestedValue && <div></div>}
+                {nestedValue}
+              </>
+            )
+          },
+          <>{value}</>
+        )
       : value
   }
 
@@ -457,13 +460,15 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   const getChanges = (formSections: IFormSection[]) => {
     const changesValue = declaration.data?.registration
       ?.correction as IFormSectionData
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const Values = changesValue && (changesValue.values as any[])
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let items: any[] = []
-
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let tempItem: any
 
     const visitedTags: string[] = []
-
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     Values?.forEach((value: any) => {
       const section = formSections.find((r) => r.id === value.section)
       if (section) {
@@ -634,6 +639,7 @@ function applyCorrectionToData(record: IDeclaration) {
   }
 
   const proposedChangesPatch = correctionRequestTask.output.reduce(
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     (acc: Record<string, Record<string, IFormFieldValue>>, curr: any) => {
       acc[curr.valueCode] = acc[curr.valueCode] || {}
 

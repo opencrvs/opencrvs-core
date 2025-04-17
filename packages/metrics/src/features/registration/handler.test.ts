@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 import { createServer } from '@metrics/server'
 import * as api from '@metrics/api'
 import { readFileSync } from 'fs'
@@ -16,6 +16,17 @@ import * as jwt from 'jsonwebtoken'
 import * as fetchAny from 'jest-fetch-mock'
 import { testDeclaration } from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
+
+jest.mock('@metrics/features/performance/viewRefresher', () => {
+  const actualModule = jest.requireActual(
+    '@metrics/features/performance/viewRefresher'
+  )
+
+  return {
+    ...actualModule,
+    refresh: jest.fn()
+  }
+})
 
 const fetch = fetchAny as any
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
@@ -109,6 +120,8 @@ describe('When an existing declaration is marked registered', () => {
     server = await createServer()
   })
   it('writes the delta between DECLARED and VALIDATED states to influxdb', async () => {
+    /* eslint-disable @typescript-eslint/no-require-imports */
+    /* eslint-disable @typescript-eslint/no-var-requires */
     const influxClient = require('@metrics/influxdb/client')
     const payload = require('./test-data/sent-for-approval-request.json')
     const res = await server.server.inject({

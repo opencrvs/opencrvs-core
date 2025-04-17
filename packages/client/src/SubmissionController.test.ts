@@ -29,6 +29,7 @@ describe('Submission Controller', () => {
     new SubmissionController(store).start()
     expect(setInterval).toBeCalled()
     vi.stubGlobal('setInterval', originalInterval)
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     // @ts-ignore
     window.setTimeout = (fn: (...args: any[]) => void) => {
       return new Promise((resolve) => {

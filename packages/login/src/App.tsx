@@ -130,7 +130,10 @@ export const App = ({ store, router }: IAppProps) => (
     <Provider store={store}>
       <IntlContainer>
         <ThemeProvider theme={getTheme()}>
-          <RouterProvider router={router} />
+          <RouterProvider
+            router={router}
+            future={{ v7_startTransition: true }}
+          />
         </ThemeProvider>
       </IntlContainer>
     </Provider>

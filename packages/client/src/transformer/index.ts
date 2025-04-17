@@ -26,6 +26,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   isFieldButton,
   isFieldHttp,
+  isFieldIDReader,
   isFieldLinkButton,
   isRadioGroupWithNestedField,
   serializeFieldValue
@@ -164,9 +165,14 @@ const toCorrectionValue = (
   }
   return changedValues
 }
-
+/**
+ * This check ensures these fields are ignored when submitting, as they only generate
+ * other field values and shouldn't be sent to the backend.
+ */
 function isMetaTypeField(field: IFormField): boolean {
-  return isFieldHttp(field) || isFieldLinkButton(field)
+  return (
+    isFieldHttp(field) || isFieldLinkButton(field) || isFieldIDReader(field)
+  )
 }
 export function getChangedValues(
   formDefinition: IForm,
@@ -365,6 +371,7 @@ export const appendGqlMetadataFromDraft = (
 
 export const gqlToDraftTransformer = (
   formDefinition: IForm,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   offlineData?: IOfflineData,
   userDetails?: UserDetails

@@ -58,7 +58,11 @@ import {
   ID_READER,
   Ii18nIDReaderFormField,
   QRReaderType,
-  ReaderType
+  ReaderType,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  ILoaderFormField,
+  LOADER,
+  Ii18nLoaderFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -86,6 +90,7 @@ import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 import { UserDetails } from '@client/utils/userUtils'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
+import { memoize } from 'lodash'
 
 export const VIEW_TYPE = {
   FORM: 'form',
@@ -154,10 +159,12 @@ export const internationaliseFieldObject = (
     base.type === CHECKBOX_GROUP ||
     base.type === DOCUMENT_UPLOADER_WITH_OPTION
   ) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
   if (base.type === BULLET_LIST) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).items = internationaliseListFieldObject(intl, base.items)
   }
 
@@ -165,8 +172,10 @@ export const internationaliseFieldObject = (
     base.type === RADIO_GROUP ||
     base.type === RADIO_GROUP_WITH_NESTED_FIELDS
   ) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).options = internationaliseOptions(intl, base.options)
     if ((field as IDateFormField).notice) {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(base as any).notice = intl.formatMessage(
         // @ts-ignore
         (field as IRadioGroupFormField).notice
@@ -175,6 +184,7 @@ export const internationaliseFieldObject = (
   }
 
   if (base.type === DATE && (field as IDateFormField).notice) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).notice = intl.formatMessage(
       // @ts-ignore
       (field as IDateFormField).notice
@@ -182,12 +192,15 @@ export const internationaliseFieldObject = (
   }
 
   if (base.type === FETCH_BUTTON) {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).modalTitle = intl.formatMessage(
       (field as ILoaderButton).modalTitle
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).successTitle = intl.formatMessage(
       (field as ILoaderButton).successTitle
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
     )
@@ -210,6 +223,12 @@ export const internationaliseFieldObject = (
     )
     ;(base as Ii18nIDReaderFormField).manualInputInstructionLabel =
       intl.formatMessage(field.manualInputInstructionLabel)
+  }
+
+  if (isFieldLoader(field)) {
+    ;(base as Ii18nLoaderFormField).loadingText = intl.formatMessage(
+      field.loadingText
+    )
   }
 
   return base as Ii18nFormField
@@ -300,6 +319,7 @@ export const getFieldValidation = (
   ) {
     field.dynamicDefinitions.validator.map(
       (element: IDynamicFormFieldValidators) => {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const params: any[] = []
         element.dependencies.map((dependency: string) =>
           params.push(values[dependency])
@@ -367,7 +387,8 @@ export function getNextSectionIds(
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
-export const getFieldOptions = (
+export const getFieldOptionsSlow = (
+  _sectionName: string,
   field:
     | ISelectFormFieldWithOptions
     | ISelectFormFieldWithDynamicOptions
@@ -445,7 +466,48 @@ export const getFieldOptions = (
   }
 }
 
+export const getFieldOptions = (
+  _sectionName: string,
+  field:
+    | ISelectFormFieldWithOptions
+    | ISelectFormFieldWithDynamicOptions
+    | IDocumentUploaderWithOptionsFormField,
+  values: IFormSectionData,
+  offlineCountryConfig: IOfflineData,
+  declaration?: IFormData
+) => {
+  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS) {
+    return getMemoisedFieldOptions(
+      _sectionName,
+      field,
+      values,
+      offlineCountryConfig
+    )
+  }
+
+  return getFieldOptionsSlow(
+    _sectionName,
+    field,
+    values,
+    offlineCountryConfig,
+    declaration
+  )
+}
+
+/** Due to the large location trees with dependencies, generating options for them can be slow. We fix this by memoizing the options */
+const getMemoisedFieldOptions = memoize(
+  getFieldOptionsSlow,
+  (sectionName, field, values) => {
+    const dynamicField = field as ISelectFormFieldWithDynamicOptions
+    const dependencyVal = values[
+      dynamicField.dynamicOptions.dependency!
+    ] as string
+    return `field:${sectionName}.${field.name},dependency:${dynamicField.dynamicOptions.dependency},dependencyValue:${dependencyVal}`
+  }
+)
+
 interface INested {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 }
 
@@ -527,6 +589,7 @@ export function isDefaultCountry(countryCode: string): boolean {
 }
 
 interface IVars {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 }
 
@@ -572,20 +635,18 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
-  return (
-    field.conditionals
-      // eslint-disable-next-line no-eval
-      .filter((conditional) =>
-        evalExpressionInFieldDefinition(
-          conditional.expression,
-          values,
-          offlineCountryConfig,
-          draftData,
-          userDetails
-        )
+  return field.conditionals
+
+    .filter((conditional) =>
+      evalExpressionInFieldDefinition(
+        conditional.expression,
+        values,
+        offlineCountryConfig,
+        draftData,
+        userDetails
       )
-      .map((conditional: Conditional) => conditional.action)
-  )
+    )
+    .map((conditional: Conditional) => conditional.action)
 }
 
 export const evalExpressionInFieldDefinition = (
@@ -599,12 +660,11 @@ export const evalExpressionInFieldDefinition = (
   $user: (UserDetails & { token?: string }) | null
 ) => {
   // For backwards compatibility
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+
   const values = $form
   const offlineCountryConfig = $config
   const draftData = $draft
   const userDetails = $user
-  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   // eslint-disable-next-line no-eval
   return eval(expression)
@@ -616,7 +676,6 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   draftData?: IFormData,
   userDetails?: UserDetails | null
 ): IFormSectionGroup[] => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const values = sectionData
 
   // handling all possible group visibility conditionals
@@ -772,8 +831,12 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
   return field.type === BUTTON
 }
 
-function isFieldIDReader(field: IFormField): field is IDReaderFormField {
+export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
+}
+
+function isFieldLoader(field: IFormField): field is ILoaderFormField {
+  return field.type === LOADER
 }
 
 export function isReaderQR(reader: ReaderType): reader is QRReaderType {

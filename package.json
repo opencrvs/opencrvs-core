@@ -1,7 +1,7 @@
 {
   "description": "OpenCRVS core workspace",
   "license": "MPL-2.0",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
   "os": [
     "darwin",
@@ -45,7 +45,7 @@
     "husky": "^9.1.6",
     "lerna": "^8.0.0",
     "lint-staged": "^15.2.10",
-    "prettier": "2.8.8"
+    "prettier": "3.5.3"
   },
   "dependencies": {
     "@types/react-signature-canvas": "^1.0.2",

@@ -4163,7 +4163,11 @@ export interface BirthRegResultSetToTotalItemsResolver<
 }
 
 export interface GQLEventRegistrationTypeResolver<TParent = any> {
-  (parent: TParent, context: any, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: any,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthRegistration'
     | 'DeathRegistration'
     | 'MarriageRegistration'
@@ -4306,7 +4310,11 @@ export interface MarriageRegistrationToHistoryResolver<
 }
 
 export interface GQLRecordDetailsTypeResolver<TParent = any> {
-  (parent: TParent, context: any, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: any,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthRegistration'
     | 'DeathRegistration'
     | Promise<'BirthRegistration' | 'DeathRegistration'>
@@ -4594,7 +4602,11 @@ export interface TotalMetricsResultToResultsResolver<
 }
 
 export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
-  (parent: TParent, context: any, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: any,
+    info: GraphQLResolveInfo
+  ):
     | 'TotalMetricsByRegistrar'
     | 'TotalMetricsByLocation'
     | 'TotalMetricsByTime'
@@ -6439,13 +6451,21 @@ export interface VSExportToCreatedOnResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLUserAuditLogResultItemTypeResolver<TParent = any> {
-  (parent: TParent, context: any, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: any,
+    info: GraphQLResolveInfo
+  ):
     | 'UserAuditLogItemWithComposition'
     | 'UserAuditLogItem'
     | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>
 }
 export interface GQLEventSearchSetTypeResolver<TParent = any> {
-  (parent: TParent, context: any, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: any,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthEventSearchSet'
     | 'DeathEventSearchSet'
     | 'MarriageEventSearchSet'
@@ -8380,7 +8400,11 @@ export interface MarriageFeeToDELAYEDResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLAuditLogItemBaseTypeResolver<TParent = any> {
-  (parent: TParent, context: any, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: any,
+    info: GraphQLResolveInfo
+  ):
     | 'UserAuditLogItemWithComposition'
     | 'UserAuditLogItem'
     | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>

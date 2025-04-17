@@ -10,14 +10,15 @@
  */
 
 import { z } from 'zod'
-import { ActionType } from './ActionConfig'
-import { FieldValue } from './FieldValue'
+import { ActionType } from './ActionType'
+import { ActionUpdate } from './ActionDocument'
 
-const BaseActionInput = z.object({
+export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  draft: z.boolean().optional().default(false),
-  data: z.record(z.string(), FieldValue)
+  declaration: ActionUpdate.default({}),
+  annotation: ActionUpdate.optional(),
+  originalActionId: z.string().optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -30,12 +31,11 @@ const CreateActionInput = BaseActionInput.merge(
 export const RegisterActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
-    identifiers: z.object({
-      trackingId: z.string(),
-      registrationNumber: z.string()
-    })
+    registrationNumber: z.string().optional()
   })
 )
+
+export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 
 export const ValidateActionInput = BaseActionInput.merge(
   z.object({
@@ -48,8 +48,7 @@ export type ValidateActionInput = z.infer<typeof ValidateActionInput>
 
 export const NotifyActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
   })
 )
 
@@ -61,19 +60,105 @@ export const DeclareActionInput = BaseActionInput.merge(
   })
 )
 
+export const PrintCertificateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.PRINT_CERTIFICATE)
+      .default(ActionType.PRINT_CERTIFICATE)
+  })
+)
+
 export type DeclareActionInput = z.infer<typeof DeclareActionInput>
 
-const AssignActionInput = BaseActionInput.merge(
+export const RejectDeclarationActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.REJECT).default(ActionType.REJECT)
+  })
+)
+export type RejectDeclarationActionInput = z.infer<
+  typeof RejectDeclarationActionInput
+>
+
+export const MarkedAsDuplicateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.MARKED_AS_DUPLICATE)
+      .default(ActionType.MARKED_AS_DUPLICATE)
+  })
+)
+export type MarkedAsDuplicateActionInput = z.infer<
+  typeof MarkedAsDuplicateActionInput
+>
+
+export const ArchiveActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE)
+  })
+)
+export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
+
+export const AssignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),
     assignedTo: z.string()
   })
 )
-const UnassignActionInput = BaseActionInput.merge(
+
+export type AssignActionInput = z.infer<typeof AssignActionInput>
+
+export const UnassignActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.UNASSIGN).default(ActionType.UNASSIGN)
+    type: z.literal(ActionType.UNASSIGN).default(ActionType.UNASSIGN),
+    assignedTo: z.literal(null).default(null)
   })
 )
+export type UnassignActionInput = z.infer<typeof UnassignActionInput>
+
+export const RequestCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.REQUEST_CORRECTION)
+      .default(ActionType.REQUEST_CORRECTION)
+  })
+)
+
+export type RequestCorrectionActionInput = z.infer<
+  typeof RequestCorrectionActionInput
+>
+
+export const RejectCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    requestId: z.string(),
+    type: z
+      .literal(ActionType.REJECT_CORRECTION)
+      .default(ActionType.REJECT_CORRECTION)
+  })
+)
+
+export type RejectCorrectionActionInput = z.infer<
+  typeof RejectCorrectionActionInput
+>
+
+export const ApproveCorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    requestId: z.string(),
+    type: z
+      .literal(ActionType.APPROVE_CORRECTION)
+      .default(ActionType.APPROVE_CORRECTION)
+  })
+)
+
+export type ApproveCorrectionActionInput = z.infer<
+  typeof ApproveCorrectionActionInput
+>
+
+export const ReadActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.READ).default(ActionType.READ)
+  })
+)
+
+export type ReadActionInput = z.infer<typeof ReadActionInput>
 
 /**
  * ActionInput types are used to validate the input data for the action.
@@ -89,8 +174,16 @@ export const ActionInput = z.discriminatedUnion('type', [
   RegisterActionInput,
   NotifyActionInput,
   DeclareActionInput,
+  RejectDeclarationActionInput,
+  MarkedAsDuplicateActionInput,
+  ArchiveActionInput,
   AssignActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  PrintCertificateActionInput,
+  RequestCorrectionActionInput,
+  RejectCorrectionActionInput,
+  ApproveCorrectionActionInput,
+  ReadActionInput
 ])
 
 export type ActionInput = z.input<typeof ActionInput>

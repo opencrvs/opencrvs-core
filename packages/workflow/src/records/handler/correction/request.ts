@@ -11,7 +11,10 @@
 
 import { conflict } from '@hapi/boom'
 import { getAuthHeader } from '@opencrvs/commons/http'
-import { CorrectionRequestedRecord } from '@opencrvs/commons/types'
+import {
+  CorrectionRequestedRecord,
+  getComposition
+} from '@opencrvs/commons/types'
 import { uploadFileToMinio } from '@workflow/documents'
 import {
   getLoggedInPractitionerResource,
@@ -27,6 +30,9 @@ import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest } from './utils'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { notifyForAction } from '@workflow/utils/country-config-api'
+import { getRecordSpecificToken } from '@workflow/records/token-exchange'
+import { getEventType } from '@workflow/features/registration/utils'
 
 export const requestCorrectionRoute = createRoute({
   method: 'POST',
@@ -77,6 +83,21 @@ export const requestCorrectionRoute = createRoute({
     await sendBundleToHearth(recordInCorrectionRequestedState)
     await createNewAuditEvent(recordInCorrectionRequestedState, token)
     await indexBundle(recordInCorrectionRequestedState, token)
+
+    const recordSpecificToken = await getRecordSpecificToken(
+      token,
+      request.headers,
+      getComposition(recordInCorrectionRequestedState).id
+    )
+    await notifyForAction({
+      event: getEventType(recordInCorrectionRequestedState),
+      action: 'request-correction',
+      record,
+      headers: {
+        ...request.headers,
+        authorization: `Bearer ${recordSpecificToken.access_token}`
+      }
+    })
 
     return recordInCorrectionRequestedState
   }

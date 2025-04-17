@@ -16,30 +16,35 @@ const hero = `
   font-weight: 600;
   font-size: 48px;
   line-height: 120%;
+  margin: 0;
 `
 const h1 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 27px;
   line-height: 120%;
+  margin: 0;
 `
 const h2 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 24px;
   line-height: 120%;
+  margin: 0;
 `
 const h3 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 19px;
   line-height: 120%;
+  margin: 0;
 `
 const h4 = `
   font-family: ${family};
   font-weight: 500;
   font-size: 17px;
   line-height: 140%;
+  margin: 0;
 `
 
 const reg19 = `
@@ -47,6 +52,7 @@ const reg19 = `
   font-weight: 400;
   font-size: 19px;
   line-height: 140%;
+  margin: 0;
 `
 
 const reg18 = `
@@ -54,12 +60,14 @@ const reg18 = `
   font-weight: 400;
   font-size: 18px;
   line-height: 140%;
+  margin: 0;
 `
 const bold18 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 18px;
   line-height: 140%;
+  margin: 0;
 `
 
 const reg16 = `
@@ -67,6 +75,7 @@ const reg16 = `
   font-weight: 400;
   font-size: 16px;
   line-height: 140%;
+  margin: 0;
 `
 
 const bold16 = `
@@ -74,6 +83,7 @@ const bold16 = `
   font-weight: 600;
   font-size: 16px;
   line-height: 140%;
+  margin: 0;
 `
 
 const reg14 = `
@@ -81,6 +91,7 @@ const reg14 = `
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
+  margin: 0;
 `
 
 const bold14 = `
@@ -88,6 +99,7 @@ const bold14 = `
   font-weight: 600;
   font-size: 14px;
   line-height: 140%;
+  margin: 0;
 `
 
 const reg12 = `
@@ -95,6 +107,7 @@ const reg12 = `
   font-weight: 400;
   font-size: 12px;
   line-height: 140%;
+  margin: 0;
 `
 
 const bold12 = `
@@ -102,6 +115,7 @@ const bold12 = `
   font-weight: 600;
   font-size: 12px;
   line-height: 140%;
+  margin: 0;
 `
 
 export const fonts = {

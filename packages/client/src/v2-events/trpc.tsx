@@ -15,18 +15,28 @@ import {
   type PersistedClient,
   type Persister
 } from '@tanstack/react-query-persist-client'
-import { httpLink, loggerLink, TRPCClientError } from '@trpc/client'
-import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
+import {
+  createTRPCClient,
+  httpLink,
+  loggerLink,
+  TRPCClientError
+} from '@trpc/client'
+import {
+  createTRPCContext,
+  createTRPCOptionsProxy
+} from '@trpc/tanstack-react-query'
 import React from 'react'
 import superjson from 'superjson'
-
 import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
 
-export const api = createTRPCReact<AppRouter>()
+const { TRPCProvider: TRPCProviderRaw, useTRPC } =
+  createTRPCContext<AppRouter>()
+
+export { AppRouter, useTRPC }
 
 function getTrpcClient() {
-  return api.createClient({
+  return createTRPCClient<AppRouter>({
     links: [
       loggerLink({
         enabled: (op) => op.direction === 'down' && op.result instanceof Error
@@ -61,7 +71,7 @@ function getQueryClient() {
 
 function createIDBPersister(idbValidKey = 'reactQuery') {
   return {
-    persistClient: async (client: PersistedClient) => {
+    persistClient: async (client) => {
       await storage.setItem(idbValidKey, client)
     },
     restoreClient: async () => {
@@ -74,12 +84,15 @@ function createIDBPersister(idbValidKey = 'reactQuery') {
   } satisfies Persister
 }
 
-const trpcClient = getTrpcClient()
 const persister = createIDBPersister()
 
-export const queryClient = getQueryClient()
+export const trpcClient = getTrpcClient()
 
-export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
+export const queryClient = getQueryClient()
+export const trpcOptionsProxy = createTRPCOptionsProxy({
+  queryClient,
+  client: trpcClient
+})
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -87,8 +100,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: undefined,
         buster: 'persisted-indexed-db',
+        maxAge: undefined,
         dehydrateOptions: {
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
@@ -96,6 +109,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
               if (error instanceof TRPCClientError && error.data?.httpStatus) {
                 return !error.data.httpStatus.toString().startsWith('4')
               }
+
               return true
             }
 
@@ -106,15 +120,16 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       onSuccess={async () => {
         await queryClient.resumePausedMutations()
 
-        queryClient
-          .getMutationCache()
-          .getAll()
-          .map(async (m) => m.continue())
+        const mutations = queryClient.getMutationCache().getAll()
+
+        for (const mutation of mutations) {
+          await mutation.continue()
+        }
       }}
     >
-      <api.Provider client={trpcClient} queryClient={queryClient}>
+      <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
         {children}
-      </api.Provider>
+      </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )
 }

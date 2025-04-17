@@ -130,19 +130,19 @@ export const StatusMapping: IStatusMapping = {
   },
   [RegStatus.Certified]: {
     labelDescriptor: statusMessages.certified,
-    color: colors.blue
+    color: colors.primary
   },
   [RegStatus.Archived]: {
     labelDescriptor: statusMessages.archived,
-    color: colors.blue
+    color: colors.primary
   },
   [RegStatus.Issued]: {
     labelDescriptor: statusMessages.issued,
-    color: colors.blue
+    color: colors.primary
   },
   [RegStatus.CorrectionRequested]: {
     labelDescriptor: statusMessages.requestedCorrection,
-    color: colors.blue
+    color: colors.primary
   }
 }
 
@@ -619,8 +619,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       columnToBeSort === 'nameIntl'
         ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
         : columnToBeSort === 'declarationStartedOn'
-        ? ['declarationStartedOnTime']
-        : [columnToBeSort],
+          ? ['declarationStartedOnTime']
+          : [columnToBeSort],
       [sortOrder[columnToBeSort]]
     ).map((row, idx) => {
       return {

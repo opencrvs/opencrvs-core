@@ -91,7 +91,6 @@ export const MyDrafts: React.FC<{
   }
 
   const transformDraftContent = () => {
-    const { locale } = intl
     if (drafts.length <= 0) {
       return []
     }
@@ -105,7 +104,7 @@ export const MyDrafts: React.FC<{
       } else if (draft.event && draft.event.toString() === 'marriage') {
         pageRoute = DRAFT_MARRIAGE_FORM_PAGE
       }
-      const name = getDeclarationFullName(draft, locale)
+      const name = getDeclarationFullName(draft, intl)
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions: IAction[] = []
 
@@ -144,8 +143,8 @@ export const MyDrafts: React.FC<{
         draft.event === EventType.Birth
           ? draft.data.child?.childBirthDate || ''
           : draft.event === EventType.Death
-          ? draft.data.deathEvent?.deathDate || ''
-          : draft.data.marriageEvent?.marriageDate || ''
+            ? draft.data.deathEvent?.deathDate || ''
+            : draft.data.marriageEvent?.marriageDate || ''
 
       const dateOfEvent = isValidPlainDate(eventTime)
         ? plainDateToLocalDate(eventTime)

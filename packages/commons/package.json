@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/commons",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
   "main": "./build/dist/common/index.js",
@@ -21,6 +21,7 @@
     "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
+    "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "yarn build",
     "build:default": "tsc --project tsconfig.build.json",
     "build:esm": "tsc --project tsconfig.esm.build.json",
@@ -53,12 +54,13 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.5.0",
-    "@typescript-eslint/parser": "^4.5.0",
-    "eslint": "^7.11.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-prettier": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^4.3.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.5",
     "jest-fetch-mock": "^2.1.2",
     "pino-pretty": "^11.0.0",
     "ts-jest": "29.2.5"

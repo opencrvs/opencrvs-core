@@ -72,6 +72,7 @@ export const nameToFieldTransformer =
   (language: string, transformedFieldName?: string, fromSectionId?: string) =>
   (
     transformedData: IFormData,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     queryData: any,
     sectionId: SectionId,
     field: IFormField
@@ -277,6 +278,7 @@ export const addressQueryTransformer =
   }
 
 interface IAddress {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 }
 
@@ -373,6 +375,7 @@ export function commentToFieldTransformer(
 
 export function attachmentToFieldTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   field: IFormField,
@@ -1087,6 +1090,7 @@ export function eventAttachmentToFieldTransformer(
 }
 export function questionnaireToTemplateFieldTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   field: IFormField,
@@ -1120,7 +1124,12 @@ export function questionnaireToTemplateFieldTransformer(
       if (!offlineCountryConfig) {
         return
       }
-      const options = getFieldOptions(field, queryData, offlineCountryConfig)
+      const options = getFieldOptions(
+        sectionId,
+        field,
+        queryData,
+        offlineCountryConfig
+      )
       transformedData[sectionId][field.name] =
         options
           .find((option) => option.value === selectedQuestion.value)
@@ -1143,6 +1152,7 @@ export function questionnaireToTemplateFieldTransformer(
 
 export function questionnaireToCustomFieldTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   field: IFormField

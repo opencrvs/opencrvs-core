@@ -8,10 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
+import {
+  IOfflineDataState,
+  IOfflineData,
+  CRVSOffice,
+  AdminStructure,
+  Facility
+} from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { createSelector } from '@reduxjs/toolkit'
 import { merge } from 'lodash'
+import { IndexMap } from '@client/utils'
 
 const getOfflineState = (store: IStoreState): IOfflineDataState => store.offline
 
@@ -47,20 +54,30 @@ export const getOfflineData = (store: IStoreState): IOfflineData => {
   return data
 }
 
-export const getLocations = createSelector(getOfflineData, (data) => ({
-  ...data.locations,
-  ...data.facilities,
-  ...data.offices
-}))
+export const getLanguage = createSelector(
+  getOfflineData,
+  (data) => data.languages[0]
+)
+export const getCertificateTemplates = createSelector(
+  getOfflineData,
+  (data) => data.templates.certificates
+)
+export const getLocations = createSelector(
+  getOfflineData,
+  (data): IndexMap<AdminStructure | Facility | CRVSOffice> => ({
+    ...data.locations,
+    ...data.facilities,
+    ...data.offices
+  })
+)
+export const getCountryLogoFile = createSelector(
+  getOfflineData,
+  (data) => data.config.COUNTRY_LOGO.file
+)
 
 export const getAdminStructureLocations = createSelector(
   getOfflineData,
   (data) => data.locations
-)
-
-export const getFacilityLocations = createSelector(
-  getOfflineData,
-  (data) => data.facilities
 )
 
 export const selectCountryBackground = (store: IStoreState) => {

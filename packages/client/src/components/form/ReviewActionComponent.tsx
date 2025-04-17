@@ -10,7 +10,6 @@
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Upload } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
@@ -66,8 +65,8 @@ const UnderLayBackground = styled.div<{ background: string }>`
     background === 'success'
       ? theme.colors.greenLighter
       : background === 'error'
-      ? theme.colors.redLighter
-      : theme.colors.greenLighter};
+        ? theme.colors.redLighter
+        : theme.colors.greenLighter};
   position: absolute;
   top: 0;
   left: 0;
@@ -111,6 +110,7 @@ const ACTION_TO_CONTENT_MAP_SKELETON: (
   deliveryMethod: string,
   hasErrorsOnFields: boolean
 ) => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
 } = (deliveryMethod, hasErrorsOnFields) => ({
   [String(ACTION.DECLARATION_TO_BE_DECLARED)]: {
@@ -328,13 +328,13 @@ const ReviewActionComponent = ({
   const background = !completeDeclaration
     ? 'error'
     : draftDeclaration
-    ? 'success'
-    : ''
+      ? 'success'
+      : ''
   const action = declarationToBeRegistered
     ? ACTION.DECLARATION_TO_BE_REGISTERED
     : declarationToBeValidated
-    ? ACTION.DECLARATION_TO_BE_VALIDATED
-    : ACTION.DECLARATION_TO_BE_DECLARED
+      ? ACTION.DECLARATION_TO_BE_VALIDATED
+      : ACTION.DECLARATION_TO_BE_DECLARED
 
   const actionContent =
     (ACTION_TO_CONTENT_MAP[action].draftStatus[
@@ -398,7 +398,7 @@ const ReviewActionComponent = ({
                   onClick={toggleSubmitModalOpen}
                   disabled={totalFileSizeExceeded}
                 >
-                  <Upload />
+                  <Icon name="PaperPlaneTilt" />
                   {intl.formatMessage(buttonMessages.sendForReview)}
                 </Button>
               </ProtectedComponent>
@@ -413,7 +413,7 @@ const ReviewActionComponent = ({
                   onClick={toggleSubmitModalOpen}
                   disabled={hasErrorsOnFields || totalFileSizeExceeded}
                 >
-                  <Upload />
+                  <Icon name="PaperPlaneTilt" />
                   {intl.formatMessage(buttonMessages.sendIncomplete)}
                 </Button>
               </ProtectedComponent>
@@ -466,23 +466,23 @@ const ReviewActionComponent = ({
                       SubmissionAction.SUBMIT_FOR_REVIEW
                     )
                   : declarationToBeRegistered
-                  ? submitDeclarationAction(
-                      declaration,
-                      SUBMISSION_STATUS.READY_TO_REGISTER,
-                      SubmissionAction.REGISTER_DECLARATION
-                    )
-                  : submitDeclarationAction(
-                      declaration,
-                      SUBMISSION_STATUS.READY_TO_APPROVE,
-                      SubmissionAction.APPROVE_DECLARATION
-                    )
+                    ? submitDeclarationAction(
+                        declaration,
+                        SUBMISSION_STATUS.READY_TO_REGISTER,
+                        SubmissionAction.REGISTER_DECLARATION
+                      )
+                    : submitDeclarationAction(
+                        declaration,
+                        SUBMISSION_STATUS.READY_TO_APPROVE,
+                        SubmissionAction.APPROVE_DECLARATION
+                      )
               }
             >
               {declarationToBeRegistered
                 ? intl.formatMessage(buttonMessages.register)
                 : declarationToBeValidated
-                ? intl.formatMessage(buttonMessages.send)
-                : intl.formatMessage(buttonMessages.send)}
+                  ? intl.formatMessage(buttonMessages.send)
+                  : intl.formatMessage(buttonMessages.send)}
             </PrimaryButton>
           ]}
           show={showSubmitModal}
