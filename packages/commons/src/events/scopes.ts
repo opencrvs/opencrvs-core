@@ -75,7 +75,7 @@ export const ACTION_ALLOWED_SCOPES = {
   [ActionType.DETECT_DUPLICATE]: []
 } satisfies Record<ActionType, RequiredScopes>
 
-export function getAvailableActionsByScopes(
+export function filterUnallowedActions(
   actions: ActionType[],
   userScopes: Scope[]
 ): ActionType[] {

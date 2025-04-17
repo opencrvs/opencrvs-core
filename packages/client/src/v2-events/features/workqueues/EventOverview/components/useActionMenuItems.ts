@@ -11,7 +11,7 @@
 import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
-  getAvailableActionsByScopes,
+  filterUnallowedActions,
   Scope,
   EventIndex,
   getUUID,
@@ -26,8 +26,8 @@ import { useAuthentication } from '@client/utils/userUtils'
  * Actions that can be performed on an event based on its status, independent of the user scopes.
  *
  */
-function getActionsByStatus(event: EventIndex): ActionType[] {
-  switch (event.status) {
+function getAvailableActionsByStatus(status: EventStatus): ActionType[] {
+  switch (status) {
     case EventStatus.CREATED: {
       return [
         ActionType.READ,
@@ -181,10 +181,10 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 
-  const actionsByStatus = getActionsByStatus(event)
-  const availableActions = getAvailableActionsByScopes(actionsByStatus, scopes)
+  const availableActions = getAvailableActionsByStatus(event.status)
+  const allowedActions = filterUnallowedActions(availableActions, scopes)
 
-  return availableActions
+  return allowedActions
     .filter((action): action is keyof typeof config =>
       Object.keys(config).includes(action)
     )
