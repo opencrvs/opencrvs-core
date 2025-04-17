@@ -11,16 +11,21 @@
 import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
-  TranslationConfig,
   getActionsByStatus,
   getAvailableActionsByScopes,
   Scope,
   EventIndex,
-  getUUID
+  getUUID,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
+
+interface ActionConfig {
+  label: TranslationConfig
+  onClick: (eventId: string) => Promise<void> | void
+}
 
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
@@ -118,7 +123,7 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId }))
     }
-  }
+  } satisfies Partial<Record<ActionType, ActionConfig>>
 
   const availableActions = getAvailableActionsByScopes(actionsByStatus, scopes)
 
