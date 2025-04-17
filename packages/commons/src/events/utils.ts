@@ -19,10 +19,9 @@ import {
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { ActionUpdate, EventState } from './ActionDocument'
+import { Action, ActionUpdate, EventState } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
-import { FieldType } from './FieldType'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID } from '../uuid'
@@ -149,40 +148,27 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   })
 }
 
-export const getVisiblePagesFormFields = (
-  formConfig: FormConfig,
-  formData: ActionUpdate
-) => {
-  return formConfig.pages
-    .filter((p) => isPageVisible(p, formData))
-    .flatMap((p) => p.fields)
-}
-
-function isOptionalUncheckedCheckbox(field: FieldConfig, form: EventState) {
-  if (field.type !== FieldType.CHECKBOX || field.required) {
-    return false
-  }
-
-  return !form[field.id]
-}
-
-export function stripHiddenFields(
-  fields: FieldConfig[],
-  declaration: EventState
-) {
-  return omitBy(declaration, (_, fieldId) => {
+export function omitHiddenFields(fields: FieldConfig[], values: EventState) {
+  return omitBy(values, (_, fieldId) => {
     const field = fields.find((f) => f.id === fieldId)
 
     if (!field) {
       return true
     }
 
-    if (isOptionalUncheckedCheckbox(field, declaration)) {
-      return true
-    }
-
-    return !isFieldVisible(field, declaration)
+    return !isFieldVisible(field, values)
   })
+}
+
+export function omitHiddenPaginatedFields(
+  formConfig: FormConfig,
+  declaration: EventState
+) {
+  const visiblePagesFormFields = formConfig.pages
+    .filter((p) => isPageVisible(p, declaration))
+    .flatMap((p) => p.fields)
+
+  return omitHiddenFields(visiblePagesFormFields, declaration)
 }
 
 export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
@@ -228,10 +214,10 @@ export function isVerificationPage(
   return page.type === PageTypes.enum.VERIFICATION
 }
 
-export function deepMerge(
-  currentDocument: ActionUpdate,
-  actionDocument: ActionUpdate
-) {
+export function deepMerge<T extends Record<string, unknown>>(
+  currentDocument: T,
+  actionDocument: T
+): T {
   return mergeWith(
     currentDocument,
     actionDocument,
@@ -249,4 +235,21 @@ export function deepMerge(
       return incomingValue // Override with latest value
     }
   )
+}
+
+export function findLastAssignmentAction(actions: Action[]) {
+  return actions
+    .filter(
+      ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
+    )
+    .reduce<
+      Action | undefined
+    >((latestAction, action) => (!latestAction || action.createdAt > latestAction.createdAt ? action : latestAction), undefined)
+}
+
+/** Tell compiler that accessing record with arbitrary key might result to undefined
+ * Use when you **cannot guarantee**  that key exists in the record
+ */
+export type IndexMap<T> = {
+  [id: string]: T | undefined
 }

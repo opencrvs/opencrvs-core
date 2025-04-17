@@ -54,6 +54,10 @@ module.exports = defineConfig([
               name: './events',
               message:
                 "Don't import from './events' directly under commons. Use the actual file (e.g., 'events/EventConfig') to avoid Zod type issues."
+            },
+            {
+              name: '@opencrvs/commons',
+              message: "Importing from '@opencrvs/commons' is not allowed."
             }
           ],
           patterns: [

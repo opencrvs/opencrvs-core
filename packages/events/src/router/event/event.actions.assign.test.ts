@@ -13,23 +13,15 @@ import { TRPCError } from '@trpc/server'
 import { ActionType } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
-test(`Allows access without any scopes`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [])
-
-  const response = client.event.actions.assignment.assign(
-    generator.event.actions.assign('event-test-id-12345')
-  )
-  await expect(response).rejects.not.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
-})
-
-test(`Should add an ${ActionType.ASSIGN} action when there is no assignment actions`, async () => {
+test(`Should add an ${ActionType.ASSIGN} action when last action is not ${ActionType.ASSIGN}`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const originalEvent = await client.event.create(generator.event.create())
+
+  await client.event.actions.assignment.unassign(
+    generator.event.actions.unassign(originalEvent.id)
+  )
 
   const response = await client.event.actions.assignment.assign(
     generator.event.actions.assign(originalEvent.id)
@@ -72,10 +64,6 @@ test(`Should throw error when assigned to a different user`, async () => {
   const client = createTestClient(user)
 
   const originalEvent = await client.event.create(generator.event.create())
-
-  await client.event.actions.assignment.assign(
-    generator.event.actions.assign(originalEvent.id)
-  )
 
   await expect(
     client.event.actions.assignment.assign(

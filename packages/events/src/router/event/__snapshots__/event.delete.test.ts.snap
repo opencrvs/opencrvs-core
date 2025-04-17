@@ -1,3 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`declared event can not be deleted 1`] = `[TRPCError: A declared or notified event can not be deleted]`;
+
 exports[`should return 404 if event does not exist 1`] = `[TRPCError: Event not found with ID: some event]`;

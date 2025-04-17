@@ -9,17 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   ActionUpdate,
   DeclarationUpdateActions,
   AnnotationActionType,
   EventConfig,
-  FieldConfig,
-  FieldUpdateValue,
-  getFieldValidationErrors,
-  Inferred,
   isPageVisible,
   isVerificationPage,
   annotationActions,
@@ -27,101 +22,89 @@ import {
   DeclarationUpdateActionType,
   getActionReviewFields,
   getDeclaration,
-  getVisiblePagesFormFields,
   DeclarationActions,
   getCurrentEventState,
-  deepMerge
+  omitHiddenPaginatedFields,
+  EventDocument,
+  deepMerge,
+  deepDropNulls,
+  omitHiddenFields
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
 import { ActionMiddlewareOptions } from '@events/router/middleware/utils'
-
-function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
-  return formFields.reduce(
-    (
-      errorResults: {
-        message: string
-        id: string
-        value: FieldUpdateValue
-      }[],
-      field: FieldConfig
-    ) => {
-      const fieldErrors = getFieldValidationErrors({
-        field,
-        values: data
-      }).errors
-
-      if (fieldErrors.length === 0) {
-        return errorResults
-      }
-
-      // For backend, use the default message without translations.
-      const errormessageWithId = fieldErrors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value: data[field.id as keyof typeof data]
-      }))
-
-      return [...errorResults, ...errormessageWithId]
-    },
-    []
-  )
-}
-
-function getVerificationPageErrors(
-  verificationPageIds: string[],
-  data: ActionUpdate
-) {
-  return verificationPageIds
-    .map((pageId) => {
-      const value = data[pageId]
-      return typeof value !== 'boolean'
-        ? {
-            message: 'Verification page result is required',
-            id: pageId,
-            value
-          }
-        : null
-    })
-    .filter((error) => error !== null)
-}
-
-function throwWhenNotEmpty(errors: unknown[]) {
-  if (errors.length > 0) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: JSON.stringify(errors)
-    })
-  }
-}
+import {
+  getFormFieldErrors,
+  getInvalidUpdateKeys,
+  getVerificationPageErrors,
+  throwWhenNotEmpty
+} from './utils'
 
 function validateDeclarationUpdateAction({
   eventConfig,
+  event,
   actionType,
-  declaration,
+  declarationUpdate,
   annotation
 }: {
   eventConfig: EventConfig
+  event: EventDocument
   actionType: DeclarationUpdateActionType
-  declaration: ActionUpdate
+  declarationUpdate: ActionUpdate
+  // @TODO: annotation is always specific to action. Is there ever a need for null?
   annotation?: ActionUpdate
 }) {
+  /*
+   * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
+   * We need to validate the update against the cleaned declaration, which is a merged version of the previous declaration and the update.
+   */
+
+  // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
+  const previousDeclaration = getCurrentEventState(event).declaration
+  // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
+  const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
+
   const declarationConfig = getDeclaration(eventConfig)
 
-  const declarationFields = getVisiblePagesFormFields(
+  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed (e.g. when dob is unknown anduser has send the age previously. Now they only send dob, without setting dob unknown to false).
+  const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
-    declaration
+    completeDeclaration
   )
 
+  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid. Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
+  const invalidKeys = getInvalidUpdateKeys({
+    update: declarationUpdate,
+    cleaned: cleanedDeclaration
+  })
+
+  if (invalidKeys.length > 0) {
+    return invalidKeys
+  }
+
+  // 4. Validate declaration update against conditional rules, taking into account conditional pages.
+  const declarationErrors = declarationConfig.pages
+    .filter((page) => isPageVisible(page, cleanedDeclaration))
+    .flatMap((page) => getFormFieldErrors(page.fields, cleanedDeclaration))
+
   const declarationActionParse = DeclarationActions.safeParse(actionType)
+
+  // 5. Validate against action review fields, if applicable
   const reviewFields = declarationActionParse.success
     ? getActionReviewFields(eventConfig, declarationActionParse.data)
     : []
 
-  const fields = [...declarationFields, ...reviewFields]
+  const visibleAnnotationFields = omitHiddenFields(
+    reviewFields,
+    deepDropNulls(annotation ?? {})
+  )
 
-  // @TODO: Separate validations for annotation and declaration
-  return getFormFieldErrors(fields, { ...declaration, ...annotation })
+  const annotationErrors = getFormFieldErrors(
+    reviewFields,
+    visibleAnnotationFields
+  )
+
+  return [...declarationErrors, ...annotationErrors]
 }
 
 function validateActionAnnotation({
@@ -165,16 +148,10 @@ export function validateAction(actionType: ActionType) {
       DeclarationUpdateActions.safeParse(actionType)
 
     if (declarationUpdateAction.success) {
-      const previousDeclaration = getCurrentEventState(event)
-      // since partial updates are allowed, full declaration is needed to resolve validations
-      const completeDeclaration = deepMerge(
-        previousDeclaration.declaration,
-        input.declaration
-      )
-
       const errors = validateDeclarationUpdateAction({
         eventConfig,
-        declaration: completeDeclaration,
+        event,
+        declarationUpdate: input.declaration,
         annotation: input.annotation,
         actionType: declarationUpdateAction.data
       })

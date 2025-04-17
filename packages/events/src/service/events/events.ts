@@ -26,7 +26,9 @@ import {
   getDeclarationFields,
   getAcceptedActions,
   AsyncRejectActionDocument,
-  ActionType
+  ActionType,
+  getCurrentEventState,
+  EventStatus
 } from '@opencrvs/commons/events'
 import { getUUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -117,17 +119,13 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  /**
-   * Once an event is declared, it cannot be removed anymore.
-   */
-  const hasNonDeletableActions = event.actions.some(
-    (action) => action.type !== ActionType.CREATE
-  )
+  const eventState = getCurrentEventState(event)
 
-  if (hasNonDeletableActions) {
+  // Once an event is declared or notified, it can not be deleted anymore
+  if (eventState.status !== EventStatus.CREATED) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'Event has actions that cannot be deleted'
+      message: 'A declared or notified event can not be deleted'
     })
   }
 
@@ -199,6 +197,21 @@ export async function createEvent({
       }
     ]
   })
+
+  const action: ActionDocument = {
+    type: ActionType.ASSIGN,
+    assignedTo: createdBy,
+    declaration: {},
+    createdBy,
+    createdAt: now,
+    createdAtLocation,
+    id,
+    status: ActionStatus.Accepted
+  }
+
+  await db
+    .collection<EventDocument>('events')
+    .updateOne({ id }, { $push: { actions: action }, $set: { updatedAt: now } })
 
   const event = await getEventById(id)
   await indexEvent(event)
@@ -344,7 +357,10 @@ export async function addAction(
 
   if (action.type !== ActionType.READ) {
     await indexEvent(updatedEvent)
-    await deleteDraftsByEventId(eventId)
+
+    if (action.type !== ActionType.ASSIGN) {
+      await deleteDraftsByEventId(eventId)
+    }
   }
 
   return updatedEvent
