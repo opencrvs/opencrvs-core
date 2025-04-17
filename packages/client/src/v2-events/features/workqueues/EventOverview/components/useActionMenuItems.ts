@@ -57,34 +57,34 @@ function getAvailableActionsByStatus(
   switch (status) {
     case EventStatus.CREATED: {
       return [
+        ...assignmentActions,
         ActionType.READ,
         ActionType.DECLARE,
-        ActionType.DELETE,
-        ...assignmentActions
+        ActionType.DELETE
       ]
     }
     case EventStatus.NOTIFIED:
     case EventStatus.DECLARED: {
-      return [ActionType.READ, ActionType.VALIDATE, ...assignmentActions]
+      return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
     }
     case EventStatus.VALIDATED: {
-      return [ActionType.READ, ActionType.REGISTER, ...assignmentActions]
+      return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
     }
     case EventStatus.CERTIFIED:
     case EventStatus.REGISTERED: {
       return [
+        ...assignmentActions,
         ActionType.READ,
         ActionType.PRINT_CERTIFICATE,
-        ActionType.REQUEST_CORRECTION,
-        ...assignmentActions
+        ActionType.REQUEST_CORRECTION
       ]
     }
     case EventStatus.REJECTED: {
       return [
+        ...assignmentActions,
         ActionType.READ,
         ActionType.DECLARE,
-        ActionType.VALIDATE,
-        ...assignmentActions
+        ActionType.VALIDATE
       ]
     }
     case EventStatus.ARCHIVED:
