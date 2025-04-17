@@ -22,7 +22,7 @@ import {
   type ActionConfig,
   getCurrentEventStateWithDrafts,
   getUUID,
-  EventIndex
+  isWriteAction
 } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -34,11 +34,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import {
-  AssignmentStatus,
-  getAssignmentStatus,
-  isWriteAction
-} from '@client/v2-events/utils'
+import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 
 const viewRecordMessage = {
   id: 'v2.view.record',
