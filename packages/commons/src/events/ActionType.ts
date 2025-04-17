@@ -97,6 +97,7 @@ export type DeclarationUpdateActionType = z.infer<
 export const annotationActions = ActionTypes.exclude(declarationActionValues)
 export type AnnotationActionType = z.infer<typeof annotationActions>
 
+/** Actions which requires the user to be assigned */
 export const writeActions = ActionTypes.exclude([
   ActionType.CREATE,
   ActionType.READ

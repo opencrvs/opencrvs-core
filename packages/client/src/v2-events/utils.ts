@@ -224,7 +224,7 @@ export function useResolveLocationFullName(
 }
 
 export function isWriteAction(actionType: ActionType): boolean {
-  return writeActions.some((writeAction) => actionType === writeAction)
+  return writeActions.safeParse(actionType).success
 }
 
 export const AssignmentStatus = {
