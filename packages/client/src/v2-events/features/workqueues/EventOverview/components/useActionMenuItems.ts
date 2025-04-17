@@ -11,16 +11,74 @@
 import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
-  getActionsByStatus,
   getAvailableActionsByScopes,
   Scope,
   EventIndex,
   getUUID,
-  TranslationConfig
+  TranslationConfig,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
+
+/**
+ * Actions that can be performed on an event based on its status, independent of the user scopes.
+ *
+ */
+function getActionsByStatus(event: EventIndex): ActionType[] {
+  switch (event.status) {
+    case EventStatus.CREATED: {
+      return [
+        ActionType.READ,
+        ActionType.DECLARE,
+        ActionType.DELETE,
+        ActionType.ASSIGN,
+        ActionType.UNASSIGN
+      ]
+    }
+
+    case EventStatus.NOTIFIED:
+    case EventStatus.DECLARED: {
+      return [
+        ActionType.READ,
+        ActionType.VALIDATE,
+        ActionType.ASSIGN,
+        ActionType.UNASSIGN
+      ]
+    }
+    case EventStatus.VALIDATED: {
+      return [
+        ActionType.READ,
+        ActionType.REGISTER,
+        ActionType.ASSIGN,
+        ActionType.UNASSIGN
+      ]
+    }
+    case EventStatus.CERTIFIED:
+    case EventStatus.REGISTERED: {
+      return [
+        ActionType.READ,
+        ActionType.PRINT_CERTIFICATE,
+        ActionType.REQUEST_CORRECTION,
+        ActionType.ASSIGN,
+        ActionType.UNASSIGN
+      ]
+    }
+    case EventStatus.REJECTED: {
+      return [
+        ActionType.READ,
+        ActionType.DECLARE,
+        ActionType.VALIDATE,
+        ActionType.ASSIGN,
+        ActionType.UNASSIGN
+      ]
+    }
+    case EventStatus.ARCHIVED:
+    default:
+      return [ActionType.READ]
+  }
+}
 
 interface ActionConfig {
   label: TranslationConfig

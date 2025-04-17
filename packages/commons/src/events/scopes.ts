@@ -11,66 +11,6 @@
 import { intersection } from 'lodash'
 import { Scope, SCOPES } from '../scopes'
 import { ActionType } from './ActionType'
-import { EventIndex } from './EventIndex'
-import { EventStatus } from './EventMetadata'
-
-/**
- * Actions that can be performed on an event based on its status, independent of the user scopes.
- *
- */
-export function getActionsByStatus(event: EventIndex): ActionType[] {
-  switch (event.status) {
-    case EventStatus.CREATED: {
-      return [
-        ActionType.READ,
-        ActionType.DECLARE,
-        ActionType.DELETE,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
-      ]
-    }
-
-    case EventStatus.NOTIFIED:
-    case EventStatus.DECLARED: {
-      return [
-        ActionType.READ,
-        ActionType.VALIDATE,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
-      ]
-    }
-    case EventStatus.VALIDATED: {
-      return [
-        ActionType.READ,
-        ActionType.REGISTER,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
-      ]
-    }
-    case EventStatus.CERTIFIED:
-    case EventStatus.REGISTERED: {
-      return [
-        ActionType.READ,
-        ActionType.PRINT_CERTIFICATE,
-        ActionType.REQUEST_CORRECTION,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
-      ]
-    }
-    case EventStatus.REJECTED: {
-      return [
-        ActionType.READ,
-        ActionType.DECLARE,
-        ActionType.VALIDATE,
-        ActionType.ASSIGN,
-        ActionType.UNASSIGN
-      ]
-    }
-    case EventStatus.ARCHIVED:
-    default:
-      return [ActionType.READ]
-  }
-}
 
 function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
@@ -84,78 +24,63 @@ type RequiredScopes =
   | RequiresNoScope
   | NotAvailableAsAction
 
-export function getRequiredScopesForAction(action: ActionType): RequiredScopes {
-  switch (action) {
-    case ActionType.READ:
-    case ActionType.CREATE:
-      return [
-        SCOPES.RECORD_DECLARE,
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_INCOMPLETE,
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-        SCOPES.RECORD_REGISTER,
-        SCOPES.RECORD_EXPORT_RECORDS
-      ]
+export const CONFIG_GET_ALLOWED_SCOPES = [
+  SCOPES.RECORD_DECLARE,
+  SCOPES.RECORD_READ,
+  SCOPES.RECORD_SUBMIT_INCOMPLETE,
+  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_EXPORT_RECORDS,
+  SCOPES.CONFIG,
+  SCOPES.CONFIG_UPDATE_ALL
+] satisfies RequiresAnyOfScopes
 
-    case ActionType.NOTIFY:
-      return [SCOPES.RECORD_SUBMIT_INCOMPLETE]
-
-    case ActionType.DECLARE:
-      return [
-        SCOPES.RECORD_DECLARE,
-        SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-        SCOPES.RECORD_REGISTER
-      ]
-
-    case ActionType.DELETE:
-      return [SCOPES.RECORD_DECLARE]
-
-    case ActionType.VALIDATE:
-      return [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER]
-
-    case ActionType.REGISTER:
-      return [SCOPES.RECORD_REGISTER]
-
-    case ActionType.PRINT_CERTIFICATE:
-      return [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]
-
-    case ActionType.REQUEST_CORRECTION:
-      return [SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION]
-
-    case ActionType.REJECT_CORRECTION:
-      return [SCOPES.RECORD_SUBMIT_FOR_UPDATES]
-
-    case ActionType.APPROVE_CORRECTION:
-      return [SCOPES.RECORD_REGISTRATION_CORRECT]
-
-    case ActionType.MARKED_AS_DUPLICATE:
-    case ActionType.ARCHIVE:
-      return [SCOPES.RECORD_DECLARATION_ARCHIVE]
-
-    case ActionType.REJECT:
-      return [SCOPES.RECORD_SUBMIT_FOR_UPDATES]
-
-    case ActionType.ASSIGN:
-    case ActionType.UNASSIGN:
-      return null
-
-    case ActionType.DETECT_DUPLICATE: {
-      return [] // pseudo action?
-    }
-    default: {
-      // eslint-disable-next-line no-console
-      console.error('Unknown action type:', action)
-      return [] // not available
-    }
-  }
-}
+export const ACTION_ALLOWED_SCOPES = {
+  [ActionType.READ]: [
+    SCOPES.RECORD_DECLARE,
+    SCOPES.RECORD_READ,
+    SCOPES.RECORD_SUBMIT_INCOMPLETE,
+    SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+    SCOPES.RECORD_REGISTER,
+    SCOPES.RECORD_EXPORT_RECORDS
+  ],
+  [ActionType.CREATE]: [
+    SCOPES.RECORD_DECLARE,
+    SCOPES.RECORD_SUBMIT_INCOMPLETE,
+    SCOPES.RECORD_SUBMIT_FOR_REVIEW
+  ],
+  [ActionType.NOTIFY]: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
+  [ActionType.DECLARE]: [
+    SCOPES.RECORD_DECLARE,
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+    SCOPES.RECORD_REGISTER
+  ],
+  [ActionType.DELETE]: [SCOPES.RECORD_DECLARE],
+  [ActionType.VALIDATE]: [
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+    SCOPES.RECORD_REGISTER
+  ],
+  [ActionType.REGISTER]: [SCOPES.RECORD_REGISTER],
+  [ActionType.PRINT_CERTIFICATE]: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
+  [ActionType.REQUEST_CORRECTION]: [
+    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+  ],
+  [ActionType.REJECT_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
+  [ActionType.APPROVE_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
+  [ActionType.MARKED_AS_DUPLICATE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
+  [ActionType.ARCHIVE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
+  [ActionType.REJECT]: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
+  [ActionType.ASSIGN]: null,
+  [ActionType.UNASSIGN]: null,
+  [ActionType.DETECT_DUPLICATE]: []
+} satisfies Record<ActionType, RequiredScopes>
 
 export function getAvailableActionsByScopes(
   actions: ActionType[],
   userScopes: Scope[]
 ): ActionType[] {
   return actions.filter((action) => {
-    const requiredScopes = getRequiredScopesForAction(action)
+    const requiredScopes = ACTION_ALLOWED_SCOPES[action]
 
     if (requiredScopes === null) {
       return true
