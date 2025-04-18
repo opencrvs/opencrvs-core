@@ -185,19 +185,21 @@ export function compileSvg({
    */
   Handlebars.registerHelper(
     '$lookup',
-    function (propertyPath: string, finalNode: string) {
+    function (data: typeof $declaration, propertyPath: string) {
+      if (data !== $declaration) {
+        const warning =
+          '$lookup currently only supports $declaration as a parameter.'
+        // eslint-disable-next-line no-console
+        console.warn(warning)
+        return warning
+      }
+
       const stringify = useFormDataStringifier()
       const formFieldWithResolvedValue = stringify(
         config.declaration.pages.flatMap((x) => x.fields),
         $declaration
       )
 
-      if (
-        typeof formFieldWithResolvedValue[propertyPath] === 'object' &&
-        finalNode
-      ) {
-        return formFieldWithResolvedValue[propertyPath][finalNode]
-      }
       return formFieldWithResolvedValue[propertyPath]
     }
   )
