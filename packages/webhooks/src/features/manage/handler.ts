@@ -18,7 +18,7 @@ import {
   generateChallenge
 } from '@webhooks/features/manage/service'
 import { internal } from '@hapi/boom'
-import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
+import Webhook from '@webhooks/model/webhook'
 import { logger } from '@opencrvs/commons'
 import { v4 as uuid } from 'uuid'
 import fetch from 'node-fetch'
@@ -40,13 +40,12 @@ export async function subscribeWebhooksHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { hub } = request.payload as ISubscribePayload
-  if (!(hub.topic in TRIGGERS)) {
+  if (hub.topic === undefined) {
     return h
       .response({
         hub: {
           mode: 'denied',
-          topic: hub.topic,
-          reason: `Unsupported topic: ${hub.topic}`
+          reason: 'hub.topic is required'
         }
       })
       .code(400)
@@ -109,7 +108,7 @@ export async function subscribeWebhooksHandler(
       createdBy,
       address: hub.callback,
       sha_secret: hub.secret,
-      trigger: hub.topic in TRIGGERS ? hub.topic : undefined
+      trigger: hub.topic
     }
     const challenge = generateChallenge()
 

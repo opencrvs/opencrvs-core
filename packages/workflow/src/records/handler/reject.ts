@@ -17,11 +17,12 @@ import { toRejected } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 import {
-  isNotificationEnabled,
-  sendNotification
+  sendNotification,
+  isNotificationEnabled
 } from '@workflow/records/notification'
-import { SCOPES } from '@opencrvs/commons/authentication'
 import { getEventType } from '@workflow/features/registration/utils'
+import { invokeWebhooks } from '@workflow/records/webhooks'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const requestSchema = z.object({
   comment: z.string(),
@@ -58,6 +59,14 @@ export const rejectRoute = createRoute({
     if (await isNotificationEnabled('sent-for-updates', event, token)) {
       await sendNotification('sent-for-updates', rejectedRecord, token)
     }
+
+    await invokeWebhooks({
+      bundle: record,
+      token,
+      event: getEventType(record),
+      isNotRegistered: true,
+      statusType: 'rejected'
+    })
 
     return rejectedRecord
   }

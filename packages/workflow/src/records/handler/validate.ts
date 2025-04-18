@@ -15,6 +15,7 @@ import { toValidated } from '@workflow/records/state-transitions'
 import { auditEvent } from '@workflow/records/audit'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
+import { invokeWebhooks } from '@workflow/records/webhooks'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { getRecordSpecificToken } from '@workflow/records/token-exchange'
 import { getComposition } from '@opencrvs/commons/types'
@@ -63,6 +64,14 @@ export const validateRoute = createRoute({
         ...request.headers,
         authorization: `Bearer ${recordSpecificToken.access_token}`
       }
+    })
+
+    await invokeWebhooks({
+      bundle: record,
+      token,
+      event: getEventType(record),
+      isNotRegistered: true,
+      statusType: 'validated'
     })
 
     return validatedRecord

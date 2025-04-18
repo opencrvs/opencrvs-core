@@ -30,6 +30,7 @@ export const SCOPES = {
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
+  SELF_SERVICE_PORTAL: 'self-service-portal',
 
   /**
    * @TODO This is a temporary scope to be used for V2 Events custom events declaration

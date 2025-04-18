@@ -53,8 +53,7 @@ import {
   getRegLastOffice,
   getEncounterLocationType,
   getPractitionerIdFromBundle,
-  fetchDeclarationsBeginnerRole,
-  isNotification
+  fetchDeclarationsBeginnerRole
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -69,7 +68,7 @@ import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { fetchTaskHistory } from '@metrics/api'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 import { getTokenPayload } from '@metrics/utils/authUtils'
-import { getUser } from '@metrics/features/audit/handler'
+import { getSystem, getUser } from '@metrics/features/audit/handler'
 
 export const generateInCompleteFieldPoints = async (
   payload: fhir.Bundle,
@@ -508,7 +507,20 @@ export async function generateDeclarationStartedPoint(
   const task = getTask(payload)
   const tokenPayload = getTokenPayload(authHeader.Authorization)
 
-  const userId = tokenPayload.sub
+  const isNotificationAPIUser =
+    tokenPayload.scope.indexOf('notification-api') > -1
+  const isSelfServicePortalAPIUser =
+    tokenPayload.scope.indexOf('self-service-portal') > -1
+  let user
+  if (isNotificationAPIUser || isSelfServicePortalAPIUser) {
+    user = await getSystem(tokenPayload.sub, {
+      Authorization: `Bearer ${authHeader.Authorization}`
+    })
+  } else {
+    user = await getUser(tokenPayload.sub, {
+      Authorization: `Bearer ${authHeader.Authorization}`
+    })
+  }
 
   if (!composition) {
     throw new Error('composition not found')
@@ -518,12 +530,8 @@ export async function generateDeclarationStartedPoint(
     throw new Error('Task not found')
   }
 
-  const role = isNotification(composition)
-    ? 'NOTIFICATION_API_USER'
-    : (await getUser(userId, authHeader)).role
-
   const fields: IDeclarationsStartedFields = {
-    role,
+    role: user.role,
     status: getDeclarationStatus(task),
     compositionId: composition.id!
   }
