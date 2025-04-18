@@ -25,7 +25,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const [event] = events.readEvent.useSuspenseQuery(eventId)
 
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
