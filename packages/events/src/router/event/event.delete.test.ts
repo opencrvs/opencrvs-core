@@ -160,8 +160,7 @@ describe('check unreferenced draft attachments are deleted while final action su
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
       expect.objectContaining({ type: ActionType.ASSIGN }),
-      expect.objectContaining({ type: ActionType.DECLARE }),
-      expect.objectContaining({ type: ActionType.READ })
+      expect.objectContaining({ type: ActionType.DECLARE })
     ])
   })
 

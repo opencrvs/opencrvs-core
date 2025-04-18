@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { SCOPES } from '@opencrvs/commons'
+import { ActionType, SCOPES } from '@opencrvs/commons'
 import {
   createTestClient,
   setupTestCase,
@@ -20,7 +20,7 @@ test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  await expect(client.event.get('event-test-id-12345')).rejects.toMatchObject(
+  await expect(client.event.read('event-test-id-12345')).rejects.toMatchObject(
     new TRPCError({ code: 'FORBIDDEN' })
   )
 })
@@ -29,7 +29,7 @@ test(`allows access with required scope`, async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.RECORD_READ])
 
-  await expect(client.event.get('some event')).rejects.not.toMatchObject(
+  await expect(client.event.read('some event')).rejects.not.toMatchObject(
     new TRPCError({ code: 'FORBIDDEN' })
   )
 })
@@ -39,7 +39,7 @@ test(`Returns 404 when not found`, async () => {
   const client = createTestClient(user)
 
   await expect(
-    client.event.get('id-not-persisted')
+    client.event.read('id-not-persisted')
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -49,10 +49,12 @@ test('Returns event', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  const fetchedEvent = await client.event.get(event.id)
+  const fetchedEvent = await client.event.read(event.id)
 
   expect(fetchedEvent.id).toEqual(event.id)
-  expect(fetchedEvent.actions).toEqual(event.actions)
+
+  const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
+  expect(fetchedEventWithoutReadAction).toEqual(event.actions)
 })
 
 test('Returns event with all actions', async () => {
@@ -107,7 +109,12 @@ test('Returns event with all actions', async () => {
     )
   )
 
-  await client.event.get(event.id)
-  const secondTimefetchedEvent = await client.event.get(event.id)
-  expect(secondTimefetchedEvent.actions).toHaveLength(12)
+  await client.event.read(event.id)
+  const secondTimefetchedEvent = await client.event.read(event.id)
+
+  expect(
+    secondTimefetchedEvent.actions.filter(
+      (action) => action.type === ActionType.READ
+    )
+  ).toHaveLength(2)
 })

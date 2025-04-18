@@ -38,16 +38,11 @@ test('event can be created and fetched', async () => {
   const event = await client.event.create(generator.event.create())
 
   const fetchedEvent = await client.event.get(event.id)
-
-  const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
-  expect(fetchedEventWithoutReadAction).toEqual(event.actions)
+  expect(fetchedEvent.actions).toEqual(event.actions)
 
   expect(fetchedEvent.actions).toEqual([
     expect.objectContaining({ type: ActionType.CREATE }),
-    expect.objectContaining({ type: ActionType.ASSIGN }),
-    expect.objectContaining({
-      type: ActionType.READ
-    })
+    expect.objectContaining({ type: ActionType.ASSIGN })
   ])
 })
 

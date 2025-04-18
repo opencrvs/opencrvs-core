@@ -54,8 +54,7 @@ test(`Should not add any new actions when assigned to the same user`, async () =
 
   expect(finalEvent.actions.map(({ type }) => type)).toEqual([
     ActionType.CREATE,
-    ActionType.ASSIGN, // only a single assign entry
-    ActionType.READ
+    ActionType.ASSIGN // only a single assign entry
   ])
 })
 

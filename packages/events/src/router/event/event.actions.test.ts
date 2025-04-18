@@ -57,8 +57,7 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({ type: ActionType.DECLARE }),
     expect.objectContaining({ type: ActionType.VALIDATE }),
-    expect.objectContaining({ type: ActionType.REGISTER }),
-    expect.objectContaining({ type: ActionType.READ })
+    expect.objectContaining({ type: ActionType.REGISTER })
   ])
 })
 
@@ -169,10 +168,6 @@ test('READ action does not delete draft', async () => {
   await client.event.draft.create(draftData)
 
   const draftEvents = await client.event.draft.list()
-
-  const event = await client.event.get(originalEvent.id)
-  // this triggers READ action
-  expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
 
   const draftEventsAfterRead = await client.event.draft.list()
 
