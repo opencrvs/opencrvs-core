@@ -21,7 +21,8 @@ import {
   EventDocument,
   type ActionConfig,
   getCurrentEventStateWithDrafts,
-  getUUID
+  getUUID,
+  EventIndex
 } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -33,6 +34,11 @@ import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import {
+  AssignmentStatus,
+  getAssignmentStatus,
+  isWriteAction
+} from '@client/v2-events/utils'
 
 const viewRecordMessage = {
   id: 'v2.view.record',
@@ -70,58 +76,25 @@ const actionMessages = defineMessages({
   }
 })
 
-function AssignmentActions({ eventId }: { eventId: string }) {
-  const intl = useIntl()
-  const events = useEvents()
-  const authentication = useAuthentication()
-  /**
-   * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
-   * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
-   */
-  const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
-
-  if (!authentication) {
-    throw new Error('Authentication is not available but is required')
-  }
-
-  return (
-    <>
-      <DropdownMenu.Item
-        key={ActionType.ASSIGN}
-        onClick={async () => {
-          await events.actions.assignment.assign.mutate({
-            eventId,
-            assignedTo: authentication.sub,
-            refetchEvent
-          })
-        }}
-      >
-        {intl.formatMessage(actionMessages.assignLabel)}
-      </DropdownMenu.Item>
-
-      <DropdownMenu.Item
-        key={ActionType.UNASSIGN}
-        onClick={() => {
-          events.actions.assignment.unassign.mutate({
-            eventId,
-            transactionId: getUUID(),
-            assignedTo: null
-          })
-        }}
-      >
-        {intl.formatMessage(actionMessages.unassignLabel)}
-      </DropdownMenu.Item>
-    </>
-  )
-}
-
 export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
 
+  /**
+   * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
+   * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
+   */
+  const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
+  const eventState = events.getEventState.useSuspenseQuery(eventId)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
+
+  if (!authentication) {
+    throw new Error('Authentication is not available but is required')
+  }
+
+  const assignmentStatus = getAssignmentStatus(eventState, authentication.sub)
 
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
@@ -173,6 +146,10 @@ export function ActionMenu({ eventId }: { eventId: string }) {
             return (
               <DropdownMenu.Item
                 key={action.type}
+                disabled={
+                  assignmentStatus !== AssignmentStatus.ASSIGNED_TO_SELF &&
+                  isWriteAction(action.type)
+                }
                 onClick={() => {
                   if (
                     action.type === ActionType.REJECT ||
@@ -205,7 +182,43 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               </DropdownMenu.Item>
             )
           })}
-          <AssignmentActions eventId={eventId} />
+          {assignmentStatus === AssignmentStatus.UNASSIGNED && (
+            <DropdownMenu.Item
+              key={ActionType.ASSIGN}
+              onClick={async () => {
+                /**
+                 * Mutations typically follow a “fire-and-forget” approach and do not need to be awaited.
+                 * However, in this case, we need to finish refetching the event first before mutating.
+                 * Hence, awaiting is required.
+                 */
+                await events.actions.assignment.assign.mutate({
+                  eventId,
+                  assignedTo: authentication.sub,
+                  refetchEvent
+                })
+              }}
+            >
+              {intl.formatMessage(actionMessages.assignLabel)}
+            </DropdownMenu.Item>
+          )}
+          {(assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ||
+            (assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
+              authentication.scope.includes(
+                SCOPES.RECORD_UNASSIGN_OTHERS
+              ))) && (
+            <DropdownMenu.Item
+              key={ActionType.UNASSIGN}
+              onClick={() => {
+                events.actions.assignment.unassign.mutate({
+                  eventId,
+                  transactionId: getUUID(),
+                  assignedTo: null
+                })
+              }}
+            >
+              {intl.formatMessage(actionMessages.unassignLabel)}
+            </DropdownMenu.Item>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>

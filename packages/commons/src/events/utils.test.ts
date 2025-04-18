@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Action, ActionType } from '@opencrvs/commons'
+import { Action } from './ActionDocument'
+import { ActionType } from './ActionType'
 import { findLastAssignmentAction } from './utils'
 
 const commonAction = {

@@ -11,10 +11,9 @@ name: Publish release
 on:
   workflow_dispatch:
     inputs:
-      branch_name:
-        description: Branch to build from
-        default: develop
-        required: true
+      # release_version:
+      #   This input parameter specifies the release version number for the workflow.
+      #   Value is used to checkout the correct branch or tag
       release_version:
         description: Release version number
         required: true
@@ -34,16 +33,18 @@ jobs:
       - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
-          ref: '${{ github.event.inputs.branch_name }}'
+          ref: '${{ github.event.inputs.release_version }}'
 
       - uses: actions/checkout@v4
         if: github.event_name == 'push'
 
-      - name: Set version
-        id: set-version
+      - name: Set version and branch
+        id: set-version-and-branch
         run: |
           export VERSION=${{ github.event.inputs.release_version }}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          export BRANCH=${{ github.event.inputs.release_version }}
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
       - name: Get list of services
         id: get-services
@@ -69,12 +70,13 @@ jobs:
           push: true
           tags: |
             ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}
-          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version.outputs.version }}
+          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}
           cache-to: type=inline
 
     outputs:
       services: ${{ steps.get-services.outputs.services }}
-      version: ${{ steps.set-version.outputs.version }}
+      version: ${{ steps.set-version-and-branch.outputs.version }}
+      branch: ${{ steps.set-version-and-branch.outputs.branch }}
 
   build:
     needs: base
@@ -87,7 +89,7 @@ jobs:
       - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
-          ref: '${{ github.event.inputs.branch_name }}'
+          ref: '${{ github.event.inputs.release_version }}'
 
       - uses: actions/checkout@v4
         if: github.event_name == 'push'
@@ -105,6 +107,7 @@ jobs:
           file: packages/${{ matrix.service }}/Dockerfile
           build-args: |
             VERSION=${{ needs.base.outputs.version }}
+            BRANCH=${{ needs.base.outputs.branch }}
           push: true
           context: .
           tags: |
