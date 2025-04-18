@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHttp } from './http'
 import { Button, getTheme, Icon } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useDeclaration } from '@client/declarations/selectors'
 import { writeDeclaration } from '@client/declarations'
 
@@ -56,12 +56,19 @@ export const LinkButtonField = ({
   const trigger = fields.find(
     (f) => f.name === fieldDefinition.options.callback.trigger
   )!
+  const { declarationId = '', pageId: section } = useParams()
+  const declaration = useDeclaration(declarationId)
+  const dispatch = useDispatch()
+  const redirectKey = ['redirect', section, declarationId].join('.')
+  const location = useLocation()
+  const previousPathRef = useRef(location.pathname)
   const onChange: Parameters<typeof useHttp>[1] = ({
     data,
     error,
     loading
   }) => {
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
+    localStorage.setItem(redirectKey, JSON.stringify({ loading, data, error }))
     if (data || error) {
       // remove query parameters from the URL after successful or failed callback request
       const url = new URL(window.location.href)
@@ -71,9 +78,6 @@ export const LinkButtonField = ({
   }
 
   const hasCallbackRequestBeenMade = useRef(false)
-  const { declarationId = '' } = useParams()
-  const declaration = useDeclaration(declarationId)
-  const dispatch = useDispatch()
 
   const { call } = useHttp<string>(
     trigger as IHttpFormField,
@@ -83,6 +87,17 @@ export const LinkButtonField = ({
     draft,
     user
   )
+
+  useEffect(() => {
+    const redirectData = localStorage.getItem(redirectKey)
+    // Check if the location pathname has changed because this button can be re-rendered
+    // when the user revokes authenticated verification (being on the same page)
+    // and the redirectData is still present in localStorage
+    if (redirectData && previousPathRef.current !== location.pathname) {
+      setFieldValue(trigger.name, JSON.parse(redirectData))
+      localStorage.removeItem(redirectKey)
+    }
+  }, [redirectKey, setFieldValue, trigger.name, location.pathname])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -113,12 +128,14 @@ export const LinkButtonField = ({
         if (declaration) {
           dispatch(
             writeDeclaration(declaration, () => {
-              window.location.href = evalExpressionInFieldDefinition(
-                '`' + decodeURIComponent(to) + '`',
-                form,
-                config,
-                draft,
-                user
+              window.location.replace(
+                evalExpressionInFieldDefinition(
+                  '`' + decodeURIComponent(to) + '`',
+                  form,
+                  config,
+                  draft,
+                  user
+                )
               )
             })
           )
