@@ -25,6 +25,7 @@ describe('correction requests', () => {
       trackingId: 'TEST12',
       createdAt: '2025-01-23T02:21:38.343Z',
       updatedAt: '2025-01-23T02:21:42.230Z',
+      updatedAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
       actions: [
         {
           type: 'CREATE',
@@ -74,6 +75,7 @@ describe('correction requests', () => {
       trackingId: 'TEST12',
       createdAt: '2025-01-23T02:21:38.343Z',
       updatedAt: '2025-01-23T02:21:42.230Z',
+      updatedAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
       actions: [
         {
           type: 'CREATE',
@@ -184,7 +186,8 @@ describe('address state transitions', () => {
       createdAt: new Date().toISOString(),
       actions,
       id: getUUID(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      updatedAtLocation: getUUID()
     })
 
     expect(state.declaration).toEqual(initialForm)
@@ -215,7 +218,8 @@ describe('address state transitions', () => {
       createdAt: new Date().toISOString(),
       actions,
       id: getUUID(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      updatedAtLocation: getUUID()
     })
 
     expect(state.declaration).toEqual({

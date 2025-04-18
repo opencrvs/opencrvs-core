@@ -17,6 +17,7 @@ export const EventDocument = z.object({
   type: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  updatedAtLocation: z.string(),
   actions: z.array(Action),
   trackingId: z.string()
 })
