@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHttp } from './http'
 import { Button, getTheme, Icon } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useDeclaration } from '@client/declarations/selectors'
 import { writeDeclaration } from '@client/declarations'
 
@@ -60,6 +60,8 @@ export const LinkButtonField = ({
   const declaration = useDeclaration(declarationId)
   const dispatch = useDispatch()
   const redirectKey = ['redirect', section, declarationId].join('.')
+  const location = useLocation()
+  const previousPathRef = useRef(location.pathname)
   const onChange: Parameters<typeof useHttp>[1] = ({
     data,
     error,
@@ -88,11 +90,11 @@ export const LinkButtonField = ({
 
   useEffect(() => {
     const redirectData = localStorage.getItem(redirectKey)
-    if (redirectData) {
+    if (redirectData && previousPathRef.current !== location.pathname) {
       setFieldValue(trigger.name, JSON.parse(redirectData))
       localStorage.removeItem(redirectKey)
     }
-  }, [redirectKey, setFieldValue, trigger.name])
+  }, [redirectKey, setFieldValue, trigger.name, location.pathname])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
