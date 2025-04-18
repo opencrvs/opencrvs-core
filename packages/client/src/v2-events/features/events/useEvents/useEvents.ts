@@ -23,16 +23,19 @@ import {
   useEventCustomAction
 } from './procedures/actions/action'
 import { useGetEvents } from './procedures/list'
+import { useReadEvent } from './procedures/read'
 
 export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
+  const readEvent = useReadEvent()
   const getEvents = useGetEvents()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   return {
     createEvent: useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
+    readEvent,
     getEvents,
     /** Returns an event with aggregated history. If you need the history of the event, use getEvent. */
     getEventState: useGetEventState(),

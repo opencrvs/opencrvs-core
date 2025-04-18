@@ -109,6 +109,13 @@ export const eventRouter = router({
   get: publicProcedure
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .input(z.string())
+    .query(async ({ input }) => {
+      const event = await getEventById(input)
+      return event
+    }),
+  read: publicProcedure
+    .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
+    .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const updatedEvent = await addAction(
