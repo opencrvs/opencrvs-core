@@ -58,7 +58,7 @@ export function declarationReference(fieldName: string) {
  * Generates an Elasticsearch query to search within `document.declaration`
  * using the provided search payload.
  */
-export function generateQuery(
+function generateQuery(
   event: Record<
     string,
     | { type: 'exact' | 'fuzzy'; term: string }
