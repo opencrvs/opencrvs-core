@@ -100,5 +100,7 @@ export type AnnotationActionType = z.infer<typeof annotationActions>
 /** Actions which requires the user to be assigned */
 export const writeActions = ActionTypes.exclude([
   ActionType.CREATE,
-  ActionType.READ
+  ActionType.READ,
+  ActionType.ASSIGN,
+  ActionType.UNASSIGN
 ])
