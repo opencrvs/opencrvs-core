@@ -1352,11 +1352,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description: 'This is what this event is referred as in the system',
         id: 'v2.event.tennis-club-membership.search'
       },
-      fields: [
-        {
-          fieldId: 'applicant.dob'
-        }
-      ]
+      fields: [field('applicant.dob').exact()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM

@@ -18,14 +18,14 @@ import {
   DraftInput,
   EventIndex,
   EventInput,
-  EventSearchIndex,
   ActionStatus,
   ApproveCorrectionActionInput,
   EventConfig,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
   AssignActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  QueryType
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -69,6 +69,15 @@ const RECORD_READ_SCOPES = [
   SCOPES.RECORD_SUBMIT_FOR_REVIEW,
   SCOPES.RECORD_REGISTER,
   SCOPES.RECORD_EXPORT_RECORDS
+]
+
+const RECORD_SEARCH_SCOPES = [
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_MARRIAGE,
+  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
 ]
 
 export const eventRouter = router({
@@ -121,7 +130,7 @@ export const eventRouter = router({
         {
           eventId: event.id,
           createdBy: ctx.user.id,
-          createdAtLocation: ctx.user.primaryOfficeId,
+          updatedAtLocation: ctx.user.primaryOfficeId,
           token: ctx.token,
           transactionId: getUUID(),
           status: ActionStatus.Accepted
@@ -170,7 +179,7 @@ export const eventRouter = router({
           return assignRecord({
             input: options.input,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token
           })
         }),
@@ -181,7 +190,7 @@ export const eventRouter = router({
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -198,7 +207,7 @@ export const eventRouter = router({
           return addAction(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId,
             status: ActionStatus.Accepted
@@ -212,7 +221,7 @@ export const eventRouter = router({
           return approveCorrection(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -224,7 +233,7 @@ export const eventRouter = router({
           return rejectCorrection(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -235,7 +244,8 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
-  search: publicProcedure.input(EventSearchIndex).query(async ({ input }) => {
-    return getIndex(input)
-  })
+  search: publicProcedure
+    .use(requiresAnyOfScopes(RECORD_SEARCH_SCOPES))
+    .input(QueryType)
+    .query(async ({ input }) => getIndex(input))
 })

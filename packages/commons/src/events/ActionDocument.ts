@@ -36,7 +36,8 @@ export const ActionBase = z.object({
   createdBy: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string(),
+  createdAtLocation: z.string().optional(),
+  updatedAtLocation: z.string().optional(),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,

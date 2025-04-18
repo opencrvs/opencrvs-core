@@ -176,8 +176,9 @@ export async function findDuplicates(
       createdAt: '2025-01-01',
       createdBy: 'test',
       createdAtLocation: 'test',
+      updatedAtLocation: 'test',
       assignedTo: 'test',
-      modifiedAt: '2025-01-01',
+      updatedAt: '2025-01-01',
       updatedBy: 'test',
       trackingId: 'TEST12'
     },
@@ -253,8 +254,9 @@ describe('deduplication tests', () => {
         createdAt: '2025-01-01',
         createdBy: 'test',
         createdAtLocation: 'test',
+        updatedAtLocation: 'test',
         assignedTo: 'test',
-        modifiedAt: '2025-01-01',
+        updatedAt: '2025-01-01',
         updatedBy: 'test',
         trackingId: 'TEST12'
       },

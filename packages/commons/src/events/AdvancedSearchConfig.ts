@@ -11,25 +11,23 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 
+const FieldType = z.enum(['FUZZY', 'EXACT', 'RANGE'])
+
+export const FieldConfigSchema = z.object({
+  fieldId: z.string(),
+  config: z.object({
+    type: FieldType.describe('Determines the type of field')
+  })
+})
+
 export const AdvancedSearchConfig = z.object({
   title: TranslationConfig.describe('Advanced search tab title'),
   fields: z
-    .array(
-      z.object({
-        fieldId: z.string(),
-        config: z
-          .object({
-            type: z
-              .enum(['FUZZY', 'EXACT', 'RANGE'])
-              .describe('Determines the type of field')
-          })
-          .optional()
-          .describe('Configuration options for the field')
-      })
-    )
+    .array(FieldConfigSchema)
     .optional()
     .default([])
     .describe('Advanced search fields.')
 })
 
+export type AdvancedSearchConfigInput = z.infer<typeof AdvancedSearchConfig>
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>

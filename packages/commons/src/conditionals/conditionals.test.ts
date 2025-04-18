@@ -957,3 +957,39 @@ describe('Matches conditional validation', () => {
     ).toBe(false)
   })
 })
+
+describe('field() helper', () => {
+  const fieldId = 'some.field'
+
+  it('should return correct config for range()', () => {
+    const result = field(fieldId).range()
+    expect(result).toEqual({
+      fieldId: 'some.field',
+      config: { type: 'RANGE' }
+    })
+  })
+
+  it('should return correct config for exact()', () => {
+    const result = field(fieldId).exact()
+    expect(result).toEqual({
+      fieldId: 'some.field',
+      config: { type: 'EXACT' }
+    })
+  })
+
+  it('should return correct config for fuzzy()', () => {
+    const result = field(fieldId).fuzzy()
+    expect(result).toEqual({
+      fieldId: 'some.field',
+      config: { type: 'FUZZY' }
+    })
+  })
+
+  it('should handle different fieldIds correctly', () => {
+    const result = field('user.age').range()
+    expect(result).toEqual({
+      fieldId: 'user.age',
+      config: { type: 'RANGE' }
+    })
+  })
+})

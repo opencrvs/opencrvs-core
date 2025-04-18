@@ -232,7 +232,7 @@ export const SearchResult = ({
           ...doc,
           event: intl.formatMessage(currentEvent.label),
           createdAt: formattedDuration(new Date(doc.createdAt)),
-          modifiedAt: formattedDuration(new Date(doc.modifiedAt)),
+          modifiedAt: formattedDuration(new Date(doc.updatedAt)),
           status: intl.formatMessage(
             {
               id: `v2.events.status`,

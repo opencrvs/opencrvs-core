@@ -179,8 +179,9 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     status: getStatusFromActions(event.actions),
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
-    createdAtLocation: creationAction.createdAtLocation,
-    modifiedAt: latestAction.createdAt,
+    createdAtLocation: creationAction.createdAtLocation ?? '', // @todo remove using empty string
+    updatedAtLocation: creationAction.updatedAtLocation ?? '', // @todo remove using empty string
+    updatedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
     declaration: aggregateActionDeclarations(activeActions),
@@ -232,7 +233,7 @@ export function applyDraftsToEventIndex(
   eventIndex: EventIndex,
   drafts: Draft[]
 ) {
-  const indexedAt = eventIndex.modifiedAt
+  const indexedAt = eventIndex.updatedAt
 
   const activeDrafts = drafts
     .filter(({ createdAt }) => new Date(createdAt) > new Date(indexedAt))

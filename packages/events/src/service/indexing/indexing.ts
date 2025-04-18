@@ -17,11 +17,11 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
-  EventSearchIndex,
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields
+  getDeclarationFields,
+  QueryType
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -31,12 +31,12 @@ import {
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import {
+  buildElasticQueryFromSearchPayload,
   decodeEventIndex,
   DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId,
-  generateQuery
+  encodeFieldId
 } from './utils'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
@@ -167,7 +167,8 @@ export async function createIndex(
           createdAt: { type: 'date' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
-          modifiedAt: { type: 'date' },
+          updatedAtLocation: { type: 'keyword' },
+          updatedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
           declaration: {
@@ -296,29 +297,43 @@ export async function getIndexedEvents() {
     .map(decodeEventIndex)
 }
 
-export async function getIndex(eventParams: EventSearchIndex) {
+export async function getIndex(eventParams: QueryType) {
   const esClient = getOrCreateClient()
-  const { type, ...queryParams } = eventParams
-
-  if (Object.values(queryParams).length === 0) {
-    throw new Error('No search params provided')
+  if ('type' in eventParams && eventParams.type === 'or') {
+    const { clauses } = eventParams
+    // eslint-disable-next-line no-console
+    console.log({ clauses })
+    return []
   }
 
-  const query = generateQuery(queryParams)
+  if ('eventType' in eventParams) {
+    const { eventType, ...queryParams } = eventParams
+    if (Object.values(eventParams).length === 0) {
+      throw new Error('No search params provided')
+    }
 
-  const response = await esClient.search<EncodedEventIndex>({
-    index: getEventIndexName(type),
-    size: DEFAULT_SIZE,
-    request_cache: false,
-    query
-  })
+    const query = buildElasticQueryFromSearchPayload(queryParams)
 
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
-  )
+    if (!eventType) {
+      throw new Error('No eventType provided')
+    }
 
-  return events
+    const response = await esClient.search<EncodedEventIndex>({
+      index: getEventIndexName(eventType),
+      size: DEFAULT_SIZE,
+      request_cache: false,
+      query
+    })
+
+    const events = z.array(EventIndex).parse(
+      response.hits.hits
+        .map((hit) => hit._source)
+        .filter((event): event is EncodedEventIndex => event !== undefined)
+        .map((event) => decodeEventIndex(event))
+    )
+
+    return events
+  }
+
+  return []
 }

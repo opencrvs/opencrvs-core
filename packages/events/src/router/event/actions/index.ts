@@ -201,7 +201,8 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
-            createdAtLocation: user.primaryOfficeId,
+            // updatedAtLocation is set to the office of the user who created the action
+            updatedAtLocation: user.primaryOfficeId,
             token,
             transactionId,
             status
@@ -249,7 +250,7 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
-            createdAtLocation: user.primaryOfficeId,
+            updatedAtLocation: user.primaryOfficeId,
             token,
             transactionId,
             status: ActionStatus.Accepted
@@ -266,7 +267,7 @@ export function getDefaultActionProcedures(
           transactionId: z.string()
         })
       )
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)
         const action = event.actions.find((a) => a.id === actionId)
@@ -292,7 +293,8 @@ export function getDefaultActionProcedures(
         return addAsyncRejectAction({
           ...input,
           originalActionId: actionId,
-          type: actionType
+          type: actionType,
+          updatedAtLocation: ctx.user.primaryOfficeId
         })
       })
   }

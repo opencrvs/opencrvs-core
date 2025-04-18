@@ -268,13 +268,16 @@ export async function addAction(
     eventId,
     createdBy,
     token,
-    createdAtLocation,
+    updatedAtLocation,
     transactionId,
     status
   }: {
     eventId: string
     createdBy: string
-    createdAtLocation: string
+    /**
+     * The location where the action was created. This is used for auditing purposes.
+     */
+    updatedAtLocation: string
     token: string
     transactionId: string
     status: ActionStatus
@@ -318,7 +321,7 @@ export async function addAction(
             type: ActionType.MARKED_AS_DUPLICATE,
             createdBy,
             createdAt: now,
-            createdAtLocation,
+            updatedAtLocation,
             id: getUUID(),
             status
           }
@@ -336,7 +339,7 @@ export async function addAction(
     ...input,
     createdBy,
     createdAt: now,
-    createdAtLocation,
+    updatedAtLocation,
     id: actionId,
     status: status
   }
@@ -361,7 +364,7 @@ export async function addAction(
             assignedTo: null,
             createdBy,
             createdAt: now,
-            createdAtLocation,
+            updatedAtLocation,
             id: actionId,
             status: status
           }

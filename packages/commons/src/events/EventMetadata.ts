@@ -42,7 +42,8 @@ export const EventMetadata = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   createdAtLocation: z.string(),
-  modifiedAt: z.string().datetime(),
+  updatedAtLocation: z.string(),
+  updatedAt: z.string().datetime(),
   assignedTo: z.string().nullish(),
   updatedBy: z.string(),
   trackingId: z.string(),
@@ -77,6 +78,11 @@ export const eventMetadataLabelMap: Record<
     defaultMessage: 'Location',
     description: 'Created At Location'
   },
+  'event.updatedAtLocation': {
+    id: 'event.updatedAtLocation.label',
+    defaultMessage: 'Location',
+    description: 'Updated At'
+  },
   'event.createdBy': {
     id: 'event.createdBy.label',
     defaultMessage: 'Created By',
@@ -87,7 +93,7 @@ export const eventMetadataLabelMap: Record<
     defaultMessage: 'ID',
     description: 'ID'
   },
-  'event.modifiedAt': {
+  'event.updatedAt': {
     id: 'event.modifiedAt.label',
     defaultMessage: 'Updated',
     description: 'Modified At'
