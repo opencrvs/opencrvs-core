@@ -50,14 +50,20 @@ export const QueryInput: ZodType = z.lazy(() =>
     z.record(z.string(), QueryInput)
   ])
 )
-// @ts-expect-error - recursive type definition
-export type QueryInputType =
+export type BaseInput =
   | z.infer<typeof Fuzzy>
   | z.infer<typeof Exact>
   | z.infer<typeof Range>
   | z.infer<typeof Within>
   | z.infer<typeof AnyOf>
-  | Record<string, QueryInputType>
+
+type QueryMap = {
+  [key: string]: BaseInput | QueryMap
+}
+
+// This is a recursive type that can be used to represent nested query structures
+// where each key can be a string and the value can be either a base input or another query map.
+export type QueryInputType = BaseInput | QueryMap
 
 const QueryExpression = z
   .object({

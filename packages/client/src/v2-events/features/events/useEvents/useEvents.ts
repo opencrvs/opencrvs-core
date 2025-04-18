@@ -66,7 +66,7 @@ export function useEvents() {
     searchEvent: {
       useQuery: (
         eventType: string,
-        searchParams: Record<string, string>,
+        searchParams: QueryInputType,
         queryType: 'and' | 'or'
       ) => {
         const input = toQueryType(eventType, searchParams, queryType)
