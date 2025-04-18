@@ -15,42 +15,49 @@ import { ActionType } from '@opencrvs/commons/client'
 import { DeclarationAction } from '@client/v2-events/features/events/components/Action/DeclarationAction'
 import * as RequestCorrection from '@client/v2-events/features/events/actions/correct/request'
 import { ROUTES } from '@client/v2-events/routes'
+import { ReviewIndex } from '../approveOrReject/Review'
 
-export const router = {
-  path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.path,
-  element: (
-    <DeclarationAction actionType={ActionType.REQUEST_CORRECTION}>
-      <Outlet />
-    </DeclarationAction>
-  ),
-  children: [
-    {
-      index: true,
-      element: <RequestCorrection.Onboarding />
-    },
-    {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.path,
-      element: <RequestCorrection.Onboarding />
-    },
-    {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.path,
-      element: <RequestCorrection.Pages />
-    },
-    {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.path,
-      element: <RequestCorrection.Review />
-    },
-    {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.path,
-      element: <RequestCorrection.AdditionalDetails />
-    },
-    {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS.path,
-      element: <RequestCorrection.AdditionalDetails />
-    },
-    {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.path,
-      element: <RequestCorrection.Summary />
-    }
-  ]
-}
+export const router = [
+  {
+    path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.path,
+    element: (
+      <DeclarationAction actionType={ActionType.REQUEST_CORRECTION}>
+        <Outlet />
+      </DeclarationAction>
+    ),
+    children: [
+      {
+        index: true,
+        element: <RequestCorrection.Onboarding />
+      },
+      {
+        path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.path,
+        element: <RequestCorrection.Onboarding />
+      },
+      {
+        path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.path,
+        element: <RequestCorrection.Pages />
+      },
+      {
+        path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.path,
+        element: <RequestCorrection.Review />
+      },
+      {
+        path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.path,
+        element: <RequestCorrection.AdditionalDetails />
+      },
+      {
+        path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS.path,
+        element: <RequestCorrection.AdditionalDetails />
+      },
+      {
+        path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.path,
+        element: <RequestCorrection.Summary />
+      }
+    ]
+  },
+  {
+    path: ROUTES.V2.EVENTS.REVIEW_CORRECTION.path,
+    element: <ReviewIndex />
+  }
+]

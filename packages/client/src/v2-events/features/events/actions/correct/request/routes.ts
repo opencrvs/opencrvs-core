@@ -11,34 +11,39 @@
 
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 
-export const routes = route(
-  'request-correction/:eventId',
-  {
+export const routes = {
+  REQUEST_CORRECTION: route(
+    'request-correction/:eventId',
+    {
+      params: { eventId: string().defined() }
+    },
+    {
+      ONBOARDING: route('onboarding/:pageId', {
+        params: { pageId: string() },
+        hash: hashValues()
+      }),
+      PAGES: route('pages/:pageId', {
+        params: { pageId: string() },
+        searchParams: {
+          from: string()
+        },
+        hash: hashValues()
+      }),
+      REVIEW: route('review'),
+      ADDITIONAL_DETAILS_INDEX: route('details', {
+        params: { pageId: string() },
+        hash: hashValues()
+      }),
+      ADDITIONAL_DETAILS: route('details/:pageId', {
+        params: { pageId: string() },
+        hash: hashValues()
+      }),
+      SUMMARY: route('summary', {
+        hash: hashValues()
+      })
+    }
+  ),
+  REVIEW_CORRECTION: route('review-correction/:eventId', {
     params: { eventId: string().defined() }
-  },
-  {
-    ONBOARDING: route('onboarding/:pageId', {
-      params: { pageId: string() },
-      hash: hashValues()
-    }),
-    PAGES: route('pages/:pageId', {
-      params: { pageId: string() },
-      searchParams: {
-        from: string()
-      },
-      hash: hashValues()
-    }),
-    REVIEW: route('review'),
-    ADDITIONAL_DETAILS_INDEX: route('details', {
-      params: { pageId: string() },
-      hash: hashValues()
-    }),
-    ADDITIONAL_DETAILS: route('details/:pageId', {
-      params: { pageId: string() },
-      hash: hashValues()
-    }),
-    SUMMARY: route('summary', {
-      hash: hashValues()
-    })
-  }
-)
+  })
+}

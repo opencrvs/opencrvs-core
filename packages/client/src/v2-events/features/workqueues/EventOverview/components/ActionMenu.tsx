@@ -154,9 +154,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                   if (
                     action.type === ActionType.REJECT ||
                     action.type === ActionType.ARCHIVE ||
-                    action.type === ActionType.MARKED_AS_DUPLICATE ||
-                    action.type === ActionType.APPROVE_CORRECTION ||
-                    action.type === ActionType.REJECT_CORRECTION
+                    action.type === ActionType.MARKED_AS_DUPLICATE
                   ) {
                     alert(`Action ${action.type} is not implemented yet.`)
                     return
@@ -168,6 +166,15 @@ export function ActionMenu({ eventId }: { eventId: string }) {
                   ) {
                     navigate(
                       ROUTES.V2.EVENTS[action.type].REVIEW.buildPath({
+                        eventId
+                      })
+                    )
+                  } else if (
+                    action.type === ActionType.APPROVE_CORRECTION ||
+                    action.type === ActionType.REJECT_CORRECTION
+                  ) {
+                    navigate(
+                      ROUTES.V2.EVENTS.REVIEW_CORRECTION.buildPath({
                         eventId
                       })
                     )
