@@ -44,6 +44,7 @@ test('event can be created and fetched', async () => {
 
   expect(fetchedEvent.actions).toEqual([
     expect.objectContaining({ type: ActionType.CREATE }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
       type: ActionType.READ
     })

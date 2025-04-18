@@ -8,82 +8,35 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import {
-  EventState,
   FieldConfig,
   FieldValue,
-  isAddressFieldType,
-  isAdministrativeAreaFieldType,
-  isCountryFieldType,
-  isFacilityFieldType,
-  isLocationFieldType,
-  isRadioGroupFieldType
+  isAddressFieldType
 } from '@opencrvs/commons/client'
+import { Address } from '@client/v2-events/features/events/registered-fields'
 import {
-  Address,
-  AdministrativeArea,
-  RadioGroup,
-  SelectCountry as Country
-} from '@client/v2-events/features/events/registered-fields'
+  formDataStringifierFactory,
+  useSimpleFieldStringifier
+} from './useSimpleFieldStringifier'
 
 function useFieldStringifier() {
-  const stringifyLocation = AdministrativeArea.useStringifier()
+  const simpleFieldStringifier = useSimpleFieldStringifier()
   const stringifyAddress = Address.useStringifier()
-  const stringifyRadioGroup = RadioGroup.useStringifier()
-  const stringifyCountry = Country.useStringifier()
 
   return (fieldConfig: FieldConfig, value: FieldValue) => {
     const field = { config: fieldConfig, value }
-    if (
-      isLocationFieldType(field) ||
-      isAdministrativeAreaFieldType(field) ||
-      isFacilityFieldType(field)
-    ) {
-      // Since all of the above field types are actually locations
-      return stringifyLocation(field.value)
-    }
-
     if (isAddressFieldType(field)) {
       return stringifyAddress(field.value)
     }
 
-    if (isRadioGroupFieldType(field)) {
-      return stringifyRadioGroup(field.value, field.config)
-    }
-
-    if (isCountryFieldType(field)) {
-      return stringifyCountry(field.value)
-    }
-
-    return !value ? '' : value.toString()
+    return simpleFieldStringifier(fieldConfig, value)
   }
 }
-
-export interface RecursiveStringRecord {
-  [key: string]: string | undefined | RecursiveStringRecord
-}
-
 /**
  *
  * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
  */
 export const useFormDataStringifier = () => {
   const stringifier = useFieldStringifier()
-  return (
-    formFields: FieldConfig[],
-    values: EventState
-  ): RecursiveStringRecord => {
-    const stringifiedValues: RecursiveStringRecord = {}
-
-    for (const [key, value] of Object.entries(values)) {
-      const fieldConfig = formFields.find((field) => field.id === key)
-      if (!fieldConfig) {
-        throw new Error(`Field ${key} not found in form config`)
-      }
-      stringifiedValues[key] = stringifier(fieldConfig, value)
-    }
-
-    return stringifiedValues
-  }
+  return formDataStringifierFactory(stringifier)
 }

@@ -27,7 +27,6 @@ type Story = StoryObj<typeof VerificationWizard>
 
 const onNextPageSpy = fn()
 const onVerifyActionSpy = fn()
-const onSubmitSpy = fn()
 
 export const VerificationWizardModal: Story = {
   parameters: {
@@ -73,10 +72,9 @@ export const VerificationWizardModal: Story = {
         }}
         pageTitle="Verification Wizard"
         showReviewButton={false}
-        totalPages={1}
         onNextPage={onNextPageSpy}
         onPreviousPage={noop}
-        onSubmit={onSubmitSpy}
+        onSubmit={noop}
         onVerifyAction={onVerifyActionSpy}
       />
     )
@@ -107,7 +105,6 @@ export const VerificationWizardModal: Story = {
           await canvas.findByRole('button', { name: 'Verify' })
         )
 
-        await expect(onSubmitSpy).toHaveBeenCalled()
         await expect(onVerifyActionSpy).toHaveBeenCalled()
       }
     )

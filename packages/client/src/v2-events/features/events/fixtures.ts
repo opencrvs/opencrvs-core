@@ -11,6 +11,7 @@
 import { v4 as uuid } from 'uuid'
 import {
   ActionStatus,
+  ActionType,
   EventDocument,
   EventIndex
 } from '@opencrvs/commons/client'
@@ -103,6 +104,16 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdAt: '2025-01-23T05:35:27.689Z',
       createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
       registrationNumber: 'TEST12121212'
+    },
+    {
+      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
+      status: ActionStatus.Accepted,
+      declaration: {},
+      type: ActionType.ASSIGN,
+      createdBy: '6780dbf7a263c6515c7b97d2',
+      createdAt: '2025-01-23T05:35:27.689Z',
+      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
+      assignedTo: '67ef7f83d6a9cb92e9edaaa9'
     }
   ]
 }

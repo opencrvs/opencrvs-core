@@ -13,11 +13,11 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
+  findLastAssignmentAction,
   UnassignActionInput
 } from '@opencrvs/commons/events'
 import { inScope, SCOPES } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
-import { findLastAssignmentAction } from '@events/service/events/utils'
 import { setBearerForToken } from '@events/router/middleware'
 
 export async function unassignRecord(
