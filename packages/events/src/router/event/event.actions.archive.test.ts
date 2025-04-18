@@ -51,8 +51,11 @@ test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} 
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVE)
-  expect(actions.at(-2)).toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
+  expect(actions.slice(-3)).toEqual([
+    ActionType.MARKED_AS_DUPLICATE,
+    ActionType.ARCHIVE,
+    ActionType.UNASSIGN
+  ])
 })
 
 test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicate`, async () => {
@@ -71,6 +74,6 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVE)
-  expect(actions.at(-2)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
+  expect(actions.at(-2)).toStrictEqual(ActionType.ARCHIVE)
+  expect(actions.at(-3)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
 })

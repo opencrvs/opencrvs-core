@@ -51,5 +51,8 @@ test(`should contain REJECT action for a valid request`, async () => {
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual(ActionType.REJECT)
+  expect(actions.slice(-2)).toStrictEqual([
+    ActionType.REJECT,
+    ActionType.UNASSIGN
+  ])
 })

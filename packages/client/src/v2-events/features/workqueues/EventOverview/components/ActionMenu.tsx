@@ -61,7 +61,6 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               <DropdownMenu.Item
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
-                // eslint-disable-next-line @typescript-eslint/promise-function-async
                 onClick={() => action.onClick(event.id)}
               >
                 {intl.formatMessage(action.label)}
