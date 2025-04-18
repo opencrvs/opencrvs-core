@@ -14,7 +14,8 @@ import { workqueues } from '../workqueues'
 import {
   ActionType,
   DeclarationActionType,
-  DeclarationActions
+  DeclarationActions,
+  writeActions
 } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
@@ -252,4 +253,8 @@ export function findLastAssignmentAction(actions: Action[]) {
  */
 export type IndexMap<T> = {
   [id: string]: T | undefined
+}
+
+export function isWriteAction(actionType: ActionType): boolean {
+  return writeActions.safeParse(actionType).success
 }
