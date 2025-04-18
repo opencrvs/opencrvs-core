@@ -449,6 +449,18 @@ export function field(fieldId: string) {
           }
         },
         required: [fieldId]
-      })
+      }),
+    range: () => ({
+      fieldId,
+      config: { type: 'RANGE' as const }
+    }),
+    exact: () => ({
+      fieldId,
+      config: { type: 'EXACT' as const }
+    }),
+    fuzzy: () => ({
+      fieldId,
+      config: { type: 'FUZZY' as const }
+    })
   }
 }
