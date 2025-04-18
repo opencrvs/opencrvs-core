@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod-openapi/extend'
 import { TranslationConfig } from './TranslationConfig'
 
 const FieldReference = z.string()
@@ -126,8 +128,8 @@ export type ClauseOutput =
  * Default assumption is that the ZodType is the input. Markers use default values, so we need to explicitly define output type, too.
  *
  */
-export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> =
-  z.lazy(() =>
+export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
+  .lazy(() =>
     z.discriminatedUnion('type', [
       And,
       Or,
@@ -137,6 +139,10 @@ export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> =
       DateDistanceMatcher
     ])
   )
+  .openapi({
+    description: 'A unique identifier for a job',
+    ref: 'clause'
+  })
 
 export type Clause = z.infer<typeof Clause>
 

@@ -74,6 +74,14 @@ const RECORD_READ_SCOPES = [
 export const eventRouter = router({
   config: router({
     get: publicProcedure
+      .meta({
+        openapi: {
+          summary: 'List event configurations',
+          method: 'GET',
+          path: '/events/config',
+          tags: ['Events']
+        }
+      })
       .use(
         requiresAnyOfScopes([
           ...RECORD_READ_SCOPES,
@@ -81,8 +89,9 @@ export const eventRouter = router({
           SCOPES.CONFIG_UPDATE_ALL
         ])
       )
+      .input(z.void())
       .output(z.array(EventConfig))
-      .query(async (options) => {
+      .query((options) => {
         return getEventConfigurations(options.ctx.token)
       })
   }),
