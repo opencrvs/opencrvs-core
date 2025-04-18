@@ -90,6 +90,9 @@ export const LinkButtonField = ({
 
   useEffect(() => {
     const redirectData = localStorage.getItem(redirectKey)
+    // Check if the location pathname has changed because this button can be re-rendered
+    // when the user revokes authenticated verification (being on the same page)
+    // and the redirectData is still present in localStorage
     if (redirectData && previousPathRef.current !== location.pathname) {
       setFieldValue(trigger.name, JSON.parse(redirectData))
       localStorage.removeItem(redirectKey)
