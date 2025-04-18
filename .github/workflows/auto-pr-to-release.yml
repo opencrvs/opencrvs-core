@@ -18,11 +18,100 @@ on:
         description: 'PR number to process'
         required: true
         default: ''
+      dry_run:
+        description: 'Dry run'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
-  create-pr:
+  resolve-releases:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.resolve-applicable-versions.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR details from workflow dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: get_pr_details_dispatch
+        run: |
+          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_DATA=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/opencrvs/opencrvs-core/pulls/$PR_NUMBER)
+          echo "MILESTONE=$(printf '%s' $PR_DATA | jq -r '.milestone.title')" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Get PR details from event
+        if: ${{ github.event_name == 'pull_request' }}
+        id: get_pr_details_event
+        run: |
+          echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Check for milestone and if release branch exists
+        continue-on-error: true
+        id: resolve-applicable-versions
+        run: |
+          if [ -z "${{ env.MILESTONE }}" ] || [ "${{ env.MILESTONE }}" = "null" ]; then
+            echo "No milestone set. Exiting."
+            exit 1
+          fi
+
+          filter_versions() {
+              local input_version=$1
+
+              # List remote branches, extract versions, and sort them semantically
+              versions=$(git ls-remote --heads origin 'release-*' | awk -F'release-' '{print $2}' | sort -V)
+
+              # Filter out versions less than the input version
+              filtered_versions=$(echo "$versions" | awk -v input="$input_version" '
+              function compare_versions(v1, v2) {
+                  split(v1, a, /[.v]/);
+                  split(v2, b, /[.v]/);
+                  for (i = 2; i <= 4; i++) {
+                      if (a[i] < b[i]) return -1;
+                      if (a[i] > b[i]) return 1;
+                  }
+                  return 0;
+              }
+              {
+                  if (compare_versions($0, input) >= 0) {
+                      print $0
+                  }
+              }')
+
+              # Keep only the highest patch version for each minor version
+              echo "$filtered_versions" | awk -F. '
+              {
+                  minor = $1 "." $2;
+                  patches[minor] = $0;
+              }
+              END {
+                  for (minor in patches) {
+                      print patches[minor];
+                  }
+              }' | sort -V
+          }
+
+          versions=$(filter_versions "${{ env.MILESTONE }}")
+          json_array=$(echo "$versions" | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "matrix=$json_array" >> $GITHUB_OUTPUT
+
+  create-pr:
+    needs: resolve-releases
+    runs-on: ubuntu-22.04
+    if: ${{ always() && needs.resolve-releases.result == 'success' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{fromJson(needs.resolve-releases.outputs.matrix)}}
 
     steps:
       - name: Checkout repository
@@ -39,13 +128,12 @@ jobs:
           echo "PR_ID=$(printf '%s' $PR_DATA | jq -r '.number')" >> $GITHUB_ENV
           echo "PR_AUTHOR=$(printf '%s' $PR_DATA | jq -r '.user.login')" >> $GITHUB_ENV
           echo "PR_MERGER=$(printf '%s' $PR_DATA | jq -r '.merged_by.login')" >> $GITHUB_ENV
-          echo "MILESTONE=$(printf '%s' $PR_DATA | jq -r '.milestone.title')" >> $GITHUB_ENV
           echo "BASE_BRANCH=$(printf '%s' $PR_DATA | jq -r '.base.ref')" >> $GITHUB_ENV
           echo "HEAD_BRANCH=$(printf '%s' $PR_DATA | jq -r '.head.ref')" >> $GITHUB_ENV
           echo "PR_TITLE=$(printf '%s' $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
           echo "BASE_SHA=$(printf '%s' $PR_DATA | jq -r '.base.sha')" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Get PR details from event
         if: ${{ github.event_name == 'pull_request' }}
@@ -54,7 +142,6 @@ jobs:
           PR_NUMBER=${{ github.event.pull_request.number }}
           echo "PR_ID=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
           echo "PR_AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
-          echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
           echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
           echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
           echo "PR_TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
@@ -64,40 +151,24 @@ jobs:
           MERGED_BY_LOGIN=$(echo "$PR_DETAILS" | jq -r '.mergedBy.login')
           echo "PR_MERGER=$MERGED_BY_LOGIN" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check for milestone and if release branch exists
-        continue-on-error: true
-        id: check_release_branch
-        run: |
-          if [ -z "${{ env.MILESTONE }}" ]; then
-            echo "No milestone set. Exiting."
-            exit 1
-          fi
-
-          RELEASE_BRANCH="release-${{ env.MILESTONE }}"
-
-          # Check if the release branch exists
-          if git ls-remote --heads origin $RELEASE_BRANCH | grep -q "refs/heads/$RELEASE_BRANCH"; then
-            echo "RELEASE_BRANCH=${RELEASE_BRANCH}" >> $GITHUB_ENV
-          else
-            echo "Release branch $RELEASE_BRANCH does not exist. Exiting."
-            exit 1
-          fi
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Create and push the new branch for the PR
-        if: ${{ steps.check_release_branch.outcome == 'success' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           SEMANTIC_PR_TITLE="${{ env.PR_TITLE }}"
+          RELEASE_BRANCH="release-${{ matrix.version }}"
+          MILESTONE="${{ matrix.version }}"
 
           # Check for semantic prefix
           if [[ $SEMANTIC_PR_TITLE =~ ^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert|wip|merge)\: ]]; then
             SEMANTIC_PR_TITLE="${BASH_REMATCH[1]}(${MILESTONE}): ${SEMANTIC_PR_TITLE#*: }"
           else
-            SEMANTIC_PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to ${{ env.RELEASE_BRANCH }}"
+            SEMANTIC_PR_TITLE="🍒 Merge changes from PR #${{ env.PR_ID }} to $RELEASE_BRANCH"
           fi
 
-          PR_BODY="Automated PR to merge changes from develop to ${{ env.RELEASE_BRANCH }}"
+          PR_BODY="Automated PR to merge changes from develop to $RELEASE_BRANCH"
 
           # Configure git
           git config user.name "github-actions"
@@ -106,10 +177,10 @@ jobs:
 
           # Fetch and checkout the release branch
           git fetch --all --unshallow
-          git checkout ${{ env.RELEASE_BRANCH }}
+          git checkout $RELEASE_BRANCH
 
           # Create a new branch for the PR
-          NEW_BRANCH="auto-pr-${{ env.RELEASE_BRANCH }}-${{ env.PR_ID }}-$RANDOM"
+          NEW_BRANCH="auto-pr-$RELEASE_BRANCH-${{ env.PR_ID }}-$RANDOM"
           git checkout -b $NEW_BRANCH
 
           echo "HEAD_BRANCH: ${{ env.HEAD_BRANCH }}"
@@ -154,6 +225,15 @@ jobs:
             "
           }
 
+          if [ "${{ github.event.inputs.dry_run }}" == "true" ]; then
+            echo "This is a dry run."
+            echo "Would have pushed the new branch $NEW_BRANCH"
+            echo "PR title: $SEMANTIC_PR_TITLE"
+            echo "PR body:"
+            echo "$PR_BODY"
+            exit 0
+          fi
+
           # Push the new branch
           git push origin $NEW_BRANCH
 
@@ -167,6 +247,4 @@ jobs:
               AUTHOR=${{ env.PR_MERGER }}
             fi
           fi
-          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "${{ env.RELEASE_BRANCH }}" --reviewer "$AUTHOR"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "$RELEASE_BRANCH" --assignee "$AUTHOR" --reviewer "$AUTHOR"

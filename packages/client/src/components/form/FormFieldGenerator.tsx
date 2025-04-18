@@ -29,7 +29,6 @@ import {
   getFieldType,
   getQueryData,
   getVisibleOptions,
-  getListOfLocations,
   getFieldHelperText,
   getDependentFields,
   evalExpressionInFieldDefinition,
@@ -82,8 +81,6 @@ import {
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
   TIME,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton,
   DIVIDER,
   HEADING3,
   SUBSECTION_HEADER,
@@ -94,8 +91,10 @@ import {
   InitialValue,
   DependencyInfo,
   Ii18nButtonFormField,
-  REDIRECT,
-  IDocumentUploaderWithOptionsFormField
+  LINK_BUTTON,
+  IDocumentUploaderWithOptionsFormField,
+  ID_READER,
+  ID_VERIFICATION_BANNER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -117,7 +116,7 @@ import {
   FormikValues,
   Formik
 } from 'formik'
-import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { IOfflineData } from '@client/offline/reducer'
 import { isEqual, flatten, cloneDeep, set } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
@@ -132,14 +131,20 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
-import { useOnlineStatus } from '@client/utils'
-import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
-import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
+import {
+  BulletList,
+  Divider,
+  IDReader,
+  InputLabel,
+  Stack
+} from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
-import { RedirectField } from '@client/components/form/Redirect'
+import { getListOfLocations } from '@client/utils/validate'
+import { LinkButtonField } from '@client/components/form/LinkButton'
+import { ReaderGenerator } from './ReaderGenerator'
+import { IDVerificationBanner } from './IDVerificationBanner'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -235,7 +240,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       (val: string) => setFieldValue(fieldDefinition.name, val),
       [fieldDefinition.name, setFieldValue]
     )
-    const isOnline = useOnlineStatus()
 
     const inputProps = {
       id: fieldDefinition.name,
@@ -269,6 +273,36 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </InputField>
       )
     }
+
+    if (fieldDefinition.type === ID_READER) {
+      return (
+        <IDReader
+          dividerLabel={fieldDefinition.dividerLabel}
+          manualInputInstructionLabel={
+            fieldDefinition.manualInputInstructionLabel
+          }
+        >
+          <ReaderGenerator
+            readers={fieldDefinition.readers}
+            form={values}
+            field={fieldDefinition}
+            draft={draftData}
+            fields={fields}
+            setFieldValue={setFieldValue}
+          />
+        </IDReader>
+      )
+    }
+    if (fieldDefinition.type === ID_VERIFICATION_BANNER) {
+      return (
+        <IDVerificationBanner
+          type={fieldDefinition.bannerType}
+          idFieldName={fieldDefinition.idFieldName}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+
     if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
       return (
         <InputField {...inputFieldProps}>
@@ -625,27 +659,15 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
+    if (fieldDefinition.type === LINK_BUTTON) {
       return (
-        <InputField {...inputFieldProps}>
-          <VerificationButton
-            id={fieldDefinition.name}
-            onClick={fieldDefinition.onClick}
-            labelForVerified={fieldDefinition.labelForVerified}
-            labelForUnverified={fieldDefinition.labelForUnverified}
-            labelForOffline={fieldDefinition.labelForOffline}
-            status={!isOnline ? 'offline' : value ? 'verified' : 'unverified'}
-          />
-        </InputField>
-      )
-    }
-
-    if (fieldDefinition.type === REDIRECT) {
-      return (
-        <RedirectField
-          to={fieldDefinition.options.url}
+        <LinkButtonField
           form={values}
           draft={draftData}
+          fieldDefinition={fieldDefinition}
+          fields={fields}
+          setFieldValue={setFieldValue}
+          isDisabled={disabled}
         />
       )
     }
@@ -801,7 +823,6 @@ interface IFormSectionProps {
 interface IStateProps {
   offlineCountryConfig: IOfflineData
   userDetails: UserDetails | null
-  onNidAuthenticationClick: () => void
 }
 
 interface IDispatchProps {
@@ -1126,22 +1147,16 @@ class FormSectionComponent extends React.Component<Props> {
                       }
                     }, {}),
                     intl,
-                    undefined,
-                    field.searchableType as LocationType[]
+                    (location) => field.searchableType.includes(location.type),
+                    field.userOfficeId
                   )
                 }
-              : field.type === NID_VERIFICATION_BUTTON
-              ? ({
-                  ...field,
-                  onClick: this.props.onNidAuthenticationClick
-                } as INidVerificationButton)
               : field
 
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === NID_VERIFICATION_BUTTON ||
             field.type === BUTTON
           ) {
             return (
@@ -1198,6 +1213,7 @@ class FormSectionComponent extends React.Component<Props> {
                   }
 
                   const nestedFieldName = `${field.name}.nestedFields.${nestedField.name}`
+
                   const nestedFieldTouched =
                     touched[field.name] &&
                     (touched[field.name] as unknown as ITouchedNestedFields)
@@ -1321,7 +1337,6 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
   const userDetails = useSelector(getUserDetails)
   const intl = useIntl()
   const dispatch = useDispatch()
-  const { onClick: onNidAuthenticationClick } = useNidAuthentication()
 
   return (
     <Formik<IFormSectionData>
@@ -1355,7 +1370,6 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
           offlineCountryConfig={offlineCountryConfig}
           userDetails={userDetails}
           dynamicDispatch={(...args) => dispatch(dynamicDispatch(...args))}
-          onNidAuthenticationClick={onNidAuthenticationClick}
         />
       )}
     </Formik>

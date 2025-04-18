@@ -10,23 +10,25 @@
  */
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
+
 import { merge } from 'lodash'
 import * as React from 'react'
 import { queries } from '@client/profile/queries'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { createStore } from '@client/store'
-import { createTestComponent, mockUserResponse } from '@client/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  REGISTRAR_DEFAULT_SCOPES,
+  setScopes
+} from '@client/tests/util'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
-import { goToSearch } from '@client/navigation'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { Event } from '@client/utils/gateway'
-import { storeDeclaration } from '@client/declarations'
-import { vi, Mock } from 'vitest'
 
-const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as Mock
+import { waitForElement } from '@client/tests/wait-for-element'
+import { EventType } from '@client/utils/gateway'
+import { storeDeclaration } from '@client/declarations'
+import { vi } from 'vitest'
+
 const mockFetchUserDetails = vi.fn()
 
 const nameObj = {
@@ -41,7 +43,14 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      systemRole: 'DISTRICT_REGISTRAR'
+      role: {
+        id: 'DISTRICT_REGISTRAR',
+        label: {
+          defaultMessage: 'District Registrar',
+          description: 'Name for user role Field Agent',
+          id: 'userRole.fieldAgent'
+        }
+      }
     }
   }
 }
@@ -52,22 +61,16 @@ queries.fetchUserDetails = mockFetchUserDetails
 
 describe('SearchResult tests', () => {
   let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
+
   beforeEach(async () => {
-    ;({ store, history } = createStore())
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+    ;({ store } = createStore())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
   })
 
   it('sets loading state while waiting for data', async () => {
-    const testComponent = await createTestComponent(
-      <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
-        }}
-      />,
-      { store, history }
+    const { component: testComponent } = await createTestComponent(
+      <SearchResult />,
+      { store, initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID'] }
     )
 
     // @ts-ignore
@@ -82,7 +85,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: '',
               nationalId: '',
               registrationNumber: '',
@@ -100,7 +102,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -131,7 +133,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: 'c7e83060-4db9-4057-8b14-71841243b05f',
-                  type: 'Death',
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -166,7 +168,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
-                  type: 'Birth',
+                  type: EventType.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -197,7 +199,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-brbe037dec2f',
-                  type: 'Birth',
+                  type: EventType.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -228,7 +230,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9beee7dec2f',
-                  type: 'Birth',
+                  type: EventType.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -259,7 +261,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
-                  type: 'Birth',
+                  type: EventType.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -296,14 +298,13 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
-      <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=01622688232&searchType=phone'
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock as any }
+    const { component: testComponent } = await createTestComponent(
+      <SearchResult />,
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=01622688232&searchType=PHONE_NUMBER']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -326,7 +327,6 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '+8801622688232',
-              declarationLocationId: '1234567s2323289',
               contactEmail: ''
             },
             sort: 'DESC'
@@ -336,14 +336,18 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=+8801622688232&searchType=phone'
+          search: '?searchText=+8801622688232&searchType=PHONE_NUMBER'
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=+8801622688232&searchType=PHONE_NUMBER']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -358,9 +362,8 @@ describe('SearchResult tests', () => {
   })
   it('renders empty search page with a header in small devices', async () => {
     const testSearchResultComponent = await createTestComponent(
-      //@ts-ignore
-      <SearchResult location={{}} />,
-      { store, history }
+      <SearchResult />,
+      { store, initialEntries: ['/search?location='] }
     )
 
     Object.defineProperty(window, 'innerWidth', {
@@ -368,9 +371,8 @@ describe('SearchResult tests', () => {
       configurable: true,
       value: 200
     })
-    store.dispatch(goToSearch())
 
-    const searchTextInput = testSearchResultComponent
+    const searchTextInput = testSearchResultComponent.component
       .find('#searchText')
       .hostNodes()
 
@@ -378,13 +380,13 @@ describe('SearchResult tests', () => {
 
     searchTextInput.simulate('change', { target: { value: 'DW0UTHR' } })
 
-    testSearchResultComponent
+    testSearchResultComponent.component
       .find('#searchIconButton')
       .hostNodes()
       .simulate('click')
 
-    expect(window.location.search).toBe(
-      '?searchText=DW0UTHR&searchType=tracking-id'
+    expect(testSearchResultComponent.router.state.location.search).toBe(
+      '?searchText=DW0UTHR&searchType=TRACKING_ID'
     )
   })
 
@@ -396,7 +398,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -414,7 +415,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -451,14 +452,13 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
-      <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock as any }
+    const { component: testComponent } = await createTestComponent(
+      <SearchResult />,
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -476,7 +476,7 @@ describe('SearchResult tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
-      event: Event.Birth,
+      event: EventType.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'REGISTERED'
     }
@@ -490,7 +490,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -508,7 +507,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-                  type: 'Death',
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -550,14 +549,13 @@ describe('SearchResult tests', () => {
       configurable: true,
       value: 1100
     })
-    const testComponent = await createTestComponent(
-      <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock as any }
+    const { component: testComponent } = await createTestComponent(
+      <SearchResult />,
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -578,7 +576,7 @@ describe('SearchResult tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
-      event: Event.Birth,
+      event: EventType.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'VALIDATED'
     }
@@ -592,7 +590,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -610,7 +607,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
-                  type: 'Death',
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -647,14 +644,13 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
-      <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock as any }
+    const { component: testComponent } = await createTestComponent(
+      <SearchResult />,
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -675,17 +671,16 @@ describe('SearchResult tests', () => {
 
 describe('SearchResult downloadButton tests', () => {
   let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
+
   beforeEach(async () => {
-    ;({ store, history } = createStore())
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+    ;({ store } = createStore())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
   })
   it('renders review button in search page', async () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
-      event: Event.Birth,
+      event: EventType.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'DECLARED'
     }
@@ -699,7 +694,6 @@ describe('SearchResult downloadButton tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -717,7 +711,7 @@ describe('SearchResult downloadButton tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
-                  type: 'Death',
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -754,14 +748,13 @@ describe('SearchResult downloadButton tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
-      <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock as any }
+    const { component: testComponent } = await createTestComponent(
+      <SearchResult />,
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -782,7 +775,7 @@ describe('SearchResult downloadButton tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
-      event: Event.Birth,
+      event: EventType.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'REJECTED'
     }
@@ -796,7 +789,6 @@ describe('SearchResult downloadButton tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -814,7 +806,7 @@ describe('SearchResult downloadButton tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-                  type: 'Death',
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -851,14 +843,13 @@ describe('SearchResult downloadButton tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
-      <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock as any }
+    const { component: testComponent } = await createTestComponent(
+      <SearchResult />,
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider

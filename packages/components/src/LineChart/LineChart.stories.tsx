@@ -110,6 +110,6 @@ Default.args = {
     }
   ],
   dataKeys: ['totalEstimate', 'totalRegistered', 'registeredInTargetDays'],
-  tooltipContent: (dataPoint: unknown) => <div />,
+  tooltipContent: () => <div />,
   legendContent: () => <div />
 }

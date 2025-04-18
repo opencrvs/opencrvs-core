@@ -46,13 +46,13 @@ elif [[ ! -d "${COUNTRY_CONFIG_PATH}" ]]; then
 fi
 
 if $outdated; then
-  yarn run ts-node -- --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --outdated
+  yarn run ts-node -- --compiler-options='{"module": "commonjs", "moduleResolution": "node"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --outdated
   exit 0
 fi
 
 if $write; then
-  yarn run ts-node -- --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --write
+  yarn run ts-node -- --compiler-options='{"module": "commonjs", "moduleResolution": "node"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --write
   exit 0
 fi
 
-yarn run ts-node -- --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH
+yarn run ts-node -- --compiler-options='{"module": "commonjs", "moduleResolution": "node"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH

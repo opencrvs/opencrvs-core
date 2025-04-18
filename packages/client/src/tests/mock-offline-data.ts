@@ -20,7 +20,7 @@ import type {
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
-export const systems: System[] = [
+const systems: System[] = [
   {
     name: 'WebHook 1',
     status: SystemStatus.Active,
@@ -39,17 +39,6 @@ export const systems: System[] = [
           permissions: ['deceased-details', 'death-encounter']
         }
       ]
-    }
-  },
-  {
-    name: 'National Id',
-    status: SystemStatus.Active,
-    type: SystemType.NationalId,
-    _id: '613ddbbe4c0b86e9b9f114e8',
-    shaSecret: '22ea09c2-f964-4562-bdac-8e9ca9b9a81a',
-    clientId: '2f1047bb-af48-4f27-8ab8-993d7b960f92',
-    settings: {
-      openIdProviderClientId: '7b621732-6c1d-4808-81b2-fd67f05f3af3'
     }
   },
   {
@@ -122,6 +111,36 @@ export const mockOfflineData = {
       status: 'active',
       type: 'CRVS_OFFICE',
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
+    },
+    'da672661-eb0a-437b-aa7a-a6d9a1711dd1': {
+      id: 'da672661-eb0a-437b-aa7a-a6d9a1711dd1',
+      name: 'Comilla Union Parishad',
+      alias: 'কুমিল্লা ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '456',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/5926982b-845c-4463-80aa-cbfb86762e0a'
+    },
+    '213ec5f3-e306-4f95-8058-f37893dbfbb6': {
+      id: '213ec5f3-e306-4f95-8058-f37893dbfbb6',
+      name: 'Chittagong Union Parishad',
+      alias: 'চট্টগ্রাম ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '234',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    '93259d69-71af-488f-8ada-32d06678df17': {
+      id: '93259d69-71af-488f-8ada-32d06678df17',
+      name: 'Dhaka Union Parishad',
+      alias: 'ঢাকা ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '345',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
     }
   } satisfies Record<string, CRVSOffice>,
   locations: {
@@ -426,37 +445,22 @@ export const mockOfflineData = {
     BIRTH: {
       REGISTRATION_TARGET: 45,
       LATE_REGISTRATION_TARGET: 365,
-      FEE: {
-        ON_TIME: 0,
-        LATE: 15,
-        DELAYED: 20
-      },
       PRINT_IN_ADVANCE: true
     },
     DEATH: {
       REGISTRATION_TARGET: 45,
-      FEE: {
-        ON_TIME: 0,
-        DELAYED: 0
-      },
       PRINT_IN_ADVANCE: true
     },
     MARRIAGE: {
       REGISTRATION_TARGET: 45,
-      FEE: {
-        ON_TIME: 0,
-        DELAYED: 0
-      },
       PRINT_IN_ADVANCE: true
     },
     FEATURES: {
       DEATH_REGISTRATION: true,
       MARRIAGE_REGISTRATION: true,
       EXTERNAL_VALIDATION_WORKQUEUE: true,
-      INFORMANT_SIGNATURE: false,
       PRINT_DECLARATION: true,
-      DATE_OF_BIRTH_UNKNOWN: true,
-      INFORMANT_SIGNATURE_REQUIRED: false
+      DATE_OF_BIRTH_UNKNOWN: true
     },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',

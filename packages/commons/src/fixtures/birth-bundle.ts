@@ -244,7 +244,7 @@ export const BIRTH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Baumbach'],
-            family: ['Neil']
+            family: 'Neil'
           }
         ],
         birthDate: '2003-07-11',
@@ -314,7 +314,8 @@ export const BIRTH_BUNDLE: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                  reference:
+                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
                 }
               }
             ]
@@ -349,7 +350,7 @@ export const BIRTH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Sophia'],
-            family: ['Baumbach']
+            family: 'Baumbach'
           }
         ],
         telecom: [
@@ -455,7 +456,8 @@ export const BIRTH_BUNDLE: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                  reference:
+                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
                 }
               }
             ]
@@ -479,7 +481,7 @@ export const BIRTH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Isadore'],
-            family: ['Baumbach']
+            family: 'Baumbach'
           }
         ],
         gender: 'female',
@@ -589,7 +591,8 @@ export const BIRTH_BUNDLE: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
+              reference:
+                'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
             }
           },
           {
@@ -762,17 +765,10 @@ export const BIRTH_BUNDLE: SavedBundle<
         extension: [
           {
             url: 'http://opencrvs.org/specs/extension/employee-signature',
-            valueSignature: {
-              type: [
-                {
-                  system: 'urn:iso-astm:E1762-95:2013',
-                  code: '1.2.840.10065.1.12.1.13',
-                  display: 'Review Signature'
-                }
-              ],
-              when: '2023-09-19T06:47:48.225Z',
-              contentType: 'image/png',
-              blob: 'data:image/png;base64,'
+            valueAttachment: {
+              contentType: 'img/png',
+              url: '/ocrvs/a1-b2-c3.png',
+              creation: '1721970080786'
             }
           }
         ],
@@ -962,19 +958,12 @@ export const BIRTH_BUNDLE: SavedBundle<
                 code: 'LOCAL_REGISTRAR'
               }
             ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Local Registrar"},{"lang":"fr","label":"Registraire local"}]'
-              }
-            ]
           }
         ],
         location: [
           {
-            reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
+            reference:
+              'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
           }
         ],
         id: '5f675c08-9494-462f-9fac-043755b865ad' as UUID,

@@ -1,5 +1,70 @@
 # Changelog
 
+## 1.7.0 Release candidate
+
+### Breaking changes
+
+- **Dashboard:** Changes made to the dashboard configuration will reset after upgrading OpenCRVS.
+- Removed unused searchBirthRegistrations and searchDeathRegistrations queries, as they are no longer used by the client.
+- **Retrieve action deprecated:** Field agents & registration agents used to be able to retrieve records to view the audit history & PII. We are removing this in favor of audit capabilities that is planned for in a future release.
+
+### New features
+
+- Allow configuring the default search criteria for record search [#6924](https://github.com/opencrvs/opencrvs-core/issues/6924)
+- Add checks to validate client and server are always on the same version. This prevents browsers with a cached or outdated client versions from making potentially invalid requests to the backend [#6695](https://github.com/opencrvs/opencrvs-core/issues/6695)
+- Two new statuses of record are added: `Validated` and `Correction Requested` for advanced search parameters [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
+- A new field: `Time Period` is added to advanced search [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
+- Deploy UI-Kit Storybook to [opencrvs.pages.dev](https://opencrvs.pages.dev) to allow extending OpenCRVS using the component library
+- Record audit action buttons are moved into action menu [#7390](https://github.com/opencrvs/opencrvs-core/issues/7390)
+- Reoder the sytem user add/edit field for surname to be first, also change labels from `Last name` to `User's surname` and lastly remove the NID question from the form [#6830](https://github.com/opencrvs/opencrvs-core/issues/6830)
+- Corrected the total amount displayed for _certification_ and _correction_ fees on the Performance Page, ensuring accurate fee tracking across certification and correction sequences. [#7793](https://github.com/opencrvs/opencrvs-core/issues/7793)
+- Auth now allows registrar's token to be exchanged for a new token that strictly allows confirming or rejecting a specific record. Core now passes this token to country configuration instead of the registrar's token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728) [#7849](https://github.com/opencrvs/opencrvs-core/issues/7849)
+- **Template Selection for Certified Copies**: Added support for multiple certificate templates for each event (birth, death, marriage). Users can now select a template during the certificate issuance process.
+- **Template-based Payment Configuration**: Implemented payment differentiation based on the selected certificate template, ensuring the correct amount is charged.
+- **Template Action Tracking**: Each template printed is tracked in the history table, showing which specific template was used.
+- **Template Selection Dropdown**: Updated print workflow to include a dropdown menu for template selection when issuing a certificate.
+- **QR code scanner**: A form field component allows pre-populating informant's details based on a ID card [#8196](https://github.com/opencrvs/opencrvs-core/pull/8196)
+- Introduced a new customisable UI component: Banner [#8276](https://github.com/opencrvs/opencrvs-core/issues/8276)
+- Auth now allows exchanging user's token for a new record-specific token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
+- A new GraphQL mutation `upsertRegistrationIdentifier` is added to allow updating the patient identifiers of a registration record such as NID [#8034](https://github.com/opencrvs/opencrvs-core/pull/8034)
+- Updated GraphQL mutation `confirmRegistration` to allow adding a `comment` for record audit [#8197](https://github.com/opencrvs/opencrvs-core/pull/8197)
+- Add `isAgeInYearsBetween` validator to enable validation that will constraint a date to be only valid if it falls within a specified date range. The `isInformantOfLegalAge` validator is now deprecated and removed in favor of `isAgeInYearsBetween` validator [#7636](https://github.com/opencrvs/opencrvs-core/issues/7636)
+
+### Improvements
+
+- Auth token, ip address, remote address redacted from server log
+- **Align Patient data model with FHIR**: Previously we were using `string[]` for `Patient.name.family` field instead of `string` as mentioned in the FHIR standard. We've now aligned the field with the standard.
+- **Certificate Fetching**: Removed certificates from the database, allowing them to be fetched directly from the country configuration via a simplified API endpoint.
+
+### Deprecated
+
+- `validator-api` & `age-verification-api` & `nationalId` scopes are deprecated as unused. Corresponding scopes are removed from the `systemScopes` and also removed from the audience when creating the token [#7904](https://github.com/opencrvs/opencrvs-core/issues/7904)
+
+### Bug fixes
+
+- Fix task history getting corrupted if a user views a record while it's in external validation [#8278](https://github.com/opencrvs/opencrvs-core/issues/8278)
+- Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
+- "Choose a new password" form now allows the user to submit the form using the "Enter/Return" key [#5502](https://github.com/opencrvs/opencrvs-core/issues/5502)
+- Dropdown options now flow to multiple rows in forms [#7653](https://github.com/opencrvs/opencrvs-core/pull/7653)
+- Only render units/postfix when field has a value [#7055](https://github.com/opencrvs/opencrvs-core/issues/7055)
+- Only show items with values in review [#5192](https://github.com/opencrvs/opencrvs-core/pull/5192)
+- Fix prefix text overlap issue in form text inputs
+- Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
+- Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
+- Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
+
+## 1.6.3 Release candidate
+
+### Bug fixes
+
+- Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations , the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
+
+- Fix rendering of Custom Date fields [#8885](https://github.com/opencrvs/opencrvs-core/issues/8885)
+
+### Improvements
+
+- For countries where local phone numbers start with 0, we now ensure the prefix remains unchanged when converting to and from the international format.
+
 ## [1.6.2](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.2)
 
 ### Bug fixes
@@ -11,6 +76,15 @@
 ### Improvements
 
 - Support for 6th administrative level
+
+### Deprecated
+
+- `INFORMANT_SIGNATURE` & `INFORMANT_SIGNATURE_REQUIRED` are now deprecated and part of form config
+
+### Bug fixes
+
+- Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
+- Fix stale validations showing for document uploader with options form field
 
 ## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
 
@@ -138,7 +212,11 @@
 - **Set Metabase default credentials.** These must be configured via countryconfig repository environment variables and secrets otherwise the dashboard service won't start: OPENCRVS_METABASE_ADMIN_EMAIL & OPENCRVS_METABASE_ADMIN_PASSWORD
 - **Check your Metabase map file.** For Metabase configuration, we renamed `farajaland-map.geojson` to `map.geojson` to not tie implementations into example country naming conventions.
 - **Feature flags** In order to make application config settings more readable, we re-organised `src/api/application/application-config-default.ts` with a clear feature flag block like so. These are then used across the front and back end of the application to control configurable functionality. New feature flags DEATH_REGISTRATION allow you to optionally run off death registration if your country doesnt want to run its first pilot including death and PRINT_DECLARATION (see New Features) have been added.
-  `FEATURES: { DEATH_REGISTRATION: true, MARRIAGE_REGISTRATION: false, ... } `
+  `FEATURES: {
+  DEATH_REGISTRATION: true, 
+  MARRIAGE_REGISTRATION: false,
+  ...
+} `
 - **Improve rendering of addresses in review page where addresses match** When entering father's address details, some countries make use of a checkbox which says "Address is the same as the mothers. " which, when selected, makes the mother's address and fathers address the same. The checkbox has a programatic value of "Yes" or "No". As a result on the review page, the value "Yes" was displayed which didn't make grammatical sense as a response. We decided to use a custom label: "Same as mother's", which is what was asked on the form. This requires some code changes in the src/form/addresses/index.ts file to pull in the `hideInPreview` prop which will hide the value "Yes" on the review page and replace with a content managed label. Associated bug [#5086](https://github.com/opencrvs/opencrvs-core/issues/5086)
 
 ### Infrastructure breaking changes

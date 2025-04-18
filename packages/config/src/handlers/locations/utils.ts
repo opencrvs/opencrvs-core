@@ -108,7 +108,7 @@ export const composeFhirLocation = (
   }
 }
 
-export function setExtensions(
+function setExtensions(
   malePopulations: Statistics,
   femalePopulations: Statistics,
   totalPopulations: Statistics,
@@ -244,7 +244,7 @@ export function updateStatisticalExtensions(
 
 export async function getLocationsByIdentifier(identifier: string) {
   const locationSearchResult = await fetchFromHearth<Bundle<Location>>(
-    `/Location/?identifier=${identifier}&_count=0`
+    `Location/?identifier=${identifier}&_count=0`
   )
 
   return (

@@ -21,7 +21,7 @@ type ButtonType =
   | 'tertiary'
   | 'positive'
   | 'negative'
-  | 'secondary_negative'
+  | 'secondaryNegative'
   | 'icon'
   | 'iconPrimary'
 
@@ -60,7 +60,7 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'primary' && styles.primary(props)}
   ${(props) => props.variant === 'secondary' && styles.secondary}
   ${(props) =>
-    props.variant === 'secondary_negative' && styles.secondary_negative}
+    props.variant === 'secondaryNegative' && styles.secondaryNegative}
 
   ${(props) => props.variant === 'tertiary' && styles.tertiary}
   ${(props) => props.variant === 'positive' && styles.positive}

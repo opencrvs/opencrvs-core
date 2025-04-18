@@ -6,12 +6,11 @@
     },
     "target": "es6",
     "module": "commonjs",
-    "outDir": "build/dist",
+    "outDir": "build/dist/common",
     "sourceMap": true,
-    "moduleResolution": "node",
     "rootDir": "src",
     "declaration": true,
-    "lib": ["esnext.asynciterable", "es2015", "es6"],
+    "lib": ["esnext.asynciterable", "es2015", "es6", "es2019"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -20,7 +19,8 @@
     "noUnusedLocals": true,
     "types": ["jest", "fhir"],
     "skipLibCheck": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "composite": true
   },
   "include": ["src/**/*.ts", "typings"],
   "exclude": ["node_modules", "build"]

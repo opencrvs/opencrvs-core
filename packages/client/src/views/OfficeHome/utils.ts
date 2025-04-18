@@ -12,6 +12,7 @@ import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/Workqueue'
 import { orderBy } from 'lodash'
 import { ITaskHistory } from '@client/declarations'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getSortedItems = <T = any>(
   items: T[],
   sortedCol: COLUMNS,
@@ -69,7 +70,7 @@ export const changeSortedColumn = (
       newSortedCol = COLUMNS.REGISTRATION_NO
       break
     default:
-      newSortedCol = COLUMNS.NAME
+      newSortedCol = COLUMNS.NONE
   }
 
   if (newSortedCol === presentSortedCol) {
@@ -77,25 +78,13 @@ export const changeSortedColumn = (
       newSortOrder = SORT_ORDER.DESCENDING
     } else {
       newSortOrder = SORT_ORDER.ASCENDING
+      newSortedCol = COLUMNS.NONE
     }
   }
 
   return {
     newSortedCol: newSortedCol,
     newSortOrder: newSortOrder
-  }
-}
-
-export const getStatusWiseWQTab = (status: string) => {
-  switch (status) {
-    case 'REGISTERED':
-      return 'printTab'
-    case 'VALIDATED':
-      return 'approvalTab'
-    case 'ISSUED':
-      return 'issueTab'
-    default:
-      return 'reviewTab'
   }
 }
 

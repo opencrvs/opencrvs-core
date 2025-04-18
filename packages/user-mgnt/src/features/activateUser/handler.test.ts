@@ -8,20 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { logger } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons/authentication'
+import User, { IUser } from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
-import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
-import User, { IUser } from '@user-mgnt/model/user'
-import { logger } from '@opencrvs/commons'
-import * as mockingoose from 'mockingoose'
+import * as jwt from 'jsonwebtoken'
 import { cloneDeep } from 'lodash'
-import { Types } from 'mongoose'
+import * as mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin'] },
+  { scope: [SCOPES.USER_UPDATE] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -30,8 +30,7 @@ const token = jwt.sign(
   }
 )
 
-// @ts-ignore
-const mockUser: IUser & { _id: string } = {
+const mockUser: Partial<IUser> & { _id: string } = {
   _id: '5d10885374be318fa7689f0b',
   name: [
     {
@@ -41,14 +40,11 @@ const mockUser: IUser & { _id: string } = {
     }
   ],
   username: 'j.doe1',
-  identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
-  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
+  role: 'LOCAL_REGISTRAR',
   status: 'pending',
   primaryOfficeId: '321',
-  scope: ['register'],
   device: 'D444',
   passwordHash:
     'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',

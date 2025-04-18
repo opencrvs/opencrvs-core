@@ -13,7 +13,7 @@ import { createRouterProps, createTestComponent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { MockedProvider } from '@apollo/client/testing'
 import {
   mockRegistrationCountRequest,
@@ -33,7 +33,7 @@ const graphqlMocks: MockedProvider['props']['mocks'] = [
 
 describe('Performance home test', () => {
   describe('Performance home without location in props', () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     let app: ReactWrapper
 
     beforeAll(async () => {
@@ -42,23 +42,21 @@ describe('Performance home test', () => {
         id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
         searchableText: 'Dhaka'
       }
-      app = await createTestComponent(
-        <PerformanceHome
-          {...createRouterProps('/performance', undefined, {
-            search: {
-              locationId: LOCATION_DHAKA_DIVISION.id,
-              event: Event.Birth,
-              timeEnd: new Date(1487076708000).toISOString(),
-              timeStart: new Date(1455454308000).toISOString()
-            }
-          })}
-        />,
-        {
-          store,
-          history,
-          graphqlMocks
+
+      const { location } = createRouterProps('/performance', undefined, {
+        search: {
+          locationId: LOCATION_DHAKA_DIVISION.id,
+          event: EventType.Birth,
+          timeEnd: new Date(1487076708000).toISOString(),
+          timeStart: new Date(1455454308000).toISOString()
         }
-      )
+      })
+
+      ;({ component: app } = await createTestComponent(<PerformanceHome />, {
+        store,
+        graphqlMocks,
+        initialEntries: [location.pathname + '?' + location.search]
+      }))
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)

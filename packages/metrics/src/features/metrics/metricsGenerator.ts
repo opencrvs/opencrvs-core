@@ -37,6 +37,7 @@ import {
   ResourceIdentifier,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
 interface IGroupedByGender {
   total: number
   gender: string
@@ -116,10 +117,7 @@ interface IGenderBasisMetrics {
   total: number
 }
 
-interface IGenderBasisPoint {
-  gender: string
-  over18: number
-  under18: number
+interface ILocationPoint {
   locationLevel2?: string
   locationLevel3?: string
   locationLevel4?: string
@@ -127,8 +125,15 @@ interface IGenderBasisPoint {
   locationLevel6?: string
 }
 
+interface IGenderBasisPoint extends ILocationPoint {
+  gender: string
+  over18: number
+  under18: number
+}
+
 type Payment = {
   total: number
+  [key: string]: any
 }
 
 export async function fetchCertificationPayments(
@@ -434,7 +439,7 @@ export async function fetchKeyFigures(
 
   const keyFigures: IBirthKeyFigures[] = []
   const queryLocationId =
-    `Location/${estimatedFigureForTargetDays.locationId}` as const
+    `Location/${estimatedFigureForTargetDays.locationId}` as `Location/${UUID}`
   const locationIds = await fetchLocationChildrenIds(queryLocationId)
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
@@ -1198,10 +1203,16 @@ export async function fetchRegistrationsGroupByTime(
     .map((item) => {
       const obj: Partial<IMetricsTotalGroupByTime> = {}
       keys.forEach((key, i) => {
-        // item[i+5] to ignore the first 5 values of json & count from index 5
-        obj[key] = item[i + 5]
-        if (key === 'total') {
-          obj[key] = Number(item[i + 5])
+        const value = item[i + 5]
+        switch (key) {
+          case 'total':
+            obj.total = Number(value)
+            break
+          case 'time':
+          case 'eventLocationType':
+          case 'timeLabel':
+            obj[key] = value as string
+            break
         }
       })
       return obj as IMetricsTotalGroupByTime
@@ -1218,7 +1229,8 @@ function populateGenderBasisMetrics(
 
   points.forEach((point: IGenderBasisPoint) => {
     const metrics = metricsArray.find(
-      (element) => element.location === point[locationLevel]
+      (element) =>
+        element.location === point[locationLevel as keyof ILocationPoint]
     )
     const femaleOver18 =
       point.gender === 'female'
@@ -1245,7 +1257,7 @@ function populateGenderBasisMetrics(
 
     if (!metrics) {
       metricsArray.push({
-        location: point[locationLevel],
+        location: point[locationLevel as keyof ILocationPoint] || '',
         femaleOver18: femaleOver18,
         maleOver18: maleOver18,
         maleUnder18: maleUnder18,

@@ -16,7 +16,8 @@ import {
   storeDeclaration
 } from '@opencrvs/client/src/declarations'
 import { IForm, IFormSectionData } from '@opencrvs/client/src/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
@@ -28,14 +29,17 @@ import {
   mockUserResponseWithName,
   getReviewFormFromStore,
   createTestStore,
-  mockDeathDeclarationData
+  mockDeathDeclarationData,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES,
+  flushPromises
 } from '@client/tests/util'
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
-import { History } from 'history'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { birthDraftData } from '@client/tests/mock-drafts'
 import { vi, Mock } from 'vitest'
+import { formatUrl } from '@client/navigation'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -153,7 +157,7 @@ const birthDeclaration: IDeclaration = {
   },
   originalData: mockDeclarationData,
   review: true,
-  event: Event.Birth,
+  event: EventType.Birth,
   registrationStatus: RegStatus.Registered,
   downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644407705186,
@@ -221,7 +225,7 @@ const deathDeclaration: IDeclaration = {
   },
   originalData: mockDeathDeclarationData,
   review: true,
-  event: Event.Death,
+  event: EventType.Death,
   registrationStatus: RegStatus.Registered,
   downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644490181166,
@@ -254,49 +258,48 @@ const mockFetchUserDetails = vi.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
 describe('ReviewForm tests', () => {
-  const scope = ['register']
-  const mock: any = vi.fn()
+  const scope = [SCOPES.RECORD_REGISTER]
+
   let form: IForm
   let store: AppStore
-  let history: History
 
   beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
 
-    form = await getReviewFormFromStore(store, Event.Birth)
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
+
+    form = await getReviewFormFromStore(store, EventType.Birth)
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth())
   })
 
   it('Shared contact phone number should be set properly', async () => {
-    const testComponent = await createTestComponent(
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    store.dispatch(storeDeclaration(birthDeclaration))
+
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         scope={scope}
         event={birthDeclaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
+        declarationId={birthDeclaration.id}
+      />,
+      {
+        store,
+        path: REVIEW_EVENT_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId: birthDeclaration.id,
             pageId: 'review',
             event: birthDeclaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={birthDeclaration.id}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
 
-    store.dispatch(storeDeclaration(birthDeclaration))
-    testComponent.update()
     const data = testComponent
       .find(RegisterForm)
       .prop('declaration') as IDeclaration
@@ -307,29 +310,32 @@ describe('ReviewForm tests', () => {
       ).registrationPhone
     ).toBe('+8801711111111')
   })
+
   it('when registration has attachment', async () => {
-    const testComponent = await createTestComponent(
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    store.dispatch(storeDeclaration(birthDeclaration))
+
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         scope={scope}
         event={birthDeclaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
+        declarationId={birthDeclaration.id}
+      />,
+      {
+        store,
+        path: REVIEW_EVENT_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId: birthDeclaration.id,
             pageId: 'review',
             event: birthDeclaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={birthDeclaration.id}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
 
     store.dispatch(storeDeclaration(birthDeclaration))
@@ -350,31 +356,32 @@ describe('ReviewForm tests', () => {
     ])
   })
   it('check registration', async () => {
-    const testComponent = await createTestComponent(
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await flushPromises()
+    store.dispatch(storeDeclaration(birthDeclaration))
+
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         scope={scope}
         event={birthDeclaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
+        declarationId={birthDeclaration.id}
+      />,
+      {
+        store,
+        path: REVIEW_EVENT_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId: birthDeclaration.id,
             pageId: 'review',
             event: birthDeclaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={birthDeclaration.id}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
 
-    store.dispatch(storeDeclaration(birthDeclaration))
     testComponent.update()
 
     const data = testComponent
@@ -405,37 +412,19 @@ describe('ReviewForm tests', () => {
       certificates: [{}]
     })
   })
+
   it('redirect to home when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.InProgress
     )
 
-    const testComponent = await createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
-        scope={scope}
-        event={declaration.event}
-        registerForm={form}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'review',
-            event: declaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={declaration.id}
-      />,
-      { store, history }
-    )
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await flushPromises()
+
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -446,44 +435,47 @@ describe('ReviewForm tests', () => {
       )
     )
     store.dispatch(storeDeclaration(declaration))
+
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(
+        <ReviewForm
+          scope={scope}
+          event={declaration.event}
+          registerForm={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          declarationId={declaration.id}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+              declarationId: declaration.id,
+              pageId: 'review',
+              event: declaration.event.toLowerCase()
+            })
+          ]
+        }
+      )
+
     testComponent.update()
     testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
-    expect(window.location.href).toContain('/progress')
+    expect(testRouter.state.location.pathname).toContain('/progress')
   })
 
   it('redirect to review tab when exit button is clicked', async () => {
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await flushPromises()
+
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.Declared
     )
 
-    const testComponent = await createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
-        scope={scope}
-        event={declaration.event}
-        registerForm={form}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'review',
-            event: declaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={declaration.id}
-      />,
-      { store, history }
-    )
-
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -494,44 +486,47 @@ describe('ReviewForm tests', () => {
       )
     )
     store.dispatch(storeDeclaration(declaration))
-    testComponent.update()
+
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(
+        <ReviewForm
+          scope={scope}
+          event={declaration.event}
+          registerForm={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          declarationId={declaration.id}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+              declarationId: declaration.id,
+              pageId: 'review',
+              event: declaration.event.toLowerCase()
+            })
+          ]
+        }
+      )
+
     testComponent.find('#exit-btn').hostNodes().simulate('click')
-    testComponent.update()
-    expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
+    expect(testRouter.state.location.pathname).toContain(
+      WORKQUEUE_TABS.readyForReview
+    )
   })
 
   it('redirect to review tab when exit button is clicked', async () => {
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await flushPromises()
+
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.Validated
     )
 
-    const testComponent = await createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
-        scope={scope}
-        event={declaration.event}
-        registerForm={form}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'review',
-            event: declaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={declaration.id}
-      />,
-      { store, history }
-    )
-
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -542,44 +537,48 @@ describe('ReviewForm tests', () => {
       )
     )
     store.dispatch(storeDeclaration(declaration))
-    testComponent.update()
+
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(
+        <ReviewForm
+          scope={scope}
+          event={declaration.event}
+          registerForm={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          declarationId={declaration.id}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+              declarationId: declaration.id,
+              pageId: 'review',
+              event: declaration.event.toLowerCase()
+            })
+          ]
+        }
+      )
+
     testComponent.find('#exit-btn').hostNodes().simulate('click')
-    testComponent.update()
-    expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
+
+    expect(testRouter.state.location.pathname).toContain(
+      WORKQUEUE_TABS.readyForReview
+    )
   })
 
   it('redirect to update tab when exit button is clicked', async () => {
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await flushPromises()
+
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.Rejected
     )
 
-    const testComponent = await createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
-        scope={scope}
-        event={declaration.event}
-        registerForm={form}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'review',
-            event: declaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={declaration.id}
-      />,
-      { store, history }
-    )
-
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -590,41 +589,44 @@ describe('ReviewForm tests', () => {
       )
     )
     store.dispatch(storeDeclaration(declaration))
-    testComponent.update()
+
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(
+        <ReviewForm
+          scope={scope}
+          event={declaration.event}
+          registerForm={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          declarationId={declaration.id}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+              declarationId: declaration.id,
+              pageId: 'review',
+              event: declaration.event.toLowerCase()
+            })
+          ]
+        }
+      )
+
     testComponent.find('#exit-btn').hostNodes().simulate('click')
-    testComponent.update()
-    expect(window.location.href).toContain(WORKQUEUE_TABS.requiresUpdate)
+    expect(testRouter.state.location.pathname).toContain(
+      WORKQUEUE_TABS.requiresUpdate
+    )
   })
 
   it('redirect to progress tab when exit button is clicked', async () => {
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await flushPromises()
+
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth
-    )
-
-    const testComponent = await createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
-        scope={scope}
-        event={declaration.event}
-        registerForm={form}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'review',
-            event: declaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={declaration.id}
-      />,
-      { store, history }
+      EventType.Birth
     )
 
     store.dispatch(
@@ -637,17 +639,43 @@ describe('ReviewForm tests', () => {
       )
     )
     store.dispatch(storeDeclaration(declaration))
-    testComponent.update()
+
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(
+        <ReviewForm
+          scope={scope}
+          event={declaration.event}
+          registerForm={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          declarationId={declaration.id}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+              declarationId: declaration.id,
+              pageId: 'review',
+              event: declaration.event.toLowerCase()
+            })
+          ]
+        }
+      )
+
     testComponent.find('#exit-btn').hostNodes().simulate('click')
-    testComponent.update()
-    expect(window.location.href).toContain('/progress')
+
+    expect(testRouter.state.location.pathname).toContain('/progress')
   })
 
   it('it checked if review form is already in store and avoid loading from backend', async () => {
+    // NOTE: check auth dispatches actions that eventually will retrieve user data
+    // from offline storage. Those would override the data we set here.
+    await flushPromises()
+
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth
+      EventType.Birth
     )
     store.dispatch(
       getStorageDeclarationsSuccess(
@@ -658,32 +686,30 @@ describe('ReviewForm tests', () => {
         })
       )
     )
-    const testComponent = await createTestComponent(
+
+    store.dispatch(storeDeclaration(declaration))
+
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         scope={scope}
         event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
+        declarationId={declaration.id}
+      />,
+      {
+        store,
+        path: REVIEW_EVENT_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId: declaration.id,
             pageId: 'review',
             event: declaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={declaration.id}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
 
-    store.dispatch(storeDeclaration(declaration))
-    testComponent.update()
     const data = testComponent
       .find(RegisterForm)
       .prop('declaration') as IDeclaration
@@ -693,31 +719,33 @@ describe('ReviewForm tests', () => {
 
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
-      const testComponent = await createTestComponent(
+      // NOTE: check auth dispatches actions that eventually will retrieve user data
+      // from offline storage. Those would override the data we set here.
+      await flushPromises()
+
+      store.dispatch(storeDeclaration(deathDeclaration))
+
+      const { component: testComponent } = await createTestComponent(
         <ReviewForm
-          location={mock}
-          history={history}
           scope={scope}
-          staticContext={mock}
           event={deathDeclaration.event}
-          registerForm={getReviewFormFromStore(store, Event.Death)}
+          registerForm={getReviewFormFromStore(store, EventType.Death)}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-          match={{
-            params: {
+          declarationId={deathDeclaration.id}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
               declarationId: deathDeclaration.id,
               pageId: 'review',
               event: deathDeclaration.event.toLowerCase()
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          declarationId={deathDeclaration.id}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
-      store.dispatch(storeDeclaration(deathDeclaration))
       testComponent.update()
       const data = testComponent
         .find(RegisterForm)
@@ -739,32 +767,33 @@ describe('ReviewForm tests', () => {
       )
     })
     it('populates proper death event section', async () => {
-      const form = await getReviewFormFromStore(store, Event.Death)
-      const testComponent = await createTestComponent(
+      // NOTE: check auth dispatches actions that eventually will retrieve user data
+      // from offline storage. Those would override the data we set here.
+      await flushPromises()
+
+      store.dispatch(storeDeclaration(deathDeclaration))
+      const form = await getReviewFormFromStore(store, EventType.Death)
+      const { component: testComponent } = await createTestComponent(
         <ReviewForm
-          location={mock}
-          history={history}
           scope={scope}
-          staticContext={mock}
           event={deathDeclaration.event}
           registerForm={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-          match={{
-            params: {
+          declarationId={deathDeclaration.id}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
               declarationId: deathDeclaration.id,
               pageId: 'review',
               event: deathDeclaration.event.toLowerCase()
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          declarationId={deathDeclaration.id}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
-      store.dispatch(storeDeclaration(deathDeclaration))
       testComponent.update()
       const data = testComponent
         .find(RegisterForm)
@@ -787,31 +816,31 @@ describe('ReviewForm tests', () => {
     })
 
     it('shows error message for user with declare scope', async () => {
+      // NOTE: check auth dispatches actions that eventually will retrieve user data
+      // from offline storage. Those would override the data we set here.
+      await flushPromises()
+
       store.dispatch(storeDeclaration(birthDeclaration))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewForm
-          location={mock}
-          history={history}
-          staticContext={mock}
           scope={scope}
           event={birthDeclaration.event}
           registerForm={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-          match={{
-            params: {
-              draftId: birthDeclaration.id,
-              pageId: 'review',
-              event: birthDeclaration.event.toLowerCase()
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
           declarationId={birthDeclaration.id}
         />,
-        { store, history }
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+              declarationId: birthDeclaration.id,
+              pageId: 'review',
+              event: birthDeclaration.event.toLowerCase()
+            })
+          ]
+        }
       )
-      testComponent.update()
 
       expect(
         testComponent

@@ -8,26 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as Hapi from '@hapi/hapi'
+import { logger } from '@opencrvs/commons'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   generateUsername,
   postFhir,
   rollbackCreateUser,
-  sendCredentialsNotification
+  sendCredentialsNotification,
+  uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
-import { logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import {
-  generateSaltedHash,
-  generateRandomPassword
+  generateRandomPassword,
+  generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { statuses, hasDemoScope, getUserId } from '@user-mgnt/utils/userUtils'
-import { userRoleScopes } from '@opencrvs/commons/authentication'
-import { QA_ENV } from '@user-mgnt/constants'
-import * as Hapi from '@hapi/hapi'
+import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import * as _ from 'lodash'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -42,14 +41,23 @@ export default async function createUser(
   let password = null
 
   try {
-    const practitioner = createFhirPractitioner(user, false)
+    const signatureAttachment = user.signature && {
+      contentType: user.signature.type,
+      url: await uploadSignatureToMinio(token, user.signature),
+      creation: new Date().getTime().toString()
+    }
+
+    const practitioner = createFhirPractitioner(
+      user,
+      false,
+      signatureAttachment
+    )
     practitionerId = await postFhir(token, practitioner)
     if (!practitionerId) {
       throw new Error(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
-    user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
     const role = await createFhirPractitionerRole(user, practitionerId, false)
     roleId = await postFhir(token, role)
@@ -58,15 +66,8 @@ export default async function createUser(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
-    const userScopes: string[] = userRoleScopes[user.systemRole]
-    if (
-      (process.env.NODE_ENV === 'development' || QA_ENV) &&
-      !userScopes.includes('demo')
-    ) {
-      userScopes.push('demo')
-    }
+
     user.status = user.status ?? statuses.PENDING
-    user.scope = userScopes
 
     password = user.password ?? generateRandomPassword(hasDemoScope(request))
 

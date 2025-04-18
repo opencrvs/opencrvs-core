@@ -8,24 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost/webhooks'
-export const HOST = process.env.HOST || '0.0.0.0'
-export const PORT = process.env.PORT || 2525
-export const USER_MANAGEMENT_URL =
-  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const SENTRY_DSN = process.env.SENTRY_DSN
+import { env } from '@webhooks/environment'
 
-export const PRODUCTION = process.env.NODE_ENV === 'production'
-export const QA_ENV = process.env.QA_ENV || false
-export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
-export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
-// Check if the token has been invalided in the auth service before it has expired
-// This needs to be a string to make it easy to pass as an ENV var.
-export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
-export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
 export const QUEUE_NAME = 'NOTIFY_URL'
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const DEFAULT_TIMEOUT = 600000
+
+export const MONGO_URL = env.MONGO_URL
+export const HOST = env.HOST
+export const PORT = env.PORT
+export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
+export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
+
+export const SENTRY_DSN = env.SENTRY_DSN
+export const PRODUCTION = env.isProd
+export const QA_ENV = env.QA_ENV
+
+export const AUTH_URL = env.AUTH_URL
+export const FHIR_URL = env.FHIR_URL
+
+export const CHECK_INVALID_TOKEN = env.CHECK_INVALID_TOKEN
+export const REDIS_HOST = env.REDIS_HOST

@@ -47,6 +47,10 @@ const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
   const [authError, setAuthError] = useState(false)
 
   const onError = (error: Error) => {
+    if (import.meta.env.MODE === 'test') {
+      // eslint-disable-next-line no-console
+      console.log(error)
+    }
     setAuthError(error.message === '401')
   }
 

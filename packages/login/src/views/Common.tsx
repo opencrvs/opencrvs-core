@@ -27,12 +27,6 @@ export const LogoContainer = styled.div`
   }
 `
 
-export interface IProps {
-  formId: string
-  submissionError: boolean
-  errorCode?: number
-}
-
 export const Container = styled.div`
   position: relative;
   height: auto;

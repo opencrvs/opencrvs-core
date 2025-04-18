@@ -11,7 +11,13 @@
 import pino from 'pino'
 export const logger =
   process.env.NODE_ENV === 'production'
-    ? pino()
+    ? pino({
+        redact: [
+          'req.headers.authorization',
+          'req.remoteAddress',
+          "req.headers['x-real-ip']"
+        ]
+      })
     : pino({
         transport: {
           target: 'pino-pretty',

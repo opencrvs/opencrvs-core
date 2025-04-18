@@ -18,7 +18,7 @@ import {
 import { IAuthHeader } from '@opencrvs/commons'
 
 import { checkUserAssignment } from '@gateway/authorisation'
-import { UnassignError } from '@gateway/utils/unassignError'
+
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
@@ -30,7 +30,8 @@ import {
   rejectRegistrationCorrection,
   requestRegistrationCorrection
 } from '@gateway/workflow'
-import { UserInputError } from 'apollo-server-hapi'
+import { SCOPES } from '@opencrvs/commons/authentication'
+import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -39,7 +40,9 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register', 'validate'])) {
+      if (
+        inScope(authHeader, [SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION])
+      ) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -56,7 +59,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register'])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -72,7 +75,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register'])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -92,7 +95,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register'])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -112,7 +115,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register'])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -132,7 +135,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register'])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -152,7 +155,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register'])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -172,7 +175,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register'])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')

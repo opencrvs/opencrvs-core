@@ -19,25 +19,21 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
+import { SCOPES } from '@opencrvs/commons/client'
 import {
+  AssignmentData,
   Attachment,
-  Event,
+  EventType,
   History,
   Query,
-  RegStatus,
-  SystemRoleType
+  RegStatus
 } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import {
-  Action as NavigationAction,
-  GO_TO_PAGE,
-  IDynamicValues
-} from '@client/navigation'
 import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
 } from '@client/profile/profileActions'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import {
@@ -45,7 +41,6 @@ import {
   draftToGqlTransformer
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
 import type {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
@@ -71,7 +66,6 @@ import {
   ShowUnassignedDeclarations,
   showUnassignedDeclarations
 } from '@client/notification/actions'
-import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import {
   UpdateRegistrarWorkqueueAction,
@@ -80,15 +74,14 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import {
-  EMPTY_STRING,
-  FIELD_AGENT_ROLES,
-  SIGNATURE_KEYS
-} from '@client/utils/constants'
+import { EMPTY_STRING, SIGNATURE_KEYS } from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
 import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
 import { getReviewForm } from '@client/forms/register/review-selectors'
+import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
+import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
+import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -109,6 +102,7 @@ const CLEAR_CORRECTION_AND_PRINT_CHANGES = 'CLEAR_CORRECTION_AND_PRINT_CHANGES'
 const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
 const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
 const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
+const UNASSIGN_DECLARATION_FAILED = 'DECLARATION/UNASSIGN_FAILED'
 const REMOVE_UNASSIGNED_DECLARATIONS =
   'DECLARATION/REMOVE_UNASSIGNED_DECLARATIONS'
 
@@ -159,7 +153,7 @@ export enum DOWNLOAD_STATUS {
   UNASSIGNING = 'UNASSIGNING'
 }
 
-export const processingStates = [
+const processingStates = [
   SUBMISSION_STATUS.READY_TO_ARCHIVE,
   SUBMISSION_STATUS.ARCHIVING,
   SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -224,7 +218,7 @@ export interface IDeclaration {
   modifiedOn?: number
   eventType?: string
   review?: boolean
-  event: Event
+  event: EventType
   registrationStatus?: RegStatus
   submissionStatus?: string
   downloadStatus?: DOWNLOAD_STATUS
@@ -238,6 +232,7 @@ export interface IDeclaration {
   writingDraft?: boolean
   operationHistories?: ITaskHistory[]
   isNotDuplicate?: boolean
+  assignmentStatus?: AssignmentData
 }
 
 type Relation =
@@ -264,11 +259,14 @@ type RelationForCertificateCorrection =
   | 'CHILD'
 
 export type ICertificate = {
-  collector?: Partial<{ type: Relation | string }>
+  collector?: Partial<{
+    type: Relation | string
+    certificateTemplateId: string
+  }>
   corrector?: Partial<{ type: RelationForCertificateCorrection | string }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
-  data?: string
+  certificateTemplateId?: string
 }
 
 /*
@@ -408,7 +406,7 @@ interface IDownloadDeclarationSuccess {
   payload: {
     queryData: any
     form: {
-      [key in Event]: IForm
+      [key in EventType]: IForm
     }
     client: ApolloClient<{}>
     offlineData?: IOfflineData
@@ -452,6 +450,16 @@ interface IUnassignDeclarationSuccess {
   }
 }
 
+interface IUnassignDeclarationFailed {
+  type: typeof UNASSIGN_DECLARATION_FAILED
+  payload: {
+    error: ApolloError
+    declarationId: string
+    client: ApolloClient<{}>
+    refetchQueries?: InternalRefetchQueriesInclude
+  }
+}
+
 export type Action =
   | IArchiveDeclarationAction
   | IStoreDeclarationAction
@@ -461,7 +469,6 @@ export type Action =
   | IWriteDeclarationAction
   | IWriteDeclarationSuccessAction
   | IWriteDeclarationFailedAction
-  | NavigationAction
   | IDeleteDeclarationAction
   | IDeleteDeclarationSuccessAction
   | IDeleteDeclarationFailedAction
@@ -476,6 +483,7 @@ export type Action =
   | IEnqueueUnassignDeclaration
   | IUnassignDeclaration
   | IUnassignDeclarationSuccess
+  | IUnassignDeclarationFailed
   | IRemoveUnassignedDeclarationAction
   | ShowUnassignedDeclarations
 
@@ -500,7 +508,17 @@ const initialState: IDeclarationsState = {
   isWritingDraft: false
 }
 
-export function createDeclaration(event: Event, initialData?: IFormData) {
+/* Need to add mappings for events here */
+const QueryMapper = {
+  [EventType.Birth]: getBirthQueryMappings,
+  [EventType.Death]: getDeathQueryMappings,
+  [EventType.Marriage]: getMarriageQueryMappings
+}
+const getQueryMapping = (event: EventType, action: DeclarationAction) => {
+  return QueryMapper[event] && QueryMapper[event](action)
+}
+
+export function createDeclaration(event: EventType, initialData?: IFormData) {
   return {
     id: uuid(),
     data: initialData || {},
@@ -510,7 +528,7 @@ export function createDeclaration(event: Event, initialData?: IFormData) {
 }
 
 export function makeDeclarationReadyToDownload(
-  event: Event,
+  event: EventType,
   compositionId: string,
   action: DeclarationAction
 ): IDeclaration {
@@ -526,7 +544,7 @@ export function makeDeclarationReadyToDownload(
 export function createReviewDeclaration(
   declarationId: string,
   formData: IFormData,
-  event: Event,
+  event: EventType,
   status?: RegStatus,
   duplicates?: IDuplicates[]
 ): IDeclaration {
@@ -585,7 +603,7 @@ export const getStorageDeclarationsSuccess = (
   payload: response
 })
 
-export const getStorageDeclarationsFailed =
+const getStorageDeclarationsFailed =
   (): IGetStorageDeclarationsFailedAction => ({
     type: GET_DECLARATIONS_FAILED
   })
@@ -639,23 +657,14 @@ export function writeDeclaration(
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
 
-export function writeDeclarationSuccess(
+function writeDeclarationSuccess(
   declaration: IDeclaration
 ): IWriteDeclarationSuccessAction {
   return { type: WRITE_DECLARATION_SUCCESS, payload: { declaration } }
 }
 
-export function writeDeclarationFailed(): IWriteDeclarationFailedAction {
+function writeDeclarationFailed(): IWriteDeclarationFailedAction {
   return { type: WRITE_DECLARATION_FAILED }
-}
-
-async function getCurrentUserSystemRole(): Promise<string> {
-  const userDetails = await storage.getItem('USER_DETAILS')
-
-  if (!userDetails) {
-    return ''
-  }
-  return (JSON.parse(userDetails) as UserDetails).systemRole || ''
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -701,7 +710,6 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
     return JSON.stringify({ declarations: [] })
   }
 
-  const currentUserRole = await getCurrentUserSystemRole()
   const currentUserID = await getCurrentUserID()
 
   const allUserData = JSON.parse(storageTable) as IUserData[]
@@ -719,33 +727,8 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   const currentUserData = allUserData.find(
     (uData) => uData.userID === currentUserID
   )
-  let currentUserDeclarations: IDeclaration[] =
+  const currentUserDeclarations: IDeclaration[] =
     (currentUserData && currentUserData.declarations) || []
-
-  if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
-    currentUserDeclarations = currentUserData.declarations.filter((d) => {
-      if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-        const history = d.originalData?.history as unknown as IDynamicValues
-        const downloadedTime = (
-          history.filter((h: IDynamicValues) => {
-            return h.action === DOWNLOAD_STATUS.DOWNLOADED
-          }) as IDynamicValues[]
-        ).sort((fe, se) => {
-          return new Date(se.date).getTime() - new Date(fe.date).getTime()
-        })
-
-        return (
-          differenceInMinutes(new Date(), new Date(downloadedTime[0].date)) <
-          1500 // 25 hours, used munites for better accuracy
-        )
-      }
-      return true
-    })
-
-    // Storing the declarations again by excluding the 24 hours old downloaded declaration
-    currentUserData.declarations = currentUserDeclarations
-    await storage.setItem('USER_DATA', JSON.stringify(allUserData))
-  }
 
   const payload: IUserData = {
     userID: currentUserID,
@@ -1017,7 +1000,7 @@ export async function deleteDeclarationByUser(
 }
 
 export function downloadDeclaration(
-  event: Event,
+  event: EventType,
   compositionId: string,
   action: DeclarationAction,
   client: ApolloClient<{}>
@@ -1067,10 +1050,8 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
-      const userDetails = getUserDetails(getState())
-      if (
-        !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
-      ) {
+      const scopes = getScope(getState())
+      if (scopes?.includes(SCOPES.RECORD_REVIEW_DUPLICATES)) {
         await fetchAllDuplicateDeclarations(data.data)
       }
       const duplicateDeclarations = await fetchAllDuplicateDeclarations(
@@ -1087,10 +1068,12 @@ function requestWithStateWrapper(
         .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 
       const allfetchableURLs = [
-        ...getAttachmentUrls(data.data),
-        ...getSignatureUrls(data.data),
-        ...getProfileIconUrls(data.data),
-        ...allduplicateDeclarationsAttachments
+        ...new Set([
+          ...getAttachmentUrls(data.data),
+          ...getSignatureUrls(data.data),
+          ...getProfileIconUrls(data.data),
+          ...allduplicateDeclarationsAttachments
+        ])
       ]
 
       await Promise.all(
@@ -1131,14 +1114,25 @@ function getAttachmentUrls(queryResultData: Query) {
 }
 
 function getSignatureUrls(queryResultData: Query) {
-  const registration =
-    queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration ||
-    queryResultData.fetchMarriageRegistration?.registration
+  const data =
+    queryResultData.fetchBirthRegistration ||
+    queryResultData.fetchDeathRegistration ||
+    queryResultData.fetchMarriageRegistration
 
-  return SIGNATURE_KEYS.map(
-    (propertyKey) => registration?.[propertyKey]
-  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+  if (!data) return []
+  const { registration, history } = data
+
+  const registrarSignatures =
+    history
+      ?.map((entry) => entry?.signature?.data)
+      .filter((entry): entry is string => Boolean(entry)) || []
+
+  return [
+    ...registrarSignatures,
+    ...SIGNATURE_KEYS.map((propertyKey) => registration?.[propertyKey]).filter(
+      (maybeUrl): maybeUrl is string => Boolean(maybeUrl)
+    )
+  ]
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
@@ -1209,7 +1203,7 @@ function downloadDeclarationFail(
   }
 }
 
-export function executeUnassignDeclaration(
+function executeUnassignDeclaration(
   id: string,
   client: ApolloClient<{}>,
   refetchQueries?: InternalRefetchQueriesInclude
@@ -1254,33 +1248,27 @@ function unassignDeclarationSuccess([id, client, refetchQueries]: [
   }
 }
 
+function unassignDeclarationFailed(
+  error: ApolloError,
+  declarationId: string,
+  client: ApolloClient<{}>,
+  refetchQueries?: InternalRefetchQueriesInclude
+): IUnassignDeclarationFailed {
+  return {
+    type: UNASSIGN_DECLARATION_FAILED,
+    payload: {
+      error,
+      declarationId,
+      client,
+      refetchQueries
+    }
+  }
+}
 export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   state: IDeclarationsState = initialState,
   action: Action
 ): IDeclarationsState | Loop<IDeclarationsState, Action> => {
   switch (action.type) {
-    case GO_TO_PAGE: {
-      const declaration = state.declarations.find(
-        ({ id }) => id === action.payload.declarationId
-      )
-
-      if (
-        !declaration ||
-        declaration.data[action.payload.pageId] ||
-        action.payload.pageId === 'preview' ||
-        action.payload.pageId === 'review'
-      ) {
-        return state
-      }
-      const modifiedDeclaration = {
-        ...declaration,
-        data: {
-          ...declaration.data,
-          [action.payload.pageId]: {}
-        }
-      }
-      return loop(state, Cmd.action(modifyDeclaration(modifiedDeclaration)))
-    }
     case STORE_DECLARATION:
       return {
         ...state,
@@ -1360,7 +1348,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const orignalAppliation: IDeclaration = {
         ...correction,
         data: {
-          ...correction.originalData
+          ...correction?.originalData
         }
       }
 
@@ -1558,14 +1546,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         eventData.registration.status &&
         eventData.registration.status[0].type
       const updateWorkqueue = () =>
-        updateRegistrarWorkqueue(
-          userDetails?.practitionerId,
-          10,
-          Boolean(
-            userDetails?.systemRole &&
-              FIELD_AGENT_ROLES.includes(userDetails.systemRole)
-          )
-        )
+        updateRegistrarWorkqueue(userDetails?.practitionerId, 10)
 
       newDeclarationsAfterDownload[downloadingDeclarationIndex] =
         createReviewDeclaration(
@@ -1579,6 +1560,10 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
+
+      newDeclarationsAfterDownload[
+        downloadingDeclarationIndex
+      ].assignmentStatus = eventData?.registration?.assignment ?? null
 
       const newStateAfterDownload = {
         ...state,
@@ -1858,7 +1843,14 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
             ]
           },
           {
-            successActionCreator: unassignDeclarationSuccess
+            successActionCreator: unassignDeclarationSuccess,
+            failActionCreator: (err: ApolloError) =>
+              unassignDeclarationFailed(
+                err,
+                action.payload.id,
+                action.payload.client,
+                action.payload.refetchQueries
+              )
           }
         )
       )
@@ -1892,6 +1884,45 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           { sequence: true }
         )
       )
+    case UNASSIGN_DECLARATION_FAILED: {
+      const error = action.payload.error
+      const declarationNextToUnassign = state.declarations.find(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_UNASSIGN
+      )
+      if (error.graphQLErrors[0]?.extensions.code === 'UNASSIGNED') {
+        return loop(
+          state,
+          Cmd.list<
+            | IDeleteDeclarationAction
+            | UpdateRegistrarWorkqueueAction
+            | IUnassignDeclaration
+          >(
+            [
+              Cmd.action(
+                deleteDeclaration(
+                  action.payload.declarationId,
+                  action.payload.client
+                )
+              ),
+              Cmd.action(updateRegistrarWorkqueue()),
+              declarationNextToUnassign
+                ? Cmd.action(
+                    executeUnassignDeclaration(
+                      declarationNextToUnassign.id,
+                      action.payload.client,
+                      action.payload.refetchQueries
+                    )
+                  )
+                : Cmd.none
+            ],
+            { sequence: true }
+          )
+        )
+      }
+      return state
+    }
+
     case REMOVE_UNASSIGNED_DECLARATIONS:
       const unassignedDeclarationTrackingIds =
         action.payload.unassignedDeclarations.map(
@@ -1934,9 +1965,7 @@ export function filterProcessingDeclarations(
   }
 }
 
-export function getMinioUrlsFromDeclaration(
-  declaration: IDeclaration | undefined
-) {
+function getMinioUrlsFromDeclaration(declaration: IDeclaration | undefined) {
   if (!declaration) {
     return []
   }
@@ -1982,7 +2011,7 @@ export function getMinioUrlsFromDeclaration(
   return minioUrls
 }
 
-export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
+function postMinioUrlsToServiceWorker(minioUrls: string[]) {
   navigator?.serviceWorker?.controller?.postMessage({
     minioUrls: minioUrls
   })
@@ -2021,6 +2050,10 @@ export function filterProcessingDeclarationsFromQuery(
     ),
     rejectTab: filterProcessingDeclarations(
       queryData.rejectTab,
+      processingDeclarationIds
+    ),
+    sentForReviewTab: filterProcessingDeclarations(
+      queryData.sentForReviewTab,
       processingDeclarationIds
     ),
     approvalTab: filterProcessingDeclarations(

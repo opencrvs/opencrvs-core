@@ -10,11 +10,12 @@
  */
 import {
   IDeclaration,
-  SUBMISSION_STATUS,
-  IPrintableDeclaration
+  IPrintableDeclaration,
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { IFormSectionData } from '@client/forms'
-import { Event, History, RegStatus } from '@client/utils/gateway'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { EventType, History, RegStatus } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -23,7 +24,6 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
-import { EMPTY_STRING } from '@client/utils/constants'
 
 const getEngName = (
   sectionData: IFormSectionData,
@@ -78,11 +78,11 @@ export const getDeclarationFullName = (
   lastNameFirst?: boolean
 ) => {
   switch (draft.event) {
-    case Event.Birth:
+    case EventType.Birth:
       return getFullName(draft.data.child, language, lastNameFirst)
-    case Event.Death:
+    case EventType.Death:
       return getFullName(draft.data.deceased, language, lastNameFirst)
-    case Event.Marriage:
+    case EventType.Marriage:
       const brideName = getFullName(draft.data.bride, language, lastNameFirst)
       const groomName = getFullName(draft.data.groom, language, lastNameFirst)
       if (brideName && groomName) {
@@ -262,14 +262,14 @@ export const transformSearchQueryDataToDraft = (
     data.registration?.createdAt && data.registration.createdAt
 
   switch (eventType) {
-    case Event.Birth:
+    case EventType.Birth:
     default:
       transformBirthSearchQueryDataToDraft(data, declaration)
       break
-    case Event.Death:
+    case EventType.Death:
       transformDeathSearchQueryDataToDraft(data, declaration)
       break
-    case Event.Marriage:
+    case EventType.Marriage:
       transformMarriageSearchQueryDataToDraft(data, declaration)
       break
   }

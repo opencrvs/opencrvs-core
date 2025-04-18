@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { RegistrationStatus, ValidRecord } from '../record'
+import { ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
 import { Extension } from './extension'
-import { Patient } from './patient'
 import {
   CompositionSection,
   CompositionSectionCode,
@@ -151,20 +150,6 @@ export type BundleEntryWithFullUrl<T extends Resource = Resource> = Omit<
   fullUrl: URNReference | URLReference
 }
 
-/*
- * A placeholder until someone writes better with Zod
- */
-export function validateBundle(bundle: unknown): bundle is Bundle {
-  if (typeof bundle !== 'object' || bundle === null) {
-    throw new Error('Bundle must be an object')
-  }
-  if (!('entry' in bundle)) {
-    throw new Error('Bundle must have an entry list')
-  }
-
-  return true
-}
-
 export type SavedBundleEntry<T extends Resource = Resource> = Omit<
   fhir3.BundleEntry<T>,
   'fullUrl' | 'resource'
@@ -175,15 +160,6 @@ export type SavedBundleEntry<T extends Resource = Resource> = Omit<
 
 export type StrictBundle<T extends Resource[]> = Omit<Bundle, 'entry'> & {
   entry: { [Property in keyof T]: BundleEntry<T[Property]> }
-}
-
-export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
-  coding: Array<
-    Omit<fhir3.Coding, 'code' | 'system'> & {
-      system: 'http://opencrvs.org/specs/reg-status'
-      code: RegistrationStatus
-    }
-  >
 }
 
 export type Composition = Omit<fhir3.Composition, 'relatesTo' | 'section'> & {
@@ -218,7 +194,7 @@ export type SavedRelatedPerson = Omit<RelatedPerson, 'id' | 'patient'> & {
   patient: SavedReference
 }
 
-export type SavedQuestionnaireResponse = Omit<
+type SavedQuestionnaireResponse = Omit<
   QuestionnaireResponse,
   'status' | 'id'
 > & {
@@ -230,7 +206,7 @@ export type CompositionHistory = Saved<Composition> & {
   resourceType: 'CompositionHistory'
 }
 
-export type SavedCompositionHistory = SavedComposition & {
+type SavedCompositionHistory = SavedComposition & {
   resourceType: 'CompositionHistory'
 }
 
@@ -310,8 +286,6 @@ export type EncounterParticipant = Omit<
   }
 }
 
-type ItemType<T> = T extends Array<infer U> ? U : never
-export type TelecomSystem = ItemType<Patient['telecom']>['system']
 export type CodeableConcept = fhir3.CodeableConcept
 
 export function markSaved<T extends Resource>(resource: T, id: UUID | string) {

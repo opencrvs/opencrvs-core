@@ -10,16 +10,19 @@
  */
 import React from 'react'
 import { AppStore, createStore } from '@client/store'
-import { createLocation, History } from 'history'
 import { ReactWrapper } from 'enzyme'
 import { IssueCollectorForm } from './IssueCollectorForm'
-import { createTestComponent, mockDeclarationData } from '@client/tests/util'
-import { Event } from '@client/utils/gateway'
+import {
+  createTestComponent,
+  mockDeclarationData,
+  TestComponentWithRouteMock
+} from '@client/tests/util'
+import { EventType } from '@client/utils/gateway'
 import { IssueCollectorFormForOthers } from './IssueFormForOthers'
+import { formatUrl } from '@client/navigation'
+import { ISSUE_COLLECTOR } from '@client/navigation/routes'
 
 let store: AppStore
-let history: History
-let location = createLocation('/')
 
 const declarationsHistory = [
   {
@@ -173,41 +176,38 @@ mockDeclarationData['history'] = declarationsHistory
 const birthDeclarationForIssuance = {
   id: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
   data: mockDeclarationData,
-  event: Event.Birth
+  event: EventType.Birth
 }
 
 beforeEach(() => {
   const s = createStore()
   store = s.store
-  history = s.history
-  location = createLocation('/')
-  history.location = location
 })
 
 describe('Certificate issue collector test for a birth registration without father details', () => {
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
+    let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <IssueCollectorForm
-          location={location}
-          history={history}
           //@ts-ignore
           declaration={birthDeclarationForIssuance}
-          match={{
-            params: {
+        />,
+        {
+          store,
+          path: ISSUE_COLLECTOR,
+          initialEntries: [
+            formatUrl(ISSUE_COLLECTOR, {
               registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
               eventType: 'birth',
               groupId: 'collector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { history, store }
+            })
+          ]
+        }
       )
+
       component = testComponent
     })
 
@@ -242,31 +242,31 @@ describe('Certificate issue collector test for a birth registration without fath
           }
         }
 
-        const testComponent = await createTestComponent(
-          <IssueCollectorForm
-            location={location}
-            history={history}
-            //@ts-ignore
-            declaration={updatedMockDeclarationData}
-            match={{
-              params: {
-                registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-                groupId: 'collector'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          { history, store }
-        )
+        const { component: testComponent, router: testRouter } =
+          await createTestComponent(
+            <IssueCollectorForm
+              //@ts-ignore
+              declaration={updatedMockDeclarationData}
+            />,
+            {
+              store,
+              path: ISSUE_COLLECTOR,
+              initialEntries: [
+                formatUrl(ISSUE_COLLECTOR, {
+                  registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
+                  groupId: 'collector'
+                })
+              ]
+            }
+          )
         component = testComponent
+        router = testRouter
       })
 
       it('redirects to id check component upon FATHER option selection', async () => {
         component.find('#continue-button').hostNodes().simulate('click')
         component.update()
-        expect(history.location.pathname).toBe(
+        expect(router.state.location.pathname).toBe(
           '/issue/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/father'
         )
       })
@@ -291,23 +291,21 @@ describe('Certificate issue collector test for a birth registration without fath
           }
         }
 
-        const testComponent = await createTestComponent(
+        const { component: testComponent, router } = await createTestComponent(
           <IssueCollectorForm
-            location={location}
-            history={history}
             //@ts-ignore
             declaration={updatedMockDeclarationData}
-            match={{
-              params: {
+          />,
+          {
+            store,
+            path: ISSUE_COLLECTOR,
+            initialEntries: [
+              formatUrl(ISSUE_COLLECTOR, {
                 registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
                 groupId: 'collector'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          { history, store }
+              })
+            ]
+          }
         )
         component = testComponent
 
@@ -319,7 +317,7 @@ describe('Certificate issue collector test for a birth registration without fath
         component.update()
         component.find('#continue-button').hostNodes().simulate('click')
         component.update()
-        expect(history.location.pathname).toBe(
+        expect(router.state.location.pathname).toBe(
           '/issue/6a5fd35d-01ec-4c37-976e-e055107a74a1/otherCollector'
         )
       })
@@ -348,23 +346,21 @@ describe('Certificate issue collector test for a birth registration without fath
         }
       }
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <IssueCollectorFormForOthers
-          location={location}
-          history={history}
           //@ts-ignore
           declaration={updatedMockDeclarationData}
-          match={{
-            params: {
+        />,
+        {
+          store,
+          path: ISSUE_COLLECTOR,
+          initialEntries: [
+            formatUrl(ISSUE_COLLECTOR, {
               registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
               groupId: 'otherCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { history, store }
+            })
+          ]
+        }
       )
       component = testComponent
     })
@@ -405,28 +401,26 @@ describe('Certificate issue collector test for a birth registration without fath
         }
       }
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         <IssueCollectorFormForOthers
-          location={location}
-          history={history}
           //@ts-ignore
           declaration={updatedMockDeclarationData}
-          match={{
-            params: {
+        />,
+        {
+          store,
+          path: ISSUE_COLLECTOR,
+          initialEntries: [
+            formatUrl(ISSUE_COLLECTOR, {
               registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
               groupId: 'otherCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { history, store }
+            })
+          ]
+        }
       )
       component = testComponent
       component.find('#continue-button').hostNodes().simulate('click')
       component.update()
-      expect(history.location.pathname).toBe(
+      expect(router.state.location.pathname).toBe(
         '/issue/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
       )
     })

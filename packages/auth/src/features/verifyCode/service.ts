@@ -10,11 +10,8 @@
  */
 import fetch from 'node-fetch'
 import { del, get, set } from '@auth/database'
-import {
-  CONFIG_SMS_CODE_EXPIRY_SECONDS,
-  JWT_ISSUER,
-  NOTIFICATION_SERVICE_URL
-} from '@auth/constants'
+import { JWT_ISSUER } from '@auth/constants'
+import { env } from '@auth/environment'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { IUserName, createToken } from '@auth/features/authenticate/service'
@@ -73,7 +70,7 @@ export async function sendVerificationCode(
     notificationEvent,
     userFullName
   }
-  await fetch(resolve(NOTIFICATION_SERVICE_URL, 'authenticationCode'), {
+  await fetch(resolve(env.NOTIFICATION_SERVICE_URL, 'authenticationCode'), {
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
@@ -103,7 +100,7 @@ export async function checkVerificationCode(
 
   const codeExpired =
     (Date.now() - codeDetails.createdAt) / 1000 >=
-    CONFIG_SMS_CODE_EXPIRY_SECONDS
+    env.CONFIG_SMS_CODE_EXPIRY_SECONDS
 
   if (code !== codeDetails.code) {
     throw new Error('Auth code invalid')

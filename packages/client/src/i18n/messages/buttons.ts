@@ -81,7 +81,7 @@ interface IButtonsMessages
 const messagesToDefine: IButtonsMessages = {
   archive: {
     id: 'buttons.archive',
-    defaultMessage: 'Archive',
+    defaultMessage: 'Archive declaration',
     description: 'Archive button text'
   },
   approve: {

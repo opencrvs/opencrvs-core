@@ -50,7 +50,8 @@ it('finds assignment from the latest task', () => {
             ]
           },
           focus: {
-            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+            reference:
+              'Composition/c5811d36-934d-40f9-94b4-15194d562e45' as `Composition/${UUID}`
           },
           extension: [
             {
@@ -122,7 +123,8 @@ it("finds assignment when it's in TaskHistory and status HAS NOT changed", () =>
             ]
           },
           focus: {
-            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+            reference:
+              'Composition/c5811d36-934d-40f9-94b4-15194d562e45' as `Composition/${UUID}`
           },
           identifier: [
             {
@@ -137,13 +139,15 @@ it("finds assignment when it's in TaskHistory and status HAS NOT changed", () =>
             {
               url: 'http://opencrvs.org/specs/extension/regLastUser',
               valueReference: {
-                reference: 'Practitioner/00000000-0000-4000-8000-000000000001'
+                reference:
+                  'Practitioner/00000000-0000-4000-8000-000000000001' as `Practitioner/${UUID}`
               }
             },
             {
               url: 'http://opencrvs.org/specs/extension/regLastOffice',
               valueReference: {
-                reference: 'Location/00000000-0000-4000-8000-000000000010'
+                reference:
+                  'Location/00000000-0000-4000-8000-000000000010' as `Location/${UUID}`
               }
             }
           ],
@@ -268,7 +272,8 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
             ]
           },
           focus: {
-            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+            reference:
+              'Composition/c5811d36-934d-40f9-94b4-15194d562e45' as `Composition/${UUID}`
           },
           identifier: [
             {
@@ -283,13 +288,15 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
             {
               url: 'http://opencrvs.org/specs/extension/regLastUser',
               valueReference: {
-                reference: 'Practitioner/00000000-0000-4000-8000-000000000001'
+                reference:
+                  'Practitioner/00000000-0000-4000-8000-000000000001' as `Practitioner/${UUID}`
               }
             },
             {
               url: 'http://opencrvs.org/specs/extension/regLastOffice',
               valueReference: {
-                reference: 'Location/00000000-0000-4000-8000-000000000010'
+                reference:
+                  'Location/00000000-0000-4000-8000-000000000010' as `Location/${UUID}`
               }
             }
           ],
@@ -317,7 +324,8 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
             ]
           },
           focus: {
-            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+            reference:
+              'Composition/c5811d36-934d-40f9-94b4-15194d562e45' as `Composition/${UUID}`
           },
           identifier: [
             {
@@ -332,13 +340,15 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
             {
               url: 'http://opencrvs.org/specs/extension/regLastUser',
               valueReference: {
-                reference: 'Practitioner/00000000-0000-4000-8000-000000000002'
+                reference:
+                  'Practitioner/00000000-0000-4000-8000-000000000002' as `Practitioner/${UUID}`
               }
             },
             {
               url: 'http://opencrvs.org/specs/extension/regLastOffice',
               valueReference: {
-                reference: 'Location/00000000-0000-4000-8000-000000000010'
+                reference:
+                  'Location/00000000-0000-4000-8000-000000000010' as `Location/${UUID}`
               }
             }
           ],
@@ -366,7 +376,8 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
             ]
           },
           focus: {
-            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+            reference:
+              'Composition/c5811d36-934d-40f9-94b4-15194d562e45' as `Composition/${UUID}`
           },
           identifier: [
             {
@@ -381,13 +392,15 @@ it("does not find assignment when it's in TaskHistory and status HAS changed", (
             {
               url: 'http://opencrvs.org/specs/extension/regLastUser',
               valueReference: {
-                reference: 'Practitioner/93e34962-cef1-446a-985f-ad0e46732939'
+                reference:
+                  'Practitioner/93e34962-cef1-446a-985f-ad0e46732939' as `Practitioner/${UUID}`
               }
             },
             {
               url: 'http://opencrvs.org/specs/extension/regLastOffice',
               valueReference: {
-                reference: 'Location/347ef736-2359-48cc-a513-5b9fae487fb7'
+                reference:
+                  'Location/347ef736-2359-48cc-a513-5b9fae487fb7' as `Location/${UUID}`
               }
             }
           ],
@@ -443,7 +456,8 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
             ]
           },
           focus: {
-            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+            reference:
+              'Composition/c5811d36-934d-40f9-94b4-15194d562e45' as `Composition/${UUID}`
           },
           identifier: [
             {
@@ -459,13 +473,15 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
             {
               url: 'http://opencrvs.org/specs/extension/regLastUser',
               valueReference: {
-                reference: 'Practitioner/00000000-0000-4000-8000-000000000001'
+                reference:
+                  'Practitioner/00000000-0000-4000-8000-000000000001' as `Practitioner/${UUID}`
               }
             },
             {
               url: 'http://opencrvs.org/specs/extension/regLastOffice',
               valueReference: {
-                reference: 'Location/00000000-0000-4000-8000-000000000010'
+                reference:
+                  'Location/00000000-0000-4000-8000-000000000010' as `Location/${UUID}`
               }
             }
           ],
@@ -492,7 +508,8 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
             ]
           },
           focus: {
-            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+            reference:
+              'Composition/c5811d36-934d-40f9-94b4-15194d562e45' as `Composition/${UUID}`
           },
           identifier: [
             {
@@ -508,13 +525,15 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
             {
               url: 'http://opencrvs.org/specs/extension/regLastUser',
               valueReference: {
-                reference: 'Practitioner/00000000-0000-4000-8000-000000000002'
+                reference:
+                  'Practitioner/00000000-0000-4000-8000-000000000002' as `Practitioner/${UUID}`
               }
             },
             {
               url: 'http://opencrvs.org/specs/extension/regLastOffice',
               valueReference: {
-                reference: 'Location/00000000-0000-4000-8000-000000000010'
+                reference:
+                  'Location/00000000-0000-4000-8000-000000000010' as `Location/${UUID}`
               }
             }
           ],
@@ -542,7 +561,8 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
             ]
           },
           focus: {
-            reference: 'Composition/c5811d36-934d-40f9-94b4-15194d562e45'
+            reference:
+              'Composition/c5811d36-934d-40f9-94b4-15194d562e45' as `Composition/${UUID}`
           },
           identifier: [
             {
@@ -557,13 +577,15 @@ it("does not find assignment when it's in TaskHistory and status has afterwards 
             {
               url: 'http://opencrvs.org/specs/extension/regLastUser',
               valueReference: {
-                reference: 'Practitioner/93e34962-cef1-446a-985f-ad0e46732939'
+                reference:
+                  'Practitioner/93e34962-cef1-446a-985f-ad0e46732939' as `Practitioner/${UUID}`
               }
             },
             {
               url: 'http://opencrvs.org/specs/extension/regLastOffice',
               valueReference: {
-                reference: 'Location/347ef736-2359-48cc-a513-5b9fae487fb7'
+                reference:
+                  'Location/347ef736-2359-48cc-a513-5b9fae487fb7' as `Location/${UUID}`
               }
             }
           ],

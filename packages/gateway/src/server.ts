@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as Hapi from '@hapi/hapi'
+import { ApolloServer, BaseContext } from '@apollo/server'
 import { getPlugins } from '@gateway/config/plugins'
 import { getRoutes } from '@gateway/config/routes'
 import {
+  AUTH_URL,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL,
-  PORT,
-  HOST,
-  DEFAULT_TIMEOUT,
-  HOSTNAME,
   CLIENT_APP_URL,
-  LOGIN_URL
+  DEFAULT_TIMEOUT,
+  HOST,
+  HOSTNAME,
+  LOGIN_URL,
+  PORT
 } from '@gateway/constants'
+import * as Hapi from '@hapi/hapi'
+import { logger, validateFunc } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
-import { validateFunc, logger } from '@opencrvs/commons'
-import {
-  ApolloServer,
-  ApolloServerPluginStopHapiServer
-} from 'apollo-server-hapi'
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
+
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
+import hapiApollo from '@as-integrations/hapi'
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/utils/redis'
 import { badRequest, Boom, isBoom } from '@hapi/boom'
+import { Context } from './graphql/context'
 import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -68,13 +68,11 @@ export async function createServer() {
 
   await app.register(plugins)
 
-  const apolloServer = new ApolloServer({
+  const apolloServer = new ApolloServer<BaseContext>({
     ...getApolloConfig(),
-    plugins: [
-      ApolloServerPluginStopHapiServer({ hapiServer: app }),
-      ApolloServerPluginLandingPageGraphQLPlayground()
-    ]
+    plugins: [ApolloServerPluginLandingPageLocalDefault({ footer: false })]
   })
+
   app.auth.strategy('jwt', 'jwt', {
     key: publicCert,
     verifyOptions: {
@@ -136,19 +134,34 @@ export async function createServer() {
 
   async function start() {
     await apolloServer.start()
-    await app.start()
-    await database.start()
-    await apolloServer.applyMiddleware({
-      app,
-      route: {
-        auth: {
-          mode: 'try'
-        }
-      },
-      cors: {
-        origin: whitelist
+
+    await app.register({
+      plugin: hapiApollo,
+      options: {
+        path: '/graphql',
+        postRoute: {
+          options: {
+            auth: {
+              strategy: 'jwt',
+              mode: 'try'
+            }
+          }
+        },
+        getRoute: {
+          options: {
+            auth: {
+              strategy: 'jwt',
+              mode: 'try'
+            }
+          }
+        },
+        context: async ({ request }) => new Context(request),
+        apolloServer
       }
     })
+
+    await app.start()
+    await database.start()
     app.log('info', `server started on port ${PORT}`)
   }
 

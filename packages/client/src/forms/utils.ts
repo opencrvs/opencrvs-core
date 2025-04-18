@@ -41,8 +41,6 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
   ISelectFormFieldWithOptions,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton,
   BULLET_LIST,
   HIDDEN,
   Ii18nHiddenFormField,
@@ -54,8 +52,13 @@ import {
   IButtonFormField,
   BUTTON,
   Ii18nButtonFormField,
-  IRedirectFormField,
-  REDIRECT
+  ILinkButtonFormField,
+  LINK_BUTTON,
+  IDReaderFormField,
+  ID_READER,
+  Ii18nIDReaderFormField,
+  QRReaderType,
+  ReaderType
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -102,7 +105,7 @@ interface IRange {
   value: string
 }
 
-export const internationaliseOptions = (
+const internationaliseOptions = (
   intl: IntlShape,
   options: Array<ISelectOption | IRadioOption | ICheckboxOption>
 ) => {
@@ -117,7 +120,7 @@ export const internationaliseOptions = (
   })
 }
 
-export const internationaliseListFieldObject = (
+const internationaliseListFieldObject = (
   intl: IntlShape,
   options: MessageDescriptor[]
 ) => {
@@ -190,18 +193,6 @@ export const internationaliseFieldObject = (
     )
   }
 
-  if (base.type === NID_VERIFICATION_BUTTON) {
-    ;(base as any).labelForVerified = intl.formatMessage(
-      (field as INidVerificationButton).labelForVerified
-    )
-    ;(base as any).labelForUnverified = intl.formatMessage(
-      (field as INidVerificationButton).labelForUnverified
-    )
-    ;(base as any).labelForOffline = intl.formatMessage(
-      (field as INidVerificationButton).labelForOffline
-    )
-  }
-
   if (isFieldButton(field)) {
     ;(base as Ii18nButtonFormField).buttonLabel = intl.formatMessage(
       field.buttonLabel
@@ -213,10 +204,18 @@ export const internationaliseFieldObject = (
     }
   }
 
+  if (isFieldIDReader(field)) {
+    ;(base as Ii18nIDReaderFormField).dividerLabel = intl.formatMessage(
+      field.dividerLabel
+    )
+    ;(base as Ii18nIDReaderFormField).manualInputInstructionLabel =
+      intl.formatMessage(field.manualInputInstructionLabel)
+  }
+
   return base as Ii18nFormField
 }
 
-export const generateOptions = (
+const generateOptions = (
   options: ILocation[],
   optionType: string
 ): ISelectOption[] => {
@@ -320,6 +319,7 @@ export function getNextSectionIds(
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   declaration: IDeclaration,
+  isCorrection: boolean,
   userDetails?: UserDetails | null
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -333,16 +333,18 @@ export function getNextSectionIds(
   )
 
   if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(
-      (section) =>
-        section.viewType !== VIEW_TYPE.HIDDEN &&
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          declaration.data[fromSection.id] || {},
-          declaration.data,
-          userDetails
-        ).length > 0
-    )
+    const visibleSections = sections
+      .filter((section) => (isCorrection ? section.id !== 'documents' : true))
+      .filter(
+        (section) =>
+          section.viewType !== VIEW_TYPE.HIDDEN &&
+          getVisibleSectionGroupsBasedOnConditions(
+            section,
+            declaration.data[fromSection.id] || {},
+            declaration.data,
+            userDetails
+          ).length > 0
+      )
 
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
@@ -524,21 +526,11 @@ export function isDefaultCountry(countryCode: string): boolean {
   return countryCode === window.config.COUNTRY.toUpperCase()
 }
 
-export function getListOfLocations(
-  resource: IOfflineData,
-  resourceType: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
-  >
-) {
-  return resource[resourceType]
-}
-
 interface IVars {
   [key: string]: any
 }
 
-export function getInputValues(
+function getInputValues(
   inputs: IFieldInput[],
   values: IFormSectionData
 ): IDynamicValues {
@@ -730,13 +722,11 @@ export const isRadioGroupWithNestedField = (
   return field.type === RADIO_GROUP_WITH_NESTED_FIELDS
 }
 
-export const isDynamicField = (
-  field: IFormField
-): field is IDynamicFormField => {
+const isDynamicField = (field: IFormField): field is IDynamicFormField => {
   return field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
 }
 
-export const isDateField = (
+const isDateField = (
   field: IFormField,
   sectionData: IFormSectionData
 ): field is IDateFormField => {
@@ -782,17 +772,31 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
   return field.type === BUTTON
 }
 
+function isFieldIDReader(field: IFormField): field is IDReaderFormField {
+  return field.type === ID_READER
+}
+
+export function isReaderQR(reader: ReaderType): reader is QRReaderType {
+  return reader.type === 'QR'
+}
+
+export function isReaderLinkButton(
+  reader: ReaderType
+): reader is ILinkButtonFormField {
+  return reader.type === LINK_BUTTON
+}
+
 export function isFieldHttp(field: IFormField): field is IHttpFormField {
   return field.type === HTTP
 }
 
-export function isFieldRedirect(
+export function isFieldLinkButton(
   field: IFormField
-): field is IRedirectFormField {
-  return field.type === REDIRECT
+): field is ILinkButtonFormField {
+  return field.type === LINK_BUTTON
 }
 
-export function isInitialValueDependencyInfo(
+function isInitialValueDependencyInfo(
   value: InitialValue
 ): value is DependencyInfo {
   return typeof value === 'object' && value !== null && 'dependsOn' in value

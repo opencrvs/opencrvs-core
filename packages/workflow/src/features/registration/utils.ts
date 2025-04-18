@@ -12,17 +12,14 @@ import {
   Bundle,
   BundleEntry,
   Composition,
-  Patient,
   Resource,
   Saved,
   Task,
   TrackingID
 } from '@opencrvs/commons/types'
-import { COUNTRY_CONFIG_URL, MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
+import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
-import { concatenateName } from '@workflow/features/registration/fhir/fhir-utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-import { logger } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import * as ShortUIDGen from 'short-uid'
 
@@ -113,100 +110,6 @@ export function isInProgressDeclaration(fhirBundle: Bundle) {
       taskEntry.resource.status === 'draft') ||
     false
   )
-}
-
-interface IMosipAuthData {
-  vid?: string
-  name?: string
-  gender?: string
-  phoneNumber?: string
-  dob?: string // Format "1998/01/01"
-  emailId?: string
-  fullAddress?: string
-}
-
-interface IMosipRequest {
-  deliverytype?: 'sync'
-  output?: string | ''
-  lang: 'eng'
-  authdata: IMosipAuthData
-}
-
-interface IMosipSeederPayload {
-  id: string | ''
-  version: string | ''
-  metadata: string | ''
-  requesttime: string | ''
-  request: IMosipRequest
-}
-
-interface IMosipErrors {
-  errorCode: string
-  errorMessage: string
-  actionMessage: string
-}
-
-interface IMosipSeederResponseContent {
-  authStatus: boolean
-  authToken: string
-}
-
-interface IMosipSeederResponse {
-  id: 'mosip.identity.auth'
-  version: 'v1'
-  responseTime: string
-  transactionID: string
-  response: IMosipSeederResponseContent
-  errors: IMosipErrors[]
-}
-
-export async function getMosipUINToken(
-  patient: Patient
-): Promise<IMosipSeederResponse> {
-  logger.info(`getMosipUINToken for Patient id ${patient.id}`)
-  let submittedNationalIDInForm = ''
-  const identifiers = patient?.identifier?.filter(
-    (identifier: fhir3.Identifier) => {
-      return identifier.type?.coding?.[0].code === 'NATIONAL_ID'
-    }
-  )
-  if (identifiers) {
-    submittedNationalIDInForm = `${identifiers[0].value}`
-  }
-  const payload: IMosipSeederPayload = {
-    id: '',
-    version: '',
-    metadata: '',
-    requesttime: new Date().toISOString(),
-    request: {
-      lang: 'eng',
-      authdata: {
-        vid: submittedNationalIDInForm,
-        name: concatenateName(patient.name),
-        gender: patient.gender,
-        dob: patient.birthDate?.replace(/-/g, '/')
-        // TODO: send informant contact phone number?  We dont ask for deceased's phone number in Civil Reg form currently
-        // TODO: send address in a way MOSIP can understand
-      }
-    }
-  }
-  const res = await fetch(`${MOSIP_TOKEN_SEEDER_URL}/authtoken/json`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-
-  if (!res.ok) {
-    logger.info(
-      `Unable to retrieve system mosip UIN token. Error: ${res.status} status received`
-    )
-  }
-
-  const body = await res.json()
-
-  return body
 }
 
 function getResourceByType<T = Resource>(

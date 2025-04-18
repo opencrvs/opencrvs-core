@@ -84,6 +84,7 @@ export type StringExtensionType = {
     url: 'http://opencrvs.org/specs/extension/regVerified'
     valueString: string
   }
+  // @deprecated in 1.7, kept for backwards compatibility
   'http://opencrvs.org/specs/extension/regDownloaded': {
     url: 'http://opencrvs.org/specs/extension/regDownloaded'
     valueString?: string
@@ -128,6 +129,10 @@ export type StringExtensionType = {
     valueString?: string
     valueBoolean: boolean
   }
+  'http://opencrvs.org/specs/extension/certificateTemplateId': {
+    url: 'http://opencrvs.org/specs/extension/certificateTemplateId'
+    valueString?: string
+  }
   'http://opencrvs.org/specs/extension/regLastOffice': {
     url: 'http://opencrvs.org/specs/extension/regLastOffice'
     valueReference: { reference: ResourceIdentifier<Location> }
@@ -145,6 +150,12 @@ export type KnownExtensionType = StringExtensionType & {
     url: 'http://opencrvs.org/specs/extension/collector'
     valueReference: {
       reference: ResourceIdentifier | URNReference /* Unsaved */
+    }
+  }
+  'http://opencrvs.org/specs/extension/certifier': {
+    url: 'http://opencrvs.org/specs/extension/certifier'
+    valueReference: {
+      reference: ResourceIdentifier
     }
   }
   'http://opencrvs.org/specs/extension/relatedperson-affidavittype': {
@@ -191,11 +202,10 @@ export type KnownExtensionType = StringExtensionType & {
   }
   'http://opencrvs.org/specs/extension/employee-signature': {
     url: 'http://opencrvs.org/specs/extension/employee-signature'
-    valueSignature: {
+    valueAttachment: {
       contentType: string
-      when?: string
-      type?: Array<{ system: string; code: string; display: string }>
-      blob: string
+      url: string
+      creation: string
     }
   }
   'http://opencrvs.org/specs/extension/regAssigned': {
@@ -238,7 +248,6 @@ export type KnownExtensionType = StringExtensionType & {
     >
   }
 }
-export type StringExtension = { url: string; valueString: string }
 export type Extension = KnownExtensionType[keyof KnownExtensionType]
 
 type NestedExtensionTypes = Extract<
@@ -249,9 +258,6 @@ type NestedExtensionTypes = Extract<
 type AllExtensions =
   | KnownExtensionType[keyof KnownExtensionType]
   | NestedExtensionTypes
-
-export type StringValueExtension =
-  StringExtensionType[keyof StringExtensionType]
 
 export function findExtension<URL extends AllExtensions['url']>(
   url: URL,

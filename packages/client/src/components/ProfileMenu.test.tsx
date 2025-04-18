@@ -19,24 +19,29 @@ import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profi
 describe('when user opens profile menu without user details', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store, history } = createStore()
-    component = await createTestComponent(<ProfileMenu />, {
-      store,
-      history
-    })
+    const { store } = createStore()
+    const { component: testComponent } = await createTestComponent(
+      <ProfileMenu />,
+      {
+        store
+      }
+    )
+    component = testComponent
   })
 
   it('open menu', () => {
-    component.find('#ProfileMenuToggleButton').hostNodes().simulate('click')
+    component.find('#ProfileMenu-dropdownMenu').hostNodes().simulate('click')
 
-    expect(component.find('#ProfileMenuSubMenu').hostNodes()).toHaveLength(1)
+    expect(
+      component.find('#ProfileMenu-Dropdown-Content').hostNodes()
+    ).toHaveLength(1)
   })
 })
 
 describe('when user opens profile menu with user details', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const details = userDetails
     details.name = [
       {
@@ -46,34 +51,41 @@ describe('when user opens profile menu with user details', () => {
       }
     ]
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(details)))
-    component = await createTestComponent(<ProfileMenu />, {
-      store,
-      history
-    })
+    const { component: testComponent } = await createTestComponent(
+      <ProfileMenu />,
+      {
+        store
+      }
+    )
+    component = testComponent
   })
 
   it('open menu', () => {
-    component.find('#ProfileMenuToggleButton').hostNodes().simulate('click')
+    component.find('#ProfileMenu-dropdownMenu').hostNodes().simulate('click')
 
-    expect(component.find('#ProfileMenuSubMenu').hostNodes()).toHaveLength(1)
+    expect(
+      component.find('#ProfileMenu-Dropdown-Content').hostNodes()
+    ).toHaveLength(1)
   })
 
   it('handle clicks', () => {
-    component.find('#ProfileMenuToggleButton').hostNodes().simulate('click')
+    component.find('#ProfileMenu-dropdownMenu').hostNodes().simulate('click')
 
     // Settings click
     component
-      .find('#ProfileMenuSubMenu')
+      .find('#ProfileMenu-Dropdown-Content')
       .hostNodes()
       .childAt(1)
       .simulate('click')
 
     component
-      .find('#ProfileMenuSubMenu')
+      .find('#ProfileMenu-Dropdown-Content')
       .hostNodes()
       .childAt(2)
       .simulate('click')
 
-    expect(component.find('#ProfileMenuSubMenu').hostNodes()).toHaveLength(1)
+    expect(
+      component.find('#ProfileMenu-Dropdown-Content').hostNodes()
+    ).toHaveLength(1)
   })
 })

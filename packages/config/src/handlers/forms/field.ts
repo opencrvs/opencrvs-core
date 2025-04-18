@@ -32,7 +32,7 @@ const dependencyInfo = z.object({
   dependsOn: z.array(z.string()),
   expression: z.string()
 })
-export const initialValue = z
+const initialValue = z
   .union([dependencyInfo, z.string(), z.number(), z.boolean()])
   .optional()
 
@@ -106,13 +106,12 @@ const LocationSearchInputField = base.extend({
   type: z.literal('LOCATION_SEARCH_INPUT')
 })
 const TimeField = base.extend({ type: z.literal('TIME') })
-const NidVerificationButtonField = base.extend({
-  type: z.literal('NID_VERIFICATION_BUTTON')
-})
 const DividerField = base.extend({ type: z.literal('DIVIDER') })
 const Heading3Field = base.extend({ type: z.literal('HEADING3') })
 const SignatureField = base.extend({ type: z.literal('SIGNATURE') })
-const RedirectField = base.extend({ type: z.literal('REDIRECT') })
+const LinkButtonField = base.extend({ type: z.literal('LINK_BUTTON') })
+const IDReaderField = base.extend({ type: z.literal('ID_READER') })
+const BannerField = base.extend({ type: z.literal('ID_VERIFICATION_BANNER') })
 
 // completed types
 const HttpField = base.extend({
@@ -165,13 +164,14 @@ export const field = z.discriminatedUnion('type', [
   FetchButtonField,
   LocationSearchInputField,
   TimeField,
-  NidVerificationButtonField,
   DividerField,
   Heading3Field,
   SignatureField,
   HttpField,
   ButtonField,
-  RedirectField
+  LinkButtonField,
+  IDReaderField,
+  BannerField
 ])
 
 type Field = z.infer<typeof field>

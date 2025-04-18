@@ -8,118 +8,107 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import {
+  createTestComponent,
+  createTestStore,
+  setScopes
+} from '@client/tests/util'
 import { DownloadButton } from './DownloadButton'
 import { AppStore } from '@client/store'
-import { History } from 'history'
 import * as React from 'react'
 import { DownloadAction } from '@client/forms'
-import { ReactWrapper } from 'enzyme'
 import * as declarationReducer from '@client/declarations'
-import { vi, SpyInstance } from 'vitest'
 import { ApolloClient } from '@apollo/client'
 import { createClient } from '@client/utils/apolloClient'
+import { SCOPES } from '@opencrvs/commons/client'
 
 const { DOWNLOAD_STATUS } = declarationReducer
 
-function getAssignmentModal(
-  testComponent: ReactWrapper<{}, {}>
-): ReactWrapper<{}, {}> {
-  const button = testComponent.find('button')
-  button.simulate('click')
-  testComponent.update()
-  return testComponent.find('#assignment').hostNodes()
-}
-
-function clickOnModalAction(
-  testComponent: ReactWrapper<{}, {}>,
-  selector: string
-) {
-  const modal = getAssignmentModal(testComponent)
-  const action = modal.find(selector).hostNodes()
-  action.simulate('click')
-  testComponent.update()
-}
-
-describe('download button tests', () => {
+describe('download button', () => {
   let store: AppStore
-  let history: History<unknown>
-  let testComponent: ReactWrapper<{}, {}>
-  let unassignSpy: SpyInstance
   let client: ApolloClient<{}>
 
-  describe('for download status downloaded', () => {
-    describe('when assignment object is undefined in props', () => {
-      beforeEach(async () => {
-        const testStore = await createTestStore()
-        store = testStore.store
-        history = testStore.history
-        client = createClient(store)
-        testComponent = await createTestComponent(
-          <DownloadButton
-            downloadConfigs={{
-              event: 'birth',
-              compositionId: '123',
-              action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: undefined,
-              declarationStatus: ''
-            }}
-            status={DOWNLOAD_STATUS.DOWNLOADED}
-          />,
-          { store, history, apolloClient: client }
-        )
-      })
+  describe('when there is no assignment', () => {
+    beforeEach(async () => {
+      const testStore = await createTestStore()
+      store = testStore.store
 
-      it('download button renders', () => {
-        expect(testComponent).toBeDefined()
-      })
-
-      it('clicking download button pops up unassign modal', () => {
-        const modal = getAssignmentModal(testComponent)
-        expect(modal.text()).toContain('Unassign record?')
-      })
+      client = createClient(store)
     })
-    describe('when assignment object is defined in props', () => {
-      beforeEach(async () => {
-        unassignSpy = vi.spyOn(declarationReducer, 'unassignDeclaration')
-        const testStore = await createTestStore()
-        store = testStore.store
-        history = testStore.history
-        client = createClient(store)
-        testComponent = await createTestComponent(
-          <DownloadButton
-            downloadConfigs={{
-              event: 'birth',
-              compositionId: '123',
-              action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: {
-                firstName: 'Kennedy',
-                lastName: 'Mweene',
-                officeName: 'Ibombo District Office',
-                practitionerId: '456',
-                avatarURL: '/ocrvs/4c3645fc-f3f9-4c89-b109-05daa8f49b3b.jpg'
-              },
-              declarationStatus: ''
-            }}
-            status={DOWNLOAD_STATUS.DOWNLOADED}
-          />,
-          { store, history, apolloClient: client }
-        )
-      })
 
-      it('download button renders', () => {
-        expect(testComponent).toBeDefined()
-      })
+    it('if the record is actionable, download button should not be disabled', async () => {
+      setScopes([SCOPES.RECORD_REGISTER], store)
+      const { component } = await createTestComponent(
+        <DownloadButton
+          id="download"
+          downloadConfigs={{
+            event: 'birth',
+            compositionId: '123',
+            action: DownloadAction.LOAD_REVIEW_DECLARATION,
+            assignment: undefined
+          }}
+          status={DOWNLOAD_STATUS.DOWNLOADED}
+          declarationStatus={declarationReducer.SUBMISSION_STATUS.DECLARED}
+        />,
+        { store, apolloClient: client }
+      )
 
-      it('clicking download button pops up unassign modal', () => {
-        const modal = getAssignmentModal(testComponent)
-        expect(modal.text()).toContain('Unassign record?')
-      })
+      expect(
+        component.find('#download-icon').hostNodes().prop('disabled')
+      ).toBeFalsy()
+    })
 
-      it('clicking on unassign button triggers unassignDeclaration action', () => {
-        clickOnModalAction(testComponent, '#unassign')
-        expect(unassignSpy).toBeCalled()
-      })
+    it('if the record is not actionable, download button should be disabled', async () => {
+      setScopes([SCOPES.RECORD_SUBMIT_FOR_REVIEW], store)
+      const { component } = await createTestComponent(
+        <DownloadButton
+          id="download"
+          downloadConfigs={{
+            event: 'birth',
+            compositionId: '123',
+            action: DownloadAction.LOAD_REVIEW_DECLARATION,
+            assignment: undefined
+          }}
+          status={DOWNLOAD_STATUS.DOWNLOADED}
+          declarationStatus={declarationReducer.SUBMISSION_STATUS.DECLARED}
+        />,
+        { store, apolloClient: client }
+      )
+      expect(
+        component.find('#download-icon').hostNodes().prop('disabled')
+      ).toBeTruthy()
+    })
+  })
+
+  describe('when there is assignment', () => {
+    beforeEach(async () => {
+      const testStore = await createTestStore()
+      store = testStore.store
+      client = createClient(store)
+    })
+
+    it('if assigned to current user & not downloaded then should not show avatar', async () => {
+      setScopes([SCOPES.RECORD_REGISTER], store)
+      const { component } = await createTestComponent(
+        <DownloadButton
+          id="download"
+          downloadConfigs={{
+            event: 'birth',
+            compositionId: '123',
+            action: DownloadAction.LOAD_REVIEW_DECLARATION,
+            assignment: {
+              firstName: 'Kennedy',
+              lastName: 'Mweene',
+              officeName: 'Ibombo District Office',
+              practitionerId: '9202fa3c-7eb7-4898-bea5-5895f7f99534',
+              avatarURL: '/ocrvs/4c3645fc-f3f9-4c89-b109-05daa8f49b3b.jpg'
+            }
+          }}
+          declarationStatus={declarationReducer.SUBMISSION_STATUS.DECLARED}
+        />,
+        { store, apolloClient: client }
+      )
+      expect(component.find('img').length).toBe(0)
     })
   })
 })

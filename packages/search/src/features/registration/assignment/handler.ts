@@ -16,7 +16,7 @@ import { logger } from '@opencrvs/commons'
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { getTokenPayload } from '@search/utils/authUtils'
-import { RouteScope } from '@search/config/routes'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export async function assignEventHandler(
   request: Hapi.Request,
@@ -24,7 +24,7 @@ export async function assignEventHandler(
 ) {
   try {
     const tokenPayload = getTokenPayload(request.headers.authorization)
-    if (tokenPayload.scope.includes(RouteScope.RECORD_SEARCH)) {
+    if (tokenPayload.scope.includes(SCOPES.RECORDSEARCH)) {
       return h.response().code(200)
     }
 

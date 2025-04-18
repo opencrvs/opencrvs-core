@@ -9,46 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  goBack,
-  goForward,
-  goToEvents as goToEventsAction,
-  goToPerformanceHome,
-  goToSearch,
-  goToSearchResult,
-  goToSettings,
-  goToTeamSearch,
-  goToTeamUserList,
-  goToCreateNewUserWithLocationId,
-  goToCreateNewUser,
-  goToAdvancedSearch
-} from '@client/navigation'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
-import {
-  BRN_DRN_TEXT,
-  NATIONAL_ID_TEXT,
-  FIELD_AGENT_ROLES,
-  NAME_TEXT,
-  NATL_ADMIN_ROLES,
-  PHONE_TEXT,
-  ADVANCED_SEARCH_TEXT,
-  SYS_ADMIN_ROLES,
-  TRACKING_ID_TEXT,
-  PERFORMANCE_MANAGEMENT_ROLES,
-  EMAIL
-} from '@client/utils/constants'
-import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
-
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
 import {
   SearchTool,
@@ -58,37 +25,39 @@ import {
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { SearchCriteria } from '@client/utils/referenceApi'
+import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
+import {
+  RECORD_DECLARE_SCOPES,
+  usePermissions
+} from '@client/hooks/useAuthorization'
+import ProtectedComponent from '@client/components/ProtectedComponent'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import { parse, stringify } from 'query-string'
+import { formatUrl } from '@client/navigation'
+import * as routes from '@client/navigation/routes'
 
 type IStateProps = {
-  userDetails: UserDetails | null
   fieldNames: string[]
   language: string
+  offlineData: IOfflineData
 }
 
 type IDispatchProps = {
-  redirectToAuthentication: typeof redirectToAuthentication
-  goToSearchResult: typeof goToSearchResult
-  goToEvents: typeof goToEventsAction
-  goToSearch: typeof goToSearch
-  goToSettings: typeof goToSettings
-  goBack: typeof goBack
-  goForward: typeof goForward
-  goToPerformanceHomeAction: typeof goToPerformanceHome
-  goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
-  goToCreateNewUser: typeof goToCreateNewUser
-  goToTeamSearchAction: typeof goToTeamSearch
-  goToTeamUserListAction: typeof goToTeamUserList
-  goToAdvancedSearch: typeof goToAdvancedSearch
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
-interface IProps extends RouteComponentProps {
+interface IProps {
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -107,12 +76,8 @@ interface IProps extends RouteComponentProps {
 type IFullProps = IntlShapeProps &
   IStateProps &
   IDispatchProps &
-  IProps &
+  RouteComponentProps<IProps> &
   IDomProps
-
-interface IState {
-  showLogoutModal: boolean
-}
 
 enum ACTIVE_MENU_ITEM {
   DECLARATIONS,
@@ -147,24 +112,31 @@ const HeaderRight = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
-  NATL_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES
-)
+const HeaderComponent = (props: IFullProps) => {
+  const {
+    router,
+    mobileSearchBar,
+    offlineData,
+    className,
+    intl,
+    activeMenuItem,
+    mobileRight,
+    setAdvancedSearchParam,
+    mapPerformanceClickHandler,
+    changeTeamLocation
+  } = props
 
-class HeaderComp extends React.Component<IFullProps, IState> {
-  constructor(props: IFullProps) {
-    super(props)
+  const {
+    canCreateUser,
+    canSearchRecords,
+    canSearchBirthRecords,
+    canSearchDeathRecords
+  } = usePermissions()
 
-    this.state = {
-      showLogoutModal: false
-    }
-  }
+  const canDoAdvanceSearch = canSearchBirthRecords || canSearchDeathRecords
 
-  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
-    const locationId = new URLSearchParams(this.props.location.search).get(
-      'locationId'
-    )
+  const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
+    const locationId = parse(router.location.search).locationId as string
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
         mobileLeft: [
@@ -176,14 +148,12 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         mobileRight: [
           {
             icon: () => <Icon name="Activity" size="medium" color="primary" />,
-            handler: () =>
-              this.props.mapPerformanceClickHandler &&
-              this.props.mapPerformanceClickHandler()
+            handler: () => mapPerformanceClickHandler?.()
           }
         ]
       }
     } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
-      if (this.props.changeTeamLocation) {
+      if (changeTeamLocation) {
         return {
           mobileLeft: [
             {
@@ -196,8 +166,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               icon: () => (
                 <Icon name="MagnifyingGlass" size="medium" color="primary" />
               ),
-              handler: () =>
-                this.props.changeTeamLocation && this.props.changeTeamLocation()
+              handler: changeTeamLocation
             },
             {
               icon: () => (
@@ -205,18 +174,15 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               ),
               handler: () => {
                 if (locationId) {
-                  this.props.goToCreateNewUserWithLocationId(locationId)
-                } else {
-                  this.props.goToCreateNewUser()
+                  router.navigate(
+                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                  )
                 }
               }
             }
           ]
         }
-      } else if (
-        this.props.userDetails?.systemRole &&
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole)
-      ) {
+      } else if (canCreateUser) {
         return {
           mobileLeft: [
             {
@@ -231,9 +197,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               ),
               handler: () => {
                 if (locationId) {
-                  this.props.goToCreateNewUserWithLocationId(locationId)
-                } else {
-                  this.props.goToCreateNewUser()
+                  router.navigate(
+                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                  )
                 }
               }
             }
@@ -249,10 +215,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ]
         }
       }
-    } else if (
-      this.props.userDetails?.systemRole &&
-      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
-    ) {
+    } else if (!canSearchRecords) {
       return {
         mobileLeft: [
           {
@@ -262,7 +225,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         ]
       }
     } else {
-      if (this.props.mobileSearchBar) {
+      if (mobileSearchBar) {
         return {
           mobileLeft: [
             {
@@ -270,7 +233,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               handler: () => {}
             }
           ],
-          mobileBody: this.renderSearchInput(this.props, true)
+          mobileBody: renderSearchInput(props, true)
         }
       } else {
         return {
@@ -285,7 +248,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               icon: () => (
                 <Icon name="MagnifyingGlass" size="medium" color="primary" />
               ),
-              handler: () => this.props.goToSearch()
+              handler: () => router.navigate(routes.SEARCH)
             }
           ]
         }
@@ -293,31 +256,25 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     }
   }
 
-  logout = () => {
-    storage.removeItem(SCREEN_LOCK)
-    this.props.redirectToAuthentication()
-  }
-
-  renderSearchInput(props: IFullProps, isMobile?: boolean) {
+  function renderSearchInput(props: IFullProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType, language, fieldNames } = props
 
     const searchTypeList: ISearchType[] = [
       {
+        name: SearchCriteria.TRACKING_ID,
         label: intl.formatMessage(constantsMessages.trackingId),
-        value: TRACKING_ID_TEXT,
         icon: <Icon name="Target" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
-        isDefault: true
+        placeHolderText: intl.formatMessage(messages.placeHolderTrackingId)
       },
       {
+        name: SearchCriteria.REGISTRATION_NUMBER,
         label: intl.formatMessage(messages.typeRN),
-        value: BRN_DRN_TEXT,
         icon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
+        name: SearchCriteria.NAME,
         label: intl.formatMessage(messages.typeName),
-        value: NAME_TEXT,
         icon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
@@ -325,8 +282,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     if (fieldNames.includes('registrationPhone')) {
       searchTypeList.splice(3, 0, {
+        name: SearchCriteria.PHONE_NUMBER,
         label: intl.formatMessage(messages.typePhone),
-        value: PHONE_TEXT,
         icon: <Icon name="Phone" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       })
@@ -338,28 +295,28 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       fieldNames.some((name) => name.endsWith('NationalId'))
     ) {
       searchTypeList.splice(2, 0, {
+        name: SearchCriteria.NATIONAL_ID,
         label: intl.formatMessage(constantsMessages.id),
-        value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderId)
       })
     }
     if (fieldNames.includes('registrationEmail')) {
       searchTypeList.push({
+        name: SearchCriteria.EMAIL,
         label: intl.formatMessage(messages.email),
-        value: EMAIL,
         icon: <Icon name="Envelope" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderEmail)
       })
     }
 
-    const navigationList: INavigationType[] = [
+    const advancedSearchNavigationList: INavigationType[] = [
       {
         label: intl.formatMessage(messages.advancedSearch),
         id: ADVANCED_SEARCH_TEXT,
         onClick: () => {
-          this.props.setAdvancedSearchParam(advancedSearchInitialState)
-          this.props.goToAdvancedSearch()
+          setAdvancedSearchParam(advancedSearchInitialState)
+          router.navigate(routes.ADVANCED_SEARCH)
         }
       }
     ]
@@ -369,177 +326,144 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         key="searchMenu"
         language={language}
         searchText={searchText}
-        selectedSearchType={selectedSearchType}
-        searchTypeList={searchTypeList}
-        navigationList={
-          FIELD_AGENT_ROLES.includes(
-            this.props.userDetails?.systemRole as string
-          )
-            ? undefined
-            : navigationList
+        selectedSearchType={
+          selectedSearchType ?? offlineData.config.SEARCH_DEFAULT_CRITERIA
         }
+        searchTypeList={searchTypeList}
+        // @TODO: How to hide the navigation list from field agents? Ask JPF
+        navigationList={canDoAdvanceSearch ? advancedSearchNavigationList : []}
         searchHandler={(text, type) =>
-          props.goToSearchResult(text, type, isMobile)
+          props.router.navigate(
+            {
+              pathname: routes.SEARCH_RESULT,
+              search: stringify({
+                searchText: text,
+                searchType: type
+              })
+            },
+            {
+              replace: isMobile
+            }
+          )
         }
       />
     )
   }
 
-  goToTeamView(props: IFullProps) {
-    const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
-    if (userDetails && userDetails.systemRole) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
-        return goToTeamSearchAction()
-      } else {
-        return goToTeamUserListAction(
-          (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
-        )
-      }
-    }
-  }
+  const title =
+    props.title ||
+    intl.formatMessage(
+      activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+        ? constantsMessages.performanceTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
+          activeMenuItem === ACTIVE_MENU_ITEM.USERS
+        ? messages.teamTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
+        ? constantsMessages.certificateTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
+        ? constantsMessages.applicationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.FORM
+        ? constantsMessages.formDeclarationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
+        ? constantsMessages.integrationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
+        ? constantsMessages.vsExportTitle
+        : constantsMessages.declarationTitle
+    )
 
-  render() {
-    const { className, intl, activeMenuItem } = this.props
-
-    const title =
-      this.props.title ||
-      intl.formatMessage(
-        activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-          ? constantsMessages.performanceTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
-            activeMenuItem === ACTIVE_MENU_ITEM.USERS
-          ? messages.teamTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
-          ? constantsMessages.certificateTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
-          ? constantsMessages.applicationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.FORM
-          ? constantsMessages.formDeclarationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
-          ? constantsMessages.integrationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
-          ? constantsMessages.vsExportTitle
-          : constantsMessages.declarationTitle
+  let rightMenu = [
+    {
+      element: <HistoryNavigator />
+    },
+    {
+      element: (
+        <HeaderCenter>
+          <ProtectedComponent scopes={RECORD_DECLARE_SCOPES}>
+            <Button
+              type="iconPrimary"
+              size="medium"
+              key="newEvent"
+              id="header_new_event"
+              onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
+            >
+              <Icon name="Plus" size="medium" />
+            </Button>
+          </ProtectedComponent>
+          {canSearchRecords && renderSearchInput(props)}
+        </HeaderCenter>
       )
+    },
+    {
+      element: (
+        <HeaderRight>
+          <ProfileMenu key="profileMenu" />
+        </HeaderRight>
+      )
+    }
+  ]
 
-    let rightMenu = [
+  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !canSearchRecords) {
+    rightMenu = [
       {
         element: <HistoryNavigator />
       },
       {
-        element: (
-          <>
-            {!(
-              this.props.userDetails?.systemRole &&
-              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
-            ) && (
-              <HeaderCenter>
-                <Button
-                  type="iconPrimary"
-                  size="medium"
-                  key="newEvent"
-                  id="header_new_event"
-                  onClick={this.props.goToEvents}
-                >
-                  <Icon name="Plus" size="medium" />
-                </Button>
-
-                {this.renderSearchInput(this.props)}
-              </HeaderCenter>
-            )}
-          </>
-        )
-      },
-      {
-        element: (
-          <HeaderRight>
-            <ProfileMenu key="profileMenu" />
-          </HeaderRight>
-        )
+        element: <ProfileMenu key="profileMenu" />
       }
     ]
-
-    if (
-      activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
-      (NATL_ADMIN_ROLES.includes(
-        this.props.userDetails?.systemRole as string
-      ) ||
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole as string))
-    ) {
-      rightMenu = [
-        {
-          element: <HistoryNavigator />
-        },
-        {
-          element: <ProfileMenu key="profileMenu" />
-        }
-      ]
-    }
-
-    const mobileHeaderActionProps =
-      this.getMobileHeaderActionProps(activeMenuItem)
-
-    const mobileHeaderActionPropsWithDefaults = {
-      mobileRight: this.props.mobileRight,
-      ...mobileHeaderActionProps
-    }
-
-    return (
-      <AppHeader
-        id="register_app_header"
-        desktopRightMenu={rightMenu}
-        className={className}
-        title={title}
-        {...mobileHeaderActionPropsWithDefaults}
-      />
-    )
   }
+
+  const mobileHeaderActionProps = getMobileHeaderActionProps(activeMenuItem)
+
+  const mobileHeaderActionPropsWithDefaults = {
+    mobileRight: mobileRight,
+    ...mobileHeaderActionProps
+  }
+
+  return (
+    <AppHeader
+      id="register_app_header"
+      desktopRightMenu={rightMenu}
+      className={className}
+      title={title}
+      {...mobileHeaderActionPropsWithDefaults}
+    />
+  )
 }
 
-export const Header = connect(
-  (store: IStoreState) => ({
-    activeMenuItem: window.location.href.includes('performance')
-      ? ACTIVE_MENU_ITEM.PERFORMANCE
-      : window.location.href.includes(TEAM_USER_LIST)
-      ? ACTIVE_MENU_ITEM.USERS
-      : window.location.href.includes('team')
-      ? ACTIVE_MENU_ITEM.TEAM
-      : window.location.href.includes('config/certificate')
-      ? ACTIVE_MENU_ITEM.CERTIFICATE
-      : window.location.href.includes('config/application')
-      ? ACTIVE_MENU_ITEM.APPLICATION
-      : window.location.href.includes('config/form')
-      ? ACTIVE_MENU_ITEM.FORM
-      : window.location.href.includes('config/integration')
-      ? ACTIVE_MENU_ITEM.INTEGRATION
-      : window.location.href.includes('vsexports')
-      ? ACTIVE_MENU_ITEM.VSEXPORTS
-      : ACTIVE_MENU_ITEM.DECLARATIONS,
-    language: store.i18n.language,
-    userDetails: getUserDetails(store),
-    fieldNames: Object.values(getRegisterForm(store))
-      .flatMap((form) => form.sections)
-      .flatMap((section) => section.groups)
-      .flatMap((group) => group.fields)
-      .map((field) => field.name)
-  }),
-  {
-    redirectToAuthentication,
-    goToSearchResult,
-    goToSearch,
-    goToSettings,
-    goBack,
-    goForward,
-    goToEvents: goToEventsAction,
-    goToPerformanceHomeAction: goToPerformanceHome,
-    goToCreateNewUserWithLocationId,
-    goToCreateNewUser,
-    goToTeamSearchAction: goToTeamSearch,
-    goToTeamUserListAction: goToTeamUserList,
-    goToAdvancedSearch: goToAdvancedSearch,
-    setAdvancedSearchParam: setAdvancedSearchParam
-  }
-)(injectIntl(withRouter(HeaderComp)))
+export const Header = withRouter(
+  connect(
+    (store: IStoreState) => ({
+      activeMenuItem: window.location.href.includes('performance')
+        ? ACTIVE_MENU_ITEM.PERFORMANCE
+        : window.location.href.includes(TEAM_USER_LIST)
+        ? ACTIVE_MENU_ITEM.USERS
+        : window.location.href.includes('team')
+        ? ACTIVE_MENU_ITEM.TEAM
+        : window.location.href.includes('config/certificate')
+        ? ACTIVE_MENU_ITEM.CERTIFICATE
+        : window.location.href.includes('config/application')
+        ? ACTIVE_MENU_ITEM.APPLICATION
+        : window.location.href.includes('config/form')
+        ? ACTIVE_MENU_ITEM.FORM
+        : window.location.href.includes('config/integration')
+        ? ACTIVE_MENU_ITEM.INTEGRATION
+        : window.location.href.includes('vsexports')
+        ? ACTIVE_MENU_ITEM.VSEXPORTS
+        : ACTIVE_MENU_ITEM.DECLARATIONS,
+      language: store.i18n.language,
+      offlineData: getOfflineData(store),
+      fieldNames: Object.values(getRegisterForm(store))
+        .flatMap((form) => form.sections)
+        .flatMap((section) => section.groups)
+        .flatMap((group) => group.fields)
+        .map((field) => field.name)
+    }),
+    {
+      setAdvancedSearchParam: setAdvancedSearchParam
+    }
+  )(injectIntl(HeaderComponent))
+)
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`

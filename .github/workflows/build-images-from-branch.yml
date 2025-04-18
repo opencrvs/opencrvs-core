@@ -9,21 +9,22 @@
 name: Publish images to Dockerhub from any branch
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       branch_name:
         description: Branch to build from
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      branch_name:
         default: develop
         required: true
-  pull_request:
-    branches-ignore:
-      - 'dependabot/**'
-      - 'renovate/**'
+        description: Branch to build from
   push:
     branches:
       - develop
       - main
-      - 'release*'
 jobs:
   base:
     runs-on: ubuntu-22.04
@@ -49,10 +50,15 @@ jobs:
           export VERSION=`git log -1 --pretty=format:%h`
           echo "Pushing version $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # the event_name is the event that triggered the caller workflow
+          # and not "workflow_call" like how it was supposed to be when
+          # another workflow is calling this one
+
           if [ "${{ github.event_name }}" == 'push' ]; then
-          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+            BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           elif [ "${{ github.event_name }}" == 'pull_request' ]; then
-          BRANCH=${{ github.event.pull_request.head.ref }}
+            BRANCH=${{ github.event.pull_request.head.ref }}
           else
           BRANCH=${{ inputs.branch_name }}
           fi

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as fetchAny from 'jest-fetch-mock'
-import { createServer } from '@auth/server'
+import { AuthServer, createServer } from '@auth/server'
 import {
   storeRetrievalStepInformation,
   RetrievalSteps
@@ -19,7 +19,7 @@ import { logger } from '@opencrvs/commons'
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('username reminder', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()

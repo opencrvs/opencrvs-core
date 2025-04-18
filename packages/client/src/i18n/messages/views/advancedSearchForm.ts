@@ -21,6 +21,8 @@ interface IAdvancedSearchMessages
   placeOfRegistrationHelperText: MessageDescriptor
   dateOfRegistration: MessageDescriptor
   statusOfRecordLabel: MessageDescriptor
+  timePeriodLabel: MessageDescriptor
+  timePeriodHelperText: MessageDescriptor
   deceasedDetails: MessageDescriptor
   informantDetails: MessageDescriptor
   recordStatusAny: MessageDescriptor
@@ -31,6 +33,11 @@ interface IAdvancedSearchMessages
   recordStatusCertified: MessageDescriptor
   recordStatusAchived: MessageDescriptor
   recordStatusCorrectionRequested: MessageDescriptor
+  recordStatusValidated: MessageDescriptor
+  timePeriodLast7Days: MessageDescriptor
+  timePeriodLast30Days: MessageDescriptor
+  timePeriodLast90Days: MessageDescriptor
+  timePeriodLastYear: MessageDescriptor
   show: MessageDescriptor
   hide: MessageDescriptor
 }
@@ -80,6 +87,16 @@ const messagesToDefine: IAdvancedSearchMessages = {
     defaultMessage: 'Status of record',
     description: 'Label for input Status of record',
     id: 'advancedSearch.form.statusOfRecordLabel'
+  },
+  timePeriodLabel: {
+    defaultMessage: 'Time period',
+    description: 'Label for input Time period',
+    id: 'advancedSearch.form.timePeriodLabel'
+  },
+  timePeriodHelperText: {
+    defaultMessage: 'Period of time since the record status changed',
+    description: 'Helper text for input Time period',
+    id: 'advancedSearch.form.timePeriodHelperText'
   },
   deceasedDetails: {
     defaultMessage: 'Deceased details',
@@ -131,6 +148,11 @@ const messagesToDefine: IAdvancedSearchMessages = {
     description: 'Option for form field: status of record',
     id: 'advancedSearch.form.recordStatusCorrectionRequested'
   },
+  recordStatusValidated: {
+    defaultMessage: 'Validated',
+    description: 'Option for form field: status of record',
+    id: 'advancedSearch.form.recordStatusValidated'
+  },
   hide: {
     defaultMessage: 'Hide',
     description: 'Label for hide button when accordion is closed',
@@ -140,6 +162,26 @@ const messagesToDefine: IAdvancedSearchMessages = {
     defaultMessage: 'Show',
     description: 'Label for show button when accordion is closed',
     id: 'advancedSearch.accordion.show'
+  },
+  timePeriodLast7Days: {
+    defaultMessage: 'Last 7 days',
+    description: 'Label for option of time period select: last 7 days',
+    id: 'form.section.label.timePeriodLast7Days'
+  },
+  timePeriodLast30Days: {
+    defaultMessage: 'Last 30 days',
+    description: 'Label for option of time period select: last 30 days',
+    id: 'form.section.label.timePeriodLast30Days'
+  },
+  timePeriodLast90Days: {
+    defaultMessage: 'Last 90 days',
+    description: 'Label for option of time period select: last 90 days',
+    id: 'form.section.label.timePeriodLast90Days'
+  },
+  timePeriodLastYear: {
+    defaultMessage: 'Last year',
+    description: 'Label for option of time period select: last year',
+    id: 'form.section.label.timePeriodLastYear'
   }
 }
 export const messages: IAdvancedSearchMessages =

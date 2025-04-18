@@ -25,8 +25,12 @@ import { messages } from '@client/i18n/messages/views/performance'
 import type { GQLTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { goToFieldAgentList } from '@client/navigation'
-import { connect } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
+import { useSelector } from 'react-redux'
+import { IStoreState } from '@client/store'
+import { SCOPES } from '@opencrvs/commons/client'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
@@ -36,15 +40,26 @@ interface ApplicationSourcesProps {
   timeStart: string
   timeEnd: string
 }
-interface IDispatchProps {
-  goToFieldAgentList: typeof goToFieldAgentList
-}
 
-function ApplicationSourcesReport(
-  props: ApplicationSourcesProps & IDispatchProps
-) {
+function ApplicationSourcesReport(props: ApplicationSourcesProps) {
   const { data, isAccessibleOffice } = props
+  const navigate = useNavigate()
   const intl = useIntl()
+  const userRoles = useSelector(
+    (state: IStoreState) => state.userForm.userRoles
+  )
+
+  const fieldAgentRoles = userRoles
+    .filter((role) => role.scopes.includes(SCOPES.RECORD_SUBMIT_FOR_REVIEW))
+    .map((role) => role.id)
+
+  const registrationAgentRoles = userRoles
+    .filter((role) => role.scopes.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL))
+    .map((role) => role.id)
+
+  const registrarRoles = userRoles
+    .filter((role) => role.scopes.includes(SCOPES.RECORD_REGISTER))
+    .map((role) => role.id)
 
   return (
     <ListContainer>
@@ -87,8 +102,8 @@ function ApplicationSourcesReport(
             <PerformanceValue>
               <TotalDisplayWithPercentage
                 total={calculateTotal(
-                  data.results.filter(
-                    (item) => item.practitionerRole === 'FIELD_AGENT'
+                  data.results.filter((item) =>
+                    fieldAgentRoles.includes(item.practitionerRole)
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}
@@ -100,12 +115,15 @@ function ApplicationSourcesReport(
               <LinkButton
                 id="field-agent-list-view"
                 onClick={() =>
-                  props.goToFieldAgentList(
-                    props.timeStart,
-                    props.timeEnd,
-                    props.locationId,
-                    props.event
-                  )
+                  navigate({
+                    pathname: routes.PERFORMANCE_FIELD_AGENT_LIST,
+                    search: stringify({
+                      locationId: props.locationId,
+                      timeStart: props.timeStart,
+                      timeEnd: props.timeEnd,
+                      event: props.event
+                    })
+                  })
                 }
               >
                 {intl.formatMessage(buttonMessages.view)}
@@ -148,8 +166,8 @@ function ApplicationSourcesReport(
             <PerformanceValue>
               <TotalDisplayWithPercentage
                 total={calculateTotal(
-                  data.results.filter(
-                    (item) => item.practitionerRole === 'REGISTRATION_AGENT'
+                  data.results.filter((item) =>
+                    registrationAgentRoles.includes(item.practitionerRole)
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}
@@ -171,33 +189,7 @@ function ApplicationSourcesReport(
               <TotalDisplayWithPercentage
                 total={calculateTotal(
                   data.results.filter((item) =>
-                    [
-                      'LOCAL_REGISTRAR',
-                      'DISTRICT_REGISTRAR',
-                      'STATE_REGISTRAR'
-                    ].includes(item.practitionerRole)
-                  )
-                )}
-                ofNumber={calculateTotal(data.results)}
-              ></TotalDisplayWithPercentage>
-            </PerformanceValue>
-          }
-        />
-        <ListViewItemSimplified
-          label={
-            <PerformanceTitle>
-              {' '}
-              {intl.formatMessage(
-                messages.performanceNationalRegistrarsApplicationsLabel
-              )}
-            </PerformanceTitle>
-          }
-          value={
-            <PerformanceValue>
-              <TotalDisplayWithPercentage
-                total={calculateTotal(
-                  data.results.filter((item) =>
-                    ['NATIONAL_REGISTRAR'].includes(item.practitionerRole)
+                    registrarRoles.includes(item.practitionerRole)
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}
@@ -209,9 +201,4 @@ function ApplicationSourcesReport(
     </ListContainer>
   )
 }
-export const AppSources = connect<ApplicationSourcesProps, IDispatchProps>(
-  undefined,
-  {
-    goToFieldAgentList
-  }
-)(ApplicationSourcesReport)
+export const AppSources = ApplicationSourcesReport

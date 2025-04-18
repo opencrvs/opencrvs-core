@@ -12,6 +12,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 
 import { inScope } from '@gateway/features/user/utils'
 import { getMetrics } from './service'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export interface IMetricsParam {
   timeStart?: string
@@ -61,14 +62,14 @@ export const resolvers: GQLResolver = {
     },
     async getVSExports(_, variables, { headers: authHeader }) {
       let results
-      if (inScope(authHeader, ['natlsysadmin', 'performance'])) {
+      if (inScope(authHeader, [SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS])) {
         results = await getMetrics('/fetchVSExport', variables, authHeader)
         return {
           results
         }
       } else {
-        return await Promise.reject(
-          new Error('User does not have the scope required for this resource')
+        throw new Error(
+          'User does not have the scope required for this resource'
         )
       }
     },

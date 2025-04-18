@@ -9,24 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export const HOST = process.env.HOST || 'localhost'
-export const PORT = process.env.PORT || 2020
+import { env } from '@notification/environment'
 
 /*
   For these locales sms content will not be sent as unicoded payload
   In future based on our experience on different countries we can add more locals here
 */
 export const NON_UNICODED_LANGUAGES = ['en']
-
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-
-export const SENTRY_DSN = process.env.SENTRY_DSN
-
-export const COUNTRY_CONFIG_URL =
-  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const DEFAULT_TIMEOUT = 600000
 
-export const MONGO_URL =
-  process.env.MONGO_URL || 'mongodb://localhost/notification'
+export const HOST = env.HOST
+export const PORT = env.PORT
+export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
+export const SENTRY_DSN = env.SENTRY_DSN
+export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
+export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
+export const MONGO_URL = env.MONGO_URL

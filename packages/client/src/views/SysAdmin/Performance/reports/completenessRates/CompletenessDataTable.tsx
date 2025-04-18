@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
@@ -31,7 +31,7 @@ import { Table } from '@opencrvs/components/lib/Table/Table'
 
 interface ITableProps extends WrappedComponentProps {
   loading: boolean
-  eventType?: Event
+  eventType?: EventType
   base: IEstimationBase
   data?: GQLLocationWiseEstimationMetric[] | GQLMonthWiseEstimationMetric[]
   completenessRateTime: CompletenessRateTime
@@ -212,7 +212,7 @@ function CompletenessDataTableComponent(props: ITableProps) {
                       messages.performanceWithinTargetDaysLabel,
                       {
                         target:
-                          eventType === Event.Birth
+                          eventType === EventType.Birth
                             ? window.config.BIRTH.REGISTRATION_TARGET
                             : window.config.DEATH.REGISTRATION_TARGET,
                         withPrefix: false

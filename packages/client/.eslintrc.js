@@ -22,6 +22,7 @@ module.exports = {
   },
   rules: {
     'react-hooks/exhaustive-deps': 'error',
+    '@typescript-eslint/no-explicit-any': 'warn',
     'no-restricted-imports': [
       'error',
       {
@@ -39,8 +40,14 @@ Query component now sends errors automatically to Sentry.`
           {
             name: 'date-fns',
             message: 'Please use submodules instead'
+          },
+          {
+            name: '@opencrvs/commons',
+            message:
+              'Importing directly from `@opencrvs/commons` is not allowed. Use `@opencrvs/commons/client` instead.'
           }
-        ]
+        ],
+        patterns: ['@opencrvs/commons/*', '!@opencrvs/commons/client']
       }
     ],
     'formatjs/enforce-id': 'error',

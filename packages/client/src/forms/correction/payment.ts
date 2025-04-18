@@ -17,7 +17,7 @@ import {
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 
-export const correctionFeesPayment = (currencySymbol: string) =>
+const correctionFeesPayment = (currencySymbol: string) =>
   ({
     id: 'correctionFeesPayment',
     fields: [

@@ -48,17 +48,7 @@ sequenceDiagram
 
     Workflow--)Metrics: POST bundle to /events/{event}/sent-notification-for-review
     Metrics->>Influx DB: Write user audit point "DECLARED"
-
-    loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate time logged point
-
-    loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate declaration started point
-    Metrics->>Influx DB: Write audit points
+    Metrics->>Influx DB: Write time logged point & declaration started point
 
     Workflow->>User management: Fetch user/system information
     Workflow->>Hearth: Get practitioner resource
@@ -78,7 +68,7 @@ sequenceDiagram
     Workflow--)Metrics: POST bundle to /events/{event}/waiting-external-validation
 
     Workflow--)Country-Config: POST record to /event-registration
-    Country-Config->>Workflow: POST /confirm/registration
+    Country-Config->>Workflow: POST /records/{id}/confirm
     Workflow->>Search: Get record by id
 
     Workflow->>User management: Fetch user/system information

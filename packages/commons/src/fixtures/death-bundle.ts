@@ -261,7 +261,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -317,7 +317,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Zack'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         gender: 'female',
@@ -373,7 +373,8 @@ export const DEATH_BUNDLE: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                  reference:
+                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
                 }
               }
             ]
@@ -397,7 +398,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -530,13 +531,15 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
+              reference:
+                'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference: 'Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f'
+              reference:
+                'Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f' as `Practitioner/${UUID}`
             }
           },
           {
@@ -582,7 +585,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Frank'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         birthDate: '2003-08-16',
@@ -628,7 +631,8 @@ export const DEATH_BUNDLE: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                  reference:
+                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
                 }
               }
             ]
@@ -1133,19 +1137,12 @@ export const DEATH_BUNDLE: SavedBundle<
                 code: 'REGISTRATION_AGENT'
               }
             ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Registration Agent"},{"lang":"fr","label":"Agent d\'enregistrement"}]'
-              }
-            ]
           }
         ],
         location: [
           {
-            reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
+            reference:
+              'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
           }
         ],
         meta: {

@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Bundle } from '..'
+import { Bundle, EVENT_TYPE } from '..'
 import { IsNominal } from '../../nominal'
-import { EVENT_TYPE } from '../../record'
 import {
   BirthRegistration,
   DeathRegistration,
@@ -22,10 +21,7 @@ export type Context<A extends string | number | symbol = never> = {
   event: EVENT_TYPE
   _index: { [Key in A]: number }
 }
-export type IFieldBuilderFunction<
-  Key extends string | number | symbol,
-  FieldType
-> = (
+type IFieldBuilderFunction<Key extends string | number | symbol, FieldType> = (
   accumulatedObj: Bundle,
   fieldValue: NonNullable<FieldType>,
   context: Context<Key>

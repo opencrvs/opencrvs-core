@@ -9,10 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FormFieldGenerator } from '@client/components/form'
+import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
 import { roleQueries } from '@client/forms/user/query/queries'
+import { formatUrl } from '@client/navigation'
+import {
+  CREATE_USER_ON_LOCATION,
+  CREATE_USER_SECTION,
+  REVIEW_USER_DETAILS,
+  REVIEW_USER_FORM
+} from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
-import { userQueries, GET_USER } from '@client/user/queries'
+import { GET_USER } from '@client/user/queries'
 import {
   createTestComponent,
   flushPromises,
@@ -20,202 +28,52 @@ import {
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
+  mockOfflineDataDispatch,
   mockRoles,
-  mockOfflineDataDispatch
+  setScopes,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import {
-  REVIEW_USER_FORM,
-  REVIEW_USER_DETAILS
-} from '@client/navigation/routes'
-import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-
-const mockUsers = {
-  data: {
-    searchUsers: {
-      totalItems: 8,
-      results: [
-        {
-          id: '5db9f3fdd2ce28e4e2da1a7e',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'API',
-              familyName: 'User',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'api.user',
-          systemRole: 'NATIONAL_REGISTRAR',
-          role: {
-            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'API_USER'
-              }
-            ]
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7d',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Sahriar',
-              familyName: 'Nafis',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'shahriar.nafis',
-          systemRole: 'LOCAL_SYSTEM_ADMIN',
-          role: 'LOCAL_SYSTEM_ADMIN',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7c',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mohamed',
-              familyName: 'Abu Abdullah',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'mohamed.abu',
-          systemRole: 'NATIONAL_REGISTRAR',
-          role: 'SECRETARY',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7b',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Nasreen Pervin',
-              familyName: 'Huq',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'nasreen.pervin',
-          systemRole: 'STATE_REGISTRAR',
-          role: 'MAYOR',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7a',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Muhammad Abdul Muid',
-              familyName: 'Khan',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'muid.khan',
-          systemRole: 'DISTRICT_REGISTRAR',
-          role: 'MAYOR',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a79',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mohammad',
-              familyName: 'Ashraful',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'mohammad.ashraful',
-          systemRole: 'LOCAL_REGISTRAR',
-          role: 'CHAIRMAN',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a78',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Tamim',
-              familyName: 'Iqbal',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'tamim.iqbal',
-          systemRole: 'REGISTRATION_AGENT',
-          role: 'ENTREPENEUR',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a77',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Shakib',
-              familyName: 'Al Hasan',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'sakibal.hasan',
-          systemRole: 'FIELD_AGENT',
-          role: 'CHA',
-          status: 'active',
-          __typename: 'User'
-        }
-      ],
-      __typename: 'SearchUserResult'
-    }
-  }
-}
+import { GetUserQuery, Status } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('create new user tests', () => {
   let store: AppStore
-  let history: History
   let testComponent: ReactWrapper
+  let testRouter: TestComponentWithRouteMock['router']
 
   beforeEach(async () => {
-    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     const s = createStore()
     store = s.store
-    history = s.history
+
+    setScopes([SCOPES.USER_CREATE], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
 
   describe('when user is in create new user form', () => {
     beforeEach(async () => {
-      testComponent = await createTestComponent(
-        <CreateNewUser
-          match={{
-            // @ts-ignore
-            params: {
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-              sectionId: mockOfflineData.userForms.sections[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+      const component = await createTestComponent(<CreateNewUser />, {
+        store,
+        path: CREATE_USER_ON_LOCATION,
+        initialEntries: [
+          formatUrl(CREATE_USER_ON_LOCATION, {
+            locationId: '0d8474da-0361-4d32-979e-af91f012340a',
+            sectionId: mockOfflineData.userForms.sections[0].id
+          })
+        ]
+      })
+
+      testComponent = component.component
+      testRouter = component.router
 
       loginAsFieldAgent(store)
     })
@@ -230,18 +88,18 @@ describe('create new user tests', () => {
       expect(
         testComponent
           .find(FormFieldGenerator)
-          .find('#familyNameEng_error')
+          .find('#familyName_error')
           .hostNodes()
           .text()
       ).toBe('Required to register a new user')
     })
 
-    it('clicking on confirm button with complete data takes user to signature attachment page', async () => {
+    it('clicking on confirm button with complete data takes user to review page', async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toContain(
+      expect(testRouter.state.location.pathname).toContain(
         'preview/preview-registration-office'
       )
     })
@@ -252,7 +110,7 @@ describe('create new user tests', () => {
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
-      expect(history.location.pathname).toContain(
+      expect(testRouter.state.location.pathname).toContain(
         '/createUser/user/signature-attachment'
       )
     })
@@ -260,24 +118,25 @@ describe('create new user tests', () => {
 
   describe('when user in review page', () => {
     beforeEach(async () => {
-      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
+
+      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      testComponent = await createTestComponent(
-        // @ts-ignore
-        <CreateNewUser
-          match={{
-            params: {
+
+      await flushPromises()
+      ;({ component: testComponent, router: testRouter } =
+        await createTestComponent(<CreateNewUser />, {
+          store,
+          path: CREATE_USER_SECTION,
+          initialEntries: [
+            formatUrl(CREATE_USER_SECTION, {
               sectionId: mockOfflineData.userForms.sections[1].id,
               groupId: mockOfflineData.userForms.sections[1].groups[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+            })
+          ]
+        }))
+
+      await waitForElement(testComponent, '#content-name')
     })
 
     it('renders review header', () => {
@@ -288,13 +147,15 @@ describe('create new user tests', () => {
 
     it('clicking change button on a field takes user back to form', async () => {
       testComponent
-        .find('#btn_change_firstNamesEng')
+        .find('#btn_change_firstName')
         .hostNodes()
         .first()
         .simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#firstNamesEng')
+      expect(testRouter.state.location.pathname).toBe(
+        '/createUser/user/user-view-group'
+      )
+      expect(testRouter.state.location.hash).toBe('#firstName')
     })
 
     it('clicking submit button submits the form data', async () => {
@@ -308,8 +169,9 @@ describe('create new user tests', () => {
 })
 
 describe('edit user tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   let component: ReactWrapper<{}, {}>
+  let router: ReturnType<typeof createMemoryRouter>
   const submitMock: Mock = vi.fn()
 
   const graphqlMocks = [
@@ -322,6 +184,7 @@ describe('edit user tests', () => {
         data: {
           getUser: {
             id: '5e835e4d81fbf01e4dc554db',
+            userMgntUserID: '5e835e4d81fbf01e4dc554db',
             name: [
               {
                 use: 'bn',
@@ -339,14 +202,15 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            identifier: {
-              system: 'NATIONAL_ID',
-              value: '101488192',
-              __typename: 'Identifier'
+            role: {
+              id: '63ef9466f708ea080777c27a',
+              label: {
+                defaultMessage: 'State Registrar',
+                description: 'Name for user role State Registrar',
+                id: 'userRole.stateRegistrar'
+              }
             },
-            systemRole: 'NATIONAL_REGISTRAR',
-            role: { _id: '63ef9466f708ea080777c27a' },
-            status: 'active',
+            status: Status.Active,
             underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {
@@ -361,15 +225,15 @@ describe('edit user tests', () => {
             }),
             creationDate: '2019-03-31T18:00:00.000Z',
             __typename: 'User'
-          }
+          } satisfies GetUserQuery['getUser']
         }
       }
     }
   ]
 
   beforeEach(async () => {
+    setScopes([SCOPES.USER_CREATE], store)
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -389,24 +253,22 @@ describe('edit user tests', () => {
 
   describe('when user is in update form page', () => {
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <CreateNewUser
-          match={{
-            params: {
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<CreateNewUser />, {
+          store,
+          graphqlMocks: graphqlMocks,
+          path: REVIEW_USER_FORM,
+          initialEntries: [
+            formatUrl(REVIEW_USER_FORM, {
               userId: '5e835e4d81fbf01e4dc554db',
               sectionId: UserSection.User,
               groupId: 'user-view-group'
-            },
-            isExact: true,
-            path: REVIEW_USER_FORM,
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMocks }
-      )
+            })
+          ]
+        })
 
       component = testComponent
+      router = testRouter
     })
 
     it('clicking on continue button takes user signature attachment page', async () => {
@@ -419,41 +281,33 @@ describe('edit user tests', () => {
       component.update()
       await flushPromises()
 
-      expect(history.location.pathname).toContain('signature-attachment')
+      // this will have to be updated after signature page is updated for new user roles structure
+      expect(router.state.location.pathname).toContain(
+        '/user/5e835e4d81fbf01e4dc554db/preview/preview-registration-office'
+      )
     })
   })
 
   describe('when user is in review page', () => {
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      ;({ component, router } = await createTestComponent(
         <CreateNewUser
-          location={{
-            pathname: REVIEW_USER_DETAILS,
-            state: {},
-            hash: '',
-            search: ''
-          }}
           // @ts-ignore
           submitForm={submitMock}
-          match={{
-            // @ts-ignore
-            params: {
+        />,
+        {
+          store,
+          graphqlMocks,
+          path: REVIEW_USER_DETAILS,
+          initialEntries: [
+            formatUrl(REVIEW_USER_DETAILS, {
               userId: '5e835e4d81fbf01e4dc554db',
               sectionId: UserSection.Preview
-            },
-            isExact: true,
-            path: REVIEW_USER_FORM,
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks }
-      )
+            })
+          ]
+        }
+      ))
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      component = testComponent
       component.update()
     })
 
@@ -469,18 +323,17 @@ describe('edit user tests', () => {
       )
       changeButtonOfType.hostNodes().first().simulate('click')
       await flushPromises()
-      expect(history.location.hash).toBe('#device')
+      expect(router.state.location.hash).toBe('#device')
     })
 
     it('clicking confirm button starts submitting the form', async () => {
-      await waitForElement(component, '#submit-edit-user-form')
-      component.update()
-
       const submitButton = await waitForElement(
         component,
         '#submit-edit-user-form'
       )
+
       submitButton.hostNodes().simulate('click')
+
       expect(store.getState().userForm.submitting).toBe(true)
     })
   })
