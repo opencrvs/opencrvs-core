@@ -242,6 +242,7 @@ function isFieldReference(value: unknown): value is FieldReference {
  *  and(field('foo').isEqualTo('bar'), field('baz').isUndefined())
  *
  */
+
 export function field(fieldId: string) {
   const getDateRange = (
     date: string,
@@ -450,14 +451,43 @@ export function field(fieldId: string) {
         },
         required: [fieldId]
       }),
+    /**
+     * Creates a range configuration for the specified field.
+     *
+     * @returns An object containing the field ID and a configuration object with a type of 'RANGE'.
+     *
+     * @example field('age').range()
+     * // {
+     * //   fieldId: 'age',
+     * //   config: { type: 'RANGE' }
+     * // }
+     */
     range: () => ({
       fieldId,
       config: { type: 'RANGE' as const }
     }),
+    /**
+     * Creates a configuration for exact matching of the specified field.
+     * @returns  An object containing the field ID and a configuration object with a type of 'EXACT'.
+     * @example field('dob').exact()
+     * // {
+     * //   fieldId: 'dob',
+     * //   config: { type: 'EXACT' }
+     * // }
+     */
     exact: () => ({
       fieldId,
       config: { type: 'EXACT' as const }
     }),
+    /**
+     * Creates a configuration for fuzzy matching of the specified field.
+     * @returns  An object containing the field ID and a configuration object with a type of 'EXACT'.
+     * @example field('name').fuzzy()
+     * // {
+     * //   fieldId: 'name',
+     * //   config: { type: 'FUZZY' }
+     * // }
+     */
     fuzzy: () => ({
       fieldId,
       config: { type: 'FUZZY' as const }
