@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/events",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "OpenCRVS Events service",
   "license": "MPL-2.0",
   "private": true,
