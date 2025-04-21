@@ -258,3 +258,10 @@ export type IndexMap<T> = {
 export function isWriteAction(actionType: ActionType): boolean {
   return writeActions.safeParse(actionType).success
 }
+
+export const metadataFields = ['trackingId', 'status'] as const
+/**
+ * Pre-defined metadata fields that can be used in advanced search
+ * and are not part of the event configuration
+ */
+export type MetadataField = (typeof metadataFields)[number]

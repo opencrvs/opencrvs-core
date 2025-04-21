@@ -15,7 +15,7 @@ import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
-import { findAllFields } from './utils'
+import { findAllFields, metadataFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 
 /**
@@ -57,13 +57,21 @@ export const EventConfig = z
     }
 
     const invalidFields = event.advancedSearch.flatMap((section) =>
-      section.fields.filter((field) => !fieldIds.includes(field.fieldId))
+      // Check if the fieldId is not in the fieldIds array
+      // and also not in the metadataFields array
+      section.fields.filter(
+        (field) =>
+          !(
+            fieldIds.includes(field.fieldId) ||
+            Boolean(metadataFields.find((f) => f === field.fieldId))
+          )
+      )
     )
 
     if (invalidFields.length > 0) {
       ctx.addIssue({
         code: 'custom',
-        message: `Advanced search id must match a field id in fields array.
+        message: `Advanced search id must match a field id of form fields or pre-defined metadata fields.
     Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
       .map((f) => f.fieldId)
       .join(', ')}`,

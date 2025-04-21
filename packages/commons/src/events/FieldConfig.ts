@@ -242,7 +242,7 @@ const File = BaseField.extend({
 
 export type File = z.infer<typeof File>
 
-const SelectOption = z.object({
+export const SelectOption = z.object({
   value: z.string().describe('The value of the option'),
   label: TranslationConfig.describe('The label of the option')
 })

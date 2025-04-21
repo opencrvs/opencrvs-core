@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventConfig, FieldValue } from '@opencrvs/commons/client'
+import {
+  AdvancedSearchConfig,
+  EventConfig,
+  FieldConfig,
+  FieldValue
+} from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
   Errors,
@@ -47,3 +52,40 @@ export const getAdvancedSearchFieldErrors = (
 
 export const flattenFieldErrors = (fieldErrors: Errors) =>
   Object.values(fieldErrors).flatMap((errObj) => errObj.errors)
+
+export const getDefaultSearchFields = (
+  section: AdvancedSearchConfig
+): FieldConfig[] => {
+  const res: FieldConfig[] = []
+  section.fields.forEach((field) => {
+    switch (field.fieldId) {
+      case 'trackingId':
+        res.push({
+          id: 'trackingId',
+          type: 'TEXT',
+          label: {
+            defaultMessage: 'Tracking ID',
+            description: 'Label for tracking ID field',
+            id: 'v2.advancedSearch.trackingId'
+          }
+        })
+        break
+      case 'status':
+        res.push({
+          id: 'status',
+          type: 'SELECT',
+          label: {
+            defaultMessage: 'Status of record',
+            description: 'Label for status field',
+            id: 'v2.advancedSearch.status'
+          },
+          options: field.options ?? []
+        })
+        break
+      default:
+        res.push()
+    }
+  })
+
+  return res
+}

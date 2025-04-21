@@ -10,6 +10,7 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { SelectOption } from './FieldConfig'
 
 const FieldType = z.enum(['FUZZY', 'EXACT', 'RANGE'])
 
@@ -17,7 +18,8 @@ export const FieldConfigSchema = z.object({
   fieldId: z.string(),
   config: z.object({
     type: FieldType.describe('Determines the type of field')
-  })
+  }),
+  options: z.array(SelectOption).optional()
 })
 
 export const AdvancedSearchConfig = z.object({
