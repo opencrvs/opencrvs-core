@@ -172,16 +172,16 @@ export function compileSvg({
    *
    * Usage: {{$lookup 'child.address.other' 'district'}}
    *
-   * Resolves a value from the declaration using a property path,
-   * then optionally returns a nested field from the resolved object.
+   * Resolves a value from the given property path within the `$declaration` object,
+   * and optionally returns a nested field from the resolved value.
    *
    * Behavior:
-   * 1. Resolves the full object/value from the declaration using `propertyPath`.
-   * 2. If the resolved value is an object and `finalNode` is provided, it returns the value at that key.
-   * 3. If not, it falls back to returning the raw resolved value.
+   * 1. The helper expects `$declaration` to be passed as the `data` parameter.
+   * 2. It serializes the `$declaration` object into a stringified form using `useFormDataStringifier`.
+   * 3. It then extracts the value from the `propertyPath` provided, and return it.
    *
-   * Useful for dereferencing fields like `locationId` or `address.districtId`
-   * when you want to extract a specific sub-property (e.g., 'district', 'town').
+   * This helper is useful for extracting specific properties from complex structures like `child.address.other`
+   * when you need to access deeply nested fields in the declaration.
    */
   Handlebars.registerHelper(
     '$lookup',
