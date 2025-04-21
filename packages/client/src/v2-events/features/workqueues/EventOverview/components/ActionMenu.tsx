@@ -61,7 +61,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               <DropdownMenu.Item
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
-                onClick={() => action.onClick(event.id)}
+                onClick={async () => action.onClick(event.id)}
               >
                 {intl.formatMessage(action.label)}
               </DropdownMenu.Item>

@@ -137,6 +137,11 @@ export const actionLabels = {
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.collect-certificate.label'
+  },
+  [ActionType.DELETE]: {
+    defaultMessage: 'Delete',
+    description: 'Label for delete button in dropdown menu',
+    id: 'v2.event.birth.action.delete.label'
   }
 }
 
@@ -156,6 +161,8 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
   }
+
+  const { mutate: deleteEvent } = events.deleteEvent.useMutation()
 
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
@@ -211,6 +218,14 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })),
       disabled: !eventIsAssignedToSelf
+    },
+    [ActionType.DELETE]: {
+      label: actionLabels[ActionType.DELETE],
+      onClick: (eventId: string) => {
+        deleteEvent({
+          eventId
+        })
+      }
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 
