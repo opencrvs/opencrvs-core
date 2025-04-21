@@ -22,24 +22,23 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Field Agent/Rejected'
+  title: 'ActionMenu/Registration Agent/Notified'
 } as Meta<typeof ActionMenu>
 
-const rejectedScenariosForFieldAgent: Scenario[] = [
+const notifiedScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.DECLARE,
-      ActionType.REJECT,
+      ActionType.NOTIFY,
       ActionType.UNASSIGN
     ],
     expected: {
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.VALIDATE]: AssertType.DISABLED
     }
   },
   {
@@ -47,35 +46,37 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.DECLARE,
-      ActionType.REJECT
+      ActionType.NOTIFY,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_SELF
     ],
     expected: {
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED
+      [ActionType.VALIDATE]: AssertType.ENABLED
     }
   },
   {
     name: 'AssignedToOthers',
     actions: [
       ActionType.CREATE,
-      AssignmentStatus.ASSIGNED_TO_OTHERS,
-      ActionType.DECLARE,
-      ActionType.REJECT
+      AssignmentStatus.ASSIGNED_TO_SELF,
+      ActionType.NOTIFY,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...hiddenActions,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.VALIDATE]: AssertType.DISABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  rejectedScenariosForFieldAgent,
-  'FieldAgent'
+  notifiedScenariosForRegistrationAgent,
+  'RegistrationAgent'
 )
 
 export const Unassigned = stories['Unassigned']

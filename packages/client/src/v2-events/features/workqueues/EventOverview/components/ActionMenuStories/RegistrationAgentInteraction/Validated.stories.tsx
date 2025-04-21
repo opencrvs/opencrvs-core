@@ -22,24 +22,23 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Field Agent/Rejected'
+  title: 'ActionMenu/Registration Agent/Validated'
 } as Meta<typeof ActionMenu>
 
-const rejectedScenariosForFieldAgent: Scenario[] = [
+const validatedScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT,
+      ActionType.VALIDATE,
       ActionType.UNASSIGN
     ],
     expected: {
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
@@ -48,34 +47,36 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT
+      ActionType.VALIDATE,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_SELF
     ],
     expected: {
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
     name: 'AssignedToOthers',
     actions: [
       ActionType.CREATE,
-      AssignmentStatus.ASSIGNED_TO_OTHERS,
+      AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT
+      ActionType.VALIDATE,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...hiddenActions,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  rejectedScenariosForFieldAgent,
-  'FieldAgent'
+  validatedScenariosForRegistrationAgent,
+  'RegistrationAgent'
 )
 
 export const Unassigned = stories['Unassigned']

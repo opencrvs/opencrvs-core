@@ -25,7 +25,7 @@ export default {
   title: 'ActionMenu/Field Agent/Registered'
 } as Meta<typeof ActionMenu>
 
-const registeredScenariosForLocalRegistrar: Scenario[] = [
+const registeredScenariosForFieldAgent: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
@@ -76,7 +76,7 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
 ]
 
 const stories = createStoriesFromScenarios(
-  registeredScenariosForLocalRegistrar,
+  registeredScenariosForFieldAgent,
   'FieldAgent'
 )
 

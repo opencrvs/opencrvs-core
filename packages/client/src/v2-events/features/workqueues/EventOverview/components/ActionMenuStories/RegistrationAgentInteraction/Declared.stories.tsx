@@ -22,24 +22,23 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Field Agent/Rejected'
+  title: 'ActionMenu/Registration Agent/Declared'
 } as Meta<typeof ActionMenu>
 
-const rejectedScenariosForFieldAgent: Scenario[] = [
+const declaredScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT,
       ActionType.UNASSIGN
     ],
     expected: {
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.VALIDATE]: AssertType.DISABLED
     }
   },
   {
@@ -48,34 +47,36 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_SELF
     ],
     expected: {
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED
+      [ActionType.VALIDATE]: AssertType.ENABLED
     }
   },
   {
     name: 'AssignedToOthers',
     actions: [
       ActionType.CREATE,
-      AssignmentStatus.ASSIGNED_TO_OTHERS,
+      AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...hiddenActions,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.VALIDATE]: AssertType.DISABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  rejectedScenariosForFieldAgent,
-  'FieldAgent'
+  declaredScenariosForRegistrationAgent,
+  'RegistrationAgent'
 )
 
 export const Unassigned = stories['Unassigned']

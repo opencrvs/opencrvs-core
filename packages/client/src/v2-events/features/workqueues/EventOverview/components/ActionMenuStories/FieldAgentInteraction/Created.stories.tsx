@@ -25,7 +25,7 @@ export default {
   title: 'ActionMenu/Field Agent/Created'
 } as Meta<typeof ActionMenu>
 
-const craetedScenariosForLocalRegistrar: Scenario[] = [
+const craetedScenariosForFieldAgent: Scenario[] = [
   {
     name: 'AssignedToSelf',
     actions: [ActionType.CREATE, AssignmentStatus.ASSIGNED_TO_SELF],
@@ -40,7 +40,7 @@ const craetedScenariosForLocalRegistrar: Scenario[] = [
 ]
 
 const stories = createStoriesFromScenarios(
-  craetedScenariosForLocalRegistrar,
+  craetedScenariosForFieldAgent,
   'FieldAgent'
 )
 

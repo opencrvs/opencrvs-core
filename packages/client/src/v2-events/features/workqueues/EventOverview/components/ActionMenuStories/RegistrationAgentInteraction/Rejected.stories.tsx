@@ -22,10 +22,10 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Field Agent/Rejected'
+  title: 'ActionMenu/Registration Agent/Rejected'
 } as Meta<typeof ActionMenu>
 
-const rejectedScenariosForFieldAgent: Scenario[] = [
+const rejectedScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
@@ -39,7 +39,8 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.DECLARE]: AssertType.DISABLED,
+      [ActionType.VALIDATE]: AssertType.DISABLED
     }
   },
   {
@@ -54,7 +55,8 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED
+      [ActionType.DECLARE]: AssertType.ENABLED,
+      [ActionType.VALIDATE]: AssertType.ENABLED
     }
   },
   {
@@ -68,14 +70,15 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
     expected: {
       ...hiddenActions,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.DECLARE]: AssertType.DISABLED,
+      [ActionType.VALIDATE]: AssertType.DISABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  rejectedScenariosForFieldAgent,
-  'FieldAgent'
+  rejectedScenariosForRegistrationAgent,
+  'RegistrationAgent'
 )
 
 export const Unassigned = stories['Unassigned']

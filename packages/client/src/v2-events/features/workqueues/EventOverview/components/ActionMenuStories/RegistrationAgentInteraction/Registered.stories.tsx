@@ -22,24 +22,25 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Field Agent/Rejected'
+  title: 'ActionMenu/Registration Agent/Registered'
 } as Meta<typeof ActionMenu>
 
-const rejectedScenariosForFieldAgent: Scenario[] = [
+const registeredScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT,
+      ActionType.VALIDATE,
+      ActionType.REGISTER,
       ActionType.UNASSIGN
     ],
     expected: {
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED
     }
   },
   {
@@ -48,34 +49,38 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT
+      ActionType.VALIDATE,
+      ActionType.REGISTER
     ],
     expected: {
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.ENABLED
     }
   },
   {
     name: 'AssignedToOthers',
     actions: [
       ActionType.CREATE,
-      AssignmentStatus.ASSIGNED_TO_OTHERS,
+      AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REJECT
+      ActionType.VALIDATE,
+      ActionType.REGISTER,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...hiddenActions,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  rejectedScenariosForFieldAgent,
-  'FieldAgent'
+  registeredScenariosForRegistrationAgent,
+  'RegistrationAgent'
 )
 
 export const Unassigned = stories['Unassigned']
