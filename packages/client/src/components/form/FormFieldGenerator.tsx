@@ -321,6 +321,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           type={fieldDefinition.bannerType}
           idFieldName={fieldDefinition.idFieldName}
           setFieldValue={setFieldValue}
+          form={values}
         />
       )
     }
