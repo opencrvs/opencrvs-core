@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   EventState,
@@ -21,11 +21,26 @@ import {
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
-function getFieldFromDataEntry(
-  formData: EventState,
-  value: string,
-  label: TranslationConfig
-) {
+function getFieldFromDataEntry({
+  intl,
+  formData,
+  entry
+}: {
+  intl: IntlShape
+  formData: EventState
+  entry: { value: TranslationConfig | string; label: TranslationConfig }
+}) {
+  const { value, label } = entry
+  if (typeof value === 'object' && 'id' in value) {
+    return {
+      value: intl.formatMessage(value),
+      config: {
+        type: FieldType.TEXT,
+        id: label.id,
+        label
+      }
+    }
+  }
   let resolvedValue = value
 
   const keys = value.match(/{([^}]+)}/g)
@@ -103,7 +118,11 @@ function DataInput({
       }
     }
 
-    return getFieldFromDataEntry(formData, entry.value, entry.label)
+    return getFieldFromDataEntry({
+      intl,
+      formData,
+      entry
+    })
   })
 
   return (
