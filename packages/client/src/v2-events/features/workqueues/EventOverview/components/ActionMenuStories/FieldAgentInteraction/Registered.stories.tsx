@@ -22,23 +22,24 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Local Registrar/Notified'
+  title: 'ActionMenu/Field Agent/Registered'
 } as Meta<typeof ActionMenu>
 
-const notifiedScenariosForLocalRegistrar: Scenario[] = [
+const registeredScenariosForLocalRegistrar: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.NOTIFY,
+      ActionType.DECLARE,
+      ActionType.VALIDATE,
+      ActionType.REGISTER,
       ActionType.UNASSIGN
     ],
     expected: {
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.DISABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
@@ -46,15 +47,14 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.NOTIFY,
-      ActionType.UNASSIGN,
-      AssignmentStatus.ASSIGNED_TO_SELF
+      ActionType.DECLARE,
+      ActionType.VALIDATE,
+      ActionType.REGISTER
     ],
     expected: {
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.ENABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
@@ -62,22 +62,22 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.NOTIFY,
+      ActionType.DECLARE,
+      ActionType.VALIDATE,
+      ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...hiddenActions,
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.DISABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  notifiedScenariosForLocalRegistrar,
-  'LocalRegistrar'
+  registeredScenariosForLocalRegistrar,
+  'FieldAgent'
 )
 
 export const Unassigned = stories['Unassigned']

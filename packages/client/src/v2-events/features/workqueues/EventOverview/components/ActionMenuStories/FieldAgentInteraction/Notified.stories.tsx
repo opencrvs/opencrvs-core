@@ -22,7 +22,7 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Local Registrar/Notified'
+  title: 'ActionMenu/Field Agent/Notified'
 } as Meta<typeof ActionMenu>
 
 const notifiedScenariosForLocalRegistrar: Scenario[] = [
@@ -37,8 +37,7 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.DISABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
@@ -53,8 +52,7 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.ENABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
@@ -69,15 +67,14 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.DISABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
   notifiedScenariosForLocalRegistrar,
-  'LocalRegistrar'
+  'FieldAgent'
 )
 
 export const Unassigned = stories['Unassigned']

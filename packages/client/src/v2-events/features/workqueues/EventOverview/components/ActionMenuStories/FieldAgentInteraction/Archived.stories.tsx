@@ -22,26 +22,29 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Local Registrar/Created'
+  title: 'ActionMenu/Field Agent/Archived'
 } as Meta<typeof ActionMenu>
 
-const craetedScenariosForLocalRegistrar: Scenario[] = [
+const archivedScenariosForLocalRegistrar: Scenario[] = [
   {
-    name: 'AssignedToSelf',
-    actions: [ActionType.CREATE, AssignmentStatus.ASSIGNED_TO_SELF],
+    name: 'Unassigned',
+    actions: [
+      ActionType.CREATE,
+      AssignmentStatus.ASSIGNED_TO_SELF,
+      ActionType.DECLARE,
+      ActionType.ARCHIVE,
+      ActionType.UNASSIGN
+    ],
     expected: {
       ...hiddenActions,
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED,
-      [ActionType.DELETE]: AssertType.ENABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  craetedScenariosForLocalRegistrar,
-  'LocalRegistrar'
+  archivedScenariosForLocalRegistrar,
+  'FieldAgent'
 )
 
-export const AssignedToSelf = stories['AssignedToSelf']
+export const Unassigned = stories['Unassigned']

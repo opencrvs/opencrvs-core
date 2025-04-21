@@ -22,23 +22,22 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Local Registrar/Notified'
+  title: 'ActionMenu/Field Agent/Declared'
 } as Meta<typeof ActionMenu>
 
-const notifiedScenariosForLocalRegistrar: Scenario[] = [
+const declaredScenariosForLocalRegistrar: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.NOTIFY,
+      ActionType.DECLARE,
       ActionType.UNASSIGN
     ],
     expected: {
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.DISABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
@@ -46,15 +45,14 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.NOTIFY,
+      ActionType.DECLARE,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_SELF
     ],
     expected: {
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.ENABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
@@ -62,22 +60,20 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.NOTIFY,
+      ActionType.DECLARE,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...hiddenActions,
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.DISABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  notifiedScenariosForLocalRegistrar,
-  'LocalRegistrar'
+  declaredScenariosForLocalRegistrar,
+  'FieldAgent'
 )
 
 export const Unassigned = stories['Unassigned']

@@ -22,7 +22,7 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Local Registrar/Created'
+  title: 'ActionMenu/Field Agent/Created'
 } as Meta<typeof ActionMenu>
 
 const craetedScenariosForLocalRegistrar: Scenario[] = [
@@ -41,7 +41,7 @@ const craetedScenariosForLocalRegistrar: Scenario[] = [
 
 const stories = createStoriesFromScenarios(
   craetedScenariosForLocalRegistrar,
-  'LocalRegistrar'
+  'FieldAgent'
 )
 
 export const AssignedToSelf = stories['AssignedToSelf']

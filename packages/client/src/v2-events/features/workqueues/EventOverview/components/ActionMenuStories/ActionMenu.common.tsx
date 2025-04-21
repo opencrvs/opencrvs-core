@@ -21,8 +21,11 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useActionMenuItems'
+
+const generator = testDataGenerator()
 
 // Base action props for mocking
 export const actionProps = {
@@ -46,7 +49,7 @@ export const mockActions: Record<
   [AssignmentStatus.ASSIGNED_TO_OTHERS]: {
     ...actionProps,
     type: ActionType.ASSIGN,
-    assignedTo: '67f6607c3866c994bcc0335a'
+    assignedTo: 'some-other-user-id'
   },
   [AssignmentStatus.ASSIGNED_TO_SELF]: {
     ...actionProps,
@@ -107,8 +110,16 @@ export const mockActions: Record<
 
 // Function to create a mock event with specified actions
 export function getMockEvent(
-  actions: (keyof typeof mockActions)[]
+  actions: (keyof typeof mockActions)[],
+  role: 'LocalRegistrar' | 'FieldAgent' | 'RegistrationAgent'
 ): EventDocument {
+  const userId =
+    // eslint-disable-next-line no-nested-ternary
+    role === 'LocalRegistrar'
+      ? '67ef7f83d6a9cb92e9edaaa9'
+      : role === 'FieldAgent'
+        ? '67ef7f83d6a9cb92e9edaa99'
+        : 'asd'
   return {
     type: 'tennis-club-membership',
     id: 'b4c52c54-f6eb-45ee-be70-142838f8c8d4',
@@ -117,7 +128,17 @@ export function getMockEvent(
     trackingId: '75HT9J',
     actions: actions
       .filter((action) => Object.keys(mockActions).includes(action))
-      .map((action) => mockActions[action])
+      .map((action) => {
+        const mockAction = mockActions[action]
+        if (
+          mockAction.type === ActionType.ASSIGN &&
+          action === AssignmentStatus.ASSIGNED_TO_SELF
+        ) {
+          mockAction.assignedTo = userId
+        }
+
+        return mockAction
+      })
   }
 }
 
@@ -178,11 +199,23 @@ export interface Scenario {
 
 // Function to create stories from scenarios
 export function createStoriesFromScenarios(
-  scenarios: Scenario[]
+  scenarios: Scenario[],
+  role: 'LocalRegistrar' | 'FieldAgent' | 'RegistrationAgent'
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
     (acc, { name, actions, expected }) => {
       acc[name] = {
+        beforeEach: () => {
+          window.localStorage.setItem(
+            'opencrvs',
+            // eslint-disable-next-line no-nested-ternary
+            role === 'LocalRegistrar'
+              ? generator.user.token.localRegistrar
+              : role === 'FieldAgent'
+                ? generator.user.token.fieldAgent
+                : generator.user.token.registrationAgent
+          )
+        },
         name: name,
         parameters: {
           layout: 'centered',
@@ -190,7 +223,7 @@ export function createStoriesFromScenarios(
             handlers: {
               event: [
                 tRPCMsw.event.get.query(() => {
-                  return getMockEvent(actions)
+                  return getMockEvent(actions, role)
                 })
               ]
             }

@@ -78,7 +78,10 @@ const validatedScenariosForLocalRegistrar: Scenario[] = [
   }
 ]
 
-const stories = createStoriesFromScenarios(validatedScenariosForLocalRegistrar)
+const stories = createStoriesFromScenarios(
+  validatedScenariosForLocalRegistrar,
+  'LocalRegistrar'
+)
 
 export const Unassigned = stories['Unassigned']
 export const AssignedToSelf = stories['AssignedToSelf']

@@ -42,6 +42,9 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
   }
 ]
 
-const stories = createStoriesFromScenarios(archivedScenariosForLocalRegistrar)
+const stories = createStoriesFromScenarios(
+  archivedScenariosForLocalRegistrar,
+  'LocalRegistrar'
+)
 
 export const Unassigned = stories['Unassigned']
