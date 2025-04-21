@@ -73,13 +73,15 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.UNASSIGN,
-        createdAt: '2023-01-01T02:00:00Z'
+        createdAt: '2023-01-01T02:00:00Z',
+        assignedTo: null
       }
     ],
     expected: {
       ...commonAction,
       type: ActionType.UNASSIGN,
-      createdAt: '2023-01-01T02:00:00Z'
+      createdAt: '2023-01-01T02:00:00Z',
+      assignedTo: null
     }
   },
   {
@@ -98,7 +100,8 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.UNASSIGN,
-        createdAt: '2023-01-01T02:00:00Z'
+        createdAt: '2023-01-01T02:00:00Z',
+        assignedTo: null
       },
       {
         ...commonAction,

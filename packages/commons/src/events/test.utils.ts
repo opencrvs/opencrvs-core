@@ -436,7 +436,7 @@ export function generateActionDocument({
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, assignedTo: null }
     case ActionType.ASSIGN:
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
