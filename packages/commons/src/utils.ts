@@ -9,10 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { MetadataField } from './events'
+import { SelectOption } from './events/FieldConfig'
+
 export function getOrThrow<T>(x: T, message: string) {
   if (x === undefined || x === null) {
     throw new Error(message)
   }
 
   return x
+}
+
+/**
+ * @param fieldId - The field ID condition is applied to.
+ * @param options - The options for the select field.
+ * @returns An object containing the configuration for the searching the metadata fields of an event.
+ * @example eventField('status', [{ label: 'Option 1', value: '1' }])
+ */
+export function eventField(fieldId: MetadataField, options?: SelectOption[]) {
+  return {
+    fieldId,
+    options,
+    config: { type: 'EXACT' as const }
+  }
 }

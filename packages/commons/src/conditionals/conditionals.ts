@@ -14,7 +14,6 @@ import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
-import { MetadataField, SelectOption } from 'src/events'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -493,19 +492,5 @@ export function field(fieldId: string) {
       fieldId,
       config: { type: 'FUZZY' as const }
     })
-  }
-}
-
-/**
- * @param fieldId - The field ID condition is applied to.
- * @param options - The options for the select field.
- * @returns An object containing the configuration for the searching the metadata fields of an event.
- * @example eventField('status', [{ label: 'Option 1', value: '1' }])
- */
-export function eventField(fieldId: MetadataField, options?: SelectOption[]) {
-  return {
-    fieldId,
-    options,
-    config: { type: 'EXACT' as const }
   }
 }
