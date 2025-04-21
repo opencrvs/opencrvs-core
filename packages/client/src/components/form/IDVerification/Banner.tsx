@@ -80,7 +80,7 @@ export const IDVerificationBanner = ({
   const userId = useSelector(getUserDetails)?.id
   useEffect(() => {
     if (
-      type === 'authenticated' &&
+      (type === 'authenticated' || type === 'failedFetchIdDetails') &&
       !!form[idFieldName] &&
       !!declaration &&
       section &&
