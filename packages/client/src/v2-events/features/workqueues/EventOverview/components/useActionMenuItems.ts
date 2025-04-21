@@ -99,6 +99,47 @@ interface ActionConfig {
   disabled?: boolean
 }
 
+export const actionLabels = {
+  [ActionType.READ]: {
+    id: 'v2.action.view.record',
+    description: 'Label for view record',
+    defaultMessage: 'View record'
+  },
+  [ActionType.ASSIGN]: {
+    defaultMessage: 'Assign',
+    description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
+    id: 'v2.action.assign.label'
+  },
+  [ActionType.UNASSIGN]: {
+    defaultMessage: 'Unassign',
+    description: `Label for the ${ActionType.UNASSIGN} action in the action menu`,
+    id: 'v2.action.unassign.label'
+  },
+  [ActionType.DECLARE]: {
+    defaultMessage: 'Declare',
+    description:
+      'This is shown as the action name anywhere the user can trigger the action from',
+    id: 'v2.event.birth.action.declare.label'
+  },
+  [ActionType.VALIDATE]: {
+    defaultMessage: 'Validate',
+    description:
+      'This is shown as the action name anywhere the user can trigger the action from',
+    id: 'v2.event.birth.action.validate.label'
+  },
+  [ActionType.REGISTER]: {
+    defaultMessage: 'Register',
+    description: 'Label for review record button in dropdown menu',
+    id: 'v2.event.birth.action.register.label'
+  },
+  [ActionType.PRINT_CERTIFICATE]: {
+    defaultMessage: 'Print certificate',
+    description:
+      'This is shown as the action name anywhere the user can trigger the action from',
+    id: 'v2.event.birth.action.collect-certificate.label'
+  }
+}
+
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
@@ -123,20 +164,12 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
 
   const config = {
     [ActionType.READ]: {
-      label: {
-        id: 'v2.action.view.record',
-        description: 'Label for view record',
-        defaultMessage: 'View record'
-      },
+      label: actionLabels[ActionType.READ],
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
     },
     [ActionType.ASSIGN]: {
-      label: {
-        defaultMessage: 'Assign',
-        description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
-        id: 'v2.action.assign.label'
-      },
+      label: actionLabels[ActionType.ASSIGN],
       onClick: async (eventId: string) => {
         await events.actions.assignment.assign.mutate({
           eventId,
@@ -146,11 +179,7 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
       }
     },
     [ActionType.UNASSIGN]: {
-      label: {
-        defaultMessage: 'Unassign',
-        description: `Label for the ${ActionType.UNASSIGN} action in the action menu`,
-        id: 'v2.action.unassign.label'
-      },
+      label: actionLabels[ActionType.UNASSIGN],
       onClick: (eventId: string) => {
         events.actions.assignment.unassign.mutate({
           eventId,
@@ -160,44 +189,25 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
       }
     },
     [ActionType.DECLARE]: {
-      label: {
-        defaultMessage: 'Declare',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'v2.event.birth.action.declare.label'
-      },
+      label: actionLabels[ActionType.DECLARE],
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.DECLARE.buildPath({ eventId })),
       disabled: !eventIsAssignedToSelf
     },
     [ActionType.VALIDATE]: {
-      label: {
-        defaultMessage: 'Validate',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'v2.event.birth.action.validate.label'
-      },
+      label: actionLabels[ActionType.VALIDATE],
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId })),
       disabled: !eventIsAssignedToSelf
     },
     [ActionType.REGISTER]: {
-      label: {
-        defaultMessage: 'Register',
-        description: 'Label for review record button in dropdown menu',
-        id: 'v2.event.birth.action.register.label'
-      },
+      label: actionLabels[ActionType.REGISTER],
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId })),
       disabled: !eventIsAssignedToSelf
     },
     [ActionType.PRINT_CERTIFICATE]: {
-      label: {
-        defaultMessage: 'Print certificate',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'v2.event.birth.action.collect-certificate.label'
-      },
+      label: actionLabels[ActionType.PRINT_CERTIFICATE],
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })),
       disabled: !eventIsAssignedToSelf
