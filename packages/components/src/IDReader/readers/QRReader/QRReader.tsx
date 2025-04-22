@@ -60,17 +60,15 @@ export const QRReader = (props: ScannableQRReader) => {
     },
     [onError]
   )
-  useEffect(() => {
-    if (isScannerDialogOpen) {
-      setError('')
-    }
-  }, [isScannerDialogOpen])
   return (
     <>
       <Button
         size="large"
         type="secondary"
-        onClick={() => setScannerDialogOpen(true)}
+        onClick={() => {
+          setScannerDialogOpen(true)
+          setError('')
+        }}
       >
         <Icon name="QrCode" size="medium" />
         {labels.button}
