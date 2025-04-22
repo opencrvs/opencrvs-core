@@ -23,6 +23,7 @@ import {
   useNavigationType
 } from 'react-router-dom'
 import { Action } from '@remix-run/router'
+
 const NavigationContext = createContext<Location[]>([])
 
 export const NavigationHistoryProvider = ({ children }: PropsWithChildren) => {
@@ -49,7 +50,7 @@ function useNavigationHistory() {
  * - User can not back-navigate inside the stack from outside the stack
  *   - This is useful for view where user for instance registers an event or does anything else where back-navigating
  *     would shown them an outdated view or cause them to attempt to re-submit an action
- * - User can back-navigate outside from the stack to the view they were in before entering the stack
+ * - User can back-navigate from inside the stack to the view they were in before entering the stack
  * - User can not forward-navigate back to the stack after leaving it
  * - User can back and forward-navigate inside the stack
  * - User can directly navigate to the stack if they know the URL
@@ -57,23 +58,42 @@ function useNavigationHistory() {
  */
 export function NavigationStack(props: PropsWithChildren) {
   const navigate = useNavigate()
+  const location = useLocation()
   const navigateType = useNavigationType()
   const history = useNavigationHistory()
   const [allowedToNavigate, setAllowedToNavigate] = useState(false)
+  const [backing, setBacking] = useState(false)
 
   useEffect(() => {
     const userAccessingViewDirectly = history.length === 0
     const userNavigatingBack =
       !userAccessingViewDirectly && navigateType === Action.Pop
 
+    // CIHAN pystytäänkö tässä iffissä backaamaan ittemme pois navigation stackista?
     if (userNavigatingBack) {
-      navigate(history[history.length - 1], { replace: true })
+      setBacking(true)
     }
+
     setAllowedToNavigate(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (!allowedToNavigate) {
+  useEffect(() => {
+    if (backing) {
+      console.log('backing', location.pathname)
+      window.history.back()
+    }
+
+    return () => {
+      if (backing) {
+        // console.log('unmounting')
+        // window.history.back()
+      }
+      // window.history.back()
+    }
+  }, [location, backing])
+
+  if (!allowedToNavigate || backing) {
     return null
   }
 
