@@ -66,7 +66,6 @@ const notifiedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...hiddenActions,
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED
     }
   }
