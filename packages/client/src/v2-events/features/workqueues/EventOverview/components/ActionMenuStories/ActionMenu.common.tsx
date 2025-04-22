@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -225,7 +225,13 @@ export function createStoriesFromScenarios(
         },
         play: async ({ canvasElement }) => {
           const canvas = within(canvasElement)
-          await userEvent.click(await canvas.findByText('Action'))
+          await waitFor(async () => {
+            const actionButton = await canvas.findByRole('button', {
+              name: 'Action'
+            })
+            await expect(actionButton).toBeVisible()
+            await userEvent.click(actionButton)
+          })
           const actionVisibility = { ...hiddenActions }
           const actionItems = canvasElement.querySelectorAll('li')
           actionItems.forEach(
