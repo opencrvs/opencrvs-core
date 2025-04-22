@@ -9,8 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MetadataField } from './events'
-import { SelectOption } from './events/FieldConfig'
+import { flattenDeep } from 'lodash'
+import {
+  EventConfig,
+  FieldConfig,
+  getAllAnnotationFields,
+  getDeclarationFields
+} from './events'
 
 export function getOrThrow<T>(x: T, message: string) {
   if (x === undefined || x === null) {
@@ -21,15 +26,18 @@ export function getOrThrow<T>(x: T, message: string) {
 }
 
 /**
- * @param fieldId - The field ID condition is applied to.
- * @param options - The options for the select field.
- * @returns An object containing the configuration for the searching the metadata fields of an event.
- * @example eventField('status', [{ label: 'Option 1', value: '1' }])
+ * @returns All the fields in the event configuration.
  */
-export function eventField(fieldId: MetadataField, options?: SelectOption[]) {
-  return {
-    fieldId,
-    options,
-    config: { type: 'EXACT' as const }
-  }
+export const findAllFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep([
+    ...getDeclarationFields(config),
+    ...getAllAnnotationFields(config)
+  ])
 }
+
+export const metadataFields = ['trackingId', 'status'] as const
+/**
+ * Pre-defined metadata fields that can be used in advanced search
+ * and are not part of the event configuration
+ */
+export type MetadataField = (typeof metadataFields)[number]
