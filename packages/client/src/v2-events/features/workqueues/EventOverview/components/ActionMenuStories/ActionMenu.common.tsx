@@ -27,8 +27,7 @@ import { actionLabels } from '../useActionMenuItems'
 
 const generator = testDataGenerator()
 
-// Base action props for mocking
-export const actionProps = {
+const actionProps = {
   createdAt: '2025-04-18T08:34:20.711Z',
   createdBy: '67f6607c3866c994bcc0335a',
   createdAtLocation: '03c4aab4-cd46-4fb1-b30d-2e3b7ba0bfe8',
@@ -37,7 +36,6 @@ export const actionProps = {
   status: ActionStatus.Accepted
 }
 
-// Mock actions for all action types
 export const mockActions: Record<
   ActionType | 'ASSIGNED_TO_SELF' | 'ASSIGNED_TO_OTHERS',
   Action
@@ -108,8 +106,7 @@ export const mockActions: Record<
   }
 }
 
-// Function to create a mock event with specified actions
-export function getMockEvent(
+function getMockEvent(
   actions: (keyof typeof mockActions)[],
   role: 'LocalRegistrar' | 'FieldAgent' | 'RegistrationAgent'
 ): EventDocument {
@@ -142,7 +139,6 @@ export function getMockEvent(
   }
 }
 
-// Base meta for storybook components
 export const baseMeta: Meta<typeof ActionMenu> = {
   title: 'ActionMenu',
   decorators: [
@@ -154,8 +150,7 @@ export const baseMeta: Meta<typeof ActionMenu> = {
   ]
 }
 
-// tRPC mock setup
-export const tRPCMsw = createTRPCMsw<AppRouter>({
+const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
       url: '/api/events'
@@ -170,7 +165,6 @@ export enum AssertType {
   DISABLED = 'DISABLED'
 }
 
-// Create a base with all actions hidden by default
 export const hiddenActions = Object.values(ActionType).reduce(
   (acc, action) => {
     acc[action] = AssertType.HIDDEN
@@ -179,8 +173,7 @@ export const hiddenActions = Object.values(ActionType).reduce(
   {} as Record<ActionType, AssertType>
 )
 
-// Helper to get action type from label
-export function getActionByLabel(label: string): ActionType {
+function getActionByLabel(label: string): ActionType {
   const actionEntry = Object.entries(actionLabels).filter(
     ([key, value]) => value.defaultMessage === label
   )
@@ -190,14 +183,12 @@ export function getActionByLabel(label: string): ActionType {
   return actionEntry[0][0] as ActionType
 }
 
-// Type definition for a scenario
 export interface Scenario {
   name: string
   actions: (keyof typeof mockActions)[]
   expected: Record<ActionType, AssertType>
 }
 
-// Function to create stories from scenarios
 export function createStoriesFromScenarios(
   scenarios: Scenario[],
   role: 'LocalRegistrar' | 'FieldAgent' | 'RegistrationAgent'
