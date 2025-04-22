@@ -170,6 +170,7 @@ export async function createIndex(
           modifiedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
+          updatedAtLocation: { type: 'keyword' },
           declaration: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)

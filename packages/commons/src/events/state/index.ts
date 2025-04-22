@@ -181,6 +181,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     modifiedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
+    updatedAtLocation: event.updatedAtLocation,
     declaration: aggregateActionDeclarations(activeActions),
     trackingId: event.trackingId,
     registrationNumber
