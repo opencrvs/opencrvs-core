@@ -222,7 +222,11 @@ export function createStoriesFromScenarios(
           }
         },
         render: function Component() {
-          return <ActionMenu eventId="some-event" />
+          return (
+            <React.Suspense fallback={<span>{'Loading...'}</span>}>
+              <ActionMenu eventId="some-event" />
+            </React.Suspense>
+          )
         },
         play: async ({ canvasElement }) => {
           const canvas = within(canvasElement)
