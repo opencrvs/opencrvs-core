@@ -30,29 +30,30 @@ function getFieldFromDataEntry({
   formData: EventState
   entry: { value: TranslationConfig | string; label: TranslationConfig }
 }) {
-  const { value, label } = entry
-  if (typeof value === 'object' && 'id' in value) {
-    return {
-      value: intl.formatMessage(value),
-      config: {
-        type: FieldType.TEXT,
-        id: label.id,
-        label
+  const { label, value: rawValue } = entry
+
+  // Resolve value if it's a message descriptor
+  const formattedValue =
+    typeof rawValue === 'object' &&
+    'id' in rawValue &&
+    'defaultMessage' in rawValue
+      ? intl.formatMessage(rawValue)
+      : rawValue
+
+  let resolvedValue = formattedValue
+
+  // Match placeholders like {someKey}
+  const placeholders = formattedValue.match(/{([^}]+)}/g)
+  if (placeholders) {
+    placeholders.forEach((placeholder) => {
+      const key = placeholder.replace(/{|}/g, '')
+      const replacement = formData[key]
+
+      if (replacement == null) {
+        throw new Error(`Could not resolve placeholder: ${placeholder}`)
       }
-    }
-  }
-  let resolvedValue = value
 
-  const keys = value.match(/{([^}]+)}/g)
-  if (keys) {
-    keys.forEach((key) => {
-      const val = formData[key.replace(/{|}/g, '')]
-
-      if (!val) {
-        throw new Error(`Could not resolve ${key}`)
-      }
-
-      resolvedValue = resolvedValue.replace(key, val.toString())
+      resolvedValue = resolvedValue.replace(placeholder, replacement.toString())
     })
   }
 
@@ -61,7 +62,7 @@ function getFieldFromDataEntry({
     config: {
       type: FieldType.TEXT,
       id: label.id,
-      label: label
+      label
     }
   }
 }
