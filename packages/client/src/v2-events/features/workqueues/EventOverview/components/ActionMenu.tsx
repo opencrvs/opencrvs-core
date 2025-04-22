@@ -13,13 +13,12 @@ import React, { useMemo } from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 
-import { getCurrentEventStateWithDrafts } from '@opencrvs/commons/client'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { getScope } from '@client/profile/profileSelectors'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useActionMenuItems } from './useActionMenuItems'
@@ -35,14 +34,9 @@ export function ActionMenu({ eventId }: { eventId: string }) {
     throw new Error('Authentication is not available but is required')
   }
 
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
-  const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, drafts),
-    [drafts, event]
-  )
+  const eventState = useMemo(() => getCurrentEventState(event), [event])
 
-  const actionMenuItems = useActionMenuItems(eventStateWithDrafts, scopes ?? [])
+  const actionMenuItems = useActionMenuItems(eventState, scopes ?? [])
 
   return (
     <>
