@@ -57,20 +57,24 @@ function useNavigationHistory() {
  * - User can refresh the page while on the stack
  */
 export function NavigationStack(props: PropsWithChildren) {
-  const navigate = useNavigate()
   const location = useLocation()
   const navigateType = useNavigationType()
   const history = useNavigationHistory()
   const [allowedToNavigate, setAllowedToNavigate] = useState(false)
+  // Tracks if we're in the process of backing out of the navigation stack
   const [backing, setBacking] = useState(false)
 
   useEffect(() => {
+    // User is accessing the view directly if there's no navigation history
     const userAccessingViewDirectly = history.length === 0
-    const userNavigatingBack =
+    // User is trying to navigate back to a view in the stack using browser back button
+    const navigatingBackToStack =
       !userAccessingViewDirectly && navigateType === Action.Pop
 
-    // CIHAN pystytäänkö tässä iffissä backaamaan ittemme pois navigation stackista?
-    if (userNavigatingBack) {
+    // When user tries to navigate back to the stack with browser back button,
+    // we initiate a sequence of back navigations to exit the stack completely.
+    // This preserves the browser's history state for proper forward/back navigation.
+    if (navigatingBackToStack) {
       setBacking(true)
     }
 
@@ -78,21 +82,25 @@ export function NavigationStack(props: PropsWithChildren) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Continue backing out of the stack.
+  // This effect retriggers on each location change, until we unmount.
   useEffect(() => {
     if (backing) {
-      console.log('backing', location.pathname)
       window.history.back()
-    }
-
-    return () => {
-      if (backing) {
-        // console.log('unmounting')
-        // window.history.back()
-      }
-      // window.history.back()
     }
   }, [location, backing])
 
+  // When unmounting while in backing mode, perform one final back navigation
+  // This ensures we land at the correct previous page that the user intended to reach
+  useEffect(() => {
+    return () => {
+      if (backing) {
+        window.history.back()
+      }
+    }
+  }, [backing])
+
+  // Don't render children while backing out or before navigation is allowed
   if (!allowedToNavigate || backing) {
     return null
   }
