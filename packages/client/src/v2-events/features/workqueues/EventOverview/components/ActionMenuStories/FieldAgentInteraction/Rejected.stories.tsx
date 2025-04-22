@@ -22,7 +22,7 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Field Agent/Rejected'
+  title: 'ActionMenu/FieldAgent/Rejected'
 } as Meta<typeof ActionMenu>
 
 const rejectedScenariosForFieldAgent: Scenario[] = [

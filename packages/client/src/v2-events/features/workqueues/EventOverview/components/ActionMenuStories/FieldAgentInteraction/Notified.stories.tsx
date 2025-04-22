@@ -22,7 +22,7 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Field Agent/Notified'
+  title: 'ActionMenu/FieldAgent/Notified'
 } as Meta<typeof ActionMenu>
 
 const notifiedScenariosForFieldAgent: Scenario[] = [

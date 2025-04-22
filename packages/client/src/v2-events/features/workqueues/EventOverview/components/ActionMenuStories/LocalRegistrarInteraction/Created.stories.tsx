@@ -22,7 +22,7 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Local Registrar/Created'
+  title: 'ActionMenu/LocalRegistrar/Created'
 } as Meta<typeof ActionMenu>
 
 const craetedScenariosForLocalRegistrar: Scenario[] = [

@@ -22,7 +22,7 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Local Registrar/Rejected'
+  title: 'ActionMenu/LocalRegistrar/Rejected'
 } as Meta<typeof ActionMenu>
 
 const rejectedScenariosForLocalRegistrar: Scenario[] = [

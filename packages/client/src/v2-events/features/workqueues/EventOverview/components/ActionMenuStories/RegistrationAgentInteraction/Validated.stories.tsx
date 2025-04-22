@@ -22,7 +22,7 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/Registration Agent/Validated'
+  title: 'ActionMenu/RegistrationAgent/Validated'
 } as Meta<typeof ActionMenu>
 
 const validatedScenariosForRegistrationAgent: Scenario[] = [
