@@ -67,6 +67,14 @@ export async function notifyOnAction(
   event: EventDocument,
   token: string
 ) {
+  console.log('INSIDE notifyOnAction')
+  console.log(
+    'Sending POST request to',
+    new URL(
+      `/events/${event.type}/actions/${action.type}`,
+      env.COUNTRY_CONFIG_URL
+    )
+  )
   try {
     await fetch(
       new URL(

@@ -93,6 +93,47 @@ export const eventRouter = router({
         return getEventConfigurations(options.ctx.token)
       })
   }),
+  /* Define a new sub router called export */
+  export: router({
+    /* Define a procedure called config to fetch workqueue "export" configurations */
+    config: publicProcedure
+      .use(
+        requiresAnyOfScopes([
+          ...RECORD_READ_SCOPES,
+          SCOPES.CONFIG,
+          SCOPES.CONFIG_UPDATE_ALL
+        ])
+      )
+      .output(z.string().array())
+      .query(() => {
+        /* Fetch configurations from country config GET /workqueues endpoint */
+        return [
+          'date-of-birth',
+          'date-of-death',
+          'place-of-birth',
+          'place-of-death'
+        ]
+      }),
+    /* Define a procedure called create to initiate export processes */
+    create: publicProcedure
+      .use(
+        requiresAnyOfScopes([
+          ...RECORD_READ_SCOPES,
+          SCOPES.CONFIG,
+          SCOPES.CONFIG_UPDATE_ALL
+        ])
+      )
+      .input(
+        z.object({ eventIds: z.string().array(), configs: z.string().array() })
+      )
+      .mutation(async (options) => {
+        const createExport = async (eventIds: string[], configs: string[]) => {
+          console.log(`Creating export with ${eventIds} and ${configs}`)
+        }
+
+        return createExport(options.input.eventIds, options.input.configs)
+      })
+  }),
   create: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
     .input(EventInput)

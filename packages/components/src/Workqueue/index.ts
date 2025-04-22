@@ -10,3 +10,5 @@
  */
 export * from './Workqueue'
 export * from './types'
+export * from './components/WorkqueueRowDesktop'
+export * from './components/ListItemAction'

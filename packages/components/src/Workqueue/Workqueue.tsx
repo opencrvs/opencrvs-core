@@ -22,6 +22,7 @@ import { useWindowSize } from '../hooks'
 
 const Wrapper = styled.div`
   width: 100%;
+  border: 1px solid red;
 `
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.grey600};

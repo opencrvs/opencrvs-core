@@ -33,7 +33,7 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
-import { Link as TextButton } from '@opencrvs/components'
+import { Icon, Link as TextButton, ToggleMenu } from '@opencrvs/components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -49,6 +49,8 @@ import { flattenEventIndex } from '@client/v2-events/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { WQContentWrapper } from './components/ContentWrapper'
+import { useExport } from '../events/useExport'
+import { SearchResults } from '../events/AdvancedSearch/SearchResults'
 
 const messages = defineMessages({
   empty: {
@@ -104,9 +106,11 @@ export function WorkqueueContainer() {
   // We'll follow up during 'workqueue' feature.
   const workqueueId = 'all'
   const { getEvents } = useEvents()
+  const { getExports } = useExport()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const [events] = getEvents.useSuspenseQuery()
+  const [exports] = getExports.useSuspenseQuery()
 
   const eventConfigs = useEventConfigurations()
 
@@ -114,6 +118,8 @@ export function WorkqueueContainer() {
     workqueueId in workqueues
       ? workqueues[workqueueId as keyof typeof workqueues]
       : null
+
+  console.log('workqueueConfig', workqueueConfig)
 
   if (!workqueueConfig) {
     return null
@@ -163,6 +169,7 @@ function Workqueue({
   const drafts = getRemoteDrafts()
   const navigate = useNavigate()
   const { width } = useWindowSize()
+  const { createExport } = useExport()
 
   const validEvents = events.filter((event) =>
     eventConfigs.some((e) => e.id === event.type)
@@ -314,6 +321,14 @@ function Workqueue({
   const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
 
   const isShowPagination = totalPages >= 1
+
+  const handleExport = () => {
+    const mutate = createExport.useMutation
+    mutate.mutate({
+      eventIds: ['abc', 'def'],
+      configs: ['date-of-birth', 'name']
+    })
+  }
   return (
     <WQContentWrapper
       error={false}
@@ -322,8 +337,30 @@ function Workqueue({
       loading={false} // @TODO: Handle these on top level
       noContent={workqueue.length === 0}
       noResultText={'No results'}
+      topActionButtons={[
+        <ToggleMenu
+          key=""
+          id="event-menu"
+          menuItems={[
+            {
+              label: 'Export',
+              icon: <Icon name="Export" />,
+              handler: () => {
+                handleExport()
+              }
+            }
+          ]}
+          toggleButton={
+            <Icon
+              color="primary"
+              data-testid="event-menu-toggle-button-image"
+              name="DotsThreeVertical"
+              size="large"
+            />
+          }
+        />
+      ]}
       paginationId={Math.round(offset / limit)}
-      // eslint-disable-next-line
       title={intl.formatMessage(workqueueConfig.title)}
       totalPages={totalPages}
     >
@@ -339,6 +376,9 @@ function Workqueue({
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
       />
+
+      <br />
+      <SearchResults columns={getColumns()} />
       <FabContainer>
         <Link to={ROUTES.V2.EVENTS.CREATE.path}>
           <FloatingActionButton
