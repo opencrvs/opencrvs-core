@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from '../../../Button'
 import { Icon } from '../../../Icon'
 import styled from 'styled-components'
@@ -60,6 +60,11 @@ export const QRReader = (props: ScannableQRReader) => {
     },
     [onError]
   )
+  useEffect(() => {
+    if (isScannerDialogOpen) {
+      setError('')
+    }
+  }, [isScannerDialogOpen])
   return (
     <>
       <Button
