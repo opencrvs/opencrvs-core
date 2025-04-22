@@ -211,7 +211,7 @@ export const DraftShownInForm: Story = {
     // Giving some time for local state to update
     await new Promise((resolve) => setTimeout(resolve, 1 * 1000))
 
-    await userEvent.click(await canvas.findByText(/Send an application/))
+    await userEvent.click(await canvas.findByText(/Declare/))
 
     await expect(
       await canvas.findByTestId('text__applicant____surname')
