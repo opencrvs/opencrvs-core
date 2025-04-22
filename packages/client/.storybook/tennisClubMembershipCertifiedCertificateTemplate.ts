@@ -35,7 +35,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M309.793 475.396L505.999 476.321" stroke="#CCCCCC" stroke-width="0.782258" stroke-dasharray="3.13 1.56" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
       <tspan x="366.248" y="489.656">
-        {{ $findUserById (lookup $state "updatedBy") "name"}}
+       Registrar {{ $findUserById (lookup $state "updatedBy") "name"}}
       </tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
@@ -155,7 +155,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </g>
     <path d="M53 514H537V513H53V514Z" fill="#ECECEC" />
   </g>
-  <image id="image0_5_2"  x="362.248" y="400.656" width="100" height="100" xlink:href="{{ $findUserById (lookup $state 'updatedBy') 'signatureFileName'}}" />
+  <image id="image0_5_2"  x="362.248" y="400.656" width="100" height="100" xlink:href="{{ $findUserById (lookup $state 'updatedBy') 'signatureFilename'}}" />
   <defs>
     <pattern id="pattern0_5_2" patternContentUnits="objectBoundingBox" width="1" height="1">
       <use xlink:href="#image0_5_2" />

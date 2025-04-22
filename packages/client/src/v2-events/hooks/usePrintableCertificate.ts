@@ -105,13 +105,13 @@ export const usePrintableCertificate = ({
 
     const base64ReplacedUsersWithSignature = await Promise.all(
       users.map(async (user) => {
-        if (user.signatureFileName && isMinioUrl(user.signatureFileName)) {
+        if (user.signatureFilename && isMinioUrl(user.signatureFilename)) {
           const base64Signature = await fetchImageAsBase64(
-            user.signatureFileName
+            user.signatureFilename
           )
           return {
             ...user,
-            signatureFileName: base64Signature
+            signatureFilename: base64Signature
           }
         }
         return user

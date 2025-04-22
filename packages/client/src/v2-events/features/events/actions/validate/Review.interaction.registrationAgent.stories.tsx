@@ -77,7 +77,7 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFileName: 'signature.png'
+  signatureFilename: 'signature.png'
 }
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
