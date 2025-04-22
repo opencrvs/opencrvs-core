@@ -14,12 +14,13 @@ import { workqueues } from '../workqueues'
 import {
   ActionType,
   DeclarationActionType,
-  DeclarationActions
+  DeclarationActions,
+  writeActions
 } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { ActionUpdate, EventState } from './ActionDocument'
+import { Action, ActionUpdate, EventState } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isFieldVisible, validate } from '../conditionals/validate'
 import { Draft } from './Draft'
@@ -237,9 +238,23 @@ export function deepMerge<T extends Record<string, unknown>>(
   )
 }
 
+export function findLastAssignmentAction(actions: Action[]) {
+  return actions
+    .filter(
+      ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
+    )
+    .reduce<
+      Action | undefined
+    >((latestAction, action) => (!latestAction || action.createdAt > latestAction.createdAt ? action : latestAction), undefined)
+}
+
 /** Tell compiler that accessing record with arbitrary key might result to undefined
  * Use when you **cannot guarantee**  that key exists in the record
  */
 export type IndexMap<T> = {
   [id: string]: T | undefined
+}
+
+export function isWriteAction(actionType: ActionType): boolean {
+  return writeActions.safeParse(actionType).success
 }

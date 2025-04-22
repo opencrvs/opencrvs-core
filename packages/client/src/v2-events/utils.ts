@@ -220,3 +220,24 @@ export function useResolveLocationFullName(
     joinValues([name, location.name], ', ')
   )
 }
+
+export const AssignmentStatus = {
+  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
+  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
+  UNASSIGNED: 'UNASSIGNED'
+} as const
+
+type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
+
+export function getAssignmentStatus(
+  eventState: EventIndex,
+  userId: string | undefined
+): AssignmentStatus {
+  if (!eventState.assignedTo) {
+    return AssignmentStatus.UNASSIGNED
+  }
+
+  return eventState.assignedTo == userId
+    ? AssignmentStatus.ASSIGNED_TO_SELF
+    : AssignmentStatus.ASSIGNED_TO_OTHERS
+}
