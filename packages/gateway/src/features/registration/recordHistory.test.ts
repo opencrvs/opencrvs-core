@@ -59,7 +59,7 @@ describe('getUserRoleFromHistory', () => {
     )
   })
 
-  it('should find the first user role from history if there is no role entry present in the given point in time', () => {
+  it('should find the first user role from history if there is no role entry present at the given point in time', () => {
     expect(getUserRoleFromHistory(history, '2019-01-15')).toEqual(
       'REGISTRATION_AGENT'
     )
