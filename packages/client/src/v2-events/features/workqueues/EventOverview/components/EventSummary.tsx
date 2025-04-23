@@ -123,10 +123,8 @@ export function EventSummary({
 
       return {
         id: field.fieldId,
-        label: intl.formatMessage(config.label),
-        placeholder:
-          field.emptyValueMessage &&
-          intl.formatMessage(field.emptyValueMessage),
+        label: config.label,
+        emptyValueMessage: field.emptyValueMessage,
         value: Output({
           field: config,
           showPreviouslyMissingValuesAsChanged: false,
@@ -137,9 +135,8 @@ export function EventSummary({
 
     return {
       id: field.id,
-      label: intl.formatMessage(field.label),
-      placeholder:
-        field.emptyValueMessage && intl.formatMessage(field.emptyValueMessage),
+      label: field.label,
+      emptyValueMessage: field.emptyValueMessage,
       value: intl.formatMessage(field.value, event)
     }
   })
@@ -154,8 +151,11 @@ export function EventSummary({
               <Summary.Row
                 key={field.id}
                 data-testid={field.id}
-                label={field.label}
-                placeholder={field.placeholder}
+                label={intl.formatMessage(field.label)}
+                placeholder={
+                  field.emptyValueMessage &&
+                  intl.formatMessage(field.emptyValueMessage)
+                }
                 value={field.value}
               />
             )
