@@ -108,51 +108,56 @@ export function EventSummary({
   const summaryPageFields = [...defaultFields, ...summary.fields]
   const declarationFields = getDeclarationFields(eventConfiguration)
 
+  const fields = summaryPageFields.map((field) => {
+    if ('fieldId' in field) {
+      const config = declarationFields.find((f) => f.id === field.fieldId)
+      const value = event[field.fieldId] ?? undefined
+
+      if (!config) {
+        return null
+      }
+
+      return {
+        id: field.fieldId,
+        label: intl.formatMessage(config.label),
+        placeholder:
+          field.emptyValueMessage &&
+          intl.formatMessage(field.emptyValueMessage),
+        value: (
+          <Output
+            field={config}
+            showPreviouslyMissingValuesAsChanged={false}
+            value={value}
+          />
+        )
+      }
+    }
+
+    return {
+      id: field.id,
+      label: intl.formatMessage(field.label),
+      placeholder:
+        field.emptyValueMessage && intl.formatMessage(field.emptyValueMessage),
+      value: intl.formatMessage(field.value, event)
+    }
+  })
+
   return (
     <>
       <Summary id="summary">
-        {summaryPageFields.map((field) => {
-          if ('fieldId' in field) {
-            const config = declarationFields.find((f) => f.id === field.fieldId)
-            const value = event[field.fieldId] ?? undefined
-
-            if (!config) {
-              return null
-            }
-
+        {fields
+          .filter((f): f is NonNullable<typeof f> => f !== null)
+          .map((field) => {
             return (
               <Summary.Row
-                key={field.fieldId}
-                data-testid={field.fieldId}
-                label={intl.formatMessage(config.label)}
-                placeholder={
-                  field.emptyValueMessage &&
-                  intl.formatMessage(field.emptyValueMessage)
-                }
-                value={
-                  <Output
-                    field={config}
-                    showPreviouslyMissingValuesAsChanged={false}
-                    value={value}
-                  />
-                }
+                key={field.id}
+                data-testid={field.id}
+                label={field.label}
+                placeholder={field.placeholder}
+                value={field.value}
               />
             )
-          }
-
-          return (
-            <Summary.Row
-              key={field.id}
-              data-testid={field.id}
-              label={intl.formatMessage(field.label)}
-              placeholder={
-                field.emptyValueMessage &&
-                intl.formatMessage(field.emptyValueMessage)
-              }
-              value={intl.formatMessage(field.value, event)}
-            />
-          )
-        })}
+          })}
       </Summary>
     </>
   )
