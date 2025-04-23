@@ -88,8 +88,6 @@ function EventOverviewContainer() {
   const { getUsers } = useUsers()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
-
   const activeActions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(activeActions)
   const [users] = getUsers.useSuspenseQuery(userIds)
