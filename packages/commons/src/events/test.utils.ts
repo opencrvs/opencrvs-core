@@ -436,7 +436,7 @@ export function generateActionDocument({
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, assignedTo: null }
     case ActionType.ASSIGN:
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
@@ -489,7 +489,8 @@ export function generateEventDocument({
     id: getUUID(),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
-    updatedAt: new Date(Date.now() - 1000).toISOString()
+    updatedAt: new Date(Date.now() - 1000).toISOString(),
+    updatedAtLocation: 'TODO'
   }
 }
 
@@ -526,6 +527,7 @@ export const eventQueryDataGenerator = (
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   createdBy: overrides.createdBy ?? getUUID(),
   createdAtLocation: overrides.createdAtLocation ?? getUUID(),
+  updatedAtLocation: overrides.updatedAtLocation ?? getUUID(),
   modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
