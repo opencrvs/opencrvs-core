@@ -159,7 +159,7 @@ export function useIntlFormatMessageWithFlattenedParams() {
     }
     // When multiple variables are provided, we trim to ensure empty content in case both are missing.
     // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
-    return formatted.trim().replaceAll(EMPTY_TOKEN, '')
+    return formatted.replaceAll(EMPTY_TOKEN, '').trim()
   }
 
   return {

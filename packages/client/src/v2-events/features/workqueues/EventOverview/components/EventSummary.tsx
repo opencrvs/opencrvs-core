@@ -123,13 +123,11 @@ export function EventSummary({
         placeholder:
           field.emptyValueMessage &&
           intl.formatMessage(field.emptyValueMessage),
-        value: (
-          <Output
-            field={config}
-            showPreviouslyMissingValuesAsChanged={false}
-            value={value}
-          />
-        )
+        value: Output({
+          field: config,
+          showPreviouslyMissingValuesAsChanged: false,
+          value: value
+        })
       }
     }
 
