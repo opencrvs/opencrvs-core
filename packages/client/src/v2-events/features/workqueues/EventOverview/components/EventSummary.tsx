@@ -109,7 +109,7 @@ export function EventSummary({
   const declarationFields = getDeclarationFields(eventConfiguration)
 
   const fields = summaryPageFields.map((field) => {
-    if ('conditional' in field && field.conditional) {
+    if (field.conditional) {
       if (!isConditionMet(field.conditional, event)) {
         return null
       }
