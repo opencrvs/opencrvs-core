@@ -71,10 +71,13 @@ export function NavigationStack(props: PropsWithChildren) {
     const navigatingBackToStack =
       !userAccessingViewDirectly && navigateType === Action.Pop
 
+    // On storybook tests we don't want to navigate the user with window.history.back()
+    const isStorybook = import.meta.env.STORYBOOK === 'true'
+
     // When user tries to navigate back to the stack with browser back button,
     // we initiate a sequence of back navigations to exit the stack completely.
     // This preserves the browser's history state for proper forward/back navigation.
-    if (navigatingBackToStack) {
+    if (navigatingBackToStack && !isStorybook) {
       setBacking(true)
     }
 
