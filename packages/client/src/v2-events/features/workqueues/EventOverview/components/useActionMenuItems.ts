@@ -56,12 +56,7 @@ function getAvailableActionsByStatus(
 ): ActionType[] {
   switch (status) {
     case EventStatus.CREATED: {
-      return [
-        ...assignmentActions,
-        ActionType.READ,
-        ActionType.DECLARE,
-        ActionType.DELETE
-      ]
+      return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
     }
     case EventStatus.NOTIFIED:
     case EventStatus.DECLARED: {
@@ -241,7 +236,6 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
   )
 
   const allowedActions = filterUnallowedActions(availableActions, scopes)
-
   return allowedActions
     .filter((action): action is keyof typeof config =>
       Object.keys(config).includes(action)
