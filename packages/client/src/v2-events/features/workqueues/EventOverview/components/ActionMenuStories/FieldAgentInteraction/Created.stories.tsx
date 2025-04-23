@@ -31,7 +31,6 @@ const craetedScenariosForFieldAgent: Scenario[] = [
     actions: [ActionType.CREATE, AssignmentStatus.ASSIGNED_TO_SELF],
     expected: {
       ...hiddenActions,
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.DECLARE]: AssertType.ENABLED,
       [ActionType.DELETE]: AssertType.ENABLED

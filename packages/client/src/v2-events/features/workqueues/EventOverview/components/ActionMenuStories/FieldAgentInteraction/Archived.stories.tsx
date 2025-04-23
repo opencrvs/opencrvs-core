@@ -37,22 +37,7 @@ const archivedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...hiddenActions,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.ASSIGN]: AssertType.ENABLED
-    }
-  },
-  {
-    name: 'AssignedToSelf',
-    actions: [
-      ActionType.CREATE,
-      AssignmentStatus.ASSIGNED_TO_SELF,
-      ActionType.DECLARE,
-      ActionType.ARCHIVE
-    ],
-    expected: {
-      ...hiddenActions,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.UNASSIGN]: AssertType.ENABLED
+      [ActionType.READ]: AssertType.ENABLED
     }
   },
   {
@@ -78,5 +63,4 @@ const stories = createStoriesFromScenarios(
 )
 
 export const Unassigned = stories['Unassigned']
-export const AssignedToSelf = stories['AssignedToSelf']
 export const AssignedToOthers = stories['AssignedToOthers']
