@@ -14,7 +14,8 @@ import { useSelector } from 'react-redux'
 import {
   EventDocument,
   getCurrentEventState,
-  getAcceptedActions
+  getAcceptedActions,
+  getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -30,6 +31,7 @@ import {
   flattenEventIndex,
   getUserIdsFromActions
 } from '@client/v2-events/utils'
+import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -48,9 +50,12 @@ function EventOverview({ event }: { event: EventDocument }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status, registrationNumber } = eventIndex
+  const { getRemoteDrafts } = useDrafts()
+  const drafts = getRemoteDrafts()
+  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
 
   const flattenedEventIndex = {
-    ...flattenEventIndex(eventIndex),
+    ...flattenEventIndex(eventWithDrafts),
     // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
     'event.status': status,
