@@ -13,12 +13,8 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
   SummaryConfig,
-  FieldValue,
-  getCurrentEventStateWithDrafts,
   EventDocument,
-  Draft,
   getCurrentEventState,
-  getDeclarationFields,
   getAcceptedActions
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -35,9 +31,7 @@ import {
   flattenEventIndex,
   getUserIdsFromActions
 } from '@client/v2-events/utils'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { RecursiveStringRecord } from '@client/v2-events/hooks/useSimpleFieldStringifier'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -53,10 +47,8 @@ import { EventOverviewProvider } from './EventOverviewContext'
  */
 function EventOverview({
   event,
-  drafts,
   summary
 }: {
-  drafts: Draft[]
   event: EventDocument
   summary: SummaryConfig
 }) {
@@ -105,7 +97,6 @@ function EventOverviewContainer() {
   const { getUsers } = useUsers()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const drafts = getRemoteDrafts()
   const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
 
   const activeActions = getAcceptedActions(fullEvent)
@@ -115,11 +106,7 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview
-        drafts={drafts}
-        event={fullEvent}
-        summary={config.summary}
-      />
+      <EventOverview event={fullEvent} summary={config.summary} />
     </EventOverviewProvider>
   )
 }
