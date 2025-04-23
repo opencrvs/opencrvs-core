@@ -79,7 +79,7 @@ export function filterUnallowedActions(
   actions: ActionType[],
   userScopes: Scope[]
 ): ActionType[] {
-  return actions.filter((action) => {
+  const allowedActions = actions.filter((action) => {
     const requiredScopes = ACTION_ALLOWED_SCOPES[action]
 
     if (requiredScopes === null) {
@@ -88,4 +88,22 @@ export function filterUnallowedActions(
 
     return hasAnyOfScopes(userScopes, requiredScopes)
   })
+  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
+  const hasOtherAllowedActions = allowedActions.some(
+    (action) =>
+      !(
+        [
+          ActionType.READ,
+          ActionType.ASSIGN,
+          ActionType.UNASSIGN
+        ] as ActionType[]
+      ).includes(action)
+  )
+
+  if (hasOtherAllowedActions) {
+    return allowedActions
+  }
+
+  // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
+  return [ActionType.READ]
 }
