@@ -12,7 +12,6 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
-  SummaryConfig,
   EventDocument,
   getCurrentEventState,
   getAcceptedActions
