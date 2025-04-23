@@ -10,6 +10,7 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { Conditional } from './Conditional'
 
 const Field = z.union([
   z
@@ -19,13 +20,19 @@ const Field = z.union([
         'Summary field value. Can utilise values defined in configuration and EventMetadata'
       ),
       label: TranslationConfig,
-      emptyValueMessage: TranslationConfig.optional()
+      emptyValueMessage: TranslationConfig.optional(),
+      conditional: Conditional.optional().describe(
+        'Field will be shown if condition is met. If conditional is not defined, the field will always be shown.'
+      )
     })
     .describe('Custom configured field'),
   z
     .object({
       fieldId: z.string(),
-      emptyValueMessage: TranslationConfig.optional()
+      emptyValueMessage: TranslationConfig.optional(),
+      conditional: Conditional.optional().describe(
+        'Field will be shown if condition is met. If conditional is not defined, the field will always be shown.'
+      )
     })
     .describe('Field directly referencing event data with field id')
 ])

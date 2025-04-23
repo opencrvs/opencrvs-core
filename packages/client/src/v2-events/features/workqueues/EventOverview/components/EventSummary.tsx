@@ -14,10 +14,10 @@ import { Summary } from '@opencrvs/components/lib/Summary'
 import {
   EventConfig,
   getDeclarationFields,
+  isConditionMet,
   SummaryConfig
 } from '@opencrvs/commons/client'
 import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
-import { EventIndex } from '@opencrvs/commons'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
@@ -109,6 +109,12 @@ export function EventSummary({
   const declarationFields = getDeclarationFields(eventConfiguration)
 
   const fields = summaryPageFields.map((field) => {
+    if ('conditional' in field && field.conditional) {
+      if (!isConditionMet(field.conditional, event)) {
+        return null
+      }
+    }
+
     if ('fieldId' in field) {
       const config = declarationFields.find((f) => f.id === field.fieldId)
       const value = event[field.fieldId] ?? undefined

@@ -30,6 +30,7 @@ import { formatISO } from 'date-fns'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
+import { JSONSchema } from 'src/client'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -138,15 +139,22 @@ export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
   })
 }
 
+export function isConditionMet(
+  conditional: JSONSchema,
+  values: Record<string, unknown>
+) {
+  return validate(conditional, {
+    $form: values,
+    $now: formatISO(new Date(), { representation: 'date' })
+  })
+}
+
 export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   if (!page.conditional) {
     return true
   }
 
-  return validate(page.conditional, {
-    $form: formValues,
-    $now: formatISO(new Date(), { representation: 'date' })
-  })
+  return isConditionMet(page.conditional, formValues)
 }
 
 export function omitHiddenFields(fields: FieldConfig[], values: EventState) {
