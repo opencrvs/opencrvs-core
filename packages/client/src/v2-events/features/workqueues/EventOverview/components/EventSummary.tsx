@@ -96,15 +96,14 @@ function getDefaultFields(
 
 export function EventSummary({
   event,
-  summary,
   eventConfiguration
 }: {
   event: Record<string, FieldValue | null>
-  summary: SummaryConfig
   eventConfiguration: EventConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const defaultFields = getDefaultFields(eventConfiguration.label)
+  const { summary, label } = eventConfiguration
+  const defaultFields = getDefaultFields(label)
   const summaryPageFields = [...defaultFields, ...summary.fields]
   const declarationFields = getDeclarationFields(eventConfiguration)
 

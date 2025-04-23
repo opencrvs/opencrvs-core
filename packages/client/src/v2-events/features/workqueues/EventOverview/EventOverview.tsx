@@ -31,7 +31,6 @@ import {
   flattenEventIndex,
   getUserIdsFromActions
 } from '@client/v2-events/utils'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -45,13 +44,7 @@ import { EventOverviewProvider } from './EventOverviewContext'
 /**
  * Renders the event overview page, including the event summary and history.
  */
-function EventOverview({
-  event,
-  summary
-}: {
-  event: EventDocument
-  summary: SummaryConfig
-}) {
+function EventOverview({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const intl = useIntlFormatMessageWithFlattenedParams()
   const eventIndex = getCurrentEventState(event)
@@ -65,6 +58,7 @@ function EventOverview({
     'event.registrationNumber': registrationNumber
   }
 
+  const { summary } = eventConfiguration
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
@@ -83,7 +77,6 @@ function EventOverview({
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        summary={summary}
       />
       <EventHistory history={actions} />
     </Content>
@@ -93,7 +86,6 @@ function EventOverview({
 function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { getEvent } = useEvents()
-  const { getRemoteDrafts } = useDrafts()
   const { getUsers } = useUsers()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
@@ -106,7 +98,7 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview event={fullEvent} summary={config.summary} />
+      <EventOverview event={fullEvent} />
     </EventOverviewProvider>
   )
 }
