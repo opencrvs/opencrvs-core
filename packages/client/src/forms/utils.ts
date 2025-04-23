@@ -432,7 +432,12 @@ export const getFieldOptionsSlow = (
     field.dynamicOptions.resource === OFFLINE_FACILITIES_KEY
   ) {
     const facilities = offlineCountryConfig[OFFLINE_FACILITIES_KEY]
-    return generateOptions(Object.values(facilities), 'facility')
+    return generateOptions(
+      Object.values(facilities).filter((facility: ILocation) => {
+        return facility.status === 'active'
+      }),
+      'facility'
+    )
   } else {
     let options
     if (!field.dynamicOptions.options) {

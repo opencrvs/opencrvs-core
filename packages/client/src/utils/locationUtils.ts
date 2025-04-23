@@ -120,31 +120,37 @@ export function generateSearchableLocations(
   offlineLocations: { [key: string]: ILocation },
   intl: IntlShape
 ) {
-  const generated: ISearchLocation[] = locations.map((location: ILocation) => {
-    let locationName = generateLocationName(location, intl)
+  const generated: ISearchLocation[] = locations.reduce(
+    (acc: ISearchLocation[], location: ILocation) => {
+      if (location.status !== 'active') return acc
 
-    if (
-      location.partOf &&
-      location.partOf !== 'Location/0' &&
-      location.type !== 'CRVS_OFFICE'
-    ) {
-      const locRef = location.partOf.split('/')[1]
-      let parent
+      let locationName = generateLocationName(location, intl)
+
       if (
-        (parent =
-          offlineLocations[locRef] &&
-          generateLocationName(offlineLocations[locRef], intl))
+        location.partOf &&
+        location.partOf !== 'Location/0' &&
+        location.type !== 'CRVS_OFFICE'
       ) {
-        locationName += `, ${parent}`
-      }
-    }
+        const locRef = location.partOf.split('/')[1]
+        const parent =
+          offlineLocations[locRef] &&
+          generateLocationName(offlineLocations[locRef], intl)
 
-    return {
-      id: location.id,
-      searchableText: getLocalizedLocationName(intl, location),
-      displayLabel: locationName
-    }
-  })
+        if (parent) {
+          locationName += `, ${parent}`
+        }
+      }
+
+      acc.push({
+        id: location.id,
+        searchableText: getLocalizedLocationName(intl, location),
+        displayLabel: locationName
+      })
+
+      return acc
+    },
+    []
+  )
   return generated
 }
 
