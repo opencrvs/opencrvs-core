@@ -33,6 +33,16 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return ajv.validate(schema, data)
 }
 
+export function isConditionMet(
+  conditional: JSONSchema,
+  values: Record<string, unknown>
+) {
+  return validate(conditional, {
+    $form: values,
+    $now: formatISO(new Date(), { representation: 'date' })
+  })
+}
+
 function getConditionalActionsForField(
   field: FieldConfig,
   values: ConditionalParameters

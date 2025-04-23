@@ -22,15 +22,13 @@ import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { Action, ActionUpdate, EventState } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
-import { isFieldVisible, validate } from '../conditionals/validate'
+import { isConditionMet, isFieldVisible } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID } from '../uuid'
-import { formatISO } from 'date-fns'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
-import { JSONSchema } from 'src/client'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -136,16 +134,6 @@ export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
         `Invalid workqueue configuration: workqueue not found with id: ${workqueue.id}`
       )
     }
-  })
-}
-
-export function isConditionMet(
-  conditional: JSONSchema,
-  values: Record<string, unknown>
-) {
-  return validate(conditional, {
-    $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
   })
 }
 
