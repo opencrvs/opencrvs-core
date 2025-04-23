@@ -128,7 +128,7 @@ function Workqueue({
 
   const validEvents = orderBy(
     events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
-    ['modifiedAt'],
+    ['updatedAt'],
     ['desc']
   )
 
