@@ -88,6 +88,7 @@ function getAvailableActionsByStatus(
       ]
     }
     case EventStatus.ARCHIVED:
+      return [...assignmentActions, ActionType.READ]
     default:
       return [ActionType.READ]
   }
