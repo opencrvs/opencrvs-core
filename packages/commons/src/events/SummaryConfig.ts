@@ -11,14 +11,24 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 
-const Field = z.object({
-  id: z.string().describe('Id of summary field'),
-  value: TranslationConfig.describe(
-    'Summary field value. Can utilise values defined in configuration and EventMetadata'
-  ),
-  label: TranslationConfig,
-  emptyValueMessage: TranslationConfig.optional()
-})
+const Field = z.union([
+  z
+    .object({
+      id: z.string().describe('Id of summary field'),
+      value: TranslationConfig.describe(
+        'Summary field value. Can utilise values defined in configuration and EventMetadata'
+      ),
+      label: TranslationConfig,
+      emptyValueMessage: TranslationConfig.optional()
+    })
+    .describe('Custom configured field'),
+  z
+    .object({
+      fieldId: z.string(),
+      emptyValueMessage: TranslationConfig.optional()
+    })
+    .describe('Field directly referencing event data with field id')
+])
 
 const Title = z.object({
   id: z.string(),

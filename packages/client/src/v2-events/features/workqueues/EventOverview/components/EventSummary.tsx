@@ -11,10 +11,15 @@
 
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
-import { SummaryConfig } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  getDeclarationFields,
+  SummaryConfig
+} from '@opencrvs/commons/client'
 import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
+import { EventIndex } from '@opencrvs/commons'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { RecursiveStringRecord } from '@client/v2-events/hooks/useSimpleFieldStringifier'
+import { Output } from '@client/v2-events/features/events/components/Output'
 
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
@@ -92,24 +97,49 @@ function getDefaultFields(
 export function EventSummary({
   event,
   summary,
-  eventLabel
+  eventConfiguration
 }: {
-  event: Record<string, FieldValue | null | RecursiveStringRecord>
+  event: Record<string, FieldValue | null>
   summary: SummaryConfig
-  /**
-   * Event label to be displayed in the summary page.
-   * This label is used for translation purposes and should not be stored in the event data.
-   */
-  eventLabel: TranslationConfig
+  eventConfiguration: EventConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const defaultFields = getDefaultFields(eventLabel)
+  const defaultFields = getDefaultFields(eventConfiguration.label)
   const summaryPageFields = [...defaultFields, ...summary.fields]
+  const declarationFields = getDeclarationFields(eventConfiguration)
 
   return (
     <>
       <Summary id="summary">
         {summaryPageFields.map((field) => {
+          if ('fieldId' in field) {
+            const config = declarationFields.find((f) => f.id === field.fieldId)
+            const value = event[field.fieldId] ?? undefined
+
+            if (!config) {
+              return null
+            }
+
+            return (
+              <Summary.Row
+                key={field.fieldId}
+                data-testid={field.fieldId}
+                label={intl.formatMessage(config.label)}
+                placeholder={
+                  field.emptyValueMessage &&
+                  intl.formatMessage(field.emptyValueMessage)
+                }
+                value={
+                  <Output
+                    field={config}
+                    showPreviouslyMissingValuesAsChanged={false}
+                    value={value}
+                  />
+                }
+              />
+            )
+          }
+
           return (
             <Summary.Row
               key={field.id}

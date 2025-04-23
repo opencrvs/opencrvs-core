@@ -61,24 +61,12 @@ function EventOverview({
   summary: SummaryConfig
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const allFields = getDeclarationFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
-
-  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status, registrationNumber } = eventIndex
 
-  const stringifyFormData = useFormDataStringifier()
-  const eventWithDefaults = stringifyFormData(
-    allFields,
-    eventWithDrafts.declaration
-  )
-
-  const flattenedEventIndex: Record<
-    string,
-    FieldValue | null | RecursiveStringRecord
-  > = {
-    ...flattenEventIndex({ ...eventIndex, declaration: eventWithDefaults }),
+  const flattenedEventIndex = {
+    ...flattenEventIndex(eventIndex),
     // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
     'event.status': status,
@@ -102,7 +90,7 @@ function EventOverview({
     >
       <EventSummary
         event={flattenedEventIndex}
-        eventLabel={eventConfiguration.label}
+        eventConfiguration={eventConfiguration}
         summary={summary}
       />
       <EventHistory history={actions} />
