@@ -86,7 +86,7 @@ export function getPractitionerContactDetails(practitioner: Practitioner) {
 
 export const getUserRoleFromHistory = (
   practitionerRoleHistory: PractitionerRoleHistory[],
-  lastModified: string
+  timePoint: string
 ) => {
   const practitionerRoleHistorySorted = practitionerRoleHistory.sort((a, b) => {
     if (a.meta?.lastUpdated === b.meta?.lastUpdated) {
@@ -106,14 +106,12 @@ export const getUserRoleFromHistory = (
 
   /*
    * Find the the first history entry that was added before the
-   * lastModified date or take the earliest entry if none found
+   * given point in time or take the earliest entry if none found
    */
   const result =
     practitionerRoleHistorySorted.find(
       (it) =>
-        it?.meta?.lastUpdated &&
-        lastModified &&
-        it?.meta?.lastUpdated <= lastModified!
+        it?.meta?.lastUpdated && timePoint && it?.meta?.lastUpdated <= timePoint
     ) ?? practitionerRoleHistorySorted.at(-1)
 
   const targetCode = result?.code?.find((element) => {
