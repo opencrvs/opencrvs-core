@@ -115,10 +115,25 @@ test('a correction request can be added to a created event', async () => {
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
   await client.event.actions.declare.request(declareInput)
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   const withCorrectionRequest = await client.event.actions.correction.request(
     generator.event.actions.correction.request(registeredEvent.id)
   )
@@ -254,10 +269,25 @@ test('a correction request can be added to a created event', async () => {
   await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id)
   )
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   const withCorrectionRequest = await client.event.actions.correction.request(
     generator.event.actions.correction.request(registeredEvent.id)
   )
@@ -284,10 +314,24 @@ describe('when a correction request exists', () => {
 
     await client.event.actions.declare.request(declareInput)
 
+    const createAction = originalEvent.actions.filter(
+      (action) => action.type === ActionType.CREATE
+    )
+
+    const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+      assignedTo: createAction[0].createdBy
+    })
+
+    await client.event.actions.assignment.assign(assignmentInput)
+
     const registeredEvent = await client.event.actions.register.request(
       generator.event.actions.register(originalEvent.id)
     )
 
+    await client.event.actions.assignment.assign({
+      ...assignmentInput,
+      transactionId: getUUID()
+    })
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(registeredEvent.id, {
         declaration: {
@@ -299,6 +343,10 @@ describe('when a correction request exists', () => {
         }
       })
     )
+    await client.event.actions.assignment.assign({
+      ...assignmentInput,
+      transactionId: getUUID()
+    })
   })
 
   test('a correction request can be approved with correct request id', async () => {
