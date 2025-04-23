@@ -66,7 +66,7 @@ function getStatusFromActions(actions: Array<Action>) {
   }, EventStatus.CREATED)
 }
 
-function getAssignedUserFromActions(actions: Array<ActionDocument>) {
+export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<null | string>((user, action) => {
     if (action.type === ActionType.ASSIGN) {
       return action.assignedTo

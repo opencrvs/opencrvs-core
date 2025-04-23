@@ -133,6 +133,7 @@ export const eventRouter = router({
   delete: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
     .input(z.object({ eventId: z.string() }))
+    .use(middleware.requireAssignment())
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
@@ -193,6 +194,7 @@ export const eventRouter = router({
           requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION])
         )
         .input(RequestCorrectionActionInput)
+        .use(middleware.requireAssignment())
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
         .mutation(async (options) => {
           return addAction(options.input, {
@@ -207,6 +209,7 @@ export const eventRouter = router({
       approve: publicProcedure
         .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
         .input(ApproveCorrectionActionInput)
+        .use(middleware.requireAssignment())
         .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
         .mutation(async (options) => {
           return approveCorrection(options.input, {
@@ -220,6 +223,7 @@ export const eventRouter = router({
       reject: publicProcedure
         .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
         .input(RejectCorrectionActionInput)
+        .use(middleware.requireAssignment())
         .mutation(async (options) => {
           return rejectCorrection(options.input, {
             eventId: options.input.eventId,

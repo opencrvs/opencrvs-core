@@ -149,6 +149,7 @@ export function getDefaultActionProcedures(
     request: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema)
+      .use(middleware.requireAssignment())
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx

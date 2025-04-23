@@ -10,8 +10,15 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { inScope, Scope } from '@opencrvs/commons'
+import {
+  ActionDocument,
+  ActionType,
+  getAssignedUserFromActions,
+  inScope,
+  Scope
+} from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
+import { getEventById } from '@events/service/events/events'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -36,5 +43,27 @@ export function requiresAnyOfScopes(scopes: Scope[]) {
     }
 
     throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+}
+
+export function requireAssignment() {
+  return async ({ input, ctx, next }: MiddlewareOptions) => {
+    const event = await getEventById(input.eventId)
+
+    const assignedTo = getAssignedUserFromActions(
+      event.actions.filter(
+        (action): action is ActionDocument =>
+          action.type === ActionType.ASSIGN ||
+          action.type === ActionType.UNASSIGN
+      )
+    )
+
+    if (ctx.user.id !== assignedTo) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: JSON.stringify('You are not assigned to this event')
+      })
+    }
+    return next()
   }
 }
