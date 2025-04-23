@@ -16,7 +16,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { DeclarationFormConfig } from './FormConfig'
-import { findAllFields, metadataFields } from '../utils'
+import { findAllFields, metadataFields } from './utils'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.

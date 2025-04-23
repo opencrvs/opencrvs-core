@@ -81,7 +81,7 @@ export const eventMetadataLabelMap: Record<
   'event.updatedAtLocation': {
     id: 'event.updatedAtLocation.label',
     defaultMessage: 'Location',
-    description: 'Updated At'
+    description: 'Updated At Location'
   },
   'event.createdBy': {
     id: 'event.createdBy.label',

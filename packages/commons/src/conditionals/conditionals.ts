@@ -15,7 +15,7 @@ import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { SelectOption } from '../events/FieldConfig'
-import { MetadataField } from '../utils'
+import { MetadataField } from '../events/utils'
 
 /** @knipignore */
 export type JSONSchema = {

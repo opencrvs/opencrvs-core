@@ -376,7 +376,7 @@ const Address = BaseField.extend({
 export const DataEntry = z.union([
   z.object({
     label: TranslationConfig,
-    value: z.string()
+    value: TranslationConfig.or(z.string())
   }),
   z.object({
     fieldId: z.string()

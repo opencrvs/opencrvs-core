@@ -185,6 +185,7 @@ export async function createEvent({
     transactionId,
     createdAt: now,
     updatedAt: now,
+    updatedAtLocation: createdAtLocation,
     trackingId,
     actions: [
       {
