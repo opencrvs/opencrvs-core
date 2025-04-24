@@ -13,10 +13,10 @@ import { TRPCError } from '@trpc/server'
 import _ from 'lodash'
 import {
   ActionUpdate,
-  FieldConfig,
-  getFieldValidationErrors,
   Inferred,
-  errorMessages
+  errorMessages,
+  runFieldValidations,
+  isFieldVisible
 } from '@opencrvs/commons/events'
 
 type ValidationError = {
@@ -26,28 +26,48 @@ type ValidationError = {
 }
 
 export function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
-  return formFields.reduce(
-    (errorResults: ValidationError[], field: FieldConfig) => {
-      const fieldErrors = getFieldValidationErrors({
-        field,
-        values: data
-      }).errors
-
-      if (fieldErrors.length === 0) {
-        return errorResults
-      }
-
-      // For backend, use the default message without translations.
-      const errormessageWithId = fieldErrors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value: data[field.id as keyof typeof data]
-      }))
-
-      return [...errorResults, ...errormessageWithId]
-    },
-    []
+  const visibleFields = formFields.filter((field) =>
+    isFieldVisible(field, data)
   )
+
+  const visibleFieldIds = visibleFields.map((field) => field.id)
+  const hiddenFieldIds = formFields
+    .filter(
+      (field) =>
+        // If field is not visible and not in the visible fields list, it is a hidden field
+        // We need to check against the visible fields list because there might be fields with same ids, one of which is visible and others are hidden
+        !isFieldVisible(field, data) && !visibleFieldIds.includes(field.id)
+    )
+    .map((field) => field.id)
+
+  // Add errors if there are any hidden fields sent in the payloa
+  const hiddenFieldErrors = hiddenFieldIds.flatMap((fieldId) => {
+    if (data[fieldId as keyof typeof data]) {
+      return {
+        message: errorMessages.hiddenField.defaultMessage,
+        id: fieldId,
+        value: data[fieldId as keyof typeof data]
+      }
+    }
+
+    return []
+  })
+
+  // For visible fields, run the field validations as configured
+  const visibleFieldErrors = visibleFields.flatMap((field) => {
+    const fieldErrors = runFieldValidations({
+      field,
+      values: data
+    })
+
+    return fieldErrors.errors.map((error) => ({
+      message: error.message.defaultMessage,
+      id: field.id,
+      value: data[field.id as keyof typeof data]
+    }))
+  })
+
+  return [...hiddenFieldErrors, ...visibleFieldErrors]
 }
 
 export function getVerificationPageErrors(

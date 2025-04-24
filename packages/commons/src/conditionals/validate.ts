@@ -263,7 +263,7 @@ export function validateFieldInput({
   }[]
 }
 
-function runFieldValidations({
+export function runFieldValidations({
   field,
   values
 }: {
@@ -289,39 +289,4 @@ function runFieldValidations({
     // Assumes that custom validation errors are based on the field type, and extend the validation.
     errors: [...fieldValidationResult, ...customValidationResults]
   }
-}
-
-/**
- * Gets applicable validation errors based on its type and custom validators.
- *
- * @returns an array of error messages for the field
- */
-export function getFieldValidationErrors({
-  field,
-  values
-}: {
-  // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
-  field: FieldConfig
-  values: ActionUpdate
-}) {
-  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
-    if (values[field.id]) {
-      return {
-        errors: [
-          {
-            message: errorMessages.hiddenField
-          }
-        ]
-      }
-    }
-
-    return {
-      errors: []
-    }
-  }
-
-  return runFieldValidations({
-    field,
-    values
-  })
 }

@@ -83,9 +83,15 @@ function validateDeclarationUpdateAction({
   }
 
   // 4. Validate declaration update against conditional rules, taking into account conditional pages.
-  const declarationErrors = declarationConfig.pages
+
+  const allVisiblePageFields = declarationConfig.pages
     .filter((page) => isPageVisible(page, cleanedDeclaration))
-    .flatMap((page) => getFormFieldErrors(page.fields, cleanedDeclaration))
+    .flatMap((page) => page.fields)
+
+  const declarationErrors = getFormFieldErrors(
+    allVisiblePageFields,
+    cleanedDeclaration
+  )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
