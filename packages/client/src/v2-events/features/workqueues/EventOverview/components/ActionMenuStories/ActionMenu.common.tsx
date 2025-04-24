@@ -68,12 +68,12 @@ export const mockActions: Record<
   [ActionType.APPROVE_CORRECTION]: {
     ...actionProps,
     type: ActionType.APPROVE_CORRECTION,
-    requestId: '827bf7e8-0e1e-4cef-aee7-66e71287a2c8'
+    requestId: '827bf7e8-0e1e-4cef-66e71287a2c8-aee7'
   },
   [ActionType.REJECT_CORRECTION]: {
     ...actionProps,
     type: ActionType.REJECT_CORRECTION,
-    requestId: '827bf7e8-0e1e-4cef-aee7-66e71287a2c8'
+    requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef'
   },
   [ActionType.DELETE]: {
     ...actionProps,
