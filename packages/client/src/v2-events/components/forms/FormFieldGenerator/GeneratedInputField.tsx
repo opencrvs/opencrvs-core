@@ -279,7 +279,7 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isFileFieldType(field)) {
-      const fileInputLabel = field.config.configuration.fileName
+      const uploadedFileNameLabel = field.config.configuration.fileName
         ? intl.formatMessage(field.config.configuration.fileName)
         : intl.formatMessage(field.config.label)
 
@@ -289,7 +289,7 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             error={inputFieldProps.error}
-            label={fileInputLabel}
+            label={uploadedFileNameLabel}
             maxFileSize={field.config.configuration.maxFileSize}
             value={field.value}
             width={field.config.configuration.style?.width}
