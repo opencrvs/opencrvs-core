@@ -16,12 +16,7 @@ import React, {
   useEffect,
   useState
 } from 'react'
-import {
-  Location,
-  useLocation,
-  useNavigate,
-  useNavigationType
-} from 'react-router-dom'
+import { Location, useLocation, useNavigationType } from 'react-router-dom'
 import { Action } from '@remix-run/router'
 
 const NavigationContext = createContext<Location[]>([])
