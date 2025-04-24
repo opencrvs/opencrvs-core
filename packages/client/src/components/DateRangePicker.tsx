@@ -42,13 +42,13 @@ import endOfMonth from 'date-fns/endOfMonth'
 
 const { useState, useEffect, useMemo } = React
 
-const LIMIT_YEAR_PAST_RECORDS = 1900
+const LIMIT_YEAR_PAST_RECORDS = 1800
 
 function getMonthsShort(locale = 'en') {
   const months = []
   for (let i = 0; i < 12; i++) {
     months.push(
-      new Date(1970, i).toLocaleString(locale, {
+      new Date(1870, i).toLocaleString(locale, {
         month: 'short'
       })
     )
