@@ -52,7 +52,7 @@ export const mockActions: Record<
   [AssignmentStatus.ASSIGNED_TO_SELF]: {
     ...actionProps,
     type: ActionType.ASSIGN,
-    assignedTo: '67ef7f83d6a9cb92e9edaaa9'
+    assignedTo: generator.user.id.localRegistrar
   },
   [ActionType.UNASSIGN]: {
     ...actionProps,
@@ -98,7 +98,7 @@ export const mockActions: Record<
   [ActionType.ASSIGN]: {
     ...actionProps,
     type: ActionType.ASSIGN,
-    assignedTo: '67ef7f83d6a9cb92e9edaaa9'
+    assignedTo: generator.user.id.localRegistrar
   },
   [ActionType.DETECT_DUPLICATE]: {
     ...actionProps,
@@ -119,10 +119,10 @@ function getMockEvent(
   const userId =
     // eslint-disable-next-line no-nested-ternary
     role === UserRoles.LOCAL_REGISTRAR
-      ? '67ef7f83d6a9cb92e9edaaa9'
+      ? generator.user.id.localRegistrar
       : role === UserRoles.FIELD_AGENT
-        ? '67ef7f83d6a9cb92e9edaa99'
-        : '67ef7f83d6a9cb92e9edaaa1'
+        ? generator.user.id.fieldAgent
+        : generator.user.id.registrationAgent
   return {
     type: 'tennis-club-membership',
     id: 'b4c52c54-f6eb-45ee-be70-142838f8c8d4',
