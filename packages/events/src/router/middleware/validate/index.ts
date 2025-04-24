@@ -28,7 +28,8 @@ import {
   EventDocument,
   deepMerge,
   deepDropNulls,
-  omitHiddenFields
+  omitHiddenFields,
+  EventState
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
@@ -83,9 +84,14 @@ function validateDeclarationUpdateAction({
   }
 
   // 4. Validate declaration update against conditional rules, taking into account conditional pages.
-  const declarationErrors = declarationConfig.pages
+  const allVisiblePageFields = declarationConfig.pages
     .filter((page) => isPageVisible(page, cleanedDeclaration))
-    .flatMap((page) => getFormFieldErrors(page.fields, cleanedDeclaration))
+    .flatMap((page) => page.fields)
+
+  const declarationErrors = getFormFieldErrors(
+    allVisiblePageFields,
+    cleanedDeclaration
+  )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
@@ -110,11 +116,13 @@ function validateDeclarationUpdateAction({
 function validateActionAnnotation({
   eventConfig,
   actionType,
-  annotation = {}
+  annotation = {},
+  declaration = {}
 }: {
   eventConfig: EventConfig
   actionType: AnnotationActionType
   annotation?: ActionUpdate
+  declaration: EventState
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
@@ -128,7 +136,7 @@ function validateActionAnnotation({
   )
 
   const errors = [
-    ...getFormFieldErrors(formFields, annotation),
+    ...getFormFieldErrors(formFields, annotation, declaration),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
@@ -138,6 +146,7 @@ function validateActionAnnotation({
 export function validateAction(actionType: ActionType) {
   return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
     const event = await getEventById(input.eventId)
+    const declaration = getCurrentEventState(event).declaration
 
     const eventConfig = await getEventConfigurationById({
       token: ctx.token,
@@ -165,7 +174,8 @@ export function validateAction(actionType: ActionType) {
       const errors = validateActionAnnotation({
         eventConfig,
         annotation: input.annotation,
-        actionType: annotationActionParse.data
+        actionType: annotationActionParse.data,
+        declaration
       })
 
       throwWhenNotEmpty(errors)
