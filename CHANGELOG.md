@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.7.0 Release candidate
+## 1.7.1 Release candidate
+
+### Bug fixes
+
+- Use the first role assigned to a user for record history entry if no role found at the point of time when the action was performed [#9300](https://github.com/opencrvs/opencrvs-core/issues/9300)
+
+## [1.7.0](https://github.com/opencrvs/opencrvs-core/compare/v1.6.2...v1.7.0)
 
 ### Breaking changes
 
