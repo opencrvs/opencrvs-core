@@ -160,7 +160,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-export enum AssertType {
+export const enum AssertType {
   HIDDEN = 'HIDDEN',
   ENABLED = 'ENABLED',
   DISABLED = 'DISABLED'
