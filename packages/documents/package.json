@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/documents",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "OpenCRVS Documents service",
   "license": "MPL-2.0",
   "private": true,
