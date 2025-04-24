@@ -8,48 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as redis from 'redis'
-import { REDIS_HOST } from '@gateway/constants'
-import { promisify } from 'util'
-import { logger } from '@opencrvs/commons'
+import { REDIS_HOST, REDIS_PASSWORD, REDIS_USERNAME } from '@gateway/constants'
+import { createClient } from 'redis'
 
-let redisClient: redis.RedisClient
+export let redis: ReturnType<typeof createClient>
 
 export async function stop() {
-  redisClient.quit()
+  redis.quit()
 }
 
-export function start(host = REDIS_HOST, port?: number) {
-  return new Promise<redis.RedisClient>((resolve) => {
-    logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
-    redisClient = redis.createClient({
-      host: host,
-      port,
-      retry_strategy: () => {
-        return 1000
-      }
-    })
-    redisClient.on('connect', () => {
-      resolve(redisClient)
-    })
-  })
+export async function start(host = REDIS_HOST, port?: number) {
+  redis = await createClient({
+    username: REDIS_USERNAME,
+    password: REDIS_PASSWORD,
+    socket: {
+      host,
+      port
+    }
+  }).connect()
 }
-
-export const get = (key: string) =>
-  promisify(redisClient.get).bind(redisClient)(key)
-
-export const set = (key: string, value: string) =>
-  promisify(redisClient.set).bind(redisClient)(key, value)
-
-export const del = (key: string) =>
-  promisify(redisClient.del).bind(redisClient)(key)
-
-export const incrementWithTTL = (key: string, ttl: number) => {
-  const multi = redisClient.multi([
-    ['incr', key],
-    ['pexpire', key, ttl]
-  ])
-  return promisify(multi.exec).call(multi)
-}
-
-export const getClient = () => redisClient
