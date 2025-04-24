@@ -15,6 +15,7 @@ import {
   AddressType,
   generateActionDeclarationInput,
   getAcceptedActions,
+  getUUID,
   SCOPES
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -47,6 +48,17 @@ test('Validation error message contains all the offending fields', async () => {
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
+
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
@@ -58,6 +70,11 @@ test('Validation error message contains all the offending fields', async () => {
       'applicant.dobUnknown': false,
       'recommender.none': true
     }
+  })
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
   })
 
   await expect(
@@ -73,6 +90,16 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
+
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
 
   const data = generator.event.actions.validate(event.id, {
     declaration: {
@@ -106,6 +133,16 @@ test('Skips required field validation when they are conditionally hidden', async
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
+
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
 
   const form = {
     'applicant.dob': '2024-02-01',
@@ -146,6 +183,16 @@ test('Prevents adding birth date in future', async () => {
     generator.event.actions.declare(event.id)
   )
 
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const form = {
     'applicant.dob': '2040-02-01',
     'applicant.dobUnknown': false,
@@ -178,6 +225,16 @@ test('validation prevents including hidden fields', async () => {
     generator.event.actions.declare(event.id)
   )
 
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const data = generator.event.actions.validate(event.id, {
     declaration: {
       ...generateActionDeclarationInput(
@@ -203,6 +260,16 @@ test('valid action is appended to event actions', async () => {
     generator.event.actions.declare(event.id)
   )
 
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )
@@ -216,6 +283,7 @@ test('valid action is appended to event actions', async () => {
       type: ActionType.DECLARE
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
       type: ActionType.VALIDATE
     }),
