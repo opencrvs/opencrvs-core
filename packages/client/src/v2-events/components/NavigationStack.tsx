@@ -74,10 +74,15 @@ export function NavigationStack(props: PropsWithChildren) {
     // On storybook tests we don't want to navigate the user with window.history.back()
     const isStorybook = import.meta.env.STORYBOOK === 'true'
 
+    // We also don't want to start backing the user if its only a page reload
+    const navEntry = performance.getEntriesByType(
+      'navigation'
+    )[0] as PerformanceNavigationTiming
+
     // When user tries to navigate back to the stack with browser back button,
     // we initiate a sequence of back navigations to exit the stack completely.
     // This preserves the browser's history state for proper forward/back navigation.
-    if (navigatingBackToStack && !isStorybook) {
+    if (navigatingBackToStack && !isStorybook && navEntry.type !== 'reload') {
       setBacking(true)
     }
 
