@@ -20,7 +20,6 @@ import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { getScope } from '@client/profile/profileSelectors'
-import { useAuthentication } from '@client/utils/userUtils'
 import { useActionMenuItems } from './useActionMenuItems'
 
 export function ActionMenu({ eventId }: { eventId: string }) {
@@ -28,11 +27,6 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   const events = useEvents()
   const scopes = useSelector(getScope)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-  const authentication = useAuthentication()
-
-  if (!authentication) {
-    throw new Error('Authentication is not available but is required')
-  }
 
   const eventState = useMemo(() => getCurrentEventState(event), [event])
 
@@ -55,7 +49,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               <DropdownMenu.Item
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
-                onClick={async () => action.onClick(event.id)}
+                onClick={() => action.onClick(event.id)}
               >
                 {intl.formatMessage(action.label)}
               </DropdownMenu.Item>

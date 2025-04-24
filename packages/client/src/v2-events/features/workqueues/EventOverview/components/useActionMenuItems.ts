@@ -17,7 +17,9 @@ import {
   getUUID,
   TranslationConfig,
   EventStatus,
-  SCOPES
+  SCOPES,
+  ACTION_ALLOWED_SCOPES,
+  hasAnyOfScopes
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -47,12 +49,12 @@ function getAssignmentActions(
 }
 
 /**
- * Actions that can be performed on an event based on its status, independent of the user scopes.
- *
+ * Actions that can be performed on an event based on its status and user scope.
  */
-function getAvailableActionsByStatus(
+function getUserActionsByStatus(
   status: EventStatus,
-  assignmentActions: ActionType[]
+  assignmentActions: ActionType[],
+  userScopes: Scope[]
 ): ActionType[] {
   switch (status) {
     case EventStatus.CREATED: {
@@ -75,13 +77,19 @@ function getAvailableActionsByStatus(
       ]
     }
     case EventStatus.REJECTED: {
-      return [
-        ...assignmentActions,
-        ActionType.READ,
-        ActionType.DECLARE,
-        ActionType.VALIDATE
-      ]
+      const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
+      const canValidate = hasAnyOfScopes(userScopes, validateScopes)
+
+      /**
+       * Show 'higher' action when the user has the required scopes.
+       */
+      const declarationAction = canValidate
+        ? ActionType.VALIDATE
+        : ActionType.DECLARE
+
+      return [...assignmentActions, ActionType.READ, declarationAction]
     }
+
     case EventStatus.ARCHIVED:
       return [...assignmentActions, ActionType.READ]
     default:
@@ -230,9 +238,10 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
     authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
   )
 
-  const availableActions = getAvailableActionsByStatus(
+  const availableActions = getUserActionsByStatus(
     event.status,
-    assignmentActions
+    assignmentActions,
+    scopes
   )
 
   const allowedActions = filterUnallowedActions(availableActions, scopes)
