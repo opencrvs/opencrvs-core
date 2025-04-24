@@ -180,4 +180,66 @@ describe('getFieldErrors()', () => {
 
     expect(errors).toMatchSnapshot()
   })
+
+  it('should return errors for field with custom validation if value does not pass validation', () => {
+    const errors = getFieldErrors(
+      [
+        {
+          id: 'test.input',
+          type: FieldType.TEXT,
+          required: true,
+          label: {
+            id: 'test.field.label',
+            defaultMessage: 'Test Field',
+            description: 'Test Field Description'
+          },
+          validation: [
+            {
+              message: {
+                id: 'test.field.validation.message',
+                defaultMessage: 'Failed validation!',
+                description: 'Test Field Validation Message Description'
+              },
+              validator: field('test.input').isEqualTo('helloooo')
+            }
+          ]
+        }
+      ],
+      { 'test.input': 'not hello!' },
+      {}
+    )
+
+    expect(errors).toMatchSnapshot()
+  })
+
+  it('should not return errors for field with custom validations if value passes validation', () => {
+    const errors = getFieldErrors(
+      [
+        {
+          id: 'test.input',
+          type: FieldType.TEXT,
+          required: true,
+          label: {
+            id: 'test.field.label',
+            defaultMessage: 'Test Field',
+            description: 'Test Field Description'
+          },
+          validation: [
+            {
+              message: {
+                id: 'test.field.validation.message',
+                defaultMessage: 'Failed validation!',
+                description: 'Test Field Validation Message Description'
+              },
+              validator: field('test.input').isEqualTo('helloooo')
+            }
+          ]
+        }
+      ],
+      { 'test.input': 'helloooo' },
+      {}
+    )
+
+    expect(errors).toMatchSnapshot()
+  })
 })
