@@ -22,11 +22,10 @@ import { FieldConfig } from './FieldConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { Action, ActionUpdate, EventState } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
-import { isFieldVisible, validate } from '../conditionals/validate'
+import { isConditionMet, isFieldVisible } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID } from '../uuid'
-import { formatISO } from 'date-fns'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
@@ -133,10 +132,7 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
     return true
   }
 
-  return validate(page.conditional, {
-    $form: formValues,
-    $now: formatISO(new Date(), { representation: 'date' })
-  })
+  return isConditionMet(page.conditional, formValues)
 }
 
 export function omitHiddenFields(fields: FieldConfig[], values: EventState) {
