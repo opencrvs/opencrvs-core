@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, PageTypes, SCOPES } from '@opencrvs/commons'
+import { ActionType, getUUID, PageTypes, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -46,6 +46,16 @@ test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page fi
     generator.event.actions.declare(event.id)
   )
 
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await expect(
     client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate(declaredEvent.id, {
@@ -65,6 +75,16 @@ test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page
   const declaredEvent = await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
+
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
 
   await expect(
     client.event.actions.printCertificate.request(
@@ -88,10 +108,24 @@ test(`${ActionType.PRINT_CERTIFICATE} action can be added to registered event`, 
     generator.event.actions.declare(originalEvent.id)
   )
 
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   const printCertificate = await client.event.actions.printCertificate.request(
     generator.event.actions.printCertificate(registeredEvent.id)
   )
