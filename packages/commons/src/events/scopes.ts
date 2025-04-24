@@ -91,13 +91,9 @@ export function filterUnallowedActions(
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
   const hasOtherAllowedActions = allowedActions.some(
     (action) =>
-      !(
-        [
-          ActionType.READ,
-          ActionType.ASSIGN,
-          ActionType.UNASSIGN
-        ] as ActionType[]
-      ).includes(action)
+      action !== ActionType.READ &&
+      action !== ActionType.ASSIGN &&
+      action !== ActionType.UNASSIGN
   )
 
   if (hasOtherAllowedActions) {
