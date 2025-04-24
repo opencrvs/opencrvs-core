@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { SCOPES, ActionType } from '@opencrvs/commons'
+import { SCOPES, ActionType, getUUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -41,10 +41,24 @@ test(`should contain REJECT action for a valid request`, async () => {
 
   const originalEvent = await client.event.create(generator.event.create())
 
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
   await client.event.actions.declare.request(declareInput)
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   const actions = (
     await client.event.actions.reject.request(
       generator.event.actions.reject(originalEvent.id)
