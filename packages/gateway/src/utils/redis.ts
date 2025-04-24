@@ -10,6 +10,7 @@
  */
 import * as redis from 'redis'
 import { REDIS_HOST } from '@gateway/constants'
+import { REDIS_PASSWORD } from '@gateway/constants'
 import { promisify } from 'util'
 import { logger } from '@opencrvs/commons'
 
@@ -19,12 +20,13 @@ export async function stop() {
   redisClient.quit()
 }
 
-export function start(host = REDIS_HOST, port?: number) {
+export function start(host = REDIS_HOST, password = REDIS_PASSWORD, port?: number, ) {
   return new Promise<redis.RedisClient>((resolve) => {
     logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
     redisClient = redis.createClient({
       host: host,
       port,
+      password: password,
       retry_strategy: () => {
         return 1000
       }

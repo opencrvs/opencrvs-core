@@ -29,3 +29,4 @@ export const FHIR_URL = env.FHIR_URL
 
 export const CHECK_INVALID_TOKEN = env.CHECK_INVALID_TOKEN
 export const REDIS_HOST = env.REDIS_HOST
+export const REDIS_PASSWORD = env.REDIS_PASSWORD
