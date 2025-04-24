@@ -270,6 +270,12 @@ export function runFieldValidations({
   field: FieldConfig
   values: ActionUpdate
 }) {
+  if (!isFieldVisible(field, values)) {
+    return {
+      errors: []
+    }
+  }
+
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' })

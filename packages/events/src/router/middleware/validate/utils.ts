@@ -16,7 +16,8 @@ import {
   Inferred,
   errorMessages,
   runFieldValidations,
-  isFieldVisible
+  isFieldVisible,
+  EventState
 } from '@opencrvs/commons/events'
 
 type ValidationError = {
@@ -25,12 +26,17 @@ type ValidationError = {
   value: unknown
 }
 
-export function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
+export function getFormFieldErrors(
+  formFields: Inferred[],
+  data: ActionUpdate,
+  declaration: EventState = {}
+) {
   const visibleFields = formFields.filter((field) =>
-    isFieldVisible(field, data)
+    isFieldVisible(field, { ...data, ...declaration })
   )
 
   const visibleFieldIds = visibleFields.map((field) => field.id)
+
   const hiddenFieldIds = formFields
     .filter(
       (field) =>
