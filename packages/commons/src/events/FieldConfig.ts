@@ -233,7 +233,8 @@ const File = BaseField.extend({
               'Whether the file upload button should take the full width of the container or not'
             )
         })
-        .optional()
+        .optional(),
+      fileName: TranslationConfig.optional()
     })
     .default({
       maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
