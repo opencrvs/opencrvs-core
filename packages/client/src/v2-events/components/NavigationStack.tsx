@@ -67,22 +67,27 @@ export function NavigationStack(props: PropsWithChildren) {
   useEffect(() => {
     // User is accessing the view directly if there's no navigation history
     const userAccessingViewDirectly = history.length === 0
-    // User is trying to navigate back to a view in the stack using browser back button
-    const navigatingBackToStack =
-      !userAccessingViewDirectly && navigateType === Action.Pop
-
-    // On storybook tests we don't want to navigate the user with window.history.back()
-    const isStorybook = import.meta.env.STORYBOOK === 'true'
 
     // We also don't want to start backing the user if its only a page reload
     const navEntry = performance.getEntriesByType(
       'navigation'
     )[0] as PerformanceNavigationTiming
 
+    const userReloadingPage = navEntry.type === 'reload'
+
+    // User is trying to navigate back to a view in the stack using browser back button
+    const navigatingBackToStack =
+      !userAccessingViewDirectly &&
+      navigateType === Action.Pop &&
+      !userReloadingPage
+
+    // On storybook tests we don't want to navigate the user with window.history.back()
+    const isStorybook = import.meta.env.STORYBOOK === 'true'
+
     // When user tries to navigate back to the stack with browser back button,
     // we initiate a sequence of back navigations to exit the stack completely.
     // This preserves the browser's history state for proper forward/back navigation.
-    if (navigatingBackToStack && !isStorybook && navEntry.type !== 'reload') {
+    if (navigatingBackToStack && !isStorybook) {
       setBacking(true)
     }
 
