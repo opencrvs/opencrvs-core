@@ -17,7 +17,8 @@ import {
   hiddenActions,
   createStoriesFromScenarios,
   AssertType,
-  Scenario
+  Scenario,
+  UserRoles
 } from '../ActionMenu.common'
 
 export default {
@@ -75,7 +76,7 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
 
 const stories = createStoriesFromScenarios(
   rejectedScenariosForFieldAgent,
-  'FieldAgent'
+  UserRoles.FIELD_AGENT
 )
 
 export const Unassigned = stories['Unassigned']

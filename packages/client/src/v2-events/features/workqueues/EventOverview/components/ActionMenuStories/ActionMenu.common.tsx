@@ -106,15 +106,21 @@ export const mockActions: Record<
   }
 }
 
+export const enum UserRoles {
+  LOCAL_REGISTRAR = 'LocalRegistrar',
+  FIELD_AGENT = 'FieldAgent',
+  REGISTRATION_AGENT = 'RegistrationAgent'
+}
+
 function getMockEvent(
   actions: (keyof typeof mockActions)[],
-  role: 'LocalRegistrar' | 'FieldAgent' | 'RegistrationAgent'
+  role: UserRoles
 ): EventDocument {
   const userId =
     // eslint-disable-next-line no-nested-ternary
-    role === 'LocalRegistrar'
+    role === UserRoles.LOCAL_REGISTRAR
       ? '67ef7f83d6a9cb92e9edaaa9'
-      : role === 'FieldAgent'
+      : role === UserRoles.FIELD_AGENT
         ? '67ef7f83d6a9cb92e9edaa99'
         : '67ef7f83d6a9cb92e9edaaa1'
   return {
@@ -192,7 +198,7 @@ export interface Scenario {
 
 export function createStoriesFromScenarios(
   scenarios: Scenario[],
-  role: 'LocalRegistrar' | 'FieldAgent' | 'RegistrationAgent'
+  role: UserRoles
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
     (acc, { name, actions, expected }) => {
@@ -201,9 +207,9 @@ export function createStoriesFromScenarios(
           window.localStorage.setItem(
             'opencrvs',
             // eslint-disable-next-line no-nested-ternary
-            role === 'LocalRegistrar'
+            role === UserRoles.LOCAL_REGISTRAR
               ? generator.user.token.localRegistrar
-              : role === 'FieldAgent'
+              : role === UserRoles.FIELD_AGENT
                 ? generator.user.token.fieldAgent
                 : generator.user.token.registrationAgent
           )

@@ -17,7 +17,8 @@ import {
   hiddenActions,
   createStoriesFromScenarios,
   AssertType,
-  Scenario
+  Scenario,
+  UserRoles
 } from '../ActionMenu.common'
 
 export default {
@@ -81,7 +82,7 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
 
 const stories = createStoriesFromScenarios(
   registeredScenariosForLocalRegistrar,
-  'LocalRegistrar'
+  UserRoles.LOCAL_REGISTRAR
 )
 
 export const Unassigned = stories['Unassigned']
