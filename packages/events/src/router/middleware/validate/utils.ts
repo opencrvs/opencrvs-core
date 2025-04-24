@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import _ from 'lodash'
-import { ActionUpdate } from '@opencrvs/commons/events'
+import { ActionUpdate, errorMessages } from '@opencrvs/commons/events'
 
 type ValidationError = {
   message: string
