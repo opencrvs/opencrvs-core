@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -53,6 +54,16 @@ test('Validation error message contains all the offending fields', async () => {
     generator.event.actions.declare(event.id)
   )
 
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )
@@ -66,6 +77,10 @@ test('Validation error message contains all the offending fields', async () => {
     }
   })
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   await expect(
     client.event.actions.register.request(data)
   ).rejects.matchSnapshot()
@@ -188,12 +203,22 @@ describe('Request and confirmation flow', () => {
     )
   }
 
-  test('should be able to successfully call action request multiple times, without creating duplicate request actions', async () => {
+  test.only('should be able to successfully call action request multiple times, without creating duplicate request actions', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
-    const { id: eventId } = await client.event.create(generator.event.create())
-
+    const originalEvent = await client.event.create(generator.event.create())
+    const { id: eventId } = originalEvent
     mockNotifyApi(200)
+
+    const createAction = originalEvent.actions.filter(
+      (action) => action.type === ActionType.CREATE
+    )
+
+    const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+      assignedTo: createAction[0].createdBy
+    })
+
+    await client.event.actions.assignment.assign(assignmentInput)
 
     const data = generator.event.actions.register(eventId, {
       declaration
