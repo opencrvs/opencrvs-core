@@ -32,7 +32,7 @@
     "jsonwebtoken": "^9.0.0",
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
-    "redis": "^3.1.1",
+    "redis": "^4.7.0",
     "tsconfig-paths": "^3.13.0"
   },
   "devDependencies": {
@@ -44,7 +44,6 @@
     "@types/jest": "^26.0.14",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node-fetch": "^2.5.12",
-    "@types/redis": "^2.8.6",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "command-line-args": "^6.0.0",
@@ -58,7 +57,6 @@
     "jest-fetch-mock": "^2.1.2",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
-    "redis-mock": "^0.56.0",
     "ts-jest": "29.2.5",
     "ts-node": "^6.1.1",
     "typescript": "5.6.3"
