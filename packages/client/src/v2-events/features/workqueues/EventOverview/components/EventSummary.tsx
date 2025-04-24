@@ -14,13 +14,12 @@ import { Summary } from '@opencrvs/components/lib/Summary'
 import {
   EventConfig,
   getDeclarationFields,
-  isConditionMet,
+  areConditionsMet,
   SummaryConfig
 } from '@opencrvs/commons/client'
 import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
-
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
@@ -108,7 +107,7 @@ export function EventSummary({
   const declarationFields = getDeclarationFields(eventConfiguration)
 
   const fields = summaryPageFields.map((field) => {
-    if (field.conditional && !isConditionMet(field.conditional, event)) {
+    if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
       return null
     }
 

@@ -20,7 +20,7 @@ import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType } from '../events/Conditional'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true,
@@ -53,6 +53,15 @@ function getConditionalActionsForField(
   return field.conditionals
     .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)
+}
+
+export function areConditionsMet(
+  conditions: FieldConditional[],
+  values: Record<string, unknown>
+) {
+  return conditions.every((condition) =>
+    isConditionMet(condition.conditional, values)
+  )
 }
 
 function isFieldConditionMet(
