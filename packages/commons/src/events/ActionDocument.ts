@@ -32,6 +32,7 @@ export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
   id: z.string(),
+  transactionId: z.string().optional(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   declaration: ActionUpdate,

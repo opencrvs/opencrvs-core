@@ -196,13 +196,17 @@ export const eventRouter = router({
         .input(RequestCorrectionActionInput)
         .use(middleware.requireAssignment())
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
-        .mutation(async (options) => {
-          return addAction(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId,
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+
+          return addAction(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId,
             status: ActionStatus.Accepted
           })
         }),
@@ -211,26 +215,32 @@ export const eventRouter = router({
         .input(ApproveCorrectionActionInput)
         .use(middleware.requireAssignment())
         .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
-        .mutation(async (options) => {
-          return approveCorrection(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+          return approveCorrection(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId
           })
         }),
       reject: publicProcedure
         .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
         .input(RejectCorrectionActionInput)
         .use(middleware.requireAssignment())
-        .mutation(async (options) => {
-          return rejectCorrection(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+          return rejectCorrection(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId
           })
         })
     })

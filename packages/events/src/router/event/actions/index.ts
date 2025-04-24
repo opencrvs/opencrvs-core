@@ -152,10 +152,13 @@ export function getDefaultActionProcedures(
       .use(middleware.requireAssignment())
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
+        const { token, user, event } = ctx
         const { eventId, transactionId } = input
         const actionId = getUUID()
-        const event = await getEventById(eventId)
+
+        if (ctx.isDuplicateAction) {
+          return event
+        }
 
         const { responseStatus, body } = await requestActionConfirmation(
           input,
@@ -214,11 +217,21 @@ export function getDefaultActionProcedures(
     accept: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
+      .use(middleware.requireAssignment())
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
+        const { token, user, event: maybeEvent } = ctx
         const { eventId, actionId, transactionId } = input
-        const event = await getEventById(eventId)
+
+        const parsedEvent = EventDocument.safeParse(maybeEvent)
+        const event = parsedEvent.success
+          ? parsedEvent.data
+          : await getEventById(eventId)
+
+        if (ctx.isDuplicateAction) {
+          return event
+        }
+
         const originalAction = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId
@@ -260,6 +273,7 @@ export function getDefaultActionProcedures(
 
     reject: publicProcedure
       .use(requireScopesMiddleware)
+      .use(middleware.requireAssignment())
       .input(
         z.object({
           actionId: z.string(),
@@ -267,9 +281,14 @@ export function getDefaultActionProcedures(
           transactionId: z.string()
         })
       )
-      .mutation(async ({ input }) => {
-        const { eventId, actionId } = input
-        const event = await getEventById(eventId)
+      .mutation(async ({ ctx, input }) => {
+        const { actionId } = input
+        const { event, isDuplicateAction } = ctx
+
+        if (isDuplicateAction) {
+          return event
+        }
+
         const action = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId

@@ -342,12 +342,16 @@ export async function addAction(
     status: status
   }
 
-  await db
+  const result = await db
     .collection<EventDocument>('events')
     .updateOne(
       { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
       { $push: { actions: action }, $set: { updatedAt: now } }
     )
+
+  if (result.matchedCount === 0) {
+    return getEventById(eventId)
+  }
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
     input.transactionId = `${transactionId}-${ActionType.UNASSIGN.toLocaleLowerCase()}`

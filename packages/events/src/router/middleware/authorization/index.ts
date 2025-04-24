@@ -50,6 +50,22 @@ export function requireAssignment() {
   return async ({ input, ctx, next }: MiddlewareOptions) => {
     const event = await getEventById(input.eventId)
 
+    /**Skip assignment check if this is a duplicate action */
+    if (
+      event.actions.some((action) =>
+        action.transactionId?.startsWith(input.transactionId)
+      )
+    ) {
+      return next({
+        ctx: {
+          ...ctx,
+          isDuplicateAction: true,
+          event
+        },
+        input
+      })
+    }
+
     const assignedTo = getAssignedUserFromActions(
       event.actions.filter(
         (action): action is ActionDocument =>
@@ -64,6 +80,12 @@ export function requireAssignment() {
         message: JSON.stringify('You are not assigned to this event')
       })
     }
-    return next()
+    return next({
+      ctx: {
+        ...ctx,
+        event
+      },
+      input
+    })
   }
 }
