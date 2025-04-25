@@ -12,77 +12,12 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import {
-  QueryInputType,
-  EventConfig,
-  workqueues
-} from '@opencrvs/commons/client'
+import { workqueues } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchResult } from './SearchResult'
-
-type Condition =
-  | { type: 'fuzzy'; term: string }
-  | { type: 'exact'; term: string }
-  | { type: 'range'; gte: string; lte: string }
-
-const ADVANCED_SEARCH_KEY = 'and'
-
-function buildCondition(type: string, value: string): Condition {
-  switch (type) {
-    case 'FUZZY':
-      return { type: 'fuzzy', term: value }
-    case 'EXACT':
-      return { type: 'exact', term: value }
-    case 'RANGE':
-      const [gte, lte] = value.split(',')
-      return { type: 'range', gte, lte }
-    default:
-      return { type: 'exact', term: value } // Fallback to exact match
-  }
-}
-
-function buildDataConditionFromSearchKeys(
-  searchKeys: {
-    fieldId: string
-    config?: {
-      type: 'FUZZY' | 'EXACT' | 'RANGE'
-    }
-  }[],
-  rawInput: Record<string, string> // values from UI or query string
-): Record<string, Condition> {
-  return searchKeys.reduce(
-    (result: Record<string, Condition>, { fieldId, config }) => {
-      const value = rawInput[fieldId]
-      if (value) {
-        const condition = buildCondition(config?.type ?? 'EXACT', value)
-
-        const transformedKey = fieldId.replace(/\./g, '____')
-        result[transformedKey] = condition
-      }
-      return result
-    },
-    {}
-  )
-}
-
-function buildDataCondition(
-  flat: Record<string, string>,
-  eventConfig: EventConfig
-): QueryInputType {
-  const advancedSearch = eventConfig.advancedSearch
-
-  // Flatten all fields into a single list of search keys
-  const searchKeys = advancedSearch.flatMap((section) =>
-    section.fields.map((field) => ({
-      fieldId: field.fieldId,
-      config: field.config // assuming field structure has a `config` prop
-    }))
-  )
-
-  return buildDataConditionFromSearchKeys(searchKeys, flat)
-}
+import { ADVANCED_SEARCH_KEY, buildDataCondition } from './utils'
 
 export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()

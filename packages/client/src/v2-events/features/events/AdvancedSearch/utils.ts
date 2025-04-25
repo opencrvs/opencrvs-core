@@ -13,7 +13,8 @@ import {
   AdvancedSearchConfig,
   EventConfig,
   FieldConfig,
-  FieldValue
+  FieldValue,
+  QueryInputType
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
@@ -59,9 +60,9 @@ export const getDefaultSearchFields = (
   const res: FieldConfig[] = []
   section.fields.forEach((field) => {
     switch (field.fieldId) {
-      case 'trackingId':
+      case 'event.trackingId':
         res.push({
-          id: 'trackingId',
+          id: 'event.trackingId',
           type: 'TEXT',
           label: {
             defaultMessage: 'Tracking ID',
@@ -70,9 +71,9 @@ export const getDefaultSearchFields = (
           }
         })
         break
-      case 'status':
+      case 'event.status':
         res.push({
-          id: 'status',
+          id: 'event.status',
           type: 'SELECT',
           label: {
             defaultMessage: 'Status of record',
@@ -88,4 +89,90 @@ export const getDefaultSearchFields = (
   })
 
   return res
+}
+
+const RegStatus = {
+  Archived: 'ARCHIVED',
+  Certified: 'CERTIFIED',
+  CorrectionRequested: 'CORRECTION_REQUESTED',
+  DeclarationUpdated: 'DECLARATION_UPDATED',
+  Declared: 'DECLARED',
+  InProgress: 'IN_PROGRESS',
+  Issued: 'ISSUED',
+  Registered: 'REGISTERED',
+  Rejected: 'REJECTED',
+  Validated: 'VALIDATED',
+  WaitingValidation: 'WAITING_VALIDATION',
+  Created: 'CREATED'
+} as const
+
+type Condition =
+  | { type: 'fuzzy'; term: string }
+  | { type: 'exact'; term: string }
+  | { type: 'range'; gte: string; lte: string }
+  | { type: 'anyOf'; terms: string[] }
+
+export const ADVANCED_SEARCH_KEY = 'and'
+
+function buildCondition(type: string, value: string): Condition {
+  switch (type) {
+    case 'FUZZY':
+      return { type: 'fuzzy', term: value }
+    case 'EXACT':
+      return { type: 'exact', term: value }
+    case 'ANY_OF':
+      return { type: 'anyOf', terms: value.split(',') }
+    case 'RANGE':
+      const [gte, lte] = value.split(',')
+      return { type: 'range', gte, lte }
+    default:
+      return { type: 'exact', term: value } // Fallback to exact match
+  }
+}
+
+function buildConditionForStatus(): Condition {
+  return { type: 'anyOf', terms: Object.values(RegStatus) }
+}
+
+function buildDataConditionFromSearchKeys(
+  searchKeys: {
+    fieldId: string
+    config?: {
+      type: 'FUZZY' | 'EXACT' | 'RANGE'
+    }
+  }[],
+  rawInput: Record<string, string> // values from UI or query string
+): Record<string, Condition> {
+  return searchKeys.reduce(
+    (result: Record<string, Condition>, { fieldId, config }) => {
+      const value = rawInput[fieldId]
+      if (fieldId === 'event.status' && value === 'ALL') {
+        const transformedKey = fieldId.replace(/\./g, '____')
+        result[transformedKey] = buildConditionForStatus()
+      } else if (value) {
+        const condition = buildCondition(config?.type ?? 'EXACT', value)
+        const transformedKey = fieldId.replace(/\./g, '____')
+        result[transformedKey] = condition
+      }
+      return result
+    },
+    {}
+  )
+}
+
+export function buildDataCondition(
+  flat: Record<string, string>,
+  eventConfig: EventConfig
+): QueryInputType {
+  const advancedSearch = eventConfig.advancedSearch
+
+  // Flatten all fields into a single list of search keys
+  const searchKeys = advancedSearch.flatMap((section) =>
+    section.fields.map((field) => ({
+      fieldId: field.fieldId,
+      config: field.config // assuming field structure has a `config` prop
+    }))
+  )
+
+  return buildDataConditionFromSearchKeys(searchKeys, flat)
 }

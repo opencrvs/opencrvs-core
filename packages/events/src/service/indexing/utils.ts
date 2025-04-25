@@ -126,10 +126,16 @@ export function buildElasticQueryFromSearchPayload(input: QueryType) {
 
     if (clause.status) {
       if (clause.status.type === 'anyOf') {
-        must.push({ terms: { status: clause.status.terms } })
+        must.push({ terms: { 'status.keyword': clause.status.terms } })
       } else if (clause.status.type === 'exact') {
-        must.push({ term: { status: clause.status.term } })
+        must.push({ term: { 'status.keyword': clause.status.term } })
       }
+    }
+
+    if (clause.trackingId) {
+      must.push({
+        term: { 'trackingId.keyword': clause.trackingId.term }
+      })
     }
 
     if (clause.createdAt) {
@@ -187,14 +193,6 @@ export function buildElasticQueryFromSearchPayload(input: QueryType) {
             location: clause.updatedAtLocation.location
           }
         })
-      }
-    }
-
-    const exactFields = ['createdBy', 'updatedBy', 'trackingId']
-    for (const field of exactFields) {
-      const fieldValue = clause[field]
-      if (fieldValue && fieldValue.type === 'exact') {
-        must.push({ term: { [field]: fieldValue.term } })
       }
     }
 

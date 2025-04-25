@@ -29,21 +29,30 @@ function toQueryType(
   searchParams: QueryInputType,
   type: 'and' | 'or'
 ): QueryType {
+  const topLevelFields: Record<string, unknown> = {}
+  const dataFields: Record<string, unknown> = {}
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (key.startsWith('event')) {
+      const strippedKey = key.replace(/^event____/, '')
+      topLevelFields[strippedKey] = value
+    } else {
+      dataFields[key] = value
+    }
+  })
+
+  const queryExpression: QueryType = {
+    type: 'and',
+    eventType,
+    ...topLevelFields,
+    data: dataFields
+  }
+
   return type === 'and'
-    ? {
-        type: 'and',
-        eventType,
-        data: searchParams
-      }
+    ? queryExpression
     : {
         type: 'or',
-        clauses: [
-          {
-            type: 'and',
-            eventType,
-            data: searchParams
-          }
-        ]
+        clauses: [queryExpression]
       }
 }
 
