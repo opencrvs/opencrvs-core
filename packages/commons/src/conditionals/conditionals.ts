@@ -505,7 +505,7 @@ export function field(fieldId: string) {
  */
 export function eventField(fieldId: MetadataField, options?: SelectOption[]) {
   return {
-    fieldId: `event.${fieldId}`,
+    fieldId,
     options,
     config: { type: 'EXACT' as const }
   }

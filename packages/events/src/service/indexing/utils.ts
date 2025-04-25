@@ -231,5 +231,7 @@ export function buildElasticQueryFromSearchPayload(input: QueryType) {
   }
 
   // default fallback (shouldn't happen if input is validated correctly)
-  return { match_all: {} }
+  return {
+    bool: { must_not: { match_all: {} } }
+  } as estypes.QueryDslQueryContainer
 }

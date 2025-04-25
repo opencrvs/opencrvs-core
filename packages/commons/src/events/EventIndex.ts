@@ -69,7 +69,7 @@ const QueryExpression = z
   .object({
     type: z.literal('and'),
     eventType: z.string(),
-    searchType: z.optional(z.union([AnyOf, Exact])),
+    searchType: z.optional(z.union([AnyOf, Exact, Fuzzy])),
     status: z.optional(z.union([AnyOf, Exact])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
