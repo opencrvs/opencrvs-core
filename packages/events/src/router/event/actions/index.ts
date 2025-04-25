@@ -140,12 +140,14 @@ export function getDefaultActionProcedures(
     request: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema)
-      .use(middleware.requireAssignment())
+      .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
-        const { token, user, event } = ctx
+        const { token, user } = ctx
         const { eventId, transactionId } = input
         const actionId = getUUID()
+
+        const event = await getEventById(eventId)
 
         if (ctx.isDuplicateAction) {
           return event
@@ -208,16 +210,13 @@ export function getDefaultActionProcedures(
     accept: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(middleware.requireAssignment())
+      .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
-        const { token, user, event: maybeEvent } = ctx
+        const { token, user } = ctx
         const { eventId, actionId, transactionId } = input
 
-        const parsedEvent = EventDocument.safeParse(maybeEvent)
-        const event = parsedEvent.success
-          ? parsedEvent.data
-          : await getEventById(eventId)
+        const event = await getEventById(eventId)
 
         if (ctx.isDuplicateAction) {
           return event
@@ -263,8 +262,6 @@ export function getDefaultActionProcedures(
       }),
 
     reject: publicProcedure
-      .use(requireScopesMiddleware)
-      .use(middleware.requireAssignment())
       .input(
         z.object({
           actionId: z.string(),
@@ -272,11 +269,13 @@ export function getDefaultActionProcedures(
           transactionId: z.string()
         })
       )
+      .use(requireScopesMiddleware)
+      .use(middleware.requireAssignment)
       .mutation(async ({ ctx, input }) => {
-        const { actionId } = input
-        const { event, isDuplicateAction } = ctx
+        const { actionId, eventId } = input
+        const event = await getEventById(eventId)
 
-        if (isDuplicateAction) {
+        if (ctx.isDuplicateAction) {
           return event
         }
 
@@ -297,7 +296,7 @@ export function getDefaultActionProcedures(
           }
 
           // Action is already rejected, so we just return the event
-          return getEventById(input.eventId)
+          return event
         }
 
         return addAsyncRejectAction({

@@ -161,6 +161,9 @@ export const ReadActionInput = BaseActionInput.merge(
 
 export type ReadActionInput = z.infer<typeof ReadActionInput>
 
+export const DeleteActionInput = z.object({ eventId: z.string() })
+export type DeleteActionInput = z.infer<typeof DeleteActionInput>
+
 /**
  * ActionInput types are used to validate the input data for the action.
  * In our use case, we use it directly with TRPC to validate the input data for the action.

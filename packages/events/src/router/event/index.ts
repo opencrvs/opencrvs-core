@@ -27,7 +27,8 @@ import {
   AssignActionInput,
   UnassignActionInput,
   ACTION_ALLOWED_SCOPES,
-  CONFIG_GET_ALLOWED_SCOPES
+  CONFIG_GET_ALLOWED_SCOPES,
+  DeleteActionInput
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -119,8 +120,8 @@ export const eventRouter = router({
     }),
   delete: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))
-    .input(z.object({ eventId: z.string() }))
-    .use(middleware.requireAssignment())
+    .input(DeleteActionInput)
+    .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
@@ -183,7 +184,7 @@ export const eventRouter = router({
           )
         )
         .input(RequestCorrectionActionInput)
-        .use(middleware.requireAssignment())
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
         .mutation(async ({ input, ctx }) => {
           if (ctx.isDuplicateAction) {
@@ -206,7 +207,7 @@ export const eventRouter = router({
           )
         )
         .input(ApproveCorrectionActionInput)
-        .use(middleware.requireAssignment())
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
         .mutation(async ({ input, ctx }) => {
           if (ctx.isDuplicateAction) {
@@ -227,7 +228,7 @@ export const eventRouter = router({
           )
         )
         .input(RejectCorrectionActionInput)
-        .use(middleware.requireAssignment())
+        .use(middleware.requireAssignment)
         .mutation(async ({ input, ctx }) => {
           if (ctx.isDuplicateAction) {
             return ctx.event

@@ -9,15 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
+import { experimental_standaloneMiddleware, TRPCError } from '@trpc/server'
 import {
   ActionDocument,
+  ActionInputWithType,
   ActionType,
+  DeleteActionInput,
   getAssignedUserFromActions,
   inScope,
   Scope
 } from '@opencrvs/commons'
-import { MiddlewareOptions } from '@events/router/middleware/utils'
+import { Context, MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
 
 /**
@@ -46,46 +48,37 @@ export function requiresAnyOfScopes(scopes: Scope[]) {
   }
 }
 
-export function requireAssignment() {
-  return async ({ input, ctx, next }: MiddlewareOptions) => {
-    const event = await getEventById(input.eventId)
-
-    /**Skip assignment check if this is a duplicate action */
-    if (
-      event.actions.some((action) =>
+/**@todo Investigate: `experimental_standaloneMiddleware has been deprecated in favor of .concat()` */
+export const requireAssignment = experimental_standaloneMiddleware<{
+  input: ActionInputWithType | DeleteActionInput
+  ctx: Context
+}>().create(async ({ next, ctx, input }) => {
+  const event = await getEventById(input.eventId)
+  if (
+    event.actions.some(
+      (action) =>
+        'transactionId' in input &&
         action.transactionId?.startsWith(input.transactionId)
-      )
-    ) {
-      return next({
-        ctx: {
-          ...ctx,
-          isDuplicateAction: true,
-          event
-        },
-        input
-      })
-    }
-
-    const assignedTo = getAssignedUserFromActions(
-      event.actions.filter(
-        (action): action is ActionDocument =>
-          action.type === ActionType.ASSIGN ||
-          action.type === ActionType.UNASSIGN
-      )
     )
-
-    if (ctx.user.id !== assignedTo) {
-      throw new TRPCError({
-        code: 'CONFLICT',
-        message: JSON.stringify('You are not assigned to this event')
-      })
-    }
+  ) {
     return next({
-      ctx: {
-        ...ctx,
-        event
-      },
+      ctx: { ...ctx, isDuplicateAction: true, event },
       input
     })
   }
-}
+
+  const assignedTo = getAssignedUserFromActions(
+    event.actions.filter(
+      (action): action is ActionDocument =>
+        action.type === ActionType.ASSIGN || action.type === ActionType.UNASSIGN
+    )
+  )
+
+  if (ctx.user.id !== assignedTo) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: JSON.stringify('You are not assigned to this event')
+    })
+  }
+  return next()
+})
