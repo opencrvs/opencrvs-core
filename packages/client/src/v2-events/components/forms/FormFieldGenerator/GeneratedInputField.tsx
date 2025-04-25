@@ -121,7 +121,7 @@ export const GeneratedInputField = React.memo(
       // If label is hidden or default message is empty, we don't need to render label
       label,
       required: fieldDefinition.required,
-      disabled: fieldDefinition.disabled || readonlyMode,
+      disabled: readonlyMode,
       error,
       touched
     }
@@ -132,7 +132,7 @@ export const GeneratedInputField = React.memo(
       onChange,
       onBlur,
       value,
-      disabled: disabled || fieldDefinition.disabled || readonlyMode,
+      disabled: disabled || readonlyMode,
       error: Boolean(error),
       touched,
       placeholder:
