@@ -20,6 +20,7 @@ import {
   Button,
   Checkbox,
   Icon,
+  IconProps,
   Link,
   ListReview,
   ResponsiveModal,
@@ -578,7 +579,8 @@ function ReviewActionComponent({
   onReject,
   messages,
   primaryButtonType,
-  canSendIncomplete
+  canSendIncomplete,
+  icon
 }: {
   incomplete: boolean
   onConfirm: () => void
@@ -591,6 +593,7 @@ function ReviewActionComponent({
   }
   primaryButtonType?: 'positive' | 'primary'
   canSendIncomplete?: boolean
+  icon: IconProps['name']
 }) {
   const intl = useIntl()
 
@@ -610,7 +613,7 @@ function ReviewActionComponent({
               type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
-              <Icon color="white" name="Check" />
+              <Icon color="white" name={icon} />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
             {onReject && messages.onReject && (
