@@ -34,13 +34,11 @@ import { FormSectionComponent } from './FormSectionComponent'
 
 function mapFieldsToValues(
   fields: FieldConfig[],
-  declaration: EventState,
   systemVariables: SystemVariables
 ) {
   return fields.reduce((memo, field) => {
     const fieldInitialValue = handleDefaultValue({
       field,
-      declaration,
       systemVariables
     })
 
@@ -73,8 +71,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
 
-    const formikCompatibleForm = makeFormFieldIdsFormikCompatible(props.form)
-
     const formikOnChange = (values: EventState) => {
       props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
     }
@@ -83,7 +79,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(props.fields, formikCompatibleForm, {
+        ...mapFieldsToValues(props.fields, {
           $user: user
         }),
         ...props.initialValues

@@ -25,11 +25,7 @@ import {
   AddressType,
   TranslationConfig
 } from '@opencrvs/commons/client'
-import { TEXT } from '@client/forms'
 import {
-  evalExpressionInFieldDefinition,
-  getDependentFields,
-  hasDefaultValueDependencyInfo,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible
 } from '@client/v2-events/components/forms/utils'
@@ -156,39 +152,8 @@ export class FormSectionComponent extends React.Component<AllProps> {
           : AddressType.INTERNATIONAL
       )
     }
-    const updateDependentFields = (id: string) => {
-      const dependentFields = getDependentFields(this.props.fields, id)
-      for (const field of dependentFields) {
-        if (
-          !field.defaultValue ||
-          !hasDefaultValueDependencyInfo(field.defaultValue)
-        ) {
-          continue
-        }
-
-        updatedValues[field.id] = evalExpressionInFieldDefinition(
-          field.defaultValue.expression,
-          { $form: updatedValues }
-        )
-        updateDependentFields(field.id)
-      }
-    }
-
-    updateDependentFields(fieldId)
 
     void this.props.setValues(updatedValues)
-  }
-
-  resetDependentSelectValues = (fieldId: string) => {
-    const fields = this.props.fields
-    const fieldsToReset = fields.filter(
-      (field) => field.type === TEXT && field.dependsOn?.includes(fieldId)
-    )
-
-    fieldsToReset.forEach((fieldToReset) => {
-      void this.props.setFieldValue(fieldToReset.id, '')
-      this.resetDependentSelectValues(fieldToReset.id)
-    })
   }
 
   render() {

@@ -9,14 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  EventState,
   FieldConfig,
-  Inferred,
   FieldValue,
   SystemVariables,
   isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
-import { DependencyInfo } from '@client/forms'
 import { replacePlaceholders } from '@client/v2-events/utils'
 
 /*
@@ -30,41 +27,16 @@ export function makeFormFieldIdFormikCompatible(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_SEPARATOR)
 }
 
-export function evalExpressionInFieldDefinition(
-  expression: string,
-  /*
-   * These are used in the eval expression
-   */
-  { $form }: { $form: EventState }
-) {
-  // eslint-disable-next-line no-eval
-  return eval(expression) as FieldValue
-}
-
-export function hasDefaultValueDependencyInfo(
-  value: Inferred['defaultValue']
-): value is DependencyInfo {
-  return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
-}
-
 export function handleDefaultValue({
   field,
-  declaration,
   systemVariables
 }: {
   field: FieldConfig
-  declaration: EventState
   systemVariables: SystemVariables
 }) {
   const defaultValue = field.defaultValue
 
-  if (hasDefaultValueDependencyInfo(defaultValue)) {
-    return evalExpressionInFieldDefinition(defaultValue.expression, {
-      $form: declaration
-    })
-  }
-
-  if (isFieldConfigDefaultValue(defaultValue)) {
+  if (isFieldConfigDefaultValue(field.defaultValue)) {
     return replacePlaceholders({
       fieldType: field.type,
       defaultValue,
@@ -73,21 +45,6 @@ export function handleDefaultValue({
   }
 
   return defaultValue
-}
-
-export function getDependentFields(
-  fields: FieldConfig[],
-  fieldId: string
-): FieldConfig[] {
-  return fields.filter((field) => {
-    if (!field.defaultValue) {
-      return false
-    }
-    if (!hasDefaultValueDependencyInfo(field.defaultValue)) {
-      return false
-    }
-    return field.defaultValue.dependsOn.includes(fieldId)
-  })
 }
 
 export interface Stringifiable {

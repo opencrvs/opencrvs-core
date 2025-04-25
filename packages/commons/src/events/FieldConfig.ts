@@ -17,37 +17,26 @@ import {
   CheckboxFieldValue,
   DateValue,
   NumberFieldValue,
-  RequiredTextValue,
+  NonEmptyTextValue,
   TextValue
 } from './FieldValue'
 import { AddressFieldValue } from './CompositeFieldValue'
 
 const FieldId = z.string()
 
-const DependencyExpression = z.object({
-  dependsOn: z.array(FieldId).default([]),
-  expression: z.string()
-})
-
 const BaseField = z.object({
   id: FieldId,
   defaultValue: z
     .union([
-      // These are the currently supported default values types
-      z.union([
-        TextValue,
-        RequiredTextValue,
-        DateValue,
-        NumberFieldValue,
-        CheckboxFieldValue
-      ]),
-      DependencyExpression
+      TextValue,
+      NonEmptyTextValue,
+      DateValue,
+      NumberFieldValue,
+      CheckboxFieldValue
     ])
     .optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
-  disabled: z.boolean().default(false).optional(),
-  hidden: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
   validation: z
     .array(
@@ -58,7 +47,6 @@ const BaseField = z.object({
     )
     .default([])
     .optional(),
-  dependsOn: z.array(FieldId).default([]).optional(),
   label: TranslationConfig,
   hideLabel: z.boolean().default(false).optional()
 })
@@ -72,7 +60,7 @@ export type Divider = z.infer<typeof Divider>
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
+  defaultValue: NonEmptyTextValue.optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -88,7 +76,7 @@ export type TextField = z.infer<typeof TextField>
 
 const NumberField = BaseField.extend({
   type: z.literal(FieldType.NUMBER),
-  defaultValue: z.union([NumberFieldValue, DependencyExpression]).optional(),
+  defaultValue: NumberFieldValue.optional(),
   configuration: z
     .object({
       min: z.number().optional().describe('Minimum value'),
@@ -101,7 +89,7 @@ const NumberField = BaseField.extend({
 
 const TextAreaField = BaseField.extend({
   type: z.literal(FieldType.TEXTAREA),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
+  defaultValue: NonEmptyTextValue.optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -158,14 +146,14 @@ export const EmailField = BaseField.extend({
     })
     .default({ maxLength: 10 })
     .optional(),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
+  defaultValue: NonEmptyTextValue.optional()
 })
 
 export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: z.union([DateValue, DependencyExpression]).optional(),
+  defaultValue: DateValue.optional(),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -192,7 +180,7 @@ export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
 
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
+  defaultValue: NonEmptyTextValue.optional(),
   configuration: z
     .object({
       styles: z
@@ -208,7 +196,7 @@ export type Paragraph = z.infer<typeof Paragraph>
 
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
+  defaultValue: NonEmptyTextValue.optional()
 }).describe('A read-only header component for form pages')
 
 export type PageHeader = z.infer<typeof PageHeader>
@@ -250,7 +238,7 @@ const SelectOption = z.object({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
-  defaultValue: z.union([TextValue, DependencyExpression]).optional(),
+  defaultValue: TextValue.optional(),
   options: z.array(SelectOption).describe('A list of options'),
   configuration: z
     .object({
@@ -267,7 +255,7 @@ export type RadioGroup = z.infer<typeof RadioGroup>
 
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
-  defaultValue: z.string().optional(),
+  defaultValue: TextValue.optional(),
   items: z.array(TranslationConfig).describe('A list of items'),
   configuration: z
     .object({
@@ -284,20 +272,20 @@ export type BulletList = z.infer<typeof BulletList>
 
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
-  defaultValue: z.union([TextValue, DependencyExpression]).optional(),
+  defaultValue: TextValue.optional(),
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
 const Checkbox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX),
-  defaultValue: z.union([CheckboxFieldValue, DependencyExpression]).optional()
+  defaultValue: CheckboxFieldValue.optional()
 }).describe('Boolean checkbox field')
 
 export type Checkbox = z.infer<typeof Checkbox>
 
 const Country = BaseField.extend({
   type: z.literal(FieldType.COUNTRY),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
+  defaultValue: NonEmptyTextValue.optional()
 }).describe('Country select field')
 
 export type Country = z.infer<typeof Country>
@@ -322,7 +310,7 @@ const AdministrativeAreaConfiguration = z
 
 const AdministrativeArea = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional(),
+  defaultValue: NonEmptyTextValue.optional(),
   configuration: AdministrativeAreaConfiguration
 }).describe('Administrative area input field e.g. facility, office')
 
@@ -330,7 +318,7 @@ export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 const Location = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
+  defaultValue: NonEmptyTextValue.optional()
 }).describe('Input field for a location')
 
 export type Location = z.infer<typeof Location>
@@ -357,14 +345,14 @@ export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
+  defaultValue: NonEmptyTextValue.optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
-  defaultValue: z.union([RequiredTextValue, DependencyExpression]).optional()
+  defaultValue: NonEmptyTextValue.optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
