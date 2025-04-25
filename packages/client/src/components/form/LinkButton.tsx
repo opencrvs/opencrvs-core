@@ -73,6 +73,18 @@ export const LinkButtonField = ({
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
     if (data || error) {
       if (section && declaration && userId) {
+        /**
+         * As we are redirecting to a new page with window.location.replace and
+         * this pushes a new entry to the browser's history stack, when the user
+         * clicks the back button and returns to the form, the app reloads, the state of the form
+         * will be lost. To avoid this, we are updating the declaration in the
+         * store with the updated values of the form fields. This will ensure that
+         * the form state is preserved when the user returns to the form after
+         * clicking the back button.
+         * The user experience can be seen here:
+         * https://github.com/opencrvs/opencrvs-core/issues/9096#issuecomment-2804381010
+         * @todo we should improve this user experience
+         */
         const updatedFormData =
           FormSectionComponent.getUpdatedValuesAfterDependentFieldEvaluation(
             form,
