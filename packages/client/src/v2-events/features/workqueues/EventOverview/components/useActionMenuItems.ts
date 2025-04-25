@@ -173,6 +173,10 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
 
+  /**
+   * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
+   * If you need to extend the functionality, consider whether it can be done elsewhere.
+   */
   const config = {
     [ActionType.READ]: {
       label: actionLabels[ActionType.READ],
