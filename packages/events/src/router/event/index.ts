@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { SCOPES, getUUID } from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import {
   ActionType,
   Draft,
@@ -25,6 +25,9 @@ import {
   RequestCorrectionActionInput,
   AssignActionInput,
   UnassignActionInput,
+  ACTION_ALLOWED_SCOPES,
+  CONFIG_GET_ALLOWED_SCOPES,
+  CONFIG_SEARCH_ALLOWED_SCOPES,
   QueryType
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
@@ -62,41 +65,17 @@ function validateEventType({
   }
 }
 
-const RECORD_READ_SCOPES = [
-  SCOPES.RECORD_DECLARE,
-  SCOPES.RECORD_READ,
-  SCOPES.RECORD_SUBMIT_INCOMPLETE,
-  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_EXPORT_RECORDS
-]
-
-const RECORD_SEARCH_SCOPES = [
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_MARRIAGE,
-  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-]
-
 export const eventRouter = router({
   config: router({
     get: publicProcedure
-      .use(
-        requiresAnyOfScopes([
-          ...RECORD_READ_SCOPES,
-          SCOPES.CONFIG,
-          SCOPES.CONFIG_UPDATE_ALL
-        ])
-      )
+      .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
       .output(z.array(EventConfig))
       .query(async (options) => {
         return getEventConfigurations(options.ctx.token)
       })
   }),
   create: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.CREATE]))
     .input(EventInput)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
@@ -116,7 +95,7 @@ export const eventRouter = router({
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
-    .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
@@ -140,7 +119,7 @@ export const eventRouter = router({
       return updatedEvent
     }),
   delete: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))
     .input(z.object({ eventId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
@@ -199,7 +178,9 @@ export const eventRouter = router({
     correction: router({
       request: publicProcedure
         .use(
-          requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION])
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.REQUEST_CORRECTION]
+          )
         )
         .input(RequestCorrectionActionInput)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
@@ -214,7 +195,11 @@ export const eventRouter = router({
           })
         }),
       approve: publicProcedure
-        .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
+        .use(
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.APPROVE_CORRECTION]
+          )
+        )
         .input(ApproveCorrectionActionInput)
         .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
         .mutation(async (options) => {
@@ -227,7 +212,11 @@ export const eventRouter = router({
           })
         }),
       reject: publicProcedure
-        .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
+        .use(
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.REJECT_CORRECTION]
+          )
+        )
         .input(RejectCorrectionActionInput)
         .mutation(async (options) => {
           return rejectCorrection(options.input, {
@@ -241,11 +230,11 @@ export const eventRouter = router({
     })
   }),
   list: publicProcedure
-    .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
   search: publicProcedure
-    .use(requiresAnyOfScopes(RECORD_SEARCH_SCOPES))
+    .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
     .query(async ({ input }) => getIndex(input))
 })
