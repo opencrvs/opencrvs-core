@@ -41,7 +41,6 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import { SEARCH_RESULT_SORT } from '@client/utils/constants'
 import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
@@ -349,8 +348,7 @@ function SearchResultView(props: ISearchResultProps) {
                           !canSearchAnywhere() && userDetails
                             ? getUserLocation(userDetails).id
                             : ''
-                      },
-                      sort: SEARCH_RESULT_SORT
+                      }
                     }
                   }
                 ],
@@ -480,8 +478,7 @@ function SearchResultView(props: ISearchResultProps) {
               contactEmail:
                 searchType === SearchCriteria.EMAIL ? searchText : '',
               name: searchType === SearchCriteria.NAME ? searchText : ''
-            },
-            sort: SEARCH_RESULT_SORT
+            }
           }}
           fetchPolicy="cache-and-network"
         >
