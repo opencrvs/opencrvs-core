@@ -34,7 +34,7 @@ function FileInput({
   name: string
   description?: string
   error?: string
-  label?: string
+  label: string
   touched?: boolean
 }) {
   const [file, setFile] = React.useState(value)
@@ -60,7 +60,7 @@ function FileInput({
       description={description}
       error={error}
       file={file}
-      label={label ?? file?.originalFilename}
+      label={label}
       maxFileSize={maxFileSize}
       name={name}
       touched={touched}
