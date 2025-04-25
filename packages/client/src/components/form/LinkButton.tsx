@@ -26,7 +26,12 @@ import { Button, getTheme, Icon } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import { useParams } from 'react-router-dom'
 import { useDeclaration } from '@client/declarations/selectors'
-import { writeDeclaration } from '@client/declarations'
+import {
+  writeDeclaration,
+  writeDeclarationByUserWithoutStateUpdate
+} from '@client/declarations'
+import { merge } from 'lodash'
+import { FormSectionComponent } from './FormFieldGenerator'
 
 export const LinkButtonField = ({
   fields,
@@ -56,16 +61,34 @@ export const LinkButtonField = ({
   const trigger = fields.find(
     (f) => f.name === fieldDefinition.options.callback.trigger
   )!
-  const { declarationId = '' } = useParams()
+  const { declarationId = '', pageId: section } = useParams()
   const declaration = useDeclaration(declarationId)
   const dispatch = useDispatch()
-  const onChange: Parameters<typeof useHttp>[1] = ({
+  const userId = useSelector(getUserDetails)?.id
+  const onChange: Parameters<typeof useHttp>[1] = async ({
     data,
     error,
     loading
   }) => {
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
     if (data || error) {
+      if (section && declaration && userId) {
+        const updatedFormData =
+          FormSectionComponent.getUpdatedValuesAfterDependentFieldEvaluation(
+            form,
+            fields,
+            trigger.name,
+            { loading, data, error } as IFormFieldValue,
+            { config, draft, user }
+          )
+        writeDeclarationByUserWithoutStateUpdate(userId, {
+          ...declaration,
+          data: {
+            ...declaration.data,
+            [section]: merge(declaration.data[section], updatedFormData)
+          }
+        })
+      }
       // remove query parameters from the URL after successful or failed callback request
       const url = new URL(window.location.href)
       url.search = '' // Remove all query parameters

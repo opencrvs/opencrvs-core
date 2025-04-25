@@ -871,7 +871,7 @@ export interface ITouchedNestedFields {
   }
 }
 
-class FormSectionComponent extends React.Component<Props> {
+export class FormSectionComponent extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     const userChangedForm = !isEqual(this.props.values, prevProps.values)
     const sectionChanged = prevProps.id !== this.props.id
@@ -951,26 +951,52 @@ class FormSectionComponent extends React.Component<Props> {
     this.props.setFieldTouched(e.target.name)
   }
 
-  setFieldValuesWithDependency = (
+  static getUpdatedValuesAfterDependentFieldEvaluation = (
+    existingValues: IFormSectionData,
+    fields: IFormField[],
     fieldName: string,
-    value: IFormFieldValue
-  ) => {
-    const updatedValues = cloneDeep(this.props.values)
+    value: IFormFieldValue,
+    evalParams: {
+      config: IOfflineData
+      draft: IFormData
+      user: UserDetails | null
+    }
+  ): IFormSectionData => {
+    const updatedValues = cloneDeep(existingValues)
     set(updatedValues, fieldName, value)
     const updateDependentFields = (fieldName: string) => {
-      const dependentFields = getDependentFields(this.props.fields, fieldName)
+      const dependentFields = getDependentFields(fields, fieldName)
       for (const field of dependentFields) {
         updatedValues[field.name] = evalExpressionInFieldDefinition(
           (field.initialValue as DependencyInfo).expression,
           updatedValues,
-          this.props.offlineCountryConfig,
-          this.props.draftData,
-          this.props.userDetails
+          evalParams.config,
+          evalParams.draft,
+          evalParams.user
         )
         updateDependentFields(field.name)
       }
     }
     updateDependentFields(fieldName)
+    return updatedValues
+  }
+
+  setFieldValuesWithDependency = (
+    fieldName: string,
+    value: IFormFieldValue
+  ) => {
+    const updatedValues =
+      FormSectionComponent.getUpdatedValuesAfterDependentFieldEvaluation(
+        this.props.values,
+        this.props.fields,
+        fieldName,
+        value,
+        {
+          config: this.props.offlineCountryConfig,
+          draft: this.props.draftData,
+          user: this.props.userDetails
+        }
+      )
 
     this.props.setValues(updatedValues)
   }

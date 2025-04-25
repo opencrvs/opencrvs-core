@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect } from 'react'
+import React from 'react'
 import { BannerType, IFormFieldValue, IFormSectionData } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { Banner, Button, Text, ResponsiveModal } from '@opencrvs/components'
@@ -17,12 +17,6 @@ import { useModal } from '@client/hooks/useModal'
 import { buttonMessages } from '@client/i18n/messages'
 import { VerificationPill } from './VerificationPill'
 import { StatusIcon } from './StatusIcon'
-import { useDeclaration } from '@client/declarations/selectors'
-import { useSelector } from 'react-redux'
-import { merge } from 'lodash'
-import { useParams } from 'react-router-dom'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { writeDeclarationByUserWithoutStateUpdate } from '@client/declarations'
 
 const ConfirmationModal: React.FC<{
   close: (result: boolean) => void
@@ -75,31 +69,6 @@ export const IDVerificationBanner = ({
 }) => {
   const intl = useIntl()
   const [modal, openModal] = useModal()
-  const { declarationId = '', pageId: section } = useParams()
-  const declaration = useDeclaration(declarationId)
-  const userId = useSelector(getUserDetails)?.id
-  useEffect(() => {
-    if (
-      (type === 'authenticated' || type === 'failedFetchIdDetails') &&
-      !!form[idFieldName] &&
-      !!declaration &&
-      section &&
-      userId
-    ) {
-      // update and save the declaration in indexedDB
-      // to persist the ID verification details
-      // we have to do it here because the updated values of entire section
-      // of the fields depending on id field are not available
-      // when the link button is rendered
-      writeDeclarationByUserWithoutStateUpdate(userId, {
-        ...declaration,
-        data: {
-          ...declaration.data,
-          [section]: merge(declaration.data[section], form)
-        }
-      })
-    }
-  }, [declaration, form, idFieldName, section, type, userId])
   const handleReset = async () => {
     const confirm = await openModal((close) => (
       <ConfirmationModal close={close} type={type} />
