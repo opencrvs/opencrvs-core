@@ -65,7 +65,8 @@ function getSectionFields(
 
     const modifiedFields = advancedSearchFields.map((f) => ({
       ...f,
-      required: false as const // advanced search fields need not be required
+      required: false as const, // advanced search fields need not be required
+      defaultValue: undefined // advanced search fields need no default or initial value
     }))
 
     return (
