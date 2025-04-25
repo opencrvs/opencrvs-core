@@ -30,7 +30,6 @@ export async function stop() {
 
 export async function start() {
   logger.info(`REDIS_HOST, ${JSON.stringify(env.REDIS_HOST)}`)
-  logger.info(`REDIS_PASSWORD, ${JSON.stringify(env.REDIS_PASSWORD)}`)
   redisClient = redis.createClient({
     host: env.REDIS_HOST,
     password: env.REDIS_PASSWORD,
