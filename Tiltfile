@@ -33,8 +33,6 @@ dependencies_namespace = 'opencrvs-deps-dev'
 if not os.path.exists('../infrastructure'):
     local("git clone git@github.com:opencrvs/infrastructure.git ../infrastructure")
 
-local_resource('README.md', cmd='awk "/For OpenCRVS Core Developers/{flag=1; next} /For OpenCRVS Country Config Developers/{flag=0} flag" ../infrastructure/README.md', labels=['0.Readme'])
-
 ############################################################
 # What common Tiltfile does?
 # - Group resources by label on UI: http://localhost:10350/
@@ -45,7 +43,7 @@ load('ext://namespace', 'namespace_create', 'namespace_inject')
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
 
 # If your machine is powerful feel free to change parallel updates from default 3
-# update_settings(max_parallel_updates=3)
+update_settings(max_parallel_updates=1)
 
 ############################################################
 # Build images:
