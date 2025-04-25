@@ -12,7 +12,7 @@ import { cleanEnv, str, port, url, bool, num } from 'envalid'
 
 export const env = cleanEnv(process.env, {
   REDIS_HOST: str({ devDefault: 'localhost' }),
-  REDIS_PASSWORD: str({ devDefault: 'password' }),
+  REDIS_PASSWORD: str({ default: undefined }),
   HOST: str({ devDefault: '0.0.0.0' }),
   PORT: port({ default: 7070 }),
   DOMAIN: str({ devDefault: '*' }),

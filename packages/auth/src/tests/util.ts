@@ -29,7 +29,6 @@ export function createProductionEnvironmentServer() {
     METRICS_URL: 'http://localhost:1050',
     NOTIFICATION_SERVICE_URL: 'http://localhost:2020/',
     REDIS_HOST: 'localhost',
-    REDIS_PASSWORD: 'password',
     USER_MANAGEMENT_URL: 'http://localhost:3030/'
   })
 }

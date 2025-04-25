@@ -19,18 +19,20 @@ export async function stop() {
   redisClient.quit()
 }
 
-export function start(
-  host = REDIS_HOST,
-  port?: number,
-  password = REDIS_PASSWORD
-) {
+export function start(host = REDIS_HOST, port?: number) {
+  if (process.env.NODE_ENV === 'production' && !REDIS_PASSWORD) {
+    throw new Error(
+      'REDIS_PASSWORD is not set. Please make sure a password exists'
+    )
+  }
+
   return new Promise<redis.RedisClient>((resolve) => {
     logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
     logger.info(`REDIS_PORT, ${JSON.stringify(port)}`)
     redisClient = redis.createClient({
       host,
       port,
-      password,
+      password: REDIS_PASSWORD,
       retry_strategy: () => {
         return 1000
       }
