@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as redis from 'redis'
-import { REDIS_HOST } from '@gateway/constants'
-import { REDIS_PASSWORD } from '@gateway/constants'
+import { REDIS_HOST, REDIS_PASSWORD } from '@gateway/constants'
 import { promisify } from 'util'
 import { logger } from '@opencrvs/commons'
 
@@ -20,13 +19,18 @@ export async function stop() {
   redisClient.quit()
 }
 
-export function start(host = REDIS_HOST, port?: number, password = REDIS_PASSWORD) {
+export function start(
+  host = REDIS_HOST,
+  port?: number,
+  password = REDIS_PASSWORD
+) {
   return new Promise<redis.RedisClient>((resolve) => {
     logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
+    logger.info(`REDIS_PORT, ${JSON.stringify(port)}`)
     redisClient = redis.createClient({
-      host: host,
+      host,
       port,
-      password: password,
+      password,
       retry_strategy: () => {
         return 1000
       }
