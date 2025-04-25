@@ -194,6 +194,7 @@ export function Review() {
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
+          icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
