@@ -19,7 +19,8 @@ import {
   FieldType,
   not,
   FieldConfig,
-  EventState
+  EventState,
+  generateTranslationConfig
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -168,6 +169,132 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
         await canvas.findByDisplayValue(12)
 
         await canvas.findByText('Exact date of birth unknown')
+      }
+    )
+  }
+}
+
+const styles = ['defensive', 'allrounder', 'hard-hitter'] as const
+
+const tennisStyleFields = [
+  {
+    id: 'tennis.style',
+    type: FieldType.SELECT,
+    required: true,
+    label: generateTranslationConfig('tennis style'),
+    options: [
+      {
+        label: generateTranslationConfig('defensive'),
+        value: 'defensive'
+      },
+      {
+        label: generateTranslationConfig('allrounder'),
+        value: 'allrounder'
+      },
+      {
+        label: generateTranslationConfig('hard-hitter'),
+        value: 'hard-hitter'
+      }
+    ]
+  },
+  ...styles.flatMap((style) => ({
+    id: `${style}.firstname`,
+    type: FieldType.TEXT,
+    required: true,
+    label: generateTranslationConfig('first name'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('tennis.style').isEqualTo(style)
+      }
+    ]
+  }))
+]
+/**
+ * Test case for a bug where conditional values were not being updated correctly due to the wrong apply order of items.
+ */
+export const ConditionalFieldsPersistValue: StoryObj<
+  typeof FormFieldGenerator
+> = {
+  name: 'Toggling conditional fields resets fields but keeps the values',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    const [formData, setFormData] = React.useState<EventState>({
+      'tennis.style': 'defensive',
+      'defensive.firstname': 'Roger'
+    })
+    return (
+      <StyledFormFieldGenerator
+        declaration={declaration}
+        fields={tennisStyleFields}
+        form={formData}
+        id="my-form"
+        initialValues={formData}
+        setAllFieldsDirty={false}
+        onChange={(data) => {
+          args.onChange(data)
+          setFormData(data)
+        }}
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders the form with correct initial values', async () => {
+      await canvas.findByText('tennis style')
+      await canvas.findByText('defensive')
+
+      await canvas.findByText('first name')
+      await canvas.findByDisplayValue('Roger')
+    })
+
+    await step(
+      'Shows new, empty firstname input when selecting a different style',
+      async () => {
+        await userEvent.click(await canvas.findByText('defensive'))
+        await userEvent.click(await canvas.findByText('allrounder'))
+
+        await canvas.findByText('tennis style')
+        await canvas.findByText('allrounder')
+        await expect(canvas.queryByText('defensive')).not.toBeInTheDocument()
+
+        await canvas.findByText('first name')
+        await expect(
+          canvas.queryByDisplayValue('Roger')
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'fills in name for defensive player first name input',
+      async () => {
+        await userEvent.type(
+          await canvas.findByTestId('text__allrounder____firstname'),
+          'Serena'
+        )
+      }
+    )
+
+    await step(
+      'Previous values are visible when defensive is selected again',
+      async () => {
+        await userEvent.click(await canvas.findByText('allrounder'))
+        await userEvent.click(await canvas.findByText('defensive'))
+
+        await canvas.findByText('tennis style')
+        await canvas.findByText('defensive')
+
+        await expect(canvas.queryByText('allrounder')).not.toBeInTheDocument()
+
+        await canvas.findByText('first name')
+        await canvas.findByDisplayValue('Roger')
+        await expect(
+          canvas.queryByDisplayValue('Serena')
+        ).not.toBeInTheDocument()
       }
     )
   }
