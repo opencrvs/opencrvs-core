@@ -119,16 +119,15 @@ export function SimpleDocumentUploader({
           onDelete={onDelete}
         />
       )}
-      {!file && (
-        <DocumentUploader
-          fullWidth={width === 'full'}
-          id={name}
-          name={name}
-          onChange={handleFileChange}
-        >
-          {intl.formatMessage(messages.uploadFile)}
-        </DocumentUploader>
-      )}
+      <DocumentUploader
+        data-testid={name}
+        fullWidth={width === 'full'}
+        id={name}
+        name={name}
+        onChange={handleFileChange}
+      >
+        {intl.formatMessage(messages.uploadFile)}
+      </DocumentUploader>
     </>
   )
 }

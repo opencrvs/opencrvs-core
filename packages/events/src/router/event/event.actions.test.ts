@@ -29,7 +29,8 @@ test('actions can be added to created events', async () => {
   expect(event.actions).toEqual([
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
-    expect.objectContaining({ type: ActionType.DECLARE })
+    expect.objectContaining({ type: ActionType.DECLARE }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
   ])
 })
 
@@ -56,8 +57,11 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({ type: ActionType.DECLARE }),
+    expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.VALIDATE }),
+    expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.REGISTER }),
+    expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.READ })
   ])
 })

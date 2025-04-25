@@ -83,7 +83,11 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
                     description: 'This is the label for the field',
                     id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
                   },
-                  value: 'National ID | {applicant.id}'
+                  value: {
+                    defaultMessage: `National ID | {applicant.id}`,
+                    description: 'This is the label for the field',
+                    id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
+                  }
                 }
               ]
             }

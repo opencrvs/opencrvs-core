@@ -10,15 +10,25 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { ShowConditional } from './Conditional'
 
-const Field = z.object({
+const BaseField = z.object({
+  emptyValueMessage: TranslationConfig.optional(),
+  conditionals: z.array(ShowConditional).default([]).optional()
+})
+
+const ReferenceField = BaseField.extend({
+  fieldId: z.string()
+}).describe('Field directly referencing event data with field id')
+
+const Field = BaseField.extend({
   id: z.string().describe('Id of summary field'),
   value: TranslationConfig.describe(
     'Summary field value. Can utilise values defined in configuration and EventMetadata'
   ),
   label: TranslationConfig,
   emptyValueMessage: TranslationConfig.optional()
-})
+}).describe('Custom configured field')
 
 const Title = z.object({
   id: z.string(),
@@ -29,7 +39,9 @@ const Title = z.object({
 export const SummaryConfig = z
   .object({
     title: Title.describe('Title of summary view.'),
-    fields: z.array(Field).describe('Fields rendered in summary view.')
+    fields: z
+      .array(z.union([Field, ReferenceField]))
+      .describe('Fields rendered in summary view.')
   })
   .describe('Configuration for summary in event.')
 

@@ -32,9 +32,9 @@ import {
   FieldConfig,
   FieldType,
   FormConfig,
-  getFieldValidationErrors,
   isFieldDisplayedOnReview,
   isPageVisible,
+  runFieldValidations,
   SCOPES
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -308,7 +308,7 @@ function FormReview({
                 value
               })
 
-              const error = getFieldValidationErrors({
+              const error = runFieldValidations({
                 field,
                 values: form
               })

@@ -96,9 +96,10 @@ test(`${ActionType.PRINT_CERTIFICATE} action can be added to registered event`, 
     generator.event.actions.printCertificate(registeredEvent.id)
   )
 
-  expect(
-    printCertificate.actions[printCertificate.actions.length - 1].type
-  ).toBe(ActionType.PRINT_CERTIFICATE)
+  expect(printCertificate.actions.slice(-2)).toEqual([
+    expect.objectContaining({ type: ActionType.PRINT_CERTIFICATE }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
+  ])
 })
 
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {

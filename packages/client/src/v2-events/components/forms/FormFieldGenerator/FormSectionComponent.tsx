@@ -23,8 +23,7 @@ import {
   isFieldEnabled,
   isFieldVisible,
   AddressType,
-  TranslationConfig,
-  deepMerge
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { TEXT } from '@client/forms'
 import {

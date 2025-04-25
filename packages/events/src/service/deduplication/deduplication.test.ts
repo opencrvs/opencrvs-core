@@ -179,7 +179,8 @@ export async function findDuplicates(
       assignedTo: 'test',
       modifiedAt: '2025-01-01',
       updatedBy: 'test',
-      trackingId: 'TEST12'
+      trackingId: 'TEST12',
+      updatedAtLocation: 'test'
     },
     DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES)
   )
@@ -256,7 +257,8 @@ describe('deduplication tests', () => {
         assignedTo: 'test',
         modifiedAt: '2025-01-01',
         updatedBy: 'test',
-        trackingId: 'TEST12'
+        trackingId: 'TEST12',
+        updatedAtLocation: 'test'
       },
       DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES)
     )

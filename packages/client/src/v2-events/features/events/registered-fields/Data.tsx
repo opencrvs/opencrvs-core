@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   EventState,
@@ -21,23 +21,39 @@ import {
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
-function getFieldFromDataEntry(
-  formData: EventState,
-  value: string,
-  label: TranslationConfig
-) {
-  let resolvedValue = value
+function getFieldFromDataEntry({
+  intl,
+  formData,
+  entry
+}: {
+  intl: IntlShape
+  formData: EventState
+  entry: { value: TranslationConfig | string; label: TranslationConfig }
+}) {
+  const { label, value: rawValue } = entry
 
-  const keys = value.match(/{([^}]+)}/g)
-  if (keys) {
-    keys.forEach((key) => {
-      const val = formData[key.replace(/{|}/g, '')]
+  // Resolve value if it's a message descriptor
+  const formattedValue =
+    typeof rawValue === 'object' &&
+    'id' in rawValue &&
+    'defaultMessage' in rawValue
+      ? intl.formatMessage(rawValue)
+      : rawValue
 
-      if (!val) {
-        throw new Error(`Could not resolve ${key}`)
+  let resolvedValue = formattedValue
+
+  // Match placeholders like {someKey}
+  const placeholders = formattedValue.match(/{([^}]+)}/g)
+  if (placeholders) {
+    placeholders.forEach((placeholder) => {
+      const key = placeholder.replace(/{|}/g, '')
+      const replacement = formData[key]
+
+      if (replacement == null) {
+        throw new Error(`Could not resolve placeholder: ${placeholder}`)
       }
 
-      resolvedValue = resolvedValue.replace(key, val.toString())
+      resolvedValue = resolvedValue.replace(placeholder, replacement.toString())
     })
   }
 
@@ -46,7 +62,7 @@ function getFieldFromDataEntry(
     config: {
       type: FieldType.TEXT,
       id: label.id,
-      label: label
+      label
     }
   }
 }
@@ -103,7 +119,11 @@ function DataInput({
       }
     }
 
-    return getFieldFromDataEntry(formData, entry.value, entry.label)
+    return getFieldFromDataEntry({
+      intl,
+      formData,
+      entry
+    })
   })
 
   return (

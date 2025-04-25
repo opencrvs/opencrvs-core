@@ -43,11 +43,15 @@ function getOptions(
   const fieldObj = { config: fieldConfig, value }
 
   if (isFileFieldType(fieldObj)) {
+    const label = fieldObj.config.configuration.fileName
+      ? `${intl.formatMessage(fieldObj.config.label)} (${intl.formatMessage(fieldObj.config.configuration.fileName)})`
+      : intl.formatMessage(fieldObj.config.label)
+
     return {
       selectOptions: [
         {
           value: fieldObj.config.id,
-          label: intl.formatMessage(fieldObj.config.label)
+          label
         }
       ],
       documentOptions: [

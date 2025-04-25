@@ -44,7 +44,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const undeclaredDraftEvent = {
   ...tennisClubMembershipEventDocument,
   actions: tennisClubMembershipEventDocument.actions.filter(
-    ({ type }) => type === ActionType.CREATE
+    ({ type }) => type === ActionType.CREATE || type === ActionType.ASSIGN
   )
 }
 const spy = fn()
@@ -167,15 +167,6 @@ export const DraftShownInForm: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
-          }),
-          tRPCMsw.event.actions.assignment.assign.mutation(() => {
-            const assignedEvent = { ...undeclaredDraftEvent }
-            assignedEvent.actions.push(
-              tennisClubMembershipEventDocument.actions.filter(
-                ({ type }) => type === ActionType.ASSIGN
-              )[0]
-            )
-            return assignedEvent
           })
         ]
       }
@@ -204,14 +195,8 @@ export const DraftShownInForm: Story = {
     await userEvent.click(await canvas.findByText('Clearly Draft'))
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
-    await userEvent.click(await canvas.findByText(/Assign/))
 
-    await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
-
-    // Giving some time for local state to update
-    await new Promise((resolve) => setTimeout(resolve, 1 * 1000))
-
-    await userEvent.click(await canvas.findByText(/Send an application/))
+    await userEvent.click(await canvas.findByText(/Declare/))
 
     await expect(
       await canvas.findByTestId('text__applicant____surname')

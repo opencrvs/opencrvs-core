@@ -487,6 +487,7 @@ describe('"event" conditionals', () => {
         trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
+        updatedAtLocation: '123456',
         actions: [
           {
             id: '1234',

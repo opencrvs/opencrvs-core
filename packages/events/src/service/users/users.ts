@@ -25,6 +25,7 @@ export const getUsersById = async (ids: string[]) => {
       _id: ObjectId
       name: ResolvedUser['name']
       role: string
+      signatureFilename?: string
     }>('users')
     .find({
       _id: {
@@ -38,6 +39,7 @@ export const getUsersById = async (ids: string[]) => {
   return results.map((user) => ({
     id: user._id.toString(),
     name: user.name,
-    role: user.role
+    role: user.role,
+    signatureFilename: user.signatureFilename
   }))
 }

@@ -57,7 +57,8 @@ const AssignedAction = ActionBase.merge(
 
 const UnassignedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.UNASSIGN)
+    type: z.literal(ActionType.UNASSIGN),
+    assignedTo: z.literal(null).default(null)
   })
 )
 

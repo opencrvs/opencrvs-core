@@ -11,43 +11,12 @@
 
 import { TRPCError } from '@trpc/server'
 import _ from 'lodash'
-import {
-  ActionUpdate,
-  FieldConfig,
-  getFieldValidationErrors,
-  Inferred,
-  errorMessages
-} from '@opencrvs/commons/events'
+import { ActionUpdate, errorMessages } from '@opencrvs/commons/events'
 
 type ValidationError = {
   message: string
   id: string
   value: unknown
-}
-
-export function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
-  return formFields.reduce(
-    (errorResults: ValidationError[], field: FieldConfig) => {
-      const fieldErrors = getFieldValidationErrors({
-        field,
-        values: data
-      }).errors
-
-      if (fieldErrors.length === 0) {
-        return errorResults
-      }
-
-      // For backend, use the default message without translations.
-      const errormessageWithId = fieldErrors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value: data[field.id as keyof typeof data]
-      }))
-
-      return [...errorResults, ...errormessageWithId]
-    },
-    []
-  )
 }
 
 export function getVerificationPageErrors(

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { v4 as uuid } from 'uuid'
 import { useMutation } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
@@ -67,6 +68,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      updatedAtLocation: uuid(),
       actions: [
         {
           type: ActionType.CREATE,

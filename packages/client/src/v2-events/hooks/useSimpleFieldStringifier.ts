@@ -24,7 +24,7 @@ import {
   SelectCountry as Country
 } from '@client/v2-events/features/events/registered-fields'
 
-export interface RecursiveStringRecord {
+interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
 

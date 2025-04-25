@@ -11,7 +11,6 @@
 
 import { TRPCError } from '@trpc/server'
 import {
-  ActionDocument,
   ActionType,
   AddressType,
   EventDocument,
@@ -124,9 +123,12 @@ test('a correction request can be added to a created event', async () => {
     generator.event.actions.correction.request(registeredEvent.id)
   )
 
-  expect(
-    withCorrectionRequest.actions[withCorrectionRequest.actions.length - 1].type
-  ).toBe(ActionType.REQUEST_CORRECTION)
+  expect(withCorrectionRequest.actions.slice(-2)).toEqual([
+    expect.objectContaining({
+      type: ActionType.REQUEST_CORRECTION
+    }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
+  ])
 })
 
 test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the offending fields`, async () => {
@@ -260,9 +262,12 @@ test('a correction request can be added to a created event', async () => {
     generator.event.actions.correction.request(registeredEvent.id)
   )
 
-  expect(
-    withCorrectionRequest.actions[withCorrectionRequest.actions.length - 1].type
-  ).toBe(ActionType.REQUEST_CORRECTION)
+  expect(withCorrectionRequest.actions.slice(-2)).toEqual([
+    expect.objectContaining({
+      type: ActionType.REQUEST_CORRECTION
+    }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
+  ])
 })
 
 describe('when a correction request exists', () => {
@@ -309,14 +314,13 @@ describe('when a correction request exists', () => {
           requestId
         )
       )
-
-    const lastAction = withApprovedCorrectionRequest.actions[
-      withApprovedCorrectionRequest.actions.length - 1
-    ] as Extract<ActionDocument, { type: 'APPROVE_CORRECTION' }>
-
-    expect(lastAction.type).toBe(ActionType.APPROVE_CORRECTION)
-
-    expect(lastAction.requestId).toBe(requestId)
+    expect(withApprovedCorrectionRequest.actions.slice(-2)).toEqual([
+      expect.objectContaining({
+        type: ActionType.APPROVE_CORRECTION,
+        requestId
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN })
+    ])
   })
 
   test('approving a request fails if request id is incorrect', async () => {

@@ -90,7 +90,9 @@ export function Pages() {
   // Allow the user to continue from the current page only if they have filled all the visible required fields.
   const currentPage = formPages.find((p) => p.id === currentPageId)
   const currentlyRequiredFields = currentPage?.fields.filter(
-    (field) => isFieldVisible(field, annotation) && field.required
+    (field) =>
+      isFieldVisible(field, { ...event.declaration, ...annotation }) &&
+      field.required
   )
 
   const isAllRequiredFieldsFilled = currentlyRequiredFields?.every((field) =>

@@ -20,7 +20,7 @@ import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType } from '../events/Conditional'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true,
@@ -33,6 +33,16 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return ajv.validate(schema, data)
 }
 
+export function isConditionMet(
+  conditional: JSONSchema,
+  values: Record<string, unknown>
+) {
+  return validate(conditional, {
+    $form: values,
+    $now: formatISO(new Date(), { representation: 'date' })
+  })
+}
+
 function getConditionalActionsForField(
   field: FieldConfig,
   values: ConditionalParameters
@@ -43,6 +53,15 @@ function getConditionalActionsForField(
   return field.conditionals
     .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)
+}
+
+export function areConditionsMet(
+  conditions: FieldConditional[],
+  values: Record<string, unknown>
+) {
+  return conditions.every((condition) =>
+    isConditionMet(condition.conditional, values)
+  )
 }
 
 function isFieldConditionMet(
@@ -244,13 +263,19 @@ export function validateFieldInput({
   }[]
 }
 
-function runFieldValidations({
+export function runFieldValidations({
   field,
   values
 }: {
   field: FieldConfig
   values: ActionUpdate
 }) {
+  if (!isFieldVisible(field, values)) {
+    return {
+      errors: []
+    }
+  }
+
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' })
@@ -270,39 +295,4 @@ function runFieldValidations({
     // Assumes that custom validation errors are based on the field type, and extend the validation.
     errors: [...fieldValidationResult, ...customValidationResults]
   }
-}
-
-/**
- * Gets applicable validation errors based on its type and custom validators.
- *
- * @returns an array of error messages for the field
- */
-export function getFieldValidationErrors({
-  field,
-  values
-}: {
-  // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
-  field: FieldConfig
-  values: ActionUpdate
-}) {
-  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
-    if (values[field.id]) {
-      return {
-        errors: [
-          {
-            message: errorMessages.hiddenField
-          }
-        ]
-      }
-    }
-
-    return {
-      errors: []
-    }
-  }
-
-  return runFieldValidations({
-    field,
-    values
-  })
 }

@@ -42,7 +42,7 @@ export async function cacheFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
   const fileNames = getFileNames(actions)
 
-  return Promise.all(fileNames.map(precacheFile))
+  return Promise.all(fileNames.map(async (filename) => precacheFile(filename)))
 }
 
 export async function removeCachedFiles(eventDocument: EventDocument) {

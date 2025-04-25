@@ -233,7 +233,8 @@ const File = BaseField.extend({
               'Whether the file upload button should take the full width of the container or not'
             )
         })
-        .optional()
+        .optional(),
+      fileName: TranslationConfig.optional()
     })
     .default({
       maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
@@ -376,7 +377,7 @@ const Address = BaseField.extend({
 export const DataEntry = z.union([
   z.object({
     label: TranslationConfig,
-    value: z.string()
+    value: TranslationConfig.or(z.string())
   }),
   z.object({
     fieldId: z.string()

@@ -18,7 +18,8 @@ export const BaseActionInput = z.object({
   transactionId: z.string(),
   declaration: ActionUpdate.default({}),
   annotation: ActionUpdate.optional(),
-  originalActionId: z.string().optional()
+  originalActionId: z.string().optional(),
+  keepAssignment: z.boolean().optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(

@@ -62,10 +62,14 @@ export const UrbanAddressUpdateValue = AdminStructure.extend({
   zipCode: z.string().nullish()
 })
 
+export type UrbanAddressUpdateValue = z.infer<typeof UrbanAddressUpdateValue>
+
 export const RuralAddressUpdateValue = AdminStructure.extend({
   urbanOrRural: z.literal(GeographicalArea.RURAL),
   village: z.string().nullish()
 })
+export type RuralAddressUpdateValue = z.infer<typeof RuralAddressUpdateValue>
+
 export const GenericAddressValue = z.object({
   country: z.string(),
   addressType: z.literal(AddressType.INTERNATIONAL),
@@ -93,6 +97,10 @@ export const GenericAddressUpdateValue = z.object({
   addressLine3: z.string().nullish(),
   postcodeOrZip: z.string().nullish()
 })
+
+export type GenericAddressUpdateValue = z.infer<
+  typeof GenericAddressUpdateValue
+>
 
 export const AddressFieldUpdateValue = z
   .discriminatedUnion('urbanOrRural', [
