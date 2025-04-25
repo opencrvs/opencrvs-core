@@ -181,7 +181,6 @@ export function Output({
             <br />
           </>
         )}
-
         {valueOutput}
       </>
     )
