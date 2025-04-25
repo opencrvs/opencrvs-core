@@ -203,7 +203,7 @@ describe('Request and confirmation flow', () => {
     )
   }
 
-  test.only('should be able to successfully call action request multiple times, without creating duplicate request actions', async () => {
+  test('should be able to successfully call action request multiple times, without creating duplicate request actions', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const originalEvent = await client.event.create(generator.event.create())
@@ -391,9 +391,11 @@ describe('Request and confirmation flow', () => {
       test('should not be able to accept action if action is already rejected', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const { id: eventId } = await client.event.create(
+        const originalEvent = await client.event.create(
           generator.event.create()
         )
+
+        const { id: eventId } = originalEvent
 
         mockNotifyApi(202)
 
@@ -403,12 +405,29 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
+        const createAction = originalEvent.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(
+          originalEvent.id,
+          {
+            assignedTo: createAction[0].createdBy
+          }
+        )
+
+        await client.event.actions.assignment.assign(assignmentInput)
+
         await client.event.actions.register.reject({
           eventId,
           actionId,
           transactionId: getUUID()
         })
 
+        await client.event.actions.assignment.assign({
+          ...assignmentInput,
+          transactionId: getUUID()
+        })
         await expect(
           client.event.actions.register.accept({
             ...data,
@@ -431,6 +450,16 @@ describe('Request and confirmation flow', () => {
         })
 
         await client.event.actions.register.request(data)
+
+        const createAction = event.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(event.id, {
+          assignedTo: createAction[0].createdBy
+        })
+
+        await client.event.actions.assignment.assign(assignmentInput)
 
         const response = await client.event.actions.register.accept({
           ...data,
@@ -469,6 +498,16 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
+        const createAction = event.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(event.id, {
+          assignedTo: createAction[0].createdBy
+        })
+
+        await client.event.actions.assignment.assign(assignmentInput)
+
         await client.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
@@ -476,6 +515,10 @@ describe('Request and confirmation flow', () => {
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
+        await client.event.actions.assignment.assign({
+          ...assignmentInput,
+          transactionId: getUUID()
+        })
         const response = await client.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
@@ -533,6 +576,16 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
+        const createAction = event.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(event.id, {
+          assignedTo: createAction[0].createdBy
+        })
+
+        await client.event.actions.assignment.assign(assignmentInput)
+
         await client.event.actions.register.accept({
           ...data,
           actionId,
@@ -540,6 +593,10 @@ describe('Request and confirmation flow', () => {
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
+        await client.event.actions.assignment.assign({
+          ...assignmentInput,
+          transactionId: getUUID()
+        })
         await expect(
           client.event.actions.register.reject({
             ...data,
@@ -551,9 +608,9 @@ describe('Request and confirmation flow', () => {
       test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const { id: eventId } = await client.event.create(
-          generator.event.create()
-        )
+        const event = await client.event.create(generator.event.create())
+
+        const { id: eventId } = event
 
         mockNotifyApi(202)
 
@@ -563,12 +620,26 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
+        const createAction = event.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(event.id, {
+          assignedTo: createAction[0].createdBy
+        })
+
+        await client.event.actions.assignment.assign(assignmentInput)
+
         await client.event.actions.register.reject({
           eventId,
           transactionId: getUUID(),
           actionId
         })
 
+        await client.event.actions.assignment.assign({
+          ...assignmentInput,
+          transactionId: getUUID()
+        })
         const response = await client.event.actions.register.reject({
           eventId,
           transactionId: getUUID(),
@@ -587,10 +658,9 @@ describe('Request and confirmation flow', () => {
       test('should successfully reject a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const { id: eventId } = await client.event.create(
-          generator.event.create()
-        )
+        const event = await client.event.create(generator.event.create())
 
+        const { id: eventId } = event
         mockNotifyApi(202)
 
         const data = generator.event.actions.register(eventId, {
@@ -598,6 +668,16 @@ describe('Request and confirmation flow', () => {
         })
 
         await client.event.actions.register.request(data)
+
+        const createAction = event.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(event.id, {
+          assignedTo: createAction[0].createdBy
+        })
+
+        await client.event.actions.assignment.assign(assignmentInput)
 
         const response = await client.event.actions.register.reject({
           eventId,

@@ -210,18 +210,11 @@ export function getDefaultActionProcedures(
     accept: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId, transactionId } = input
-
         const event = await getEventById(eventId)
-
-        if (ctx.isDuplicateAction) {
-          return event
-        }
-
         const originalAction = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId
@@ -262,6 +255,7 @@ export function getDefaultActionProcedures(
       }),
 
     reject: publicProcedure
+      .use(requireScopesMiddleware)
       .input(
         z.object({
           actionId: z.string(),
@@ -269,16 +263,9 @@ export function getDefaultActionProcedures(
           transactionId: z.string()
         })
       )
-      .use(requireScopesMiddleware)
-      .use(middleware.requireAssignment)
-      .mutation(async ({ ctx, input }) => {
-        const { actionId, eventId } = input
+      .mutation(async ({ input }) => {
+        const { eventId, actionId } = input
         const event = await getEventById(eventId)
-
-        if (ctx.isDuplicateAction) {
-          return event
-        }
-
         const action = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId
@@ -296,7 +283,7 @@ export function getDefaultActionProcedures(
           }
 
           // Action is already rejected, so we just return the event
-          return event
+          return getEventById(input.eventId)
         }
 
         return addAsyncRejectAction({

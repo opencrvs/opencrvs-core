@@ -2,11 +2,7 @@
 
 exports[`Prevents adding birth date in future 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2040-02-01"}]]`;
 
-exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept action if action is already rejected 1`] = `[TRPCError: Action has already been rejected.]`;
-
 exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept the action if action is not first requested 1`] = `[TRPCError: Action not found.]`;
-
-exports[`Request and confirmation flow > Asynchronous confirmation flow > Rejecting > should not be able to reject the action if action is already accepted 1`] = `[TRPCError: Action has already been accepted.]`;
 
 exports[`Request and confirmation flow > Asynchronous confirmation flow > Rejecting > should not be able to reject the action if action is not first requested 1`] = `[TRPCError: Action not found.]`;
 
