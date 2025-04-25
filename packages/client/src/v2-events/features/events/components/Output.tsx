@@ -157,13 +157,32 @@ export function Output({
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
   if (hasPreviousValue && !_.isEqual(previousValue, value)) {
+    const valueOutput = ValueOutput({
+      config: field,
+      value
+    })
+
+    if (valueOutput === null) {
+      return null
+    }
+
+    const previousValueOutput = ValueOutput({
+      config: field,
+      value: previousValue
+    })
+
     return (
       <>
-        <Deleted>
-          <ValueOutput config={field} value={previousValue} />
-        </Deleted>
-        <br />
-        <ValueOutput config={field} value={value} />
+        {previousValueOutput !== null && (
+          <>
+            <Deleted>
+              <ValueOutput config={field} value={previousValue} />
+            </Deleted>
+            <br />
+          </>
+        )}
+
+        {valueOutput}
       </>
     )
   }
