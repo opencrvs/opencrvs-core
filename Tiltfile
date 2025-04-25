@@ -58,7 +58,13 @@ docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
 # Build services
 docker_build("ghcr.io/opencrvs/ocrvs-client:local", ".",
               dockerfile="packages/client/Dockerfile", 
-              only=["infrastructure", "packages/components","packages/client","packages/events","packages/gateway"],
+              only=[
+                "infrastructure",
+                "packages/components",
+                "packages/client",
+                "packages/events",
+                "packages/gateway"
+              ],
               network="host")
 docker_build("ghcr.io/opencrvs/ocrvs-login:local", ".",
               dockerfile="packages/login/Dockerfile", 
