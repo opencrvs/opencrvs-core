@@ -200,6 +200,7 @@ export function Review() {
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
+          icon="Check"
           incomplete={incomplete}
           messages={messages}
           primaryButtonType="positive"
