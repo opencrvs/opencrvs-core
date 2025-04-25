@@ -12,7 +12,7 @@ import { intersection } from 'lodash'
 import { Scope, SCOPES } from '../scopes'
 import { ActionType } from './ActionType'
 
-function hasAnyOfScopes(a: Scope[], b: Scope[]) {
+export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
 }
 
