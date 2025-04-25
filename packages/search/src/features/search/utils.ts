@@ -38,31 +38,51 @@ export async function advancedQueryBuilder(
 
   if (params.name) {
     must.push({
-      multi_match: {
-        query: params.name,
-        fields: [
-          'childFirstNames',
-          'childFamilyName',
-          'motherFirstNames',
-          'motherFamilyName',
-          'fatherFirstNames',
-          'fatherFamilyName',
-          'informantFirstNames',
-          'informantFamilyName',
-          'deceasedFirstNames',
-          'deceasedFamilyName',
-          'spouseFirstNames',
-          'spouseFamilyName',
-          'brideFirstNames',
-          'brideFamilyName',
-          'groomFirstNames',
-          'groomFamilyName',
-          'witnessOneFirstNames',
-          'witnessOneFamilyName',
-          'witnessTwoFirstNames',
-          'witnessTwoFamilyName'
+      bool: {
+        should: [
+          {
+            query_string: {
+              query: params.name,
+              default_field: 'name'
+            }
+          },
+          {
+            multi_match: {
+              query: params.name,
+              fields: [
+                'brideFirstNames^3',
+                'brideFamilyName^3',
+                'groomFirstNames^3',
+                'groomFamilyName^3'
+              ],
+              type: 'cross_fields',
+              operator: 'and'
+            }
+          },
+          {
+            multi_match: {
+              query: params.name,
+              fields: [
+                'motherFirstNames',
+                'motherFamilyName',
+                'fatherFirstNames',
+                'fatherFamilyName',
+                'informantFirstNames',
+                'informantFamilyName',
+                'deceasedFirstNames',
+                'deceasedFamilyName',
+                'spouseFirstNames',
+                'spouseFamilyName',
+                'witnessOneFirstNames',
+                'witnessOneFamilyName',
+                'witnessTwoFirstNames',
+                'witnessTwoFamilyName'
+              ],
+              fuzziness: 'AUTO'
+            }
+          }
         ],
-        fuzziness: 'AUTO'
+        minimum_should_match: 1
       }
     })
   }
