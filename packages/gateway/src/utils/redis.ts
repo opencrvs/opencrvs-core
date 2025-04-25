@@ -20,7 +20,7 @@ export async function stop() {
   redisClient.quit()
 }
 
-export function start(host = REDIS_HOST, password = REDIS_PASSWORD, port?: number, ) {
+export function start(host = REDIS_HOST, port?: number, password = REDIS_PASSWORD) {
   return new Promise<redis.RedisClient>((resolve) => {
     logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
     redisClient = redis.createClient({
