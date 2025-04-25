@@ -35,34 +35,32 @@ function getStatusFromActions(actions: Array<Action>) {
   }
 
   return actions.reduce<EventStatus>((status, action) => {
-    if (action.type === ActionType.CREATE) {
-      return EventStatus.CREATED
+    switch (action.type) {
+      case ActionType.CREATE:
+        return EventStatus.CREATED
+      case ActionType.DECLARE:
+        return EventStatus.DECLARED
+      case ActionType.VALIDATE:
+        return EventStatus.VALIDATED
+      case ActionType.REGISTER:
+        return EventStatus.REGISTERED
+      case ActionType.REJECT:
+        return EventStatus.REJECTED
+      case ActionType.ARCHIVE:
+        return EventStatus.ARCHIVED
+      case ActionType.NOTIFY:
+        return EventStatus.NOTIFIED
+      case ActionType.PRINT_CERTIFICATE:
+      case ActionType.ASSIGN:
+      case ActionType.UNASSIGN:
+      case ActionType.REQUEST_CORRECTION:
+      case ActionType.APPROVE_CORRECTION:
+      case ActionType.MARKED_AS_DUPLICATE:
+      case ActionType.REJECT_CORRECTION:
+      case ActionType.READ:
+      default:
+        return status
     }
-
-    if (action.type === ActionType.DECLARE) {
-      return EventStatus.DECLARED
-    }
-
-    if (action.type === ActionType.VALIDATE) {
-      return EventStatus.VALIDATED
-    }
-
-    if (action.type === ActionType.REGISTER) {
-      return EventStatus.REGISTERED
-    }
-
-    if (action.type === ActionType.REJECT) {
-      return EventStatus.REJECTED
-    }
-
-    if (action.type === ActionType.ARCHIVE) {
-      return EventStatus.ARCHIVED
-    }
-
-    if (action.type === ActionType.NOTIFY) {
-      return EventStatus.NOTIFIED
-    }
-    return status
   }, EventStatus.CREATED)
 }
 
