@@ -46,7 +46,7 @@ function getMonthsShort(locale = 'en') {
   const months = []
   for (let i = 0; i < 12; i++) {
     months.push(
-      new Date(1870, i).toLocaleString(locale, {
+      new Date(1970, i).toLocaleString(locale, {
         month: 'short'
       })
     )
