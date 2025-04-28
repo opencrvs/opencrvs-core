@@ -58,7 +58,7 @@ export const requireAssignment = experimental_standaloneMiddleware<{
     event.actions.some(
       (action) =>
         'transactionId' in input &&
-        action.transactionId?.startsWith(input.transactionId)
+        action.transactionId.startsWith(input.transactionId)
     )
   ) {
     return next({
