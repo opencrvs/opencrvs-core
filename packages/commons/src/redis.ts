@@ -8,15 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/service'
-export * from './authentication'
-export * from './utils'
-export * from './redis'
+
+const REDIS_DEFAULT_PORT = 6379
+
+export function getRedisUrl(
+  host: string,
+  port: number = REDIS_DEFAULT_PORT,
+  username?: string,
+  password?: string
+) {
+  if (username && password) {
+    return `redis://${username}:${password}@${host}:${port}`
+  }
+
+  return `redis://${host}:${port}`
+}

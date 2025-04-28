@@ -11,7 +11,7 @@
 import * as redis from 'redis'
 import { env } from '@auth/environment'
 import { promisify } from 'util'
-import { logger } from '@opencrvs/commons'
+import { logger, getRedisUrl } from '@opencrvs/commons'
 
 let redisClient: redis.RedisClient
 
@@ -31,9 +31,12 @@ export async function stop() {
 export async function start() {
   logger.info(`REDIS_HOST, ${JSON.stringify(env.REDIS_HOST)}`)
   redisClient = redis.createClient({
-    host: env.REDIS_HOST,
-    username: env.REDIS_USERNAME,
-    password: env.REDIS_PASSWORD,
+    url: getRedisUrl(
+      env.REDIS_HOST,
+      undefined,
+      env.REDIS_USERNAME,
+      env.REDIS_PASSWORD
+    ),
     retry_strategy: (options) => 1000
   })
 }
