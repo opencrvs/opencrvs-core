@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Location } from '@events/service/locations/locations'
+import { IntlShape } from 'react-intl'
 import {
   EventState,
   FieldConfig,
@@ -49,11 +50,7 @@ export const formDataStringifierFactory =
     return stringifiedValues
   }
 
-export function useSimpleFieldStringifier(locations?: Location[]) {
-  const stringifyLocation = AdministrativeArea.useStringifier(locations)
-  const stringifyRadioGroup = RadioGroup.useStringifier()
-  const stringifyCountry = Country.useStringifier()
-
+export function stringifySimpleField(intl: IntlShape, locations: Location[]) {
   return (fieldConfig: FieldConfig, value: FieldValue) => {
     const field = { config: fieldConfig, value }
     if (
@@ -62,15 +59,15 @@ export function useSimpleFieldStringifier(locations?: Location[]) {
       isFacilityFieldType(field)
     ) {
       // Since all of the above field types are actually locations
-      return stringifyLocation(field.value)
+      return AdministrativeArea.stringify(locations, field.value)
     }
 
     if (isRadioGroupFieldType(field)) {
-      return stringifyRadioGroup(field.value, field.config)
+      return RadioGroup.stringify(intl, field.value, field.config)
     }
 
     if (isCountryFieldType(field)) {
-      return stringifyCountry(field.value)
+      return Country.stringify(intl, field.value)
     }
 
     return !value ? '' : value.toString()

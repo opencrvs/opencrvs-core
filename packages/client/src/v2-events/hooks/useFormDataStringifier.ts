@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Location } from '@events/service/locations/locations'
+import { IntlShape } from 'react-intl'
 import {
   FieldConfig,
   FieldValue,
@@ -17,17 +18,16 @@ import {
 import { Address } from '@client/v2-events/features/events/registered-fields'
 import {
   formDataStringifierFactory,
-  useSimpleFieldStringifier
+  stringifySimpleField
 } from './useSimpleFieldStringifier'
 
-function useFieldStringifier(locations?: Location[]) {
-  const simpleFieldStringifier = useSimpleFieldStringifier(locations)
-  const stringifyAddress = Address.useStringifier()
+function useFieldStringifier(intl: IntlShape, locations: Location[]) {
+  const simpleFieldStringifier = stringifySimpleField(intl, locations)
 
   return (fieldConfig: FieldConfig, value: FieldValue) => {
     const field = { config: fieldConfig, value }
     if (isAddressFieldType(field)) {
-      return stringifyAddress(field.value)
+      return Address.stringify(intl, locations, field.value)
     }
 
     return simpleFieldStringifier(fieldConfig, value)
@@ -37,7 +37,10 @@ function useFieldStringifier(locations?: Location[]) {
  *
  * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
  */
-export const useFormDataStringifier = (locations?: Location[]) => {
-  const stringifier = useFieldStringifier(locations)
+export const getFormDataStringifier = (
+  intl: IntlShape,
+  locations: Location[]
+) => {
+  const stringifier = useFieldStringifier(intl, locations)
   return formDataStringifierFactory(stringifier)
 }

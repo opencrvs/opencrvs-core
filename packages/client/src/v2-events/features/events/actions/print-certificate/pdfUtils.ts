@@ -37,7 +37,7 @@ import {
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 interface FontFamilyTypes {
   normal: string
@@ -194,13 +194,11 @@ export function compileSvg({
         return warning
       }
 
-      const stringify = useFormDataStringifier(locations)
+      const stringify = getFormDataStringifier(intl, locations)
       const formFieldWithResolvedValue = stringify(
         config.declaration.pages.flatMap((x) => x.fields),
         $declaration
       )
-
-      // console.log('formFieldWithResolvedValue', formFieldWithResolvedValue)
 
       return formFieldWithResolvedValue[propertyPath]
     }

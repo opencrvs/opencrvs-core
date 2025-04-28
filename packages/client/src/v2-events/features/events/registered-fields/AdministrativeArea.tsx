@@ -72,27 +72,15 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   return location ? location.name : ''
 }
 
-function useStringifier(providedLocations?: Location[]) {
-  let locations: Location[] = []
+function stringify(locations: Location[], value: string) {
+  const location = locations.find((l) => l.id === value)
 
-  if (!providedLocations) {
-    const { getLocations } = useLocations()
-    const [foundLocations] = getLocations.useSuspenseQuery()
-    locations = foundLocations
-  } else {
-    locations = providedLocations
-  }
-
-  return (value: string): string => {
-    const location = locations.find((l) => l.id === value)
-
-    const name = location?.name
-    return name ?? EMPTY_TOKEN
-  }
+  const name = location?.name
+  return name ?? EMPTY_TOKEN
 }
 
 export const AdministrativeArea = {
   Input: AdministrativeAreaInput,
   Output: AdministrativeAreaOutput,
-  useStringifier: useStringifier
+  stringify
 }
