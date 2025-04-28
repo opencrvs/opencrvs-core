@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as redis from 'redis'
-import { REDIS_HOST, REDIS_PASSWORD } from '@gateway/constants'
+import { REDIS_HOST, REDIS_PASSWORD, REDIS_USERNAME } from '@gateway/constants'
 import { promisify } from 'util'
 import { logger } from '@opencrvs/commons'
 
@@ -32,6 +32,7 @@ export function start(host = REDIS_HOST, port?: number) {
     redisClient = redis.createClient({
       host,
       port,
+      username: REDIS_USERNAME,
       password: REDIS_PASSWORD,
       retry_strategy: () => {
         return 1000

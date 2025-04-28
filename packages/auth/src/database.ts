@@ -32,6 +32,7 @@ export async function start() {
   logger.info(`REDIS_HOST, ${JSON.stringify(env.REDIS_HOST)}`)
   redisClient = redis.createClient({
     host: env.REDIS_HOST,
+    username: env.REDIS_USERNAME,
     password: env.REDIS_PASSWORD,
     retry_strategy: (options) => 1000
   })

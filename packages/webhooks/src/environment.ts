@@ -26,5 +26,6 @@ export const env = cleanEnv(process.env, {
     desc: 'Check if the token has been invalidated in the auth service before it has expired'
   }),
   REDIS_HOST: str({ devDefault: 'localhost' }),
+  REDIS_USERNAME: str({ default: undefined }),
   REDIS_PASSWORD: str({ default: undefined })
 })
