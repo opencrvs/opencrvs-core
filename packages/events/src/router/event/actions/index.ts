@@ -147,11 +147,11 @@ export function getDefaultActionProcedures(
         const { eventId, transactionId } = input
         const actionId = getUUID()
 
-        const event = await getEventById(eventId)
-
         if (ctx.isDuplicateAction) {
-          return event
+          return ctx.event
         }
+
+        const event = await getEventById(eventId)
 
         const { responseStatus, body } = await requestActionConfirmation(
           input,
