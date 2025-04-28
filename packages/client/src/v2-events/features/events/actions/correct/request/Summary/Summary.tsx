@@ -44,7 +44,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 function shouldBeShownAsAValue(field: FieldConfig) {
   if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
@@ -118,8 +117,6 @@ export function Summary() {
   const previousFormValues = event.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
   const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues()
