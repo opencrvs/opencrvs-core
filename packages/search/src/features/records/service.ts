@@ -428,19 +428,8 @@ export const aggregateRecords = ({
           }
         ]
       : []),
-    {
-      $group: {
-        _id: null,
-        composition: { $push: '$$ROOT' }
-      }
-    },
-    { $project: { _id: 0 } },
-    { $unwind: '$composition' },
-    {
-      $addFields: {
-        bundle: ['$composition']
-      }
-    },
+    { $addFields: { bundle: ['$$ROOT'], composition: '$$ROOT' } },
+    { $project: { bundle: 1, composition: 1 } },
 
     ...(includeHistoryResources
       ? [
@@ -1110,5 +1099,7 @@ export const streamAllRecords = async (includeHistoryResources: boolean) => {
   const connectedClient = await client.connect()
   const db = connectedClient.db()
   const query = aggregateRecords({ includeHistoryResources })
+  console.log(JSON.stringify(query))
+
   return db.collection('Composition').aggregate<Bundle>(query).stream()
 }
