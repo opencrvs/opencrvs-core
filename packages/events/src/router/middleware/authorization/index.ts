@@ -55,11 +55,8 @@ export const requireAssignment = experimental_standaloneMiddleware<{
 }>().create(async ({ next, ctx, input }) => {
   const event = await getEventById(input.eventId)
   if (
-    event.actions.some(
-      (action) =>
-        'transactionId' in input &&
-        action.transactionId.startsWith(input.transactionId)
-    )
+    'transactionId' in input &&
+    event.actions.some((action) => action.transactionId === input.transactionId)
   ) {
     return next({
       ctx: { ...ctx, isDuplicateAction: true, event },
