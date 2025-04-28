@@ -105,3 +105,37 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
   expect(actions.at(-2)).toStrictEqual(ActionType.ARCHIVE)
   expect(actions.at(-3)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
 })
+
+test(`${ActionType.ARCHIVE} action is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare.request(declareInput)
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const archivePayload = generator.event.actions.archive(originalEvent.id)
+
+  const firstResponse =
+    await client.event.actions.archive.request(archivePayload)
+  const secondResponse =
+    await client.event.actions.archive.request(archivePayload)
+
+  expect(firstResponse).toEqual(secondResponse)
+})

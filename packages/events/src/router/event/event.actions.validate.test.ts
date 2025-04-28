@@ -293,3 +293,32 @@ test('valid action is appended to event actions', async () => {
     })
   ])
 })
+
+test(`${ActionType.VALIDATE} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  const validatePayload = generator.event.actions.validate(event.id)
+  const firstResponse =
+    await client.event.actions.validate.request(validatePayload)
+  const secondResponse =
+    await client.event.actions.validate.request(validatePayload)
+
+  expect(firstResponse).toEqual(secondResponse)
+})

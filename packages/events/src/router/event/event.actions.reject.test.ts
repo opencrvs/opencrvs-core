@@ -70,3 +70,35 @@ test(`should contain REJECT action for a valid request`, async () => {
     ActionType.UNASSIGN
   ])
 })
+
+test(`${ActionType.REJECT} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare.request(declareInput)
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+  const rejectPayload = generator.event.actions.reject(originalEvent.id)
+  const firstResponse = await client.event.actions.reject.request(rejectPayload)
+  const secondResponse =
+    await client.event.actions.reject.request(rejectPayload)
+
+  expect(firstResponse).toEqual(secondResponse)
+})
