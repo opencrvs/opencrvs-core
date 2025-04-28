@@ -21,14 +21,14 @@ EVENTS_YML="$(mktemp -u).yml"
 COUNTRYCONFIG_YML="$(mktemp -u).yml"
 (cd $WORK_DIR/../commons && npx tsx src/countryconfig/openapi.ts) > $COUNTRYCONFIG_YML
 
-echo $EVENTS_YML
-echo $COUNTRYCONFIG_YML
+echo "Events YAML: $EVENTS_YML"
+echo "Countryconfig YAML: $COUNTRYCONFIG_YML"
 
 # Join docs
 JOINED_YML="$(mktemp -u).yml"
 echo "Joining OpenAPI YAML files"
 LOG_LEVEL=debug npx @redocly/cli join $EVENTS_YML $COUNTRYCONFIG_YML -o $JOINED_YML
-
+echo "Joined YAML file: $JOINED_YML"
 echo "Building OpenAPI docs"
 # Build docs
 npx @redocly/cli build-docs $JOINED_YML -o build/index.html
