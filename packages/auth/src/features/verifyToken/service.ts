@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { get } from '@auth/database'
 import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
+import { redisClient } from '@auth/database'
 
 export async function verifyToken(token: string) {
-  const record = await get(`${INVALID_TOKEN_NAMESPACE}:${token}`)
+  const record = await redisClient.GET(`${INVALID_TOKEN_NAMESPACE}:${token}`)
   return record === null
 }

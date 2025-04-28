@@ -11,7 +11,7 @@
 import fetch from 'node-fetch'
 import { env } from '@auth/environment'
 import { resolve } from 'url'
-import { get, set, del } from '@auth/database'
+import { redisClient } from '@auth/database'
 import { IUserName } from '@auth/features/authenticate/service'
 
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
@@ -65,7 +65,7 @@ export async function storeRetrievalStepInformation(
   status: RetrievalSteps,
   retrievalStepInformation: Omit<IRetrievalStepInformation, 'status'>
 ) {
-  return set(
+  return redisClient.SET(
     `retrieval_step_${nonce}`,
     JSON.stringify({ ...retrievalStepInformation, status })
   )
@@ -74,12 +74,12 @@ export async function storeRetrievalStepInformation(
 export async function getRetrievalStepInformation(
   nonce: string
 ): Promise<IRetrievalStepInformation & { status: RetrievalSteps }> {
-  const record = await get(`retrieval_step_${nonce}`)
+  const record = await redisClient.GET(`retrieval_step_${nonce}`)
   if (record === null) {
     throw new Error('password/username retrieval step information not found')
   }
   return JSON.parse(record)
 }
 export async function deleteRetrievalStepInformation(nonce: string) {
-  await del(`retrieval_step_${nonce}`)
+  await redisClient.DEL(`retrieval_step_${nonce}`)
 }

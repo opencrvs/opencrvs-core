@@ -8,12 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { setex } from '@auth/database'
+import { redisClient } from '@auth/database'
 import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
 import { env } from '@auth/environment'
 
 export async function invalidateToken(token: string) {
-  return setex(
+  return redisClient.SETEX(
     `${INVALID_TOKEN_NAMESPACE}:${token}`,
     env.CONFIG_TOKEN_EXPIRY_SECONDS,
     'INVALID'

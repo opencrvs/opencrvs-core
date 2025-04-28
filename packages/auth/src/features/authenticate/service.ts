@@ -14,7 +14,7 @@ import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
-import { get, set } from '@auth/database'
+import { redisClient } from '@auth/database'
 import * as t from 'io-ts'
 import {
   NotificationEvent,
@@ -178,14 +178,14 @@ export async function storeUserInformation(
   mobile?: string,
   email?: string
 ) {
-  return set(
+  return redisClient.SET(
     `user_information_${nonce}`,
     JSON.stringify({ userId, scope, userFullName, mobile, email })
   )
 }
 
 export async function getStoredUserInformation(nonce: string) {
-  const record = await get(`user_information_${nonce}`)
+  const record = await redisClient.GET(`user_information_${nonce}`)
   if (record === null) {
     throw new UserInfoNotFoundError('user not found')
   }

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AuthServer, createServer } from '@auth/server'
-import { get, setex } from '@auth/database'
+import { redisClient } from '@auth/database'
 import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
 
 describe('invalidate token handler', () => {
@@ -30,12 +30,14 @@ describe('invalidate token handler', () => {
 
     expect(res.statusCode).toBe(200)
 
-    const val = await get(`${INVALID_TOKEN_NAMESPACE}:111`)
+    const val = await redisClient.GET(`${INVALID_TOKEN_NAMESPACE}:111`)
     expect(val).toBe('INVALID')
   })
 
   it('catches redis errors', async () => {
-    ;(setex as jest.Mock).mockImplementationOnce(() => Promise.reject('boom'))
+    ;(redisClient.SETEX as jest.Mock).mockImplementationOnce(() =>
+      Promise.reject('boom')
+    )
 
     const res = await server.server.inject({
       method: 'POST',

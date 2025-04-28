@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { del, get, set } from '@auth/database'
+import { redisClient } from '@auth/database'
 import { JWT_ISSUER } from '@auth/constants'
 import { env } from '@auth/environment'
 import * as crypto from 'crypto'
@@ -34,7 +34,7 @@ export async function storeVerificationCode(nonce: string, code: string) {
     createdAt: Date.now()
   }
 
-  await set(`verification_${nonce}`, JSON.stringify(codeDetails))
+  await redisClient.SET(`verification_${nonce}`, JSON.stringify(codeDetails))
 }
 
 export async function generateVerificationCode(
@@ -48,7 +48,10 @@ export async function generateVerificationCode(
 export async function getVerificationCodeDetails(
   nonce: string
 ): Promise<ICodeDetails> {
-  const codeDetails = await get(`verification_${nonce}`)
+  const codeDetails = await redisClient.GET(`verification_${nonce}`)
+  if (!codeDetails) {
+    throw new Error('Auth code not found')
+  }
   return JSON.parse(codeDetails) as ICodeDetails
 }
 
@@ -114,6 +117,6 @@ export async function checkVerificationCode(
 export async function deleteUsedVerificationCode(
   nonce: string
 ): Promise<boolean> {
-  const count = await del(`verification_${nonce}`)
+  const count = await redisClient.DEL(`verification_${nonce}`)
   return Boolean(count)
 }
