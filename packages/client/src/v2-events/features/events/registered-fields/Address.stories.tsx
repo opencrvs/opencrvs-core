@@ -13,7 +13,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
 import {
   EventConfig,
   FieldType,
@@ -25,9 +24,8 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Address',
@@ -276,12 +274,8 @@ export const AddressInCopy: StoryObj<typeof Review> = {
     layout: 'centered'
   },
   render: function Component() {
-    const intl = useIntl()
-    const { getLocations } = useLocations()
-    const [locations] = getLocations.useSuspenseQuery()
-
     const allFields = declarationForm.pages.map((page) => page.fields).flat()
-    const stringifier = getFormDataStringifier(intl, locations)
+    const stringifier = useFormDataStringifier()
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
     const FORM_DATA = {
       'applicant.address': {

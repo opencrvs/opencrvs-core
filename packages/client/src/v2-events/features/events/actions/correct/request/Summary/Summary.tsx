@@ -41,7 +41,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -120,7 +120,7 @@ export function Summary() {
 
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
-  const stringifyFormData = getFormDataStringifier(intl, locations)
+  const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues()
   const formConfig = getDeclaration(eventConfiguration)

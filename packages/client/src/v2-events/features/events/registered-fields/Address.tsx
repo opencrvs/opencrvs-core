@@ -32,7 +32,7 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 import {
   formDataStringifierFactory,
   stringifySimpleField
-} from '@client/v2-events/hooks/useSimpleFieldStringifier'
+} from '@client/v2-events/hooks/useFormDataStringifier'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
