@@ -21,10 +21,10 @@ import type {
   TDocumentDefinitions,
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
-import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
 import format from 'date-fns/format'
 import isValid from 'date-fns/isValid'
+import { Location } from '@events/service/locations/locations'
 import {
   EventIndex,
   EventState,
@@ -124,7 +124,7 @@ export function compileSvg({
   language: LanguageConfig
   config: EventConfig
 }): string {
-  const intl: IntlShape = createIntl(
+  const intl = createIntl(
     {
       locale: language.lang,
       messages: language.messages
@@ -194,11 +194,13 @@ export function compileSvg({
         return warning
       }
 
-      const stringify = useFormDataStringifier()
+      const stringify = useFormDataStringifier(locations)
       const formFieldWithResolvedValue = stringify(
         config.declaration.pages.flatMap((x) => x.fields),
         $declaration
       )
+
+      // console.log('formFieldWithResolvedValue', formFieldWithResolvedValue)
 
       return formFieldWithResolvedValue[propertyPath]
     }

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Location } from '@events/service/locations/locations'
 import {
   FieldConfig,
   FieldValue,
@@ -19,8 +20,8 @@ import {
   useSimpleFieldStringifier
 } from './useSimpleFieldStringifier'
 
-function useFieldStringifier() {
-  const simpleFieldStringifier = useSimpleFieldStringifier()
+function useFieldStringifier(locations?: Location[]) {
+  const simpleFieldStringifier = useSimpleFieldStringifier(locations)
   const stringifyAddress = Address.useStringifier()
 
   return (fieldConfig: FieldConfig, value: FieldValue) => {
@@ -36,7 +37,7 @@ function useFieldStringifier() {
  *
  * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
  */
-export const useFormDataStringifier = () => {
-  const stringifier = useFieldStringifier()
+export const useFormDataStringifier = (locations?: Location[]) => {
+  const stringifier = useFieldStringifier(locations)
   return formDataStringifierFactory(stringifier)
 }

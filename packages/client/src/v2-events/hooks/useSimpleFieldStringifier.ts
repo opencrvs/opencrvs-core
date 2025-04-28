@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Location } from '@events/service/locations/locations'
 import {
   EventState,
   FieldConfig,
@@ -23,7 +24,6 @@ import {
   RadioGroup,
   SelectCountry as Country
 } from '@client/v2-events/features/events/registered-fields'
-
 interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
@@ -49,8 +49,8 @@ export const formDataStringifierFactory =
     return stringifiedValues
   }
 
-export function useSimpleFieldStringifier() {
-  const stringifyLocation = AdministrativeArea.useStringifier()
+export function useSimpleFieldStringifier(locations?: Location[]) {
+  const stringifyLocation = AdministrativeArea.useStringifier(locations)
   const stringifyRadioGroup = RadioGroup.useStringifier()
   const stringifyCountry = Country.useStringifier()
 
