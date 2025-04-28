@@ -272,7 +272,6 @@ export async function addAction(
     createdBy,
     token,
     createdAtLocation,
-    transactionId,
     status
   }: {
     eventId: string
