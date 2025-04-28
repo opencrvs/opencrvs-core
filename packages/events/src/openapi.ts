@@ -8,4 +8,7 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
   baseUrl: 'http://localhost:3000'
 })
 
-console.log(yaml.stringify(openApiDocument))
+const clean = JSON.parse(
+  JSON.stringify(openApiDocument, (_, v) => (v === null ? undefined : v))
+)
+console.log(yaml.stringify(clean))

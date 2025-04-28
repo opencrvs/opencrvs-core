@@ -91,7 +91,7 @@ export const eventRouter = router({
       )
       .input(z.void())
       .output(z.array(EventConfig))
-      .query((options) => {
+      .query(async (options) => {
         return getEventConfigurations(options.ctx.token)
       })
   }),
