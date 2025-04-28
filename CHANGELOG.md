@@ -2,9 +2,11 @@
 
 ## [1.6.5](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.5)
 
-## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.4)
-
 - Fix migration issue discovered when restoring an OpenCRVS instance with a large number of records. `$push used too much memory and cannot spill to disk. Memory limit: 104857600 bytes` [#9116](https://github.com/opencrvs/opencrvs-core/issues/9116)
+
+### Breaking changes
+
+- Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
 
 ## [1.6.3](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.3)
 
