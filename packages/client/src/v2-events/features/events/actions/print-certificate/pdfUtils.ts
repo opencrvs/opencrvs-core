@@ -21,10 +21,10 @@ import type {
   TDocumentDefinitions,
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
-import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
 import format from 'date-fns/format'
 import isValid from 'date-fns/isValid'
+import { Location } from '@events/service/locations/locations'
 import {
   EventIndex,
   EventState,
@@ -37,7 +37,7 @@ import {
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 interface FontFamilyTypes {
   normal: string
@@ -124,7 +124,7 @@ export function compileSvg({
   language: LanguageConfig
   config: EventConfig
 }): string {
-  const intl: IntlShape = createIntl(
+  const intl = createIntl(
     {
       locale: language.lang,
       messages: language.messages
@@ -194,7 +194,7 @@ export function compileSvg({
         return warning
       }
 
-      const stringify = useFormDataStringifier()
+      const stringify = getFormDataStringifier(intl, locations)
       const formFieldWithResolvedValue = stringify(
         config.declaration.pages.flatMap((x) => x.fields),
         $declaration
