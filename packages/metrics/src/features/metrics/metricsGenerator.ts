@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { INFLUXDB_URL, INFLUX_DB } from '@metrics/influxdb/constants'
 import {
   FEMALE,
@@ -37,7 +38,9 @@ import {
   ResourceIdentifier,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
-import { UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
+import { createChunks } from '@metrics/utils/batchHelpers'
+
 interface IGroupedByGender {
   total: number
   gender: string
@@ -336,7 +339,7 @@ export async function getCurrentAndLowerLocationLevels(
   locationId: ResourceIdentifier<FhirLocation>,
   event: EVENT_TYPE
 ): Promise<ICurrentAndLowerLocationLevels> {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
@@ -440,7 +443,10 @@ export async function fetchKeyFigures(
   const keyFigures: IBirthKeyFigures[] = []
   const queryLocationId =
     `Location/${estimatedFigureForTargetDays.locationId}` as `Location/${UUID}`
-  const locationIds = await fetchLocationChildrenIds(queryLocationId)
+  const locationIds = await fetchLocationChildrenIds(
+    queryLocationId,
+    'CRVS_OFFICE'
+  )
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
@@ -802,7 +808,7 @@ export async function getTotalNumberOfRegistrations(
   locationId: ResourceIdentifier<FhirLocation>,
   event: EVENT_TYPE
 ) {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
@@ -833,7 +839,7 @@ export async function fetchLocationWiseEventEstimations(
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
@@ -971,29 +977,43 @@ export async function fetchEventsGroupByMonthDatesByLocation(
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
-  const locationIds = await fetchLocationChildrenIds(locationId)
-  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
-    locationIds,
-    'officeLocation'
-  )
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
 
-  const registrationsInTargetDaysPoints: IGroupByEventDate[] = await query(
-    `SELECT COUNT(${column}) AS total
-      FROM ${measurement}
-    WHERE time > $timeFrom
-      AND time <= $timeTo
-      AND (${officeLocationInChildren})
-    GROUP BY dateLabel, timeLabel`,
-    {
-      placeholders: {
-        timeFrom,
-        timeTo,
-        ...locationPlaceholders
-      }
+  const batchquery = async (locationIds: string[]) => {
+    const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+      locationIds,
+      'officeLocation'
+    )
+    try {
+      const registrationsInTargetDaysPoints: IGroupByEventDate[] = await query(
+        `SELECT COUNT(${column}) AS total
+          FROM ${measurement}
+        WHERE time > $timeFrom
+          AND time <= $timeTo
+          AND (${officeLocationInChildren})
+        GROUP BY dateLabel, timeLabel`,
+        {
+          placeholders: {
+            timeFrom,
+            timeTo,
+            ...locationPlaceholders
+          }
+        }
+      )
+
+      return registrationsInTargetDaysPoints
+    } catch (error) {
+      logger.error(
+        `Error fetching events group by month dates by location: ${error.message}`
+      )
+      throw error
     }
-  )
+  }
 
-  return registrationsInTargetDaysPoints
+  const locationBatches = createChunks(locationIds, 1000)
+  return await Promise.all(locationBatches.map(batchquery)).then((res) =>
+    res.flat()
+  )
 }
 
 export async function fetchEventsGroupByMonthDates(
@@ -1034,27 +1054,39 @@ export async function getTotalMetricsByLocation(
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
-  const locationIds = await fetchLocationChildrenIds(locationId)
-  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
-    locationIds,
-    'officeLocation'
-  )
-
-  const totalMetrics: IMetricsTotalGroup[] = await query(
-    `SELECT COUNT(${column}) AS total
-    FROM ${measurement}
-  WHERE time > $timeFrom
-    AND time <= $timeTo
-    AND (${officeLocationInChildren})
-  GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
-    {
-      placeholders: {
-        timeFrom,
-        timeTo,
-        ...locationPlaceholders
-      }
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
+  const batchquery = async (locationIds: string[]) => {
+    const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+      locationIds,
+      'officeLocation'
+    )
+    try {
+      return await query(
+        `SELECT COUNT(${column}) AS total
+          FROM ${measurement}
+        WHERE time > $timeFrom
+          AND time <= $timeTo
+          AND (${officeLocationInChildren})
+        GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`,
+        {
+          placeholders: {
+            timeFrom,
+            timeTo,
+            ...locationPlaceholders
+          }
+        }
+      )
+    } catch (error) {
+      logger.error(`Error fetching total metrics by location: ${error.message}`)
+      throw error
     }
-  )
+  }
+
+  const locationBatches = createChunks(locationIds, 1000)
+
+  const totalMetrics: IMetricsTotalGroup[] = await Promise.all(
+    locationBatches.map(batchquery)
+  ).then((res) => res.flat())
 
   const estimationOfTimeRange: IEstimation =
     await fetchEstimateForTargetDaysByLocationId(
@@ -1119,23 +1151,34 @@ export async function fetchRegistrationsGroupByOfficeLocationByLocation(
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
-  const locationIds = await fetchLocationChildrenIds(locationId)
-  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
-    locationIds,
-    'officeLocation'
-  )
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
 
-  const result: IMetricsTotalGroupByLocation[] = await query(
-    `SELECT COUNT(${column}) AS total
-    FROM ${measurement}
-  WHERE time > '${timeFrom}'
-    AND time <= '${timeTo}'
-    AND (${officeLocationInChildren})
-  GROUP BY officeLocation, eventLocationType, timeLabel`,
-    { placeholders: { ...locationPlaceholders } }
-  )
+  const batchquery = async (locationIds: string[]) => {
+    const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+      locationIds,
+      'officeLocation'
+    )
 
-  return result
+    try {
+      return await query(
+        `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      AND (${officeLocationInChildren})
+    GROUP BY officeLocation, eventLocationType, timeLabel`,
+        { placeholders: { ...locationPlaceholders } }
+      )
+    } catch (error) {
+      logger.error(`Error fetching total metrics by location: ${error.message}`)
+      throw error
+    }
+  }
+
+  const locationBatches = createChunks(locationIds, 1000)
+  return await Promise.all(locationBatches.map(batchquery)).then((res) =>
+    res.flat()
+  )
 }
 
 export async function fetchRegistrationsGroupByOfficeLocation(
@@ -1167,36 +1210,46 @@ export async function fetchRegistrationsGroupByTime(
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
-  const locationIds = locationId && (await fetchLocationChildrenIds(locationId))
+  const locationIds =
+    locationId && (await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE'))
 
-  const fluxQuery = `
-   from(bucket: "${INFLUX_DB}")
-   |> range(start: ${timeFrom}, stop: ${timeTo})
-   |> filter(fn: (r) => r._measurement == "${measurement}")
-   ${
-     locationIds
-       ? `|> filter(fn: (r) => (${locationIds
-           .map((locationId) => `r.officeLocation == "${locationId}"`)
-           .join(' or ')}))`
-       : ``
-   }
-   |> filter(fn: (r) => r._field == "${column}")
-   |> group(columns: ["timeLabel", "eventLocationType"])
-   |> aggregateWindow(every: 1mo, fn: count, timeSrc: "_start")
-   |> sort(columns: ["_time"], desc: true)
-   |> rename(columns: {_value: "total"})
-   `
+  const batchquery = async (locationIds: string[]) => {
+    const fluxQuery = `
+      from(bucket: "${INFLUX_DB}")
+      |> range(start: ${timeFrom}, stop: ${timeTo})
+      |> filter(fn: (r) => r._measurement == "${measurement}")
+      ${
+        locationIds
+          ? `|> filter(fn: (r) => (${locationIds
+              .map((locationId) => `r.officeLocation == "${locationId}"`)
+              .join(' or ')}))`
+          : ``
+      }
+      |> filter(fn: (r) => r._field == "${column}")
+      |> group(columns: ["timeLabel", "eventLocationType"])
+      |> aggregateWindow(every: 1mo, fn: count, timeSrc: "_start")
+      |> sort(columns: ["_time"], desc: true)
+      |> rename(columns: {_value: "total"})
+      `
 
-  const res = await fetch(`${INFLUXDB_URL}/api/v2/query`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/csv',
-      'Content-type': 'application/vnd.flux'
-    },
-    body: fluxQuery
-  })
-  // slice(4) to ignoring unwanted rows in csv
-  const fluxJson = (await csvToJSON(await res.text())).slice(4)
+    const res = await fetch(`${INFLUXDB_URL}/api/v2/query`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/csv',
+        'Content-type': 'application/vnd.flux'
+      },
+      body: fluxQuery
+    })
+
+    // slice(4) to ignoring unwanted rows in csv
+    return (await csvToJSON(await res.text())).slice(4)
+  }
+  const locationBatches = createChunks(locationIds || [], 1000)
+
+  const fluxJson = await Promise.all(locationBatches.map(batchquery)).then(
+    (res) => res.flat()
+  )
+
   const keys = ['eventLocationType', 'timeLabel', 'total', 'time']
   const fluxRes: IMetricsTotalGroupByTime[] = fluxJson
     .slice(0, -1)

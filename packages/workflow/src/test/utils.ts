@@ -313,43 +313,141 @@ export const testFhirTaskBundle: Saved<Bundle<Task>> = {
   ]
 }
 
-export const fieldAgentPractitionerMock = JSON.stringify({
-  resourceType: 'Bundle',
-  id: 'eacae600-a501-42d6-9d59-b8b94f3e50c1',
-  meta: { lastUpdated: '2018-11-27T17:13:20.662+00:00' },
-  type: 'searchset',
-  total: 1,
-  link: [
+type PatientIdentifier = NonNullable<Patient['identifier']>[number]
+
+const drnIdentifier = {
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'DEATH_REGISTRATION_NUMBER'
+      }
+    ]
+  },
+  value: '2022DSNEYUG'
+} satisfies PatientIdentifier
+
+const nidIdentifier = {
+  value: '654654666',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'NATIONAL_ID'
+      }
+    ]
+  }
+} satisfies PatientIdentifier
+
+const brnIdentifier = {
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'BIRTH_REGISTRATION_NUMBER'
+      }
+    ]
+  },
+  value: '2022BSNEYUG'
+} satisfies PatientIdentifier
+
+const mosipPsutTokenIdentifier = {
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'MOSIP_PSUT_TOKEN_ID'
+      }
+    ]
+  },
+  value: '257803821990055124230310596669133515'
+} as fhir3.CodeableConcept
+
+const birthPatientIdentifier = {
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'BIRTH_PATIENT_ENTRY'
+      }
+    ]
+  },
+  value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
+} as fhir3.CodeableConcept
+
+export const mosipDeceasedPatientMock: Saved<Patient> = {
+  resourceType: 'Patient',
+  active: true,
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1' as UUID,
+  name: [
     {
-      relation: 'self',
-      url: 'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
+      use: 'en',
+      given: ['Sakib Al'],
+      family: ['Hasan']
     }
   ],
+  gender: 'male',
+  deceased: true,
+  birthDate: '1990-09-01',
+  identifier: [nidIdentifier, drnIdentifier]
+}
+
+export const mosipUpdatedDeceasedPatientMock = {
+  resourceType: 'Patient',
+  active: true,
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
+  name: [
+    {
+      use: 'en',
+      given: ['Sakib Al'],
+      family: ['Hasan']
+    }
+  ],
+  gender: 'male',
+  deceased: true,
+  birthDate: '1990-09-01',
+  identifier: [nidIdentifier, drnIdentifier, birthPatientIdentifier]
+}
+
+const mosipBirthPatientMock = {
+  resourceType: 'Patient',
+  active: true,
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d2',
+  name: [
+    {
+      use: 'bn',
+      given: ['Sakib Al'],
+      family: ['Hasan']
+    }
+  ],
+  gender: 'male',
+  birthDate: '1990-09-01',
+  multipleBirthInteger: 1,
+  identifier: [brnIdentifier, mosipPsutTokenIdentifier]
+}
+
+export const mosipBirthPatientBundleMock = {
+  resourceType: 'Bundle',
+  type: 'document',
   entry: [
     {
-      fullUrl:
-        'http://localhost:3447/fhir/Practitioner/b1f46aba-075d-431e-8aeb-ebc57a4a0ad0',
-      resource: {
-        resourceType: 'Practitioner',
-        identifier: [
-          { use: 'official', system: 'mobile', value: '01711111111' }
-        ],
-        telecom: [{ system: 'phone', value: '01711111111' }],
-        name: [
-          { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-          { use: 'bn', family: '', given: [''] }
-        ],
-        gender: 'male',
-        meta: {
-          lastUpdated: '2018-11-25T17:31:08.062+00:00',
-          versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-        },
-        id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-      }
+      fullUrl: `urn:uuid:888` as URNReference,
+      resource: mosipBirthPatientMock
     }
   ]
-})
+}
 
+export const mosipSuccessMock = {
+  transactionID: '5763906453',
+  version: '1.0',
+  id: 'mosip.identity.auth',
+  errors: null,
+  responseTime: '2022-08-30T08:15:11.033Z',
+  response: {
+    authStatus: true,
+    authToken: '257803821990055124230310596669133515'
+  }
+}
 export const mosipConfigMock = [
   { status: 'active', name: 'Sweet Health', integratingSystemType: 'MOSIP' }
 ]

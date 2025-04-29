@@ -647,7 +647,7 @@ interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
   allowedDocType?: string[]
 }
 
-interface ILocationSearchInputFormField extends IFormFieldBase {
+export interface ILocationSearchInputFormField extends IFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
   searchableResource: Array<
     Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>

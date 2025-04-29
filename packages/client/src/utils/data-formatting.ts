@@ -11,6 +11,8 @@
 import { getDefaultLanguage } from '@client/i18n/utils'
 import type { GQLComment } from '@client/utils/gateway-deprecated-do-not-use'
 import { HumanName } from './gateway'
+import { constantsMessages } from '@client/i18n/messages'
+import { IntlShape } from 'react-intl'
 
 interface INamesMap {
   [key: string]: string
@@ -80,4 +82,18 @@ export const mergeArraysRemovingEmptyStrings = (
 
 export function getPercentage(total: number, current: number) {
   return current === 0 || total === 0 ? 0 : (current / total) * 100
+}
+
+export function getLocalisedName(
+  intl: IntlShape,
+  nameObject: HumanName
+): string {
+  return intl
+    .formatMessage(constantsMessages.humanName, {
+      firstName: nameObject?.firstNames,
+      middleName: nameObject?.middleName,
+      lastName: nameObject?.familyName
+    })
+    .replace(/\s+/g, ' ') // Remove extra spaces
+    .trim()
 }
