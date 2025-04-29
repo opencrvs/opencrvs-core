@@ -8,20 +8,30 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import { Header } from '@client/components/Header/Header'
 import { injectIntl, useIntl } from 'react-intl'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { messages } from '@client/i18n/messages/views/config'
-import { Content, ContentSize, FormTabs, Frame } from '@opencrvs/components'
+import {
+  Content,
+  ContentSize,
+  ErrorText,
+  FormTabs,
+  Frame
+} from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { createAdvancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { createAdvancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages
+} from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
@@ -52,6 +62,10 @@ enum TabId {
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
+`
+
+const ErrorTextWrapper = styled.div`
+  padding-top: 20px;
 `
 
 export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
@@ -86,9 +100,10 @@ export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
     validNonDateFields.length +
     validationResultsPerDateField.filter((valid) => valid).length
 
-  return (
-    validCount >= 2 && validationResultsPerDateField.every((isValid) => isValid)
-  )
+  return validCount >= 2 &&
+    validationResultsPerDateField.every((isValid) => isValid)
+    ? true
+    : false
 }
 
 interface BirthSectionProps {
@@ -119,6 +134,8 @@ const BirthSection: React.FC<BirthSectionProps> = ({
     birthSearchInformantSection
   } = advancedSearchBirthSections
 
+  const [showWarningMessage, setShowWarningMessage] = useState(false)
+
   const intl = useIntl()
   const navigate = useNavigate()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
@@ -141,6 +158,13 @@ const BirthSection: React.FC<BirthSectionProps> = ({
 
   const isDisabled = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (showWarningMessage) {
+      // only when it has set the error message once
+      setShowWarningMessage(isAdvancedSearchFormValid(formState) ? false : true)
+    }
+  }, [formState, showWarningMessage])
 
   const accordionShowingLabel = intl.formatMessage(
     advancedSearchFormMessages.show
@@ -307,24 +331,36 @@ const BirthSection: React.FC<BirthSectionProps> = ({
         />
       </Accordion>
 
+      {showWarningMessage && (
+        <ErrorTextWrapper>
+          <ErrorText>{`${intl.formatMessage(
+            errorMessages.searchParamCountError
+          )}`}</ErrorText>
+        </ErrorTextWrapper>
+      )}
+
       <SearchButton
         id="search"
         key="search"
         type="primary"
         fullWidth
         size="large"
-        disabled={isDisabled}
+        disabled={false}
         onClick={() => {
-          dispatch(
-            setAdvancedSearchParam({
-              ...transformAdvancedSearchLocalStateToStoreData(
-                formState,
-                offlineData
-              ),
-              event: 'birth'
-            })
-          )
-          navigate(routes.ADVANCED_SEARCH_RESULT)
+          if (isDisabled) {
+            setShowWarningMessage(true)
+          } else {
+            dispatch(
+              setAdvancedSearchParam({
+                ...transformAdvancedSearchLocalStateToStoreData(
+                  formState,
+                  offlineData
+                ),
+                event: 'birth'
+              })
+            )
+            navigate(routes.ADVANCED_SEARCH_RESULT)
+          }
         }}
       >
         {' '}
@@ -359,6 +395,8 @@ const DeathSection: React.FC<DeathSectionProps> = ({
     )
   )
 
+  const [showWarningMessage, setShowWarningMessage] = useState(false)
+
   const isDisable = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
   const accordionShowingLabel = intl.formatMessage(
@@ -372,6 +410,13 @@ const DeathSection: React.FC<DeathSectionProps> = ({
     hasDeathSearchJurisdictionScope,
     userOfficeId
   )
+
+  useEffect(() => {
+    if (showWarningMessage) {
+      // only when it has set the error message once
+      setShowWarningMessage(isAdvancedSearchFormValid(formState) ? false : true)
+    }
+  }, [formState, showWarningMessage])
 
   const {
     deathSearchRegistrationSection,
@@ -492,25 +537,37 @@ const DeathSection: React.FC<DeathSectionProps> = ({
         />
       </Accordion>
 
+      {showWarningMessage && (
+        <ErrorTextWrapper>
+          <ErrorText>{`${intl.formatMessage(
+            errorMessages.searchParamCountError
+          )}`}</ErrorText>
+        </ErrorTextWrapper>
+      )}
+
       <SearchButton
         id="search"
         key="search"
         type="primary"
         size="large"
         fullWidth
-        disabled={isDisable}
+        disabled={false}
         onClick={() => {
-          dispatch(
-            setAdvancedSearchParam({
-              ...transformAdvancedSearchLocalStateToStoreData(
-                formState,
-                offlineData
-              ),
-              event: 'death'
-            })
-          )
+          if (isDisable) {
+            setShowWarningMessage(true)
+          } else {
+            dispatch(
+              setAdvancedSearchParam({
+                ...transformAdvancedSearchLocalStateToStoreData(
+                  formState,
+                  offlineData
+                ),
+                event: 'death'
+              })
+            )
 
-          navigate(routes.ADVANCED_SEARCH_RESULT)
+            navigate(routes.ADVANCED_SEARCH_RESULT)
+          }
         }}
       >
         {' '}
