@@ -9,9 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
-import { inScope, Scope } from '@opencrvs/commons'
-import { MiddlewareOptions } from '@events/router/middleware/utils'
+import { experimental_standaloneMiddleware, TRPCError } from '@trpc/server'
+import {
+  ActionDocument,
+  ActionInputWithType,
+  ActionType,
+  DeleteActionInput,
+  getAssignedUserFromActions,
+  inScope,
+  Scope
+} from '@opencrvs/commons'
+import { Context, MiddlewareOptions } from '@events/router/middleware/utils'
+import { getEventById } from '@events/service/events/events'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -38,3 +47,35 @@ export function requiresAnyOfScopes(scopes: Scope[]) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 }
+
+/**@todo Investigate: `experimental_standaloneMiddleware has been deprecated in favor of .concat()` */
+export const requireAssignment = experimental_standaloneMiddleware<{
+  input: ActionInputWithType | DeleteActionInput
+  ctx: Context
+}>().create(async ({ next, ctx, input }) => {
+  const event = await getEventById(input.eventId)
+  if (
+    'transactionId' in input &&
+    event.actions.some((action) => action.transactionId === input.transactionId)
+  ) {
+    return next({
+      ctx: { ...ctx, isDuplicateAction: true, event },
+      input
+    })
+  }
+
+  const assignedTo = getAssignedUserFromActions(
+    event.actions.filter(
+      (action): action is ActionDocument =>
+        action.type === ActionType.ASSIGN || action.type === ActionType.UNASSIGN
+    )
+  )
+
+  if (ctx.user.id !== assignedTo) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: JSON.stringify('You are not assigned to this event')
+    })
+  }
+  return next()
+})
