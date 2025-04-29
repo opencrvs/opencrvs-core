@@ -11,6 +11,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
+import { getUUID } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useGetEvent, useGetEventState } from './procedures/get'
 import { useOutbox } from './outbox'
@@ -21,26 +22,18 @@ import {
   useEventAction,
   useEventCustomAction
 } from './procedures/actions/action'
+import { useGetEvents } from './procedures/list'
 
 export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
+  const getEvents = useGetEvents()
+  const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   return {
     createEvent: useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
-    getEvents: {
-      useQuery: useQuery({
-        ...trpc.event.list.queryOptions(),
-        queryKey: trpc.event.list.queryKey()
-      }),
-      useSuspenseQuery: () => [
-        useSuspenseQuery({
-          ...trpc.event.list.queryOptions(),
-          queryKey: trpc.event.list.queryKey()
-        }).data
-      ]
-    },
+    getEvents,
     /** Returns an event with aggregated history. If you need the history of the event, use getEvent. */
     getEventState: useGetEventState(),
     deleteEvent: {
@@ -82,6 +75,30 @@ export function useEvents() {
         request: useEventAction(trpc.event.actions.correction.request),
         approve: useEventAction(trpc.event.actions.correction.approve),
         reject: useEventAction(trpc.event.actions.correction.reject)
+      },
+      assignment: {
+        assign: {
+          mutate: async ({
+            eventId,
+            assignedTo,
+            refetchEvent
+          }: {
+            eventId: string
+            assignedTo: string
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            refetchEvent: () => Promise<any>
+          }) => {
+            /**This makes sure all the files and users referenced in the event document is prefetched to be used even in offline */
+            await refetchEvent()
+
+            return assignMutation.mutate({
+              eventId,
+              transactionId: getUUID(),
+              assignedTo
+            })
+          }
+        },
+        unassign: useEventAction(trpc.event.actions.assignment.unassign)
       }
     },
     onlineActions: {
@@ -95,6 +112,9 @@ export function useEvents() {
       ]),
       validateOnDeclare: useEventCustomAction([
         ...customMutationKeys.validateOnDeclare
+      ]),
+      registerOnValidate: useEventCustomAction([
+        ...customMutationKeys.registerOnValidate
       ])
     }
   }

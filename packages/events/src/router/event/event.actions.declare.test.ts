@@ -13,7 +13,7 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   AddressType,
-  generateActionInput,
+  generateActionDeclarationInput,
   getAcceptedActions,
   SCOPES
 } from '@opencrvs/commons'
@@ -51,6 +51,7 @@ test('Validation error message contains all the offending fields', async () => {
   const data = generator.event.actions.declare(event.id, {
     declaration: {
       'applicant.dob': '02-02',
+      'applicant.dobUnknown': false,
       'recommender.none': true
     }
   })
@@ -69,6 +70,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   const data = generator.event.actions.declare(event.id, {
     declaration: {
       'applicant.dob': '02-1-2024',
+      'applicant.dobUnknown': false,
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
       'recommender.none': true,
@@ -96,6 +98,7 @@ test('Skips required field validation when they are conditionally hidden', async
 
   const form = {
     'applicant.dob': '2024-02-01',
+    'applicant.dobUnknown': false,
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'recommender.none': true,
@@ -197,6 +200,7 @@ test('Prevents adding birth date in future', async () => {
 
   const form = {
     'applicant.dob': '2040-02-01',
+    'applicant.dobUnknown': false,
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'recommender.none': true,
@@ -227,7 +231,10 @@ test('validation prevents including hidden fields', async () => {
 
   const data = generator.event.actions.declare(event.id, {
     declaration: {
-      ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
+      ...generateActionDeclarationInput(
+        tennisClubMembershipEvent,
+        ActionType.DECLARE
+      ),
       'recommender.firstname': 'this should not be here'
     }
   })
@@ -250,11 +257,27 @@ test('valid action is appended to event actions', async () => {
 
   expect(updatedEvent.actions).toEqual([
     expect.objectContaining({ type: ActionType.CREATE }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
       type: ActionType.DECLARE
     }),
+    expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({
       type: ActionType.READ
     })
   ])
+})
+
+test(`${ActionType.DECLARE} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const data = generator.event.actions.declare(event.id)
+
+  const firstResponse = await client.event.actions.declare.request(data)
+  const secondResponse = await client.event.actions.declare.request(data)
+
+  expect(firstResponse).toEqual(secondResponse)
 })

@@ -12,7 +12,8 @@
 import {
   ActionType,
   AddressType,
-  getCurrentEventState
+  getCurrentEventState,
+  getUUID
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
@@ -28,7 +29,9 @@ test('actions can be added to created events', async () => {
 
   expect(event.actions).toEqual([
     expect.objectContaining({ type: ActionType.CREATE }),
-    expect.objectContaining({ type: ActionType.DECLARE })
+    expect.objectContaining({ type: ActionType.ASSIGN }),
+    expect.objectContaining({ type: ActionType.DECLARE }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
   ])
 })
 
@@ -41,8 +44,23 @@ test('Action data can be retrieved', async () => {
   const generatedDeclaration = generator.event.actions.declare(originalEvent.id)
   await client.event.actions.declare.request(generatedDeclaration)
 
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const generatedValidation = generator.event.actions.validate(originalEvent.id)
   await client.event.actions.validate.request(generatedValidation)
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
 
   const generatedRegistration = generator.event.actions.register(
     originalEvent.id
@@ -53,9 +71,15 @@ test('Action data can be retrieved', async () => {
 
   expect(updatedEvent.actions).toEqual([
     expect.objectContaining({ type: ActionType.CREATE }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({ type: ActionType.DECLARE }),
+    expect.objectContaining({ type: ActionType.UNASSIGN }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({ type: ActionType.VALIDATE }),
+    expect.objectContaining({ type: ActionType.UNASSIGN }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({ type: ActionType.REGISTER }),
+    expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.READ })
   ])
 })
@@ -103,6 +127,16 @@ test('Action data accepts partial changes', async () => {
     }
   )
 
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await client.event.actions.declare.request(declarationWithoutVillage)
 
   const updatedEvent = await client.event.get(originalEvent.id)
@@ -110,6 +144,10 @@ test('Action data accepts partial changes', async () => {
   const eventStateBeforeVillageRemoval = getCurrentEventState(updatedEvent)
   expect(eventStateBeforeVillageRemoval.declaration).toEqual(initialForm)
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   const declarationWithVillageNull = generator.event.actions.declare(
     originalEvent.id,
     {
@@ -209,4 +247,42 @@ test('Action other than READ deletes draft', async () => {
   const draftEventsAfterRead = await client.event.draft.list()
 
   expect(draftEventsAfterRead.length).toBe(0)
+})
+
+test('partial declaration update accounts for conditional field values not in payload', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id)
+  )
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  await client.event.actions.validate.request({
+    type: ActionType.VALIDATE,
+    duplicates: [],
+    declaration: {
+      'applicant.dobUnknown': true,
+      'applicant.age': 25
+    },
+    eventId: originalEvent.id,
+    transactionId: '123-123-124'
+  })
+
+  const event = await client.event.get(originalEvent.id)
+
+  const eventState = getCurrentEventState(event)
+
+  expect(eventState.declaration).toMatchSnapshot()
 })

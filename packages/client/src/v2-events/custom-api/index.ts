@@ -38,20 +38,23 @@ export async function registerOnDeclare({
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID()
+    transactionId: getUUID(),
+    keepAssignment: true
   })
 
+  // update is a patch, no need to send again.
   await trpcClient.event.actions.validate.request.mutate({
-    declaration,
+    declaration: {},
     annotation,
     eventId,
     transactionId: getUUID(),
-    duplicates: []
+    duplicates: [],
+    keepAssignment: true
   })
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
     {
-      declaration,
+      declaration: {},
       annotation,
       eventId,
       transactionId: getUUID()
@@ -77,12 +80,49 @@ export async function validateOnDeclare(variables: {
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID()
+    transactionId: getUUID(),
+    keepAssignment: true
   })
 
   const latestResponse = await trpcClient.event.actions.validate.request.mutate(
     {
-      declaration,
+      // update is a patch, no need to send again.
+      declaration: {},
+      annotation,
+      eventId,
+      transactionId: getUUID(),
+      duplicates: []
+    }
+  )
+
+  return latestResponse
+}
+
+/**
+ * Runs a sequence of actions from  validate to register.
+ *
+ * Defining the function here, statically allows offline support.
+ * Moving the function to one level up will break offline support since the definition needs to be static.
+ */
+export async function registerOnValidate(variables: {
+  eventId: string
+  declaration: EventState
+  annotation?: EventState
+}) {
+  const { eventId, declaration, annotation } = variables
+  await trpcClient.event.actions.validate.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId: getUUID(),
+    duplicates: [],
+    keepAssignment: true
+  })
+
+  const latestResponse = await trpcClient.event.actions.register.request.mutate(
+    {
+      // update is a patch, no need to send again.
+      declaration: {},
       annotation,
       eventId,
       transactionId: getUUID(),

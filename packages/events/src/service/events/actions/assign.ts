@@ -13,10 +13,10 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
-  AssignActionInput
+  AssignActionInput,
+  findLastAssignmentAction
 } from '@opencrvs/commons/events'
 import { addAction, getEventById } from '@events/service/events/events'
-import { findLastAssignmentAction } from '@events/service/events/utils'
 
 export async function assignRecord({
   createdBy,

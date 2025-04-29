@@ -9,14 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Action, ActionType } from '@opencrvs/commons'
-
-export function findLastAssignmentAction(actions: Action[]) {
-  return actions
-    .filter(
-      ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
-    )
-    .reduce<
-      Action | undefined
-    >((latestAction, action) => (!latestAction || action.createdAt > latestAction.createdAt ? action : latestAction), undefined)
-}
+export { FormFieldGenerator } from './FormFieldGenerator'

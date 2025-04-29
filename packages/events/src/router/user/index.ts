@@ -10,10 +10,21 @@
  */
 
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 
 export const userRouter = router({
+  get: publicProcedure.input(z.string()).query(async ({ input }) => {
+    const [user] = await getUsersById([input])
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!user) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    return user
+  }),
   list: publicProcedure
     .input(z.array(z.string()))
     .query(async ({ input }) => getUsersById(input))

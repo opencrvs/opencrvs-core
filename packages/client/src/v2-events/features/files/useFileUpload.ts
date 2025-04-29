@@ -79,16 +79,17 @@ export function getFullUrl(filename: string) {
   throw new Error('MINIO_URL is not defined')
 }
 
-async function getPresignedUrl(fileUri: string) {
-  const response = await fetch(
-    '/api/presigned-url/event-attachments/' + fileUri,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
+async function getPresignedUrl(
+  fileUri: string,
+  minioFolder = '/event-attachments/'
+) {
+  const url = `/api/presigned-url${minioFolder}` + fileUri
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
     }
-  )
+  })
 
   const res = await response.json()
   return res
@@ -115,7 +116,7 @@ async function cacheFile(filename: string, file: File) {
   )
 }
 
-async function removeCached(filename: string) {
+export async function removeCached(filename: string) {
   const cacheKeys = await caches.keys()
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
@@ -131,8 +132,9 @@ async function removeCached(filename: string) {
   return cache.delete(getFullUrl(filename))
 }
 
-export async function precacheFile(filename: string) {
-  const presignedUrl = (await getPresignedUrl(filename)).presignedURL
+export async function precacheFile(filename: string, minioFolder?: string) {
+  const presignedUrl = (await getPresignedUrl(filename, minioFolder))
+    .presignedURL
   const response = await fetch(presignedUrl)
   const blob = await response.blob()
   const file = new File([blob], filename, { type: blob.type })

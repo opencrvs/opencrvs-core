@@ -9,92 +9,47 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
-import { useNavigate } from 'react-router-dom'
-import formatISO from 'date-fns/formatISO'
-import { validate, ActionType, ConditionalType } from '@opencrvs/commons/client'
-import { ActionConfig } from '@opencrvs/commons/client'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
+import { getScope } from '@client/profile/profileSelectors'
+import { useActionMenuItems } from './useActionMenuItems'
 
 export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
-  const navigate = useNavigate()
-  const authentication = useAuthentication()
+  const scopes = useSelector(getScope)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const eventState = useMemo(() => getCurrentEventState(event), [event])
 
-  function isActionVisible(action: ActionConfig) {
-    if (action.conditionals.length === 0) {
-      return true
-    }
-
-    const params = {
-      $event: event,
-      $user: authentication,
-      $now: formatISO(new Date(), { representation: 'date' })
-    }
-    return action.conditionals.reduce((acc, conditional) => {
-      if (conditional.type === ConditionalType.SHOW) {
-        return acc && validate(conditional.conditional, params)
-      }
-
-      return acc
-    }, true)
-  }
+  const actionMenuItems = useActionMenuItems(eventState, scopes ?? [])
 
   return (
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton icon={() => <CaretDown />}>
+          <PrimaryButton
+            data-testid="action-dropdownMenu"
+            icon={() => <CaretDown />}
+          >
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {configuration.actions.filter(isActionVisible).map((action) => {
+          {actionMenuItems.map((action) => {
             return (
               <DropdownMenu.Item
                 key={action.type}
-                onClick={() => {
-                  if (
-                    action.type === ActionType.REJECT ||
-                    action.type === ActionType.ARCHIVE ||
-                    action.type === ActionType.MARKED_AS_DUPLICATE ||
-                    action.type === ActionType.APPROVE_CORRECTION ||
-                    action.type === ActionType.REJECT_CORRECTION
-                  ) {
-                    alert(`Action ${action.type} is not implemented yet.`)
-                    return
-                  }
-
-                  if (
-                    action.type === ActionType.REGISTER ||
-                    action.type === ActionType.VALIDATE
-                  ) {
-                    navigate(
-                      ROUTES.V2.EVENTS[action.type].REVIEW.buildPath({
-                        eventId
-                      })
-                    )
-                  } else {
-                    navigate(
-                      ROUTES.V2.EVENTS[action.type].buildPath({ eventId })
-                    )
-                  }
-                }}
+                disabled={'disabled' in action ? action.disabled : false}
+                onClick={async () => action.onClick(event.id)}
               >
                 {intl.formatMessage(action.label)}
               </DropdownMenu.Item>

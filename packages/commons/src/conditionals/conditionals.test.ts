@@ -197,7 +197,7 @@ describe('"field" conditionals', () => {
           'mother.dob': '1990-01-02'
         })
       )
-    ).toBe(false)
+    ).toBe(true)
 
     // Reference to another field, when the comparable field is wrong format
     expect(
@@ -285,7 +285,7 @@ describe('"field" conditionals', () => {
           'child.dob': '1990-01-02'
         })
       )
-    ).toBe(false)
+    ).toBe(true)
 
     // Reference to another field, when the comparable field is wrong format
     expect(
@@ -487,6 +487,7 @@ describe('"event" conditionals', () => {
         trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
+        updatedAtLocation: '123456',
         actions: [
           {
             id: '1234',
@@ -495,7 +496,8 @@ describe('"event" conditionals', () => {
             createdBy: '12345',
             declaration: {},
             createdAtLocation: '123456',
-            status: ActionStatus.Accepted
+            status: ActionStatus.Accepted,
+            transactionId: '123456'
           }
         ]
       }

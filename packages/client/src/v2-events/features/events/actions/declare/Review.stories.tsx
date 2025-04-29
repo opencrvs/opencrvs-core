@@ -50,6 +50,19 @@ const eventDocument = generateEventDocument({
 const eventId = eventDocument.id
 const draft = generateEventDraftDocument(eventId)
 
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  role: 'SOCIAL_WORKER',
+  signatureFilename: 'signature.png'
+}
+
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {
     reactRouter: {
@@ -83,6 +96,9 @@ export const ReviewForLocalRegistrarComplete: Story = {
                 getUser: generator.user.localRegistrar()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -118,6 +134,9 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
                 getUser: generator.user.localRegistrar()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -164,6 +183,9 @@ export const ReviewForRegistrationAgentComplete: Story = {
                 getUser: generator.user.registrationAgent()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -205,6 +227,9 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
                 getUser: generator.user.registrationAgent()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -234,12 +259,7 @@ export const ReviewForFieldAgentComplete: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return {
-              ...generateEventDocument({
-                configuration: tennisClubMembershipEvent,
-                actions: [ActionType.CREATE]
-              })
-            }
+            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -252,6 +272,9 @@ export const ReviewForFieldAgentComplete: Story = {
                 getUser: generator.user.fieldAgent()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -290,6 +313,9 @@ export const ReviewForFieldAgentIncomplete: Story = {
                 getUser: generator.user.fieldAgent()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }

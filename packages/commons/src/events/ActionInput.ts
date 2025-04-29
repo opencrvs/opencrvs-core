@@ -16,9 +16,10 @@ import { ActionUpdate } from './ActionDocument'
 export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  declaration: ActionUpdate,
+  declaration: ActionUpdate.default({}),
   annotation: ActionUpdate.optional(),
-  originalActionId: z.string().optional()
+  originalActionId: z.string().optional(),
+  keepAssignment: z.boolean().optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -159,6 +160,9 @@ export const ReadActionInput = BaseActionInput.merge(
 )
 
 export type ReadActionInput = z.infer<typeof ReadActionInput>
+
+export const DeleteActionInput = z.object({ eventId: z.string() })
+export type DeleteActionInput = z.infer<typeof DeleteActionInput>
 
 /**
  * ActionInput types are used to validate the input data for the action.

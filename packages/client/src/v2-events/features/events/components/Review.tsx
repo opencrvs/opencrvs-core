@@ -20,6 +20,7 @@ import {
   Button,
   Checkbox,
   Icon,
+  IconProps,
   Link,
   ListReview,
   ResponsiveModal,
@@ -32,9 +33,9 @@ import {
   FieldConfig,
   FieldType,
   FormConfig,
-  getFieldValidationErrors,
-  isFieldVisible,
+  isFieldDisplayedOnReview,
   isPageVisible,
+  runFieldValidations,
   SCOPES
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -296,7 +297,7 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldVisible(field, form))
+            .filter((field) => isFieldDisplayedOnReview(field, form))
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
@@ -308,7 +309,7 @@ function FormReview({
                 value
               })
 
-              const error = getFieldValidationErrors({
+              const error = runFieldValidations({
                 field,
                 values: form
               })
@@ -341,6 +342,16 @@ function FormReview({
             return <></>
           }
 
+          // Only display fields that have a non-undefined/null value or have an validation error
+          const displayedFields = fields.filter(
+            ({ valueDisplay, errorDisplay }) => {
+              // Explicitly check for undefined and null, so that e.g. number 0 and empty string outputs are shown
+              const hasValue =
+                valueDisplay !== undefined && valueDisplay !== null
+              return hasValue || Boolean(errorDisplay)
+            }
+          )
+
           return (
             <DeclarationDataContainer
               key={'Section_' + page.title.defaultMessage}
@@ -365,12 +376,8 @@ function FormReview({
                 name={'Accordion_' + page.id}
               >
                 <ListReview id={'Section_' + page.id}>
-                  {fields
-                    .filter(
-                      ({ valueDisplay, errorDisplay }) =>
-                        valueDisplay || errorDisplay
-                    )
-                    .map(({ id, label, errorDisplay, valueDisplay }) => (
+                  {displayedFields.map(
+                    ({ id, label, errorDisplay, valueDisplay }) => (
                       <ListReview.Row
                         key={id}
                         actions={
@@ -394,7 +401,8 @@ function FormReview({
                         label={intl.formatMessage(label)}
                         value={errorDisplay || valueDisplay}
                       />
-                    ))}
+                    )
+                  )}
                 </ListReview>
               </Accordion>
             </DeclarationDataContainer>
@@ -477,7 +485,7 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
-                  formData={annotation}
+                  form={annotation}
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
@@ -566,14 +574,15 @@ const ActionContainer = styled.div`
 `
 
 function ReviewActionComponent({
+  incomplete,
   onConfirm,
   onReject,
   messages,
   primaryButtonType,
   canSendIncomplete,
-  isPrimaryActionDisabled
+  icon
 }: {
-  isPrimaryActionDisabled: boolean
+  incomplete: boolean
   onConfirm: () => void
   onReject?: () => void
   messages: {
@@ -584,10 +593,11 @@ function ReviewActionComponent({
   }
   primaryButtonType?: 'positive' | 'primary'
   canSendIncomplete?: boolean
+  icon: IconProps['name']
 }) {
   const intl = useIntl()
 
-  const background = isPrimaryActionDisabled ? 'error' : 'success'
+  const background = incomplete ? 'error' : 'success'
 
   return (
     <Container>
@@ -597,13 +607,13 @@ function ReviewActionComponent({
           <Description>{intl.formatMessage(messages.description)}</Description>
           <ActionContainer>
             <Button
-              disabled={isPrimaryActionDisabled && !canSendIncomplete}
+              disabled={!!incomplete && !canSendIncomplete}
               id="validateDeclarationBtn"
               size="large"
               type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
-              <Icon color="white" name="Check" />
+              <Icon color="white" name={icon} />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
             {onReject && messages.onReject && (
@@ -684,23 +694,26 @@ function EditModal({
 function AcceptActionModal({
   copy,
   close,
-  action,
-  incomplete
+  action
 }: {
-  copy?: {
-    onCancel?: MessageDescriptor
-    onConfirm?: MessageDescriptor
-    title?: MessageDescriptor
-    description?: MessageDescriptor
+  copy: {
+    onCancel: MessageDescriptor
+    onConfirm: MessageDescriptor
+    title: MessageDescriptor
+    description: MessageDescriptor
+    eventLabel: MessageDescriptor
   }
   close: (result: boolean | null) => void
   action: string
-  incomplete?: boolean
 }) {
   const intl = useIntl()
+  // @TODO: Revisit this. There must be a better way to have the event name as part of string.
+  const eventName = intl.formatMessage(copy.eventLabel).toLocaleLowerCase()
+
   return (
     <ResponsiveModal
       autoHeight
+      show
       showHeaderBorder
       actions={[
         <Button
@@ -711,9 +724,7 @@ function AcceptActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(
-            copy?.onCancel || reviewMessages.actionModalCancel
-          )}
+          {intl.formatMessage(copy.onCancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -723,28 +734,20 @@ function AcceptActionModal({
             close(true)
           }}
         >
-          {intl.formatMessage(
-            copy?.onConfirm || reviewMessages.actionModalPrimaryAction,
-            {
-              action
-            }
-          )}
+          {intl.formatMessage(copy.onConfirm)}
         </Button>
       ]}
       handleClose={() => close(null)}
-      show={true}
       title={intl.formatMessage(
-        copy?.title || reviewMessages.actionModalTitle,
-        { action }
+        copy.title,
+        // @TODO: Consider whether every formatted message should have access to global variables
+        // currently it seems we are arbitrarily deciding which ones do.
+        { event: eventName }
       )}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(
-            incomplete
-              ? reviewMessages.actionModalIncompleteDescription
-              : copy?.description || reviewMessages.actionModalDescription
-          )}
+          {intl.formatMessage(copy.description)}
         </Text>
       </Stack>
     </ResponsiveModal>

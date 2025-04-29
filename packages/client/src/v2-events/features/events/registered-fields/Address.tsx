@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { IntlShape } from 'react-intl'
+import { Location } from '@events/service/locations/locations'
 import {
   EventState,
   AddressFieldValue,
@@ -27,7 +29,10 @@ import {
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import {
+  formDataStringifierFactory,
+  stringifySimpleField
+} from '@client/v2-events/hooks/useFormDataStringifier'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -451,7 +456,7 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
-      formData={value}
+      form={value}
       initialValues={{ ...defaultValue, ...value }}
       setAllFieldsDirty={false}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
@@ -488,19 +493,23 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
   )
 }
 
-function useStringifier() {
-  return function useAddressStringifier(value: AddressFieldValue) {
-    /*
-     * As address is just a collection of other form fields, its string formatter just redirects the data back to
-     * form data stringifier so location and other form fields can handle stringifying their own data
-     */
-    const stringifier = useFormDataStringifier()
-    return stringifier(ALL_ADDRESS_FIELDS, value as EventState)
-  }
+function stringify(
+  intl: IntlShape,
+  locations: Location[],
+  value: AddressFieldValue
+) {
+  const fieldStringifier = stringifySimpleField(intl, locations)
+
+  /*
+   * As address is just a collection of other form fields, its string formatter just redirects the data back to
+   * form data stringifier so location and other form fields can handle stringifying their own data
+   */
+  const formStringifier = formDataStringifierFactory(fieldStringifier)
+  return formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
 }
 
 export const Address = {
   Input: AddressInput,
   Output: AddressOutput,
-  useStringifier: useStringifier
+  stringify
 }

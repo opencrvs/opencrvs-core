@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getFieldErrors() > should not return an error if a required field is provided 1`] = `[]`;
+
+exports[`getFieldErrors() > should not return an error if a value for a conditionally hidden required field is not provided 1`] = `[]`;
+
+exports[`getFieldErrors() > should not return an error if a value for a conditionally visible required field is provided 1`] = `[]`;
+
+exports[`getFieldErrors() > should not return error if multiple fields with same id are configured, and value is provided 1`] = `[]`;
+
+exports[`getFieldErrors() > should not return errors for field with custom validations if value passes validation 1`] = `[]`;
+
+exports[`getFieldErrors() > should return an error if a required field is not provided 1`] = `
+[
+  {
+    "id": "test.checkbox",
+    "message": "Required for registration",
+    "value": undefined,
+  },
+]
+`;
+
+exports[`getFieldErrors() > should return an error if a value for a conditionally hidden required field is provided 1`] = `
+[
+  {
+    "id": "test.checkbox",
+    "message": "Hidden or disabled field should not receive a value",
+    "value": true,
+  },
+]
+`;
+
+exports[`getFieldErrors() > should return errors for field with custom validation if value does not pass validation 1`] = `
+[
+  {
+    "id": "test.input",
+    "message": "Failed validation!",
+    "value": "not hello!",
+  },
+]
+`;

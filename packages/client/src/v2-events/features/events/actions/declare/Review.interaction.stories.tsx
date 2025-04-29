@@ -24,10 +24,8 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
+import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { ReviewIndex } from './Review'
-
-/* eslint-disable max-lines */
 
 const generator = testDataGenerator()
 
@@ -57,26 +55,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const callTracker = {
-  localRegistrar: {
-    'event.create': 0,
-    'event.actions.declare': 0,
-    'event.actions.validate': 0,
-    'event.actions.register': 0
-  },
-  registrationAgent: {
-    'event.create': 0,
-    'event.actions.declare': 0,
-    'event.actions.validate': 0,
-    'event.actions.register': 0
-  },
-  fieldAgent: {
-    'event.create': 0,
-    'event.actions.declare': 0,
-    'event.actions.validate': 0,
-    'event.actions.register': 0
-  }
-}
+const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
@@ -87,7 +66,25 @@ const eventId = eventDocument.id
 
 const draft = generateEventDraftDocument(eventId, ActionType.REGISTER)
 
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  role: 'SOCIAL_WORKER',
+  signatureFilename: 'signature.png'
+}
+
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
+  beforeEach: () => {
+    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -98,60 +95,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return [draft]
-          })
-        ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
-          tRPCMsw.event.create.mutation(() => {
-            callTracker.localRegistrar['event.create']++
-
-            return eventDocument
-          }),
-          tRPCMsw.event.actions.declare.request.mutation(() => {
-            callTracker.localRegistrar['event.actions.declare']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE, ActionType.DECLARE]
-            })
-          }),
-          tRPCMsw.event.actions.validate.request.mutation(() => {
-            callTracker.localRegistrar['event.actions.validate']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.request.mutation(() => {
-            callTracker.localRegistrar['event.actions.register']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE,
-                ActionType.REGISTER
-              ]
-            })
-          })
-        ],
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers,
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -159,6 +104,9 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
                 getUser: generator.user.localRegistrar()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -173,7 +121,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 
       const modal = within(await canvas.findByRole('dialog'))
 
-      await modal.findByText('Register?')
+      await modal.findByText('Register the tennis club membership application?')
       await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
         await modal.findByRole('button', { name: 'Register' })
@@ -182,17 +130,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 
     await step('Confirm action triggers scope based actions', async () => {
       await within(canvasElement).findByText('All events')
+
       await waitFor(async () => {
-        await expect(callTracker.localRegistrar['event.create']).toBe(0)
-        await expect(callTracker.localRegistrar['event.actions.declare']).toBe(
-          1
-        )
-        await expect(callTracker.localRegistrar['event.actions.validate']).toBe(
-          1
-        )
-        await expect(callTracker.localRegistrar['event.actions.register']).toBe(
-          1
-        )
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
+          'event.actions.notify.request': false,
+          'event.actions.declare.request': true,
+          'event.actions.validate.request': true,
+          'event.actions.register.request': true
+        })
       })
     })
   }
@@ -200,9 +146,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
-    })
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
 
     window.localStorage.setItem(
       'opencrvs',
@@ -219,60 +164,8 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return [draft]
-          })
-        ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
-          tRPCMsw.event.create.mutation(() => {
-            callTracker.registrationAgent['event.create']++
-
-            return eventDocument
-          }),
-          tRPCMsw.event.actions.declare.request.mutation(() => {
-            callTracker.registrationAgent['event.actions.declare']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE, ActionType.DECLARE]
-            })
-          }),
-          tRPCMsw.event.actions.validate.request.mutation(() => {
-            callTracker.registrationAgent['event.actions.validate']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.request.mutation(() => {
-            callTracker.registrationAgent['event.actions.register']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE,
-                ActionType.REGISTER
-              ]
-            })
-          })
-        ],
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers,
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -280,6 +173,9 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
                 getUser: generator.user.registrationAgent()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -303,17 +199,15 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 
     await step('Confirm action triggers scope based actions', async () => {
       await within(canvasElement).findByText('All events')
+
       await waitFor(async () => {
-        await expect(callTracker.registrationAgent['event.create']).toBe(0)
-        await expect(
-          callTracker.registrationAgent['event.actions.declare']
-        ).toBe(1)
-        await expect(
-          callTracker.registrationAgent['event.actions.validate']
-        ).toBe(1)
-        await expect(
-          callTracker.registrationAgent['event.actions.register']
-        ).toBe(0)
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
+          'event.actions.notify.request': false,
+          'event.actions.declare.request': true,
+          'event.actions.validate.request': true,
+          'event.actions.register.request': false
+        })
       })
     })
   }
@@ -321,9 +215,8 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 
 export const ReviewForFieldAgentCompleteInteraction: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
-    })
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
 
     window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
   },
@@ -337,60 +230,8 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return [draft]
-          })
-        ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
-          tRPCMsw.event.create.mutation(() => {
-            callTracker.fieldAgent['event.create']++
-
-            return eventDocument
-          }),
-          tRPCMsw.event.actions.declare.request.mutation(() => {
-            callTracker.fieldAgent['event.actions.declare']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE, ActionType.DECLARE]
-            })
-          }),
-          tRPCMsw.event.actions.validate.request.mutation(() => {
-            callTracker.fieldAgent['event.actions.validate']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.request.mutation(() => {
-            callTracker.fieldAgent['event.actions.register']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE,
-                ActionType.REGISTER
-              ]
-            })
-          })
-        ],
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers,
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -398,6 +239,9 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
                 getUser: generator.user.registrationAgent()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -422,11 +266,15 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 
     await step('Confirm action triggers scope based actions', async () => {
       await within(canvasElement).findByText('All events')
+
       await waitFor(async () => {
-        await expect(callTracker.fieldAgent['event.create']).toBe(0)
-        await expect(callTracker.fieldAgent['event.actions.declare']).toBe(1)
-        await expect(callTracker.fieldAgent['event.actions.validate']).toBe(0)
-        await expect(callTracker.fieldAgent['event.actions.register']).toBe(0)
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
+          'event.actions.notify.request': false,
+          'event.actions.declare.request': true,
+          'event.actions.validate.request': false,
+          'event.actions.register.request': false
+        })
       })
     })
   }
@@ -434,9 +282,8 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
-    })
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
 
     window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
   },
@@ -455,62 +302,17 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
             return []
           })
         ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
-          tRPCMsw.event.create.mutation(() => {
-            callTracker.fieldAgent['event.create']++
-
-            return eventDocument
-          }),
-          tRPCMsw.event.actions.declare.request.mutation(() => {
-            callTracker.fieldAgent['event.actions.declare']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [ActionType.CREATE, ActionType.DECLARE]
-            })
-          }),
-          tRPCMsw.event.actions.validate.request.mutation(() => {
-            callTracker.fieldAgent['event.actions.validate']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.request.mutation(() => {
-            callTracker.fieldAgent['event.actions.register']++
-
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE,
-                ActionType.REGISTER
-              ]
-            })
-          })
-        ],
+        events: declarationTrpcMsw.events.handlers,
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.fieldAgent()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [mockUser]
           })
         ]
       }
@@ -537,11 +339,15 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 
     await step('Confirm action triggers scope based actions', async () => {
       await within(canvasElement).findByText('All events')
+
       await waitFor(async () => {
-        await expect(callTracker.fieldAgent['event.create']).toBe(0)
-        await expect(callTracker.fieldAgent['event.actions.declare']).toBe(1)
-        await expect(callTracker.fieldAgent['event.actions.validate']).toBe(0)
-        await expect(callTracker.fieldAgent['event.actions.register']).toBe(0)
+        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
+          'event.actions.notify.request': true,
+          'event.actions.declare.request': false,
+          'event.actions.validate.request': false,
+          'event.actions.register.request': false
+        })
       })
     })
   }

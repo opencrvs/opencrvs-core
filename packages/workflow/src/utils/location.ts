@@ -22,7 +22,7 @@ export const fetchLocationHierarchy = async (id: UUID) => {
 
   if (!response.ok) {
     throw new Error(
-      `Couldn't fetch the hierarch of a location from config: ${await response.text()}`
+      `Couldn't fetch the hierarchy of a location from config: ${await response.text()}`
     )
   }
 

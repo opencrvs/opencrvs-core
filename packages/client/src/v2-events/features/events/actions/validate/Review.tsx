@@ -10,16 +10,15 @@
  */
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useSelector } from 'react-redux'
 import {
   getCurrentEventState,
   ActionType,
   getActionAnnotation,
   getDeclaration,
-  getActionReviewFields,
   getActionReview
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
@@ -36,39 +35,11 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-
-const messages = defineMessages({
-  validateActionTitle: {
-    id: 'v2.validateAction.title',
-    defaultMessage: 'Send for approval',
-    description: 'The title for validate action'
-  },
-  validateActionDescription: {
-    id: 'v2.validateAction.description',
-    defaultMessage:
-      'The informant will receive an email with a registration number that they can use to collect the certificate',
-    description: 'The description for validate action'
-  },
-  validateActionDeclare: {
-    id: 'v2.validateAction.Declare',
-    defaultMessage: 'Send for approval',
-    description: 'The label for declare button of validate action'
-  },
-  validateActionReject: {
-    id: 'v2.validateAction.Reject',
-    defaultMessage: 'Reject',
-    description: 'The label for reject button of validate action'
-  },
-  validateActionDescriptionIncomplete: {
-    id: 'v2.validateAction.incompleteForm',
-    defaultMessage:
-      'Please add mandatory information before sending for approval',
-    description: 'The description for warning of incomplete form'
-  }
-})
+import { getScope } from '@client/profile/profileSelectors'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
  *
@@ -81,12 +52,10 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
-  const validateMutation = events.actions.validate
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const { setAnnotation: setMetadata, getAnnotation: getMetadata } =
-    useActionAnnotation()
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
 
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
@@ -96,7 +65,7 @@ export function Review() {
     drafts: []
   })
 
-  const annotation = getMetadata(previousAnnotation)
+  const annotation = getAnnotation(previousAnnotation)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -107,6 +76,16 @@ export function Review() {
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const previousFormValues = getCurrentEventState(event).declaration
   const form = getFormValues()
+
+  const scopes = useSelector(getScope) ?? undefined
+
+  const reviewActionConfiguration = useReviewActionConfig({
+    formConfig,
+    declaration: form,
+    annotation,
+    scopes,
+    reviewFields: reviewConfig.fields
+  })
 
   async function handleEdit({
     pageId,
@@ -130,25 +109,37 @@ export function Review() {
           {
             from: 'review'
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
     return
   }
 
-  async function handleRegistration() {
-    const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal.Accept action="Validate" close={close} />
-    ))
-    if (confirmedRegistration) {
-      validateMutation.mutate({
-        eventId,
-        declaration: form,
-        transactionId: uuid(),
-        annotation,
-        duplicates: []
-      })
+  async function handleValidation() {
+    const confirmedValidation = await openModal<boolean | null>((close) => {
+      if (reviewActionConfiguration.messages.modal === undefined) {
+        // eslint-disable-next-line no-console
+        console.error(
+          'Tried to render validate modal without message definitions.'
+        )
+        return null
+      }
+
+      return (
+        <ReviewComponent.ActionModal.Accept
+          action="Validate"
+          close={close}
+          copy={{
+            ...reviewActionConfiguration.messages.modal,
+            eventLabel: config.label
+          }}
+        />
+      )
+    })
+
+    if (confirmedValidation) {
+      reviewActionConfiguration.onConfirm(eventId)
 
       goToHome()
     }
@@ -183,13 +174,6 @@ export function Review() {
     }
   }
 
-  const hasValidationErrors = validationErrorsInActionFormExist({
-    formConfig,
-    form,
-    annotation,
-    reviewFields: reviewConfig.fields
-  })
-
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.VALIDATE}
@@ -207,21 +191,15 @@ export function Review() {
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        onAnnotationChange={(values) => setMetadata(values)}
+        onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
-          isPrimaryActionDisabled={hasValidationErrors}
-          messages={{
-            title: messages.validateActionTitle,
-            description: hasValidationErrors
-              ? messages.validateActionDescriptionIncomplete
-              : messages.validateActionDescription,
-            onConfirm: messages.validateActionDeclare,
-            onReject: messages.validateActionReject
-          }}
-          primaryButtonType={'positive'}
-          onConfirm={handleRegistration}
+          icon={reviewActionConfiguration.icon}
+          incomplete={reviewActionConfiguration.incomplete}
+          messages={reviewActionConfiguration.messages}
+          primaryButtonType={reviewActionConfiguration.buttonType}
+          onConfirm={handleValidation}
           onReject={handleRejection}
         />
         {modal}

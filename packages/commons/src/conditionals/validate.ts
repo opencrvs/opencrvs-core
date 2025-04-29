@@ -20,7 +20,7 @@ import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType } from '../events/Conditional'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true,
@@ -31,6 +31,16 @@ const ajv = new Ajv({
 addFormats(ajv)
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return ajv.validate(schema, data)
+}
+
+export function isConditionMet(
+  conditional: JSONSchema,
+  values: Record<string, unknown>
+) {
+  return validate(conditional, {
+    $form: values,
+    $now: formatISO(new Date(), { representation: 'date' })
+  })
 }
 
 function getConditionalActionsForField(
@@ -45,10 +55,19 @@ function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
+export function areConditionsMet(
+  conditions: FieldConditional[],
+  values: Record<string, unknown>
+) {
+  return conditions.every((condition) =>
+    isConditionMet(condition.conditional, values)
+  )
+}
+
 function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  conditionalType: typeof ConditionalType.SHOW | typeof ConditionalType.ENABLE
+  conditionalType: ConditionalType
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -80,6 +99,17 @@ export function isFieldEnabled(
   form: ActionUpdate | EventState
 ) {
   return isFieldConditionMet(field, form, ConditionalType.ENABLE)
+}
+
+// Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
+export function isFieldDisplayedOnReview(
+  field: FieldConfig,
+  form: ActionUpdate | EventState
+) {
+  return (
+    isFieldVisible(field, form) &&
+    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW)
+  )
 }
 
 export const errorMessages = {
@@ -233,38 +263,22 @@ export function validateFieldInput({
   }[]
 }
 
-/**
- * Checks if a field has validation errors based on its type and custom conditionals.
- *
- * @returns an array of error messages for the field
- */
-export function getFieldValidationErrors({
+export function runFieldValidations({
   field,
   values
 }: {
-  // Checkboxes can never have validation errors since they represent a boolean choice that defaults to unchecked
   field: FieldConfig
   values: ActionUpdate
 }) {
-  const conditionalParameters = {
-    $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
-  }
-
-  if (!isFieldVisible(field, values) || !isFieldEnabled(field, values)) {
-    if (values[field.id]) {
-      return {
-        errors: [
-          {
-            message: errorMessages.hiddenField
-          }
-        ]
-      }
-    }
-
+  if (!isFieldVisible(field, values)) {
     return {
       errors: []
     }
+  }
+
+  const conditionalParameters = {
+    $form: values,
+    $now: formatISO(new Date(), { representation: 'date' })
   }
 
   const fieldValidationResult = validateFieldInput({

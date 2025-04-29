@@ -14,6 +14,8 @@ exports[`allows sending partial payload as NOTIFY action 1`] = `
     "urbanOrRural": "URBAN",
     "zipCode": "123456",
   },
+  "applicant.age": 19,
+  "applicant.dobUnknown": true,
   "applicant.image": {
     "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     "originalFilename": "abcd.png",

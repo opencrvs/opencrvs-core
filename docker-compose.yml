@@ -274,6 +274,7 @@ services:
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
+      - EVENTS_MONGO_URL=mongodb://mongo1/events
       - SEARCH_URL=http://search:9090/
       - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb

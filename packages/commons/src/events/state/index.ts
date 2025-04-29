@@ -35,38 +35,36 @@ function getStatusFromActions(actions: Array<Action>) {
   }
 
   return actions.reduce<EventStatus>((status, action) => {
-    if (action.type === ActionType.CREATE) {
-      return EventStatus.CREATED
+    switch (action.type) {
+      case ActionType.CREATE:
+        return EventStatus.CREATED
+      case ActionType.DECLARE:
+        return EventStatus.DECLARED
+      case ActionType.VALIDATE:
+        return EventStatus.VALIDATED
+      case ActionType.REGISTER:
+        return EventStatus.REGISTERED
+      case ActionType.REJECT:
+        return EventStatus.REJECTED
+      case ActionType.ARCHIVE:
+        return EventStatus.ARCHIVED
+      case ActionType.NOTIFY:
+        return EventStatus.NOTIFIED
+      case ActionType.PRINT_CERTIFICATE:
+      case ActionType.ASSIGN:
+      case ActionType.UNASSIGN:
+      case ActionType.REQUEST_CORRECTION:
+      case ActionType.APPROVE_CORRECTION:
+      case ActionType.MARKED_AS_DUPLICATE:
+      case ActionType.REJECT_CORRECTION:
+      case ActionType.READ:
+      default:
+        return status
     }
-
-    if (action.type === ActionType.DECLARE) {
-      return EventStatus.DECLARED
-    }
-
-    if (action.type === ActionType.VALIDATE) {
-      return EventStatus.VALIDATED
-    }
-
-    if (action.type === ActionType.REGISTER) {
-      return EventStatus.REGISTERED
-    }
-
-    if (action.type === ActionType.REJECT) {
-      return EventStatus.REJECTED
-    }
-
-    if (action.type === ActionType.ARCHIVE) {
-      return EventStatus.ARCHIVED
-    }
-
-    if (action.type === ActionType.NOTIFY) {
-      return EventStatus.NOTIFIED
-    }
-    return status
   }, EventStatus.CREATED)
 }
 
-function getAssignedUserFromActions(actions: Array<ActionDocument>) {
+export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<null | string>((user, action) => {
     if (action.type === ActionType.ASSIGN) {
       return action.assignedTo
@@ -74,6 +72,7 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.UNASSIGN) {
       return null
     }
+
     return user
   }, null)
 }
@@ -113,6 +112,12 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
   }, {})
 }
 
+type NonNullableDeep<T> = T extends (infer U)[]
+  ? NonNullableDeep<U>[]
+  : T extends object
+    ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+    : NonNullable<T>
+
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values
  *
@@ -120,26 +125,23 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
  * deepDropNulls({ a: null, b: { c: null, d: 'foo' } }) // { b: { d: 'foo' } }
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function deepDropNulls<T extends Record<string, any>>(obj: T): T {
-  if (!_.isObject(obj)) {
-    return obj
+export function deepDropNulls<T>(obj: T): NonNullableDeep<T> {
+  if (Array.isArray(obj)) {
+    return obj.map(deepDropNulls) as NonNullableDeep<T>
   }
 
-  return Object.entries(obj).reduce((acc: T, [key, value]) => {
-    if (_.isObject(value)) {
-      value = deepDropNulls(value)
-    }
-
-    if (value !== null) {
-      return {
-        ...acc,
-        [key]: value
+  if (obj !== null && typeof obj === 'object') {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+      const cleanedValue = deepDropNulls(value)
+      if (cleanedValue !== null) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(acc as any)[key] = cleanedValue
       }
-    }
+      return acc
+    }, {} as NonNullableDeep<T>)
+  }
 
-    return acc
-  }, {} as T)
+  return obj as NonNullableDeep<T>
 }
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
@@ -179,6 +181,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     modifiedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
+    updatedAtLocation: event.updatedAtLocation,
     declaration: aggregateActionDeclarations(activeActions),
     trackingId: event.trackingId,
     registrationNumber
@@ -246,6 +249,22 @@ export function applyDraftsToEventIndex(
       ...activeDrafts[activeDrafts.length - 1].declaration
     }
   }
+}
+
+/**
+ * Annotation is always specific to the action. when action with annotation is triggered multiple times,
+ * previous annotations should have no effect on the new action annotation. (e.g. printing once should not pre-select print form fields)
+ *
+ * @returns annotation generated from drafts
+ */
+export function getAnnotationFromDrafts(drafts: Draft[]) {
+  const actions = drafts.map((draft) => draft.action)
+
+  const annotation = actions.reduce((ann, action) => {
+    return deepMerge(ann, action.annotation ?? {})
+  }, {})
+
+  return deepDropNulls(annotation)
 }
 
 export function getActionAnnotation({

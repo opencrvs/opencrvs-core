@@ -14,7 +14,7 @@ import styled from 'styled-components'
 import { MimeType, FieldValue, FileFieldValue } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
-import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
+import { formMessages as messages } from '@client/i18n/messages'
 import { DocumentPreview } from './DocumentPreview'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
 import { useOnFileChange } from './useOnFileChange'
@@ -39,7 +39,7 @@ const FieldDescription = styled.div`
 
 interface SimpleDocumentUploaderProps {
   name: string
-  label?: string
+  label: string
   file?: FileFieldValue
   description?: string
   width?: 'full' | 'auto'
@@ -115,20 +115,19 @@ export function SimpleDocumentUploader({
           disableDelete={disableDeleteInPreview}
           goBack={closePreviewSection}
           previewImage={previewImage}
-          title={intl.formatMessage(buttonMessages.preview)}
+          title={label}
           onDelete={onDelete}
         />
       )}
-      {!file && (
-        <DocumentUploader
-          fullWidth={width === 'full'}
-          id={name}
-          name={name}
-          onChange={handleFileChange}
-        >
-          {intl.formatMessage(messages.uploadFile)}
-        </DocumentUploader>
-      )}
+      <DocumentUploader
+        data-testid={name}
+        fullWidth={width === 'full'}
+        id={name}
+        name={name}
+        onChange={handleFileChange}
+      >
+        {intl.formatMessage(messages.uploadFile)}
+      </DocumentUploader>
     </>
   )
 }

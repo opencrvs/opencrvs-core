@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Conditional, ActionConditional } from './Conditional'
+import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
 import { FieldType } from './FieldType'
@@ -44,7 +44,7 @@ const BaseField = z.object({
       DependencyExpression
     ])
     .optional(),
-  conditionals: z.array(ActionConditional).default([]).optional(),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
   disabled: z.boolean().default(false).optional(),
   hidden: z.boolean().default(false).optional(),
@@ -52,7 +52,7 @@ const BaseField = z.object({
   validation: z
     .array(
       z.object({
-        validator: Conditional(),
+        validator: Conditional,
         message: TranslationConfig
       })
     )
@@ -233,7 +233,8 @@ const File = BaseField.extend({
               'Whether the file upload button should take the full width of the container or not'
             )
         })
-        .optional()
+        .optional(),
+      fileName: TranslationConfig.optional()
     })
     .default({
       maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
@@ -376,7 +377,7 @@ const Address = BaseField.extend({
 export const DataEntry = z.union([
   z.object({
     label: TranslationConfig,
-    value: z.string()
+    value: TranslationConfig.or(z.string())
   }),
   z.object({
     fieldId: z.string()

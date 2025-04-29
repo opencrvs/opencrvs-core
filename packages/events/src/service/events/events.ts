@@ -26,7 +26,10 @@ import {
   getDeclarationFields,
   getAcceptedActions,
   AsyncRejectActionDocument,
-  ActionType
+  ActionType,
+  getCurrentEventState,
+  EventStatus,
+  isWriteAction
 } from '@opencrvs/commons/events'
 import { getUUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -117,17 +120,13 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  /**
-   * Once an event is declared, it cannot be removed anymore.
-   */
-  const hasNonDeletableActions = event.actions.some(
-    (action) => action.type !== ActionType.CREATE
-  )
+  const eventState = getCurrentEventState(event)
 
-  if (hasNonDeletableActions) {
+  // Once an event is declared or notified, it can not be deleted anymore
+  if (eventState.status !== EventStatus.CREATED) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'Event has actions that cannot be deleted'
+      message: 'A declared or notified event can not be deleted'
     })
   }
 
@@ -186,6 +185,7 @@ export async function createEvent({
     transactionId,
     createdAt: now,
     updatedAt: now,
+    updatedAtLocation: createdAtLocation,
     trackingId,
     actions: [
       {
@@ -195,10 +195,27 @@ export async function createEvent({
         createdAtLocation,
         id: getUUID(),
         declaration: {},
-        status: ActionStatus.Accepted
+        status: ActionStatus.Accepted,
+        transactionId: getUUID()
       }
     ]
   })
+
+  const action: ActionDocument = {
+    type: ActionType.ASSIGN,
+    assignedTo: createdBy,
+    declaration: {},
+    createdBy,
+    createdAt: now,
+    createdAtLocation,
+    id,
+    status: ActionStatus.Accepted,
+    transactionId: getUUID()
+  }
+
+  await db
+    .collection<EventDocument>('events')
+    .updateOne({ id }, { $push: { actions: action }, $set: { updatedAt: now } })
 
   const event = await getEventById(id)
   await indexEvent(event)
@@ -255,7 +272,6 @@ export async function addAction(
     createdBy,
     token,
     createdAtLocation,
-    transactionId,
     status
   }: {
     eventId: string
@@ -289,16 +305,18 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
-    input.transactionId = getUUID()
     await db.collection<EventDocument>('events').updateOne(
       {
         id: eventId,
-        'actions.transactionId': { $nin: [transactionId, input.transactionId] }
+        'actions.transactionId': {
+          $ne: input.transactionId
+        }
       },
       {
         $push: {
           actions: {
             ...input,
+            transactionId: getUUID(),
             type: ActionType.MARKED_AS_DUPLICATE,
             createdBy,
             createdAt: now,
@@ -312,7 +330,6 @@ export async function addAction(
         }
       }
     )
-    input.transactionId = transactionId
   }
 
   const action: ActionDocument = {
@@ -327,9 +344,32 @@ export async function addAction(
   await db
     .collection<EventDocument>('events')
     .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: transactionId } },
+      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
       { $push: { actions: action }, $set: { updatedAt: now } }
     )
+
+  if (isWriteAction(input.type) && !input.keepAssignment) {
+    await db.collection<EventDocument>('events').updateOne(
+      { id: eventId },
+      {
+        $push: {
+          actions: {
+            ...input,
+            transactionId: getUUID(),
+            type: ActionType.UNASSIGN,
+            declaration: {},
+            assignedTo: null,
+            createdBy,
+            createdAt: now,
+            createdAtLocation,
+            id: actionId,
+            status: status
+          }
+        },
+        $set: { updatedAt: now }
+      }
+    )
+  }
 
   const drafts = await getDraftsForAction(eventId, createdBy, input.type)
 
@@ -344,7 +384,10 @@ export async function addAction(
 
   if (action.type !== ActionType.READ) {
     await indexEvent(updatedEvent)
-    await deleteDraftsByEventId(eventId)
+
+    if (action.type !== ActionType.ASSIGN) {
+      await deleteDraftsByEventId(eventId)
+    }
   }
 
   return updatedEvent

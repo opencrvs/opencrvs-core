@@ -10,16 +10,106 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { useTRPC } from '@client/v2-events/trpc'
+import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
+import { getFullUrl, precacheFile } from '../features/files/useFileUpload'
+
+setQueryDefaults(trpcOptionsProxy.user.get, {
+  queryFn: async (...params) => {
+    const {
+      queryKey: [, input]
+    } = params[0]
+
+    const queryOptions = trpcOptionsProxy.user.get.queryOptions(input.input)
+
+    if (typeof queryOptions.queryFn !== 'function') {
+      throw new Error('queryFn is not a function')
+    }
+
+    const user = await queryOptions.queryFn(...params)
+
+    if (user.signatureFilename) {
+      await precacheFile(user.signatureFilename, '/')
+      return {
+        ...user,
+        signatureFilename: getFullUrl(user.signatureFilename)
+      }
+    }
+
+    return user
+  }
+})
+
+setQueryDefaults(trpcOptionsProxy.user.list, {
+  queryFn: async (...params) => {
+    const {
+      queryKey: [, input]
+    } = params[0]
+
+    const queryOptions = trpcOptionsProxy.user.list.queryOptions(input.input)
+
+    if (typeof queryOptions.queryFn !== 'function') {
+      throw new Error('queryFn is not a function')
+    }
+
+    const users = await queryOptions.queryFn(...params)
+
+    await Promise.allSettled(
+      users.map(async (user) => {
+        if (user.signatureFilename) {
+          return precacheFile(user.signatureFilename, '/')
+        }
+        return user
+      })
+    )
+
+    return users.map((user) => ({
+      ...user,
+      signatureFilename: user.signatureFilename
+        ? getFullUrl(user.signatureFilename)
+        : undefined
+    }))
+  }
+})
 
 export function useUsers() {
   const trpc = useTRPC()
   return {
+    getUser: {
+      useQuery: (id: string) => {
+        const { queryFn, ...options } = trpc.user.get.queryOptions(id)
+        return useQuery({
+          ...options,
+          queryKey: trpc.user.get.queryKey(id)
+        })
+      },
+      useSuspenseQuery: (id: string) => {
+        const { queryFn, ...options } = trpc.user.get.queryOptions(id)
+        return [
+          useSuspenseQuery({
+            ...options,
+            queryKey: trpc.user.get.queryKey(id)
+          }).data
+        ]
+      }
+    },
     getUsers: {
-      useQuery: (ids: string[]) => useQuery(trpc.user.list.queryOptions(ids)),
-      useSuspenseQuery: (ids: string[]) => [
-        useSuspenseQuery(trpc.user.list.queryOptions(ids)).data
-      ]
+      useQuery: (ids: string[]) => {
+        const { queryFn, ...options } = trpc.user.list.queryOptions(ids)
+        return useQuery({
+          ...options,
+          queryKey: trpc.user.list.queryKey(ids)
+        })
+      },
+      useSuspenseQuery: (ids: string[]) => {
+        const { queryFn, ...options } = trpc.user.list.queryOptions(ids)
+        return [
+          useSuspenseQuery({
+            ...options,
+            queryKey: trpc.user.list.queryKey(ids)
+          }).data
+        ]
+      }
     }
   }
 }

@@ -150,6 +150,7 @@ export const WithRejectedAction: Story = {
                   type: ActionType.ARCHIVE,
                   status: ActionStatus.Rejected,
                   id: getUUID(),
+                  transactionId: getUUID(),
                   createdAt: new Date().toISOString(),
                   createdBy: '123',
                   createdAtLocation: '123'

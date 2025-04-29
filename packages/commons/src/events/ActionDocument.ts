@@ -32,6 +32,7 @@ export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
   id: z.string(),
+  transactionId: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   declaration: ActionUpdate,
@@ -57,7 +58,8 @@ const AssignedAction = ActionBase.merge(
 
 const UnassignedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.UNASSIGN)
+    type: z.literal(ActionType.UNASSIGN),
+    assignedTo: z.literal(null).default(null)
   })
 )
 

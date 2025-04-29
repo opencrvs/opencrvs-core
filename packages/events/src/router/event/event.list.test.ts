@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { AddressType, EventStatus, SCOPES } from '@opencrvs/commons'
+import { ActionType, AddressType, EventStatus, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -88,6 +88,17 @@ test('Returns aggregated event with updated status and values', async () => {
     ...initialDeclaration,
     'applicant.firstname': 'Jane'
   }
+
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
       declaration: updatedDeclaration

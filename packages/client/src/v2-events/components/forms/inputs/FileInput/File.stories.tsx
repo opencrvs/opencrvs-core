@@ -101,7 +101,7 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
             ]
           }
         ]}
-        formData={formData}
+        form={formData}
         id="my-form"
         setAllFieldsDirty={false}
         onChange={(data) => {
@@ -134,11 +134,16 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
               },
               configuration: {
                 style: { width: args.width },
-                maxFileSize: 5 * 1024 * 1024
+                maxFileSize: 5 * 1024 * 1024,
+                fileName: {
+                  defaultMessage: 'Uploaded photo',
+                  description: 'The title for the file input',
+                  id: 'storybook.file.label'
+                }
               }
             }
           ]}
-          formData={formData}
+          form={formData}
           id="my-form"
           setAllFieldsDirty={false}
           onChange={(data) => {

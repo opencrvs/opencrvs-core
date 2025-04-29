@@ -19,7 +19,7 @@ import { FieldValue } from './FieldValue'
 /**
  * Available system variables for configuration.
  */
-export type MetaFields = {
+export type SystemVariables = {
   $user: {
     province: string
     district: string
@@ -39,19 +39,19 @@ type FlattenedKeyStrings<T, Prefix extends string = ''> = {
     : `${Prefix}${K & string}`
 }[keyof T]
 
-export type FlattenedMetaFields = FlattenedKeyStrings<MetaFields>
+export type FlattenenedSystemVariables = FlattenedKeyStrings<SystemVariables>
 
 /**
  * Default value for a field when configuring a form.
  */
 export type FieldConfigDefaultValue =
   | FieldValue
-  | FlattenedMetaFields
-  | Record<string, FlattenedMetaFields | FieldValue>
+  | FlattenenedSystemVariables
+  | Record<string, FlattenenedSystemVariables | FieldValue>
 
 export function isTemplateVariable(
   value: FieldConfigDefaultValue
-): value is FlattenedMetaFields {
+): value is FlattenenedSystemVariables {
   return typeof value === 'string' && (value as string).startsWith('$')
 }
 

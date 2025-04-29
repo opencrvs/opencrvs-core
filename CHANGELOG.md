@@ -2,6 +2,11 @@
 
 ## 1.8.0 Release candidate
 
+### New features
+
+- **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
+- **Redis replaced with Valkey**, version was bumped from 5 to 8. [#6720](https://github.com/opencrvs/opencrvs-core/issues/6720)
+
 ### Improvements
 
 - Improved text color for disabled text inputs and dropdowns

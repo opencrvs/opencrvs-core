@@ -13,7 +13,7 @@ import {
   FieldConfig,
   Inferred,
   FieldValue,
-  MetaFields,
+  SystemVariables,
   isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
 import { DependencyInfo } from '@client/forms'
@@ -47,16 +47,20 @@ export function hasDefaultValueDependencyInfo(
   return Boolean(value && typeof value === 'object' && 'dependsOn' in value)
 }
 
-export function handleDefaultValue(
-  field: FieldConfig,
-  formData: EventState,
-  meta: MetaFields
-) {
+export function handleDefaultValue({
+  field,
+  declaration,
+  systemVariables
+}: {
+  field: FieldConfig
+  declaration: EventState
+  systemVariables: SystemVariables
+}) {
   const defaultValue = field.defaultValue
 
   if (hasDefaultValueDependencyInfo(defaultValue)) {
     return evalExpressionInFieldDefinition(defaultValue.expression, {
-      $form: formData
+      $form: declaration
     })
   }
 
@@ -64,15 +68,16 @@ export function handleDefaultValue(
     return replacePlaceholders({
       fieldType: field.type,
       defaultValue,
-      meta: meta
+      systemVariables
     })
   }
+
   return defaultValue
 }
 
 export function getDependentFields(
   fields: FieldConfig[],
-  fieldName: string
+  fieldId: string
 ): FieldConfig[] {
   return fields.filter((field) => {
     if (!field.defaultValue) {
@@ -81,7 +86,7 @@ export function getDependentFields(
     if (!hasDefaultValueDependencyInfo(field.defaultValue)) {
       return false
     }
-    return field.defaultValue.dependsOn.includes(fieldName)
+    return field.defaultValue.dependsOn.includes(fieldId)
   })
 }
 
@@ -103,10 +108,10 @@ export function formatDateFieldValue(value: string) {
  * @returns adds 0 before single digit days and months to make them 2 digit
  * because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
  */
-export function makeDatesFormatted(
+export function makeDatesFormatted<T extends Record<string, FieldValue>>(
   fields: FieldConfig[],
-  values: Record<string, FieldValue>
-) {
+  values: T
+): T {
   return fields.reduce((acc, field) => {
     const fieldId = field.id.replaceAll('.', FIELD_SEPARATOR)
 

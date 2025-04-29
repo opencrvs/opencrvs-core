@@ -79,7 +79,7 @@ function getSectionFields(
       >
         <FormFieldGenerator
           fields={modifiedFields}
-          formData={formValues}
+          form={formValues}
           id={section.title.id}
           initialValues={fieldValues}
           setAllFieldsDirty={false}

@@ -10,12 +10,12 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { Location } from '@events/service/locations/locations'
 import { FieldProps } from '@opencrvs/commons/client'
-import {
-  getAdminStructureLocations,
-  getLocations
-} from '@client/offline/selectors'
+import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { Select } from './Select'
 
 function useAdminLocations(partOf: string) {
@@ -62,20 +62,25 @@ function AdministrativeAreaInput({
 }
 
 function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
-  const locations = useSelector(getLocations)
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
-  const location = value.toString() && locations[value.toString()]
+  const location = value.toString()
+    ? locations.find((l) => l.id === value.toString())
+    : null
 
   return location ? location.name : ''
 }
 
-function useStringifier() {
-  const locations = useSelector(getLocations)
-  return (value: string) => (value ? locations[value].name : '__EMPTY__')
+function stringify(locations: Location[], value: string) {
+  const location = locations.find((l) => l.id === value)
+
+  const name = location?.name
+  return name ?? EMPTY_TOKEN
 }
 
 export const AdministrativeArea = {
   Input: AdministrativeAreaInput,
   Output: AdministrativeAreaOutput,
-  useStringifier: useStringifier
+  stringify
 }

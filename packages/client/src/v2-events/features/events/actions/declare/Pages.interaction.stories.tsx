@@ -44,7 +44,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const undeclaredDraftEvent = {
   ...tennisClubMembershipEventDocument,
   actions: tennisClubMembershipEventDocument.actions.filter(
-    ({ type }) => type === ActionType.CREATE
+    ({ type }) => type === ActionType.CREATE || type === ActionType.ASSIGN
   )
 }
 const spy = fn()
@@ -61,6 +61,7 @@ function createDraftHandlers() {
         action: {
           status: ActionStatus.Accepted,
           ...req,
+          declaration: req.declaration || {},
           createdBy: 'test-user',
           createdAtLocation: 'test-location',
           createdAt: new Date().toISOString()
@@ -192,8 +193,10 @@ export const DraftShownInForm: Story = {
     await userEvent.click(await modal.findByRole('button', { name: /Confirm/ }))
 
     await userEvent.click(await canvas.findByText('Clearly Draft'))
+
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
-    await userEvent.click(await canvas.findByText(/Send an application/))
+
+    await userEvent.click(await canvas.findByText(/Declare/))
 
     await expect(
       await canvas.findByTestId('text__applicant____surname')

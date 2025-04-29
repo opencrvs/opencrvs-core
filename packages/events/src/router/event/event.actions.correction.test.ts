@@ -11,11 +11,10 @@
 
 import { TRPCError } from '@trpc/server'
 import {
-  ActionDocument,
   ActionType,
   AddressType,
   EventDocument,
-  generateActionInput,
+  generateActionDeclarationInput,
   getAcceptedActions,
   getUUID,
   SCOPES
@@ -116,17 +115,35 @@ test('a correction request can be added to a created event', async () => {
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
   await client.event.actions.declare.request(declareInput)
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   const withCorrectionRequest = await client.event.actions.correction.request(
     generator.event.actions.correction.request(registeredEvent.id)
   )
 
-  expect(
-    withCorrectionRequest.actions[withCorrectionRequest.actions.length - 1].type
-  ).toBe(ActionType.REQUEST_CORRECTION)
+  expect(withCorrectionRequest.actions.slice(-2)).toEqual([
+    expect.objectContaining({
+      type: ActionType.REQUEST_CORRECTION
+    }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
+  ])
 })
 
 test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the offending fields`, async () => {
@@ -138,6 +155,7 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   const data = generator.event.actions.correction.request(event.id, {
     declaration: {
       'applicant.dob': '02-02',
+      'applicant.dobUnknown': false,
       'recommender.none': true
     }
   })
@@ -156,6 +174,7 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
   const data = generator.event.actions.correction.request(event.id, {
     declaration: {
       'applicant.dob': '02-1-2024',
+      'applicant.dobUnknown': false,
       'applicant.firstname': 'John',
       'applicant.surname': 'Doe',
       'recommender.none': true,
@@ -183,6 +202,7 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
 
   const form = {
     'applicant.dob': '2024-02-01',
+    'applicant.dobUnknown': false,
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'recommender.none': true,
@@ -217,6 +237,7 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
 
   const form = {
     'applicant.dob': '2040-02-01',
+    'applicant.dobUnknown': false,
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
     'recommender.none': true,
@@ -248,17 +269,35 @@ test('a correction request can be added to a created event', async () => {
   await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id)
   )
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
   )
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   const withCorrectionRequest = await client.event.actions.correction.request(
     generator.event.actions.correction.request(registeredEvent.id)
   )
 
-  expect(
-    withCorrectionRequest.actions[withCorrectionRequest.actions.length - 1].type
-  ).toBe(ActionType.REQUEST_CORRECTION)
+  expect(withCorrectionRequest.actions.slice(-2)).toEqual([
+    expect.objectContaining({
+      type: ActionType.REQUEST_CORRECTION
+    }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
+  ])
 })
 
 describe('when a correction request exists', () => {
@@ -275,18 +314,39 @@ describe('when a correction request exists', () => {
 
     await client.event.actions.declare.request(declareInput)
 
+    const createAction = originalEvent.actions.filter(
+      (action) => action.type === ActionType.CREATE
+    )
+
+    const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+      assignedTo: createAction[0].createdBy
+    })
+
+    await client.event.actions.assignment.assign(assignmentInput)
+
     const registeredEvent = await client.event.actions.register.request(
       generator.event.actions.register(originalEvent.id)
     )
 
+    await client.event.actions.assignment.assign({
+      ...assignmentInput,
+      transactionId: getUUID()
+    })
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(registeredEvent.id, {
         declaration: {
-          ...generateActionInput(tennisClubMembershipEvent, ActionType.DECLARE),
-          'applicant.firstName': 'Johnny'
+          ...generateActionDeclarationInput(
+            tennisClubMembershipEvent,
+            ActionType.DECLARE
+          ),
+          'applicant.firstname': 'Johnny'
         }
       })
     )
+    await client.event.actions.assignment.assign({
+      ...assignmentInput,
+      transactionId: getUUID()
+    })
   })
 
   test('a correction request can be approved with correct request id', async () => {
@@ -302,14 +362,13 @@ describe('when a correction request exists', () => {
           requestId
         )
       )
-
-    const lastAction = withApprovedCorrectionRequest.actions[
-      withApprovedCorrectionRequest.actions.length - 1
-    ] as Extract<ActionDocument, { type: 'APPROVE_CORRECTION' }>
-
-    expect(lastAction.type).toBe(ActionType.APPROVE_CORRECTION)
-
-    expect(lastAction.requestId).toBe(requestId)
+    expect(withApprovedCorrectionRequest.actions.slice(-2)).toEqual([
+      expect.objectContaining({
+        type: ActionType.APPROVE_CORRECTION,
+        requestId
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN })
+    ])
   })
 
   test('approving a request fails if request id is incorrect', async () => {
@@ -325,4 +384,152 @@ describe('when a correction request exists', () => {
     )
     await expect(request).rejects.toThrow()
   })
+})
+
+test(`${ActionType.REQUEST_CORRECTION} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare.request(declareInput)
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  const registeredEvent = await client.event.actions.register.request(
+    generator.event.actions.register(originalEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+  const correctionRequestPayload = generator.event.actions.correction.request(
+    registeredEvent.id
+  )
+  const firstResponse = await client.event.actions.correction.request(
+    correctionRequestPayload
+  )
+
+  const secondResponse = await client.event.actions.correction.request(
+    correctionRequestPayload
+  )
+
+  expect(firstResponse).toEqual(secondResponse)
+})
+
+test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare.request(declareInput)
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  const registeredEvent = await client.event.actions.register.request(
+    generator.event.actions.register(originalEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const withCorrectionRequest = await client.event.actions.correction.request(
+    generator.event.actions.correction.request(registeredEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const approveCorrectionPayload = generator.event.actions.correction.approve(
+    withCorrectionRequest.id,
+    withCorrectionRequest.actions.at(-1).id
+  )
+
+  const firstResponse = await client.event.actions.correction.approve(
+    approveCorrectionPayload
+  )
+  const secondResponse = await client.event.actions.correction.approve(
+    approveCorrectionPayload
+  )
+
+  expect(firstResponse).toEqual(secondResponse)
+})
+
+test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare.request(declareInput)
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  const registeredEvent = await client.event.actions.register.request(
+    generator.event.actions.register(originalEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const withCorrectionRequest = await client.event.actions.correction.request(
+    generator.event.actions.correction.request(registeredEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const rejectCorrectionPayload = generator.event.actions.correction.reject(
+    withCorrectionRequest.id,
+    withCorrectionRequest.actions.at(-1).id
+  )
+
+  const firstResponse = await client.event.actions.correction.reject(
+    rejectCorrectionPayload
+  )
+  const secondResponse = await client.event.actions.correction.reject(
+    rejectCorrectionPayload
+  )
+
+  expect(firstResponse).toEqual(secondResponse)
 })

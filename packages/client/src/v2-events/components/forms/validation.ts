@@ -11,12 +11,12 @@
 import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
-  getFieldValidationErrors,
   EventState,
-  stripHiddenFields,
-  getVisiblePagesFormFields,
+  omitHiddenPaginatedFields,
   isPageVisible,
-  FormConfig
+  FormConfig,
+  omitHiddenFields,
+  runFieldValidations
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -44,7 +44,7 @@ export function getValidationErrorsForForm(
 
     return {
       ...errorsForAllFields,
-      [field.id]: getFieldValidationErrors({ field, values })
+      [field.id]: runFieldValidations({ field, values })
     }
   }, {})
 }
@@ -61,12 +61,9 @@ export function validationErrorsInActionFormExist({
   reviewFields?: FieldConfig[]
 }): boolean {
   // We don't want to validate hidden fields
-  const formWithoutHiddenFields = stripHiddenFields(
-    getVisiblePagesFormFields(formConfig, form),
-    form
-  )
+  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
 
-  const visibleAnnotationFields = stripHiddenFields(
+  const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
     annotation ?? {}
   )

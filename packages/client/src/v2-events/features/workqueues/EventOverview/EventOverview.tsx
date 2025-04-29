@@ -12,14 +12,10 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
-  SummaryConfig,
-  FieldValue,
-  getCurrentEventStateWithDrafts,
   EventDocument,
-  Draft,
   getCurrentEventState,
-  getDeclarationFields,
-  getAcceptedActions
+  getAcceptedActions,
+  getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -35,11 +31,7 @@ import {
   flattenEventIndex,
   getUserIdsFromActions
 } from '@client/v2-events/utils'
-import {
-  RecursiveStringRecord,
-  useFormDataStringifier
-} from '@client/v2-events/hooks/useFormDataStringifier'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -53,40 +45,24 @@ import { EventOverviewProvider } from './EventOverviewContext'
 /**
  * Renders the event overview page, including the event summary and history.
  */
-function EventOverview({
-  event,
-  drafts,
-  summary
-}: {
-  drafts: Draft[]
-  event: EventDocument
-  summary: SummaryConfig
-}) {
+function EventOverview({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const allFields = getDeclarationFields(eventConfiguration)
   const intl = useIntlFormatMessageWithFlattenedParams()
-
-  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status, registrationNumber } = eventIndex
+  const { getRemoteDrafts } = useDrafts()
+  const drafts = getRemoteDrafts()
+  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
 
-  const stringifyFormData = useFormDataStringifier()
-  const eventWithDefaults = stringifyFormData(
-    allFields,
-    eventWithDrafts.declaration
-  )
-
-  const flattenedEventIndex: Record<
-    string,
-    FieldValue | null | RecursiveStringRecord
-  > = {
-    ...flattenEventIndex({ ...eventIndex, declaration: eventWithDefaults }),
+  const flattenedEventIndex = {
+    ...flattenEventIndex(eventWithDrafts),
     // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
     'event.status': status,
     'event.registrationNumber': registrationNumber
   }
 
+  const { summary } = eventConfiguration
   const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
@@ -104,8 +80,7 @@ function EventOverview({
     >
       <EventSummary
         event={flattenedEventIndex}
-        eventLabel={eventConfiguration.label}
-        summary={summary}
+        eventConfiguration={eventConfiguration}
       />
       <EventHistory history={actions} />
     </Content>
@@ -115,13 +90,9 @@ function EventOverview({
 function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { getEvent } = useEvents()
-  const { getRemoteDrafts } = useDrafts()
   const { getUsers } = useUsers()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const drafts = getRemoteDrafts()
-  const { eventConfiguration: config } = useEventConfiguration(fullEvent.type)
-
   const activeActions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(activeActions)
   const [users] = getUsers.useSuspenseQuery(userIds)
@@ -129,11 +100,7 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview
-        drafts={drafts}
-        event={fullEvent}
-        summary={config.summary}
-      />
+      <EventOverview event={fullEvent} />
     </EventOverviewProvider>
   )
 }
