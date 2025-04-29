@@ -351,3 +351,56 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
   }
 }
+
+export const ReviewChangeButtonInteraction: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      formValues: getCurrentEventState(validateEventDocument).declaration
+    })
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
+        eventId
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers,
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.localRegistrar()
+              }
+            })
+          }),
+          tRPCMsw.user.list.query(() => {
+            return [mockUser]
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Register' })
+    )
+
+    await userEvent.click(
+      await canvas.findByTestId('change-button-applicant.surname')
+    )
+
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Continue' })
+    )
+
+    await expect(
+      await canvas.findByTestId('text__applicant____surname')
+    ).toBeVisible()
+  }
+}
