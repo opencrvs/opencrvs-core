@@ -16,6 +16,8 @@ import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { findAllFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod-openapi/extend'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -68,6 +70,9 @@ export const EventConfig = z
         path: ['advancedSearch']
       })
     }
+  })
+  .openapi({
+    ref: 'EventConfig'
   })
 
 export type EventConfig = z.infer<typeof EventConfig>

@@ -11,15 +11,19 @@
 
 import { z } from 'zod'
 import { Action } from './ActionDocument'
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod-openapi/extend'
 
-export const EventDocument = z.object({
-  id: z.string(),
-  type: z.string(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  updatedAtLocation: z.string(),
-  actions: z.array(Action),
-  trackingId: z.string()
-})
+export const EventDocument = z
+  .object({
+    id: z.string(),
+    type: z.string(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+    updatedAtLocation: z.string(),
+    actions: z.array(Action),
+    trackingId: z.string()
+  })
+  .openapi({ ref: 'EventDocument' })
 
 export type EventDocument = z.infer<typeof EventDocument>

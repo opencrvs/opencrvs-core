@@ -9,27 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { OpenApiBuilder } from '@zodios/openapi'
 import * as yaml from 'yaml'
-import { countryConfigAPI } from '.'
+import { createDocument } from 'zod-openapi'
+import { countryConfigApi } from '.'
 
-const openapi = new OpenApiBuilder({
-  title: 'Countryconfig implementation requirements',
-  version: '1.8.0',
-  description: 'Country specific configuration server for OpenCRVS'
+const document = createDocument({
+  openapi: '3.1.0',
+  info: {
+    title: 'Countryconfig implementation requirements',
+    version: '1.8.0',
+    description: 'Country specific configuration server for OpenCRVS'
+  },
+  paths: countryConfigApi
 })
-  .addPublicApi(countryConfigAPI)
-  /*
-   * This just overrides the build-in tag logic of zodios-openapi
-   */
-  .setCustomTagsFn(
-    (api) => countryConfigAPI.find((a) => a.path === api)?.tags || []
-  )
 
-  .build()
-
-const clean = JSON.parse(
-  JSON.stringify(openapi, (_, v) => (v === null ? undefined : v))
-)
 // eslint-disable-next-line no-console
-console.log(yaml.stringify(clean))
+console.log(yaml.stringify(document))

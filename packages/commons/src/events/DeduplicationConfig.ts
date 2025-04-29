@@ -140,8 +140,7 @@ export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
     ])
   )
   .openapi({
-    description: 'A unique identifier for a job',
-    ref: 'clause'
+    ref: 'Clause'
   })
 
 export type Clause = z.infer<typeof Clause>

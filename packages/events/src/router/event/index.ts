@@ -77,6 +77,7 @@ export const eventRouter = router({
         }
       })
       .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+      .input(z.void())
       .output(z.array(EventConfig))
       .query(async (options) => {
         return getEventConfigurations(options.ctx.token)

@@ -9,17 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createAPIClient, getOrThrow } from '@opencrvs/commons'
+import fetch from 'node-fetch'
+import { array } from 'zod'
+import { EventConfig, getOrThrow } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-const apiClient = createAPIClient(env.COUNTRY_CONFIG_URL)
-
-export function getEventConfigurations(token: string) {
-  return apiClient.getEventConfigurations({
+export async function getEventConfigurations(token: string) {
+  const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     }
   })
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch events config')
+  }
+
+  return array(EventConfig).parse(await res.json())
 }
 
 async function findEventConfigurationById({

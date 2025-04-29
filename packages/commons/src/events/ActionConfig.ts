@@ -15,7 +15,8 @@ import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
-
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod-openapi/extend'
 /**
  * By default, when conditionals are not defined, action is visible and enabled to the user.
  */
@@ -149,19 +150,26 @@ export type InferredActionConfig =
   | z.infer<typeof RejectCorrectionConfig>
   | z.infer<typeof ApproveCorrectionConfig>
 
-export const ActionConfig = z.discriminatedUnion('type', [
-  DeclareConfig,
-  ValidateConfig,
-  RejectDeclarationConfig,
-  MarkedAsDuplicateConfig,
-  ArchiveConfig,
-  RegisterConfig,
-  DeleteConfig,
-  PrintCertificateActionConfig,
-  RequestCorrectionConfig,
-  RejectCorrectionConfig,
-  ApproveCorrectionConfig
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
+export const ActionConfig = z
+  .discriminatedUnion('type', [
+    DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
+    ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
+    RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
+    MarkedAsDuplicateConfig.openapi({ ref: 'MarkedAsDuplicateActionConfig' }),
+    ArchiveConfig.openapi({ ref: 'ArchiveActionConfig' }),
+    RegisterConfig.openapi({ ref: 'RegisterActionConfig' }),
+    DeleteConfig.openapi({ ref: 'DeleteActionConfig' }),
+    PrintCertificateActionConfig.openapi({
+      ref: 'PrintCertificateActionConfig'
+    }),
+    RequestCorrectionConfig.openapi({ ref: 'RequestCorrectionActionConfig' }),
+    RejectCorrectionConfig.openapi({ ref: 'RejectCorrectionActionConfig' }),
+    ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' })
+  ])
+  .openapi({ ref: 'ActionConfig' }) as unknown as z.ZodDiscriminatedUnion<
+  'type',
+  AllActionConfigFields[]
+>
 
 export type ActionConfig = InferredActionConfig
 
