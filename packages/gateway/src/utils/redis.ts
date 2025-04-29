@@ -31,6 +31,7 @@ export function start(host = REDIS_HOST, port?: number) {
     logger.info(`REDIS_PORT, ${JSON.stringify(port)}`)
 
     const url = getRedisUrl(host, port, REDIS_USERNAME, REDIS_PASSWORD)
+    logger.info(`REDIS_URL, ${JSON.stringify(url)}`)
 
     redisClient = redis.createClient({
       url,
