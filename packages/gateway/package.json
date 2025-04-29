@@ -65,7 +65,7 @@
     "lodash": "^4.17.10",
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
-    "redis": "^3.0.2",
+    "redis": "^3.1.1",
     "tsconfig-paths": "^3.13.0",
     "uuid": "^3.2.1",
     "uuid-validate": "^0.0.3",
