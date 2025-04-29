@@ -31,13 +31,13 @@ import {
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import {
-  buildElasticQueryFromSearchPayload,
   decodeEventIndex,
   DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId
 } from './utils'
+import { buildElasticQueryFromSearchPayload } from './query'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))

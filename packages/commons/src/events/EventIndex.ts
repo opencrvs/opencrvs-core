@@ -69,7 +69,6 @@ const QueryExpression = z
   .object({
     type: z.literal('and'),
     eventType: z.string(),
-    searchType: z.optional(z.union([AnyOf, Exact, Fuzzy])),
     status: z.optional(z.union([AnyOf, Exact])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
@@ -86,6 +85,8 @@ const Or = z.object({
   type: z.literal('or'),
   clauses: z.array(QueryExpression)
 })
+
+export type QueryExpression = z.infer<typeof QueryExpression>
 
 export const QueryType = z.discriminatedUnion('type', [QueryExpression, Or])
 export type QueryType = z.infer<typeof QueryType>

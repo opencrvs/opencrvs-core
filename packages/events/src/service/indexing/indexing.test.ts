@@ -17,7 +17,7 @@ import {
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import { indexAllEvents } from './indexing'
-import { buildElasticQueryFromSearchPayload } from './utils'
+import { buildElasticQueryFromSearchPayload } from './query'
 
 test('indexes all records from MongoDB with one function call', async () => {
   const { user, generator } = await setupTestCase()
