@@ -39,12 +39,12 @@ function useAdminLocations(partOf: string) {
 }
 
 function AdministrativeAreaInput({
-  setFieldValue,
+  onChange,
   value,
   partOf,
   ...props
 }: FieldProps<'ADMINISTRATIVE_AREA'> & {
-  setFieldValue: (name: string, val: string | undefined) => void
+  onChange: (val: string | undefined) => void
   partOf: string | null
   value?: string
 }) {
@@ -57,7 +57,7 @@ function AdministrativeAreaInput({
       options={options}
       type="SELECT"
       value={value}
-      onChange={(val: string) => setFieldValue(props.id, val)}
+      onChange={onChange}
     />
   )
 }

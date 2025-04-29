@@ -24,6 +24,12 @@ import { AddressFieldValue } from './CompositeFieldValue'
 
 const FieldId = z.string()
 
+const ParentReference = z
+  .object({
+    _fieldId: FieldId.optional()
+  })
+  .optional()
+
 const BaseField = z.object({
   id: FieldId,
   defaultValue: z
@@ -35,6 +41,7 @@ const BaseField = z.object({
       CheckboxFieldValue
     ])
     .optional(),
+  parent: ParentReference,
   conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
@@ -490,8 +497,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   EmailField,
   FileUploadWithOptions,
   DataField
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-]) as unknown as z.ZodType<Inferred, any, InferredInput>
+])
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>

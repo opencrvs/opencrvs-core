@@ -13,7 +13,6 @@ import React, { useEffect } from 'react'
 
 import { Formik } from 'formik'
 import { isEqual, noop } from 'lodash'
-import { useIntl } from 'react-intl'
 import {
   EventConfig,
   EventState,
@@ -67,13 +66,11 @@ interface FormFieldGeneratorProps {
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
   (props) => {
-    const intl = useIntl()
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
 
-    const formikOnChange = (values: EventState) => {
+    const formikOnChange = (values: EventState) =>
       props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
-    }
 
     const user = useUserAddress()
 
@@ -132,11 +129,11 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               fields={props.fields}
               fieldsToShowValidationErrors={props.fieldsToShowValidationErrors}
               id={props.id}
-              intl={intl}
               readonlyMode={props.readonlyMode}
               resetForm={formikProps.resetForm}
               setAllFieldsDirty={props.setAllFieldsDirty}
               setAllTouchedFields={setAllTouchedFields}
+              setErrors={formikProps.setErrors}
               setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
