@@ -23,7 +23,7 @@ const Container = styled.div`
   display: flex;
   gap: 4px;
   align-items: center;
-  padding: 0px 8px 8px 4px;
+  padding: 20px 8px 8px 4px;
 `
 
 export function ErrorText(props: IErrorTextProps) {

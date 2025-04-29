@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
 
 import { injectIntl, useIntl } from 'react-intl'
@@ -18,7 +18,7 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, ContentSize, FormTabs } from '@opencrvs/components'
+import { Content, ContentSize, ErrorText, FormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -100,9 +100,7 @@ export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
     validNonDateFields.length +
     validationResultsPerDateField.filter((valid) => valid).length
 
-  return (
-    validCount >= 2 && validationResultsPerDateField.every((isValid) => isValid)
-  )
+  return validCount >= 2 ? true : false
 }
 
 const BirthSection = () => {
@@ -119,6 +117,7 @@ const BirthSection = () => {
   const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
+  const [showWarningMessage, setShowWarningMessage] = useState(false)
 
   const isDisabled = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
@@ -129,6 +128,12 @@ const BirthSection = () => {
   const accordionHidingLabel = intl.formatMessage(
     advancedSearchFormMessages.hide
   )
+
+  useEffect(() => {
+    if (showWarningMessage) {
+      setShowWarningMessage(isAdvancedSearchFormValid(formState) ? false : true)
+    }
+  }, [formState, showWarningMessage])
 
   return (
     <>
@@ -287,24 +292,32 @@ const BirthSection = () => {
         />
       </Accordion>
 
+      {showWarningMessage && (
+        <ErrorText>You must select a minimum of 2 search criteria.</ErrorText>
+      )}
+
       <SearchButton
         id="search"
         key="search"
         type="primary"
         fullWidth
         size="large"
-        disabled={isDisabled}
+        disabled={false}
         onClick={() => {
-          dispatch(
-            setAdvancedSearchParam({
-              ...transformAdvancedSearchLocalStateToStoreData(
-                formState,
-                offlineData
-              ),
-              event: 'birth'
-            })
-          )
-          dispatch(goToAdvancedSearchResult())
+          if (isDisabled) {
+            setShowWarningMessage(true)
+          } else {
+            dispatch(
+              setAdvancedSearchParam({
+                ...transformAdvancedSearchLocalStateToStoreData(
+                  formState,
+                  offlineData
+                ),
+                event: 'birth'
+              })
+            )
+            dispatch(goToAdvancedSearchResult())
+          }
         }}
       >
         {' '}
@@ -330,6 +343,8 @@ const DeathSection = () => {
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 
+  const [showWarningMessage, setShowWarningMessage] = useState(false)
+
   const isDisable = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
   const accordionShowingLabel = intl.formatMessage(
@@ -338,6 +353,12 @@ const DeathSection = () => {
   const accordionHidingLabel = intl.formatMessage(
     advancedSearchFormMessages.hide
   )
+
+  useEffect(() => {
+    if (showWarningMessage) {
+      setShowWarningMessage(isAdvancedSearchFormValid(formState) ? false : true)
+    }
+  }, [formState, showWarningMessage])
 
   return (
     <>
@@ -450,24 +471,32 @@ const DeathSection = () => {
         />
       </Accordion>
 
+      {showWarningMessage && (
+        <ErrorText>You must select a minimum of 2 search criteria.</ErrorText>
+      )}
+
       <SearchButton
         id="search"
         key="search"
         type="primary"
         size="large"
         fullWidth
-        disabled={isDisable}
+        disabled={false}
         onClick={() => {
-          dispatch(
-            setAdvancedSearchParam({
-              ...transformAdvancedSearchLocalStateToStoreData(
-                formState,
-                offlineData
-              ),
-              event: 'death'
-            })
-          )
-          dispatch(goToAdvancedSearchResult())
+          if (isDisable) {
+            setShowWarningMessage(true)
+          } else {
+            dispatch(
+              setAdvancedSearchParam({
+                ...transformAdvancedSearchLocalStateToStoreData(
+                  formState,
+                  offlineData
+                ),
+                event: 'death'
+              })
+            )
+            dispatch(goToAdvancedSearchResult())
+          }
         }}
       >
         {' '}
