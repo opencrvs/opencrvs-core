@@ -8,12 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  defineConditional,
-  field,
-  never,
-  not
-} from '../conditionals/conditionals'
+import { defineConditional, never, not } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
 import {
   defineActionForm,
@@ -23,6 +18,7 @@ import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
+import { field } from '../field'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -1345,15 +1341,16 @@ export const tennisClubMembershipEvent = defineConfig({
       }
     }
   ],
-  advancedSearch: [
-    {
-      title: {
-        defaultMessage: 'Tennis club registration search',
-        description: 'This is what this event is referred as in the system',
-        id: 'v2.event.tennis-club-membership.search'
-      },
-      fields: [field('applicant.dob').exact()]
-    }
-  ],
+  advancedSearch: [],
+  // [
+  //   {
+  //     title: {
+  //       defaultMessage: 'Tennis club registration search',
+  //       description: 'This is what this event is referred as in the system',
+  //       id: 'v2.event.tennis-club-membership.search'
+  //     },
+  //     fields: [field('applicant.dob').exact()]
+  //   }
+  // ]
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })

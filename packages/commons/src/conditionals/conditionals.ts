@@ -14,8 +14,6 @@ import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
-import { SelectOption } from '../events/FieldConfig'
-import { MetadataField } from '../events/utils'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -158,32 +156,38 @@ export const user = {
  *
  * Generate conditional rules for event.
  */
-export const event = {
-  hasAction: (action: ActionType) =>
-    defineConditional({
-      type: 'object',
-      properties: {
-        $event: {
-          type: 'object',
-          properties: {
-            actions: {
-              type: 'array',
-              contains: {
-                type: 'object',
-                properties: {
-                  type: {
-                    const: action
-                  }
-                },
-                required: ['type']
+export function createEventConditionals() {
+  return {
+    /**
+     * Checks if the event contains a specific action type.
+     * @param action - The action type to check for.
+     */
+    hasAction: (action: ActionType) =>
+      defineConditional({
+        type: 'object',
+        properties: {
+          $event: {
+            type: 'object',
+            properties: {
+              actions: {
+                type: 'array',
+                contains: {
+                  type: 'object',
+                  properties: {
+                    type: {
+                      const: action
+                    }
+                  },
+                  required: ['type']
+                }
               }
-            }
-          },
-          required: ['actions']
-        }
-      },
-      required: ['$event']
-    })
+            },
+            required: ['actions']
+          }
+        },
+        required: ['$event']
+      })
+  }
 }
 
 function getDateFromNow(days: number) {
@@ -245,7 +249,7 @@ function isFieldReference(value: unknown): value is FieldReference {
  *
  */
 
-export function field(fieldId: string) {
+export function createFieldConditionals(fieldId: string) {
   const getDateRange = (
     date: string,
     clause: 'formatMinimum' | 'formatMaximum'
@@ -262,10 +266,6 @@ export function field(fieldId: string) {
   })
 
   return {
-    /**
-     * @private Internal property used for field reference tracking.
-     */
-    _fieldId: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () =>
@@ -452,61 +452,6 @@ export function field(fieldId: string) {
           }
         },
         required: [fieldId]
-      }),
-    /**
-     * Creates a range configuration for the specified field.
-     *
-     * @returns An object containing the field ID and a configuration object with a type of 'RANGE'.
-     *
-     * @example field('age').range()
-     * // {
-     * //   fieldId: 'age',
-     * //   config: { type: 'RANGE' }
-     * // }
-     */
-    range: () => ({
-      fieldId,
-      config: { type: 'RANGE' as const }
-    }),
-    /**
-     * Creates a configuration for exact matching of the specified field.
-     * @returns  An object containing the field ID and a configuration object with a type of 'EXACT'.
-     * @example field('dob').exact()
-     * // {
-     * //   fieldId: 'dob',
-     * //   config: { type: 'EXACT' }
-     * // }
-     */
-    exact: () => ({
-      fieldId,
-      config: { type: 'EXACT' as const }
-    }),
-    /**
-     * Creates a configuration for fuzzy matching of the specified field.
-     * @returns  An object containing the field ID and a configuration object with a type of 'EXACT'.
-     * @example field('name').fuzzy()
-     * // {
-     * //   fieldId: 'name',
-     * //   config: { type: 'FUZZY' }
-     * // }
-     */
-    fuzzy: () => ({
-      fieldId,
-      config: { type: 'FUZZY' as const }
-    })
-  }
-}
-
-/**
- * @param fieldId - The field ID condition is applied to.
- * @param options - The options for the select field.
- * @returns An object containing the configuration for the searching the metadata fields of an event.
- * @example eventField('status', [{ label: 'Option 1', value: '1' }])
- */
-export function eventField(fieldId: MetadataField, options?: SelectOption[]) {
-  return {
-    fieldId,
-    options,
-    config: { type: 'EXACT' as const }
+      })
   }
 }

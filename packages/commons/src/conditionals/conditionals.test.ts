@@ -14,18 +14,18 @@ import {
   user,
   and,
   or,
-  field,
   not,
   ConditionalParameters,
   UserConditionalParameters,
   EventConditionalParameters,
-  event,
   FormConditionalParameters
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus } from '../events/ActionDocument'
+import { field } from '../field'
+import { event } from '../event'
 
 /*  eslint-disable max-lines */
 
@@ -956,41 +956,5 @@ describe('Matches conditional validation', () => {
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
-  })
-})
-
-describe('field() helper', () => {
-  const fieldId = 'some.field'
-
-  it('should return correct config for range()', () => {
-    const result = field(fieldId).range()
-    expect(result).toEqual({
-      fieldId: 'some.field',
-      config: { type: 'RANGE' }
-    })
-  })
-
-  it('should return correct config for exact()', () => {
-    const result = field(fieldId).exact()
-    expect(result).toEqual({
-      fieldId: 'some.field',
-      config: { type: 'EXACT' }
-    })
-  })
-
-  it('should return correct config for fuzzy()', () => {
-    const result = field(fieldId).fuzzy()
-    expect(result).toEqual({
-      fieldId: 'some.field',
-      config: { type: 'FUZZY' }
-    })
-  })
-
-  it('should handle different fieldIds correctly', () => {
-    const result = field('user.age').range()
-    expect(result).toEqual({
-      fieldId: 'user.age',
-      config: { type: 'RANGE' }
-    })
   })
 })
