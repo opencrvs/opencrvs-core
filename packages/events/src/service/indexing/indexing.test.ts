@@ -85,10 +85,6 @@ const fullAndPayload: QueryType = {
     type: 'within',
     location: 'some-location-id'
   },
-  searchType: {
-    type: 'fuzzy',
-    term: 'search term'
-  },
   data: {
     name: { type: 'exact', term: 'John Doe' }
   }

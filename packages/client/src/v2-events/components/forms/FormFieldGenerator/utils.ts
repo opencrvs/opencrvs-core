@@ -8,9 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { MessageDescriptor } from 'react-intl'
-import { EventState, FieldConfig, EventConfig } from '@opencrvs/commons/client'
 import { IndexMap } from '@client/utils'
 import {
   FIELD_SEPARATOR,
