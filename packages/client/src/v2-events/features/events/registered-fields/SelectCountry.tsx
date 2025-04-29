@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
 import { Select } from './Select'
@@ -42,17 +42,13 @@ function SelectCountryOutput({ value }: { value: string | undefined }) {
   return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
 }
 
-function useStringifier() {
-  const intl = useIntl()
-
-  return (value: string) => {
-    const selectedCountry = countries.find((country) => country.value === value)
-    return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
-  }
+function stringify(intl: IntlShape, value: string) {
+  const selectedCountry = countries.find((country) => country.value === value)
+  return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
 }
 
 export const SelectCountry = {
   Input: SelectCountryInput,
   Output: SelectCountryOutput,
-  useStringifier: useStringifier
+  stringify
 }
