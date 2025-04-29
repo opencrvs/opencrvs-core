@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { env } from '@auth/environment'
-import { getRedisUrl, logger } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import { createClient } from 'redis'
 
 export let redis: ReturnType<typeof createClient>
@@ -22,14 +22,6 @@ export async function start() {
   logger.info(`REDIS_HOST, ${JSON.stringify(env.REDIS_HOST)}`)
   logger.info(`REDIS_USERNAME, ${JSON.stringify(env.REDIS_USERNAME)}`)
 
-  const url = getRedisUrl(
-    env.REDIS_HOST,
-    undefined,
-    env.REDIS_USERNAME,
-    env.REDIS_PASSWORD
-  )
-
-  logger.info(`REDIS_URL, ${JSON.stringify(url)}`)
   redis = await createClient({
     username: env.REDIS_USERNAME,
     password: env.REDIS_PASSWORD,

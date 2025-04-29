@@ -8,56 +8,28 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as redis from 'redis'
 import { REDIS_HOST, REDIS_PASSWORD, REDIS_USERNAME } from '@gateway/constants'
-import { promisify } from 'util'
-import { getRedisUrl, logger } from '@opencrvs/commons'
+import { createClient } from 'redis'
 
-let redisClient: redis.RedisClient
+export let redis: ReturnType<typeof createClient>
 
 export async function stop() {
-  redisClient.quit()
+  redis.quit()
 }
 
-export function start(host = REDIS_HOST, port?: number) {
+export async function start(host = REDIS_HOST, port?: number) {
   if (process.env.NODE_ENV === 'production' && !REDIS_PASSWORD) {
     throw new Error(
       'REDIS_PASSWORD is not set. Please make sure a password exists'
     )
   }
 
-  return new Promise<redis.RedisClient>((resolve) => {
-    logger.info(`REDIS_HOST, ${JSON.stringify(host)}`)
-    logger.info(`REDIS_PORT, ${JSON.stringify(port)}`)
-
-    const url = getRedisUrl(host, port, REDIS_USERNAME, REDIS_PASSWORD)
-    logger.info(`REDIS_URL, ${JSON.stringify(url)}`)
-
-    redisClient = redis.createClient({
-      url,
-      retry_strategy: () => 1000
-    })
-    redisClient.on('connect', () => {
-      resolve(redisClient)
-    })
-  })
+  redis = await createClient({
+    username: REDIS_USERNAME,
+    password: REDIS_PASSWORD,
+    socket: {
+      host,
+      port
+    }
+  }).connect()
 }
-
-export const get = (key: string) =>
-  promisify(redisClient.get).bind(redisClient)(key)
-
-export const set = (key: string, value: string) =>
-  promisify(redisClient.set).bind(redisClient)(key, value)
-
-export const del = (key: string) =>
-  promisify(redisClient.del).bind(redisClient)(key)
-
-export const incrementWithTTL = (key: string, ttl: number) => {
-  const multi = redisClient.multi([
-    ['incr', key],
-    ['pexpire', key, ttl]
-  ])
-  return promisify(multi.exec).call(multi)
-}
-
-export const getClient = () => redisClient
