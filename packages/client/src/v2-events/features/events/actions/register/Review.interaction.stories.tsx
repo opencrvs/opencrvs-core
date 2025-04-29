@@ -399,8 +399,6 @@ export const ReviewChangeButtonInteraction: Story = {
       await canvas.findByRole('button', { name: 'Continue' })
     )
 
-    await expect(
-      await canvas.findByTestId('text__applicant____surname')
-    ).toBeVisible()
+    await expect(await canvas.findByText("Applicant's surname")).toBeVisible()
   }
 }
