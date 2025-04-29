@@ -385,20 +385,35 @@ export const ReviewChangeButtonInteraction: Story = {
       }
     }
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(
-      await canvas.findByRole('button', { name: 'Register' })
-    )
+    await step('Start changing the surname', async () => {
+      const surnameChangeButton = await canvas.findByTestId(
+        'change-button-applicant.surname'
+      )
 
-    await userEvent.click(
-      await canvas.findByTestId('change-button-applicant.surname')
-    )
+      await userEvent.click(surnameChangeButton)
 
-    await userEvent.click(
-      await canvas.findByRole('button', { name: 'Continue' })
-    )
+      const continueButton = await canvas.findByText('Continue')
+      await userEvent.click(continueButton)
+    })
 
-    await expect(await canvas.findByText("Applicant's surname")).toBeVisible()
+    await step('Change input field value', async () => {
+      const surnameInput = await canvas.findByTestId(
+        'text__applicant____surname'
+      )
+      await userEvent.clear(surnameInput)
+      await userEvent.type(surnameInput, 'Nileem-Rowa')
+    })
+
+    await step('Navigate back to review', async () => {
+      const backToReviewButton = await canvas.findByText('Back to review')
+      await userEvent.click(backToReviewButton)
+
+      const surnameValue = await canvas.findByTestId(
+        'row-value-applicant.surname'
+      )
+      await expect(surnameValue).toHaveTextContent('Nileem-Rowa')
+    })
   }
 }
