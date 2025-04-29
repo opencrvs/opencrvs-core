@@ -58,7 +58,6 @@
     "jest-fetch-mock": "^2.1.2",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
-    "redis-mock": "^0.56.0",
     "ts-jest": "29.2.5",
     "ts-node": "^6.1.1",
     "typescript": "5.6.3"
