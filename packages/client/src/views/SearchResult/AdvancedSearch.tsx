@@ -24,7 +24,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
@@ -299,7 +299,9 @@ const BirthSection = () => {
 
       {showWarningMessage && (
         <ErrorTextWrapper>
-          <ErrorText>You must select a minimum of 2 search criteria.</ErrorText>
+          <ErrorText>{`${intl.formatMessage(
+            errorMessages.searchParamCountError
+          )}`}</ErrorText>
         </ErrorTextWrapper>
       )}
 
@@ -481,7 +483,9 @@ const DeathSection = () => {
 
       {showWarningMessage && (
         <ErrorTextWrapper>
-          <ErrorText>You must select a minimum of 2 search criteria.</ErrorText>
+          <ErrorText>{`${intl.formatMessage(
+            errorMessages.searchParamCountError
+          )}`}</ErrorText>
         </ErrorTextWrapper>
       )}
 
