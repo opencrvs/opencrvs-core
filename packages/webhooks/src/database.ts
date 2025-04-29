@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import mongoose from 'mongoose'
-import { MONGO_URL, REDIS_HOST, REDIS_PASSWORD, REDIS_USERNAME } from '@webhooks/constants'
+import {
+  MONGO_URL,
+  REDIS_HOST,
+  REDIS_PASSWORD,
+  REDIS_USERNAME
+} from '@webhooks/constants'
 import { logger } from '@opencrvs/commons'
 import Redis, * as IORedis from 'ioredis'
 const db = mongoose.connection
