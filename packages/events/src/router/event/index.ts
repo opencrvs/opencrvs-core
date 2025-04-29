@@ -229,9 +229,10 @@ export const eventRouter = router({
         )
         .input(RejectCorrectionActionInput)
         .use(middleware.requireAssignment)
+        .use(middleware.validateAction(ActionType.REJECT_CORRECTION))
         .mutation(async ({ input, ctx }) => {
-          if ('isDuplicateAction' in ctx && ctx.isDuplicateAction) {
-            return 'event' in ctx ? ctx.event : getEventById(input.eventId)
+          if (ctx.isDuplicateAction) {
+            return ctx.event
           }
           return rejectCorrection(input, {
             eventId: input.eventId,
