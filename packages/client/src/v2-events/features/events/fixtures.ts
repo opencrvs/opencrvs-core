@@ -50,7 +50,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdAt: '2025-01-23T05:30:02.615Z',
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
-      declaration: {}
+      declaration: {},
+      transactionId: 'a0f1b2c3-d4e5-6f7g-8h9i-j0k1l2m3n4o5'
     },
     {
       id: '8db635cf-ee30-40ca-8117-a7188256a2b1',
@@ -72,7 +73,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       type: 'DECLARE',
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAt: '2025-01-23T05:30:08.847Z',
-      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf'
+      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
+      transactionId: 'aasdk342-asdkj3423-kn234k23'
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
@@ -87,7 +89,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       type: 'VALIDATE',
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf'
+      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
+      transactionId: 'aasdk342-asdkj3423-kn234k24'
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
@@ -103,7 +106,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAt: '2025-01-23T05:35:27.689Z',
       createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
-      registrationNumber: 'TEST12121212'
+      registrationNumber: 'TEST12121212',
+      transactionId: 'aasdk342-asdkj3423-kn234k25'
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
@@ -113,7 +117,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdBy: '6780dbf7a263c6515c7b97d2',
       createdAt: '2025-01-23T05:35:27.689Z',
       createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
-      assignedTo: '67ef7f83d6a9cb92e9edaaa9'
+      assignedTo: '67ef7f83d6a9cb92e9edaaa9',
+      transactionId: 'aasdk342-asdkj3423-kn234k26'
     }
   ]
 }
