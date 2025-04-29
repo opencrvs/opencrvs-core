@@ -15,6 +15,7 @@ import styled from 'styled-components'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
 import { ROUTES } from '@client/v2-events/routes'
+import { constantsMessages } from '@client/v2-events/messages'
 
 const messagesToDefine = {
   edit: {
@@ -64,7 +65,13 @@ export function SearchModifierComponent({
   return (
     <>
       <SearchParamContainer>
-        {searchParamsAsLabel.map((pill, index) => {
+        {[
+          {
+            key: intl.formatMessage(constantsMessages.event),
+            value: convertPathToLabel(eventType)
+          },
+          ...searchParamsAsLabel
+        ].map((pill, index) => {
           const label = `${pill.key} : ${pill.value}`
           return (
             <Pill
