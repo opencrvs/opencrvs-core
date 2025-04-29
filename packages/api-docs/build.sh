@@ -13,13 +13,19 @@ mkdir -p build
 
 WORK_DIR="$(dirname "$(realpath "$0")")"
 
+mkdir -p $WORK_DIR/build/events
+mkdir -p $WORK_DIR/build/countryconfig
+
+cp index.html $WORK_DIR/build/events/index.html
+cp index.html $WORK_DIR/build/countryconfig/index.html
+
 # Build OpenAPI docs for Events service
-EVENTS_YML="$WORK_DIR/build/opencrvs-events.yml"
+EVENTS_YML="$WORK_DIR/build/events/openapi.yml"
 touch $EVENTS_YML
 (cd $WORK_DIR/../events && NODE_ENV=develop npx tsx src/openapi.ts) > $EVENTS_YML
 
 # Build OpenAPI docs for country config
-COUNTRYCONFIG_YML="$WORK_DIR/build/opencrvs-countryconfig.yml"
+COUNTRYCONFIG_YML="$WORK_DIR/build/countryconfig/openapi.yml"
 touch $COUNTRYCONFIG_YML
 (cd $WORK_DIR/../commons && npx tsx src/countryconfig/openapi.ts) > $COUNTRYCONFIG_YML
 
