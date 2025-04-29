@@ -18,7 +18,7 @@ export const countryConfigAPI = makeApi([
     method: 'get',
     path: '/events',
     alias: 'getEventConfigurations',
-    tags: ['CC Events'],
+    tags: ['Events'],
     description: 'Get event configurations',
     response: z.array(EventConfig),
     errors: makeErrors([])
@@ -27,7 +27,7 @@ export const countryConfigAPI = makeApi([
     method: 'post',
     path: '/events/:eventType/actions/:actionType',
     alias: 'actionEventTrigger',
-    tags: ['CC Events'],
+    tags: ['Events'],
     description: 'Receive a notification of an action',
     parameters: [
       {
