@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
 import { cloneDeep, isEqual, set } from 'lodash'
 import { WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -76,155 +76,165 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-export class FormSectionComponent extends React.Component<AllProps> {
-  componentDidUpdate(prevProps: AllProps) {
-    const userChangedForm = !isEqual(this.props.values, prevProps.values)
-    const sectionChanged = prevProps.id !== this.props.id
+function focusElementByHash() {
+  const hash = window.location.hash.slice(1)
+  if (!hash) {
+    return
+  }
+
+  const input =
+    document.querySelector<HTMLElement>(`input[id*="${hash}"]`) ??
+    document.querySelector<HTMLElement>(`${window.location.hash} input`)
+
+  input?.focus()
+  window.scrollTo(0, document.documentElement.scrollTop - 100)
+}
+
+export function FormSectionComponent({
+  values,
+  fields: fieldsWithDotIds,
+  touched,
+  intl,
+  className,
+  declaration,
+  readonlyMode,
+  id,
+  errors: propsErrors,
+  eventConfig,
+  setValues,
+  setTouched,
+  onChange,
+  resetForm,
+  setAllFieldsDirty,
+  fieldsToShowValidationErrors
+}: AllProps) {
+  const prevValuesRef = useRef(values)
+  const prevIdRef = useRef(id)
+
+  const language = intl.locale
+  const fields = fieldsWithDotIds.map((field) => ({
+    ...field,
+    id: makeFormFieldIdFormikCompatible(field.id)
+  }))
+  const errors = makeFormFieldIdsFormikCompatible(propsErrors)
+  const form = makeFormikFieldIdsOpenCRVSCompatible(
+    makeDatesFormatted(fieldsWithDotIds, values)
+  )
+
+  // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
+  // Address is the only deep value.
+  const completeForm = { ...(declaration ?? {}), ...form }
+
+  const showValidationErrors = useCallback(
+    (formFields: FieldConfig[]) => {
+      const touchedForm = formFields.reduce<Record<string, boolean>>(
+        (acc, { id: fieldId }) => {
+          acc[fieldId] = true
+          return acc
+        },
+        {}
+      )
+      void setTouched(touchedForm)
+    },
+    [setTouched]
+  )
+
+  const setFieldValuesWithDependency = useCallback(
+    (fieldId: string, value: FieldValue | undefined) => {
+      const updatedValues = cloneDeep(values)
+      set(updatedValues, fieldId, value)
+
+      if (fieldId === 'country') {
+        const defaultCountry = window.config.COUNTRY || 'FAR'
+        set(
+          updatedValues,
+          'addressType',
+          value === defaultCountry
+            ? AddressType.DOMESTIC
+            : AddressType.INTERNATIONAL
+        )
+      }
+
+      void setValues(updatedValues)
+    },
+    [values, setValues]
+  )
+
+  useEffect(() => {
+    if (setAllFieldsDirty) {
+      showValidationErrors(fieldsWithDotIds)
+    }
+
+    focusElementByHash()
+  }, [setAllFieldsDirty, fieldsWithDotIds, showValidationErrors])
+
+  useEffect(() => {
+    const userChangedForm = !isEqual(values, prevValuesRef.current)
+    const sectionChanged = prevIdRef.current !== id
 
     if (userChangedForm) {
-      prevProps.onChange(this.props.values)
+      onChange(values)
     }
 
     if (sectionChanged) {
-      prevProps.resetForm()
-      if (this.props.setAllFieldsDirty) {
-        this.showValidationErrors(this.props.fields)
-      } else if (
-        this.props.fieldsToShowValidationErrors &&
-        this.props.fieldsToShowValidationErrors.length > 0
-      ) {
-        this.showValidationErrors(this.props.fieldsToShowValidationErrors)
+      resetForm()
+
+      const fieldsToValidate = setAllFieldsDirty
+        ? fieldsWithDotIds
+        : (fieldsToShowValidationErrors ?? [])
+
+      if (fieldsToValidate.length) {
+        showValidationErrors(fieldsToValidate)
       }
     }
-  }
 
-  componentDidMount() {
-    if (this.props.setAllFieldsDirty) {
-      this.showValidationErrors(this.props.fields)
-    }
+    prevValuesRef.current = values
+    prevIdRef.current = id
+  }, [
+    values,
+    id,
+    onChange,
+    resetForm,
+    fieldsWithDotIds,
+    fieldsToShowValidationErrors,
+    setAllFieldsDirty,
+    showValidationErrors
+  ])
 
-    if (window.location.hash) {
-      setTimeout(() => {
-        const newScroll = document.documentElement.scrollTop - 100
-        window.scrollTo(0, newScroll)
-
-        const focusedElementId = window.location.hash.replace('#', '')
-        let focusedElement = document.querySelector(
-          `input[id*="${focusedElementId}"]`
-        ) as HTMLElement | null
-
-        if (focusedElement === null) {
-          // Handling for Select
-          focusedElement = document.querySelector(
-            `${window.location.hash} input`
-          ) as HTMLElement | null
-
-          focusedElement?.focus()
-        } else {
-          // Handling for Input
-          focusedElement.focus()
+  return (
+    <section className={className}>
+      {fields.map((field) => {
+        if (!isFieldVisible(field, completeForm)) {
+          return null
         }
-      }, 0)
-    }
-  }
 
-  showValidationErrors(fields: FieldConfig[]) {
-    const touched = fields.reduce((memo, field) => {
-      return { ...memo, [field.id]: true }
-    }, {})
+        const isDisabled = !isFieldEnabled(field, completeForm)
+        const visibleError = errors[field.id]?.errors[0]?.message
+        const error = visibleError ? intl.formatMessage(visibleError) : ''
 
-    void this.props.setTouched(touched)
-  }
-
-  setFieldValuesWithDependency = (
-    fieldId: string,
-    value: FieldValue | undefined
-  ) => {
-    const updatedValues = cloneDeep(this.props.values)
-    set(updatedValues, fieldId, value)
-
-    if (fieldId === 'country') {
-      set(
-        updatedValues,
-        'addressType',
-        value === (window.config.COUNTRY || 'FAR')
-          ? AddressType.DOMESTIC
-          : AddressType.INTERNATIONAL
-      )
-    }
-
-    void this.props.setValues(updatedValues)
-  }
-
-  render() {
-    const {
-      values,
-      fields: fieldsWithDotIds,
-      touched,
-      intl,
-      className,
-      declaration,
-      readonlyMode
-    } = this.props
-
-    const language = this.props.intl.locale
-
-    const errors = makeFormFieldIdsFormikCompatible(this.props.errors)
-
-    const fields = fieldsWithDotIds.map((field) => ({
-      ...field,
-      id: makeFormFieldIdFormikCompatible(field.id)
-    }))
-
-    const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
-    const form = makeFormikFieldIdsOpenCRVSCompatible(valuesWithFormattedDate)
-
-    // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-    // Address is the only deep value.
-    const completeForm = { ...(declaration ?? {}), ...form }
-
-    return (
-      <section className={className}>
-        {fields.map((field) => {
-          let error: string
-          const visibleError = errors[field.id]?.errors[0]?.message
-
-          if (visibleError) {
-            error = intl.formatMessage(visibleError)
-          }
-
-          if (!isFieldVisible(field, completeForm)) {
-            return null
-          }
-
-          const isDisabled = !isFieldEnabled(field, completeForm)
-
-          return (
-            <FormItem
-              key={`${field.id}${language}`}
-              ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
-            >
-              <Field name={field.id}>
-                {(formikFieldProps: FieldProps) => {
-                  return (
-                    <GeneratedInputField
-                      {...formikFieldProps.field}
-                      disabled={isDisabled}
-                      error={isDisabled ? '' : error}
-                      eventConfig={this.props.eventConfig}
-                      fieldDefinition={field}
-                      form={completeForm}
-                      readonlyMode={readonlyMode}
-                      setFieldValue={this.setFieldValuesWithDependency}
-                      touched={touched[field.id] ?? false}
-                    />
-                  )
-                }}
-              </Field>
-            </FormItem>
-          )
-        })}
-      </section>
-    )
-  }
+        return (
+          <FormItem
+            key={`${field.id}${language}`}
+            ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
+          >
+            <Field name={field.id}>
+              {({ field: formikField }: FieldProps) => (
+                <GeneratedInputField
+                  {...formikField}
+                  disabled={isDisabled}
+                  error={isDisabled ? '' : error}
+                  eventConfig={eventConfig}
+                  fieldDefinition={field}
+                  form={completeForm}
+                  readonlyMode={readonlyMode}
+                  setFieldValue={setFieldValuesWithDependency}
+                  touched={touched[field.id] ?? false}
+                />
+              )}
+            </Field>
+          </FormItem>
+        )
+      })}
+    </section>
+  )
 }
