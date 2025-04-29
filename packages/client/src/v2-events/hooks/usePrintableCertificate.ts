@@ -121,10 +121,7 @@ export const usePrintableCertificate = ({
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
       $state: currentEventState,
-      $declaration: {
-        ...base64ReplacedTemplate,
-        preview: false
-      },
+      $declaration: base64ReplacedTemplate,
       locations,
       users: base64ReplacedUsersWithSignature,
       language,
@@ -135,6 +132,7 @@ export const usePrintableCertificate = ({
     const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
     printAndDownloadPdf(pdfTemplate, event.id)
   }
+
   return {
     svgCode,
     handleCertify
