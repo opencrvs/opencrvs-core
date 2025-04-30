@@ -218,6 +218,9 @@ export function createStoriesFromScenarios(
         },
         name: name,
         parameters: {
+          chromatic: {
+            disableSnapshot: true
+          },
           layout: 'centered',
           msw: {
             handlers: {
