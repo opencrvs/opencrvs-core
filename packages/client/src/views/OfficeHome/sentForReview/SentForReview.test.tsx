@@ -243,7 +243,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
     expect(data[0].sentForApproval).toBe(EXPECTED_DATE_OF_DECLARATION)
-    expect(data[0].name).toBe('iliyas khan')
+    expect(data[0].name).toBe('khan iliyas')
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()

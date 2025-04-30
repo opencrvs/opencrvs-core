@@ -17,6 +17,17 @@ import * as fetchAny from 'jest-fetch-mock'
 import { testDeclaration } from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
 
+jest.mock('@metrics/features/performance/viewRefresher', () => {
+  const actualModule = jest.requireActual(
+    '@metrics/features/performance/viewRefresher'
+  )
+
+  return {
+    ...actualModule,
+    refresh: jest.fn()
+  }
+})
+
 const fetch = fetchAny as any
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
 
