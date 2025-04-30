@@ -10,7 +10,13 @@
 
 - Filter out inactive locations in the Organisations menu [#8782](https://github.com/opencrvs/opencrvs-core/issues/8782)
 
-## 1.7.0 Release candidate
+## [1.7.1](https://github.com/opencrvs/opencrvs-core/compare/v1.7.0...v1.7.1)
+
+### Bug fixes
+
+- Use the first role assigned to a user for record history entry if no role found at the point of time when the action was performed [#9300](https://github.com/opencrvs/opencrvs-core/issues/9300)
+
+## [1.7.0](https://github.com/opencrvs/opencrvs-core/compare/v1.6.2...v1.7.0)
 
 ### Breaking changes
 
@@ -65,7 +71,7 @@
 
 ## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.4)
 
-## [1.6.3](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.3)
+## [1.6.3](https://github.com/opencrvs/opencrvs-core/compare/v1.6.2...v1.6.3)
 
 ### Bug fixes
 
@@ -85,15 +91,6 @@
 ### Improvements
 
 - Support for 6th administrative level
-
-### Deprecated
-
-- `INFORMANT_SIGNATURE` & `INFORMANT_SIGNATURE_REQUIRED` are now deprecated and part of form config
-
-### Bug fixes
-
-- Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
-- Fix stale validations showing for document uploader with options form field
 
 ## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
 
