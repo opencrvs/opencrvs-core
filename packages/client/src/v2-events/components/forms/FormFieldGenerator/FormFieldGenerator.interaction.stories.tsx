@@ -197,26 +197,17 @@ const tennisStyleFields = [
       }
     ]
   },
-  ...styles.flatMap((style) => ({
-    id: `${style}.firstname`,
+  {
+    id: `tennis.style.firstname`,
     type: FieldType.TEXT,
     required: true,
     label: generateTranslationConfig('first name'),
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: field('tennis.style').isEqualTo(style)
-      }
-    ]
-  }))
+    parent: field('tennis.style')
+  }
 ]
-/**
- * Test case for a bug where conditional values were not being updated correctly due to the wrong apply order of items.
- */
-export const ConditionalFieldsPersistValue: StoryObj<
-  typeof FormFieldGenerator
-> = {
-  name: 'Toggling conditional fields resets fields but keeps the values',
+
+export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Toggling parent field resets children',
   parameters: {
     layout: 'centered',
     chromatic: { disableSnapshot: true }
@@ -224,7 +215,7 @@ export const ConditionalFieldsPersistValue: StoryObj<
   render: function Component(args) {
     const [formData, setFormData] = React.useState<EventState>({
       'tennis.style': 'defensive',
-      'defensive.firstname': 'Roger'
+      'tennis.style.firstname': 'Roger'
     })
     return (
       <StyledFormFieldGenerator
@@ -269,18 +260,15 @@ export const ConditionalFieldsPersistValue: StoryObj<
       }
     )
 
-    await step(
-      'fills in name for defensive player first name input',
-      async () => {
-        await userEvent.type(
-          await canvas.findByTestId('text__allrounder____firstname'),
-          'Serena'
-        )
-      }
-    )
+    await step('fills in first name for allrounder player', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__tennis____style____firstname'),
+        'Serena'
+      )
+    })
 
     await step(
-      'Previous values are visible when defensive is selected again',
+      'Previous values are removed when selecting defensive style again',
       async () => {
         await userEvent.click(await canvas.findByText('allrounder'))
         await userEvent.click(await canvas.findByText('defensive'))
@@ -291,11 +279,69 @@ export const ConditionalFieldsPersistValue: StoryObj<
         await expect(canvas.queryByText('allrounder')).not.toBeInTheDocument()
 
         await canvas.findByText('first name')
-        await canvas.findByDisplayValue('Roger')
+
+        await expect(
+          canvas.queryByDisplayValue('Roger')
+        ).not.toBeInTheDocument()
         await expect(
           canvas.queryByDisplayValue('Serena')
         ).not.toBeInTheDocument()
       }
     )
+  }
+}
+
+export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Error is reset when parent field changes',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    const [formData, setFormData] = React.useState<EventState>({
+      'tennis.style': 'defensive'
+    })
+    return (
+      <StyledFormFieldGenerator
+        declaration={declaration}
+        fields={tennisStyleFields}
+        form={formData}
+        id="my-form"
+        initialValues={formData}
+        setAllFieldsDirty={false}
+        onChange={(data) => {
+          args.onChange(data)
+          setFormData(data)
+        }}
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders error for required field', async () => {
+      await canvas.findByText('tennis style')
+      await canvas.findByText('defensive')
+
+      await userEvent.click(
+        await canvas.findByTestId('text__tennis____style____firstname')
+      )
+      await userEvent.click(await canvas.findByText('first name'))
+
+      await canvas.findByText('Required for registration')
+    })
+
+    await step('Empties error when selecting a different style', async () => {
+      await userEvent.click(await canvas.findByText('defensive'))
+      await userEvent.click(await canvas.findByText('allrounder'))
+
+      await canvas.findByText('tennis style')
+      await canvas.findByText('allrounder')
+      await expect(canvas.queryByText('defensive')).not.toBeInTheDocument()
+
+      await expect(
+        canvas.queryByText('Required for registration')
+      ).not.toBeInTheDocument()
+    })
   }
 }

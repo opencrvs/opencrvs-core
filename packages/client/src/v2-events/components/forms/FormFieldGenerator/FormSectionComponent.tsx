@@ -45,8 +45,14 @@ type AllProps = {
   className?: string
   readonlyMode?: boolean
   errors: Record<string, { errors: { message: TranslationConfig }[] }>
+  /**
+   * Update the form values in the non-formik state.
+   */
   onChange: (values: EventState) => void
   setAllFieldsDirty: boolean
+  /**
+   * Update the touched values in the non-formik state.
+   */
   setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
   fieldsToShowValidationErrors?: FieldConfig[]
 } & UsedFormikProps
@@ -78,7 +84,11 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-function getFieldChildIds(
+/**
+ * Given a parent field id, retrieve the ids of all its child field ids.
+ * Used to reset the values of child fields when a parent field changes.
+ */
+function retrieveChildFieldIds(
   parentId: string,
   fieldParentMap: IndexMap<FieldConfig[]>
 ): string[] {
@@ -105,6 +115,7 @@ function focusElementByHash() {
   window.scrollTo(0, document.documentElement.scrollTop - 100)
 }
 
+// @TODO: Clarify and unify the naming of the props. What is from formik and what is from the state.
 export function FormSectionComponent({
   values,
   fields: fieldsWithDotSeparator,
@@ -133,6 +144,8 @@ export function FormSectionComponent({
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
+  // Create a reference map of parent fields and their their children for quick access.
+  // This is used to reset the values of child fields when a parent field changes.
   const fieldsByParentId: IndexMap<FieldConfig[]> = useMemo(
     () => groupBy(fieldsWithDotSeparator, (field) => field.parent?._fieldId),
     [fieldsWithDotSeparator]
@@ -168,15 +181,12 @@ export function FormSectionComponent({
 
       const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
 
-      const childIds = getFieldChildIds(ocrvsFieldId, fieldsByParentId)
-      const formikChildIds = childIds.map((childId) =>
-        makeFormFieldIdFormikCompatible(childId)
-      )
+      const childIds = retrieveChildFieldIds(ocrvsFieldId, fieldsByParentId)
 
-      // update the actual value
+      // update the value of the field that was changed
       set(updatedValues, formikFieldId, value)
 
-      // reset all children values. e.g. When changing informant.relation, empty out phone number, email and others.
+      // reset the children values of the changed field. (e.g. When changing informant.relation, empty out phone number, email and others.)
       for (const childId of childIds) {
         set(updatedValues, makeFormFieldIdFormikCompatible(childId), undefined)
         set(updatedErrors, childId, { errors: [] })
@@ -194,6 +204,9 @@ export function FormSectionComponent({
         )
       }
 
+      const formikChildIds = childIds.map((childId) =>
+        makeFormFieldIdFormikCompatible(childId)
+      )
       const updatedTouched = omit(touched, formikChildIds)
 
       // @TODO: Formik does not type errors well. Actual error message differs from the type.
@@ -229,6 +242,8 @@ export function FormSectionComponent({
 
     const sectionChanged = prevIdRef.current !== id
 
+    // Formik does not allow controlling the form state 'easily'.
+    // We propagate changes to the non-formik state from formik
     if (userChangedForm) {
       onChange(values)
     }
