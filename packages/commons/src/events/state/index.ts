@@ -283,11 +283,11 @@ export function getAnnotationFromDrafts(drafts: Draft[]) {
 export function getActionAnnotation({
   event,
   actionType,
-  drafts
+  drafts = []
 }: {
   event: EventDocument
   actionType: ActionType
-  drafts: Draft[]
+  drafts?: Draft[]
 }): EventState {
   const activeActions = getAcceptedActions(event)
   const action = activeActions.find(
