@@ -9,15 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventConfig } from './EventConfig'
-import { EventConfigInput } from './EventConfigInput'
+import * as yaml from 'yaml'
+import { createDocument } from 'zod-openapi'
+import { countryConfigApi } from '.'
 
-/**
- * Builds a validated configuration for an event
- * @param config - Event specific configuration
- */
-export const defineConfig = (config: EventConfigInput) => {
-  const input = EventConfig.parse(config)
+const document = createDocument({
+  openapi: '3.1.0',
+  info: {
+    title: 'Countryconfig implementation requirements',
+    version: '1.8.0',
+    description: 'Country specific configuration server for OpenCRVS'
+  },
+  paths: countryConfigApi
+})
 
-  return input
-}
+// eslint-disable-next-line no-console
+console.log(yaml.stringify(document))

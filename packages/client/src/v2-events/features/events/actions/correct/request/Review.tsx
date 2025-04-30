@@ -24,6 +24,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -63,7 +64,7 @@ export function Review() {
           {
             from: 'review'
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }

@@ -246,14 +246,14 @@ export function Review() {
 
     if (confirmed) {
       try {
-        const response: EventDocument =
-          await onlineActions.printCertificate.mutateAsync({
-            eventId: fullEvent.id,
-            declaration: {},
-            annotation: { ...annotation, templateId },
-            transactionId: uuid(),
-            type: ActionType.PRINT_CERTIFICATE
-          })
+        await onlineActions.printCertificate.mutateAsync({
+          eventId: fullEvent.id,
+          declaration: {},
+          annotation: { ...annotation, templateId },
+          transactionId: uuid(),
+          type: ActionType.PRINT_CERTIFICATE
+        })
+
         await handleCertify(fullEvent)
         navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
       } catch (error) {

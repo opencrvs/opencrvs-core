@@ -496,7 +496,8 @@ describe('"event" conditionals', () => {
             createdBy: '12345',
             declaration: {},
             createdAtLocation: '123456',
-            status: ActionStatus.Accepted
+            status: ActionStatus.Accepted,
+            transactionId: '123456'
           }
         ]
       }

@@ -167,13 +167,14 @@ jobs:
       - name: Check if branch exists in opencrvs-farajaland repo
         run: |
           FARAJALAND_REPO=https://github.com/opencrvs/opencrvs-farajaland
-          if git ls-remote --heads $FARAJALAND_REPO ${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
+          if git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
             COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
+            echo "Branch ${{ env.BRANCH_NAME }} exists in opencrvs-farajaland repo: $COMMIT_HASH"
           else
             COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/develop | cut -c1-7)
+            echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-farajaland repo: $COMMIT_HASH"
           fi
           echo "FARAJALAND_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
-
       - name: Parse the stack name
         id: generate_stack
         run: |

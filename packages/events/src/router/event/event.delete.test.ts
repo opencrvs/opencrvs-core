@@ -72,6 +72,16 @@ test('declared event can not be deleted', async () => {
     generator.event.actions.declare(event.id)
   )
 
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await expect(
     client.event.delete({ eventId: event.id })
   ).rejects.toThrowErrorMatchingSnapshot()

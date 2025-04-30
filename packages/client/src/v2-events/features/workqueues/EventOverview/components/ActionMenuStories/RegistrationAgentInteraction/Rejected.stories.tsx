@@ -40,7 +40,6 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED,
       [ActionType.VALIDATE]: AssertType.DISABLED
     }
   },
@@ -56,7 +55,6 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED,
       [ActionType.VALIDATE]: AssertType.ENABLED
     }
   },
@@ -71,7 +69,6 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...hiddenActions,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED,
       [ActionType.VALIDATE]: AssertType.DISABLED
     }
   }

@@ -8,9 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 /**
  * ActionUpdate is a record of a specific action that updated data fields.
@@ -32,6 +35,7 @@ export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
   id: z.string(),
+  transactionId: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   declaration: ActionUpdate,
@@ -58,7 +62,7 @@ const AssignedAction = ActionBase.merge(
 const UnassignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.UNASSIGN),
-    assignedTo: z.literal(null).default(null)
+    assignedTo: z.literal(null)
   })
 )
 
@@ -145,23 +149,27 @@ const ReadAction = ActionBase.merge(
   })
 )
 
-export const ActionDocument = z.discriminatedUnion('type', [
-  CreatedAction,
-  ValidateAction,
-  RejectAction,
-  MarkAsDuplicateAction,
-  ArchiveAction,
-  NotifiedAction,
-  RegisterAction,
-  DeclareAction,
-  AssignedAction,
-  RequestedCorrectionAction,
-  ApprovedCorrectionAction,
-  RejectedCorrectionAction,
-  UnassignedAction,
-  PrintCertificateAction,
-  ReadAction
-])
+export const ActionDocument = z
+  .discriminatedUnion('type', [
+    CreatedAction.openapi({ ref: 'CreatedAction' }),
+    ValidateAction.openapi({ ref: 'ValidateAction' }),
+    RejectAction.openapi({ ref: 'RejectAction' }),
+    MarkAsDuplicateAction.openapi({ ref: 'MarkAsDuplicateAction' }),
+    ArchiveAction.openapi({ ref: 'ArchiveAction' }),
+    NotifiedAction.openapi({ ref: 'NotifiedAction' }),
+    RegisterAction.openapi({ ref: 'RegisterAction' }),
+    DeclareAction.openapi({ ref: 'DeclareAction' }),
+    AssignedAction.openapi({ ref: 'AssignedAction' }),
+    RequestedCorrectionAction.openapi({ ref: 'RequestedCorrectionAction' }),
+    ApprovedCorrectionAction.openapi({ ref: 'ApprovedCorrectionAction' }),
+    RejectedCorrectionAction.openapi({ ref: 'RejectedCorrectionAction' }),
+    UnassignedAction.openapi({ ref: 'UnassignedAction' }),
+    PrintCertificateAction.openapi({ ref: 'PrintCertificateAction' }),
+    ReadAction.openapi({ ref: 'ReadAction' })
+  ])
+  .openapi({
+    ref: 'ActionDocument'
+  })
 
 export type ActionDocument = z.infer<typeof ActionDocument>
 

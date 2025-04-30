@@ -8,35 +8,102 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Location } from '@events/service/locations/locations'
+import { IntlShape, useIntl } from 'react-intl'
 import {
+  EventState,
   FieldConfig,
   FieldValue,
-  isAddressFieldType
+  isAddressFieldType,
+  isCountryFieldType,
+  isAdministrativeAreaFieldType,
+  isFacilityFieldType,
+  isLocationFieldType,
+  isRadioGroupFieldType
 } from '@opencrvs/commons/client'
-import { Address } from '@client/v2-events/features/events/registered-fields'
 import {
-  formDataStringifierFactory,
-  useSimpleFieldStringifier
-} from './useSimpleFieldStringifier'
+  Address,
+  AdministrativeArea,
+  RadioGroup,
+  SelectCountry as Country
+} from '@client/v2-events/features/events/registered-fields'
+import { useLocations } from './useLocations'
 
-function useFieldStringifier() {
-  const simpleFieldStringifier = useSimpleFieldStringifier()
-  const stringifyAddress = Address.useStringifier()
+interface RecursiveStringRecord {
+  [key: string]: string | undefined | RecursiveStringRecord
+}
 
+type FieldStringifier = (
+  fieldConfig: FieldConfig,
+  value: FieldValue
+) => string | RecursiveStringRecord
+
+export function stringifySimpleField(intl: IntlShape, locations: Location[]) {
   return (fieldConfig: FieldConfig, value: FieldValue) => {
     const field = { config: fieldConfig, value }
-    if (isAddressFieldType(field)) {
-      return stringifyAddress(field.value)
+    if (
+      isLocationFieldType(field) ||
+      isAdministrativeAreaFieldType(field) ||
+      isFacilityFieldType(field)
+    ) {
+      // Since all of the above field types are actually locations
+      return AdministrativeArea.stringify(locations, field.value)
     }
 
-    return simpleFieldStringifier(fieldConfig, value)
+    if (isRadioGroupFieldType(field)) {
+      return RadioGroup.stringify(intl, field.value, field.config)
+    }
+
+    if (isCountryFieldType(field)) {
+      return Country.stringify(intl, field.value)
+    }
+
+    return !value ? '' : value.toString()
   }
 }
+
+export const formDataStringifierFactory =
+  (stringifier: FieldStringifier) =>
+  (formFields: FieldConfig[], values: EventState): RecursiveStringRecord => {
+    const stringifiedValues: RecursiveStringRecord = {}
+
+    for (const [key, value] of Object.entries(values)) {
+      const fieldConfig = formFields.find((field) => field.id === key)
+      if (!fieldConfig) {
+        throw new Error(`Field ${key} not found in form config`)
+      }
+      stringifiedValues[key] = stringifier(fieldConfig, value)
+    }
+
+    return stringifiedValues
+  }
+
 /**
  *
  * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
  */
-export const useFormDataStringifier = () => {
-  const stringifier = useFieldStringifier()
+export const getFormDataStringifier = (
+  intl: IntlShape,
+  locations: Location[]
+) => {
+  const simpleFieldStringifier = stringifySimpleField(intl, locations)
+
+  const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
+    const field = { config: fieldConfig, value }
+    if (isAddressFieldType(field)) {
+      return Address.stringify(intl, locations, field.value)
+    }
+
+    return simpleFieldStringifier(fieldConfig, value)
+  }
+
   return formDataStringifierFactory(stringifier)
+}
+
+export function useFormDataStringifier() {
+  const intl = useIntl()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+
+  return getFormDataStringifier(intl, locations)
 }

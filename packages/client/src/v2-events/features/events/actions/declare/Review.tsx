@@ -34,7 +34,6 @@ import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -149,6 +148,7 @@ export function Review() {
       >
         <ReviewComponent.Actions
           canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
+          icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}

@@ -54,7 +54,8 @@ export function useReviewActionConfig({
         }),
       messages: incomplete
         ? reviewMessages.incomplete.register
-        : reviewMessages.complete.register
+        : reviewMessages.complete.register,
+      icon: 'PaperPlaneTilt'
     } as const
   }
 
@@ -72,7 +73,8 @@ export function useReviewActionConfig({
         }),
       messages: incomplete
         ? reviewMessages.incomplete.validate
-        : reviewMessages.complete.validate
+        : reviewMessages.complete.validate,
+      icon: 'PaperPlaneTilt'
     } as const
   }
 

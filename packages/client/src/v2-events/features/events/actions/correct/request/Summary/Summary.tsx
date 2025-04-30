@@ -116,6 +116,7 @@ export function Summary() {
 
   const previousFormValues = event.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
+
   const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues()

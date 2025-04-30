@@ -53,3 +53,20 @@ test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () =
       ?.declaration
   ).toMatchSnapshot()
 })
+
+test(`${ActionType.NOTIFY} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    SCOPES.RECORD_SUBMIT_INCOMPLETE,
+    SCOPES.RECORD_DECLARE
+  ])
+
+  const event = await client.event.create(generator.event.create())
+
+  const notifyPayload = generator.event.actions.notify(event.id)
+
+  const firstResponse = await client.event.actions.notify.request(notifyPayload)
+  const secondResponse =
+    await client.event.actions.notify.request(notifyPayload)
+  expect(firstResponse).toEqual(secondResponse)
+})

@@ -1,0 +1,15 @@
+{
+  "name": "@opencrvs/api-docs",
+  "version": "1.8.0",
+  "description": "OpenCRVS API documentation",
+  "license": "MPL-2.0",
+  "scripts": {
+    "start": "yarn build && serve -p 5555 build",
+    "build": "bash build.sh"
+  },
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

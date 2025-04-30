@@ -41,7 +41,7 @@ function getDefaultFields(
       value: {
         id: 'v2.event.summary.status.value',
         defaultMessage:
-          '{event.status, select, CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+          '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
         description: 'Status of the event'
       }
     },

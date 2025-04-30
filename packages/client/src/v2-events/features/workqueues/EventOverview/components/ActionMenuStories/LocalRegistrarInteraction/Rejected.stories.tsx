@@ -40,7 +40,6 @@ const rejectedScenariosForLocalRegistrar: Scenario[] = [
       ...hiddenActions,
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED,
       [ActionType.VALIDATE]: AssertType.DISABLED
     }
   },
@@ -56,7 +55,6 @@ const rejectedScenariosForLocalRegistrar: Scenario[] = [
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED,
       [ActionType.VALIDATE]: AssertType.ENABLED
     }
   },
@@ -72,7 +70,6 @@ const rejectedScenariosForLocalRegistrar: Scenario[] = [
       ...hiddenActions,
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED,
       [ActionType.VALIDATE]: AssertType.DISABLED
     }
   }
