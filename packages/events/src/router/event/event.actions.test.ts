@@ -177,7 +177,8 @@ test('Action data accepts partial changes', async () => {
   expect(events).toEqual([
     expect.objectContaining({
       ...stateAfterVillageRemoval,
-      modifiedAt: expect.any(String)
+      modifiedAt: expect.any(String),
+      updatedByUserRole: expect.any(String)
     })
   ])
 })
