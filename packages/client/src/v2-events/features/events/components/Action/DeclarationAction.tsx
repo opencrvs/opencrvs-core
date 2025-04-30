@@ -16,7 +16,9 @@ import {
   findActiveDrafts,
   getCurrentEventStateWithDrafts,
   getActionAnnotation,
-  DeclarationUpdateActionType
+  DeclarationUpdateActionType,
+  ActionType,
+  Action
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -29,6 +31,42 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
 type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
+
+function getPreviousDeclarationActionType(
+  actions: Action[],
+  currentActionType: DeclarationUpdateActionType
+): DeclarationUpdateActionType | undefined {
+  // If action type is DECLARE, there is no previous declaration action
+  if (currentActionType === ActionType.DECLARE) {
+    return
+  }
+
+  // If action type is VALIDATE, we know that the previous declaration action is DECLARE
+  if (currentActionType === ActionType.VALIDATE) {
+    return ActionType.DECLARE
+  }
+
+  // If action type is REGISTER, we know that the previous declaration action is VALIDATE
+  if (currentActionType === ActionType.REGISTER) {
+    return ActionType.VALIDATE
+  }
+
+  // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
+  // Check for the most recent action type in order of precedence
+  const actionTypes = [
+    ActionType.REGISTER,
+    ActionType.VALIDATE,
+    ActionType.DECLARE
+  ]
+
+  for (const type of actionTypes) {
+    if (actions.find((a) => a.type === type)) {
+      return type
+    }
+  }
+
+  return
+}
 
 /**
  * Creates a wrapper component for the declaration action.
@@ -125,9 +163,25 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     })
   }, [eventDrafts, event, actionType])
 
+  const previousActionAnnotation = useMemo(() => {
+    const previousActionType = getPreviousDeclarationActionType(
+      event.actions,
+      actionType
+    )
+
+    if (!previousActionType) {
+      return {}
+    }
+
+    return getActionAnnotation({
+      event,
+      actionType: previousActionType
+    })
+  }, [event, actionType])
+
   useEffect(() => {
     setInitialFormValues(eventStateWithDrafts.declaration)
-    setInitialAnnotation(actionAnnotation)
+    setInitialAnnotation({ ...previousActionAnnotation, ...actionAnnotation })
 
     return () => {
       /*
