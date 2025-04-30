@@ -10,7 +10,6 @@
  */
 
 import { flattenDeep, omitBy, mergeWith, isArray, isObject } from 'lodash'
-import { workqueues } from '../workqueues'
 import {
   ActionType,
   DeclarationActionType,
@@ -19,7 +18,6 @@ import {
 } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
-import { WorkqueueConfig } from './WorkqueueConfig'
 import { Action, ActionUpdate, EventState } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isConditionMet, isFieldVisible } from '../conditionals/validate'
@@ -112,19 +110,6 @@ export function getActionReviewFields(
   actionType: DeclarationActionType
 ) {
   return getActionReview(configuration, actionType).fields
-}
-
-export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
-  workqueueConfigs.map((workqueue) => {
-    const rootWorkqueue = Object.values(workqueues).find(
-      (wq) => wq.id === workqueue.id
-    )
-    if (!rootWorkqueue) {
-      throw new Error(
-        `Invalid workqueue configuration: workqueue not found with id: ${workqueue.id}`
-      )
-    }
-  })
 }
 
 export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {

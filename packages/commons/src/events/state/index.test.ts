@@ -34,7 +34,8 @@ describe('correction requests', () => {
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
           declaration: {},
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         },
         {
           declaration: { name: 'John Doe' },
@@ -43,7 +44,8 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:39.161Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8',
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         },
         {
           declaration: {},
@@ -52,7 +54,8 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:40.182Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2',
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         },
         {
           declaration: { name: 'Doe John' },
@@ -61,7 +64,8 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:41.206Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         }
       ]
     })
@@ -84,7 +88,8 @@ describe('correction requests', () => {
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
           declaration: {},
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         },
         {
           declaration: { name: 'John Doe' },
@@ -93,7 +98,8 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:39.161Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8',
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         },
         {
           declaration: {},
@@ -102,7 +108,8 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:40.182Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2',
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         },
         {
           declaration: { name: 'Doe John' },
@@ -111,7 +118,8 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:41.206Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         },
         {
           declaration: {},
@@ -121,7 +129,8 @@ describe('correction requests', () => {
           createdAt: '2025-01-23T02:21:42.230Z',
           createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
           id: '94d5a963-0125-4d31-85f0-6d77080758f4',
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         }
       ]
     })

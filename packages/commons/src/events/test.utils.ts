@@ -141,6 +141,7 @@ export const eventPayloadGenerator = {
         createdAt: new Date().toISOString(),
         transactionId: getUUID(),
         action: {
+          transactionId: getUUID(),
           type: actionType,
           status: ActionStatus.Accepted,
           declaration: {
@@ -427,7 +428,8 @@ export function generateActionDocument({
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
     ...defaults,
-    status: ActionStatus.Accepted
+    status: ActionStatus.Accepted,
+    transactionId: getUUID()
   } satisfies ActionBase
 
   switch (action) {

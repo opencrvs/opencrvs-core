@@ -1002,28 +1002,6 @@ export const tennisClubMembershipEvent = defineConfig({
       }
     ]
   },
-  workqueues: [
-    {
-      id: 'all',
-      filters: []
-    },
-    {
-      id: 'ready-for-review',
-      filters: [
-        {
-          status: ['DECLARED']
-        }
-      ]
-    },
-    {
-      id: 'registered',
-      filters: [
-        {
-          status: ['REGISTERED']
-        }
-      ]
-    }
-  ],
   actions: [
     {
       type: ActionType.DECLARE,

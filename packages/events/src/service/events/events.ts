@@ -195,7 +195,8 @@ export async function createEvent({
         createdAtLocation,
         id: getUUID(),
         declaration: {},
-        status: ActionStatus.Accepted
+        status: ActionStatus.Accepted,
+        transactionId: getUUID()
       }
     ]
   })
@@ -208,7 +209,8 @@ export async function createEvent({
     createdAt: now,
     createdAtLocation,
     id,
-    status: ActionStatus.Accepted
+    status: ActionStatus.Accepted,
+    transactionId: getUUID()
   }
 
   await db
@@ -307,7 +309,6 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
-    input.transactionId = `${transactionId}-${ActionType.MARKED_AS_DUPLICATE.toLocaleLowerCase()}`
     await db.collection<EventDocument>('events').updateOne(
       {
         id: eventId,
@@ -319,6 +320,7 @@ export async function addAction(
         $push: {
           actions: {
             ...input,
+            transactionId: getUUID(),
             type: ActionType.MARKED_AS_DUPLICATE,
             createdBy,
             createdAt: now,
@@ -333,8 +335,6 @@ export async function addAction(
       }
     )
   }
-
-  input.transactionId = `${transactionId}-${input.type.toLocaleLowerCase()}`
 
   const action: ActionDocument = {
     ...input,
@@ -353,13 +353,13 @@ export async function addAction(
     )
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
-    input.transactionId = `${transactionId}-${ActionType.UNASSIGN.toLocaleLowerCase()}`
     await db.collection<EventDocument>('events').updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
+      { id: eventId },
       {
         $push: {
           actions: {
             ...input,
+            transactionId: getUUID(),
             type: ActionType.UNASSIGN,
             declaration: {},
             assignedTo: null,
