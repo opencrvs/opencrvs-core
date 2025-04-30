@@ -383,7 +383,7 @@ export const mosipDeceasedPatientMock: Saved<Patient> = {
     {
       use: 'en',
       given: ['Sakib Al'],
-      family: ['Hasan']
+      family: 'Hasan'
     }
   ],
   gender: 'male',
