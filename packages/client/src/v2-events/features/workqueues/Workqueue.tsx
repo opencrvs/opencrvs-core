@@ -20,11 +20,9 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   applyDraftsToEventIndex,
-  defaultColumns,
   EventConfig,
   EventIndex,
   getOrThrow,
-  RootWorkqueueConfig,
   workqueues
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
