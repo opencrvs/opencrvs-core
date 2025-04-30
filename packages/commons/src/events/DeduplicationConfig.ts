@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-// eslint-disable-next-line import/no-unassigned-import
-import 'zod-openapi/extend'
-
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 const FieldReference = z.string()
 

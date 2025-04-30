@@ -19,4 +19,5 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
   baseUrl: 'http://localhost:3000'
 })
 
+// eslint-disable-next-line no-console
 console.log(yaml.stringify(openApiDocument))

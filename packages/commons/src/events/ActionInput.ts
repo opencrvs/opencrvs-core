@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// eslint-disable-next-line import/no-unassigned-import
-import 'zod-openapi/extend'
-
 import { z } from 'zod'
 import { ActionType } from './ActionType'
 import { ActionUpdate } from './ActionDocument'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 export const BaseActionInput = z.object({
   eventId: z.string(),
