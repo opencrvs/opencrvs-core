@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createFieldConditionals } from './conditionals/conditionals'
-import { createFieldConfigs } from './field-config/field-configuration'
+import { createFieldConditionals } from '../conditionals/conditionals'
+import { createFieldConfigs } from '../field-config/field-configuration'
 
 /**
  * Entry point for defining conditional logic or configuration for a form field.

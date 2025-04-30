@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { field } from '../field'
+import { field } from '../events/field'
 
 describe('field() helper', () => {
   const fieldId = 'some.field'

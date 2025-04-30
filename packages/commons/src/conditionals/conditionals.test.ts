@@ -24,8 +24,8 @@ import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus } from '../events/ActionDocument'
-import { field } from '../field'
-import { event } from '../event'
+import { field } from '../events/field'
+import { event } from '../events/event'
 
 /*  eslint-disable max-lines */
 

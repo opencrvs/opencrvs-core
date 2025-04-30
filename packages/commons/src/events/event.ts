@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createEventConditionals } from './conditionals/conditionals'
-import { createEventFieldConfig } from './event-config/event-configuration'
-import { SelectOption } from './events/FieldConfig'
-import { MetadataField } from './events/utils'
+import { createEventConditionals } from '../conditionals/conditionals'
+import { createEventFieldConfig } from '../event-config/event-configuration'
+import { SelectOption } from './FieldConfig'
+import { MetadataField } from './utils'
 
 /**
  * Creates a function that acts like a callable + static method container.
@@ -21,7 +21,7 @@ import { MetadataField } from './events/utils'
  * event('status') // → returns search config
  * event.hasAction('CLICKED') // → returns conditional
  */
-const eventFn = (fieldId: MetadataField, options?: SelectOption[]) => {
+function eventFn(fieldId: MetadataField, options?: SelectOption[]) {
   return createEventFieldConfig(fieldId, options)
 }
 

@@ -18,7 +18,7 @@ import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
-import { field } from '../field'
+import { field } from '../events/field'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
