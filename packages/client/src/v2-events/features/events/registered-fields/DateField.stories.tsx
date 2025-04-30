@@ -72,7 +72,8 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
               id: 'storybook.date.label',
               defaultMessage: 'Date input',
               description: 'The title for the date input'
-            }
+            },
+            required: true
           }
         ]}
         form={formData}
