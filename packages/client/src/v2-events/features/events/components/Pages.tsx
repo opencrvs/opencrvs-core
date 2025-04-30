@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
@@ -35,9 +35,9 @@ export function Pages({
   pageId,
   continueButtonText,
   setFormData,
-  disableContinue = false,
   eventConfig,
-  declaration
+  declaration,
+  validateBeforeNextPage = false
 }: {
   form: EventState
   setFormData: (dec: EventState) => void
@@ -121,11 +121,7 @@ export function Pages({
   }
 
   return (
-    <FormWizard
-      {...wizardProps}
-      continueButtonText={continueButtonText}
-      disableContinue={disableContinue}
-    >
+    <FormWizard {...wizardProps} continueButtonText={continueButtonText}>
       {fields}
     </FormWizard>
   )

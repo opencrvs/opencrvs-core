@@ -104,7 +104,6 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
         ]}
         form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
           setFormData(data)
@@ -178,7 +177,6 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
         ]}
         form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
           setFormData(data)

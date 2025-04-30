@@ -104,7 +104,6 @@ export const FileInputWithOptionTest: StoryObj<typeof FormFieldGenerator> = {
         ]}
         form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
           setFormData(data)
@@ -209,7 +208,6 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
         ]}
         form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
           setFormData(data)

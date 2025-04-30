@@ -489,7 +489,6 @@ function ReviewComponent({
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
-                  setAllFieldsDirty={false}
                   onChange={onAnnotationChange}
                 />
               </ReviewContainter>

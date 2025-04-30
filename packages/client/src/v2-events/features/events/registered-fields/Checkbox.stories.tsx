@@ -62,7 +62,6 @@ export const CheckboxInput: StoryObj<typeof FormFieldGenerator> = {
         ]}
         form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
           setFormData(data)

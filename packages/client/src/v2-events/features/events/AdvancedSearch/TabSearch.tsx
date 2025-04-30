@@ -82,7 +82,6 @@ function getSectionFields(
           form={formValues}
           id={section.title.id}
           initialValues={fieldValues}
-          setAllFieldsDirty={false}
           onChange={(updatedValues) => {
             Object.entries(updatedValues).forEach(([fieldId, value]) => {
               handleFieldChange(fieldId, value)
