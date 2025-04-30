@@ -8,6 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod-openapi/extend'
+
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
@@ -16,8 +19,6 @@ import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { findAllFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
-// eslint-disable-next-line import/no-unassigned-import
-import 'zod-openapi/extend'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.

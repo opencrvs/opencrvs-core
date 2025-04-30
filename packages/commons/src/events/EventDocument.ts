@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { Action } from './ActionDocument'
 // eslint-disable-next-line import/no-unassigned-import
 import 'zod-openapi/extend'
+
+import { z } from 'zod'
+import { Action } from './ActionDocument'
 
 export const EventDocument = z
   .object({

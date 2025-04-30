@@ -8,6 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod-openapi/extend'
+
 import { z } from 'zod'
 import { EnableConditional, ShowConditional } from './Conditional'
 import { PageConfig } from './PageConfig'
@@ -15,8 +18,6 @@ import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
-// eslint-disable-next-line import/no-unassigned-import
-import 'zod-openapi/extend'
 /**
  * By default, when conditionals are not defined, action is visible and enabled to the user.
  */
