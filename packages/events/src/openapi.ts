@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventConfig } from './EventConfig'
-import { EventConfigInput } from './EventConfigInput'
+import { generateOpenApiDocument } from 'trpc-to-openapi'
+import * as yaml from 'yaml'
+import { appRouter } from './router/router'
 
-/**
- * Builds a validated configuration for an event
- * @param config - Event specific configuration
- */
-export const defineConfig = (config: EventConfigInput) => {
-  const input = EventConfig.parse(config)
+export const openApiDocument = generateOpenApiDocument(appRouter, {
+  title: 'OpenCRVS API',
+  version: '1.8.0',
+  baseUrl: 'http://localhost:3000'
+})
 
-  return input
-}
+// eslint-disable-next-line no-console
+console.log(yaml.stringify(openApiDocument))

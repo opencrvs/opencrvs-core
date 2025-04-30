@@ -27,7 +27,8 @@ import {
   AssignActionInput,
   UnassignActionInput,
   ACTION_ALLOWED_SCOPES,
-  CONFIG_GET_ALLOWED_SCOPES
+  CONFIG_GET_ALLOWED_SCOPES,
+  DeleteActionInput
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -67,7 +68,16 @@ function validateEventType({
 export const eventRouter = router({
   config: router({
     get: publicProcedure
+      .meta({
+        openapi: {
+          summary: 'List event configurations',
+          method: 'GET',
+          path: '/events/config',
+          tags: ['Events']
+        }
+      })
       .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+      .input(z.void())
       .output(z.array(EventConfig))
       .query(async (options) => {
         return getEventConfigurations(options.ctx.token)
@@ -119,7 +129,8 @@ export const eventRouter = router({
     }),
   delete: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))
-    .input(z.object({ eventId: z.string() }))
+    .input(DeleteActionInput)
+    .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
@@ -182,14 +193,19 @@ export const eventRouter = router({
           )
         )
         .input(RequestCorrectionActionInput)
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
-        .mutation(async (options) => {
-          return addAction(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId,
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+
+          return addAction(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId,
             status: ActionStatus.Accepted
           })
         }),
@@ -200,14 +216,18 @@ export const eventRouter = router({
           )
         )
         .input(ApproveCorrectionActionInput)
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
-        .mutation(async (options) => {
-          return approveCorrection(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+          return approveCorrection(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId
           })
         }),
       reject: publicProcedure
@@ -217,13 +237,18 @@ export const eventRouter = router({
           )
         )
         .input(RejectCorrectionActionInput)
-        .mutation(async (options) => {
-          return rejectCorrection(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+        .use(middleware.requireAssignment)
+        .use(middleware.validateAction(ActionType.REJECT_CORRECTION))
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+          return rejectCorrection(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId
           })
         })
     })

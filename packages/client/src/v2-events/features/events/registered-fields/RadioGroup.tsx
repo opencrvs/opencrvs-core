@@ -10,7 +10,7 @@
  */
 import { on } from 'events'
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldProps,
   RadioGroup as RadioGroupField,
@@ -72,26 +72,26 @@ function RadioGroupOutput({
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
 }
 
-function useStringifier() {
-  const intl = useIntl()
+function stringify(
+  intl: IntlShape,
+  value: string,
+  fieldConfig: RadioGroupField
+) {
+  const option = fieldConfig.options.find((opt) => opt.value === value)
 
-  return (value: string, fieldConfig: RadioGroupField) => {
-    const option = fieldConfig.options.find((opt) => opt.value === value)
-
-    if (!option) {
-      // eslint-disable-next-line no-console
-      console.error(
-        `Could not find option with value ${value} for field ${fieldConfig.id}`
-      )
-      return value
-    }
-
-    return intl.formatMessage(option.label)
+  if (!option) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Could not find option with value ${value} for field ${fieldConfig.id}`
+    )
+    return value
   }
+
+  return intl.formatMessage(option.label)
 }
 
 export const RadioGroup = {
   Input: RadioGroupInput,
   Output: RadioGroupOutput,
-  useStringifier: useStringifier
+  stringify
 }
