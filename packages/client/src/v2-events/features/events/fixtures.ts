@@ -28,6 +28,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   modifiedAt: '2023-03-01T00:00:00.000Z',
   assignedTo: null,
   updatedBy: 'system',
+  updatedByUserRole: 'system',
   declaration: {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
