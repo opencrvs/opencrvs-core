@@ -22,7 +22,7 @@ import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
-import { deepMerge, findActiveDrafts } from '../utils'
+import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
 
 function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -62,6 +62,18 @@ function getStatusFromActions(actions: Array<Action>) {
         return status
     }
   }, EventStatus.CREATED)
+}
+
+function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
+  return actions.reduce<string>((updatedByRole, action) => {
+    if (!isWriteAction(action.type)) {
+      return updatedByRole
+    }
+    if (action.status === ActionStatus.Rejected) {
+      return updatedByRole
+    }
+    return action.createdByRole
+  }, '')
 }
 
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
@@ -184,7 +196,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     updatedAtLocation: event.updatedAtLocation,
     declaration: aggregateActionDeclarations(activeActions),
     trackingId: event.trackingId,
-    registrationNumber
+    registrationNumber,
+    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions)
   })
 }
 

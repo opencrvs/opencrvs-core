@@ -19,11 +19,13 @@ export async function createDraft(
   {
     eventId,
     createdBy,
+    createdByRole,
     createdAtLocation,
     transactionId
   }: {
     eventId: string
     createdBy: string
+    createdByRole: string
     createdAtLocation: string
     token: string
     transactionId: string
@@ -42,6 +44,7 @@ export async function createDraft(
       status: ActionStatus.Accepted,
       type: input.type,
       createdBy,
+      createdByRole,
       createdAt: now,
       createdAtLocation
     }

@@ -89,6 +89,7 @@ export const eventRouter = router({
       return createEvent({
         eventInput: options.input,
         createdBy: options.ctx.user.id,
+        createdByRole: options.ctx.user.role,
         createdAtLocation: options.ctx.user.primaryOfficeId,
         transactionId: options.input.transactionId
       })
@@ -109,6 +110,7 @@ export const eventRouter = router({
         {
           eventId: event.id,
           createdBy: ctx.user.id,
+          createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId,
           token: ctx.token,
           transactionId: getUUID(),
@@ -135,6 +137,7 @@ export const eventRouter = router({
       return createDraft(options.input, {
         eventId,
         createdBy: options.ctx.user.id,
+        createdByRole: options.ctx.user.role,
         createdAtLocation: options.ctx.user.primaryOfficeId,
         token: options.ctx.token,
         transactionId: options.input.transactionId
@@ -194,6 +197,7 @@ export const eventRouter = router({
           return addAction(input, {
             eventId: input.eventId,
             createdBy: ctx.user.id,
+            createdByRole: ctx.user.role,
             createdAtLocation: ctx.user.primaryOfficeId,
             token: ctx.token,
             transactionId: input.transactionId,
@@ -216,6 +220,7 @@ export const eventRouter = router({
           return approveCorrection(input, {
             eventId: input.eventId,
             createdBy: ctx.user.id,
+            createdByRole: ctx.user.role,
             createdAtLocation: ctx.user.primaryOfficeId,
             token: ctx.token,
             transactionId: input.transactionId
@@ -237,6 +242,7 @@ export const eventRouter = router({
           return rejectCorrection(input, {
             eventId: input.eventId,
             createdBy: ctx.user.id,
+            createdByRole: ctx.user.role,
             createdAtLocation: ctx.user.primaryOfficeId,
             token: ctx.token,
             transactionId: input.transactionId

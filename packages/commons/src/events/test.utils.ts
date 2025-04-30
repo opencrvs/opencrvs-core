@@ -156,6 +156,7 @@ export const eventPayloadGenerator = {
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
+          createdByRole: '@todo',
           createdAtLocation: '@todo'
         }
       } satisfies Draft,
@@ -421,6 +422,7 @@ export function generateActionDocument({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
+    createdByRole: 'FIELD_AGENT',
     id: getUUID(),
     createdAtLocation: 'TODO',
     declaration: generateActionDeclarationInput(configuration, action),
