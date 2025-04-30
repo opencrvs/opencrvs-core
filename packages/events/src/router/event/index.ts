@@ -171,6 +171,7 @@ export const eventRouter = router({
           return assignRecord({
             input: options.input,
             createdBy: options.ctx.user.id,
+            createdByRole: options.ctx.user.role,
             createdAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token
           })
@@ -182,6 +183,7 @@ export const eventRouter = router({
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
+            createdByRole: options.ctx.user.role,
             createdAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
