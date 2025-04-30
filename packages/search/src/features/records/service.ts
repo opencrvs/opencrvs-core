@@ -15,15 +15,12 @@ import {
   getFromBundleById,
   isComposition
 } from '@opencrvs/commons/types'
-import { HEARTH_MONGO_URL } from '@search/constants'
-import { MongoClient } from 'mongodb'
 import { writeFileSync } from 'fs'
 import * as os from 'os'
 import { join } from 'path'
 import { sortBy, uniqBy } from 'lodash'
 import { UUID } from '@opencrvs/commons'
-
-const client = new MongoClient(HEARTH_MONGO_URL)
+import client from '@search/config/hearthClient'
 
 function developmentTimeError(...params: Parameters<typeof console.error>) {
   /* eslint-disable no-console */
@@ -431,19 +428,8 @@ export const aggregateRecords = ({
           }
         ]
       : []),
-    {
-      $group: {
-        _id: null,
-        composition: { $push: '$$ROOT' }
-      }
-    },
-    { $project: { _id: 0 } },
-    { $unwind: '$composition' },
-    {
-      $addFields: {
-        bundle: ['$composition']
-      }
-    },
+    { $addFields: { bundle: ['$$ROOT'], composition: '$$ROOT' } },
+    { $project: { bundle: 1, composition: 1 } },
 
     ...(includeHistoryResources
       ? [
@@ -1061,8 +1047,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   _allowedStates: T,
   includeHistoryResources: boolean
 ): Promise<StateIdenfitiers[T[number]]> {
-  const connectedClient = await client.connect()
-  const db = connectedClient.db()
+  const db = client.db()
   const query = aggregateRecords({ recordId, includeHistoryResources })
   const result = await db
     .collection('Composition')

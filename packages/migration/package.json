@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/migration",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "OpenCRVS migration microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "type": "module",

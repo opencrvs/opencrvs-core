@@ -274,7 +274,7 @@ describe('Record audit summary for WorkQueue declarations', () => {
       component.find({ 'data-testid': 'type-value' }).hostNodes().text()
     ).toBe('Birth')
     expect(component.find('#content-name').hostNodes().text()).toBe(
-      'Shakib Al Hasan'
+      'Al Hasan Shakib'
     )
     expect(
       component

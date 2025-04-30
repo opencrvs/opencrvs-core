@@ -8,12 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ServerRoute } from '@hapi/hapi'
-import { resolveLocationParents } from './locationTreeSolver'
-import { UUID } from '@opencrvs/commons'
-
-export const locationHierarchyHandler: ServerRoute['handler'] = async (req) => {
-  const { locationId } = req.params as { locationId: UUID }
-
-  return await resolveLocationParents(locationId)
+export function createChunks<T>(array: T[], limit: number): T[][] {
+  const result = []
+  for (let i = 0; i < array.length; i += limit) {
+    result.push(array.slice(i, i + limit))
+  }
+  return result
 }

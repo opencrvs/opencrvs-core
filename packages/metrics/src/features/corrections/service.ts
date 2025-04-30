@@ -13,6 +13,8 @@ import { ResourceIdentifier, Location } from '@opencrvs/commons/types'
 import { query } from '@metrics/influxdb/client'
 import { fetchLocationChildrenIds } from '@metrics/configApi'
 import { helpers } from '@metrics/utils/queryHelper'
+import { logger } from '@opencrvs/commons'
+import { createChunks } from '@metrics/utils/batchHelpers'
 
 interface ICorrectionTotalGroup {
   total: number
@@ -48,28 +50,42 @@ export async function getTotalCorrectionsByLocation(
   locationId: ResourceIdentifier<Location>,
   event: EVENT_TYPE
 ) {
-  const locationIds = await fetchLocationChildrenIds(locationId)
-  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
-    locationIds,
-    'officeLocation'
-  )
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
 
-  const q = `SELECT COUNT(compositionId) AS total
-      FROM correction
-    WHERE time > $timeFrom
-      AND time <= $timeTo
-      AND eventType = $event
-      AND (${officeLocationInChildren})
-    GROUP BY reason`
+  const batchQuery = async (locationIds: string[]) => {
+    const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+      locationIds,
+      'officeLocation'
+    )
 
-  const totalCorrections: ICorrectionTotalGroup[] = await query(q, {
-    placeholders: {
-      timeFrom,
-      timeTo,
-      event,
-      ...locationPlaceholders
+    const q = `SELECT COUNT(compositionId) AS total
+                FROM correction
+              WHERE time > $timeFrom
+                AND time <= $timeTo
+                AND eventType = $event
+                AND (${officeLocationInChildren})
+              GROUP BY reason`
+
+    try {
+      const totalCorrections: ICorrectionTotalGroup[] = await query(q, {
+        placeholders: {
+          timeFrom,
+          timeTo,
+          event,
+          ...locationPlaceholders
+        }
+      })
+      return totalCorrections
+    } catch (error) {
+      logger.error(
+        `Error fetching total corrections by location: ${error.message}`
+      )
+      throw error
     }
-  })
+  }
 
-  return totalCorrections
+  const locationBatches = createChunks(locationIds, 1000)
+  return await Promise.all(locationBatches.map(batchQuery)).then((res) =>
+    res.flat()
+  )
 }

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { HEARTH_MONGO_URL } from '@metrics/constants'
 import { logger } from '@opencrvs/commons'
 import { MongoClient } from 'mongodb'
 
@@ -26,6 +25,7 @@ import { MongoClient } from 'mongodb'
  */
 import * as Hapi from '@hapi/hapi'
 import { getDashboardQueries } from '@metrics/configApi'
+import client from '@metrics/config/hearthClient'
 
 let updateInProgress = false
 let nextUpdateRequested = false
@@ -50,17 +50,13 @@ export async function refresh() {
     return
   }
   logger.info('Refreshing performance materialised views')
-  const client = new MongoClient(HEARTH_MONGO_URL)
   try {
     updateInProgress = true
-    const connectedClient = await client.connect()
-    await refreshPerformanceMaterialisedViews(connectedClient)
+    await refreshPerformanceMaterialisedViews(client)
     logger.info('Performance materialised views refreshed')
   } catch (error) {
     logger.error(`Error refreshing performances materialised views ${error}`)
   } finally {
-    await client.close()
-
     updateInProgress = false
     if (nextUpdateRequested) {
       nextUpdateRequested = false

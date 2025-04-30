@@ -19,6 +19,7 @@ import {
 import getPlugins from '@search/config/plugins'
 import { getRoutes } from '@search/config/routes'
 import { readFileSync } from 'fs'
+import * as mongoDirect from '@search/config/hearthClient'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -61,11 +62,13 @@ export async function createServer() {
 
   async function start() {
     await server.start()
+    await mongoDirect.start()
     server.log('info', `Search server started on ${HOST}:${PORT}`)
   }
 
   async function stop() {
     await server.stop()
+    await mongoDirect.stop()
     server.log('info', 'Search server stopped')
   }
 

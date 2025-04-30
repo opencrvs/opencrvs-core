@@ -11,7 +11,9 @@
 
 import { fetchLocationChildrenIds } from '@metrics/configApi'
 import { query } from '@metrics/influxdb/client'
+import { createChunks } from '@metrics/utils/batchHelpers'
 import { helpers } from '@metrics/utils/queryHelper'
+import { logger } from '@opencrvs/commons'
 import { ResourceIdentifier, Location } from '@opencrvs/commons/types'
 
 export async function getTotalCertificationsByLocation(
@@ -19,29 +21,41 @@ export async function getTotalCertificationsByLocation(
   timeTo: string,
   locationId: ResourceIdentifier<Location>
 ) {
-  const locationIds = await fetchLocationChildrenIds(locationId)
-  const [officeLocationInChildren, locationPlaceholders] = helpers.in(
-    locationIds,
-    'officeLocation'
-  )
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
 
-  const totalMetrics = await query<Array<{ total: number; eventType: string }>>(
-    `SELECT COUNT(DISTINCT(compositionId)) AS total
-      FROM certification
-    WHERE time > $timeFrom
-      AND time <= $timeTo
-      AND (${officeLocationInChildren})
-    GROUP BY eventType`,
-    {
-      placeholders: {
-        timeFrom,
-        timeTo,
-        ...locationPlaceholders
-      }
+  const batchQuery = async (locationIds: string[]) => {
+    const [officeLocationInChildren, locationPlaceholders] = helpers.in(
+      locationIds,
+      'officeLocation'
+    )
+    try {
+      return await query<Array<{ total: number; eventType: string }>>(
+        `SELECT COUNT(DISTINCT(compositionId)) AS total
+          FROM certification
+        WHERE time > $timeFrom
+          AND time <= $timeTo
+          AND (${officeLocationInChildren})
+        GROUP BY eventType`,
+        {
+          placeholders: {
+            timeFrom,
+            timeTo,
+            ...locationPlaceholders
+          }
+        }
+      )
+    } catch (error) {
+      logger.error(
+        `Error fetching total certifications by location: ${error.message}`
+      )
+      throw error
     }
-  )
+  }
 
-  return totalMetrics
+  const locationBatches = createChunks(locationIds, 1000)
+  return await Promise.all(locationBatches.map(batchQuery)).then((res) =>
+    res.flat()
+  )
 }
 
 export async function getTotalCertifications(timeFrom: string, timeTo: string) {

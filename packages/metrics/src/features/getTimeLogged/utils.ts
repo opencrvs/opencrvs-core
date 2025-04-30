@@ -66,7 +66,7 @@ export async function getTimeLoggedForPractitioner(
   locationId: ResourceIdentifier<Location>,
   count?: number
 ): Promise<ITimeLoggedData[]> {
-  const locationIds = await fetchLocationChildrenIds(locationId)
+  const locationIds = await fetchLocationChildrenIds(locationId, 'CRVS_OFFICE')
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
     'officeLocation'
