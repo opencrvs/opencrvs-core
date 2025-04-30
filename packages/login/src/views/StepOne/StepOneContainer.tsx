@@ -140,28 +140,30 @@ export function StepOneContainer() {
                 <Field name={userNameField.name} component={UserNameInput} />
 
                 <Field name={passwordField.name} component={Password} />
-
-                <Button
-                  id="login-mobile-submit"
-                  type="primary"
-                  size="large"
-                  loading={submitting}
-                >
-                  {intl.formatMessage(messages.submit)}
-                </Button>
-                <Link
-                  to={FORGOTTEN_ITEM}
-                  id="login-forgot-password"
-                  style={{
-                    textDecoration: 'none',
-                    display: 'flex',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <Button size="small" type="tertiary">
-                    {intl.formatMessage(messages.forgotPassword)}
+                <Stack direction="column" gap={16}>
+                  <Button
+                    id="login-mobile-submit"
+                    type="primary"
+                    size="large"
+                    fullWidth
+                    loading={submitting}
+                  >
+                    {intl.formatMessage(messages.submit)}
                   </Button>
-                </Link>
+                  <Link
+                    to={FORGOTTEN_ITEM}
+                    id="login-forgot-password"
+                    style={{
+                      textDecoration: 'none',
+                      display: 'flex',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <Button size="small" type="tertiary">
+                      {intl.formatMessage(messages.forgotPassword)}
+                    </Button>
+                  </Link>
+                </Stack>
               </Stack>
             </FormWrapper>
           )}

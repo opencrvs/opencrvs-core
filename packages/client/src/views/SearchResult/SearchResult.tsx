@@ -438,7 +438,7 @@ function SearchResultView(props: ISearchResultProps) {
       })
   }
 
-  const { intl, userDetails } = props
+  const { intl } = props
   const search = location.search
   const params = new URLSearchParams(search)
   const [searchText, searchType] = [

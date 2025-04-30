@@ -129,6 +129,7 @@ describe('form component', () => {
       beforeEach(() => {
         const instance = component
           .find('FormSectionComponent')
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           .instance() as any
         instance.resetDependentSelectValues('statePrimary')
       })
@@ -565,7 +566,7 @@ describe('when field definition has select field on mobile device', () => {
 
     input.find('input').simulate('focus').update()
 
-    input.find('.react-select__control').simulate('mousedown').update()
+    input.find('.react-select__control').first().simulate('mousedown').update()
     await flushPromises()
     component.update()
     expect(scrollMock).toBeCalled()

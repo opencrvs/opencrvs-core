@@ -19,12 +19,13 @@ const StyledWrapper = styled.nav`
   display: flex;
 `
 
-const StyledTrigger = styled.button.withConfig({
+const StyledTrigger = styled.div.withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
     ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
   // Forward popovertarget prop directly
-})<{ popovertarget: string; dropdownName: string }>`
-  anchor-name: ${({ dropdownName }) => `--Dropdown-Anchor-${dropdownName}`};
+})<{ popovertarget?: string; dropdownName?: string }>`
+  anchor-name: ${({ dropdownName }) =>
+    `--Dropdown-Anchor-${dropdownName || ''}`};
   margin: 0;
   padding: 0;
   border: 0;
@@ -48,10 +49,10 @@ const StyledContent = styled.ul.withConfig({
   background-color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.light};
   text-align: left;
-  min-width: 200px;
+  min-width: 256px;
   width: auto;
   white-space: nowrap;
-  padding: 8px 0;
+  padding: 4px;
   position-anchor: ${({ dropdownName }) => `--Dropdown-Anchor-${dropdownName}`};
   inset-area: ${({ position }) => position};
   position-area: ${({ position }) => position};
@@ -79,11 +80,10 @@ const MenuItem = styled.li<{ disabled?: boolean }>`
   color: ${({ theme }) => theme.colors.grey600};
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   outline: none;
   cursor: pointer;
-  margin: 0 6px;
-  border-radius: 4px;
+  border-radius: 2px;
   padding: 8px 12px;
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
@@ -134,10 +134,26 @@ export const DropdownMenu = ({
   )
 }
 
-const Trigger: React.FC<{ children: JSX.Element }> = ({ children }) => {
+const Trigger: React.FC<{ children: JSX.Element; asChild?: boolean }> = ({
+  children,
+  asChild = false
+}) => {
   const { dropdownName } = useDropdown()
+
+  if (asChild) {
+    return (
+      <StyledTrigger>
+        {React.cloneElement(children, {
+          ...children.props,
+          popovertarget: `${dropdownName}-Dropdown-Content`,
+          dropdownName
+        })}
+      </StyledTrigger>
+    )
+  }
   return (
     <StyledTrigger
+      as={'button'}
       popovertarget={`${dropdownName}-Dropdown-Content`}
       dropdownName={dropdownName}
     >

@@ -40,6 +40,8 @@ import {
 import { IconProps } from '@opencrvs/components/lib'
 import { UUID } from '@opencrvs/commons/client'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
@@ -78,6 +80,7 @@ export const BUTTON = 'BUTTON'
 export const LINK_BUTTON = 'LINK_BUTTON'
 export const ID_READER = 'ID_READER'
 export const ID_VERIFICATION_BANNER = 'ID_VERIFICATION_BANNER'
+export const LOADER = 'LOADER'
 
 export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
@@ -348,8 +351,8 @@ type FunctionParamsToDescriptor<T, Descriptor> =
   T extends Array<any>
     ? { [K in keyof T]: FunctionParamsToDescriptor<T[K], Descriptor> }
     : T extends IFormFieldQueryMapFunction | IFormFieldMutationMapFunction // It's a query transformation function - return a query transformation descriptor
-    ? Descriptor
-    : T // It's a none of the above - return self
+      ? Descriptor
+      : T // It's a none of the above - return self
 
 interface FactoryOperation<
   OperationMap,
@@ -379,9 +382,7 @@ export type IFormFieldMapping = {
  */
 
 type UnionKeys<T> = T extends any ? keyof T : never
-type UnionPick<T, K extends any> = T extends any
-  ? Pick<T, Extract<K, keyof T>>
-  : never
+type UnionPick<T, K> = T extends any ? Pick<T, Extract<K, keyof T>> : never
 
 type UnionOmit<T, K extends UnionKeys<T>> = UnionPick<
   T,
@@ -755,6 +756,10 @@ export interface ILinkButtonFormField extends IFormFieldBase {
 
 export interface QRReaderType {
   type: 'QR'
+  validation: {
+    rule: unknown
+    errorMessage: MessageDescriptor
+  }
 }
 
 export type ReaderType = QRReaderType | ILinkButtonFormField
@@ -765,11 +770,20 @@ export interface IDReaderFormField extends IFormFieldBase {
   readers: [ReaderType, ...ReaderType[]]
 }
 
-export type BannerType = 'pending' | 'verified' | 'failed'
+export type BannerType =
+  | 'authenticated'
+  | 'verified'
+  | 'failed'
+  | 'failedFetchIdDetails'
 interface IIDVerificationBannerFormField extends IFormFieldBase {
   type: typeof ID_VERIFICATION_BANNER
   bannerType: BannerType
   idFieldName: string
+}
+
+export interface ILoaderFormField extends IFormFieldBase {
+  type: typeof LOADER
+  loadingText: MessageDescriptor
 }
 
 export type IFormField =
@@ -810,6 +824,7 @@ export type IFormField =
   | ILinkButtonFormField
   | IDReaderFormField
   | IIDVerificationBannerFormField
+  | ILoaderFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1307,6 +1322,11 @@ interface Ii18nIDVerificationBannerFormField extends Ii18nFormFieldBase {
   bannerType: BannerType
   idFieldName: string
 }
+
+export interface Ii18nLoaderFormField extends Ii18nFormFieldBase {
+  type: typeof LOADER
+  loadingText: string
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1343,6 +1363,7 @@ export type Ii18nFormField =
   | Ii18nLinkButtonFormField
   | Ii18nIDReaderFormField
   | Ii18nIDVerificationBannerFormField
+  | Ii18nLoaderFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

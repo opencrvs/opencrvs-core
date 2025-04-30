@@ -243,8 +243,8 @@ export function Outbox() {
                 }
               ]
             : icon
-            ? [{ actionComponent: icon }]
-            : null,
+              ? [{ actionComponent: icon }]
+              : null,
         dateOfEvent
       }
     })

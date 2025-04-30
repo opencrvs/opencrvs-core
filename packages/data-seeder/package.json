@@ -1,19 +1,20 @@
 {
   "name": "@opencrvs/data-seeder",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "OpenCRVS data-seeder microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "license": "MPL-2.0",
   "scripts": {
     "seed": "NODE_OPTIONS=--dns-result-order=ipv4first ts-node -r tsconfig-paths/register src/index.ts",
-    "test:compilation": "tsc --noEmit"
+    "test:compilation": "tsc --noEmit",
+    "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.5.0",
-    "@typescript-eslint/parser": "^4.5.0",
-    "eslint": "^7.11.0",
-    "eslint-config-prettier": "^9.0.0",
-    "prettier": "2.8.8"
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.5",
+    "prettier": "3.5.3"
   },
   "dependencies": {
     "@types/fhir": "^0.0.37",

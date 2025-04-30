@@ -11,32 +11,105 @@
 
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
-import { SummaryConfig } from '@opencrvs/commons/events'
-import { EventIndex, FieldValue } from '@opencrvs/commons/client'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { SummaryConfig } from '@opencrvs/commons/client'
+import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { RecursiveStringRecord } from '@client/v2-events/hooks/useSimpleFieldStringifier'
 
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
+/**
+ * @returns default fields for the event summary
+ */
+function getDefaultFields(
+  eventLabel: TranslationConfig
+): SummaryConfig['fields'] {
+  return [
+    {
+      id: 'status',
+      label: {
+        id: 'v2.event.summary.status.label',
+        defaultMessage: 'Status',
+        description: 'Status of the event'
+      },
+      value: {
+        id: 'v2.event.summary.status.value',
+        defaultMessage:
+          '{event.status, select, CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        description: 'Status of the event'
+      }
+    },
+    {
+      id: 'event',
+      label: {
+        id: 'v2.event.summary.event.label',
+        defaultMessage: 'Event',
+        description: 'Event label'
+      },
+      value: eventLabel
+    },
+    {
+      id: 'tracking-id',
+      label: {
+        id: 'v2.event.summary.trackingId.label',
+        defaultMessage: 'Tracking ID',
+        description: 'Tracking id label'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.trackingId.empty',
+        defaultMessage: 'No tracking ID',
+        description: 'No tracking ID message'
+      },
+      value: {
+        id: 'v2.event.summary.trackingId.value',
+        defaultMessage: '{event.trackingId}',
+        description: 'Tracking id value'
+      }
+    },
+    {
+      id: 'registrationNumber',
+      label: {
+        id: 'v2.event.summary.registrationNumber.label',
+        defaultMessage: 'Registration Number',
+        description: 'Registration Number label'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.registrationNumber.empty',
+        defaultMessage: 'No registration number',
+        description: 'No registration number message'
+      },
+      value: {
+        id: 'v2.event.summary.registrationNumber.value',
+        defaultMessage: '{event.registrationNumber}',
+        description: 'Registration number value'
+      }
+    }
+  ]
+}
+
 export function EventSummary({
   event,
   summary,
-  defaultValues
+  eventLabel
 }: {
-  event: EventIndex
+  event: Record<string, FieldValue | null | RecursiveStringRecord>
   summary: SummaryConfig
-  defaultValues: Record<string, FieldValue>
+  /**
+   * Event label to be displayed in the summary page.
+   * This label is used for translation purposes and should not be stored in the event data.
+   */
+  eventLabel: TranslationConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const { toString } = useTransformer(event.type)
-  const data = toString(event.data)
+  const defaultFields = getDefaultFields(eventLabel)
+  const summaryPageFields = [...defaultFields, ...summary.fields]
 
   return (
     <>
       <Summary id="summary">
-        {summary.fields.map((field) => {
+        {summaryPageFields.map((field) => {
           return (
             <Summary.Row
               key={field.id}
@@ -46,10 +119,7 @@ export function EventSummary({
                 field.emptyValueMessage &&
                 intl.formatMessage(field.emptyValueMessage)
               }
-              value={intl.formatMessage(field.value, {
-                ...defaultValues,
-                ...data
-              })}
+              value={intl.formatMessage(field.value, event)}
             />
           )
         })}

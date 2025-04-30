@@ -9,125 +9,80 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useSelector } from 'react-redux'
 import {
-  Button,
-  Checkbox,
-  ResponsiveModal,
-  Stack,
-  Text,
-  TextInput
-} from '@opencrvs/components'
+  ActionType,
+  getActionReview,
+  getDeclaration,
+  SCOPES
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { FormLayout } from '@client/v2-events/layouts/form'
-
-const messages = defineMessages({
-  reviewActionTitle: {
-    id: 'reviewAction.title',
-    defaultMessage: 'Declare member',
-    description: 'The title for review action'
-  },
-  reviewActionDescription: {
-    id: 'reviewAction.description',
-    defaultMessage:
-      'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
-    description: 'The description for review action'
-  },
-  reviewActionDeclare: {
-    id: 'reviewAction.Declare',
-    defaultMessage: 'Declare',
-    description: 'The label for declare button of review action'
-  },
-  reviewActionReject: {
-    id: 'reviewAction.reject',
-    defaultMessage: 'Reject',
-    description: 'The label for reject button of review action'
-  },
-  rejectModalCancel: {
-    id: 'rejectModal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'The label for cancel button of reject modal'
-  },
-  rejectModalArchive: {
-    id: 'rejectModal.archive',
-    defaultMessage: 'Archive',
-    description: 'The label for archive button of reject modal'
-  },
-  rejectModalSendForUpdate: {
-    id: 'rejectModal.sendForUpdate',
-    defaultMessage: 'Send For Update',
-    description: 'The label for send For Update button of reject modal'
-  },
-  rejectModalTitle: {
-    id: 'rejectModal.title',
-    defaultMessage: 'Reason for rejection?',
-    description: 'The title for reject modal'
-  },
-  rejectModalDescription: {
-    id: 'rejectModal.description',
-    defaultMessage:
-      'Please describe the updates required to this record for follow up action.',
-    description: 'The description for reject modal'
-  },
-  rejectModalMarkAsDuplicate: {
-    id: 'rejectModal.markAsDuplicate',
-    defaultMessage: 'Mark as a duplicate',
-    description: 'The label for mark as duplicate checkbox of reject modal'
-  }
-})
-
-// eslint-disable-next-line no-shadow
-enum REJECT_ACTIONS {
-  ARCHIVE,
-  SEND_FOR_UPDATE
-}
-
-interface RejectionState {
-  rejectAction: REJECT_ACTIONS
-  details: string
-  isDuplicate: boolean
-}
+import { FormLayout } from '@client/v2-events/layouts'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { getScope } from '@client/profile/profileSelectors'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
+  const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
-  const intl = useIntl()
-
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { goToHome } = useEventFormNavigation()
-  const declareMutation = events.actions.declare
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEventState.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const { forms: formConfigs } = config.actions.filter(
-    (action) => action.type === 'DECLARE'
-  )[0]
+  const formConfig = getDeclaration(config)
+  const reviewConfig = getActionReview(config, ActionType.DECLARE)
 
-  const form = useEventFormData((state) => state.formValues)
+  const form = useEventFormData((state) => state.getFormValues())
+
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
+
+  const scopes = useSelector(getScope) ?? undefined
+
+  const reviewActionConfiguration = useReviewActionConfig({
+    formConfig,
+    declaration: form,
+    annotation,
+    scopes,
+    reviewFields: reviewConfig.fields
+  })
 
   async function handleEdit({
     pageId,
-    fieldId
+    fieldId,
+    confirmation
   }: {
     pageId: string
     fieldId?: string
+    confirmation?: boolean
   }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
-    ))
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
+      )))
 
     if (confirmedEdit) {
       navigate(
@@ -136,7 +91,7 @@ export function Review() {
           {
             from: 'review'
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -145,160 +100,65 @@ export function Review() {
   }
 
   async function handleDeclaration() {
-    const confirmedDeclaration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal action="Declare" close={close} />
-    ))
+    const confirmedDeclaration = await openModal<boolean | null>((close) => {
+      if (reviewActionConfiguration.messages.modal === undefined) {
+        // eslint-disable-next-line no-console
+        console.error(
+          'Tried to render declare modal without message definitions.'
+        )
+        return null
+      }
+
+      return (
+        <ReviewComponent.ActionModal.Accept
+          action="Declare"
+          close={close}
+          copy={{
+            ...reviewActionConfiguration.messages.modal,
+            eventLabel: config.label
+          }}
+        />
+      )
+    })
+
     if (confirmedDeclaration) {
-      declareMutation.mutate({
-        eventId: event.id,
-        data: form,
-        transactionId: uuid()
-      })
+      reviewActionConfiguration.onConfirm(eventId)
 
       goToHome()
     }
   }
 
-  async function handleReject() {
-    const confirmedReject = await openModal<RejectionState | null>((close) => (
-      <RejectModal close={close}></RejectModal>
-    ))
-    if (confirmedReject) {
-      const { rejectAction, ...rest } = confirmedReject
-      switch (rejectAction) {
-        case REJECT_ACTIONS.ARCHIVE:
-          alert('Archived the registration ' + JSON.stringify(rest))
-          break
-        case REJECT_ACTIONS.SEND_FOR_UPDATE:
-          alert('Sent the registration for update ' + JSON.stringify(rest))
-          break
-        default:
-          break
-      }
-    }
-    return
-  }
-
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
-      onSaveAndExit={() => {
-        events.actions.declare.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          draft: true
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          drafts.submitLocalDraft()
+          goToHome()
         })
-        goToHome()
-      }}
+      }
     >
       <ReviewComponent.Body
-        eventConfig={config}
-        formConfig={formConfigs[0]}
-        // eslint-disable-next-line
-        onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
+        annotation={annotation}
         form={form}
-        // @todo: Update to use dynamic title
-        title={intl.formatMessage(formConfigs[0].review.title, {
-          firstname: form['applicant.firstname'] as string,
-          surname: form['applicant.surname'] as string
-        })}
+        formConfig={formConfig}
+        reviewFields={reviewConfig.fields}
+        title={formatMessage(reviewConfig.title, form)}
+        onAnnotationChange={(values) => setAnnotation(values)}
+        onEdit={handleEdit}
       >
         <ReviewComponent.Actions
-          messages={{
-            title: messages.reviewActionTitle,
-            description: messages.reviewActionDescription,
-            onConfirm: messages.reviewActionDeclare
-          }}
+          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
+          incomplete={reviewActionConfiguration.incomplete}
+          messages={reviewActionConfiguration.messages}
+          primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
-          onReject={handleReject}
         />
       </ReviewComponent.Body>
       {modal}
+      {saveAndExitModal}
     </FormLayout>
   )
 }
 
-function RejectModal({
-  close
-}: {
-  close: (result: RejectionState | null) => void
-}) {
-  const [state, setState] = useState<RejectionState>({
-    rejectAction: REJECT_ACTIONS.ARCHIVE,
-    details: '',
-    isDuplicate: false
-  })
-
-  const intl = useIntl()
-
-  return (
-    <ResponsiveModal
-      autoHeight
-      actions={[
-        <Button
-          key="cancel_reject"
-          id="cancel_reject"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(messages.rejectModalCancel)}
-        </Button>,
-        <Button
-          key="confirm_reject_with_archive"
-          id="confirm_reject_with_archive"
-          type="secondaryNegative"
-          onClick={() => {
-            close({
-              ...state,
-              rejectAction: REJECT_ACTIONS.ARCHIVE
-            })
-          }}
-        >
-          {intl.formatMessage(messages.rejectModalArchive)}
-        </Button>,
-        <Button
-          key="confirm_reject_with_update"
-          id="confirm_reject_with_update"
-          type="negative"
-          onClick={() => {
-            close({
-              ...state,
-              rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
-            })
-          }}
-        >
-          {intl.formatMessage(messages.rejectModalSendForUpdate)}
-        </Button>
-      ]}
-      handleClose={() => close(null)}
-      responsive={false}
-      show={true}
-      title={intl.formatMessage(messages.rejectModalTitle)}
-    >
-      <Stack alignItems="left" direction="column">
-        <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(messages.rejectModalDescription)}
-        </Text>
-        <TextInput
-          required={true}
-          value={state.details}
-          onChange={(e) =>
-            setState((prev) => ({ ...prev, details: e.target.value }))
-          }
-        />
-        <Checkbox
-          label={intl.formatMessage(messages.rejectModalMarkAsDuplicate)}
-          name={'markDUplicate'}
-          selected={state.isDuplicate}
-          value={''}
-          onChange={() =>
-            setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
-          }
-        />
-      </Stack>
-    </ResponsiveModal>
-  )
-}
+export const ReviewIndex = withSuspense(Review)

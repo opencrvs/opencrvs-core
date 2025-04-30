@@ -235,6 +235,7 @@ export const resizeWindow = (width: number, height: number) => {
 }
 
 export const selectOption = (
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
   selector: string,
   option: string
@@ -242,7 +243,7 @@ export const selectOption = (
   const input = wrapper.find(selector).hostNodes()
 
   input.find('input').simulate('focus').update()
-  input.find('.react-select__control').simulate('mousedown').update()
+  input.find('.react-select__control').first().simulate('mousedown').update()
 
   const availableOptions: string[] = []
 
@@ -264,9 +265,9 @@ export const selectOption = (
     )
   }
 
-  nodes.simulate('click').update()
+  nodes.first().simulate('click').update()
 
-  return input.find('.react-select__control')
+  return input.find('.react-select__control').first()
 }
 
 const eventAddressData = {
@@ -509,9 +510,12 @@ export const mockRegistrarUserResponse = {
 }
 
 function appendStringToKeys(
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   obj: Record<string, any>,
   appendString: string
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): Record<string, any> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const newObj: Record<string, any> = {}
 
   for (const key in obj) {
@@ -1009,6 +1013,7 @@ export async function createTestComponent(
   }: {
     store: AppStore
     graphqlMocks?: MockedProvider['props']['mocks']
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     apolloClient?: ApolloClient<any>
     initialEntries?:
       | string[]
@@ -1705,6 +1710,7 @@ export const mockUserGraphqlOperation = {
                 }
               ]
             },
+            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
             builtInValidators as any
           )
         ]

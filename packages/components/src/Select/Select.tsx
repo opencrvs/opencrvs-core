@@ -101,6 +101,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.yellow};
   }
 
+  .react-select__control--is-disabled {
+    background-color: ${({ theme }) => theme.colors.white};
+  }
+
   .react-select__value-container {
     padding: 4px 16px;
   }
@@ -131,7 +135,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__single-value--is-disabled {
-    color: ${({ theme }) => theme.colors.copy};
+    color: ${({ theme }) => theme.colors.grey500};
   }
 
   .react-select__menu {
@@ -159,6 +163,23 @@ export interface ISelectProps
   searchableLength?: number
 }
 
+type ControlProps = React.ComponentProps<typeof components.Control>
+
+function CustomControl(props: ControlProps) {
+  const { innerProps, selectProps } = props
+  return (
+    <components.Control
+      {...props}
+      innerProps={
+        {
+          ...innerProps,
+          'data-testid': selectProps['data-testid']
+        } as ControlProps['innerProps'] & { 'data-testid': string }
+      }
+    />
+  )
+}
+
 export const Select = (props: ISelectProps) => {
   const { searchableLength, onChange, disabled, options, value, error } = props
 
@@ -172,7 +193,7 @@ export const Select = (props: ISelectProps) => {
   return (
     <StyledSelect
       classNamePrefix="react-select"
-      components={{ DropdownIndicator }}
+      components={{ DropdownIndicator, Control: CustomControl }}
       {...props}
       onChange={handleChange}
       isDisabled={disabled}

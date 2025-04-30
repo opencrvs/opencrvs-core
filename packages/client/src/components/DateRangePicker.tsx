@@ -297,7 +297,7 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
 
   ${({ theme, selected }) =>
     selected
-      ? `background: ${theme.colors.secondary};
+      ? `background: ${theme.colors.primary};
   color: ${theme.colors.white};`
       : `background: none;
   color: ${theme.colors.copy};`}
@@ -306,7 +306,7 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
     padding: 12px 24px;
 
     &:active {
-      background: ${({ theme }) => theme.colors.secondary};
+      background: ${({ theme }) => theme.colors.primaryDark};
       color: ${({ theme }) => theme.colors.white};
     }
   }
@@ -318,7 +318,7 @@ const MonthButton = styled.button<{ selected?: boolean }>`
   border: 0;
   ${({ theme, selected }) =>
     selected
-      ? `background: ${theme.colors.secondary};
+      ? `background: ${theme.colors.primary};
   color: ${theme.colors.white};`
       : `background: none;
   color: ${theme.colors.copy};`}
@@ -342,7 +342,7 @@ const MonthButton = styled.button<{ selected?: boolean }>`
     -moz-background-clip: content-box;
 
     &:active {
-      background: ${({ theme }) => theme.colors.secondary};
+      background: ${({ theme }) => theme.colors.primaryDark};
       background-clip: content-box;
       -moz-background-clip: content-box;
       color: ${({ theme }) => theme.colors.white};

@@ -38,7 +38,7 @@ import {
   ResourceIdentifier,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
-import { logger, UUID } from '@opencrvs/commons'
+import { UUID, logger } from '@opencrvs/commons'
 import { createChunks } from '@metrics/utils/batchHelpers'
 
 interface IGroupedByGender {
@@ -1289,22 +1289,22 @@ function populateGenderBasisMetrics(
       point.gender === 'female'
         ? point.over18
         : metrics
-        ? metrics.femaleOver18
-        : 0
+          ? metrics.femaleOver18
+          : 0
     const maleOver18 =
       point.gender === 'male' ? point.over18 : metrics ? metrics.maleOver18 : 0
     const femaleUnder18 =
       point.gender === 'female'
         ? point.under18
         : metrics
-        ? metrics.femaleUnder18
-        : 0
+          ? metrics.femaleUnder18
+          : 0
     const maleUnder18 =
       point.gender === 'male'
         ? point.under18
         : metrics
-        ? metrics.maleUnder18
-        : 0
+          ? metrics.maleUnder18
+          : 0
 
     const total = maleOver18 + femaleOver18 + maleUnder18 + femaleUnder18
 

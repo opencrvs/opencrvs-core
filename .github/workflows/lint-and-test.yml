@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -52,7 +52,7 @@ jobs:
   test:
     name: Test
     needs: setup
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -163,10 +163,23 @@ jobs:
 
   prepare-client-tests:
     name: Prepare client tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    outputs:
+      chromatic_required: ${{ steps.detect-changes.outputs.chromatic_required }}
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Ensure we have at least one previous commit for comparison
+
+      - name: Detect changes in v2-events
+        id: detect-changes
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q 'packages/client/src/v2-events/'; then
+            echo "chromatic_required=true" >> $GITHUB_OUTPUT
+          else
+            echo "chromatic_required=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
@@ -232,11 +245,10 @@ jobs:
           path: |
             .
             !**/node_modules
-
   lint-client:
     name: Lint client
     needs: prepare-client-tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Download filesystem artifact
@@ -269,10 +281,103 @@ jobs:
       - name: Run linting
         run: cd packages/client && yarn lint
 
+  chromatic:
+    name: Run chromatic visual tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+    if: needs.prepare-client-tests.outputs.chromatic_required == 'true'
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      # Without this, the fetch command will fail with
+      # fatal: could not read Username for 'https://github.com': No such device or address
+      - name: Remove extraheader config
+        run: git config --unset http.https://github.com/.extraheader
+
+      - name: Fetch full Git history
+        run: git fetch --prune --unshallow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Chromatic
+        run: yarn run chromatic
+        working-directory: packages/client
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+  test-storybook:
+    name: Run storybook interaction tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Install Playwright
+        # Playwright is required since @storybook/test-runner depends on it
+        run: npx playwright install --with-deps
+
+      - name: Build Storybook
+        working-directory: packages/client
+        run: yarn run build-storybook
+
+      - name: Serve Storybook and run tests
+        working-directory: packages/client
+        # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "npx http-server storybook-static --port 6006 --silent" \
+            "npx wait-on tcp:127.0.0.1:6006 && yarn test-storybook"
+
   test-client:
     name: Test client
     needs: prepare-client-tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -308,9 +413,13 @@ jobs:
 
   lint-knip:
     name: Lint unused exports with Knip
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
+      - name: Use Node 18.X
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
@@ -364,7 +473,7 @@ jobs:
 
   build-toolkit:
     name: Build toolkit
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code

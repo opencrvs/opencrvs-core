@@ -23,13 +23,12 @@ export const up = async (db: Db, client: MongoClient) => {
         .collection('Location')
         .find({ 'type.coding.0.code': 'ADMIN_STRUCTURE' })
       const locationsCount = await db.collection('Location').countDocuments({})
-      // eslint-disable-next-line no-console
+
       console.log(
         `Migration - Crude birth rates to be amended, total ${locationsCount} needs to be processed`
       )
 
       for await (const location of locations) {
-        // eslint-disable-next-line no-console
         console.log(
           `Processed ${processLocation + 1}/${locationsCount} , progress ${(
             ((processLocation + 1) / locationsCount) *

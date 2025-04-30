@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Text } from '../Text'
+import { Stack } from '../Stack'
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
 
@@ -17,6 +18,7 @@ const ProgressBackground = styled.div`
   height: 100vh;
   width: 100%;
   display: flex;
+  gap: 16px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -45,7 +47,7 @@ const Progress = styled.div`
   gap: 0px;
   border-radius: 100px;
   opacity: 0px;
-  background: ${({ theme }) => theme.colors.blueDark};
+  background: ${({ theme }) => theme.colors.primary};
   animation: ${ProgressAnimation} 300s ease;
 `
 export const LoadingBar = () => (
@@ -56,11 +58,18 @@ export const LoadingBar = () => (
       width={90}
       height={90}
     />
-    <ProgressBar id="appSpinner">
-      <Progress id="progress" />
-    </ProgressBar>
-    <Text variant="reg16" element="p">
-      Loading records...
-    </Text>
+    <Stack
+      direction="column"
+      align-items="center"
+      justify-content="center"
+      gap={16}
+    >
+      <ProgressBar id="appSpinner">
+        <Progress id="progress" />
+      </ProgressBar>
+      <Text variant="reg16" element="p">
+        Loading records...
+      </Text>
+    </Stack>
   </ProgressBackground>
 )

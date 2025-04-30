@@ -518,8 +518,8 @@ const mapStateToProps = (
     event === EventType.Birth
       ? getOfflineData(state).config.BIRTH.PRINT_IN_ADVANCE
       : event === EventType.Death
-      ? getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
-      : getOfflineData(state).config.MARRIAGE.PRINT_IN_ADVANCE
+        ? getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
+        : getOfflineData(state).config.MARRIAGE.PRINT_IN_ADVANCE
 
   const formGroup = isAllowPrintInAdvance
     ? certFormSection.groups.find((group) => group.id === groupId) ||

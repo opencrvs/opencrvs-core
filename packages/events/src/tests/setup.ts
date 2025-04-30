@@ -8,37 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { inject, vi } from 'vitest'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { getDeclarationFields } from '@opencrvs/commons/events'
 import { resetServer as resetEventsMongoServer } from '@events/storage/mongodb/__mocks__/events'
 import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
-import { inject, vi } from 'vitest'
 
 import { createIndex } from '@events/service/indexing/indexing'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { mswServer } from './msw'
-import { getAllFields } from '@opencrvs/commons'
 
 vi.mock('@events/storage/mongodb/events')
 vi.mock('@events/storage/mongodb/user-mgnt')
 
 vi.mock('@events/storage/elasticsearch')
-vi.mock('@events/service/config/config', () => ({
-  notifyOnAction: async () => Promise.resolve(),
-  getEventConfigurations: async () =>
-    Promise.all([
-      tennisClubMembershipEvent,
-      { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
-    ])
-}))
 
 async function resetESServer() {
   const { getEventIndexName, getEventAliasName } = await import(
-    // @ts-ignore "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+    // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
   )
   const index = 'events_tennis_club_membership' + Date.now() + Math.random()
   getEventIndexName.mockReturnValue(index)
   getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
-  await createIndex(index, getAllFields(tennisClubMembershipEvent))
+  await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
 }
 
 beforeEach(async () =>

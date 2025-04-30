@@ -29,7 +29,7 @@ const intlEngish = createIntl(
 )
 const intlBangla = createIntl(
   {
-    locale: 'en',
+    locale: 'bn',
     messages: {}
   },
   cache
