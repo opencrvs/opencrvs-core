@@ -20,10 +20,13 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   applyDraftsToEventIndex,
+  defaultColumns,
   EventConfig,
   EventIndex,
   getOrThrow,
-  workqueues
+  RootWorkqueueConfig,
+  workqueues,
+  WorkQueueColumnConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -239,7 +242,7 @@ function Workqueue({
 
   function getDefaultColumns(): Array<Column> {
     return workqueueConfig.defaultColumns.map(
-      (column): Column => ({
+      (column: string): Column => ({
         label:
           column in defaultColumns
             ? intl.formatMessage(
@@ -257,7 +260,7 @@ function Workqueue({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     const configuredColumns: Array<Column> = workqueueConfig.columns.map(
-      (column) => ({
+      (column: WorkQueueColumnConfig) => ({
         label: intl.formatMessage(column.label),
         width: 35,
         key: column.id,

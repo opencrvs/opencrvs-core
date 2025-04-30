@@ -13,7 +13,7 @@ import { allWorkqueue } from './all'
 import { inReviewWorkqueue } from './readyForReview'
 import { registeredWorkqueue } from './readyToPrint'
 /** @knipignore */
-export { RootWorkqueueConfig } from './WorkqueueConfig'
+export { RootWorkqueueConfig, WorkQueueColumnConfig } from './WorkqueueConfig'
 /** @knipignore */
 export { defaultColumns } from './defaultColumns'
 

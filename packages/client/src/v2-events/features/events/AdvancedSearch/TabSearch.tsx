@@ -22,7 +22,7 @@ import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
 
-const MIN_PARAMS_TO_SEARCH = 1
+const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -151,7 +151,7 @@ export function TabSearch({
   }
 
   const hasEnoughParams =
-    Object.entries(filterEmptyValues(formValues)).length > MIN_PARAMS_TO_SEARCH
+    Object.entries(filterEmptyValues(formValues)).length >= MIN_PARAMS_TO_SEARCH
 
   const Search = (
     <SearchButton

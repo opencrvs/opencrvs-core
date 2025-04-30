@@ -12,7 +12,6 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
@@ -51,11 +50,12 @@ function convertPathToLabel(path: string): string {
 }
 
 export function SearchModifierComponent({
+  eventType,
   searchParams
 }: {
+  eventType: string
   searchParams: Record<string, string>
 }) {
-  const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const navigate = useNavigate()
   const intl = useIntl()
   const searchParamsAsLabel = Object.entries(searchParams).map(
