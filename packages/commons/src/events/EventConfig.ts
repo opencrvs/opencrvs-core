@@ -16,6 +16,8 @@ import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { findAllFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -68,6 +70,9 @@ export const EventConfig = z
         path: ['advancedSearch']
       })
     }
+  })
+  .openapi({
+    ref: 'EventConfig'
   })
 
 export type EventConfig = z.infer<typeof EventConfig>
