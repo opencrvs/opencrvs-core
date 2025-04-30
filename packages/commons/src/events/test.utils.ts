@@ -535,6 +535,7 @@ export const eventQueryDataGenerator = (
   modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
+  updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
   declaration: overrides.declaration ?? {
     'recommender.none': true,
     'applicant.firstname': 'Danny',
