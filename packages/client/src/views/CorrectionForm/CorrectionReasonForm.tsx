@@ -17,9 +17,8 @@ import {
 import { connect, useSelector } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
-  goBack,
-  goToCertificateCorrection,
-  goToHomeTab
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl
 } from '@client/navigation'
 import {
   CorrectionSection,
@@ -34,20 +33,18 @@ import { buttonMessages } from '@client/i18n/messages'
 import { correctReasonSection } from '@client/forms/correction/reason'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { groupHasError } from './utils'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { useNavigate } from 'react-router-dom'
 
 type IProps = {
   declaration: IDeclaration
 }
 
 type IDispatchProps = {
-  goBack: typeof goBack
-  goToHomeTab: typeof goToHomeTab
-  goToCertificateCorrection: typeof goToCertificateCorrection
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
 }
@@ -78,6 +75,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
   const { declaration, intl } = props
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
+  const navigate = useNavigate()
 
   const section = correctReasonSection
 
@@ -106,7 +104,12 @@ function CorrectionReasonFormComponent(props: IFullProps) {
 
   const continueButtonHandler = () => {
     props.writeDeclaration(declaration)
-    props.goToCertificateCorrection(declaration.id, CorrectionSection.Summary)
+    navigate(
+      generateCertificateCorrectionUrl({
+        declarationId: declaration.id,
+        pageId: CorrectionSection.Summary
+      })
+    )
   }
 
   const continueButton = (
@@ -132,8 +135,14 @@ function CorrectionReasonFormComponent(props: IFullProps) {
         id="corrector_form"
         title={section.title && intl.formatMessage(section.title)}
         hideBackground
-        goBack={props.goBack}
-        goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
+        goBack={() => navigate(-1)}
+        goHome={() =>
+          navigate(
+            generateGoToHomeTabUrl({
+              tabId: WORKQUEUE_TABS.readyForReview
+            })
+          )
+        }
       >
         <Content
           title={group.title && intl.formatMessage(group.title)}
@@ -158,9 +167,6 @@ function CorrectionReasonFormComponent(props: IFullProps) {
 }
 
 export const CorrectionReasonForm = connect(undefined, {
-  goBack,
-  goToHomeTab,
   modifyDeclaration,
-  goToCertificateCorrection,
   writeDeclaration
 })(injectIntl(CorrectionReasonFormComponent))

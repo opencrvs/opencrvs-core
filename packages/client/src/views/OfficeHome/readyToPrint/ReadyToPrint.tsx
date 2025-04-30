@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  goToDeclarationRecordAudit,
-  goToPrintCertificate
-} from '@client/navigation'
+import { formatUrl, generatePrintCertificateUrl } from '@client/navigation'
 import { transformData } from '@client/search/transformer'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -37,7 +34,8 @@ import { IStoreState } from '@client/store'
 import {
   IDeclaration,
   DOWNLOAD_STATUS,
-  clearCorrectionAndPrintChanges
+  clearCorrectionAndPrintChanges,
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
@@ -59,11 +57,14 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import { useState } from 'react'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 interface IBasePrintTabProps {
   theme: ITheme
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+
   clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   outboxDeclarations: IDeclaration[]
   queryData: {
@@ -76,87 +77,54 @@ interface IBasePrintTabProps {
   pageSize: number
 }
 
-interface IPrintTabState {
-  width: number
-  sortedCol: COLUMNS
-  sortOrder: SORT_ORDER
-}
-
 type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
 
-class ReadyToPrintComponent extends React.Component<
-  IPrintTabProps,
-  IPrintTabState
-> {
-  constructor(props: IPrintTabProps) {
-    super(props)
-    this.state = {
-      width: window.innerWidth,
-      sortedCol: COLUMNS.REGISTERED,
-      sortOrder: SORT_ORDER.DESCENDING
-    }
-  }
+function ReadyToPrintComponent(props: IPrintTabProps) {
+  const navigate = useNavigate()
+  const { width } = useWindowSize()
+  const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  getExpandable = () => {
-    return this.state.width > this.props.theme.grid.breakpoints.lg
-      ? true
-      : false
-  }
-
-  onColumnClick = (columnName: string) => {
+  const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
-      this.state.sortedCol,
-      this.state.sortOrder
+      sortedCol,
+      sortOrder
     )
-    this.setState({
-      sortOrder: newSortOrder,
-      sortedCol: newSortedCol
-    })
+    setSortOrder(newSortOrder)
+    setSortedCol(newSortedCol)
   }
 
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+  const getColumns = () => {
+    if (width > props.theme.grid.breakpoints.lg) {
       return [
         {
           width: 30,
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: props.intl.formatMessage(constantsMessages.name),
           key: COLUMNS.ICON_WITH_NAME,
-          isSorted: this.state.sortedCol === COLUMNS.NAME,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.NAME,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.event),
+          label: props.intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.EVENT,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.EVENT,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          label: props.intl.formatMessage(constantsMessages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.registered),
+          label: props.intl.formatMessage(constantsMessages.registered),
           width: 18,
           key: COLUMNS.REGISTERED,
-          isSorted: this.state.sortedCol === COLUMNS.REGISTERED,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.REGISTERED,
+          sortFunction: onColumnClick
         },
         {
           width: 18,
@@ -168,7 +136,7 @@ class ReadyToPrintComponent extends React.Component<
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: props.intl.formatMessage(constantsMessages.name),
           width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
@@ -182,33 +150,36 @@ class ReadyToPrintComponent extends React.Component<
     }
   }
 
-  transformRegisteredContent = (data: GQLEventSearchResultSet) => {
-    const { intl } = this.props
+  const transformRegisteredContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = props
     if (!data || !data.results) {
       return []
     }
 
-    const transformedData = transformData(data, this.props.intl)
+    const transformedData = transformData(data, props.intl)
     const items = transformedData.map((reg, index) => {
-      const foundDeclaration = this.props.outboxDeclarations.find(
+      const foundDeclaration = props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus = foundDeclaration?.downloadStatus
 
-      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      if (width > props.theme.grid.breakpoints.lg) {
         actions.push({
-          label: this.props.intl.formatMessage(buttonMessages.print),
+          label: props.intl.formatMessage(buttonMessages.print),
           disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
           handler: (
             e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
           ) => {
             e && e.stopPropagation()
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-              this.props.clearCorrectionAndPrintChanges(reg.id)
-              this.props.goToPrintCertificate(
-                reg.id,
-                reg.event.toLocaleLowerCase() || ''
+              props.clearCorrectionAndPrintChanges(reg.id)
+
+              navigate(
+                generatePrintCertificateUrl({
+                  registrationId: reg.id,
+                  event: reg.event.toLocaleLowerCase() || ''
+                })
               )
             }
           }
@@ -221,10 +192,14 @@ class ReadyToPrintComponent extends React.Component<
               event: reg.event,
               compositionId: reg.id,
               action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: reg.assignment
+              assignment:
+                foundDeclaration?.assignmentStatus ??
+                reg.assignment ??
+                undefined
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
           />
         )
       })
@@ -248,7 +223,12 @@ class ReadyToPrintComponent extends React.Component<
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('printTab', reg.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'printTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {reg.name}
@@ -257,7 +237,12 @@ class ReadyToPrintComponent extends React.Component<
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('printTab', reg.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'printTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -282,11 +267,7 @@ class ReadyToPrintComponent extends React.Component<
         actions
       }
     })
-    const sortedItems = getSortedItems(
-      items,
-      this.state.sortedCol,
-      this.state.sortOrder
-    )
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
 
     return sortedItems.map((item) => {
       return {
@@ -299,40 +280,38 @@ class ReadyToPrintComponent extends React.Component<
     })
   }
 
-  render() {
-    const { intl, queryData, paginationId, onPageChange, pageSize } = this.props
-    const { data } = queryData
-    const totalPages = this.props.queryData.data.totalItems
-      ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
-      : 0
-    const isShowPagination =
-      this.props.queryData.data.totalItems &&
-      this.props.queryData.data.totalItems > pageSize
-        ? true
-        : false
-    return (
-      <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.print)}
-        isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
-        isShowPagination={isShowPagination}
-        paginationId={paginationId}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-        loading={this.props.loading}
-        error={this.props.error}
-        noResultText={intl.formatMessage(wqMessages.noRecordsReadyToPrint)}
-        noContent={this.transformRegisteredContent(data).length <= 0}
-      >
-        <Workqueue
-          content={this.transformRegisteredContent(data)}
-          columns={this.getColumns()}
-          loading={this.props.loading}
-          sortOrder={this.state.sortOrder}
-          hideLastBorder={!isShowPagination}
-        />
-      </WQContentWrapper>
-    )
-  }
+  const { intl, queryData, paginationId, onPageChange, pageSize } = props
+  const { data } = queryData
+  const totalPages = props.queryData.data.totalItems
+    ? Math.ceil(props.queryData.data.totalItems / pageSize)
+    : 0
+  const isShowPagination =
+    props.queryData.data.totalItems &&
+    props.queryData.data.totalItems > pageSize
+      ? true
+      : false
+  return (
+    <WQContentWrapper
+      title={intl.formatMessage(navigationMessages.print)}
+      isMobileSize={width < props.theme.grid.breakpoints.lg}
+      isShowPagination={isShowPagination}
+      paginationId={paginationId}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      loading={props.loading}
+      error={props.error}
+      noResultText={intl.formatMessage(wqMessages.noRecordsReadyToPrint)}
+      noContent={transformRegisteredContent(data).length <= 0}
+    >
+      <Workqueue
+        content={transformRegisteredContent(data)}
+        columns={getColumns()}
+        loading={props.loading}
+        sortOrder={sortOrder}
+        hideLastBorder={!isShowPagination}
+      />
+    </WQContentWrapper>
+  )
 }
 
 function mapStateToProps(state: IStoreState) {
@@ -342,7 +321,5 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const ReadyToPrint = connect(mapStateToProps, {
-  goToPrintCertificate,
-  goToDeclarationRecordAudit,
   clearCorrectionAndPrintChanges
 })(injectIntl(withTheme(ReadyToPrintComponent)))

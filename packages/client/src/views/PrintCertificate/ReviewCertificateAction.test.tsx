@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Mock } from 'vitest'
 import * as React from 'react'
 import { createStore } from '@client/store'
 import { storeDeclaration, IDeclaration } from '@client/declarations'
@@ -18,17 +17,16 @@ import {
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
   flushPromises,
-  loginAsFieldAgent,
-  createRouterProps
+  loginAsFieldAgent
 } from '@client/tests/util'
 import { ReviewCertificate } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'
 import { IFormSectionData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { push } from 'connected-react-router'
-import { useParams } from 'react-router'
+import { formatUrl } from '@client/navigation'
+import { REVIEW_CERTIFICATE } from '@client/navigation/routes'
 
 const deathDeclaration = {
   id: 'mockDeath1234',
@@ -42,35 +40,31 @@ const deathDeclaration = {
       }
     ]
   },
-  event: Event.Death
+  event: EventType.Death
 }
 
 describe('when user wants to review death certificate', () => {
   it('displays the "Confirm & Print" button', async () => {
-    const { history, match } = createRouterProps(
-      '/',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: 'mockDeath1234',
-          eventType: Event.Death
-        }
-      }
-    )
-    ;(useParams as Mock).mockImplementation(() => match.params)
-
     const { store } = createStore()
 
     loginAsFieldAgent(store)
 
-    const component = await createTestComponent(<ReviewCertificate />, {
+    const { component } = await createTestComponent(<ReviewCertificate />, {
       store,
-      history
+      path: REVIEW_CERTIFICATE,
+      initialEntries: [
+        {
+          pathname: formatUrl(REVIEW_CERTIFICATE, {
+            registrationId: 'mockDeath1234',
+            eventType: EventType.Death
+          }),
+          state: { isNavigatedInsideApp: false }
+        }
+      ]
     })
 
     // @ts-ignore
     store.dispatch(storeDeclaration(deathDeclaration))
-    await flushPromises()
     component.update()
 
     const confirmBtn = component.find('#confirm-print')
@@ -80,8 +74,6 @@ describe('when user wants to review death certificate', () => {
 })
 
 describe('back button behavior tests of review certificate action', () => {
-  let component: ReactWrapper
-
   const mockBirthDeclarationData = {
     ...cloneDeep(mockDeclarationData),
     history: [
@@ -93,60 +85,58 @@ describe('back button behavior tests of review certificate action', () => {
     ]
   }
   mockBirthDeclarationData.registration.certificates[0] = {
+    //@ts-ignore
     collector: {
       type: 'PRINT_IN_ADVANCE'
-    }
+    },
+    certificateTemplateId: 'death-certificate'
   }
 
   it('takes user history back when navigated from inside app', async () => {
-    const { history, match } = createRouterProps(
-      '/previous-route',
-      { isNavigatedInsideApp: true },
-      {
-        matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.Birth
-        }
-      }
-    )
-    ;(useParams as Mock).mockImplementation(() => match.params)
-
-    const { store } = createStore(history)
-
-    store.dispatch(push('/new-route', { isNavigatedInsideApp: true }))
+    const { store } = createStore()
 
     loginAsFieldAgent(store)
     const birthDeclaration = {
       id: 'asdhdqe2472487jsdfsdf',
       data: mockBirthDeclarationData,
-      event: Event.Birth
+      event: EventType.Birth
     }
     store.dispatch(
       // @ts-ignore
       storeDeclaration(birthDeclaration)
     )
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
-    })
+    const { component, router } = await createTestComponent(
+      <ReviewCertificate />,
+      {
+        store,
+        path: '*',
+        initialEntries: [
+          {
+            pathname: formatUrl(REVIEW_CERTIFICATE, {
+              registrationId: 'asdhdqe2472487jsdfsdf',
+              eventType: EventType.Birth
+            }),
+            state: { isNavigatedInsideApp: true }
+          },
+          {
+            pathname: '',
+            state: { isNavigatedInsideApp: true }
+          }
+        ]
+      }
+    )
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
-    expect(history.location.pathname).toBe('/previous-route')
+    expect(router.state.location.pathname).toBe(
+      formatUrl(REVIEW_CERTIFICATE, {
+        registrationId: 'asdhdqe2472487jsdfsdf',
+        eventType: EventType.Birth
+      })
+    )
   })
 
   it('takes user to registration home when navigated from external link', async () => {
-    const { history, match } = createRouterProps(
-      '/previous-route',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.Birth
-        }
-      }
-    )
-    ;(useParams as Mock).mockImplementation(() => match.params)
-    const { store } = createStore(history)
+    const { store } = createStore()
 
     loginAsFieldAgent(store)
     store.dispatch(
@@ -154,17 +144,30 @@ describe('back button behavior tests of review certificate action', () => {
       storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
         data: mockBirthDeclarationData,
-        event: Event.Birth
+        event: EventType.Birth
       } as IDeclaration)
     )
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
-    })
+    const { component, router } = await createTestComponent(
+      <ReviewCertificate />,
+      {
+        store,
+        initialEntries: [
+          {
+            pathname: formatUrl(REVIEW_CERTIFICATE, {
+              registrationId: 'asdhdqe2472487jsdfsdf',
+              eventType: EventType.Birth
+            }),
+            state: { isNavigatedInsideApp: false }
+          }
+        ]
+      }
+    )
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
     await flushPromises()
-    expect(history.location.pathname).toContain('/registration-home/print/')
+    expect(router.state.location.pathname).toContain(
+      '/registration-home/print/'
+    )
   })
 })
 
@@ -172,24 +175,15 @@ describe('when user wants to review birth certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { history, match } = createRouterProps(
-      '/',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.Birth
-        }
-      }
-    )
-    ;(useParams as Mock).mockImplementation(() => match.params)
-    const { store } = createStore(history)
+    const { store } = createStore()
 
     const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
     mockBirthDeclarationData.registration.certificates[0] = {
+      //@ts-ignore
       collector: {
         type: 'PRINT_IN_ADVANCE'
-      }
+      },
+      certificateTemplateId: 'birth-certificate'
     }
     loginAsFieldAgent(store)
     await flushPromises()
@@ -206,16 +200,30 @@ describe('when user wants to review birth certificate', () => {
             }
           ] as unknown as IFormSectionData
         },
-        event: Event.Birth
+        event: EventType.Birth
       })
     )
 
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
-    })
+    const { component: testComponent } = await createTestComponent(
+      <ReviewCertificate />,
+      {
+        store,
+        path: REVIEW_CERTIFICATE,
+        initialEntries: [
+          {
+            pathname: formatUrl(REVIEW_CERTIFICATE, {
+              registrationId: 'asdhdqe2472487jsdfsdf',
+              eventType: EventType.Birth
+            }),
+            state: { isNavigatedInsideApp: false }
+          }
+        ]
+      }
+    )
     await flushPromises()
-    component.update()
+    testComponent.update()
+
+    component = testComponent
   })
 
   it('displays have the Continue and print Button', () => {
@@ -252,18 +260,7 @@ describe('when user wants to review marriage certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { history, match } = createRouterProps(
-      '/',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: '1234896128934719',
-          eventType: Event.Birth
-        }
-      }
-    )
-    ;(useParams as Mock).mockImplementation(() => match.params)
-    const { store } = createStore(history)
+    const { store } = createStore()
 
     const mockMarriageData = cloneDeep(mockMarriageDeclarationData)
 
@@ -282,16 +279,30 @@ describe('when user wants to review marriage certificate', () => {
             }
           ] as unknown as IFormSectionData
         },
-        event: Event.Marriage
+        event: EventType.Marriage
       })
     )
 
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
-    })
+    const { component: testComponent } = await createTestComponent(
+      <ReviewCertificate />,
+      {
+        store,
+        path: REVIEW_CERTIFICATE,
+        initialEntries: [
+          {
+            pathname: formatUrl(REVIEW_CERTIFICATE, {
+              registrationId: '1234896128934719',
+              eventType: EventType.Birth
+            }),
+            state: { isNavigatedInsideApp: false }
+          }
+        ]
+      }
+    )
     await flushPromises()
-    component.update()
+    testComponent.update()
+
+    component = testComponent
   })
 
   it('displays have the Continue and print Button', () => {

@@ -8,46 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
-export const AUTH_HOST = process.env.AUTH_HOST || '0.0.0.0'
-export const AUTH_PORT = process.env.AUTH_PORT || 4040
-export const USER_MANAGEMENT_URL =
-  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
-export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
-export const NOTIFICATION_SERVICE_URL =
-  process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
-export const HOSTNAME = process.env.DOMAIN || '*'
-export const COUNTRY_CONFIG_URL =
-  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040/'
-export const LOGIN_URL = process.env.LOGIN_URL || 'http://localhost:3020/'
-export const CLIENT_APP_URL =
-  process.env.CLIENT_APP_URL || 'http://localhost:3000/'
-
-export const CERT_PRIVATE_KEY_PATH =
-  (process.env.CERT_PRIVATE_KEY_PATH as string) ||
-  '../../.secrets/private-key.pem'
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const SENTRY_DSN = process.env.SENTRY_DSN
-
-export const PRODUCTION = process.env.NODE_ENV === 'production'
-export const QA_ENV = process.env.QA_ENV || false
-
-export const CONFIG_TOKEN_EXPIRY_SECONDS = process.env
-  .CONFIG_TOKEN_EXPIRY_SECONDS
-  ? parseInt(process.env.CONFIG_TOKEN_EXPIRY_SECONDS, 10)
-  : 604800 // 1 week
-
-export const CONFIG_SMS_CODE_EXPIRY_SECONDS = process.env
-  .CONFIG_SMS_CODE_EXPIRY_SECONDS
-  ? parseInt(process.env.CONFIG_SMS_CODE_EXPIRY_SECONDS, 10)
-  : 600
-
-export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
-  .CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
-  ? parseInt(process.env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS, 10)
-  : 600
 
 export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:auth-user',
@@ -64,9 +24,6 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:documents-user'
 ]
 export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
-export const VALIDATOR_API_USER_AUDIENCE = 'opencrvs:validator-api-user'
-export const AGE_VERIFICATION_USER_AUDIENCE = 'opencrvs:age-verification-user'
-export const NATIONAL_ID_USER_AUDIENCE = 'opencrvs:nationalId-api-user'
 export const JWT_ISSUER = 'opencrvs:auth-service'
 export const INVALID_TOKEN_NAMESPACE = 'invalidToken'
 export const DEFAULT_TIMEOUT = 600000

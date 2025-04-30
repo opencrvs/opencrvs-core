@@ -1560,7 +1560,7 @@ const countryMessagesToDefine: Record<
   FAR: {
     id: 'countries.FAR',
     defaultMessage: 'Farajaland',
-    description: 'Fictional country for OpenCRSV demo'
+    description: 'Fictional country for OpenCRVS demo'
   },
   FRO: {
     id: 'countries.FRO',

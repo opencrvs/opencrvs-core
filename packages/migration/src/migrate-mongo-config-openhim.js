@@ -9,6 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+if (process.env.NODE_ENV === 'production' && !process.env.OPENHIM_MONGO_URL) {
+  throw new Error(
+    `Missing environment variable: OPENHIM_MONGO_URL. Please set it to your Mongo URL of OpenHIM.`
+  )
+}
+
 const config = {
   mongodb: {
     url: process.env.OPENHIM_MONGO_URL || 'mongodb://localhost/openhim-dev',

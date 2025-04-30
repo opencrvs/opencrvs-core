@@ -268,7 +268,7 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
           {
             use: 'en',
             given: ['Bashir'],
-            family: ['Khan']
+            family: 'Khan'
           }
         ],
         gender: 'male',
@@ -361,7 +361,7 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
           {
             use: 'en',
             given: ['Jane'],
-            family: ['Foster']
+            family: 'Foster'
           }
         ],
         identifier: [
@@ -405,7 +405,8 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
+                  reference:
+                    'Location/fe107046-f90b-4c10-a165-827b0c5c8d79' as `Location/${UUID}`
                 }
               }
             ]
@@ -431,7 +432,8 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/collector',
             valueReference: {
-              reference: 'RelatedPerson/219a94d9-92cf-4b7d-a082-368736c4eff5'
+              reference:
+                'RelatedPerson/219a94d9-92cf-4b7d-a082-368736c4eff5' as `RelatedPerson/${UUID}`
             }
           },
           {
@@ -479,12 +481,14 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
           ]
         },
         focus: {
-          reference: 'Composition/9d377df7-8e18-46ce-b7c2-99393ddf3410'
+          reference:
+            'Composition/9d377df7-8e18-46ce-b7c2-99393ddf3410' as `Composition/${UUID}`
         },
         id: '8c80cb66-6068-4ae8-97cb-bb65b75788b9' as UUID,
         requester: {
           agent: {
-            reference: 'Practitioner/e46e1ed0-3869-48fe-8c7b-0859647649a7'
+            reference:
+              'Practitioner/e46e1ed0-3869-48fe-8c7b-0859647649a7' as `Practitioner/${UUID}`
           }
         },
         identifier: [
@@ -509,13 +513,15 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference: 'Practitioner/e46e1ed0-3869-48fe-8c7b-0859647649a7'
+              reference:
+                'Practitioner/e46e1ed0-3869-48fe-8c7b-0859647649a7' as `Practitioner/${UUID}`
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference: 'Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273'
+              reference:
+                'Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273' as `Location/${UUID}`
             }
           }
         ],
@@ -580,7 +586,8 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
+          reference:
+            'Location/fe107046-f90b-4c10-a165-827b0c5c8d79' as `Location/${UUID}`
         },
         type: {
           coding: [
@@ -626,7 +633,8 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/e452aebe-5ce1-43dd-b2cd-d5628ff2b706'
+          reference:
+            'Location/e452aebe-5ce1-43dd-b2cd-d5628ff2b706' as `Location/${UUID}`
         },
         type: {
           coding: [
@@ -668,7 +676,8 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/fe107046-f90b-4c10-a165-827b0c5c8d79'
+          reference:
+            'Location/fe107046-f90b-4c10-a165-827b0c5c8d79' as `Location/${UUID}`
         },
         type: {
           coding: [
@@ -746,7 +755,8 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
         ],
         location: [
           {
-            reference: 'Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273'
+            reference:
+              'Location/4a9f7b1a-01b9-4ab5-977b-8942b2c20273' as `Location/${UUID}`
           }
         ],
         meta: {
@@ -777,7 +787,7 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/0'
+          reference: 'Location/0' as `Location/${UUID}`
         },
         type: {
           coding: [

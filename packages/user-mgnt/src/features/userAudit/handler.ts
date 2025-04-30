@@ -24,8 +24,8 @@ import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler
 interface IAuditUserPayload {
   userId: string
   auditedBy: string
-  action: string
-  reason: string
+  action: keyof typeof AUDIT_ACTION
+  reason: keyof typeof AUDIT_REASON
   comment: string
 }
 

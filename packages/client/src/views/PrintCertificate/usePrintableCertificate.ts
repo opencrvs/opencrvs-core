@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   IPrintableDeclaration,
-  SUBMISSION_STATUS,
   modifyDeclaration,
+  SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
 import { useDeclaration } from '@client/declarations/selectors'
@@ -21,30 +21,58 @@ import {
   IFormSectionData,
   SubmissionAction
 } from '@client/forms'
-import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
-import { getOfflineData } from '@client/offline/selectors'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { IStoreState } from '@client/store'
 import {
-  hasRegisterScope,
-  hasRegistrationClerkScope
-} from '@client/utils/authUtils'
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl
+} from '@client/navigation'
+import { AdminStructure, IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { printPDF } from '@client/pdfRenderer'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType } from '@client/utils/gateway'
+import { getLocationHierarchy } from '@client/utils/locationUtils'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { cloneDeep } from 'lodash'
-import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
-  isCertificateForPrintInAdvance,
-  getRegisteredDate,
+  calculatePrice,
   getEventDate,
-  calculatePrice
+  getRegisteredDate,
+  isCertificateForPrintInAdvance
 } from './utils'
-import { Event } from '@client/utils/gateway'
-import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { AdminStructure, IOfflineData } from '@client/offline/reducer'
-import { getLocationHierarchy } from '@client/utils/locationUtils'
-import { printPDF } from '@client/pdfRenderer'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import { useNavigate } from 'react-router-dom'
+import { ICertificateData } from '@client/utils/referenceApi'
+import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { isMinioUrl } from '@opencrvs/commons/client'
+
+async function replaceMinioUrlWithBase64(template: Record<string, any>) {
+  async function recursiveTransform(obj: any) {
+    if (typeof obj !== 'object' || obj === null) {
+      return obj
+    }
+
+    const transformedObject = Array.isArray(obj) ? [...obj] : { ...obj }
+
+    for (const key in obj) {
+      const value = obj[key]
+      if (typeof value === 'string' && isMinioUrl(value)) {
+        transformedObject[key] = await fetchImageAsBase64(value)
+      } else if (typeof value === 'object') {
+        transformedObject[key] = await recursiveTransform(value)
+      } else {
+        transformedObject[key] = value
+      }
+    }
+
+    return transformedObject
+  }
+  return recursiveTransform(template)
+}
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -61,7 +89,8 @@ const withEnhancedTemplateVariables = (
     declaration.event,
     eventDate,
     registeredDate,
-    offlineData
+    offlineData,
+    declaration.data.registration.certificates[0]
   )
 
   const locationKey = userDetails?.primaryOffice?.id
@@ -101,7 +130,8 @@ const withEnhancedTemplateVariables = (
   }
 }
 
-export const usePrintableCertificate = (declarationId: string) => {
+export const usePrintableCertificate = (declarationId?: string) => {
+  const navigate = useNavigate()
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
   >(declarationId)
@@ -114,37 +144,38 @@ export const usePrintableCertificate = (declarationId: string) => {
   )
 
   const state = useSelector((store: IStoreState) => store)
-  const [svg, setSvg] = useState<string>()
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
   const dispatch = useDispatch()
-  const scope = useSelector(getScope)
-  const canUserEditRecord =
-    declaration?.event !== Event.Marriage &&
-    (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
+  const { hasAnyScope } = usePermissions()
+  const canUserCorrectRecord =
+    declaration?.event !== EventType.Marriage &&
+    hasAnyScope([
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+    ])
 
-  useEffect(() => {
-    const certificateTemplate =
-      declaration &&
-      offlineData.templates.certificates?.[declaration.event].definition
-    if (certificateTemplate)
-      compileSvg(
-        certificateTemplate,
-        { ...declaration.data.template, preview: true },
-        state
-      ).then((svg) => {
-        const svgWithFonts = addFontsToSvg(
-          svg,
-          offlineData.templates.fonts ?? {}
-        )
-        setSvg(svgWithFonts)
-      })
-  }, [offlineData, declaration, state])
+  const certificateTemplateConfig: ICertificateData | undefined =
+    offlineData.templates.certificates.find(
+      (x) =>
+        x.id ===
+        declaration?.data.registration.certificates[0].certificateTemplateId
+    )
+  if (!certificateTemplateConfig) return { svgCode: null }
+
+  const certificateFonts = certificateTemplateConfig?.fonts ?? {}
+  const svgTemplate = certificateTemplateConfig?.svg
+
+  if (!svgTemplate) return { svgCode: null }
+
+  const svgWithoutFonts = compileSvg(
+    svgTemplate,
+    { ...declaration?.data.template, preview: true },
+    state
+  )
+  const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   const handleCertify = async () => {
-    if (
-      !declaration ||
-      !offlineData.templates.certificates?.[declaration.event].definition
-    ) {
+    if (!declaration || !certificateTemplateConfig) {
       return
     }
     const draft = cloneDeep(declaration)
@@ -162,7 +193,8 @@ export const usePrintableCertificate = (declarationId: string) => {
         draft.event,
         eventDate,
         registeredDate,
-        offlineData
+        offlineData,
+        declaration.data.registration.certificates[0]
       )
       certificate.payments = {
         type: 'MANUAL' as const,
@@ -172,60 +204,58 @@ export const usePrintableCertificate = (declarationId: string) => {
       }
     }
 
-    const svg = await compileSvg(
-      offlineData.templates.certificates[draft.event].definition,
-      { ...draft.data.template, preview: false },
-      state
+    const base64ReplacedTemplate = await replaceMinioUrlWithBase64(
+      draft.data.template
     )
 
+    const svg = compileSvg(
+      svgTemplate,
+      { ...base64ReplacedTemplate, preview: false },
+      state
+    )
     draft.data.registration = {
       ...draft.data.registration,
       certificates: [
         {
-          ...certificate,
-          data: svg || ''
+          ...certificate
         }
       ]
     }
 
-    const pdfTemplate = svgToPdfTemplate(svg, offlineData)
+    const pdfTemplate = svgToPdfTemplate(svg, certificateFonts)
 
     printPDF(pdfTemplate, draft.id)
 
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(draft))
-    dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
+
+    navigate(
+      generateGoToHomeTabUrl({
+        tabId: WORKQUEUE_TABS.readyToPrint
+      })
+    )
   }
 
   const handleEdit = () => {
-    // Delete certificate properties during print record corrections
-    // since correction flow doesn't handle certificates
-    if (declaration?.data?.registration.certificates) {
-      const { certificates, ...rest } = declaration.data.registration
-      const updatedDeclaration = {
-        ...declaration,
-        data: {
-          ...declaration.data,
-          registration: {
-            ...rest
-          }
-        }
-      }
-
-      dispatch(modifyDeclaration(updatedDeclaration))
-      dispatch(writeDeclaration(updatedDeclaration))
+    if (!declarationId) {
+      // eslint-disable-next-line no-console
+      console.error('No declaration id provided')
+      return
     }
 
-    dispatch(
-      goToCertificateCorrection(declarationId, CorrectionSection.Corrector)
+    navigate(
+      generateCertificateCorrectionUrl({
+        declarationId,
+        pageId: CorrectionSection.Corrector
+      })
     )
   }
 
   return {
-    svg,
+    svgCode,
     handleCertify,
     isPrintInAdvance,
-    canUserEditRecord,
+    canUserCorrectRecord,
     handleEdit
   }
 }

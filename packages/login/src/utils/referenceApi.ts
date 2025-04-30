@@ -11,7 +11,7 @@
 import { IntlMessages } from '@login/i18n/reducer'
 import { request } from './authApi'
 
-export interface ILanguage {
+interface ILanguage {
   lang: string
   displayName: string
   messages: IntlMessages

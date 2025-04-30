@@ -20,7 +20,7 @@ import {
 import { internal } from '@hapi/boom'
 import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
 import { logger } from '@opencrvs/commons'
-import * as uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 
@@ -40,7 +40,7 @@ export async function subscribeWebhooksHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { hub } = request.payload as ISubscribePayload
-  if (!TRIGGERS[TRIGGERS[hub.topic]]) {
+  if (!(hub.topic in TRIGGERS)) {
     return h
       .response({
         hub: {
@@ -109,7 +109,7 @@ export async function subscribeWebhooksHandler(
       createdBy,
       address: hub.callback,
       sha_secret: hub.secret,
-      trigger: TRIGGERS[TRIGGERS[hub.topic]]
+      trigger: hub.topic in TRIGGERS ? hub.topic : undefined
     }
     const challenge = generateChallenge()
 
@@ -164,12 +164,7 @@ export async function subscribeWebhooksHandler(
 
 const getScopeType = (scopes: string[]) => {
   const isWebhookUser = scopes.includes('webhook')
-  const isNationalIDAPIUser = scopes.includes('nationalId')
-  return isWebhookUser
-    ? 'webhook'
-    : isNationalIDAPIUser
-    ? 'nationalId'
-    : 'health'
+  return isWebhookUser ? 'webhook' : 'health'
 }
 export const reqSubscribeWebhookSchema = Joi.object({
   hub: Joi.object({

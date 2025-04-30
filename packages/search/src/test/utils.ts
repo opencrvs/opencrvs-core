@@ -20,6 +20,7 @@ import { UUID } from '@opencrvs/commons'
 import { isNil } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -254,7 +255,7 @@ export const mockBirthFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Salam'],
-            family: ['Ahmed']
+            family: 'Ahmed'
           }
         ],
         gender: 'male',
@@ -321,7 +322,7 @@ export const mockBirthFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Sufiana'],
-            family: ['Khatum']
+            family: 'Khatum'
           }
         ],
         identifier: [
@@ -365,7 +366,8 @@ export const mockBirthFhirBundle: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+                  reference:
+                    'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb' as `Location/${UUID}`
                 }
               }
             ]
@@ -399,13 +401,15 @@ export const mockBirthFhirBundle: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference: 'Practitioner/4651d1cc-6072-4e34-bf20-b583f421a9f1'
+              reference:
+                'Practitioner/4651d1cc-6072-4e34-bf20-b583f421a9f1' as `Practitioner/${UUID}`
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+              reference:
+                'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957' as `Location/${UUID}`
             }
           }
         ],
@@ -438,7 +442,8 @@ export const mockBirthFhirBundle: SavedBundle<
           ]
         },
         focus: {
-          reference: 'Composition/c8b8e843-c5e0-49b5-96d9-a702ddb46454'
+          reference:
+            'Composition/c8b8e843-c5e0-49b5-96d9-a702ddb46454' as `Composition/${UUID}`
         },
         meta: {
           lastUpdated: '2023-11-30T12:36:27.277+00:00',
@@ -498,7 +503,8 @@ export const mockBirthFhirBundle: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/ed6195ff-0f83-4852-832e-dc9db07151ff'
+          reference:
+            'Location/ed6195ff-0f83-4852-832e-dc9db07151ff' as `Location/${UUID}`
         },
         type: {
           coding: [
@@ -540,7 +546,8 @@ export const mockBirthFhirBundle: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+          reference:
+            'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb' as `Location/${UUID}`
         },
         type: {
           coding: [
@@ -581,7 +588,8 @@ export const mockBirthFhirBundle: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/af050fc6-5866-455a-9cd2-6437e34a3fbe'
+          reference:
+            'Location/af050fc6-5866-455a-9cd2-6437e34a3fbe' as `Location/${UUID}`
         },
         type: {
           coding: [
@@ -622,19 +630,12 @@ export const mockBirthFhirBundle: SavedBundle<
                 code: 'FIELD_AGENT'
               }
             ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Social Worker"},{"lang":"fr","label":"Travailleur social"}]'
-              }
-            ]
           }
         ],
         location: [
           {
-            reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+            reference:
+              'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957' as `Location/${UUID}`
           }
         ],
         meta: {
@@ -665,7 +666,7 @@ export const mockBirthFhirBundle: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/0'
+          reference: 'Location/0' as `Location/${UUID}`
         },
         type: {
           coding: [
@@ -1209,7 +1210,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -1265,7 +1266,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Zack'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         gender: 'female',
@@ -1321,7 +1322,8 @@ export const mockDeathFhirBundle: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                  reference:
+                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
                 }
               }
             ]
@@ -1345,7 +1347,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -1478,13 +1480,15 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
+              reference:
+                'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference: 'Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f'
+              reference:
+                'Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f' as `Practitioner/${UUID}`
             }
           },
           {
@@ -1530,7 +1534,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Frank'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         birthDate: '2003-08-16',
@@ -1576,7 +1580,8 @@ export const mockDeathFhirBundle: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
+                  reference:
+                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
                 }
               }
             ]
@@ -2081,19 +2086,12 @@ export const mockDeathFhirBundle: SavedBundle<
                 code: 'REGISTRATION_AGENT'
               }
             ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Registration Agent"},{"lang":"fr","label":"Agent d\'enregistrement"}]'
-              }
-            ]
           }
         ],
         location: [
           {
-            reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
+            reference:
+              'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
           }
         ],
         meta: {
@@ -4572,60 +4570,8 @@ export const mockMinimalMarriageFhirBundle = {
   ]
 }
 
-export const dummyUser = {
-  _id: '5d027bc403b93b17526323f6',
-  name: [
-    {
-      use: 'en',
-      given: ['Sakib Al'],
-      family: 'Hasan'
-    }
-  ],
-  username: 'sakibal.hasan',
-  mobile: '+8801711111111',
-  email: 'test@test.org',
-  identifiers: [],
-  passwordHash:
-    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-  salt: '12345',
-  scope: ['register'],
-  systemRole: 'FIELD_AGENT',
-  role: {
-    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-    labels: [
-      {
-        lang: 'en',
-        label: 'Field Agent'
-      }
-    ]
-  },
-  status: 'active',
-  avatar: {
-    type: 'image/jpg',
-    data: 'data:image/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-  },
-  practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'MOTHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ],
-  creationDate: 1559054406433,
-  auditHistory: []
-}
-
 export const mockUserModelResponse = {
-  scope: ['register', 'performance', 'certify', 'demo'],
+  scope: [SCOPES.SEARCH_BIRTH],
   status: 'active',
   _id: '5ddfdfec61f7c0d1aafe1961',
   name: [
@@ -4640,7 +4586,6 @@ export const mockUserModelResponse = {
   mobile: '+8801733333333',
   passwordHash: 'hash',
   salt: '78e7e7a1-9e21-42d7-b535-ca3d982fcbaf',
-  systemRole: 'LOCAL_REGISTRAR',
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [

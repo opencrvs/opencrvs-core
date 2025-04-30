@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FHIR_URL } from '@config/config/constants'
+import { env } from '@config/environment'
 import { joinURL } from '@opencrvs/commons'
 
 export const fetchFromHearth = async <T = any>(
@@ -16,7 +16,7 @@ export const fetchFromHearth = async <T = any>(
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  const response = await fetch(joinURL(FHIR_URL, suffix), {
+  const response = await fetch(joinURL(env.FHIR_URL, suffix), {
     method,
     headers: {
       'Content-Type': 'application/fhir+json'
@@ -37,7 +37,7 @@ export const sendToFhir = async (
   method: string,
   token: string
 ) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
+  return fetch(`${env.FHIR_URL}${suffix}`, {
     method,
     body,
     headers: {

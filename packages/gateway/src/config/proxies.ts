@@ -98,6 +98,24 @@ export const catchAllProxy = {
   }
 } satisfies Record<string, ServerRoute>
 
+export const authProxy = {
+  token: {
+    method: 'POST',
+    path: '/auth/token',
+    handler: (req, h) =>
+      h.proxy({
+        uri: AUTH_URL + `/token${req.url.search}`
+      }),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  }
+} satisfies Record<string, ServerRoute>
+
 export const rateLimitedAuthProxy = {
   authenticate: {
     method: 'POST',

@@ -10,18 +10,19 @@
  */
 
 import {
+  ICertificate,
   IDeclaration,
   IPrintableDeclaration,
   modifyDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import { formatUrl, goBack, goToHomeTab } from '@client/navigation'
+import { formatUrl, generateGoToHomeTabUrl } from '@client/navigation'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
-import { Redirect, useParams } from 'react-router'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   calculatePrice,
   getEventDate,
@@ -42,7 +43,7 @@ import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { useDispatch, useSelector } from 'react-redux'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { Button } from '@opencrvs/components/src/Button'
 import { SubmissionAction } from '@client/forms'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
@@ -52,6 +53,7 @@ import { useDeclaration } from '@client/declarations/selectors'
 export const IssuePayment = () => {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const offlineCountryConfig = useSelector<IStoreState, any>((state) =>
     getOfflineData(state)
   )
@@ -71,6 +73,11 @@ export const IssuePayment = () => {
   const draft = useDeclaration<IDeclaration>(registrationId)
 
   const readyToIssue = () => {
+    if (draft === undefined) {
+      // eslint-disable-next-line no-console
+      console.error('draft is undefined')
+      return
+    }
     const registeredDate = getRegisteredDate(declaration.data)
     const certificate = declaration.data.registration.certificates[0]
     const eventDate = getEventDate(declaration.data, event)
@@ -81,7 +88,8 @@ export const IssuePayment = () => {
       event,
       eventDate,
       registeredDate,
-      offlineCountryConfig
+      offlineCountryConfig,
+      certificate as ICertificate
     )
     certificate.payments = {
       type: 'MANUAL' as const,
@@ -91,7 +99,12 @@ export const IssuePayment = () => {
     }
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(declaration))
-    dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))
+
+    navigate(
+      generateGoToHomeTabUrl({
+        tabId: WORKQUEUE_TABS.readyToIssue
+      })
+    )
   }
 
   const toggleModal = () => {
@@ -100,7 +113,7 @@ export const IssuePayment = () => {
 
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToIssue,
           selectorId: ''
@@ -117,7 +130,8 @@ export const IssuePayment = () => {
     event,
     eventDate,
     registeredDate,
-    offlineCountryConfig
+    offlineCountryConfig,
+    declaration.data.registration.certificates[0]
   )
 
   const serviceMessage = getServiceMessage(
@@ -137,9 +151,15 @@ export const IssuePayment = () => {
     <>
       <ActionPageLight
         title={intl.formatMessage(issueMessages.issueCertificate)}
-        goBack={() => dispatch(goBack())}
+        goBack={() => navigate(-1)}
         hideBackground
-        goHome={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
+        goHome={() =>
+          navigate(
+            generateGoToHomeTabUrl({
+              tabId: WORKQUEUE_TABS.readyToIssue
+            })
+          )
+        }
       >
         <Content
           title={titleMessage}
@@ -215,10 +235,10 @@ const getEvent = (eventType: string | undefined) => {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.Birth
+      return EventType.Birth
     case 'death':
-      return Event.Death
+      return EventType.Death
     case 'marriage':
-      return Event.Marriage
+      return EventType.Marriage
   }
 }

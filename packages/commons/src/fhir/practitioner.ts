@@ -11,9 +11,7 @@
 import {
   Bundle,
   Resource,
-  Task,
   WithStrictExtensions,
-  findExtension,
   WithUUID,
   SavedReference
 } from '.'
@@ -47,12 +45,6 @@ export function isPractitionerRole<T extends Resource>(
   return resource.resourceType === 'PractitionerRole'
 }
 
-export function isPractitionerRoleHistory<T extends Resource>(
-  resource: T
-): resource is T & PractitionerRoleHistory {
-  return resource.resourceType === 'PractitionerRoleHistory'
-}
-
 export function isPractitionerRoleOrPractitionerRoleHistory<T extends Resource>(
   resource: T
 ): resource is (T & PractitionerRoleHistory) | (T & PractitionerRole) {
@@ -71,17 +63,6 @@ export function getPractitioner(id: string, bundle: Bundle) {
     throw new Error(`Practitioner ${id} not found in bundle`)
   }
   return practitioner
-}
-
-export function getPractitionerIdFromTask(task: Task) {
-  const extension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastUser',
-    task.extension
-  )
-  if (!extension) {
-    throw new Error('No practitioner found in task')
-  }
-  return extension.valueReference.reference.split('/')[1]
 }
 
 export function getPractitionerContactDetails(practitioner: Practitioner) {
@@ -105,7 +86,7 @@ export function getPractitionerContactDetails(practitioner: Practitioner) {
 
 export const getUserRoleFromHistory = (
   practitionerRoleHistory: PractitionerRoleHistory[],
-  lastModified: string
+  timePoint: string
 ) => {
   const practitionerRoleHistorySorted = practitionerRoleHistory.sort((a, b) => {
     if (a.meta?.lastUpdated === b.meta?.lastUpdated) {
@@ -123,19 +104,20 @@ export const getUserRoleFromHistory = (
     )
   })
 
-  const result = practitionerRoleHistorySorted.find(
-    (it) =>
-      it?.meta?.lastUpdated &&
-      lastModified &&
-      it?.meta?.lastUpdated <= lastModified!
-  )
+  /*
+   * Find the the first history entry that was added before the
+   * given point in time or take the earliest entry if none found
+   */
+  const result =
+    practitionerRoleHistorySorted.find(
+      (it) =>
+        it?.meta?.lastUpdated && timePoint && it?.meta?.lastUpdated <= timePoint
+    ) ?? practitionerRoleHistorySorted.at(-1)
 
   const targetCode = result?.code?.find((element) => {
-    return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
+    return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
   })
 
   const role = targetCode?.coding?.[0].code
-  const systemRole = result?.code?.[0].coding?.[0].code
-
-  return { role, systemRole }
+  return role
 }

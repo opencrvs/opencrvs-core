@@ -158,6 +158,31 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         contactEmail
+        assignment {
+          practitionerId
+          firstName
+          lastName
+          officeName
+          avatarURL
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          certificateTemplateId
+          collector {
+            relationship
+            otherRelationship
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
+            }
+          }
+        }
         groomSignature
         brideSignature
         witnessOneSignature
@@ -192,7 +217,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         type
         trackingId
         registrationNumber
-        mosipAid
       }
       typeOfMarriage
       eventLocation {
@@ -228,6 +252,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         otherReason
         requester
         hasShowedVerifiedDocument
+        certificateTemplateId
         noSupportingDocumentationRequired
         date
         action
@@ -253,13 +278,16 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         user {
           id
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
-          systemRole
+          primaryOffice {
+            id
+          }
           name {
             firstNames
             familyName
@@ -310,6 +338,21 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
               system
               value
               use
+            }
+          }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
           }
         }
@@ -499,7 +542,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         type
         trackingId
         registrationNumber
-        mosipAid
       }
       typeOfMarriage
       eventLocation {
@@ -545,13 +587,13 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         user {
           id
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
-          systemRole
           name {
             firstNames
             familyName
@@ -593,7 +635,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           collector {
             relationship
             otherRelationship
-
             name {
               use
               firstNames
@@ -603,6 +644,21 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
               system
               value
               use
+            }
+          }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
           }
         }

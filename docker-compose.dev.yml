@@ -78,7 +78,6 @@ services:
       - NODE_ENV=development
       - FHIR_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040
-      - CONFIRM_REGISTRATION_URL=http://workflow:5050/confirm/registration
       - CHECK_INVALID_TOKEN=true
     ports:
       - '3040:3040'

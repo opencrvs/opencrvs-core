@@ -22,6 +22,7 @@ import {
   SavedLocation
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',
@@ -58,7 +59,13 @@ describe('Create record endpoint', () => {
 
   it('returns OK for a correctly authenticated user with birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['declare'] },
+      {
+        scope: [
+          SCOPES.RECORD_DECLARE_BIRTH,
+          SCOPES.RECORD_DECLARE_DEATH,
+          SCOPES.RECORD_DECLARE_MARRIAGE
+        ]
+      },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',

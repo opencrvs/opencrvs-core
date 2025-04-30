@@ -8,26 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { formatUrl } from '@client/navigation'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { AppStore } from '@client/store'
-import {
-  createRouterProps,
-  createTestComponent,
-  createTestStore
-} from '@client/tests/util'
+import { createTestComponent, createTestStore } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { ReactWrapper } from 'enzyme'
-import * as React from 'react'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
-import { History } from 'history'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 import { vi } from 'vitest'
-import { TEAM_USER_LIST } from '@client/navigation/routes'
-import { formatUrl } from '@client/navigation'
 
 describe('User audit list tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
 
   const graphqlMock = [
     {
@@ -175,26 +169,22 @@ describe('User audit list tests', () => {
 
   beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createTestStore())
-    component = await createTestComponent(
+    ;({ store } = await createTestStore())
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
-      <UserAuditHistory
-        practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2"
-        {...createRouterProps(
+      <UserAuditHistory practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2" />,
+      {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
           formatUrl(TEAM_USER_LIST, {
             userId: '5d08e102542c7a19fc55b790'
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              userId: '5d08e102542c7a19fc55b790'
-            }
-          }
-        )}
-      />,
-      { store, history, graphqlMocks: graphqlMock }
+          })
+        ],
+        graphqlMocks: graphqlMock
+      }
     )
-
+    component = testComponent
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
@@ -208,25 +198,22 @@ describe('User audit list tests', () => {
   })
 
   it('renders in loading mode', async () => {
-    const testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       // @ts-ignore
       <UserAuditHistory isLoading={true} />,
       {
-        store,
-        history
+        store
       }
     )
-    expect(
-      await waitForElement(testComponent, '#loading-audit-list')
-    ).toBeDefined()
+    expect(await waitForElement(component, '#loading-audit-list')).toBeDefined()
   })
   it('renders with a error toast for graphql error', async () => {
-    const testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       // @ts-ignore
       <UserAuditHistory userDetails={null} />,
-      { store, history }
+      { store }
     )
-    expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
+    expect(await waitForElement(component, '#error-toast')).toBeDefined()
   })
   it('toggles sorting order of the list', async () => {
     const firstRowElement = await waitForElement(component, '#row_0')
@@ -244,15 +231,13 @@ describe('User audit list tests', () => {
   })
 
   it('renders next page of audits after clicking next page', async () => {
-    const testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       <UserAuditHistory
         practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2"
         practitionerName="Kennedy Mweene"
-        loggedInUserRole="LOCAL_REGISTRAR"
       />,
       {
         store,
-        history,
         graphqlMocks: [
           graphqlMock[0],
           {
@@ -292,14 +277,14 @@ describe('User audit list tests', () => {
       }
     )
 
-    const nextPageButton = await waitForElement(testComponent, '#page-number-1')
+    const nextPageButton = await waitForElement(component, '#page-number-1')
     nextPageButton.hostNodes().find('button').first().simulate('click')
     // wait for query to go from loading to success
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
-    testComponent.update()
-    const firstRow = await waitForElement(testComponent, '#row_0')
+    component.update()
+    const firstRow = await waitForElement(component, '#row_0')
     expect(firstRow.hostNodes().childAt(1).text()).toBe('D23S2D0')
   })
 })

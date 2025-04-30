@@ -23,7 +23,7 @@ import {
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { Event, RegStatus, History } from '@client/utils/gateway'
+import { EventType, RegStatus, History } from '@client/utils/gateway'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { getLanguage } from '@client/i18n/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -67,6 +67,12 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { SupportingDocumentsView } from '@client/views/RegisterForm/duplicate/SupportingDocumentsView'
 
+const RightAlignedOnSmallScreen = styled(Text)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    text-align: end;
+  }
+`
+
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 56px;
@@ -107,7 +113,7 @@ interface IComparisonDeclaration {
   }[]
 }
 
-export const getVisibleSections = (
+const getVisibleSections = (
   formSections: IFormSection[],
   declaration: IDeclaration
 ) => {
@@ -629,7 +635,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       const eventData =
         duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing
       const eventType =
-        duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as Event
+        duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as EventType
       const duplicateDeclarationData = gqlToDraftTransformer(
         form[eventType],
         eventData,
@@ -726,11 +732,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           leftValue: (
             <Text variant="reg16" element="span" color="grey600">
               {actualRegData.status
-                ? intl.formatMessage(
-                    regStatusMessages[
-                      actualRegData.status as unknown as RegStatus
-                    ]
-                  )
+                ? intl.formatMessage(regStatusMessages[actualRegData.status])
                 : EMPTY_STRING}
             </Text>
           ),
@@ -941,8 +943,22 @@ export const DuplicateFormTabs = (props: IProps) => {
                               right: item.heading.right,
                               left: item.heading.left
                             }}
-                            leftValue={item.leftValue}
-                            rightValue={item.rightValue}
+                            leftValue={
+                              <RightAlignedOnSmallScreen
+                                variant="reg16"
+                                element="span"
+                              >
+                                {item.leftValue}
+                              </RightAlignedOnSmallScreen>
+                            }
+                            rightValue={
+                              <RightAlignedOnSmallScreen
+                                variant="reg16"
+                                element="span"
+                              >
+                                {item.rightValue}
+                              </RightAlignedOnSmallScreen>
+                            }
                             key={`row-${index}`}
                           />
                         ))}

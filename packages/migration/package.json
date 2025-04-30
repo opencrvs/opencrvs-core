@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/migration",
-  "version": "1.6.4",
+  "version": "1.7.2",
   "description": "OpenCRVS migration microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "type": "module",
@@ -8,7 +8,7 @@
   "scripts": {
     "start": "yarn build && ./run-migrations.sh",
     "revert": "./revert-migrations.sh",
-    "start:prod": "./run-migrations.sh",
+    "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:hearth": "./create-migrations.sh hearth",
     "create:openhim": "./create-migrations.sh openhim",
     "create:performance": "./create-migrations.sh performance",
@@ -44,7 +44,7 @@
     "mongodb": "^4.17.1",
     "prettier": "^2.5.0",
     "rimraf": "^5.0.0",
-    "typescript": "4.9.5"
+    "typescript": "5.6.3"
   },
   "lint-staged": {
     "src/**/*.ts": [

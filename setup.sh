@@ -235,7 +235,7 @@ done
 
 ###
 #
-# Check if Docker Compose exists 
+# Check if Docker Compose exists
 #
 ###
 
@@ -243,7 +243,7 @@ if ! docker compose version &> /dev/null
 then
     echo "Docker Compose is not available in your Docker installation"
     echo "Your Docker version may be too old to include Docker Compose as part of the Docker CLI."
-    
+
     if [ $OS == "UBUNTU" ]; then
         echo "Please follow the installation instructions here: https://docs.docker.com/engine/install/ubuntu/"
     else
@@ -333,6 +333,10 @@ else
   npm install -g wait-on
 fi
 yarn install
+
+echo -e "\033[32m:::::::::::::::::::::: Setting hooks path to .husky ::::::::::::::::::::::\033[0m"
+echo
+git config --local core.hooksPath .husky/
 
 echo -e "\033[32m::::::::::::::::::::::: Creating some directories :::::::::::::::::::::::\033[0m"
 echo

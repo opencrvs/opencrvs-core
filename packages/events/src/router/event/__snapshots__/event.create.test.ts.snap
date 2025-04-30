@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`event with unknown type cannot be created 1`] = `[TRPCError: Invalid event type EVENT_TYPE_THAT_DOES_NOT_EXIST. Valid event types are: TENNIS_CLUB_MEMBERSHIP, TENNIS_CLUB_MEMBERSHIP_PREMIUM]`;

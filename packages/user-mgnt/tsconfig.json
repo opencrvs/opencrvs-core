@@ -5,7 +5,7 @@
       "@user-mgnt/*": ["./*"]
     },
     "target": "es6",
-    "module": "commonjs",
+    "module": "node16",
     "rootDir": ".",
     "sourceMap": true,
     "moduleResolution": "node16",
@@ -16,17 +16,10 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["fhir", "jest"],
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "typings"],
-  "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "src/setupTests.ts",
-    "src/**/*.test.ts"
-  ]
+  "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

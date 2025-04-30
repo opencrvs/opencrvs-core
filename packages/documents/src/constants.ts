@@ -8,11 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const HOST = process.env.DOCUMENTS_HOST || '0.0.0.0'
-export const PORT = process.env.DOCUMENTS_PORT || 9050
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
+import { cleanEnv, str, num } from 'envalid'
+
+const env = cleanEnv(process.env, {
+  DOCUMENTS_HOST: str({ default: '0.0.0.0' }),
+  DOCUMENTS_PORT: num({ default: 9050 }),
+  CERT_PUBLIC_KEY_PATH: str({ default: '../../.secrets/public-key.pem' }),
+  DEFAULT_TIMEOUT: num({ default: 600000 })
+})
+
+export const HOST = env.DOCUMENTS_HOST
+export const PORT = env.DOCUMENTS_PORT
+export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const SENTRY_DSN = process.env.SENTRY_DSN
-export const DEFAULT_TIMEOUT = 600000
-export const PRODUCTION = process.env.NODE_ENV === 'production'
+export const DEFAULT_TIMEOUT = env.DEFAULT_TIMEOUT
+export const PRODUCTION = env.isProd

@@ -231,7 +231,7 @@ export const RECORD_WITH_MOTHER_AS_INFORMANT: Bundle<
           {
             use: 'en',
             given: ['CFirst', ''],
-            family: ['CLast']
+            family: 'CLast'
           }
         ],
         gender: 'male',
@@ -324,7 +324,7 @@ export const RECORD_WITH_MOTHER_AS_INFORMANT: Bundle<
           {
             use: 'en',
             given: ['FFirst', ''],
-            family: ['FLast']
+            family: 'FLast'
           }
         ],
         identifier: [
@@ -418,7 +418,7 @@ export const RECORD_WITH_MOTHER_AS_INFORMANT: Bundle<
           {
             use: 'en',
             given: ['MFirst', ''],
-            family: ['MLast']
+            family: 'MLast'
           }
         ],
         identifier: [

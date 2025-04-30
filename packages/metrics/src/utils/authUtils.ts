@@ -8,13 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as decode from 'jwt-decode'
-
-export enum USER_SCOPE {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify'
-}
+import decode from 'jwt-decode'
 
 export interface ITokenPayload {
   sub: string

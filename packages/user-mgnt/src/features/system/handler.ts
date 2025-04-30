@@ -11,7 +11,7 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { systemRoleScopes } from '@opencrvs/commons/authentication'
+import { DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES } from '@opencrvs/commons/authentication'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
@@ -29,7 +29,7 @@ import { pickSystem, types } from '@user-mgnt/utils/system'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
-import * as uuid from 'uuid/v4'
+import uuid from 'uuid/v4'
 
 export enum EventType {
   Birth = 'birth',
@@ -47,7 +47,7 @@ interface IRegisterSystemPayload {
     dailyQuota: number
     webhook: WebHookPayload[]
   }
-  type: string
+  type: keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES
   integratingSystemType: string
 }
 
@@ -88,11 +88,11 @@ export async function registerSystem(
     if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
       throw new Error('System with NATIONAL_ID already exists !')
     }
-    if (!systemRoleScopes[type]) {
+    if (!DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]) {
       logger.error('scope doesnt exist')
       return h.response().code(400)
     }
-    const systemScopes: string[] = systemRoleScopes[type]
+    const systemScopes: string[] = DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&

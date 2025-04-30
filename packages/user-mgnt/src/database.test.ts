@@ -17,7 +17,7 @@ jest.mock('mongoose', () => ({
   disconnect: () => {}
 }))
 
-import * as mongoose from 'mongoose'
+import mongoose from 'mongoose'
 import { start, stop } from '@user-mgnt/database'
 import { logger } from '@opencrvs/commons'
 

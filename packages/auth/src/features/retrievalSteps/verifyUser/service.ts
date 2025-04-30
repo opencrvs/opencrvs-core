@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@auth/constants'
+import { env } from '@auth/environment'
 import { resolve } from 'url'
 import { get, set, del } from '@auth/database'
 import { IUserName } from '@auth/features/authenticate/service'
@@ -23,7 +23,7 @@ export enum RetrievalSteps {
   SECURITY_Q_VERIFIED = 'SECURITY_Q_VERIFIED'
 }
 export async function verifyUser(mobile?: string, email?: string) {
-  const url = resolve(USER_MANAGEMENT_URL, '/verifyUser')
+  const url = resolve(env.USER_MANAGEMENT_URL, '/verifyUser')
 
   const res = await fetch(url, {
     method: 'POST',

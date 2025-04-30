@@ -15,7 +15,6 @@ import {
   Composition,
   OpenCRVSPatientName,
   Patient,
-  Resource,
   Saved,
   Task,
   findExtension,
@@ -27,8 +26,7 @@ import {
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
   EVENT_TYPE,
-  OPENCRVS_SPECIFICATION_URL,
-  RegStatus
+  OPENCRVS_SPECIFICATION_URL
 } from '@workflow/features/registration/fhir/constants'
 import {
   getSectionEntryBySectionCode,
@@ -41,7 +39,6 @@ import {
 } from '@workflow/features/registration/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import { logger } from '@opencrvs/commons'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
 import fetch, { RequestInit } from 'node-fetch'
 
 export async function getSharedContactMsisdn(fhirBundle: Bundle) {
@@ -64,18 +61,16 @@ export async function getSharedContactEmail(fhirBundle: Bundle) {
   )
 }
 
-export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
+function concatenateName(fhirNames: OpenCRVSPatientName[]) {
   const language = getDefaultLanguage()
   const name = fhirNames.find((humanName: OpenCRVSPatientName) => {
     return humanName.use === language
-  }) as (Omit<fhir3.HumanName, 'family'> & { family?: string[] }) | undefined
+  })
 
   if (!name) {
     throw new Error(`Didn't found informant's ${language} name`)
   }
-  return [...(name.given ?? []), ...(name.family ?? [])]
-    .filter(Boolean)
-    .join(' ')
+  return [...(name.given ?? []), name.family].filter(Boolean).join(' ')
 }
 
 export function getTrackingId(fhirBundle: Bundle) {
@@ -166,21 +161,6 @@ export function getPaperFormID(taskResource: Task) {
   return paperFormIdentifier.value
 }
 
-export function getRegStatusCode(tokenPayload: ITokenPayload) {
-  if (!tokenPayload.scope) {
-    throw new Error('No scope found on token')
-  }
-  if (tokenPayload.scope.indexOf(USER_SCOPE.REGISTER.toString()) > -1) {
-    return RegStatus.REGISTERED
-  } else if (tokenPayload.scope.indexOf(USER_SCOPE.DECLARE.toString()) > -1) {
-    return RegStatus.DECLARED
-  } else if (tokenPayload.scope.indexOf(USER_SCOPE.VALIDATE.toString()) > -1) {
-    return RegStatus.VALIDATED
-  } else {
-    throw new Error('No valid scope found on token')
-  }
-}
-
 export function getEntryId(fhirBundle: Bundle) {
   const composition =
     fhirBundle &&
@@ -261,28 +241,6 @@ export async function postToHearth(payload: any) {
     )
   }
   return res.json()
-}
-
-export async function updateResourceInHearth(resource: Resource) {
-  const res = await fetch(
-    `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
-    {
-      method: 'PUT',
-      body: JSON.stringify(resource),
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    }
-  )
-  if (!res.ok) {
-    throw new Error(
-      `FHIR update to ${resource.resourceType} failed with [${
-        res.status
-      }] body: ${await res.text()}`
-    )
-  }
-
-  return res.text()
 }
 
 //TODO: need to modifty for marriage event

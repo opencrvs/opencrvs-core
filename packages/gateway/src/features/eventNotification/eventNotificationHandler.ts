@@ -35,7 +35,13 @@ export enum Code {
   HEALTH_FACILITY = 'HEALTH_FACILITY'
 }
 
-const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation', 'QuestionnaireResponse']
+const RESOURCE_TYPES = [
+  'Patient',
+  'RelatedPerson',
+  'Encounter',
+  'Observation',
+  'QuestionnaireResponse'
+]
 
 const resourceSchema = Joi.object({
   resourceType: Joi.string()
@@ -125,7 +131,8 @@ async function validateTask(bundle: Bundle) {
   }
 
   // check if the office id is valid and it is part of the provided office location
-  const office = await fetchFromHearth(`/${regLastOfficeIdRef}`)
+  const office = await fetchFromHearth(`${regLastOfficeIdRef}`)
+
   if (
     !office ||
     !office.type ||
@@ -144,6 +151,7 @@ export async function eventNotificationHandler(
   let bundle: Bundle
   try {
     bundle = req.payload as Bundle
+
     await validateTask(bundle)
     await validateAddressesOfTask(bundle)
   } catch (e) {
@@ -195,7 +203,7 @@ export async function validateAddressesOfTask(bundle: Bundle) {
     throw BoomErrorWithCustomMessage('Encounter location not found! in bundle!')
   }
 
-  const location = await fetchFromHearth(`/${locationId}`)
+  const location = await fetchFromHearth(`${locationId}`)
 
   if (!location || !location.type) {
     throw BoomErrorWithCustomMessage(
@@ -222,6 +230,7 @@ export function getResourceByType<T = Resource>(
         return entry.resource.resourceType === type
       }
     })
+
   return bundleEntry && (bundleEntry.resource as T)
 }
 
@@ -247,7 +256,8 @@ export async function validateLocationLevelsAndCountry(address: Address) {
 
     for (let i = 0; i < locationLevels.length - 1; i++) {
       if (locationLevels[i]) {
-        const location = await fetchFromHearth(`/Location/${locationLevels[i]}`)
+        const location = await fetchFromHearth(`Location/${locationLevels[i]}`)
+
         if (!location || !location.type) {
           throw BoomErrorWithCustomMessage(
             `Could not process the Event Notification, as the location with id ${locationLevels[i]} not found!`

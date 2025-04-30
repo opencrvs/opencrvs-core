@@ -36,12 +36,15 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest, sendNotification } from './utils'
+import { SCOPES } from '@opencrvs/commons/authentication'
+import { getValidRecordById } from '@workflow/records'
 
 export const approveCorrectionRoute = createRoute({
   method: 'POST',
   path: '/records/{recordId}/approve-correction',
   allowedStartStates: ['CORRECTION_REQUESTED'],
   action: 'APPROVE_CORRECTION',
+  allowedScopes: [SCOPES.RECORD_REGISTRATION_CORRECT],
   includeHistoryResources: true,
   handler: async (request, record): Promise<RegisteredRecord> => {
     const recordInput = request.payload as
@@ -120,9 +123,14 @@ export const approveCorrectionRoute = createRoute({
     /*
      * Create metrics events & reindex the bundle in elasticsearch
      */
+    const updatedRecord = await getValidRecordById(
+      request.params.recordId,
+      request.headers.authorization,
+      true
+    )
 
-    await createNewAuditEvent(recordWithUpdatedValues, token)
-    await indexBundle(recordWithUpdatedValues, token)
+    await createNewAuditEvent(updatedRecord, token)
+    await indexBundle(updatedRecord, token)
 
     /*
      * Notify the requesting practitioner that the correction request has been approved
@@ -142,7 +150,7 @@ export const approveCorrectionRoute = createRoute({
       practitionerContacts,
       getAuthHeader(request),
       {
-        event: 'BIRTH',
+        event: getEventType(record),
         trackingId: getTrackingId(recordWithUpdatedValues)!,
         userFullName: requestingPractitioner.name
       }

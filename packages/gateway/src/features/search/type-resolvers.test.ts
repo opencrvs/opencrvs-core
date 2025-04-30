@@ -10,6 +10,7 @@
  */
 import { searchTypeResolvers as resolvers } from '@gateway/features/search/type-resolvers'
 import { TestResolvers } from '@gateway/utils/testUtils'
+import { EVENT } from '@opencrvs/commons'
 import * as fetchAny from 'jest-fetch-mock'
 const searchTypeResolvers = resolvers as unknown as TestResolvers
 const fetch = fetchAny as any
@@ -22,7 +23,7 @@ describe('Search type resolvers', () => {
   it('return BirthEventSearchSet type', () => {
     const mock = {
       _source: {
-        event: 'Birth'
+        event: EVENT.BIRTH
       }
     }
     const res = searchTypeResolvers.EventSearchSet!.__resolveType(mock)
@@ -31,7 +32,7 @@ describe('Search type resolvers', () => {
   it('return DeathEventSearchSet type', () => {
     const mock = {
       _source: {
-        event: 'Death'
+        event: EVENT.DEATH
       }
     }
     const res = searchTypeResolvers.EventSearchSet!.__resolveType(mock)
@@ -48,16 +49,16 @@ describe('Search type resolvers', () => {
       const type = searchTypeResolvers.BirthEventSearchSet!.type({
         _id: '123',
         _source: {
-          event: 'Birth'
+          event: EVENT.BIRTH
         }
       })
-      expect(type).toBe('Birth')
+      expect(type).toBe(EVENT.BIRTH)
     })
     it('returns childName from birth event search set', () => {
       const name = searchTypeResolvers.BirthEventSearchSet!.childName({
         _id: '123',
         _source: {
-          event: 'Birth',
+          event: EVENT.BIRTH,
           childFirstNames: 'Bishal',
           childMiddleName: 'Bashak',
           childFamilyName: 'Papon',
@@ -70,12 +71,12 @@ describe('Search type resolvers', () => {
         {
           use: 'en',
           given: ['Bishal', 'Bashak'],
-          family: ['Papon']
+          family: 'Papon'
         },
         {
           use: 'bn',
           given: ['বিশাল', 'বসাক'],
-          family: ['পাপন']
+          family: 'পাপন'
         }
       ])
     })
@@ -87,7 +88,7 @@ describe('Search type resolvers', () => {
       const name = searchTypeResolvers.BirthEventSearchSet!.childName({
         _id: '123',
         _source: {
-          event: 'Birth'
+          event: EVENT.BIRTH
         }
       })
       expect(name).toEqual([
@@ -107,7 +108,7 @@ describe('Search type resolvers', () => {
       const dob = searchTypeResolvers.BirthEventSearchSet!.dateOfBirth({
         _id: '123',
         _source: {
-          event: 'Birth',
+          event: EVENT.BIRTH,
           childFirstNames: 'Anik',
           childFamilyName: 'Hoque',
           childFirstNamesLocal: 'অনিক',
@@ -121,7 +122,7 @@ describe('Search type resolvers', () => {
       const dob = searchTypeResolvers.BirthEventSearchSet!.dateOfBirth({
         _id: '123',
         _source: {
-          event: 'Birth',
+          event: EVENT.BIRTH,
           childFirstNames: 'Anik',
           childFamilyName: 'Hoque',
           childFirstNamesLocal: 'অনিক',
@@ -135,7 +136,7 @@ describe('Search type resolvers', () => {
         searchTypeResolvers.BirthEventSearchSet!.registration({
           _id: '123',
           _source: {
-            event: 'Birth',
+            event: EVENT.BIRTH,
             childFirstNames: 'Anik',
             childFamilyName: 'Hoque',
             childFirstNamesLocal: 'অনিক',
@@ -144,7 +145,7 @@ describe('Search type resolvers', () => {
           }
         })
       expect(registration).toEqual({
-        event: 'Birth',
+        event: EVENT.BIRTH,
         childFirstNames: 'Anik',
         childFamilyName: 'Hoque',
         childFirstNamesLocal: 'অনিক',
@@ -236,16 +237,16 @@ describe('Search type resolvers', () => {
       const type = searchTypeResolvers.DeathEventSearchSet!.type({
         _id: '123',
         _source: {
-          event: 'Death'
+          event: EVENT.DEATH
         }
       })
-      expect(type).toBe('Death')
+      expect(type).toBe(EVENT.DEATH)
     })
     it('returns deceassedName from Death event search set', () => {
       const name = searchTypeResolvers.DeathEventSearchSet!.deceasedName({
         _id: '123',
         _source: {
-          event: 'Death',
+          event: EVENT.DEATH,
           deceasedFirstNames: 'Bishal',
           deceasedMiddleName: 'Bashak',
           deceasedFamilyName: 'Papon',
@@ -258,12 +259,12 @@ describe('Search type resolvers', () => {
         {
           use: 'en',
           given: ['Bishal', 'Bashak'],
-          family: ['Papon']
+          family: 'Papon'
         },
         {
           use: 'bn',
           given: ['বিশাল', 'বসাক'],
-          family: ['পাপন']
+          family: 'পাপন'
         }
       ])
     })
@@ -275,7 +276,7 @@ describe('Search type resolvers', () => {
       const name = searchTypeResolvers.DeathEventSearchSet!.deceasedName({
         _id: '123',
         _source: {
-          event: 'Death'
+          event: EVENT.DEATH
         }
       })
       expect(name).toEqual([
@@ -295,7 +296,7 @@ describe('Search type resolvers', () => {
       const dod = searchTypeResolvers.DeathEventSearchSet!.dateOfDeath({
         _id: '123',
         _source: {
-          event: 'Death',
+          event: EVENT.DEATH,
           deceasedFirstNames: 'Anik',
           deceasedFamilyName: 'Hoque',
           deceasedFirstNamesLocal: 'অনিক',
@@ -309,7 +310,7 @@ describe('Search type resolvers', () => {
       const dod = searchTypeResolvers.DeathEventSearchSet!.dateOfDeath({
         _id: '123',
         _source: {
-          event: 'Death',
+          event: EVENT.DEATH,
           deceasedFirstNames: 'Anik',
           deceasedFamilyName: 'Hoque',
           deceasedFirstNamesLocal: 'অনিক',
@@ -323,7 +324,7 @@ describe('Search type resolvers', () => {
         searchTypeResolvers.DeathEventSearchSet!.registration({
           _id: '123',
           _source: {
-            event: 'Death',
+            event: EVENT.DEATH,
             deceasedFirstNames: 'Anik',
             deceasedFamilyName: 'Hoque',
             deceasedFirstNamesLocal: 'অনিক',
@@ -332,7 +333,7 @@ describe('Search type resolvers', () => {
           }
         })
       expect(registration).toEqual({
-        event: 'Death',
+        event: EVENT.DEATH,
         deceasedFirstNames: 'Anik',
         deceasedFamilyName: 'Hoque',
         deceasedFirstNamesLocal: 'অনিক',
@@ -416,7 +417,7 @@ describe('Search type resolvers', () => {
   describe('type resolvers for event registration', () => {
     it('returns status from search set', () => {
       const status = searchTypeResolvers.RegistrationSearchSet!.status({
-        event: 'Death',
+        event: EVENT.DEATH,
         type: 'DECLARED',
         deceasedFirstNames: 'Anik',
         deceasedFamilyName: 'Hoque',
@@ -429,7 +430,7 @@ describe('Search type resolvers', () => {
     it('returns locationid from search set', () => {
       const locationid =
         searchTypeResolvers.RegistrationSearchSet!.registeredLocationId({
-          event: 'Death',
+          event: EVENT.DEATH,
           type: 'DECLARED',
           deceasedFirstNames: 'Anik',
           deceasedFamilyName: 'Hoque',
@@ -443,7 +444,7 @@ describe('Search type resolvers', () => {
     it('returns eventLocationId from search set', () => {
       const eventLocationId =
         searchTypeResolvers.RegistrationSearchSet!.eventLocationId({
-          event: 'Death',
+          event: EVENT.DEATH,
           type: 'DECLARED',
           deceasedFirstNames: 'Anik',
           deceasedFamilyName: 'Hoque',
@@ -457,7 +458,7 @@ describe('Search type resolvers', () => {
     })
     it('returns duplicates from search set', () => {
       const duplicates = searchTypeResolvers.RegistrationSearchSet!.duplicates({
-        event: 'Death',
+        event: EVENT.DEATH,
         type: 'DECLARED',
         deceasedFirstNames: 'Anik',
         deceasedFamilyName: 'Hoque',
@@ -481,16 +482,16 @@ describe('Search type resolvers', () => {
     it('returns event type', () => {
       const type = searchTypeResolvers.EventProgressSet!.type({
         _source: {
-          event: 'Birth'
+          event: EVENT.BIRTH
         }
       })
 
-      expect(type).toEqual('Birth')
+      expect(type).toEqual(EVENT.BIRTH)
     })
     it('returns child name', () => {
       const childName = searchTypeResolvers.EventProgressSet!.name({
         _source: {
-          event: 'Birth',
+          event: EVENT.BIRTH,
           childFirstNames: 'Jon',
           childMiddleName: 'C.',
           childFamilyName: 'Doe',
@@ -503,19 +504,19 @@ describe('Search type resolvers', () => {
         {
           use: 'en',
           given: ['Jon', 'C.'],
-          family: ['Doe']
+          family: 'Doe'
         },
         {
           use: 'bn',
           given: ['জন', 'সি.'],
-          family: ['ডো']
+          family: 'ডো'
         }
       ])
     })
     it('returns deceased name', () => {
       const deceasedName = searchTypeResolvers.EventProgressSet!.name({
         _source: {
-          event: 'Death',
+          event: EVENT.DEATH,
           deceasedFirstNames: 'Jon',
           deceasedMiddleName: 'C.',
           deceasedFamilyName: 'Doe',
@@ -528,19 +529,19 @@ describe('Search type resolvers', () => {
         {
           use: 'en',
           given: ['Jon', 'C.'],
-          family: ['Doe']
+          family: 'Doe'
         },
         {
           use: 'bn',
           given: ['জন', 'সি.'],
-          family: ['ডো']
+          family: 'ডো'
         }
       ])
     })
     it('returns date of birth', () => {
       const dateOfBirth = searchTypeResolvers.EventProgressSet!.dateOfEvent({
         _source: {
-          event: 'Birth',
+          event: EVENT.BIRTH,
           childDoB: '01-01-2019'
         }
       })
@@ -549,7 +550,7 @@ describe('Search type resolvers', () => {
     it('returns date of death', () => {
       const dateOfDeath = searchTypeResolvers.EventProgressSet!.dateOfEvent({
         _source: {
-          event: 'Death',
+          event: EVENT.DEATH,
           deathDate: '01-01-2019'
         }
       })
@@ -559,18 +560,18 @@ describe('Search type resolvers', () => {
       const registration = searchTypeResolvers.EventProgressSet!.registration({
         _id: 'dummy_id',
         _source: {
-          event: 'Birth'
+          event: EVENT.BIRTH
         }
       })
       expect(registration).toEqual({
-        event: 'Birth'
+        event: EVENT.BIRTH
       })
     })
     it('return the startedAt from operationalHistories', () => {
       const startedAt = searchTypeResolvers.EventProgressSet!.startedAt({
         _id: 'dummy_id',
         _source: {
-          event: 'Birth',
+          event: EVENT.BIRTH,
           operationHistories: [
             {
               operatedOn: '2019-12-12T15:21:51.355Z',

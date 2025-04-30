@@ -13,16 +13,13 @@ import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { SystemRoleType } from '@client/utils/gateway'
-import { UserDetails } from './userUtils'
-
-export type Scope = string[]
+import { Scope } from '@opencrvs/commons/client'
 
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: Scope
+  scope: Scope[]
 }
 
 export const isTokenStillValid = (decoded: ITokenPayload) => {
@@ -65,13 +62,7 @@ export const getTokenPayload = (token: string) => {
   return decoded
 }
 
-export function getCurrentUserScope() {
-  const token = getToken()
-  const payload = token && getTokenPayload(token)
-  return (payload && payload.scope) || []
-}
-
-export function isTokenAboutToExpire(token: string) {
+function isTokenAboutToExpire(token: string) {
   const payload = token && getTokenPayload(token)
   const payloadExpMillis = Number(payload && payload.exp) * 1000
   return payloadExpMillis - Date.now() <= TOKEN_EXPIRE_MILLIS
@@ -99,46 +90,4 @@ export async function refreshToken() {
     }
   }
   return true
-}
-
-export const enum AuthScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin',
-  VALIDATE = 'validate',
-  NATLSYSADMIN = 'natlsysadmin'
-}
-
-export const hasNatlSysAdminScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(AuthScope.NATLSYSADMIN)) {
-    return true
-  }
-  return false
-}
-
-export const hasRegisterScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(AuthScope.REGISTER)) {
-    return true
-  }
-  return false
-}
-
-export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(AuthScope.VALIDATE)) {
-    return true
-  }
-  return false
-}
-
-export const hasAccessToRoute = (
-  roles: SystemRoleType[],
-  userDetails: UserDetails
-): boolean => {
-  const userRole = userDetails.systemRole
-  if (roles.includes(userRole)) {
-    return true
-  }
-  return false
 }

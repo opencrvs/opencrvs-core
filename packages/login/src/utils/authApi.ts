@@ -11,7 +11,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as Sentry from '@sentry/react'
 
-export interface ICodeVerifyData {
+interface ICodeVerifyData {
   nonce: string
   code: string
 }

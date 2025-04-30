@@ -10,10 +10,11 @@
  */
 import {
   IDeclaration,
-  SUBMISSION_STATUS,
-  IPrintableDeclaration
+  IPrintableDeclaration,
+  SUBMISSION_STATUS
 } from '@client/declarations'
-import { Event, History, RegStatus } from '@client/utils/gateway'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { EventType, History, RegStatus } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -22,7 +23,6 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
-import { EMPTY_STRING } from '@client/utils/constants'
 import { getLocalisedName } from './data-formatting'
 import { IntlShape } from 'react-intl'
 
@@ -31,7 +31,7 @@ export const getDeclarationFullName = (
   intl: IntlShape
 ) => {
   switch (draft.event) {
-    case Event.Birth:
+    case EventType.Birth:
       return draft.data.child
         ? getLocalisedName(intl, {
             firstNames: draft.data.child.firstNamesEng as string,
@@ -39,7 +39,7 @@ export const getDeclarationFullName = (
             familyName: draft.data.child.familyNameEng as string
           })
         : EMPTY_STRING
-    case Event.Death:
+    case EventType.Death:
       return draft.data.deceased
         ? getLocalisedName(intl, {
             firstNames: draft.data.deceased.firstNamesEng as string,
@@ -47,7 +47,7 @@ export const getDeclarationFullName = (
             familyName: draft.data.deceased.familyNameEng as string
           })
         : EMPTY_STRING
-    case Event.Marriage:
+    case EventType.Marriage:
       const brideName = draft.data.bride
         ? getLocalisedName(intl, {
             firstNames: draft.data.bride.firstNamesEng as string,
@@ -239,14 +239,14 @@ export const transformSearchQueryDataToDraft = (
     data.registration?.createdAt && data.registration.createdAt
 
   switch (eventType) {
-    case Event.Birth:
+    case EventType.Birth:
     default:
       transformBirthSearchQueryDataToDraft(data, declaration)
       break
-    case Event.Death:
+    case EventType.Death:
       transformDeathSearchQueryDataToDraft(data, declaration)
       break
-    case Event.Marriage:
+    case EventType.Marriage:
       transformMarriageSearchQueryDataToDraft(data, declaration)
       break
   }

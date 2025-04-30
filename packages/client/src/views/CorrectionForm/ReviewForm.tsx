@@ -9,18 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import {
-  RouteProps,
-  RegisterForm
-} from '@client/views/RegisterForm/RegisterForm'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { IForm } from '@client/forms'
 import { IDeclaration } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { CERTIFICATE_CORRECTION_REVIEW, HOME } from '@client/navigation/routes'
 import { connect } from 'react-redux'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
-import { Event } from '@client/utils/gateway'
-import { Redirect } from 'react-router'
+import { EventType } from '@client/utils/gateway'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 type IStateProps = {
   declaration: IDeclaration | undefined
@@ -28,17 +29,21 @@ type IStateProps = {
   pageRoute: string
 }
 
-type IProps = IStateProps & RouteProps
+type IProps = RouteComponentProps<IStateProps>
 
 function CorrectionReviewFormComponent({ declaration, ...props }: IProps) {
   if (!declaration) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
+
   return <RegisterForm declaration={declaration} {...props} />
 }
 
-function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
-  const { match } = props
+function mapStateToProps(
+  state: IStoreState,
+  props: RouteComponentProps
+): IStateProps {
+  const { match } = props.router
 
   const { declarationId } = match.params
 
@@ -46,7 +51,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     (app) => app.id === declarationId
   )
 
-  const event = declaration?.event || Event.Birth
+  const event = declaration?.event || EventType.Birth
 
   const reviewForm = getEventReviewForm(state, event)
 
@@ -57,6 +62,6 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   }
 }
 
-export const CorrectionReviewForm = connect(mapStateToProps)(
-  CorrectionReviewFormComponent
+export const CorrectionReviewForm = withRouter(
+  connect(mapStateToProps)(CorrectionReviewFormComponent)
 )

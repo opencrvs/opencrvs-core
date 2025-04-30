@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
+import { EventType } from '@client/utils/gateway'
 
 export function getBirthRegistrationSectionTransformer(
   transformedData: IFormData,
@@ -27,38 +27,25 @@ export function getBirthRegistrationSectionTransformer(
   }
 
   if (queryData[sectionId].type && queryData[sectionId].type === 'BIRTH') {
-    transformedData[sectionId].type = Event.Birth
+    transformedData[sectionId].type = EventType.Birth
   }
 
   if (queryData[sectionId].status) {
     transformStatusData(transformedData, queryData[sectionId].status, sectionId)
   }
-}
 
-export function mosipAidTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  targetSectionId?: string,
-  targetFieldName?: string
-) {
-  if (queryData[sectionId].mosipAid) {
-    transformedData[targetSectionId || sectionId][
-      targetFieldName || 'mosipAid'
-    ] = queryData[sectionId].mosipAid
-  }
-}
-
-export function mosipAidLabelTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  targetSectionId?: string,
-  targetFieldName?: string
-) {
-  if (queryData[sectionId].mosipAid) {
-    transformedData[targetSectionId || sectionId][
-      targetFieldName || 'mosipAIDLabel'
-    ] = 'MOSIP Application ID'
+  if (
+    Array.isArray(queryData[sectionId].certificates) &&
+    queryData[sectionId].certificates.length > 0
+  ) {
+    const currentCertificate =
+      queryData[sectionId].certificates[
+        queryData[sectionId].certificates.length - 1
+      ]
+    if (currentCertificate?.collector?.relationship === 'PRINT_IN_ADVANCE') {
+      transformedData[sectionId].certificates = [
+        { certificateTemplateId: currentCertificate.certificateTemplateId }
+      ]
+    }
   }
 }

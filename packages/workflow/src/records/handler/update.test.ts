@@ -16,12 +16,17 @@ import { rest } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import {
+  EVENT_TYPE,
+  findCompositionSection,
+  getComposition,
   getStatusFromTask,
   getTaskFromSavedBundle,
   TransactionResponse,
+  updateFHIRBundle,
   URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 describe('Update record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -37,7 +42,7 @@ describe('Update record endpoint', () => {
 
   it('returns OK for a correctly authenticated updating a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: [SCOPES.RECORD_DECLARATION_EDIT] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
@@ -179,5 +184,338 @@ describe('Update record endpoint', () => {
 
     expect(response.statusCode).toBe(200)
     expect(businessStatus).toBe('DECLARATION_UPDATED')
+  })
+
+  it('should handle removing supporting documents from the record', async () => {
+    const updatedRecord = updateFHIRBundle(
+      {
+        resourceType: 'Bundle',
+        type: 'document',
+        entry: [
+          {
+            fullUrl:
+              '/fhir/Composition/acc7f08b-2024-457d-9860-c97cabad3dd6/_history/0072ef5d-8ba6-4856-9dbf-fa6453312e1d' as URLReference,
+            resource: {
+              identifier: {
+                system: 'urn:ietf:rfc:3986',
+                value: 'BT01GIK'
+              },
+              resourceType: 'Composition',
+              status: 'preliminary',
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/doc-types',
+                    code: 'birth-declaration'
+                  }
+                ],
+                text: 'Birth Declaration'
+              },
+              class: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/doc-classes',
+                    code: 'crvs-document'
+                  }
+                ],
+                text: 'CRVS Document'
+              },
+              title: 'Birth Declaration',
+              section: [
+                {
+                  title: "Informant's details",
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/doc-sections',
+                        code: 'informant-details'
+                      }
+                    ],
+                    text: "Informant's details"
+                  },
+                  entry: [
+                    {
+                      reference:
+                        'RelatedPerson/5a23ebdf-240e-4f39-9203-60afa59c2ac2'
+                    }
+                  ]
+                },
+                {
+                  title: "Mother's details",
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/doc-sections',
+                        code: 'mother-details'
+                      }
+                    ],
+                    text: "Mother's details"
+                  },
+                  entry: [
+                    {
+                      reference: 'Patient/c9759a39-1cd2-438c-8815-32285d35ec4a'
+                    }
+                  ]
+                },
+                {
+                  title: 'Supporting Documents',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/sections',
+                        code: 'supporting-documents'
+                      }
+                    ],
+                    text: 'Supporting Documents'
+                  },
+                  entry: [
+                    {
+                      reference:
+                        'DocumentReference/afc3e761-282a-4ad5-9885-c5e312697d20'
+                    },
+                    {
+                      reference:
+                        'DocumentReference/92c8567c-fbc3-47ee-b361-63412a9fc534'
+                    },
+                    {
+                      reference:
+                        'DocumentReference/05ef3e79-dac8-4913-b434-f6f87dae7fd1'
+                    }
+                  ]
+                },
+                {
+                  title: 'Child details',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/doc-sections',
+                        code: 'child-details'
+                      }
+                    ],
+                    text: 'Child details'
+                  },
+                  entry: [
+                    {
+                      reference: 'Patient/2f89ea29-a841-4c27-bf9e-3eb32fb155de'
+                    }
+                  ]
+                },
+                {
+                  title: "Father's details",
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/doc-sections',
+                        code: 'father-details'
+                      }
+                    ],
+                    text: "Father's details"
+                  },
+                  entry: [
+                    {
+                      reference: 'Patient/41280523-ed6a-4752-98f5-a309d3d4f74a'
+                    }
+                  ]
+                },
+                {
+                  title: 'Birth encounter',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/sections',
+                        code: 'birth-encounter'
+                      }
+                    ],
+                    text: 'Birth encounter'
+                  },
+                  entry: [
+                    {
+                      reference:
+                        'Encounter/96b50360-8475-44ab-8e06-412892a6a93a'
+                    }
+                  ]
+                }
+              ],
+              subject: {},
+              date: '2025-02-26T08:12:14.291Z',
+              author: [],
+              meta: {
+                lastUpdated: '2025-02-26T08:12:14.551+00:00',
+                versionId: '0072ef5d-8ba6-4856-9dbf-fa6453312e1d'
+              },
+              _transforms: {
+                meta: {
+                  lastUpdated: '2025-02-26T08:12:14.551Z'
+                }
+              },
+              _request: {
+                method: 'POST'
+              },
+              id: 'acc7f08b-2024-457d-9860-c97cabad3dd6'
+            }
+          },
+          {
+            fullUrl:
+              '/fhir/DocumentReference/05ef3e79-dac8-4913-b434-f6f87dae7fd1/_history/8c8f1cd2-8a5b-423f-b21f-e18323395f08' as URLReference,
+            resource: {
+              resourceType: 'DocumentReference',
+              masterIdentifier: {
+                system: 'urn:ietf:rfc:3986',
+                value: 'd3701615-c917-4c3f-95d8-4a94c9c072c9'
+              },
+              extension: [],
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/supporting-doc-type',
+                    code: 'BIRTH_CERTIFICATE'
+                  }
+                ]
+              },
+              content: [
+                {
+                  attachment: {
+                    contentType: 'image/jpeg',
+                    data: '/ocrvs/5f796a34-85ac-4381-bb66-880e6679582c.jpg'
+                  }
+                }
+              ],
+              status: 'current',
+              subject: {
+                display: 'MOTHER'
+              },
+              _transforms: {
+                meta: {
+                  lastUpdated: '2025-02-26T08:12:14.563Z'
+                }
+              },
+              meta: {
+                lastUpdated: '2025-02-26T08:12:14.563+00:00',
+                versionId: '8c8f1cd2-8a5b-423f-b21f-e18323395f08'
+              },
+              _request: {
+                method: 'POST'
+              },
+              id: '05ef3e79-dac8-4913-b434-f6f87dae7fd1'
+            }
+          },
+          {
+            fullUrl:
+              '/fhir/DocumentReference/92c8567c-fbc3-47ee-b361-63412a9fc534/_history/a606f48f-b587-4d50-b02d-d38c9a5a8ee9' as URLReference,
+            resource: {
+              resourceType: 'DocumentReference',
+              masterIdentifier: {
+                system: 'urn:ietf:rfc:3986',
+                value: 'c357204a-b619-4272-a971-b69c35d15a74'
+              },
+              extension: [],
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/supporting-doc-type',
+                    code: 'NATIONAL_ID'
+                  }
+                ]
+              },
+              content: [
+                {
+                  attachment: {
+                    contentType: 'image/png',
+                    data: '/ocrvs/89354b7d-5d9f-4131-9291-4c3742055150.png'
+                  }
+                }
+              ],
+              status: 'current',
+              subject: {
+                display: 'MOTHER'
+              },
+              _transforms: {
+                meta: {
+                  lastUpdated: '2025-02-26T08:12:14.562Z'
+                }
+              },
+              meta: {
+                lastUpdated: '2025-02-26T08:12:14.562+00:00',
+                versionId: 'a606f48f-b587-4d50-b02d-d38c9a5a8ee9'
+              },
+              _request: {
+                method: 'POST'
+              },
+              id: '92c8567c-fbc3-47ee-b361-63412a9fc534'
+            }
+          },
+          {
+            fullUrl:
+              '/fhir/DocumentReference/afc3e761-282a-4ad5-9885-c5e312697d20/_history/9ea290f3-981c-40e4-8c5f-3e3e3e9525b8' as URLReference,
+            resource: {
+              resourceType: 'DocumentReference',
+              masterIdentifier: {
+                system: 'urn:ietf:rfc:3986',
+                value: '927f9fbf-eb05-4d7f-be4b-803332c36f16'
+              },
+              extension: [],
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/supporting-doc-type',
+                    code: 'NOTIFICATION_OF_BIRTH'
+                  }
+                ]
+              },
+              content: [
+                {
+                  attachment: {
+                    contentType: 'image/jpeg',
+                    data: '/ocrvs/cb9bb5f0-7431-4824-9862-5897fcc20836.jpg'
+                  }
+                }
+              ],
+              status: 'current',
+              subject: {
+                display: 'CHILD'
+              },
+              _transforms: {
+                meta: {
+                  lastUpdated: '2025-02-26T08:12:14.561Z'
+                }
+              },
+              meta: {
+                lastUpdated: '2025-02-26T08:12:14.561+00:00',
+                versionId: '9ea290f3-981c-40e4-8c5f-3e3e3e9525b8'
+              },
+              _request: {
+                method: 'POST'
+              },
+              id: 'afc3e761-282a-4ad5-9885-c5e312697d20'
+            }
+          }
+        ]
+      },
+      {
+        registration: {
+          attachments: [
+            {
+              contentType: 'image/jpeg',
+              uri: '/ocrvs/mock-245',
+              subject: 'CHILD',
+              type: 'NOTIFICATION_OF_BIRTH'
+            },
+            {
+              contentType: 'image/png',
+              uri: '/ocrvs/mock-123',
+              subject: 'MOTHER',
+              type: 'NATIONAL_ID'
+            }
+          ]
+        }
+      },
+      EVENT_TYPE.BIRTH
+    )
+    const composition = getComposition(updatedRecord)
+    const documentsSection = findCompositionSection(
+      'supporting-documents',
+      composition
+    )
+    expect(documentsSection?.entry.length).toBe(2)
   })
 })

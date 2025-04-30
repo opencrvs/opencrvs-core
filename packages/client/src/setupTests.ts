@@ -12,7 +12,6 @@ import { storage } from '@client/storage'
 import { IUserData } from './declarations'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
-import { authApi } from './utils/authApi'
 // eslint-disable-next-line import/no-unassigned-import
 import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import
@@ -40,11 +39,7 @@ const config = {
   BIRTH: {
     REGISTRATION_TARGET: 45,
     LATE_REGISTRATION_TARGET: 365,
-    FEE: {
-      ON_TIME: 0,
-      LATE: 0,
-      DELAYED: 0
-    }
+    PRINT_IN_ADVANCE: true
   },
   COUNTRY: 'BGD',
   CURRENCY: {
@@ -53,16 +48,12 @@ const config = {
   },
   DEATH: {
     REGISTRATION_TARGET: 45,
-    FEE: {
-      ON_TIME: 0,
-      DELAYED: 0
-    }
+    PRINT_IN_ADVANCE: true
   },
   FEATURES: {
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
-    INFORMANT_SIGNATURE: true,
     PRINT_DECLARATION: true
   },
   LANGUAGES: 'en,bn,fr',
@@ -201,7 +192,6 @@ vi.doMock(
           languages: mockOfflineData.languages
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
-      loadCertificateConfiguration: () => Promise.resolve({}),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
       loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
       importConditionals: () => Promise.resolve({}),
@@ -211,16 +201,12 @@ vi.doMock(
   })
 )
 
-vi.doMock(
-  '@client/utils/authApi',
-  (): {
-    authApi: typeof authApi
-  } => ({
-    authApi: {
-      invalidateToken: () => Promise.resolve()
-    }
-  })
-)
+vi.mock('@client/utils/authApi', () => ({
+  invalidateToken: () => Promise.resolve()
+}))
+vi.mock('@client/pdfRenderer', () => ({
+  printPDF: () => Promise.resolve()
+}))
 
 beforeEach(() => {
   /*
@@ -277,20 +263,4 @@ vi.mock('./utils', async () => ({
   useOnlineStatus: () => true,
   isNavigatorOnline: () => true,
   getUserRole: vi.fn().mockImplementation((lang, role) => 'ENTREPENEUR')
-}))
-
-vi.mock('react-router', async () => ({
-  ...((await vi.importActual('react-router')) as any),
-  useParams: vi.fn().mockImplementation(() => ({
-    event: 'birth',
-    section: 'child'
-  }))
-}))
-
-vi.mock('@client/views/OIDPVerificationCallback/utils', async () => ({
-  ...((await vi.importActual(
-    '@client/views/OIDPVerificationCallback/utils'
-  )) as any),
-  useExtractCallBackState: vi.fn(),
-  useQueryParams: vi.fn()
 }))

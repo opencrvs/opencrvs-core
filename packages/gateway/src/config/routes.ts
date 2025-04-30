@@ -15,11 +15,14 @@ import {
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
-import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import { authProxy, catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import sendVerifyCodeHandler, {
   requestSchema,
   responseSchema
 } from '@gateway/routes/verifyCode/handler'
+import { trpcProxy } from '@gateway/v2-events/event-config/routes'
+import { DOCUMENTS_URL } from '@gateway/constants'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -51,7 +54,12 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Create a health notification',
         auth: {
-          scope: ['declare', 'notification-api']
+          scope: [
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.NOTIFICATION_API
+          ]
         },
         validate: {
           payload: fhirBundleSchema,
@@ -76,7 +84,38 @@ export const getRoutes = () => {
         }
       }
     },
-
+    {
+      method: 'POST',
+      path: '/upload',
+      handler: async (req, h) => {
+        return h.proxy({
+          uri: `${DOCUMENTS_URL}/files`,
+          passThrough: true
+        })
+      },
+      options: {
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/files/{filename}',
+      handler: async (req, h) => {
+        return h.proxy({
+          uri: `${DOCUMENTS_URL}/files/${req.params.filename}`,
+          passThrough: true
+        })
+      },
+      options: {
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
     catchAllProxy.locations,
     catchAllProxy.locationsSuffix,
 
@@ -84,9 +123,11 @@ export const getRoutes = () => {
     catchAllProxy.locationId,
 
     catchAllProxy.auth,
+    authProxy.token,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
-    rateLimitedAuthProxy.verifyUser
+    rateLimitedAuthProxy.verifyUser,
+    ...trpcProxy
   ]
 
   return routes

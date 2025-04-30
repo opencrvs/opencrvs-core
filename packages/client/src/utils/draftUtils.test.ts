@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import {
   getDeclarationFullName,
   transformSearchQueryDataToDraft
@@ -51,7 +51,7 @@ describe('draftUtils tests', () => {
                   familyNameEng: 'Hoque'
                 }
               },
-              event: Event.Birth,
+              event: EventType.Birth,
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },
@@ -71,7 +71,7 @@ describe('draftUtils tests', () => {
                   familyNameEng: 'Hoque'
                 }
               },
-              event: Event.Birth,
+              event: EventType.Birth,
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },
@@ -93,7 +93,7 @@ describe('draftUtils tests', () => {
                   familyNameEng: 'Hoque'
                 }
               },
-              event: Event.Death,
+              event: EventType.Death,
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },
@@ -114,7 +114,7 @@ describe('draftUtils tests', () => {
                   familyNameEng: 'Hoque'
                 }
               },
-              event: Event.Death,
+              event: EventType.Death,
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },

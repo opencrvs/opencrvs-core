@@ -47,7 +47,6 @@ export async function setCollectorForPrintInAdvance(
     familyName: nameItem.family,
     firstNames: nameItem.given.join(' ')
   }))
-  const role = userDetails.role.labels.find(({ lang }) => lang === 'en')?.label
 
   details?.registration?.certificates?.forEach((certificate) => {
     if (!certificate) return
@@ -55,7 +54,7 @@ export async function setCollectorForPrintInAdvance(
       certificate.collector = {
         name,
         relationship: 'PRINT_IN_ADVANCE',
-        otherRelationship: role,
+        otherRelationship: userDetails.role,
         identifier: []
       }
     }

@@ -56,3 +56,17 @@ Inactive.args = {
   label: 'Inactive',
   type: 'inactive'
 }
+
+export const ActiveDark = Template.bind({})
+ActiveDark.args = {
+  label: 'Active Dark',
+  type: 'active',
+  pillTheme: 'dark'
+}
+
+export const PendingDark = Template.bind({})
+PendingDark.args = {
+  label: 'Pending Dark',
+  type: 'pending',
+  pillTheme: 'dark'
+}

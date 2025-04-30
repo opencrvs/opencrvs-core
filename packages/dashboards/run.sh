@@ -85,7 +85,7 @@ if [ -z "${OPENCRVS_METABASE_ADMIN_PASSWORD}" ]; then
 fi
 
 export MB_JETTY_PORT=${MB_JETTY_PORT:-4444}
-export MB_DB_FILE=/data/metabase/metabase.mv.db
+export MB_DB_FILE=${MB_DB_FILE:-'/data/metabase/metabase.mv.db'}
 export OPENCRVS_METABASE_ADMIN_PASSWORD_SALT=$(uuidgen)
 SALT_AND_PASSWORD=$OPENCRVS_METABASE_ADMIN_PASSWORD_SALT$OPENCRVS_METABASE_ADMIN_PASSWORD
 export OPENCRVS_METABASE_ADMIN_PASSWORD_HASH=$(java -cp $METABASE_JAR clojure.main -e "(require 'metabase.util.password) (println (metabase.util.password/hash-bcrypt \"$SALT_AND_PASSWORD\"))" 2>/dev/null | tail -n 1)
