@@ -155,6 +155,10 @@ export type InferredActionConfig =
 
 export const ActionConfig = z
   .discriminatedUnion('type', [
+    /*
+     * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
+     * and treat them as "models" instead of duplicating the data structure in each endpoint.
+     */
     DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
     ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
     RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
