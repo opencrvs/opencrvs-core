@@ -81,7 +81,7 @@ function buildClause(clause: QueryExpression) {
   if (clause.status) {
     if (clause.status.type === 'anyOf') {
       must.push({ terms: { 'status.keyword': clause.status.terms } })
-    } else if (clause.status.type === 'exact') {
+    } else {
       must.push({ term: { 'status.keyword': clause.status.term } })
     }
   }
@@ -95,7 +95,7 @@ function buildClause(clause: QueryExpression) {
   if (clause.createdAt) {
     if (clause.createdAt.type === 'exact') {
       must.push({ term: { createdAt: clause.createdAt.term } })
-    } else if (clause.createdAt.type === 'range') {
+    } else {
       must.push({
         range: {
           createdAt: {
@@ -110,7 +110,7 @@ function buildClause(clause: QueryExpression) {
   if (clause.updatedAt) {
     if (clause.updatedAt.type === 'exact') {
       must.push({ term: { updatedAt: clause.updatedAt.term } })
-    } else if (clause.updatedAt.type === 'range') {
+    } else {
       must.push({
         range: {
           updatedAt: {
@@ -125,7 +125,7 @@ function buildClause(clause: QueryExpression) {
   if (clause.createAtLocation) {
     if (clause.createAtLocation.type === 'exact') {
       must.push({ term: { createdAtLocation: clause.createAtLocation.term } })
-    } else if (clause.createAtLocation.type === 'within') {
+    } else {
       must.push({
         geo_distance: {
           distance: '10km',
@@ -140,7 +140,7 @@ function buildClause(clause: QueryExpression) {
       must.push({
         term: { updatedAtLocation: clause.updatedAtLocation.term }
       })
-    } else if (clause.updatedAtLocation.type === 'within') {
+    } else {
       must.push({
         geo_distance: {
           distance: '10km',
