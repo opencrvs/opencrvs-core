@@ -65,15 +65,22 @@ function getStatusFromActions(actions: Array<Action>) {
 }
 
 function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
-  return actions.reduce<string>((updatedByRole, action) => {
-    if (!isWriteAction(action.type)) {
-      return updatedByRole
-    }
-    if (action.status === ActionStatus.Rejected) {
-      return updatedByRole
-    }
-    return action.createdByRole
-  }, '')
+  const actionsWithRoles = actions
+    .filter(
+      (action) =>
+        !isWriteAction(action.type) && action.status !== ActionStatus.Rejected
+    )
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  const lastAction = actionsWithRoles.at(-1)
+
+  if (!lastAction) {
+    throw new Error(
+      'Should never happen, at least CREATE action should be present'
+    )
+  }
+
+  return ActionDocument.parse(lastAction).createdByRole
 }
 
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
