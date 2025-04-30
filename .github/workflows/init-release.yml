@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Initialize a Release
+name: Release - Start a new release
 on:
   workflow_dispatch:
     inputs:
@@ -19,12 +19,70 @@ jobs:
   release_workflow:
     runs-on: ubuntu-latest
     steps:
-      - name: gitflow-workflow-action release workflows
+      - id: release_workflow_dry_run
+        name: gitflow-workflow-action release workflows
+        if: github.event_name == 'workflow_dispatch'
         uses: hoangvvo/gitflow-workflow-action@0.3.8
         with:
           develop_branch: "develop"
           main_branch: "master"
-          merge_back_from_main: false
+          dry_run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - id: generate_pr_summary
+        name: generate pr summary
+        if: ${{ steps.release_workflow_dry_run.outputs.type == 'release' && steps.release_workflow_dry_run.outputs.pull_numbers_in_release }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pull_numbers_in_release = "${{ steps.release_workflow_dry_run.outputs.pull_numbers_in_release }}";
+            const mergedPrNumbers = Array.from(new Set(pull_numbers_in_release.split(',').map(Number)));
+            // Get the PRs and parse the release summary
+            const mergedPrs = await Promise.all(mergedPrNumbers.map(async (prNumber) => {
+              const pr = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              if (!pr.data.body) {
+                return;
+              }
+              const regex = /\#\# What does this PR do\?([\s\S]*?)\n\#\#/gm;
+              let match = regex.exec(pr.data.body)?.[1]?.trim();
+              // try to remove empty lines
+              match = match?.split('\n').map(s => s.trim()).filter(Boolean).map(
+                s => s.startsWith('-') || s.startsWith('*') ? s : `* ${s}`
+              ).join('\n');
+
+              let type = 0 // patch
+              if (pr.data.body.includes("[x] Major")) {
+                type = 2 // major
+              } else if (pr.data.body.includes("[x] Minor")) {
+                type = 1 // minor
+              }
+
+              return {
+                summary: `${pr.data.title}\n${match}`,
+                type,
+              }
+            })).then((prs) => prs.filter(Boolean));
+
+            const releaseSummary = mergedPrs.map((pr) => pr.summary).join('\n\n');
+            core.setOutput('release_summary', releaseSummary);
+
+            const versionIncrementType = Math.max(...mergedPrs.map((pr) => pr.type));
+            const versionIncrement = ['patch', 'minor', 'major'][versionIncrementType] || 'patch';
+            core.setOutput('version_increment', versionIncrement);
+        
+      - id: release_workflow
+        name: gitflow-workflow-action release workflows
+        uses: hoangvvo/gitflow-workflow-action@0.3.8
+        with:
+          develop_branch: "develop"
+          main_branch: "master"
           version: ${{ inputs.version }}
+          release_summary: ${{ steps.generate_pr_summary.outputs.release_summary }}
+          version_increment: ${{ steps.generate_pr_summary.outputs.version_increment }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
