@@ -47,7 +47,6 @@ export function Pages({
   onPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
-  disableContinue?: boolean
   eventConfig?: EventConfig
   declaration?: EventState
 }) {
