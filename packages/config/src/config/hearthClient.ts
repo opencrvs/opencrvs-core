@@ -11,9 +11,9 @@
 
 import { logger } from '@opencrvs/commons'
 import { MongoClient } from 'mongodb'
-import { HEARTH_MONGO_URL } from './constants'
+import { env } from '@config/environment'
 
-const client = new MongoClient(HEARTH_MONGO_URL)
+const client = new MongoClient(env.HEARTH_MONGO_URL)
 
 client.on('close', () => {
   logger.error('MongoDB connection closed.')
