@@ -8,15 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/service'
-export * from './authentication'
-export * from './utils'
-export * from './countryconfig'
+
+import { generateOpenApiDocument } from 'trpc-to-openapi'
+import * as yaml from 'yaml'
+import { appRouter } from './router/router'
+
+export const openApiDocument = generateOpenApiDocument(appRouter, {
+  title: 'OpenCRVS API',
+  version: '1.8.0',
+  baseUrl: 'http://localhost:3000'
+})
+
+// eslint-disable-next-line no-console
+console.log(yaml.stringify(openApiDocument))

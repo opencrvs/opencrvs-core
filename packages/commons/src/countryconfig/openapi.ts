@@ -8,15 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/service'
-export * from './authentication'
-export * from './utils'
-export * from './countryconfig'
+
+import * as yaml from 'yaml'
+import { createDocument } from 'zod-openapi'
+import { countryConfigApi } from '.'
+
+const document = createDocument({
+  openapi: '3.1.0',
+  info: {
+    title: 'Countryconfig implementation requirements',
+    version: '1.8.0',
+    description: 'Country specific configuration server for OpenCRVS'
+  },
+  paths: countryConfigApi
+})
+
+// eslint-disable-next-line no-console
+console.log(yaml.stringify(document))
