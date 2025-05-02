@@ -1319,16 +1319,15 @@ export const tennisClubMembershipEvent = defineConfig({
       }
     }
   ],
-  advancedSearch: [],
-  // [
-  //   {
-  //     title: {
-  //       defaultMessage: 'Tennis club registration search',
-  //       description: 'This is what this event is referred as in the system',
-  //       id: 'v2.event.tennis-club-membership.search'
-  //     },
-  //     fields: [field('applicant.dob').exact()]
-  //   }
-  // ]
+  advancedSearch: [
+    {
+      title: {
+        defaultMessage: 'Tennis club registration search',
+        description: 'This is what this event is referred as in the system',
+        id: 'v2.event.tennis-club-membership.search'
+      },
+      fields: [field('applicant.dob').exact()]
+    }
+  ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })

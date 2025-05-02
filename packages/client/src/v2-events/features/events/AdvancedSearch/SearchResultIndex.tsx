@@ -22,7 +22,7 @@ import { ADVANCED_SEARCH_KEY, buildDataCondition } from './utils'
 export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
-  const { eventConfiguration: currentEvent } = useEventConfiguration(eventType)
+  const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
   const searchParams = parse(window.location.search, {
     arrayFormat: 'comma'
@@ -47,7 +47,7 @@ export const SearchResultIndex = () => {
 
   return (
     <SearchResult
-      currentEvent={currentEvent}
+      eventConfig={eventConfig}
       queryData={queryData}
       searchParams={searchParams}
       workqueueConfig={workqueueConfig}
