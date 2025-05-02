@@ -29,6 +29,7 @@ export const SearchResultIndex = () => {
   }) as Record<string, string>
 
   const formattedSearchParams = buildDataCondition(searchParams, currentEvent)
+
   const queryData = searchEvent.useSuspenseQuery(
     eventType,
     formattedSearchParams,

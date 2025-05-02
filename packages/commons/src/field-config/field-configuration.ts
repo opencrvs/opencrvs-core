@@ -13,6 +13,11 @@
  * Returns configuration options for the field.
  */
 export function createFieldConfigs(fieldId: string) {
+  const baseField = {
+    fieldId,
+    fieldType: 'field' as const
+  }
+
   return {
     /**
      * Creates a range configuration for the specified field.
@@ -26,7 +31,7 @@ export function createFieldConfigs(fieldId: string) {
      * // }
      */
     range: () => ({
-      fieldId,
+      ...baseField,
       config: { type: 'RANGE' as const }
     }),
     /**
@@ -39,7 +44,7 @@ export function createFieldConfigs(fieldId: string) {
      * // }
      */
     exact: () => ({
-      fieldId,
+      ...baseField,
       config: { type: 'EXACT' as const }
     }),
     /**
@@ -52,7 +57,7 @@ export function createFieldConfigs(fieldId: string) {
      * // }
      */
     fuzzy: () => ({
-      fieldId,
+      ...baseField,
       config: { type: 'FUZZY' as const }
     })
   }

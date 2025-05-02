@@ -14,7 +14,9 @@ import {
   EventConfig,
   FieldConfig,
   FieldValue,
-  QueryInputType
+  QueryInputType,
+  SearchField,
+  EventFieldId
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
@@ -54,41 +56,46 @@ export const getAdvancedSearchFieldErrors = (
 export const flattenFieldErrors = (fieldErrors: Errors) =>
   Object.values(fieldErrors).flatMap((errObj) => errObj.errors)
 
+const defaultSearchFieldGenerator: Record<
+  // this should be strictly typed, not just any string
+  string,
+  (config: SearchField) => FieldConfig
+> = {
+  [EventFieldId.enum.trackingId]: (_) => ({
+    id: 'event.trackingId',
+    type: 'TEXT',
+    label: {
+      defaultMessage: 'Tracking ID',
+      description: 'Label for tracking ID field',
+      id: 'v2.advancedSearch.trackingId'
+    }
+  }),
+  [EventFieldId.enum.status]: (config) => ({
+    id: 'event.status',
+    type: 'SELECT',
+    label: {
+      defaultMessage: 'Status of record',
+      description: 'Label for status field',
+      id: 'v2.advancedSearch.status'
+    },
+    options: config.options ?? []
+  })
+}
+
 export const getDefaultSearchFields = (
   section: AdvancedSearchConfig
 ): FieldConfig[] => {
-  const res: FieldConfig[] = []
-  section.fields.forEach((field) => {
-    switch (field.fieldId) {
-      case 'event.trackingId':
-        res.push({
-          id: 'event.trackingId',
-          type: 'TEXT',
-          label: {
-            defaultMessage: 'Tracking ID',
-            description: 'Label for tracking ID field',
-            id: 'v2.advancedSearch.trackingId'
-          }
-        })
-        break
-      case 'event.status':
-        res.push({
-          id: 'event.status',
-          type: 'SELECT',
-          label: {
-            defaultMessage: 'Status of record',
-            description: 'Label for status field',
-            id: 'v2.advancedSearch.status'
-          },
-          options: field.options ?? []
-        })
-        break
-      default:
-        res.push()
+  const searchFields: FieldConfig[] = []
+
+  section.fields.forEach((fieldConfig) => {
+    const generator = defaultSearchFieldGenerator[fieldConfig.fieldId]
+
+    if (generator) {
+      searchFields.push(generator(fieldConfig))
     }
   })
 
-  return res
+  return searchFields
 }
 
 const RegStatus = {
@@ -140,18 +147,21 @@ function buildDataConditionFromSearchKeys(
     config?: {
       type: 'FUZZY' | 'EXACT' | 'RANGE'
     }
+    fieldType: 'field' | 'event'
   }[],
   rawInput: Record<string, string> // values from UI or query string
 ): Record<string, Condition> {
   return searchKeys.reduce(
-    (result: Record<string, Condition>, { fieldId, config }) => {
-      const value = rawInput[fieldId]
-      if (fieldId === 'event.status' && value === 'ALL') {
-        const transformedKey = fieldId.replace(/\./g, '____')
+    (result: Record<string, Condition>, { fieldId, config, fieldType }) => {
+      const fieldIdEdited = fieldType === 'event' ? `event.${fieldId}` : fieldId
+      const value = rawInput[fieldIdEdited]
+
+      if (fieldIdEdited === 'event.status' && value === 'ALL') {
+        const transformedKey = fieldIdEdited.replace(/\./g, '____')
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
         const condition = buildCondition(config?.type ?? 'EXACT', value)
-        const transformedKey = fieldId.replace(/\./g, '____')
+        const transformedKey = fieldIdEdited.replace(/\./g, '____')
         result[transformedKey] = condition
       }
       return result
@@ -170,7 +180,8 @@ export function buildDataCondition(
   const searchKeys = advancedSearch.flatMap((section) =>
     section.fields.map((field) => ({
       fieldId: field.fieldId,
-      config: field.config // assuming field structure has a `config` prop
+      config: field.config, // assuming field structure has a `config` prop
+      fieldType: field.fieldType
     }))
   )
 

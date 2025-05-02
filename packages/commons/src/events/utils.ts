@@ -240,7 +240,7 @@ export const findAllFields = (config: EventConfig): FieldConfig[] => {
   ])
 }
 
-export const metadataFields = ['event.trackingId', 'event.status'] as const
+export const metadataFields = ['trackingId', 'status'] as const
 /**
  * Pre-defined metadata fields that can be used in advanced search
  * and are not part of the event configuration

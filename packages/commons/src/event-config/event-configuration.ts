@@ -25,6 +25,7 @@ export function createEventFieldConfig(
   return {
     fieldId,
     options,
-    config: { type: 'EXACT' as const }
+    config: { type: 'EXACT' as const },
+    fieldType: 'event' as const
   }
 }

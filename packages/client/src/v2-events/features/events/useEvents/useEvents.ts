@@ -79,6 +79,7 @@ export function useEvents() {
         queryType: 'and' | 'or'
       ) => {
         const input = toQueryType(eventType, searchParams, queryType)
+
         return useQuery({
           ...trpc.event.search.queryOptions(input),
           queryKey: trpc.event.search.queryKey(input)
@@ -90,6 +91,7 @@ export function useEvents() {
         queryType: 'and' | 'or'
       ) => {
         const input = toQueryType(eventType, searchParams, queryType)
+
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(input),
           queryKey: trpc.event.search.queryKey(input)
