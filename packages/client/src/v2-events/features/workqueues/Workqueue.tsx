@@ -177,7 +177,7 @@ function Workqueue({
       const titleColumnId = workqueueConfig.columns[0].id
 
       const title = flattenedIntl.formatMessage(
-        eventConfig.summary.title.label,
+        eventConfig.title,
         flattenEventIndex(event)
       )
 

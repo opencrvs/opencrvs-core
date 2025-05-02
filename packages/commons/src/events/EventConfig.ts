@@ -31,6 +31,7 @@ export const EventConfig = z
       .describe(
         'A machine-readable identifier for the event, e.g. "birth" or "death"'
       ),
+    title: TranslationConfig,
     summary: SummaryConfig,
     label: TranslationConfig,
     actions: z.array(ActionConfig),
