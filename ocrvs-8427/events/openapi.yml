@@ -4431,7 +4431,6 @@ components:
                         - config
                         - fieldId
                         - fieldType
-                default: []
                 description: Advanced search fields.
             required:
               - title
