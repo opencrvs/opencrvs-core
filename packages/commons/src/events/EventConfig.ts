@@ -13,11 +13,11 @@ import { ActionConfig } from './ActionConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { AdvancedSearchConfig } from './AdvancedSearchConfig'
+import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
 import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
 extendZodWithOpenApi(z)
-import { findAllFields, metadataFields } from './utils'
+import { findAllFields } from './utils'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -63,7 +63,7 @@ export const EventConfig = z
         (field) =>
           !(
             fieldIds.includes(field.fieldId) ||
-            Boolean(metadataFields.find((f) => f === field.fieldId))
+            (EventFieldId.options as string[]).includes(field.fieldId)
           )
       )
     )

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { EventFieldId } from '../events/AdvancedSearchConfig'
 import { SelectOption } from '../events/FieldConfig'
-import { MetadataField } from '../events/utils'
 
 /**
  * Creates a search configuration object for a given event metadata field.
@@ -19,7 +19,7 @@ import { MetadataField } from '../events/utils'
  * @param options - UI options for rendering (optional).
  */
 export function createEventFieldConfig(
-  fieldId: MetadataField,
+  fieldId: EventFieldId,
   options?: SelectOption[]
 ) {
   return {

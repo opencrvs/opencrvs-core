@@ -11,8 +11,8 @@
 
 import { createEventConditionals } from '../conditionals/conditionals'
 import { createEventFieldConfig } from '../event-config/event-configuration'
+import { EventFieldId } from './AdvancedSearchConfig'
 import { SelectOption } from './FieldConfig'
-import { MetadataField } from './utils'
 
 /**
  * Creates a function that acts like a callable + static method container.
@@ -21,7 +21,7 @@ import { MetadataField } from './utils'
  * event('status') // → returns search config
  * event.hasAction('CLICKED') // → returns conditional
  */
-function eventFn(fieldId: MetadataField, options?: SelectOption[]) {
+function eventFn(fieldId: EventFieldId, options?: SelectOption[]) {
   return createEventFieldConfig(fieldId, options)
 }
 

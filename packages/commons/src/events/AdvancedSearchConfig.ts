@@ -27,36 +27,23 @@ export const FieldConfigSchema = BaseField.extend({
 })
 
 export const EventFieldId = z.enum(['trackingId', 'status'])
+export type EventFieldId = z.infer<typeof EventFieldId>
 
 export const EventFieldConfigSchema = BaseField.extend({
   fieldId: EventFieldId,
   fieldType: z.literal('event')
 })
 
-// TODO Ashikul: test if these can be removed
-type Inferred =
-  | z.infer<typeof FieldConfigSchema>
-  | z.infer<typeof EventFieldConfigSchema>
-
-type InferredInput =
-  | z.input<typeof FieldConfigSchema>
-  | z.input<typeof EventFieldConfigSchema>
-
 export const SearchField = z.discriminatedUnion('fieldType', [
   FieldConfigSchema,
   EventFieldConfigSchema
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-]) as unknown as z.ZodType<Inferred, any, InferredInput>
+])
 
 export type SearchField = z.infer<typeof SearchField>
 
 export const AdvancedSearchConfig = z.object({
   title: TranslationConfig.describe('Advanced search tab title'),
-  fields: z
-    .array(SearchField)
-    .optional()
-    .default([])
-    .describe('Advanced search fields.')
+  fields: z.array(SearchField).describe('Advanced search fields.')
 })
 
 export type AdvancedSearchConfigInput = z.infer<typeof AdvancedSearchConfig>

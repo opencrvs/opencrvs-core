@@ -239,11 +239,3 @@ export const findAllFields = (config: EventConfig): FieldConfig[] => {
     ...getAllAnnotationFields(config)
   ])
 }
-
-// TODO Ashikul: remove this one and use EventFieldId zod enum
-export const metadataFields = ['trackingId', 'status'] as const
-/**
- * Pre-defined metadata fields that can be used in advanced search
- * and are not part of the event configuration
- */
-export type MetadataField = (typeof metadataFields)[number]
