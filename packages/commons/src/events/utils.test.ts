@@ -18,6 +18,7 @@ const commonAction = {
   id: 'action-id-1',
   declaration: {},
   createdBy: 'user-id-1',
+  createdByRole: 'user-role-1',
   createdAtLocation: 'location-id-1',
   transactionId: 'transaction-id-1'
 }
