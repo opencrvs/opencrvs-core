@@ -34035,6 +34035,8 @@ components:
           format: date-time
         createdBy:
           type: string
+        createdByRole:
+          type: string
         declaration:
           type: object
           additionalProperties:
@@ -34332,6 +34334,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -34346,6 +34349,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -34640,6 +34645,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -34654,6 +34660,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -34948,6 +34956,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -34962,6 +34971,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -35256,6 +35267,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -35270,6 +35282,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -35564,6 +35578,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -35578,6 +35593,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -35872,6 +35889,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -35886,6 +35904,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -36182,6 +36202,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -36196,6 +36217,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -36490,6 +36513,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -36504,6 +36528,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -36800,6 +36826,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -36815,6 +36842,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -37109,6 +37138,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -37123,6 +37153,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -37419,6 +37451,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -37434,6 +37467,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -37730,6 +37765,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -37745,6 +37781,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -38041,6 +38079,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -38056,6 +38095,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -38350,6 +38391,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
@@ -38364,6 +38406,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -38658,6 +38702,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - status
         - type
