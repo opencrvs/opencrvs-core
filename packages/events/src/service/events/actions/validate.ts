@@ -26,12 +26,14 @@ export async function validate(
   {
     eventId,
     createdBy,
+    createdByRole,
     token,
     transactionId,
     createdAtLocation
   }: {
     eventId: string
     createdBy: string
+    createdByRole: string
     createdAtLocation: string
     transactionId: string
     token: string
@@ -55,6 +57,7 @@ export async function validate(
         ...input,
         createdAt: new Date().toISOString(),
         createdBy,
+        createdByRole,
         id: getUUID(),
         createdAtLocation,
         status: ActionStatus.Accepted
@@ -90,6 +93,7 @@ export async function validate(
     {
       eventId,
       createdBy,
+      createdByRole,
       transactionId,
       token,
       createdAtLocation,

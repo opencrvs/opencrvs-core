@@ -159,10 +159,12 @@ export async function createEvent({
   eventInput,
   createdAtLocation,
   createdBy,
+  createdByRole,
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
   createdBy: string
+  createdByRole: string
   createdAtLocation: string
   transactionId: string
 }): Promise<EventDocument> {
@@ -192,6 +194,7 @@ export async function createEvent({
         type: ActionType.CREATE,
         createdAt: now,
         createdBy,
+        createdByRole,
         createdAtLocation,
         id: getUUID(),
         declaration: {},
@@ -206,6 +209,7 @@ export async function createEvent({
     assignedTo: createdBy,
     declaration: {},
     createdBy,
+    createdByRole,
     createdAt: now,
     createdAtLocation,
     id,
@@ -270,12 +274,14 @@ export async function addAction(
   {
     eventId,
     createdBy,
+    createdByRole,
     token,
     createdAtLocation,
     status
   }: {
     eventId: string
     createdBy: string
+    createdByRole: string
     createdAtLocation: string
     token: string
     transactionId: string
@@ -319,6 +325,7 @@ export async function addAction(
             transactionId: getUUID(),
             type: ActionType.MARKED_AS_DUPLICATE,
             createdBy,
+            createdByRole,
             createdAt: now,
             createdAtLocation,
             id: getUUID(),
@@ -335,6 +342,7 @@ export async function addAction(
   const action: ActionDocument = {
     ...input,
     createdBy,
+    createdByRole,
     createdAt: now,
     createdAtLocation,
     id: actionId,
@@ -360,6 +368,7 @@ export async function addAction(
             declaration: {},
             assignedTo: null,
             createdBy,
+            createdByRole,
             createdAt: now,
             createdAtLocation,
             id: actionId,
