@@ -18,7 +18,8 @@ describe('field() helper', () => {
     const result = field(fieldId).range()
     expect(result).toEqual({
       fieldId: 'some.field',
-      config: { type: 'RANGE' }
+      config: { type: 'RANGE' },
+      fieldType: 'field'
     })
   })
 
@@ -26,7 +27,8 @@ describe('field() helper', () => {
     const result = field(fieldId).exact()
     expect(result).toEqual({
       fieldId: 'some.field',
-      config: { type: 'EXACT' }
+      config: { type: 'EXACT' },
+      fieldType: 'field'
     })
   })
 
@@ -34,7 +36,8 @@ describe('field() helper', () => {
     const result = field(fieldId).fuzzy()
     expect(result).toEqual({
       fieldId: 'some.field',
-      config: { type: 'FUZZY' }
+      config: { type: 'FUZZY' },
+      fieldType: 'field'
     })
   })
 
@@ -42,7 +45,8 @@ describe('field() helper', () => {
     const result = field('user.age').range()
     expect(result).toEqual({
       fieldId: 'user.age',
-      config: { type: 'RANGE' }
+      config: { type: 'RANGE' },
+      fieldType: 'field'
     })
   })
 })

@@ -28,7 +28,7 @@ export const SearchResultIndex = () => {
     arrayFormat: 'comma'
   }) as Record<string, string>
 
-  const formattedSearchParams = buildDataCondition(searchParams, currentEvent)
+  const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
 
   const queryData = searchEvent.useSuspenseQuery(
     eventType,
