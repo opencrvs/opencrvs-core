@@ -34010,6 +34010,8 @@ components:
           format: date-time
         createdBy:
           type: string
+        createdByRole:
+          type: string
         declaration:
           type: object
           additionalProperties:
@@ -34305,6 +34307,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -34320,6 +34323,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -34612,6 +34617,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -34627,6 +34633,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -34919,6 +34927,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -34934,6 +34943,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -35226,6 +35237,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -35241,6 +35253,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -35533,6 +35547,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -35548,6 +35563,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -35840,6 +35857,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -35855,6 +35873,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -36149,6 +36169,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -36164,6 +36185,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -36456,6 +36479,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -36471,6 +36495,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -36765,6 +36791,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -36781,6 +36808,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -37073,6 +37102,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -37088,6 +37118,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -37382,6 +37414,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -37398,6 +37431,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -37692,6 +37727,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -37708,6 +37744,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -38002,6 +38040,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -38018,6 +38057,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -38310,6 +38351,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
@@ -38325,6 +38367,8 @@ components:
           type: string
           format: date-time
         createdBy:
+          type: string
+        createdByRole:
           type: string
         declaration:
           type: object
@@ -38617,6 +38661,7 @@ components:
         - transactionId
         - createdAt
         - createdBy
+        - createdByRole
         - declaration
         - createdAtLocation
         - status
