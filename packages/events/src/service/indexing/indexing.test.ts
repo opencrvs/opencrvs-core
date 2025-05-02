@@ -112,7 +112,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { 'status.keyword': 'REGISTERED' } },
+          { term: { status: 'REGISTERED' } },
           { match: { eventType: 'tennis-club-membership' } }
         ]
       }
@@ -123,7 +123,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     const result = buildElasticQueryFromSearchPayload(anyOfStatusPayload)
     expect(result).toEqual({
       bool: {
-        must: [{ terms: { 'status.keyword': ['REGISTERED', 'VALIDATED'] } }]
+        must: [{ terms: { status: ['REGISTERED', 'VALIDATED'] } }]
       }
     })
   })
@@ -133,8 +133,8 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toMatchObject({
       bool: {
         must: expect.arrayContaining([
-          { term: { 'status.keyword': 'ARCHIVED' } },
-          { term: { 'trackingId.keyword': 'ABC123' } },
+          { term: { status: 'ARCHIVED' } },
+          { term: { trackingId: 'ABC123' } },
           { range: { createdAt: { gte: '2024-01-01', lte: '2024-12-31' } } },
           { term: { updatedAt: '2024-06-01' } },
           { term: { createdAtLocation: 'some-location-id' } },
@@ -159,7 +159,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           {
             bool: {
               must: [
-                { term: { 'status.keyword': 'ISSUED' } },
+                { term: { status: 'ISSUED' } },
                 { match: { eventType: 'foo' } }
               ]
             }
@@ -167,7 +167,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           {
             bool: {
               must: [
-                { term: { 'status.keyword': 'REJECTED' } },
+                { term: { status: 'REJECTED' } },
                 { match: { eventType: 'bar' } }
               ]
             }
