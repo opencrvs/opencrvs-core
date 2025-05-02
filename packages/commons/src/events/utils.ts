@@ -240,6 +240,7 @@ export const findAllFields = (config: EventConfig): FieldConfig[] => {
   ])
 }
 
+// TODO Ashikul: remove this one and use EventFieldId zod enum
 export const metadataFields = ['trackingId', 'status'] as const
 /**
  * Pre-defined metadata fields that can be used in advanced search
