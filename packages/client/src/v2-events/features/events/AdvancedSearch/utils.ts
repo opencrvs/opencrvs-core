@@ -89,10 +89,7 @@ export const getDefaultSearchFields = (
 
   section.fields.forEach((fieldConfig) => {
     const generator = defaultSearchFieldGenerator[fieldConfig.fieldId]
-
-    if (generator) {
-      searchFields.push(generator(fieldConfig))
-    }
+    searchFields.push(generator(fieldConfig))
   })
 
   return searchFields
