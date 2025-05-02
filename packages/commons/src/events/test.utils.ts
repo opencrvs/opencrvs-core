@@ -156,6 +156,7 @@ export const eventPayloadGenerator = {
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
+          createdByRole: '@todo',
           createdAtLocation: '@todo',
           updatedAtLocation: '@todo'
         }
@@ -422,6 +423,7 @@ export function generateActionDocument({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
+    createdByRole: 'FIELD_AGENT',
     id: getUUID(),
     createdAtLocation: 'TODO',
     updatedAtLocation: 'TODO',
@@ -535,6 +537,7 @@ export const eventQueryDataGenerator = (
   updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
+  updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
   declaration: overrides.declaration ?? {
     'recommender.none': true,
     'applicant.firstname': 'Danny',

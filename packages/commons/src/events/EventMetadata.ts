@@ -41,6 +41,7 @@ export const EventMetadata = z.object({
   status: EventStatuses,
   createdAt: z.string().datetime(),
   createdBy: z.string(),
+  updatedByUserRole: z.string(),
   createdAtLocation: z.string(),
   updatedAtLocation: z.string(),
   updatedAt: z.string().datetime(),
@@ -87,6 +88,11 @@ export const eventMetadataLabelMap: Record<
     id: 'event.createdBy.label',
     defaultMessage: 'Created By',
     description: 'Created By'
+  },
+  'event.updatedByUserRole': {
+    id: 'event.updatedByUserRole.label',
+    defaultMessage: 'Updated By Role',
+    description: 'Updated By Role'
   },
   'event.id': {
     id: 'event.id.label',

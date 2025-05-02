@@ -198,6 +198,7 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
+            createdByRole: user.role,
             // updatedAtLocation is set to the office of the user who created the action
             updatedAtLocation: user.primaryOfficeId,
             token,
@@ -247,6 +248,7 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
+            createdByRole: user.role,
             updatedAtLocation: user.primaryOfficeId,
             token,
             transactionId,
