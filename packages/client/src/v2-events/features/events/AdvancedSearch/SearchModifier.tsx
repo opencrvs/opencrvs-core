@@ -58,30 +58,19 @@ export function SearchModifierComponent({
 }) {
   const navigate = useNavigate()
   const intl = useIntl()
-  const searchParamsAsLabel = Object.entries(searchParams).map(
-    ([key, value]) => ({ key: convertPathToLabel(key), value })
+  const eventSearchParamLabel = `${intl.formatMessage(constantsMessages.event)} : ${convertPathToLabel(eventType)}`
+  const searchParamLabels = Object.entries(searchParams).map(
+    ([key, value]) => `${convertPathToLabel(key)} : ${value}`
   )
+
+  const allSearchParamLabels = [eventSearchParamLabel, ...searchParamLabels]
 
   return (
     <>
       <SearchParamContainer>
-        {[
-          {
-            key: intl.formatMessage(constantsMessages.event),
-            value: convertPathToLabel(eventType)
-          },
-          ...searchParamsAsLabel
-        ].map((pill, index) => {
-          const label = `${pill.key} : ${pill.value}`
-          return (
-            <Pill
-              key={`${label}${index}`}
-              label={label}
-              size="small"
-              type="default"
-            ></Pill>
-          )
-        })}
+        {allSearchParamLabels.map((label) => (
+          <Pill key={label} label={label} size="small" type="default"></Pill>
+        ))}
         <StyledLink
           font="bold14"
           onClick={() =>
