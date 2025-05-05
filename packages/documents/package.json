@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/documents",
-  "version": "1.8.0",
+  "version": "0.4.4",
   "description": "OpenCRVS Documents service",
   "license": "MPL-2.0",
   "private": true,
@@ -16,7 +16,6 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
-    "zod": "^3.23.8",
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.7.0",
@@ -35,7 +34,8 @@
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
     "tsconfig-paths": "^3.13.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/archiver": "^3.0.0",
@@ -47,9 +47,9 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/node-fetch": "^2.5.12",
     "@types/uuid": "^3.4.3",
-    "cross-env": "^7.0.0",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
+    "cross-env": "^7.0.0",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-import": "^2.31.0",
