@@ -14,6 +14,7 @@ import {
   Action,
   ActionDocument,
   ActionStatus,
+  ActionUpdate,
   EventState,
   RegisterAction
 } from '../ActionDocument'
@@ -83,27 +84,6 @@ function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
   return ActionDocument.parse(lastAction).createdByRole
 }
 
-function findFieldValueFromActions(actions: Action[], field: string) {
-  return actions
-    .filter(
-      (action) =>
-        isWriteAction(action.type) && action.status !== ActionStatus.Rejected
-    )
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-    .reduce((value, action: ActionDocument) => {
-      if (action.type === ActionType.APPROVE_CORRECTION) {
-        const requestAction = actions.find(({ id }) => id === action.requestId)
-        if (!requestAction) {
-          return value
-        }
-        return 'declaration' in requestAction
-          ? requestAction.declaration[field]
-          : value
-      }
-      return action.declaration[field] ?? value
-    }, undefined)
-}
-
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<null | string>((user, action) => {
     if (action.type === ActionType.ASSIGN) {
@@ -117,7 +97,9 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-function aggregateActionDeclarations(actions: Array<ActionDocument>) {
+function aggregateActionDeclarations(
+  actions: Array<ActionDocument>
+): ActionUpdate {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
@@ -211,19 +193,13 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const registrationNumber = registrationAction?.registrationNumber ?? null
 
-  let dateOfEvent: string | undefined = event.createdAt.split('T')[0]
+  const declaration = aggregateActionDeclarations(activeActions)
+
+  let dateOfEvent: string | null = event.createdAt.split('T')[0]
 
   if (event.dateOfEvent) {
-    const eventDateFieldValue = findFieldValueFromActions(
-      event.actions,
-      event.dateOfEvent.fieldId
-    )
-    if (eventDateFieldValue) {
-      const parsedDate = ZodDate.safeParse(eventDateFieldValue)
-      dateOfEvent = parsedDate.success ? parsedDate.data : undefined
-    } else {
-      dateOfEvent = undefined
-    }
+    const parsedDate = ZodDate.safeParse(declaration[event.dateOfEvent.fieldId])
+    dateOfEvent = parsedDate.success ? parsedDate.data : null
   }
 
   return deepDropNulls({
@@ -237,7 +213,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
     updatedAtLocation: event.updatedAtLocation,
-    declaration: aggregateActionDeclarations(activeActions),
+    declaration,
     trackingId: event.trackingId,
     registrationNumber,
     updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
