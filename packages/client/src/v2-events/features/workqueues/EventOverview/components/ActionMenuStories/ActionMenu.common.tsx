@@ -17,6 +17,7 @@ import {
   Action,
   ActionStatus,
   ActionType,
+  ActionTypes,
   EventDocument,
   getUUID
 } from '@opencrvs/commons/client'
@@ -175,13 +176,14 @@ export const enum AssertType {
   DISABLED = 'DISABLED'
 }
 
-export const hiddenActions = Object.values(ActionType).reduce(
-  (acc, action) => {
-    acc[action] = AssertType.HIDDEN
-    return acc
-  },
-  {} as Record<ActionType, AssertType>
-)
+export const getHiddenActions = () =>
+  Object.values(ActionTypes.Values).reduce(
+    (acc, action) => {
+      acc[action] = AssertType.HIDDEN
+      return acc
+    },
+    {} as Record<ActionType, AssertType>
+  )
 
 function getActionByLabel(label: string): ActionType {
   const actionEntry = Object.entries(actionLabels).filter(
@@ -197,6 +199,36 @@ export interface Scenario {
   name: string
   actions: (keyof typeof mockActions)[]
   expected: Record<ActionType, AssertType>
+}
+
+/**
+ * Throwaway function to compare the action states.
+ * @TODO: Remove this function when the issue with the test is resolved and no longer occurs.
+ *
+ */
+function compareActionStates(
+  actual: Record<string, string>,
+  expected: Record<string, string>
+): void {
+  const mismatches: { key: string; expected: string; actual: string }[] = []
+
+  const allKeys = new Set([...Object.keys(actual), ...Object.keys(expected)])
+
+  for (const key of allKeys) {
+    const actualValue = actual[key]
+    const expectedValue = expected[key]
+
+    if (actualValue !== expectedValue) {
+      mismatches.push({ key, expected: expectedValue, actual: actualValue })
+    }
+  }
+
+  if (mismatches.length === 0) {
+    console.log('✅ All keys match.')
+  } else {
+    console.log('❌ Mismatches found:')
+    console.log(mismatches)
+  }
 }
 
 export function createStoriesFromScenarios(
@@ -242,23 +274,43 @@ export function createStoriesFromScenarios(
         },
         play: async ({ canvasElement }) => {
           const canvas = within(canvasElement)
-          await waitFor(async () => {
-            const actionButton = await canvas.findByRole('button', {
-              name: 'Action'
-            })
-            await expect(actionButton).toBeVisible()
-            await userEvent.click(actionButton)
+
+          const actionButton = await canvas.findByRole('button', {
+            name: 'Action'
           })
-          const actionVisibility = { ...hiddenActions }
-          const actionItems = canvasElement.querySelectorAll('li')
-          actionItems.forEach(
-            (li) =>
-              (actionVisibility[getActionByLabel(li.innerText)] =
-                li.hasAttribute('disabled')
-                  ? AssertType.DISABLED
-                  : AssertType.ENABLED)
+
+          await expect(actionButton).toBeVisible()
+          await userEvent.click(actionButton)
+
+          const listItems = await canvas.findAllByRole('listitem')
+
+          const actionVisibility = Object.values(ActionTypes.Values).reduce(
+            (hiddenActionAcc, action) => {
+              hiddenActionAcc[action] = AssertType.HIDDEN
+              return hiddenActionAcc
+            },
+            {} as Record<ActionType, AssertType>
           )
-          await expect(actionVisibility).toEqual(expected)
+
+          for (const li of listItems) {
+            const label = getActionByLabel(li.innerText)
+
+            actionVisibility[label] = li.hasAttribute('disabled')
+              ? AssertType.DISABLED
+              : AssertType.ENABLED
+          }
+
+          await waitFor(async () => {
+            try {
+              await expect(actionVisibility).toEqual(expected)
+            } catch (error) {
+              compareActionStates(actionVisibility, expected)
+              console.log('name', name)
+              console.log('role', role)
+              console.log(window.localStorage.getItem('opencrvs'))
+              throw error
+            }
+          })
         }
       } satisfies StoryObj<typeof ActionMenu>
       return acc
