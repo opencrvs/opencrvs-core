@@ -67,7 +67,7 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   return []
 }
 
-export const getAllAnnotationFields = (config: EventConfig): FieldConfig[] => {
+function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
   return flattenDeep(config.actions.map(getActionAnnotationFields))
 }
 
@@ -130,15 +130,19 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   return isConditionMet(page.conditional, formValues)
 }
 
-export function omitHiddenFields(fields: FieldConfig[], values: EventState) {
+export function omitHiddenFields(
+  fields: FieldConfig[],
+  values: EventState | ActionUpdate
+) {
   return omitBy(values, (_, fieldId) => {
-    const field = fields.find((f) => f.id === fieldId)
+    // There can be multiple field configurations with the same id, with e.g. different options and conditions
+    const fieldConfigs = fields.filter((f) => f.id === fieldId)
 
-    if (!field) {
+    if (!fieldConfigs.length) {
       return true
     }
 
-    return !isFieldVisible(field, values)
+    return fieldConfigs.every((f) => !isFieldVisible(f, values))
   })
 }
 
@@ -151,6 +155,15 @@ export function omitHiddenPaginatedFields(
     .flatMap((p) => p.fields)
 
   return omitHiddenFields(visiblePagesFormFields, declaration)
+}
+
+export function omitHiddenAnnotationFields(
+  actionConfig: ActionConfig,
+  declaration: EventState,
+  annotation: ActionUpdate
+) {
+  const annotationFields = getActionAnnotationFields(actionConfig)
+  return omitHiddenFields(annotationFields, { ...declaration, ...annotation })
 }
 
 export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {

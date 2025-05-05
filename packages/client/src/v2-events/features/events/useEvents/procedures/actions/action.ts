@@ -15,7 +15,14 @@ import type {
   inferInput
 } from '@trpc/tanstack-react-query'
 import { TRPCClientError } from '@trpc/client'
-import { ActionType, omitHiddenPaginatedFields } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventDocument,
+  FieldValue,
+  getCurrentEventState,
+  omitHiddenAnnotationFields,
+  omitHiddenPaginatedFields
+} from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -259,6 +266,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         throw new Error('Event configuration not found')
       }
 
+      // TODO CIHAN: here
+
       return mutation.mutate({
         ...params,
         declaration: omitHiddenPaginatedFields(
@@ -267,8 +276,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         )
       })
     },
-    mutateAsync: async (params: inferInput<P>) => {
-      const localEvent = findLocalEventData(params.eventId)
+    mutateAsync: async (
+      params: inferInput<P> & { fullEvent?: EventDocument }
+    ) => {
+      const { eventId } = params
+      const localEvent = findLocalEventData(eventId)
       const eventConfiguration = eventConfigurations.find(
         (event) => event.id === localEvent?.type
       )
@@ -277,12 +289,39 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         throw new Error('Event configuration not found')
       }
 
+      const actionConfiguration = eventConfiguration.actions.find(
+        (action) => action.type === actionType
+      )
+
+      if (!actionConfiguration) {
+        throw new Error('Action configuration not found')
+      }
+
+      let originalDeclaration: Record<string, FieldValue> = {}
+
+      if (params.fullEvent) {
+        const eventState = getCurrentEventState(params.fullEvent)
+        originalDeclaration = eventState.declaration
+      }
+
+      console.log('params async 1', params.annotation)
+      console.log('originalDeclaration', originalDeclaration)
+
+      const annotation = omitHiddenAnnotationFields(
+        actionConfiguration,
+        params.annotation,
+        originalDeclaration
+      )
+
+      console.log('params async 2', annotation)
+
       return mutation.mutateAsync({
         ...params,
         declaration: omitHiddenPaginatedFields(
           eventConfiguration.declaration,
           params.declaration
-        )
+        ),
+        annotation
       })
     }
   }
