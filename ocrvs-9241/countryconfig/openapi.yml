@@ -83,6 +83,13 @@ components:
         id:
           type: string
           description: A machine-readable identifier for the event, e.g. "birth" or "death"
+        dateOfEvent:
+          type: object
+          properties:
+            fieldId:
+              type: string
+          required:
+            - fieldId
         title:
           type: object
           properties:
@@ -33887,6 +33894,8 @@ components:
         id:
           type: string
         type:
+          type: string
+        dateOfEventField:
           type: string
         createdAt:
           type: string
