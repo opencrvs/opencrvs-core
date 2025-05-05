@@ -23,6 +23,7 @@ import { EventStatus } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
+import { z } from 'zod'
 
 function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -211,6 +212,21 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const registrationNumber = registrationAction?.registrationNumber ?? null
 
+  let dateOfEvent: string | undefined = event.createdAt.split('T')[0]
+
+  if (event.dateOfEventField) {
+    const dateOfEventFieldValue = findFieldValueFromActions(
+      event.actions,
+      event.dateOfEventField
+    )
+    if (dateOfEventFieldValue) {
+      const parsedDate = z.string().date().safeParse(dateOfEventFieldValue)
+      dateOfEvent = parsedDate.success ? parsedDate.data : undefined
+    } else {
+      dateOfEvent = undefined
+    }
+  }
+
   return deepDropNulls({
     id: event.id,
     type: event.type,
@@ -226,9 +242,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     trackingId: event.trackingId,
     registrationNumber,
     updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
-    dateOfEvent: event.dateOfEventField
-      ? findFieldValueFromActions(event.actions, event.dateOfEventField) || null
-      : event.createdAt
+    dateOfEvent
   })
 }
 
