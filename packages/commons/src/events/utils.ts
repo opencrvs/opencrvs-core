@@ -130,15 +130,20 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   return isConditionMet(page.conditional, formValues)
 }
 
-export function omitHiddenFields(fields: FieldConfig[], values: EventState) {
-  return omitBy(values, (_, fieldId) => {
-    const field = fields.find((f) => f.id === fieldId)
+export function omitHiddenFields<T extends EventState | ActionUpdate>(
+  fields: FieldConfig[],
+  values: T
+) {
+  return omitBy<T>(values, (_, fieldId) => {
+    // There can be multiple field configurations with the same id, with e.g. different options and conditions
+    const fieldConfigs = fields.filter((f) => f.id === fieldId)
 
-    if (!field) {
+    if (!fieldConfigs.length) {
       return true
     }
 
-    return !isFieldVisible(field, values)
+    // As long as one of the field configs is visible, the field should be included
+    return fieldConfigs.every((f) => !isFieldVisible(f, values))
   })
 }
 
@@ -159,18 +164,7 @@ export function omitHiddenAnnotationFields(
   annotation: ActionUpdate
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
-  const values = { ...declaration, ...annotation }
-
-  return omitBy(values, (_, fieldId) => {
-    // There can be multiple field configurations with the same id, with e.g. different options and conditions
-    const fieldConfigs = annotationFields.filter((f) => f.id === fieldId)
-
-    if (!fieldConfigs.length) {
-      return true
-    }
-
-    return fieldConfigs.every((f) => !isFieldVisible(f, values))
-  })
+  return omitHiddenFields(annotationFields, { ...declaration, ...annotation })
 }
 
 export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
