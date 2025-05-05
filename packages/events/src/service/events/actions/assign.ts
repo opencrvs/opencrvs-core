@@ -20,11 +20,13 @@ import { addAction, getEventById } from '@events/service/events/events'
 
 export async function assignRecord({
   createdBy,
+  createdByRole,
   token,
   createdAtLocation,
   input
 }: {
   createdBy: string
+  createdByRole: string
   createdAtLocation: string
   token: string
   input: AssignActionInput
@@ -45,6 +47,7 @@ export async function assignRecord({
   return addAction(input, {
     eventId: input.eventId,
     createdBy,
+    createdByRole,
     token,
     createdAtLocation,
     transactionId: input.transactionId,

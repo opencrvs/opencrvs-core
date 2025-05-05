@@ -27,13 +27,16 @@ countryconfig_image_tag="develop"
 opencrvs_namespace = 'opencrvs-dev'
 dependencies_namespace = 'opencrvs-deps-dev'
 
-
+# Security enabled:
+# Configure security for dependencies and OpenCRVS services:
+# - Setup MinIO admin user and password
+# - Configure Redis users
+# - Sync passwords between dependencies and OpenCRVS services
+security_enabled = True
 
 # Checkout infrastructure directory if not exists
 if not os.path.exists('../infrastructure'):
     local("git clone git@github.com:opencrvs/infrastructure.git ../infrastructure")
-
-local_resource('README.md', cmd='awk "/For OpenCRVS Core Developers/{flag=1; next} /For OpenCRVS Country Config Developers/{flag=0} flag" ../infrastructure/README.md', labels=['0.Readme'])
 
 ############################################################
 # What common Tiltfile does?
@@ -45,7 +48,7 @@ load('ext://namespace', 'namespace_create', 'namespace_inject')
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
 
 # If your machine is powerful feel free to change parallel updates from default 3
-# update_settings(max_parallel_updates=3)
+update_settings(max_parallel_updates=1)
 
 ############################################################
 # Build images:
@@ -60,7 +63,13 @@ docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
 # Build services
 docker_build("ghcr.io/opencrvs/ocrvs-client:local", ".",
               dockerfile="packages/client/Dockerfile", 
-              only=["infrastructure", "packages/components","packages/client","packages/events","packages/gateway"],
+              only=[
+                "infrastructure",
+                "packages/components",
+                "packages/client",
+                "packages/events",
+                "packages/gateway"
+              ],
               network="host")
 docker_build("ghcr.io/opencrvs/ocrvs-login:local", ".",
               dockerfile="packages/login/Dockerfile", 
@@ -119,16 +128,22 @@ helm_resource(
 ######################################################
 # OpenCRVS Dependencies Deployment
 # NOTE: This helm chart can be deployed as helm release
+if security_enabled:
+    deps_configuration_file = '../infrastructure/infrastructure/localhost/dependencies/values-dev-secure.yaml'
+    opencrvs_configuration_file = '../infrastructure/infrastructure/localhost/opencrvs-services/values-dev-secure.yaml'
+else:
+    deps_configuration_file = '../infrastructure/infrastructure/localhost/dependencies/values-dev.yaml'
+    opencrvs_configuration_file = '../infrastructure/infrastructure/localhost/opencrvs-services/values-dev.yaml'
 k8s_yaml(helm('../infrastructure/charts/dependencies',
   namespace=dependencies_namespace,
-  values=['../infrastructure/infrastructure/localhost/dependencies/values-dev.yaml']))
+  values=[deps_configuration_file]))
 
 ######################################################
 # OpenCRVS Deployment
 k8s_yaml(
   helm('../infrastructure/charts/opencrvs-services',
        namespace=opencrvs_namespace,
-       values=['../infrastructure/infrastructure/localhost/opencrvs-services/values-dev.yaml'],
+       values=[opencrvs_configuration_file],
        set=[
         "image.tag={}".format(core_images_tag),
         "countryconfig.image.name={}".format(countryconfig_image_name),
@@ -136,6 +151,14 @@ k8s_yaml(
         ]
       )
 )
+
+if security_enabled:
+    local_resource(
+      "copy_secrets",
+      cmd="""kubectl get secret redis-opencrvs-users minio-opencrvs-users -n {0} -o yaml \
+          | sed "s#namespace: {0}#namespace: {1}#" | grep -v 'resourceVersion\\|uid\\|creationTimestamp' \
+          | kubectl replace -n {1} -f -""".format(dependencies_namespace, opencrvs_namespace),
+      resource_deps=["minio", "redis"])
 
 ######################################################
 # Data management tasks:

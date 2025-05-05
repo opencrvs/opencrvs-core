@@ -67,8 +67,7 @@ export function Review() {
 
   const previousAnnotation = getActionAnnotation({
     event,
-    actionType: ActionType.REGISTER,
-    drafts: []
+    actionType: ActionType.REGISTER
   })
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()

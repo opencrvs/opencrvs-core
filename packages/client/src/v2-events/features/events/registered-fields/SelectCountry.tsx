@@ -15,11 +15,11 @@ import { countries } from '@client/utils/countries'
 import { Select } from './Select'
 
 function SelectCountryInput({
-  setFieldValue,
   value,
+  onChange,
   ...props
 }: FieldProps<'COUNTRY'> & {
-  setFieldValue: (name: string, val: string | undefined) => void
+  onChange: (val: string | undefined) => void
   value?: string
 }) {
   return (
@@ -30,7 +30,7 @@ function SelectCountryInput({
       options={countries as SelectOption[]}
       type="SELECT"
       value={value}
-      onChange={(val: string) => setFieldValue(props.id, val)}
+      onChange={onChange}
     />
   )
 }

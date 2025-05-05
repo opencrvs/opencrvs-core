@@ -59,7 +59,11 @@ export function createTestClient(
   const token = createTestToken(user.id, scopes)
 
   const caller = createCaller({
-    user: { id: user.id, primaryOfficeId: user.primaryOfficeId },
+    user: {
+      id: user.id,
+      primaryOfficeId: user.primaryOfficeId,
+      role: user.role
+    },
     token
   })
   return caller

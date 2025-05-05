@@ -21,12 +21,14 @@ export async function rejectCorrection(
   {
     eventId,
     createdBy,
+    createdByRole,
     token,
     createdAtLocation,
     transactionId
   }: {
     eventId: string
     createdBy: string
+    createdByRole: string
     createdAtLocation: string
     token: string
     transactionId: string
@@ -45,6 +47,7 @@ export async function rejectCorrection(
   return addAction(input, {
     eventId,
     createdBy,
+    createdByRole,
     token,
     createdAtLocation,
     transactionId,

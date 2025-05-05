@@ -227,13 +227,16 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
-          'event.create': false,
-          'event.actions.notify.request': false,
-          'event.actions.declare.request': false,
-          'event.actions.validate.request': false,
-          'event.actions.register.request': false,
           'event.actions.archive.request': true,
-          'event.actions.reject.request': false
+          'event.actions.declare.request': false,
+          'event.actions.notify.request': false,
+          'event.actions.register.request': false,
+          'event.actions.reject.request': false,
+          'event.actions.validate.request': false,
+          'event.config.get': true,
+          'event.create': false,
+          'event.get': true,
+          'event.list': true
         })
       })
     })

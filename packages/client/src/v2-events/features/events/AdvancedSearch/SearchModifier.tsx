@@ -12,8 +12,9 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { Link as StyledLink } from '@opencrvs/components/lib'
+import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
 import { ROUTES } from '@client/v2-events/routes'
+import { constantsMessages } from '@client/v2-events/messages'
 
 const messagesToDefine = {
   edit: {
@@ -38,21 +39,44 @@ const SearchParamContainer = styled.div`
   }
 `
 
+function convertPathToLabel(path: string): string {
+  if (!path.includes('.')) {
+    return path.charAt(0).toUpperCase() + path.slice(1)
+  }
+
+  const parts = path.split('.')
+  const capitalizedFirst = parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
+  return [capitalizedFirst, ...parts.slice(1)].join(' ')
+}
+
 export function SearchModifierComponent({
+  eventType,
   searchParams
 }: {
+  eventType: string
   searchParams: Record<string, string>
 }) {
   const navigate = useNavigate()
   const intl = useIntl()
+  const eventSearchParamLabel = `${intl.formatMessage(constantsMessages.event)} : ${convertPathToLabel(eventType)}`
+  const searchParamLabels = Object.entries(searchParams).map(
+    ([key, value]) => `${convertPathToLabel(key)} : ${value}`
+  )
+
+  const allSearchParamLabels = [eventSearchParamLabel, ...searchParamLabels]
 
   return (
     <>
       <SearchParamContainer>
+        {allSearchParamLabels.map((label) => (
+          <Pill key={label} label={label} size="small" type="default"></Pill>
+        ))}
         <StyledLink
           font="bold14"
           onClick={() =>
-            navigate(ROUTES.V2.ADVANCED_SEARCH.path, { state: searchParams })
+            navigate(ROUTES.V2.ADVANCED_SEARCH.path, {
+              state: { searchParams, eventType }
+            })
           }
         >
           {intl.formatMessage(messages.edit)}

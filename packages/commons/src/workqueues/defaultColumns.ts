@@ -17,6 +17,7 @@ export const WorkQueueColumnConfig = z.object({
   label: TranslationConfig
 })
 
+/** @knipignore */
 export const defaultColumns = {
   event: {
     id: 'event',

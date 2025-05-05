@@ -61,8 +61,7 @@ export function Review() {
 
   const previousAnnotation = getActionAnnotation({
     event,
-    actionType: ActionType.VALIDATE,
-    drafts: []
+    actionType: ActionType.VALIDATE
   })
 
   const annotation = getAnnotation(previousAnnotation)

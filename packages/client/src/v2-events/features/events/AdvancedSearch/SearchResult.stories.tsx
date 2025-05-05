@@ -26,18 +26,18 @@ const meta: Meta<typeof SearchResult> = {
 }
 
 const mockSearchParams = {
+  'applicant.firstname': 'Danny',
   'applicant.dob': '1999-11-11'
 }
 
 export default meta
-
 export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
   name: 'Default Search Result',
   render: function Component() {
     return (
       <React.Suspense>
         <SearchResult
-          currentEvent={tennisClubMembershipEvent}
+          eventConfig={tennisClubMembershipEvent}
           queryData={[eventQueryDataGenerator()]}
           searchParams={mockSearchParams}
           workqueueConfig={workqueues['all']}

@@ -76,6 +76,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
+          createdByRole: 'offline',
           createdAtLocation: 'TODO',
           declaration: {},
           status: ActionStatus.Accepted,

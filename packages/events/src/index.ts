@@ -50,7 +50,7 @@ const server = createHTTPServer({
       })
     }
 
-    const { primaryOfficeId } = await getUser(
+    const { primaryOfficeId, role } = await getUser(
       env.USER_MANAGEMENT_URL,
       userId,
       token
@@ -59,7 +59,8 @@ const server = createHTTPServer({
     return {
       user: {
         id: userId,
-        primaryOfficeId
+        primaryOfficeId,
+        role
       },
       token: token
     }

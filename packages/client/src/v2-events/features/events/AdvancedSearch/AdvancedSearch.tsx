@@ -40,7 +40,7 @@ export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
   const location = useLocation()
-  const searchParams = location.state
+  const { searchParams = {}, eventType = '' } = location.state || {}
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
@@ -51,7 +51,11 @@ export function AdvancedSearch() {
     title: intl.formatMessage(a.label)
   })) satisfies IFormTabProps['sections']
 
-  const [activeTabId, setActiveTabId] = useState<string>(formTabSections[0].id)
+  const selectedTabId =
+    formTabSections.find((tab) => tab.id === eventType)?.id ??
+    formTabSections[0]?.id
+
+  const [activeTabId, setActiveTabId] = useState<string>(selectedTabId)
 
   const handleTabClick = (tabId: string) => {
     setActiveTabId(tabId)

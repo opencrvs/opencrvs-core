@@ -38,6 +38,7 @@ export const ActionBase = z.object({
   transactionId: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
+  createdByRole: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
   createdAtLocation: z.string(),
@@ -177,6 +178,7 @@ export const AsyncRejectActionDocument = ActionBase.omit({
   declaration: true,
   annotation: true,
   createdBy: true,
+  createdByRole: true,
   createdAtLocation: true
 }).merge(
   z.object({

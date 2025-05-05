@@ -44,12 +44,12 @@ function useAdministrativeAreas(
 }
 
 function LocationSearchInput({
-  setFieldValue,
+  onChange,
   value,
   searchableResource,
   ...props
 }: FieldProps<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
-  setFieldValue: (name: string, val: string | undefined) => void
+  onChange: (val: string | undefined) => void
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string
 }) {
@@ -62,9 +62,7 @@ function LocationSearchInput({
     <LocationSearchComponent
       buttonLabel="Health facility"
       locationList={locationList}
-      searchHandler={(location: SearchLocation) =>
-        setFieldValue(props.id, location.id)
-      }
+      searchHandler={(location: SearchLocation) => onChange(location.id)}
       selectedLocation={selectedLocation}
       {...props}
     />

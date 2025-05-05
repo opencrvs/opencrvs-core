@@ -170,6 +170,7 @@ export async function createIndex(
           modifiedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
+          updatedByUserRole: { type: 'keyword' },
           updatedAtLocation: { type: 'keyword' },
           declaration: {
             type: 'object',

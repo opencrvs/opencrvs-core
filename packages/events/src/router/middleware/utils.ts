@@ -16,6 +16,7 @@ export interface Context {
   user: {
     id: string
     primaryOfficeId: string
+    role: string
   }
   token: TokenWithBearer
 }

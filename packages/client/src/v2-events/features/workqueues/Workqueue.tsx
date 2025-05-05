@@ -25,7 +25,8 @@ import {
   EventIndex,
   getOrThrow,
   RootWorkqueueConfig,
-  workqueues
+  workqueues,
+  WorkQueueColumnConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -241,7 +242,7 @@ function Workqueue({
 
   function getDefaultColumns(): Array<Column> {
     return workqueueConfig.defaultColumns.map(
-      (column): Column => ({
+      (column: string): Column => ({
         label:
           column in defaultColumns
             ? intl.formatMessage(
@@ -259,7 +260,7 @@ function Workqueue({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     const configuredColumns: Array<Column> = workqueueConfig.columns.map(
-      (column) => ({
+      (column: WorkQueueColumnConfig) => ({
         label: intl.formatMessage(column.label),
         width: 35,
         key: column.id,

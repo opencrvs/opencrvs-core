@@ -20,7 +20,11 @@ const rootWorkqueueConfig = z.object({
   defaultColumns: z.array(DefaultColumnKeys)
 })
 
+/** @knipignore */
 export type RootWorkqueueConfig = z.infer<typeof rootWorkqueueConfig>
+
+/** @knipignore */
+export type WorkQueueColumnConfig = z.infer<typeof WorkQueueColumnConfig>
 
 export const defineWorkqueue = (config: RootWorkqueueConfig) =>
   rootWorkqueueConfig.parse(config)
