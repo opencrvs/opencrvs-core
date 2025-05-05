@@ -94,7 +94,8 @@ import {
   LINK_BUTTON,
   IDocumentUploaderWithOptionsFormField,
   ID_READER,
-  ID_VERIFICATION_BANNER
+  ID_VERIFICATION_BANNER,
+  ILocationSearchInputFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -122,7 +123,10 @@ import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUplo
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
 import { useDispatch, useSelector } from 'react-redux'
-import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
+import {
+  ISearchLocation,
+  LocationSearch
+} from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -1061,6 +1065,7 @@ class FormSectionComponent extends React.Component<Props> {
                   ...field,
                   type: SELECT_WITH_OPTIONS,
                   options: getFieldOptions(
+                    sectionName,
                     field,
                     values,
                     offlineCountryConfig,
@@ -1068,90 +1073,79 @@ class FormSectionComponent extends React.Component<Props> {
                   )
                 } satisfies ISelectFormFieldWithOptions)
               : field.type === DOCUMENT_UPLOADER_WITH_OPTION
-              ? ({
-                  ...field,
-                  options: getFieldOptions(
-                    field,
-                    values,
-                    offlineCountryConfig,
-                    draftData
-                  )
-                } satisfies IDocumentUploaderWithOptionsFormField)
-              : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
-              ? ({
-                  ...field,
-                  type: getFieldType(field as IDynamicFormField, values),
-                  label: getFieldLabel(field as IDynamicFormField, values),
-                  helperText: getFieldHelperText(
-                    field as IDynamicFormField,
-                    values
-                  ),
-                  tooltip: getFieldLabelToolTip(
-                    field as IDynamicFormField,
-                    values
-                  )
-                } as ITextFormField)
-              : field.type === DYNAMIC_LIST
-              ? ({
-                  ...field,
-                  type: BULLET_LIST,
-                  items: getFieldOptionsByValueMapper(
-                    field as IDynamicListFormField,
-                    draftData as IFormData,
-                    field.dynamicItems.valueMapper
-                  )
-                } as IListFormField)
-              : field.type === FETCH_BUTTON
-              ? ({
-                  ...field,
-                  queryData: getQueryData(field as ILoaderButton, values),
-                  draftData: draftData as IFormData,
-                  onFetch: (response) => {
-                    const section = {
-                      id: this.props.id,
-                      groups: [
-                        {
-                          id: `${this.props.id}-view-group`,
-                          fields
-                        }
-                      ]
-                    } as IFormSection
-
-                    const form = {
-                      sections: [section]
-                    } as IForm
-
-                    const queryData: IQueryData = {}
-                    queryData[this.props.id] = response
-
-                    const transformedData = gqlToDraftTransformer(
-                      form,
-                      queryData
-                    )
-                    const updatedValues = Object.assign(
-                      {},
+                ? ({
+                    ...field,
+                    options: getFieldOptions(
+                      sectionName,
+                      field,
                       values,
-                      transformedData[this.props.id]
+                      offlineCountryConfig,
+                      draftData
                     )
-                    setValues(updatedValues)
-                  }
-                } as ILoaderButton)
-              : field.type === LOCATION_SEARCH_INPUT
-              ? {
-                  ...field,
-                  locationList: generateLocations(
-                    field.searchableResource.reduce((locations, resource) => {
-                      return {
-                        ...locations,
-                        ...getListOfLocations(offlineCountryConfig, resource)
-                      }
-                    }, {}),
-                    intl,
-                    (location) => field.searchableType.includes(location.type),
-                    field.userOfficeId
-                  )
-                }
-              : field
+                  } satisfies IDocumentUploaderWithOptionsFormField)
+                : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
+                  ? ({
+                      ...field,
+                      type: getFieldType(field as IDynamicFormField, values),
+                      label: getFieldLabel(field as IDynamicFormField, values),
+                      helperText: getFieldHelperText(
+                        field as IDynamicFormField,
+                        values
+                      ),
+                      tooltip: getFieldLabelToolTip(
+                        field as IDynamicFormField,
+                        values
+                      )
+                    } as ITextFormField)
+                  : field.type === DYNAMIC_LIST
+                    ? ({
+                        ...field,
+                        type: BULLET_LIST,
+                        items: getFieldOptionsByValueMapper(
+                          field as IDynamicListFormField,
+                          draftData as IFormData,
+                          field.dynamicItems.valueMapper
+                        )
+                      } as IListFormField)
+                    : field.type === FETCH_BUTTON
+                      ? ({
+                          ...field,
+                          queryData: getQueryData(
+                            field as ILoaderButton,
+                            values
+                          ),
+                          draftData: draftData as IFormData,
+                          onFetch: (response) => {
+                            const section = {
+                              id: this.props.id,
+                              groups: [
+                                {
+                                  id: `${this.props.id}-view-group`,
+                                  fields
+                                }
+                              ]
+                            } as IFormSection
+
+                            const form = {
+                              sections: [section]
+                            } as IForm
+
+                            const queryData: IQueryData = {}
+                            queryData[this.props.id] = response
+
+                            const transformedData = gqlToDraftTransformer(
+                              form,
+                              queryData
+                            )
+                            const updatedValues = Object.assign(
+                              {},
+                              values,
+                              transformedData[this.props.id]
+                            )
+                            setValues(updatedValues)
+                          }
+                        } as ILoaderButton)
+                      : field
 
           if (
             field.type === FETCH_BUTTON ||
@@ -1289,6 +1283,46 @@ class FormSectionComponent extends React.Component<Props> {
                 </Field>
               </FormItem>
             )
+          } else if (field.type === LOCATION_SEARCH_INPUT) {
+            return (
+              <FormItem
+                key={`${field.name}${language}`}
+                ignoreBottomMargin={field.ignoreBottomMargin}
+              >
+                <Field name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => {
+                    return (
+                      <MemoizedLocationList field={field}>
+                        {(locationList) => (
+                          <GeneratedInputField
+                            fieldDefinition={internationaliseFieldObject(intl, {
+                              ...field,
+                              locationList
+                            })}
+                            setFieldValue={this.setFieldValuesWithDependency}
+                            setFieldTouched={setFieldTouched}
+                            resetDependentSelectValues={
+                              this.resetDependentSelectValues
+                            }
+                            {...formikFieldProps.field}
+                            touched={touched[field.name] || false}
+                            error={isFieldDisabled ? '' : error}
+                            draftData={draftData}
+                            fields={fields}
+                            values={values}
+                            dynamicDispatch={dynamicDispatch}
+                            disabled={isFieldDisabled}
+                            onUploadingStateChanged={
+                              this.props.onUploadingStateChanged
+                            }
+                          />
+                        )}
+                      </MemoizedLocationList>
+                    )
+                  }}
+                </Field>
+              </FormItem>
+            )
           } else {
             return (
               <FormItem
@@ -1330,6 +1364,30 @@ class FormSectionComponent extends React.Component<Props> {
       </section>
     )
   }
+}
+
+const MemoizedLocationList: React.FC<{
+  children: (locationList: ISearchLocation[]) => React.ReactElement
+  field: ILocationSearchInputFormField
+}> = ({ children, field }) => {
+  const offlineCountryConfig = useSelector(getOfflineData)
+  const intl = useIntl()
+  const locationList = React.useMemo(
+    () =>
+      generateLocations(
+        field.searchableResource.reduce((locations, resource) => {
+          return {
+            ...locations,
+            ...getListOfLocations(offlineCountryConfig, resource)
+          }
+        }, {}),
+        intl,
+        (location) => field.searchableType.includes(location.type),
+        field.userOfficeId
+      ),
+    [field, offlineCountryConfig, intl]
+  )
+  return children(locationList)
 }
 
 export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {

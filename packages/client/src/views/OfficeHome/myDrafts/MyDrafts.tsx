@@ -105,7 +105,7 @@ export const MyDrafts: React.FC<{
       } else if (draft.event && draft.event.toString() === 'marriage') {
         pageRoute = DRAFT_MARRIAGE_FORM_PAGE
       }
-      const name = getDeclarationFullName(draft, locale)
+      const name = getDeclarationFullName(draft, intl)
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions: IAction[] = []
 
