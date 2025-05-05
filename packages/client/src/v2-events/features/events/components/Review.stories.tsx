@@ -64,7 +64,7 @@ const meta: Meta<typeof Review.Body> = {
     (Story) => (
       <TRPCProvider>
         <React.Suspense>
-        <Story />
+          <Story />
         </React.Suspense>
       </TRPCProvider>
     )
