@@ -254,71 +254,50 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     ...mutationOptions
   })
 
-  return {
-    mutate: (params: inferInput<P>) => {
-      const localEvent = findLocalEventData(params.eventId)
+  type ActionMutationInput = inferInput<P> & { fullEvent?: EventDocument }
 
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
+  function getMutationPayload(params: ActionMutationInput) {
+    const { eventId } = params
+    const localEvent = findLocalEventData(eventId)
+    const eventConfiguration = eventConfigurations.find(
+      (event) => event.id === localEvent?.type
+    )
 
-      if (!eventConfiguration) {
-        throw new Error('Event configuration not found')
-      }
-
-      // TODO CIHAN: here
-
-      return mutation.mutate({
-        ...params,
-        declaration: omitHiddenPaginatedFields(
-          eventConfiguration.declaration,
-          params.declaration
-        )
-      })
-    },
-    mutateAsync: async (
-      params: inferInput<P> & { fullEvent?: EventDocument }
-    ) => {
-      const { eventId } = params
-      const localEvent = findLocalEventData(eventId)
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
-
-      if (!eventConfiguration) {
-        throw new Error('Event configuration not found')
-      }
-
-      const actionConfiguration = eventConfiguration.actions.find(
-        (action) => action.type === actionType
-      )
-
-      if (!actionConfiguration) {
-        throw new Error('Action configuration not found')
-      }
-
-      let originalDeclaration: Record<string, FieldValue> = {}
-
-      if (params.fullEvent) {
-        const eventState = getCurrentEventState(params.fullEvent)
-        originalDeclaration = eventState.declaration
-      }
-
-      const annotation = omitHiddenAnnotationFields(
-        actionConfiguration,
-        params.annotation,
-        originalDeclaration
-      )
-
-      return mutation.mutateAsync({
-        ...params,
-        declaration: omitHiddenPaginatedFields(
-          eventConfiguration.declaration,
-          params.declaration
-        ),
-        annotation
-      })
+    if (!eventConfiguration) {
+      throw new Error('Event configuration not found')
     }
+
+    const actionConfiguration = eventConfiguration.actions.find(
+      (action) => action.type === actionType
+    )
+
+    const originalDeclaration = params.fullEvent
+      ? getCurrentEventState(params.fullEvent).declaration
+      : {}
+
+    const annotation = actionConfiguration
+      ? omitHiddenAnnotationFields(
+          actionConfiguration,
+          params.annotation,
+          originalDeclaration
+        )
+      : {}
+
+    return {
+      ...params,
+      declaration: omitHiddenPaginatedFields(
+        eventConfiguration.declaration,
+        params.declaration
+      ),
+      annotation
+    }
+  }
+
+  return {
+    mutate: (params: ActionMutationInput) =>
+      mutation.mutate(getMutationPayload(params)),
+    mutateAsync: async (params: ActionMutationInput) =>
+      mutation.mutateAsync(getMutationPayload(params))
   }
 }
 
