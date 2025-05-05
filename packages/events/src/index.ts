@@ -9,16 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import '@opencrvs/commons/monitoring'
-
-import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { TRPCError } from '@trpc/server'
-import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { getUser, logger } from '@opencrvs/commons'
-import { appRouter } from './router/router'
+import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
+import '@opencrvs/commons/monitoring'
+import { TRPCError } from '@trpc/server'
+import { createHTTPHandler } from '@trpc/server/adapters/standalone'
+import { createServer } from 'http'
+import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { env } from './environment'
-import { getEventConfigurations } from './service/config/config'
+import { appRouter } from './router/router'
 import { getAnonymousToken } from './service/auth'
+import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -27,7 +28,7 @@ const appModulePath = require('app-module-path')
 
 appModulePath.addPath(path.join(__dirname, '../'))
 
-const server = createHTTPServer({
+const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
   createContext: async function createContext(opts) {
     const parseResult = TokenWithBearer.safeParse(
@@ -65,6 +66,27 @@ const server = createHTTPServer({
       token: token
     }
   }
+}
+const restServer = createOpenApiHttpHandler(trpcConfig)
+const trpcServer = createHTTPHandler(trpcConfig)
+
+const server = createServer((req, res) => {
+  if (!req.url) {
+    res.writeHead(500)
+    res.end('No URL provided')
+    return
+  }
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const isTrpcUrl =
+    url.search.startsWith('?input') || url.pathname.startsWith('/event.')
+  console.log({ isTrpcUrl, url })
+
+  if (isTrpcUrl) {
+    trpcServer(req, res)
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    restServer(req, res)
+  }
 })
 export async function main() {
   try {
@@ -86,7 +108,6 @@ export async function main() {
     setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
     return
   }
-
   server.listen(5555)
 }
 

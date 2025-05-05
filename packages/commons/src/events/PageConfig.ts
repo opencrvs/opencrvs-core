@@ -12,6 +12,8 @@ import { z } from 'zod'
 import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 export const PageTypes = z.enum(['FORM', 'VERIFICATION'])
 export type PageType = z.infer<typeof PageTypes>
@@ -27,6 +29,9 @@ const PageConfigBase = z.object({
 
 export const FormPageConfig = PageConfigBase.extend({
   type: z.literal(PageTypes.enum.FORM).default(PageTypes.enum.FORM)
+}).openapi({
+  description: 'Form page configuration',
+  ref: 'FormPageConfig'
 })
 
 export type FormPageConfig = z.infer<typeof FormPageConfig>
@@ -44,6 +49,10 @@ export const VerificationActionConfig = z
     })
   })
   .describe('Actions available on the verification page')
+  .openapi({
+    description: 'Verification action configuration',
+    ref: 'VerificationActionConfig'
+  })
 
 export const VerificationPageConfig = FormPageConfig.extend({
   type: z.literal(PageTypes.enum.VERIFICATION),

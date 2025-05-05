@@ -11,6 +11,8 @@
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 import { FieldType } from './FieldType'
 import {
@@ -479,31 +481,35 @@ export type InferredInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
 
-export const FieldConfig = z.discriminatedUnion('type', [
-  Address,
-  TextField,
-  NumberField,
-  TextAreaField,
-  DateField,
-  Paragraph,
-  RadioGroup,
-  BulletList,
-  PageHeader,
-  Select,
-  Checkbox,
-  File,
-  Country,
-  AdministrativeArea,
-  Divider,
-  Location,
-  Facility,
-  Office,
-  SignatureField,
-  EmailField,
-  FileUploadWithOptions,
-  DataField
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-]) as unknown as z.ZodType<Inferred, any, InferredInput>
+export const FieldConfig = z
+  .discriminatedUnion('type', [
+    Address,
+    TextField,
+    NumberField,
+    TextAreaField,
+    DateField,
+    Paragraph,
+    RadioGroup,
+    BulletList,
+    PageHeader,
+    Select,
+    Checkbox,
+    File,
+    Country,
+    AdministrativeArea,
+    Divider,
+    Location,
+    Facility,
+    Office,
+    SignatureField,
+    EmailField,
+    FileUploadWithOptions,
+    DataField
+  ])
+  .openapi({
+    description: 'Form field configuration',
+    ref: 'FieldConfig'
+  }) as unknown as z.ZodType<Inferred, any, InferredInput>
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
