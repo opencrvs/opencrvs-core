@@ -62,7 +62,7 @@ function getSectionFields(
   const advancedSearchSections = event.advancedSearch
   const allUniqueFields = getAllUniqueFields(event)
   return advancedSearchSections.map((section) => {
-    const defaultFields = getDefaultSearchFields(section)
+    const metadataFields = getDefaultSearchFields(section)
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
@@ -70,7 +70,7 @@ function getSectionFields(
       advancedSearchFieldId.includes(field.id)
     )
 
-    const combinedFields = [...defaultFields, ...advancedSearchFields]
+    const combinedFields = [...metadataFields, ...advancedSearchFields]
     const modifiedFields = combinedFields.map((f) => ({
       ...f,
       required: false as const, // advanced search fields need not be required

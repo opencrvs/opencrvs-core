@@ -89,7 +89,10 @@ export const getDefaultSearchFields = (
 
   section.fields.forEach((fieldConfig) => {
     const generator = defaultSearchFieldGenerator[fieldConfig.fieldId]
-    searchFields.push(generator(fieldConfig))
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (generator) {
+      searchFields.push(generator(fieldConfig))
+    }
   })
 
   return searchFields
