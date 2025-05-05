@@ -17,6 +17,7 @@ import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { findAllFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { FieldType } from './FieldType'
 extendZodWithOpenApi(z)
 
 /**
@@ -73,16 +74,24 @@ export const EventConfig = z
       })
     }
 
-    if (
-      event.dateOfEvent &&
-      !findAllFields(event).some(({ id }) => id === event.dateOfEvent?.fieldId)
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Date of event field id must match a field id in fields array.
-        Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.fieldId}`,
-        path: ['dateOfEvent']
-      })
+    if (event.dateOfEvent) {
+      const dateOfEventField = findAllFields(event).find(
+        ({ id }) => id === event.dateOfEvent?.fieldId
+      )
+      if (!dateOfEventField) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Date of event field id must match a field id in fields array.
+          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.fieldId}`,
+          path: ['dateOfEvent']
+        })
+      } else if (dateOfEventField.type !== FieldType.DATE) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Field specified for date of event is of type: ${dateOfEventField.type}, but it needs to be of type: ${FieldType.DATE}`,
+          path: ['dateOfEvent.fieldType']
+        })
+      }
     }
   })
   .openapi({
