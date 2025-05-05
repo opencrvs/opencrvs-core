@@ -63,6 +63,7 @@ function createDraftHandlers() {
           ...req,
           declaration: req.declaration || {},
           createdBy: 'test-user',
+          createdByRole: 'test-role',
           createdAtLocation: 'test-location',
           createdAt: new Date().toISOString()
         }

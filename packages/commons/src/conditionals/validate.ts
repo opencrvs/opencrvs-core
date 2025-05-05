@@ -94,6 +94,11 @@ export function isFieldVisible(
   return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
+function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
+  const fieldValue = form[field.id]
+  return !field.required && (fieldValue === undefined || fieldValue === '')
+}
+
 export function isFieldEnabled(
   field: FieldConfig,
   form: ActionUpdate | EventState
@@ -270,7 +275,10 @@ export function runFieldValidations({
   field: FieldConfig
   values: ActionUpdate
 }) {
-  if (!isFieldVisible(field, values)) {
+  if (
+    !isFieldVisible(field, values) ||
+    isFieldEmptyAndNotRequired(field, values)
+  ) {
     return {
       errors: []
     }

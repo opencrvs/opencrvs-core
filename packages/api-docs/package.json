@@ -4,7 +4,7 @@
   "description": "OpenCRVS API documentation",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "yarn build && serve -p 5556 build",
+    "start": "yarn build && serve -p 3003 build",
     "build": "bash build.sh"
   },
   "private": true,
