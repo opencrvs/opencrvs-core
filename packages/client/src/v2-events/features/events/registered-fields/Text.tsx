@@ -11,9 +11,15 @@
 
 import * as React from 'react'
 import {
-  ITextInputProps as TextInputProps,
+  ITextInputProps as ComponentTextInputProps,
   TextInput as TextInputComponent
 } from '@opencrvs/components'
+
+interface TextInputProps
+  extends Omit<ComponentTextInputProps, 'onChange' | 'value'> {
+  onChange(val: string | undefined): void
+  value: string | undefined
+}
 
 function TextInput({
   value,
@@ -22,18 +28,22 @@ function TextInput({
   type,
   ...props
 }: TextInputProps) {
-  const [inputValue, setInputValue] = React.useState(value ?? '')
+  const [inputValue, setInputValue] = React.useState<string>(value ?? '')
+
+  React.useEffect(() => {
+    setInputValue(value ?? '')
+  }, [value])
 
   return (
     <TextInputComponent
-      type={type ?? 'text'}
       {...props}
       data-testid={`text__${props.id}`}
       isDisabled={disabled}
       maxLength={maxLength}
+      type={type ?? 'text'}
       value={inputValue}
       onBlur={(e) => {
-        props.onChange?.(e)
+        props.onChange(inputValue)
         props.onBlur?.(e)
       }}
       onChange={(e) => setInputValue(e.target.value)}
