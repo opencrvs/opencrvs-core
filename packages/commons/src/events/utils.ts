@@ -132,9 +132,15 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
 
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
-  values: T
+  values: T,
+  visibleVerificationPageIds: string[] = []
 ) {
   return omitBy<T>(values, (_, fieldId) => {
+    // We dont want to omit visible verification page values
+    if (visibleVerificationPageIds.includes(fieldId)) {
+      return false
+    }
+
     // There can be multiple field configurations with the same id, with e.g. different options and conditions
     const fieldConfigs = fields.filter((f) => f.id === fieldId)
 
@@ -156,15 +162,6 @@ export function omitHiddenPaginatedFields(
     .flatMap((p) => p.fields)
 
   return omitHiddenFields(visiblePagesFormFields, declaration)
-}
-
-export function omitHiddenAnnotationFields(
-  actionConfig: ActionConfig,
-  declaration: EventState,
-  annotation: ActionUpdate
-) {
-  const annotationFields = getActionAnnotationFields(actionConfig)
-  return omitHiddenFields(annotationFields, { ...declaration, ...annotation })
 }
 
 export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
@@ -208,6 +205,39 @@ export function isVerificationPage(
   page: PageConfig
 ): page is VerificationPageConfig {
   return page.type === PageTypes.enum.VERIFICATION
+}
+
+export function getActionVerificationPageIds(
+  actionConfig: ActionConfig,
+  annotation: ActionUpdate
+) {
+  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
+    return actionConfig.printForm.pages
+      .filter((page) => isVerificationPage(page))
+      .filter((page) => isPageVisible(page, annotation))
+      .map((page) => page.id)
+  }
+
+  return []
+}
+
+export function omitHiddenAnnotationFields(
+  actionConfig: ActionConfig,
+  declaration: EventState,
+  annotation: ActionUpdate
+) {
+  const annotationFields = getActionAnnotationFields(actionConfig)
+
+  const visibleVerificationPageIds = getActionVerificationPageIds(
+    actionConfig,
+    annotation
+  )
+
+  return omitHiddenFields(
+    annotationFields,
+    { ...declaration, ...annotation },
+    visibleVerificationPageIds
+  )
 }
 
 export function deepMerge<T extends Record<string, unknown>>(

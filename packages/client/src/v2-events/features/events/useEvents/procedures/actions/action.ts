@@ -305,7 +305,6 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       }
 
       console.log('params async 1', params.annotation)
-      console.log('originalDeclaration', originalDeclaration)
 
       const annotation = omitHiddenAnnotationFields(
         actionConfiguration,
