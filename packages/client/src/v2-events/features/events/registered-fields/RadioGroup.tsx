@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { on } from 'events'
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import {
@@ -22,13 +23,13 @@ import {
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
 function RadioGroupInput({
-  setFieldValue,
+  onChange,
   value,
   options,
   configuration,
   ...props
 }: FieldProps<'RADIO_GROUP'> & {
-  setFieldValue: (name: string, val: string | undefined) => void
+  onChange: (val: string | undefined) => void
   value?: string
 }) {
   const intl = useIntl()
@@ -43,6 +44,7 @@ function RadioGroupInput({
 
   return (
     <RadioGroupComponent
+      {...props}
       data-testid={props.id}
       name={props.id}
       options={formattedOptions}
@@ -52,8 +54,7 @@ function RadioGroupInput({
           : RadioSize.LARGE
       }
       value={inputValue}
-      onChange={(val: string) => setFieldValue(props.id, val)}
-      {...props}
+      onChange={onChange}
     />
   )
 }
