@@ -18,6 +18,7 @@ export const EventDocument = z
   .object({
     id: z.string(),
     type: z.string(),
+    dateOfEventField: z.string().optional(),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
     updatedAtLocation: z.string(),

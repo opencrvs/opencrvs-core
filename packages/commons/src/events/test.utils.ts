@@ -494,7 +494,8 @@ export function generateEventDocument({
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     updatedAt: new Date(Date.now() - 1000).toISOString(),
-    updatedAtLocation: 'TODO'
+    dateOfEventField: configuration.dateOfEvent?.fieldId,
+    updatedAtLocation: getUUID()
   }
 }
 

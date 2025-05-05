@@ -487,6 +487,7 @@ describe('"event" conditionals', () => {
         trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
+        dateOfEventField: 'child.dateOfBirth',
         updatedAtLocation: '123456',
         actions: [
           {

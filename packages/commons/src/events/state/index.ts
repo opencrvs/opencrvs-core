@@ -83,6 +83,27 @@ function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
   return ActionDocument.parse(lastAction).createdByRole
 }
 
+function findFieldValueFromActions(actions: Action[], field: string) {
+  return actions
+    .filter(
+      (action) =>
+        isWriteAction(action.type) && action.status !== ActionStatus.Rejected
+    )
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .reduce((value, action: ActionDocument) => {
+      if (action.type === ActionType.APPROVE_CORRECTION) {
+        const requestAction = actions.find(({ id }) => id === action.requestId)
+        if (!requestAction) {
+          return value
+        }
+        return 'declaration' in requestAction
+          ? requestAction.declaration[field]
+          : value
+      }
+      return action.declaration[field] ?? value
+    }, undefined)
+}
+
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<null | string>((user, action) => {
     if (action.type === ActionType.ASSIGN) {
@@ -204,7 +225,10 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     declaration: aggregateActionDeclarations(activeActions),
     trackingId: event.trackingId,
     registrationNumber,
-    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions)
+    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
+    dateOfEvent: event.dateOfEventField
+      ? findFieldValueFromActions(event.actions, event.dateOfEventField) || null
+      : event.createdAt
   })
 }
 

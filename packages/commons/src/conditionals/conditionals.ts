@@ -449,6 +449,7 @@ export function field(fieldId: string) {
           }
         },
         required: [fieldId]
-      })
+      }),
+    getId: () => ({ fieldId })
   }
 }

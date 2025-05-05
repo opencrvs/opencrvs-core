@@ -31,6 +31,7 @@ export const EventConfig = z
       .describe(
         'A machine-readable identifier for the event, e.g. "birth" or "death"'
       ),
+    dateOfEvent: z.object({ fieldId: z.string() }).optional(),
     title: TranslationConfig,
     summary: SummaryConfig,
     label: TranslationConfig,
@@ -69,6 +70,18 @@ export const EventConfig = z
       .map((f) => f.fieldId)
       .join(', ')}`,
         path: ['advancedSearch']
+      })
+    }
+
+    if (
+      event.dateOfEvent &&
+      !findAllFields(event).some(({ id }) => id === event.dateOfEvent?.fieldId)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Date of event field id must match a field id in fields array.
+        Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.fieldId}`,
+        path: ['dateOfEvent']
       })
     }
   })
