@@ -204,15 +204,7 @@ describe('elasticsearch params formatter', () => {
                           fields: [
                             'name^3',
                             'childFirstNames^2',
-                            'childFamilyName'
-                          ],
-                          fuzziness: 'AUTO'
-                        }
-                      },
-                      should: {
-                        multi_match: {
-                          query: 'sadman anik',
-                          fields: [
+                            'childFamilyName',
                             'informantFirstNames',
                             'informantFamilyName',
                             'motherFirstNames',
@@ -234,15 +226,7 @@ describe('elasticsearch params formatter', () => {
                           fields: [
                             'name^3',
                             'deceasedFirstNames^2',
-                            'deceasedFamilyName'
-                          ],
-                          fuzziness: 'AUTO'
-                        }
-                      },
-                      should: {
-                        multi_match: {
-                          query: 'sadman anik',
-                          fields: [
+                            'deceasedFamilyName',
                             'informantFirstNames',
                             'informantFamilyName',
                             'spouseFirstNames',
@@ -263,22 +247,14 @@ describe('elasticsearch params formatter', () => {
                             'brideFirstNames^6',
                             'brideFamilyName^6',
                             'groomFirstNames^6',
-                            'groomFamilyName^6'
-                          ],
-                          type: 'cross_fields',
-                          operator: 'and'
-                        }
-                      },
-                      should: {
-                        multi_match: {
-                          query: 'sadman anik',
-                          fields: [
+                            'groomFamilyName^6',
                             'witnessOneFirstNames',
                             'witnessOneFamilyName',
                             'witnessTwoFirstNames',
                             'witnessTwoFamilyName'
                           ],
-                          fuzziness: 'AUTO'
+                          type: 'cross_fields',
+                          operator: 'and'
                         }
                       }
                     }
