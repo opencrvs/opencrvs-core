@@ -206,7 +206,7 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
     [ActionType.DECLARE]: {
       label: actionLabels[ActionType.DECLARE],
       onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.DECLARE.buildPath({ eventId })),
+        navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId })),
       disabled: !eventIsAssignedToSelf
     },
     [ActionType.VALIDATE]: {
