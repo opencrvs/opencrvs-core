@@ -10,8 +10,8 @@
  */
 import { IndexMap } from '@client/utils'
 import {
-  FIELD_SEPARATOR,
-  makeFormFieldIdFormikCompatible
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 
 /**
@@ -37,7 +37,7 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
 ): IndexMap<T> {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
-      key.replaceAll(FIELD_SEPARATOR, '.'),
+      makeFormikFieldIdOpenCRVSCompatible(key),
       value
     ])
   )
