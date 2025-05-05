@@ -11,9 +11,9 @@ name: Deploy PR to feature environment
 on:
   pull_request:
     types:
-        - labeled
-        - opened
-        - synchronize
+      - labeled
+      - opened
+      - synchronize
   workflow_dispatch:
     inputs:
       pr_number:
@@ -63,10 +63,10 @@ jobs:
         id: PR_pull
         if: github.event_name == 'pull_request'
         run: |
-            pr_number=${{ github.event.pull_request.number }}
-            response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}")
-            labels=$(echo "$response" | jq '.labels | map(.name) | join(",")' | sed 's/"//g')
-            echo pr_labels=$labels >> $GITHUB_OUTPUT
+          pr_number=${{ github.event.pull_request.number }}
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}")
+          labels=$(echo "$response" | jq '.labels | map(.name) | join(",")' | sed 's/"//g')
+          echo pr_labels=$labels >> $GITHUB_OUTPUT
 
       - name: Get input data (when triggered by event)
         if: github.event_name != 'workflow_dispatch'
@@ -167,9 +167,13 @@ jobs:
       - name: Check if branch exists in opencrvs-farajaland repo
         run: |
           FARAJALAND_REPO=https://github.com/opencrvs/opencrvs-farajaland
+          COUNTRYCONFIG_REPO=https://github.com/opencrvs/opencrvs-countryconfig
           if git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
             COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
             echo "Branch ${{ env.BRANCH_NAME }} exists in opencrvs-farajaland repo: $COMMIT_HASH"
+          elif git ls-remote $COUNTRYCONFIG_REPO refs/heads/${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
+            COMMIT_HASH=$(git ls-remote $COUNTRYCONFIG_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
+            echo "Branch ${{ env.BRANCH_NAME }} exists in opencrvs-countryconfig repo: $COMMIT_HASH"
           else
             COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/develop | cut -c1-7)
             echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-farajaland repo: $COMMIT_HASH"
