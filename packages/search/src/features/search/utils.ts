@@ -46,14 +46,10 @@ export async function advancedQueryBuilder(
               must: {
                 multi_match: {
                   query: params.name,
-                  fields: ['name^3', 'childFirstNames^2', 'childFamilyName'],
-                  fuzziness: 'AUTO'
-                }
-              },
-              should: {
-                multi_match: {
-                  query: params.name,
                   fields: [
+                    'name^3',
+                    'childFirstNames^2',
+                    'childFamilyName',
                     'informantFirstNames',
                     'informantFamilyName',
                     'motherFirstNames',
@@ -75,15 +71,7 @@ export async function advancedQueryBuilder(
                   fields: [
                     'name^3',
                     'deceasedFirstNames^2',
-                    'deceasedFamilyName'
-                  ],
-                  fuzziness: 'AUTO'
-                }
-              },
-              should: {
-                multi_match: {
-                  query: params.name,
-                  fields: [
+                    'deceasedFamilyName',
                     'informantFirstNames',
                     'informantFamilyName',
                     'spouseFirstNames',
@@ -104,22 +92,14 @@ export async function advancedQueryBuilder(
                     'brideFirstNames^6',
                     'brideFamilyName^6',
                     'groomFirstNames^6',
-                    'groomFamilyName^6'
-                  ],
-                  type: 'cross_fields',
-                  operator: 'and'
-                }
-              },
-              should: {
-                multi_match: {
-                  query: params.name,
-                  fields: [
+                    'groomFamilyName^6',
                     'witnessOneFirstNames',
                     'witnessOneFamilyName',
                     'witnessTwoFirstNames',
                     'witnessTwoFamilyName'
                   ],
-                  fuzziness: 'AUTO'
+                  type: 'cross_fields',
+                  operator: 'and'
                 }
               }
             }
