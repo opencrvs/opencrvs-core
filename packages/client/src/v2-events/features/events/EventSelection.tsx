@@ -90,7 +90,7 @@ function EventSelector() {
     createEvent.mutate({
       type: eventType,
       transactionId,
-      dateOfEventField: eventConfig.dateOfEvent?.fieldId
+      dateOfEvent: eventConfig.dateOfEvent
     })
 
     clearForm()

@@ -30,6 +30,8 @@ export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 export const eventStatuses = Object.values(EventStatus)
 export const EventStatuses = z.nativeEnum(EventStatus)
 
+export const ZodDate = z.string().date()
+
 /**
  * Event metadata exposed to client.
  *
@@ -40,7 +42,7 @@ export const EventMetadata = z.object({
   type: z.string(),
   status: EventStatuses,
   createdAt: z.string().datetime(),
-  dateOfEvent: z.string().date().optional(),
+  dateOfEvent: ZodDate.nullish(),
   createdBy: z.string(),
   updatedByUserRole: z.string(),
   createdAtLocation: z.string(),

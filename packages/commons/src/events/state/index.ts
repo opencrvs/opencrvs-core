@@ -19,11 +19,10 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus } from '../EventMetadata'
+import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
-import { z } from 'zod'
 
 function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -214,13 +213,13 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   let dateOfEvent: string | undefined = event.createdAt.split('T')[0]
 
-  if (event.dateOfEventField) {
-    const dateOfEventFieldValue = findFieldValueFromActions(
+  if (event.dateOfEvent) {
+    const eventDateFieldValue = findFieldValueFromActions(
       event.actions,
-      event.dateOfEventField
+      event.dateOfEvent.fieldId
     )
-    if (dateOfEventFieldValue) {
-      const parsedDate = z.string().date().safeParse(dateOfEventFieldValue)
+    if (eventDateFieldValue) {
+      const parsedDate = ZodDate.safeParse(eventDateFieldValue)
       dateOfEvent = parsedDate.success ? parsedDate.data : undefined
     } else {
       dateOfEvent = undefined

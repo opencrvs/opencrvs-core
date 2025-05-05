@@ -13,7 +13,7 @@ import { z } from 'zod'
 export const EventInput = z.object({
   transactionId: z.string(),
   type: z.string(),
-  dateOfEventField: z.string().optional()
+  dateOfEvent: z.object({ fieldId: z.string() }).optional()
 })
 
 export type EventInput = z.infer<typeof EventInput>
