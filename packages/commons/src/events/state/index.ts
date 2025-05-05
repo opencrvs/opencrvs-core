@@ -51,6 +51,7 @@ function getStatusFromActions(actions: Array<Action>) {
       case ActionType.NOTIFY:
         return EventStatus.NOTIFIED
       case ActionType.PRINT_CERTIFICATE:
+        return EventStatus.CERTIFIED
       case ActionType.ASSIGN:
       case ActionType.UNASSIGN:
       case ActionType.REQUEST_CORRECTION:
