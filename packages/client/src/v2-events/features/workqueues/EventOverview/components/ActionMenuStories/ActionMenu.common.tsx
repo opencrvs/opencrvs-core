@@ -17,7 +17,8 @@ import {
   Action,
   ActionStatus,
   ActionType,
-  EventDocument
+  EventDocument,
+  getUUID
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -30,10 +31,12 @@ const generator = testDataGenerator()
 const actionProps = {
   createdAt: '2025-04-18T08:34:20.711Z',
   createdBy: '67f6607c3866c994bcc0335a',
+  createdByRole: 'some-user-role',
   createdAtLocation: '03c4aab4-cd46-4fb1-b30d-2e3b7ba0bfe8',
   id: '827bf7e8-0e1e-4cef-aee7-66e71287a2c8',
   declaration: {},
-  status: ActionStatus.Accepted
+  status: ActionStatus.Accepted,
+  transactionId: getUUID()
 }
 
 export const mockActions: Record<
@@ -216,6 +219,9 @@ export function createStoriesFromScenarios(
         },
         name: name,
         parameters: {
+          chromatic: {
+            disableSnapshot: true
+          },
           layout: 'centered',
           msw: {
             handlers: {

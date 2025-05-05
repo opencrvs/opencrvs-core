@@ -159,10 +159,12 @@ export async function createEvent({
   eventInput,
   createdAtLocation,
   createdBy,
+  createdByRole,
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
   createdBy: string
+  createdByRole: string
   createdAtLocation: string
   transactionId: string
 }): Promise<EventDocument> {
@@ -192,10 +194,12 @@ export async function createEvent({
         type: ActionType.CREATE,
         createdAt: now,
         createdBy,
+        createdByRole,
         createdAtLocation,
         id: getUUID(),
         declaration: {},
-        status: ActionStatus.Accepted
+        status: ActionStatus.Accepted,
+        transactionId: getUUID()
       }
     ]
   })
@@ -205,10 +209,12 @@ export async function createEvent({
     assignedTo: createdBy,
     declaration: {},
     createdBy,
+    createdByRole,
     createdAt: now,
     createdAtLocation,
     id,
-    status: ActionStatus.Accepted
+    status: ActionStatus.Accepted,
+    transactionId: getUUID()
   }
 
   await db
@@ -268,13 +274,14 @@ export async function addAction(
   {
     eventId,
     createdBy,
+    createdByRole,
     token,
     createdAtLocation,
-    transactionId,
     status
   }: {
     eventId: string
     createdBy: string
+    createdByRole: string
     createdAtLocation: string
     token: string
     transactionId: string
@@ -304,7 +311,6 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
-    input.transactionId = `${transactionId}-${ActionType.MARKED_AS_DUPLICATE.toLocaleLowerCase()}`
     await db.collection<EventDocument>('events').updateOne(
       {
         id: eventId,
@@ -316,8 +322,10 @@ export async function addAction(
         $push: {
           actions: {
             ...input,
+            transactionId: getUUID(),
             type: ActionType.MARKED_AS_DUPLICATE,
             createdBy,
+            createdByRole,
             createdAt: now,
             createdAtLocation,
             id: getUUID(),
@@ -331,11 +339,10 @@ export async function addAction(
     )
   }
 
-  input.transactionId = `${transactionId}-${input.type.toLocaleLowerCase()}`
-
   const action: ActionDocument = {
     ...input,
     createdBy,
+    createdByRole,
     createdAt: now,
     createdAtLocation,
     id: actionId,
@@ -350,17 +357,18 @@ export async function addAction(
     )
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
-    input.transactionId = `${transactionId}-${ActionType.UNASSIGN.toLocaleLowerCase()}`
     await db.collection<EventDocument>('events').updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
+      { id: eventId },
       {
         $push: {
           actions: {
             ...input,
+            transactionId: getUUID(),
             type: ActionType.UNASSIGN,
             declaration: {},
             assignedTo: null,
             createdBy,
+            createdByRole,
             createdAt: now,
             createdAtLocation,
             id: actionId,

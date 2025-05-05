@@ -13,10 +13,11 @@ import { ActionConfig } from './ActionConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { WorkqueueConfig } from './WorkqueueConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { findAllFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -34,7 +35,6 @@ export const EventConfig = z
     label: TranslationConfig,
     actions: z.array(ActionConfig),
     declaration: DeclarationFormConfig,
-    workqueues: z.array(WorkqueueConfig),
     deduplication: z.array(DeduplicationConfig).optional().default([]),
     advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
   })
@@ -70,6 +70,9 @@ export const EventConfig = z
         path: ['advancedSearch']
       })
     }
+  })
+  .openapi({
+    ref: 'EventConfig'
   })
 
 export type EventConfig = z.infer<typeof EventConfig>

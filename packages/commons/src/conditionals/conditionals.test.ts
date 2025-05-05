@@ -494,9 +494,11 @@ describe('"event" conditionals', () => {
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
+            createdByRole: 'some-role',
             declaration: {},
             createdAtLocation: '123456',
-            status: ActionStatus.Accepted
+            status: ActionStatus.Accepted,
+            transactionId: '123456'
           }
         ]
       }

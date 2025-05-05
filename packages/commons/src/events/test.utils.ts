@@ -141,6 +141,7 @@ export const eventPayloadGenerator = {
         createdAt: new Date().toISOString(),
         transactionId: getUUID(),
         action: {
+          transactionId: getUUID(),
           type: actionType,
           status: ActionStatus.Accepted,
           declaration: {
@@ -155,6 +156,7 @@ export const eventPayloadGenerator = {
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
+          createdByRole: '@todo',
           createdAtLocation: '@todo'
         }
       } satisfies Draft,
@@ -420,12 +422,14 @@ export function generateActionDocument({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
+    createdByRole: 'FIELD_AGENT',
     id: getUUID(),
     createdAtLocation: 'TODO',
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
     ...defaults,
-    status: ActionStatus.Accepted
+    status: ActionStatus.Accepted,
+    transactionId: getUUID()
   } satisfies ActionBase
 
   switch (action) {
@@ -531,6 +535,7 @@ export const eventQueryDataGenerator = (
   modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
+  updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
   declaration: overrides.declaration ?? {
     'recommender.none': true,
     'applicant.firstname': 'Danny',

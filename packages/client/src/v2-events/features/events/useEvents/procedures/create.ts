@@ -19,7 +19,8 @@ import {
   ActionType,
   CreatedAction,
   getCurrentEventState,
-  ActionStatus
+  ActionStatus,
+  getUUID
 } from '@opencrvs/commons/client'
 
 import {
@@ -75,9 +76,11 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
+          createdByRole: 'offline',
           createdAtLocation: 'TODO',
           declaration: {},
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         } satisfies CreatedAction
       ]
     }

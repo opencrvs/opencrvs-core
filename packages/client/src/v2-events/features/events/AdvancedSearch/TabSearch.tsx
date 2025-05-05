@@ -18,9 +18,11 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
 import { EventConfig, FieldValue } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { getAllUniqueFields } from '@client/v2-events/utils'
+import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
+
+const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -65,7 +67,8 @@ function getSectionFields(
 
     const modifiedFields = advancedSearchFields.map((f) => ({
       ...f,
-      required: false as const // advanced search fields need not be required
+      required: false as const, // advanced search fields need not be required
+      defaultValue: undefined // advanced search fields need no default or initial value
     }))
 
     return (
@@ -107,11 +110,16 @@ export function TabSearch({
     Record<string, FieldValue>
   >(fieldValues ?? {})
 
-  const hasEnoughParams = Object.entries(formValues).length > 0
   const navigate = useNavigate()
 
+  const prevEventId = React.useRef(currentEvent.id)
+
   React.useEffect(() => {
-    setFormValues({})
+    // only reset formValues if another event search tab is selected
+    if (prevEventId.current !== currentEvent.id) {
+      setFormValues({})
+      prevEventId.current = currentEvent.id
+    }
   }, [currentEvent])
 
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
@@ -125,15 +133,6 @@ export function TabSearch({
     getAdvancedSearchFieldErrors(currentEvent, formValues)
   )
 
-  const handleSearch = () => {
-    const searchParams = stringify(formValues)
-    const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
-      eventType: currentEvent.id
-    })
-
-    navigate(`${navigateTo}?${searchParams.toString()}`)
-  }
-
   const SectionFields = getSectionFields(
     currentEvent,
     formValues,
@@ -141,6 +140,18 @@ export function TabSearch({
     intl,
     fieldValues
   )
+
+  const handleSearch = () => {
+    const searchParams = stringify(filterEmptyValues(formValues))
+    const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
+      eventType: currentEvent.id
+    })
+
+    navigate(`${navigateTo}?${searchParams.toString()}`)
+  }
+
+  const hasEnoughParams =
+    Object.entries(filterEmptyValues(formValues)).length >= MIN_PARAMS_TO_SEARCH
 
   const Search = (
     <SearchButton

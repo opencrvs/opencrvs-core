@@ -1006,28 +1006,6 @@ export const tennisClubMembershipEvent = defineConfig({
       }
     ]
   },
-  workqueues: [
-    {
-      id: 'all',
-      filters: []
-    },
-    {
-      id: 'ready-for-review',
-      filters: [
-        {
-          status: ['DECLARED']
-        }
-      ]
-    },
-    {
-      id: 'registered',
-      filters: [
-        {
-          status: ['REGISTERED']
-        }
-      ]
-    }
-  ],
   actions: [
     {
       type: ActionType.DECLARE,
@@ -1353,6 +1331,9 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'v2.event.tennis-club-membership.search'
       },
       fields: [
+        {
+          fieldId: 'applicant.firstname'
+        },
         {
           fieldId: 'applicant.dob'
         }

@@ -140,11 +140,17 @@ export function getDefaultActionProcedures(
     request: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema)
+      .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, transactionId } = input
         const actionId = getUUID()
+
+        if (ctx.isDuplicateAction) {
+          return ctx.event
+        }
+
         const event = await getEventById(eventId)
 
         const { responseStatus, body } = await requestActionConfirmation(
@@ -192,6 +198,7 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
+            createdByRole: user.role,
             createdAtLocation: user.primaryOfficeId,
             token,
             transactionId,
@@ -240,6 +247,7 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
+            createdByRole: user.role,
             createdAtLocation: user.primaryOfficeId,
             token,
             transactionId,
