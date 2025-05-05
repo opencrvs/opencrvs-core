@@ -108,7 +108,7 @@ describe('search tests', () => {
       expect(scores[0]).toBeGreaterThan(scores[2])
       expect(scores[1]).toEqual(scores[2])
     })
-    it('finds a single hit when searching with a bride and groom name', async () => {
+    it('finds the same Marriage event with different scores depending on how many names are provided', async () => {
       const t = await setupTestCases(setup)
 
       await addRecords({ client: t.elasticClient })
@@ -128,18 +128,47 @@ describe('search tests', () => {
 
       expect(allDocumentsCountCheck).toHaveProperty('body.hits.total.value', 12)
 
-      const searchParams = await formatSearchParams(
+      const searchParamsWithWitnessNameOnly = await formatSearchParams(
         {
           parameters: {
-            name: 'Jane Andrews James Ford'
+            name: 'Michael Andrews'
+          }
+        },
+        false
+      )
+      const searchParamsWithBrideAndGroom = await formatSearchParams(
+        {
+          parameters: {
+            name: 'Jane Austen James Ford'
           }
         },
         false
       )
 
-      const searchResult = await t.elasticClient.search(searchParams)
+      const searchResultWithWitnessNameOnly = await t.elasticClient.search(
+        searchParamsWithWitnessNameOnly
+      )
+      const searchResultWithWitnessNameOnlyScore =
+        searchResultWithWitnessNameOnly.hits.max_score as number
 
-      expect(searchResult).toHaveProperty('hits.total.value', 1)
+      const searchResultWithBrideAndGroom = await t.elasticClient.search(
+        searchParamsWithBrideAndGroom
+      )
+      const searchResultWithBrideAndGroomScore = searchResultWithBrideAndGroom
+        .hits.max_score as number
+
+      expect(searchResultWithWitnessNameOnly).toHaveProperty(
+        'hits.total.value',
+        1
+      )
+
+      expect(searchResultWithBrideAndGroom).toHaveProperty(
+        'hits.total.value',
+        1
+      )
+      expect(searchResultWithBrideAndGroomScore).toBeGreaterThan(
+        searchResultWithWitnessNameOnlyScore
+      )
     })
     it('finds two hits across Birth and Death events when searching with only a last name Smith', async () => {
       const t = await setupTestCases(setup)
@@ -326,7 +355,7 @@ const addRecords = async ({ client }: { client: elasticsearch.Client }) => {
     event: EVENT.MARRIAGE,
     compositionId: marriageRecordId,
     brideFirstNames: 'Jane',
-    brideFamilyName: 'Andrews',
+    brideFamilyName: 'Austen',
     groomFirstNames: 'James',
     groomFamilyName: 'Ford',
     witnessOneFirstNames: 'Michael',
@@ -346,11 +375,13 @@ const addRecords = async ({ client }: { client: elasticsearch.Client }) => {
     const bulkResponse = await client.bulk({ body: bulkOperations })
 
     if (bulkResponse.errors) {
+      // eslint-disable-next-line no-console
       console.error('Some records failed to index:', bulkResponse.items)
     } else {
       await client.indices.refresh({ index: OPENCRVS_INDEX_NAME })
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Failed to perform bulk insert:', error)
   }
 }
