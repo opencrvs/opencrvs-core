@@ -39,8 +39,7 @@ import {
   getActionAnnotationFields,
   getDeclaration,
   getDeclarationFields,
-  isPageVisible,
-  isVerificationPage,
+  getVisibleVerificationPageIds,
   omitHiddenFields,
   omitHiddenPaginatedFields
 } from './utils'
@@ -96,13 +95,10 @@ export function generateActionAnnotationInput(
 
   const annotation = fieldConfigsToActionPayload(annotationFields)
 
-  const visibleVerificationPageIds = findRecordActionPages(
-    configuration,
-    action
+  const visibleVerificationPageIds = getVisibleVerificationPageIds(
+    findRecordActionPages(configuration, action),
+    annotation
   )
-    .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
-    .map((page) => page.id)
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
