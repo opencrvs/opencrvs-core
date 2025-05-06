@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import { Header } from '@client/components/Header/Header'
 import { injectIntl, useIntl } from 'react-intl'
@@ -100,10 +100,9 @@ export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
     validNonDateFields.length +
     validationResultsPerDateField.filter((valid) => valid).length
 
-  return validCount >= 2 &&
-    validationResultsPerDateField.every((isValid) => isValid)
-    ? true
-    : false
+  return (
+    validCount >= 2 && validationResultsPerDateField.every((isValid) => isValid)
+  )
 }
 
 interface BirthSectionProps {
@@ -156,15 +155,8 @@ const BirthSection: React.FC<BirthSectionProps> = ({
     )
   )
 
-  const isDisabled = !isAdvancedSearchFormValid(formState)
+  const isFormNotValid = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
-
-  useEffect(() => {
-    if (showWarningMessage) {
-      // only when it has set the error message once
-      setShowWarningMessage(isAdvancedSearchFormValid(formState) ? false : true)
-    }
-  }, [formState, showWarningMessage])
 
   const accordionShowingLabel = intl.formatMessage(
     advancedSearchFormMessages.show
@@ -331,7 +323,7 @@ const BirthSection: React.FC<BirthSectionProps> = ({
         />
       </Accordion>
 
-      {showWarningMessage && (
+      {showWarningMessage && !isAdvancedSearchFormValid(formState) && (
         <ErrorTextWrapper>
           <ErrorText>{`${intl.formatMessage(
             errorMessages.searchParamCountError
@@ -347,7 +339,7 @@ const BirthSection: React.FC<BirthSectionProps> = ({
         size="large"
         disabled={false}
         onClick={() => {
-          if (isDisabled) {
+          if (isFormNotValid) {
             setShowWarningMessage(true)
           } else {
             dispatch(
@@ -397,7 +389,7 @@ const DeathSection: React.FC<DeathSectionProps> = ({
 
   const [showWarningMessage, setShowWarningMessage] = useState(false)
 
-  const isDisable = !isAdvancedSearchFormValid(formState)
+  const isFormNotValid = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
   const accordionShowingLabel = intl.formatMessage(
     advancedSearchFormMessages.show
@@ -410,13 +402,6 @@ const DeathSection: React.FC<DeathSectionProps> = ({
     hasDeathSearchJurisdictionScope,
     userOfficeId
   )
-
-  useEffect(() => {
-    if (showWarningMessage) {
-      // only when it has set the error message once
-      setShowWarningMessage(isAdvancedSearchFormValid(formState) ? false : true)
-    }
-  }, [formState, showWarningMessage])
 
   const {
     deathSearchRegistrationSection,
@@ -537,7 +522,7 @@ const DeathSection: React.FC<DeathSectionProps> = ({
         />
       </Accordion>
 
-      {showWarningMessage && (
+      {showWarningMessage && !isAdvancedSearchFormValid(formState) && (
         <ErrorTextWrapper>
           <ErrorText>{`${intl.formatMessage(
             errorMessages.searchParamCountError
@@ -553,7 +538,7 @@ const DeathSection: React.FC<DeathSectionProps> = ({
         fullWidth
         disabled={false}
         onClick={() => {
-          if (isDisable) {
+          if (isFormNotValid) {
             setShowWarningMessage(true)
           } else {
             dispatch(
