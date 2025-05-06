@@ -15,7 +15,14 @@ import type {
   inferInput
 } from '@trpc/tanstack-react-query'
 import { TRPCClientError } from '@trpc/client'
-import { ActionType, omitHiddenPaginatedFields } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventDocument,
+  FieldValue,
+  getCurrentEventState,
+  omitHiddenAnnotationFields,
+  omitHiddenPaginatedFields
+} from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -247,44 +254,50 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     ...mutationOptions
   })
 
-  return {
-    mutate: (params: inferInput<P>) => {
-      const localEvent = findLocalEventData(params.eventId)
+  type ActionMutationInput = inferInput<P> & { fullEvent?: EventDocument }
 
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
+  function getMutationPayload(params: ActionMutationInput) {
+    const { eventId } = params
+    const localEvent = findLocalEventData(eventId)
+    const eventConfiguration = eventConfigurations.find(
+      (event) => event.id === localEvent?.type
+    )
 
-      if (!eventConfiguration) {
-        throw new Error('Event configuration not found')
-      }
-
-      return mutation.mutate({
-        ...params,
-        declaration: omitHiddenPaginatedFields(
-          eventConfiguration.declaration,
-          params.declaration
-        )
-      })
-    },
-    mutateAsync: async (params: inferInput<P>) => {
-      const localEvent = findLocalEventData(params.eventId)
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
-
-      if (!eventConfiguration) {
-        throw new Error('Event configuration not found')
-      }
-
-      return mutation.mutateAsync({
-        ...params,
-        declaration: omitHiddenPaginatedFields(
-          eventConfiguration.declaration,
-          params.declaration
-        )
-      })
+    if (!eventConfiguration) {
+      throw new Error('Event configuration not found')
     }
+
+    const actionConfiguration = eventConfiguration.actions.find(
+      (action) => action.type === actionType
+    )
+
+    const originalDeclaration = params.fullEvent
+      ? getCurrentEventState(params.fullEvent).declaration
+      : {}
+
+    const annotation = actionConfiguration
+      ? omitHiddenAnnotationFields(
+          actionConfiguration,
+          params.annotation,
+          originalDeclaration
+        )
+      : {}
+
+    return {
+      ...params,
+      declaration: omitHiddenPaginatedFields(
+        eventConfiguration.declaration,
+        params.declaration
+      ),
+      annotation
+    }
+  }
+
+  return {
+    mutate: (params: ActionMutationInput) =>
+      mutation.mutate(getMutationPayload(params)),
+    mutateAsync: async (params: ActionMutationInput) =>
+      mutation.mutateAsync(getMutationPayload(params))
   }
 }
 

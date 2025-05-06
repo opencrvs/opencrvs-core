@@ -20,7 +20,11 @@ import { EventConfig, FieldValue } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
+import {
+  flattenFieldErrors,
+  getAdvancedSearchFieldErrors,
+  getDefaultSearchFields
+} from './utils'
 
 const MIN_PARAMS_TO_SEARCH = 2
 
@@ -57,6 +61,7 @@ function getSectionFields(
   const advancedSearchSections = event.advancedSearch
   const allUniqueFields = getAllUniqueFields(event)
   return advancedSearchSections.map((section) => {
+    const metadataFields = getDefaultSearchFields(section)
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
@@ -64,7 +69,8 @@ function getSectionFields(
       advancedSearchFieldId.includes(field.id)
     )
 
-    const modifiedFields = advancedSearchFields.map((f) => ({
+    const combinedFields = [...metadataFields, ...advancedSearchFields]
+    const modifiedFields = combinedFields.map((f) => ({
       ...f,
       required: false as const, // advanced search fields need not be required
       defaultValue: undefined // advanced search fields need no default or initial value
