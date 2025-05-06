@@ -207,15 +207,35 @@ export function isVerificationPage(
   return page.type === PageTypes.enum.VERIFICATION
 }
 
+export function getVisibleVerificationPageIds(
+  pages: PageConfig[],
+  annotation: ActionUpdate
+): string[] {
+  return pages
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, annotation))
+    .map((page) => page.id)
+}
+
 export function getActionVerificationPageIds(
   actionConfig: ActionConfig,
   annotation: ActionUpdate
-) {
+): string[] {
+  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
+    return [
+      ...getVisibleVerificationPageIds(actionConfig.onboardingForm, annotation),
+      ...getVisibleVerificationPageIds(
+        actionConfig.additionalDetailsForm,
+        annotation
+      )
+    ]
+  }
+
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
-    return actionConfig.printForm.pages
-      .filter((page) => isVerificationPage(page))
-      .filter((page) => isPageVisible(page, annotation))
-      .map((page) => page.id)
+    return getVisibleVerificationPageIds(
+      actionConfig.printForm.pages,
+      annotation
+    )
   }
 
   return []
