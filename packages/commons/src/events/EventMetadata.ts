@@ -11,6 +11,8 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { ActionType } from './ActionType'
+import { ActionStatus } from './ActionDocument'
 
 /**
  * Event statuses recognized by the system
@@ -27,7 +29,14 @@ export const EventStatus = {
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
-export const Flag = z.string()
+export const Flag = z
+  .string()
+  .regex(
+    new RegExp(
+      `^(${Object.values(ActionType).join('|')}):(${Object.values(ActionStatus).join('|')})$`
+    ),
+    'Flag must be in the format ActionType:ActionStatus'
+  )
 export type Flag = z.infer<typeof Flag>
 
 export const eventStatuses = Object.values(EventStatus)
