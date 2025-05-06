@@ -94,12 +94,14 @@ export const ReviewForLocalRegistrarComplete: Story = {
 }
 
 export const ReviewForRegistrationAgentComplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-  },
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -130,12 +132,14 @@ export const ReviewForRegistrationAgentComplete: Story = {
 }
 
 export const ReviewForRegistrationAgentIncomplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-  },
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,

@@ -145,12 +145,14 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
 }
 
 export const ReviewForRegistrationAgentComplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-  },
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -194,12 +196,14 @@ export const ReviewForRegistrationAgentComplete: Story = {
 }
 
 export const ReviewForRegistrationAgentIncomplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-  },
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -237,9 +241,11 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
   }
 }
 export const ReviewForFieldAgentComplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-  },
+  loaders: [
+    () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -283,9 +289,11 @@ export const ReviewForFieldAgentComplete: Story = {
 }
 
 export const ReviewForFieldAgentIncomplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-  },
+  loaders: [
+    () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,

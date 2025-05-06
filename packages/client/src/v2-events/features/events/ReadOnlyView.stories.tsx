@@ -61,9 +61,14 @@ const eventId = eventDocument.id
 const draft = generateEventDraftDocument(eventId)
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-  },
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+    }
+  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('Finds view record menu item in action menu', async () => {
