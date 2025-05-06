@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, expect, waitFor } from '@storybook/test'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -217,17 +217,6 @@ export function createStoriesFromScenarios(
           }
         ],
         name,
-        // beforeEach: () => {
-        //   window.localStorage.setItem(
-        //     'opencrvs',
-        //     // eslint-disable-next-line no-nested-ternary
-        //     role === UserRoles.LOCAL_REGISTRAR
-        //       ? generator.user.token.localRegistrar
-        //       : role === UserRoles.FIELD_AGENT
-        //         ? generator.user.token.fieldAgent
-        //         : generator.user.token.registrationAgent
-        //   )
-        // },
         parameters: {
           layout: 'centered',
           chromatic: { disableSnapshot: true },
