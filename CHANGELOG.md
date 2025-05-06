@@ -9,6 +9,7 @@
 ### Bug fixes
 
 - Filter out inactive locations in the Organisations menu [#8782](https://github.com/opencrvs/opencrvs-core/issues/8782)
+- Improve quick search results when searching by name [#9272](https://github.com/opencrvs/opencrvs-core/issues/9272)
 
 ## [1.7.1](https://github.com/opencrvs/opencrvs-core/compare/v1.7.0...v1.7.1)
 
