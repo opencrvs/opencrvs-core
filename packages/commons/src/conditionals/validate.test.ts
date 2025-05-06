@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldConfig } from '../events/FieldConfig'
+import { DateField, FieldConfig } from '../events/FieldConfig'
 import { FieldType } from '../events/FieldType'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
@@ -27,9 +27,10 @@ function getErrorIds(errors: { message: TranslationConfig }[]) {
   return errors.map((o) => o.message.id)
 }
 
-const dateFieldConfig = {
+const dateFieldConfig: DateField = {
   type: FieldType.DATE,
   id: 'date',
+  kind: 'EXACT',
   label: {
     defaultMessage: '',
     description: '',
