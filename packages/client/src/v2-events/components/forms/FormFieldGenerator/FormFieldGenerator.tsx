@@ -56,8 +56,6 @@ interface FormFieldGeneratorProps {
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
-  /** Current active form that is in edit mode. */
-  form: EventState
   /** Latest declaration before any editing has happened. Used for context. @TODO: Check whether declaration and initialValues could be mutually exclusive. */
   declaration?: EventState
   /** Default field values. Might equal to declaration, when a declaration form is rendered. */

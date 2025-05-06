@@ -50,7 +50,6 @@ const messages = defineMessages(messagesToDefine)
 
 function getSectionFields(
   event: EventConfig,
-  formValues: Record<string, FieldValue>,
   handleFieldChange: (fieldId: string, value: FieldValue) => void,
   intl: IntlShape,
   fieldValues?: Record<string, string>
@@ -82,7 +81,6 @@ function getSectionFields(
       >
         <FormFieldGenerator
           fields={modifiedFields}
-          form={formValues}
           id={section.title.id}
           initialValues={fieldValues}
           onChange={(updatedValues) => {
@@ -134,7 +132,6 @@ export function TabSearch({
 
   const SectionFields = getSectionFields(
     currentEvent,
-    formValues,
     handleFieldChange,
     intl,
     fieldValues

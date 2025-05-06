@@ -93,7 +93,6 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        form={{}}
         id="my-form"
         onChange={noop}
       />
@@ -146,7 +145,6 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
             }
           }
         ]}
-        form={{}}
         id="my-form"
         onChange={noop}
       />
@@ -196,7 +194,6 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
             }
           }
         ]}
-        form={{}}
         id="my-form"
         onChange={noop}
       />

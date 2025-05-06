@@ -49,11 +49,15 @@ export function Pages({
   continueButtonText?: string
   eventConfig?: EventConfig
   declaration?: EventState
+  validateBeforeNextPage?: boolean
 }) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
+
+  const [shouldValidate, setShouldValidate] = useState(false)
+  const [hasValidationErrors, setHasValidationErrors] = useState(false)
 
   // If page changes, scroll to the top of the page using the anchor element ID
   useEffect(() => {
@@ -64,6 +68,11 @@ export function Pages({
     const nextPageIdx = pageIdx + 1
     const nextPage =
       nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
+
+    if (validateBeforeNextPage) {
+      setShouldValidate(true)
+      return
+    }
 
     // If there is a next page on the form available, navigate to it.
     // Otherwise, submit the form.
@@ -94,10 +103,9 @@ export function Pages({
       declaration={declaration}
       eventConfig={eventConfig}
       fields={page.fields}
-      form={form}
       id="locationForm"
       initialValues={form}
-      setAllFieldsDirty={false}
+      setAllFieldsDirty={shouldValidate}
       onChange={(values) => setFormData(values)}
     />
   )

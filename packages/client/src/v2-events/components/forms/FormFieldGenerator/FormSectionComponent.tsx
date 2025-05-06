@@ -162,8 +162,12 @@ export function FormSectionComponent({
 
   const showValidationErrors = useCallback(
     (formFields: FieldConfig[]) => {
-      const touchedForm = formFields.reduce<Record<string, boolean>>(
-        (acc, { id: fieldId }) => {
+      const formattedFieldIds = formFields.map(({ id: fieldId }) =>
+        makeFormFieldIdFormikCompatible(fieldId)
+      )
+
+      const touchedForm = formattedFieldIds.reduce<Record<string, boolean>>(
+        (acc, fieldId) => {
           acc[fieldId] = true
           return acc
         },
@@ -236,6 +240,12 @@ export function FormSectionComponent({
     focusElementByHash()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (setAllFieldsDirty) {
+      showValidationErrors(fieldsWithDotSeparator)
+    }
+  }, [setAllFieldsDirty, fieldsWithDotSeparator, showValidationErrors])
 
   useEffect(() => {
     const userChangedForm = !isEqual(values, prevValuesRef.current)

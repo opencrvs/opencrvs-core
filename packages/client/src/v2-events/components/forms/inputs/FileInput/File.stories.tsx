@@ -41,7 +41,6 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
         fields={[
@@ -101,11 +100,9 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
             ]
           }
         ]}
-        form={formData}
         id="my-form"
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
@@ -119,7 +116,6 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
       layout: 'centered'
     },
     render: function Component(args) {
-      const [formData, setFormData] = React.useState({})
       return (
         <StyledFormFieldGenerator
           fields={[
@@ -142,11 +138,9 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
               }
             }
           ]}
-          form={formData}
           id="my-form"
           onChange={(data) => {
             args.onChange(data)
-            setFormData(data)
           }}
         />
       )

@@ -104,17 +104,14 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState<EventState>(declaration)
     return (
       <StyledFormFieldGenerator
         declaration={declaration}
         fields={fields}
-        form={formData}
         id="my-form"
-        initialValues={formData}
+        initialValues={declaration}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
@@ -212,21 +209,20 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState<EventState>({
+    const initialValues = {
       'tennis.style': 'defensive',
       'tennis.style.firstname': 'Roger'
-    })
+    }
+
     return (
       <StyledFormFieldGenerator
         declaration={declaration}
         fields={tennisStyleFields}
-        form={formData}
         id="my-form"
-        initialValues={formData}
+        initialValues={initialValues}
         setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
@@ -297,20 +293,19 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState<EventState>({
+    const initialValues = {
       'tennis.style': 'defensive'
-    })
+    }
+
     return (
       <StyledFormFieldGenerator
         declaration={declaration}
         fields={tennisStyleFields}
-        form={formData}
         id="my-form"
-        initialValues={formData}
+        initialValues={initialValues}
         setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
