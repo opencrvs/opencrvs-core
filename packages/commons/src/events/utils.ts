@@ -72,16 +72,6 @@ function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
 }
 
 /**
- * @returns All the fields in the event configuration.
- */
-export const findAllFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep([
-    ...getDeclarationFields(config),
-    ...getAllAnnotationFields(config)
-  ])
-}
-
-/**
  * @TODO: Request correction should have same format as print certificate
  */
 export const findRecordActionPages = (
@@ -302,4 +292,14 @@ export type IndexMap<T> = {
 
 export function isWriteAction(actionType: ActionType): boolean {
   return writeActions.safeParse(actionType).success
+}
+
+/**
+ * @returns All the fields in the event configuration.
+ */
+export const findAllFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep([
+    ...getDeclarationFields(config),
+    ...getAllAnnotationFields(config)
+  ])
 }
