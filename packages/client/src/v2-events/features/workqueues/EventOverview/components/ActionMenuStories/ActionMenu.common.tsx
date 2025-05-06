@@ -13,13 +13,16 @@ import { userEvent, within, expect, waitFor } from '@storybook/test'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { screen } from '@testing-library/dom'
 import {
   Action,
   ActionStatus,
   ActionType,
   ActionTypes,
   EventDocument,
-  getUUID
+  getUUID,
+  IndexMap,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -185,50 +188,10 @@ export const getHiddenActions = () =>
     {} as Record<ActionType, AssertType>
   )
 
-function getActionByLabel(label: string): ActionType {
-  const actionEntry = Object.entries(actionLabels).filter(
-    ([key, value]) => value.defaultMessage === label
-  )
-  if (actionEntry.length === 0) {
-    throw new Error(`Action with label ${label} not found`)
-  }
-  return actionEntry[0][0] as ActionType
-}
-
 export interface Scenario {
   name: string
   actions: (keyof typeof mockActions)[]
   expected: Record<ActionType, AssertType>
-}
-
-/**
- * Throwaway function to compare the action states.
- * @TODO: Remove this function when the issue with the test is resolved and no longer occurs.
- *
- */
-function compareActionStates(
-  actual: Record<string, string>,
-  expected: Record<string, string>
-): void {
-  const mismatches: { key: string; expected: string; actual: string }[] = []
-
-  const allKeys = new Set([...Object.keys(actual), ...Object.keys(expected)])
-
-  for (const key of allKeys) {
-    const actualValue = actual[key]
-    const expectedValue = expected[key]
-
-    if (actualValue !== expectedValue) {
-      mismatches.push({ key, expected: expectedValue, actual: actualValue })
-    }
-  }
-
-  if (mismatches.length === 0) {
-    console.log('✅ All keys match.')
-  } else {
-    console.log('❌ Mismatches found:')
-    console.log(mismatches)
-  }
 }
 
 export function createStoriesFromScenarios(
@@ -238,79 +201,78 @@ export function createStoriesFromScenarios(
   return scenarios.reduce(
     (acc, { name, actions, expected }) => {
       acc[name] = {
-        beforeEach: () => {
-          window.localStorage.setItem(
-            'opencrvs',
-            // eslint-disable-next-line no-nested-ternary
-            role === UserRoles.LOCAL_REGISTRAR
-              ? generator.user.token.localRegistrar
-              : role === UserRoles.FIELD_AGENT
-                ? generator.user.token.fieldAgent
-                : generator.user.token.registrationAgent
-          )
-        },
-        name: name,
+        loaders: [
+          () => {
+            window.localStorage.setItem(
+              'opencrvs',
+              // eslint-disable-next-line no-nested-ternary
+              role === UserRoles.LOCAL_REGISTRAR
+                ? generator.user.token.localRegistrar
+                : role === UserRoles.FIELD_AGENT
+                  ? generator.user.token.fieldAgent
+                  : generator.user.token.registrationAgent
+            )
+
+            return {}
+          }
+        ],
+        name,
+        // beforeEach: () => {
+        //   window.localStorage.setItem(
+        //     'opencrvs',
+        //     // eslint-disable-next-line no-nested-ternary
+        //     role === UserRoles.LOCAL_REGISTRAR
+        //       ? generator.user.token.localRegistrar
+        //       : role === UserRoles.FIELD_AGENT
+        //         ? generator.user.token.fieldAgent
+        //         : generator.user.token.registrationAgent
+        //   )
+        // },
         parameters: {
-          chromatic: {
-            disableSnapshot: true
-          },
           layout: 'centered',
+          chromatic: { disableSnapshot: true },
           msw: {
             handlers: {
               event: [
-                tRPCMsw.event.get.query(() => {
-                  return getMockEvent(actions, role)
-                })
+                tRPCMsw.event.get.query(() => getMockEvent(actions, role))
               ]
             }
           }
         },
-        render: function Component() {
-          return (
-            <React.Suspense fallback={<span>{'Loading...'}</span>}>
-              <ActionMenu eventId="some-event" />
-            </React.Suspense>
-          )
-        },
-        play: async ({ canvasElement }) => {
-          const canvas = within(canvasElement)
-
-          const actionButton = await canvas.findByRole('button', {
+        render: () => (
+          <React.Suspense fallback={<span>{'Loading…'}</span>}>
+            <ActionMenu eventId="some-event" />
+          </React.Suspense>
+        ),
+        play: async () => {
+          const actionButton = await screen.findByRole('button', {
             name: 'Action'
           })
 
           await expect(actionButton).toBeVisible()
           await userEvent.click(actionButton)
 
-          const listItems = await canvas.findAllByRole('listitem')
+          // We want to ensure compiler knows that action labels is a subset of action types.
+          const actionLabelsAsPartial: IndexMap<TranslationConfig> =
+            actionLabels
 
-          const actionVisibility = Object.values(ActionTypes.Values).reduce(
-            (hiddenActionAcc, action) => {
-              hiddenActionAcc[action] = AssertType.HIDDEN
-              return hiddenActionAcc
-            },
-            {} as Record<ActionType, AssertType>
-          )
+          for (const [action, expectedState] of Object.entries(expected)) {
+            const label = actionLabelsAsPartial[action]?.defaultMessage
+            if (!label) {
+              continue
+            } else if (expectedState === AssertType.HIDDEN) {
+              await expect(screen.queryByText(label)).not.toBeInTheDocument()
+            } else {
+              const item = await screen.findByText(label)
 
-          for (const li of listItems) {
-            const label = getActionByLabel(li.innerText)
-
-            actionVisibility[label] = li.hasAttribute('disabled')
-              ? AssertType.DISABLED
-              : AssertType.ENABLED
-          }
-
-          await waitFor(async () => {
-            try {
-              await expect(actionVisibility).toEqual(expected)
-            } catch (error) {
-              compareActionStates(actionVisibility, expected)
-              console.log('name', name)
-              console.log('role', role)
-              console.log(window.localStorage.getItem('opencrvs'))
-              throw error
+              await waitFor(async () => {
+                const isDisabled = item.hasAttribute('disabled')
+                await expect(isDisabled).toBe(
+                  expectedState === AssertType.DISABLED
+                )
+              })
             }
-          })
+          }
         }
       } satisfies StoryObj<typeof ActionMenu>
       return acc
