@@ -13,7 +13,6 @@ import React, { useEffect } from 'react'
 
 import { Formik } from 'formik'
 import { isEqual, noop } from 'lodash'
-import { useIntl } from 'react-intl'
 import {
   EventConfig,
   EventState,
@@ -34,13 +33,11 @@ import { FormSectionComponent } from './FormSectionComponent'
 
 function mapFieldsToValues(
   fields: FieldConfig[],
-  declaration: EventState,
   systemVariables: SystemVariables
 ) {
   return fields.reduce((memo, field) => {
     const fieldInitialValue = handleDefaultValue({
       field,
-      declaration,
       systemVariables
     })
 
@@ -68,37 +65,21 @@ interface FormFieldGeneratorProps {
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
-  ({
-    form,
-    onChange,
-    fields,
-    initialValues,
-    className,
-    eventConfig,
-    declaration,
-    id,
-    fieldsToShowValidationErrors,
-    readonlyMode,
-    setAllFieldsDirty = false
-  }) => {
-    const intl = useIntl()
+  (props) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
 
-    const formikCompatibleForm = makeFormFieldIdsFormikCompatible(form)
-
-    const formikOnChange = (values: EventState) => {
-      onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
-    }
+    const formikOnChange = (values: EventState) =>
+      props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
     const user = useUserAddress()
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(fields, formikCompatibleForm, {
+        ...mapFieldsToValues(props.fields, {
           $user: user
         }),
-        ...initialValues
+        ...props.initialValues
       })
 
     return (
@@ -108,7 +89,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
           getValidationErrorsForForm(
-            fields,
+            props.fields,
             makeFormikFieldIdsOpenCRVSCompatible(values)
           )
         }
@@ -139,21 +120,21 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
 
           return (
             <FormSectionComponent
-              className={className}
-              declaration={declaration}
+              className={props.className}
+              declaration={props.declaration}
               // @TODO: Formik does not type errors well. Actual error message differs from the type.
               // This was previously cast on FormSectionComponent level.
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               errors={formikProps.errors as any}
-              eventConfig={eventConfig}
-              fields={fields}
-              fieldsToShowValidationErrors={fieldsToShowValidationErrors}
-              id={id}
-              intl={intl}
-              readonlyMode={readonlyMode}
+              eventConfig={props.eventConfig}
+              fields={props.fields}
+              fieldsToShowValidationErrors={props.fieldsToShowValidationErrors}
+              id={props.id}
+              readonlyMode={props.readonlyMode}
               resetForm={formikProps.resetForm}
-              setAllFieldsDirty={setAllFieldsDirty}
+              setAllFieldsDirty={props.setAllFieldsDirty || false}
               setAllTouchedFields={setAllTouchedFields}
+              setErrors={formikProps.setErrors}
               setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}

@@ -198,6 +198,7 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
+            createdByRole: user.role,
             createdAtLocation: user.primaryOfficeId,
             token,
             transactionId,
@@ -246,6 +247,7 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
+            createdByRole: user.role,
             createdAtLocation: user.primaryOfficeId,
             token,
             transactionId,

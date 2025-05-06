@@ -75,6 +75,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
         status: ActionStatus.Accepted,
         createdAt: new Date().toISOString(),
         createdBy: '@todo',
+        createdByRole: '@todo',
         createdAtLocation: '@todo',
         ...variables,
         declaration: variables.declaration || {}
