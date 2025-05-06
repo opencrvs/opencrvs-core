@@ -22,10 +22,10 @@ import ReactTooltip from 'react-tooltip'
 import {
   ActionType,
   EventConfig,
-  EventDocument,
   getOrThrow,
   getAcceptedActions,
-  SCOPES
+  SCOPES,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -184,6 +184,7 @@ export function Review() {
     certificateConfig,
     language
   })
+
   /**
    * If there are validation errors in the form, redirect to the
    * print certificate form page, since the user should not be able to
@@ -247,6 +248,7 @@ export function Review() {
     if (confirmed) {
       try {
         await onlineActions.printCertificate.mutateAsync({
+          fullEvent,
           eventId: fullEvent.id,
           declaration: {},
           annotation: { ...annotation, templateId },

@@ -16,7 +16,7 @@ import {
   AnnotationActionType,
   EventConfig,
   isPageVisible,
-  isVerificationPage,
+  getVisibleVerificationPageIds,
   annotationActions,
   findRecordActionPages,
   DeclarationUpdateActionType,
@@ -176,10 +176,10 @@ function validateActionAnnotation({
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
-  const visibleVerificationPageIds = pages
-    .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
-    .map((page) => page.id)
+  const visibleVerificationPageIds = getVisibleVerificationPageIds(
+    pages,
+    annotation
+  )
 
   const formFields = pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)

@@ -172,6 +172,7 @@ function Workqueue({
         if (isInDrafts) {
           return 'DRAFT'
         }
+
         return event.status
       }
 
@@ -201,9 +202,9 @@ function Workqueue({
 
         status: intl.formatMessage(
           {
-            id: `events.status`,
+            id: 'v2.events.status',
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} NOTIFIED {In progress} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
           },
           {
             status: getEventStatus()
