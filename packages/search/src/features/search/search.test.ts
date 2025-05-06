@@ -30,26 +30,42 @@ describe('search tests', () => {
   afterEach(cleanup)
   afterAll(shutdown)
 
-  describe('standard advanced search', () => {
+  describe('quick name search', () => {
     it('finds several hits with identical scores when searching with only a first name John', async () => {
       const t = await setupTestCases(setup)
 
-      await addRecords({ client: t.elasticClient })
-
-      const allDocumentsCountCheck = await t.elasticClient.search(
+      const dataset = [
         {
-          index: OPENCRVS_INDEX_NAME,
-          body: {
-            query: { match_all: {} }
-          }
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Smith',
+          childFirstNames: 'John',
+          childFamilyName: 'Smith'
         },
         {
-          meta: true,
-          ignore: [404]
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Johnson',
+          childFirstNames: 'John',
+          childFamilyName: 'Johnson'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Williams',
+          childFirstNames: 'John',
+          childFamilyName: 'Williams'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'Jane Doe',
+          childFirstNames: 'Jane',
+          childFamilyName: 'Doe'
         }
-      )
+      ]
 
-      expect(allDocumentsCountCheck).toHaveProperty('body.hits.total.value', 12)
+      await addRecords({ records: dataset, client: t.elasticClient })
 
       const searchParams = await formatSearchParams(
         {
@@ -62,37 +78,57 @@ describe('search tests', () => {
 
       const searchResult = await t.elasticClient.search(searchParams)
 
-      expect(searchResult).toHaveProperty('hits.total.value', 3)
+      const hits = searchResult.hits.hits.map((hit) => ({
+        name: (hit._source as { name: string }).name,
+        score: hit._score
+      }))
 
-      const scores = searchResult.hits.hits.map((hit) => hit._score) as number[]
-
-      expect(scores[0]).toEqual(scores[1])
-      expect(scores[0]).toEqual(scores[2])
+      expect(hits).toEqual([
+        { name: 'John Smith', score: 1.0700248 },
+        { name: 'John Johnson', score: 1.0700248 },
+        { name: 'John Williams', score: 1.0700248 }
+      ])
     })
-    it('finds several hits when searching with a more specific name John Davis, but the score for John Davis is higher than other hits', async () => {
+    it('finds several hits when searching with a more specific name John Smith, but the score for John Smith is higher than other hits', async () => {
       const t = await setupTestCases(setup)
 
-      await addRecords({ client: t.elasticClient })
-
-      const allDocumentsCountCheck = await t.elasticClient.search(
+      const dataset = [
         {
-          index: OPENCRVS_INDEX_NAME,
-          body: {
-            query: { match_all: {} }
-          }
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Smith',
+          childFirstNames: 'John',
+          childFamilyName: 'Smith'
         },
         {
-          meta: true,
-          ignore: [404]
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Johnson',
+          childFirstNames: 'John',
+          childFamilyName: 'Johnson'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Williams',
+          childFirstNames: 'John',
+          childFamilyName: 'Williams'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'Jane Doe',
+          childFirstNames: 'Jane',
+          childFamilyName: 'Doe'
         }
-      )
+      ]
 
-      expect(allDocumentsCountCheck).toHaveProperty('body.hits.total.value', 12)
+      await addRecords({ records: dataset, client: t.elasticClient })
 
       const searchParams = await formatSearchParams(
         {
           parameters: {
-            name: 'John Davis'
+            name: 'John Smith'
           }
         },
         false
@@ -100,35 +136,64 @@ describe('search tests', () => {
 
       const searchResult = await t.elasticClient.search(searchParams)
 
-      expect(searchResult).toHaveProperty('hits.total.value', 3)
+      const hits = searchResult.hits.hits.map((hit) => ({
+        name: (hit._source as { name: string }).name,
+        score: hit._score
+      }))
 
-      const scores = searchResult.hits.hits.map((hit) => hit._score) as number[]
-
-      expect(scores[0]).toBeGreaterThan(scores[1])
-      expect(scores[0]).toBeGreaterThan(scores[2])
-      expect(scores[1]).toEqual(scores[2])
+      expect(hits).toEqual([
+        { name: 'John Smith', score: 4.6819434 },
+        { name: 'John Johnson', score: 1.0700248 },
+        { name: 'John Williams', score: 1.0700248 }
+      ])
     })
-    it('finds the same Marriage event with different scores depending on how many names are provided', async () => {
+    it('finds the Marriage event with a lower score when only the witness name is used for search', async () => {
       const t = await setupTestCases(setup)
 
-      await addRecords({ client: t.elasticClient })
-
-      const allDocumentsCountCheck = await t.elasticClient.search(
+      const dataset = [
         {
-          index: OPENCRVS_INDEX_NAME,
-          body: {
-            query: { match_all: {} }
-          }
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Smith',
+          childFirstNames: 'John',
+          childFamilyName: 'Smith'
         },
         {
-          meta: true,
-          ignore: [404]
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Johnson',
+          childFirstNames: 'John',
+          childFamilyName: 'Johnson'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Williams',
+          childFirstNames: 'John',
+          childFamilyName: 'Williams'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'Jane Doe',
+          childFirstNames: 'Jane',
+          childFamilyName: 'Doe'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.MARRIAGE,
+          brideFirstNames: 'Grace',
+          brideFamilyName: 'Collins',
+          groomFirstNames: 'James',
+          groomFamilyName: 'Ford',
+          witnessOneFirstNames: 'Michael',
+          witnessOneFamilyName: 'Andrews'
         }
-      )
+      ]
 
-      expect(allDocumentsCountCheck).toHaveProperty('body.hits.total.value', 12)
+      await addRecords({ records: dataset, client: t.elasticClient })
 
-      const searchParamsWithWitnessNameOnly = await formatSearchParams(
+      const searchParams = await formatSearchParams(
         {
           parameters: {
             name: 'Michael Andrews'
@@ -136,59 +201,173 @@ describe('search tests', () => {
         },
         false
       )
-      const searchParamsWithBrideAndGroom = await formatSearchParams(
+
+      const searchResult = await t.elasticClient.search(searchParams)
+
+      const hits = searchResult.hits.hits.map((hit) => {
+        const {
+          brideFirstNames,
+          brideFamilyName,
+          groomFirstNames,
+          groomFamilyName
+        } = hit._source as {
+          brideFirstNames: string
+          brideFamilyName: string
+          groomFirstNames: string
+          groomFamilyName: string
+        }
+        return {
+          brideFirstNames,
+          brideFamilyName,
+          groomFirstNames,
+          groomFamilyName,
+          score: hit._score
+        }
+      })
+
+      expect(hits).toEqual([
+        {
+          brideFirstNames: 'Grace',
+          brideFamilyName: 'Collins',
+          groomFirstNames: 'James',
+          groomFamilyName: 'Ford',
+          score: 0.5753642
+        }
+      ])
+    })
+    it('finds the same Marriage event with a higher score when bride and groom names are used for search', async () => {
+      const t = await setupTestCases(setup)
+
+      const dataset = [
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Smith',
+          childFirstNames: 'John',
+          childFamilyName: 'Smith'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Johnson',
+          childFirstNames: 'John',
+          childFamilyName: 'Johnson'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Williams',
+          childFirstNames: 'John',
+          childFamilyName: 'Williams'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'Jane Doe',
+          childFirstNames: 'Jane',
+          childFamilyName: 'Doe'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.MARRIAGE,
+          brideFirstNames: 'Grace',
+          brideFamilyName: 'Collins',
+          groomFirstNames: 'James',
+          groomFamilyName: 'Ford',
+          witnessOneFirstNames: 'Michael',
+          witnessOneFamilyName: 'Andrews'
+        }
+      ]
+
+      await addRecords({ records: dataset, client: t.elasticClient })
+
+      const searchParams = await formatSearchParams(
         {
           parameters: {
-            name: 'Jane Austen James Ford'
+            name: 'Grace Collins James Ford'
           }
         },
         false
       )
 
-      const searchResultWithWitnessNameOnly = await t.elasticClient.search(
-        searchParamsWithWitnessNameOnly
-      )
-      const searchResultWithWitnessNameOnlyScore =
-        searchResultWithWitnessNameOnly.hits.max_score as number
+      const searchResult = await t.elasticClient.search(searchParams)
 
-      const searchResultWithBrideAndGroom = await t.elasticClient.search(
-        searchParamsWithBrideAndGroom
-      )
-      const searchResultWithBrideAndGroomScore = searchResultWithBrideAndGroom
-        .hits.max_score as number
-
-      expect(searchResultWithWitnessNameOnly).toHaveProperty(
-        'hits.total.value',
-        1
-      )
-
-      expect(searchResultWithBrideAndGroom).toHaveProperty(
-        'hits.total.value',
-        1
-      )
-      expect(searchResultWithBrideAndGroomScore).toBeGreaterThan(
-        searchResultWithWitnessNameOnlyScore
-      )
+      const hits = searchResult.hits.hits.map((hit) => {
+        const {
+          brideFirstNames,
+          brideFamilyName,
+          groomFirstNames,
+          groomFamilyName
+        } = hit._source as {
+          brideFirstNames: string
+          brideFamilyName: string
+          groomFirstNames: string
+          groomFamilyName: string
+        }
+        return {
+          brideFirstNames,
+          brideFamilyName,
+          groomFirstNames,
+          groomFamilyName,
+          score: hit._score
+        }
+      })
+      expect(hits).toEqual([
+        {
+          brideFirstNames: 'Grace',
+          brideFamilyName: 'Collins',
+          groomFirstNames: 'James',
+          groomFamilyName: 'Ford',
+          score: 6.9043703
+        }
+      ])
     })
     it('finds two hits across Birth and Death events when searching with only a last name Smith', async () => {
       const t = await setupTestCases(setup)
 
-      await addRecords({ client: t.elasticClient })
-
-      const allDocumentsCountCheck = await t.elasticClient.search(
+      const dataset = [
         {
-          index: OPENCRVS_INDEX_NAME,
-          body: {
-            query: { match_all: {} }
-          }
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Smith',
+          childFirstNames: 'John',
+          childFamilyName: 'Smith'
         },
         {
-          meta: true,
-          ignore: [404]
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Johnson',
+          childFirstNames: 'John',
+          childFamilyName: 'Johnson'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Williams',
+          childFirstNames: 'John',
+          childFamilyName: 'Williams'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'Jane Doe',
+          childFirstNames: 'Jane',
+          childFamilyName: 'Doe'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.DEATH,
+          name: 'Robert Smith',
+          deceasedFirstNames: 'Robert',
+          deceasedFamilyName: 'Smith',
+          informantFirstNames: 'George',
+          informantFamilyName: 'Pope',
+          spouseFirstNames: 'Lily',
+          spouseFamilyName: 'Smith'
         }
-      )
+      ]
 
-      expect(allDocumentsCountCheck).toHaveProperty('body.hits.total.value', 12)
+      await addRecords({ records: dataset, client: t.elasticClient })
 
       const searchParams = await formatSearchParams(
         {
@@ -201,32 +380,67 @@ describe('search tests', () => {
 
       const searchResult = await t.elasticClient.search(searchParams)
 
-      expect(searchResult).toHaveProperty('hits.total.value', 2)
+      const hits = searchResult.hits.hits.map((hit) => ({
+        name: (hit._source as { name: string }).name,
+        score: hit._score
+      }))
+
+      expect(hits).toEqual([
+        { name: 'John Smith', score: 2.6264062 },
+        { name: 'Robert Smith', score: 2.6264062 }
+      ])
     })
-    it('finds a single hit of a Death event when searching with only a spouse name Lily Pope', async () => {
+    it('finds a Death event with a lower score when searching with only an informant name', async () => {
       const t = await setupTestCases(setup)
 
-      await addRecords({ client: t.elasticClient })
-
-      const allDocumentsCountCheck = await t.elasticClient.search(
+      const dataset = [
         {
-          index: OPENCRVS_INDEX_NAME,
-          body: {
-            query: { match_all: {} }
-          }
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Smith',
+          childFirstNames: 'John',
+          childFamilyName: 'Smith'
         },
         {
-          meta: true,
-          ignore: [404]
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Johnson',
+          childFirstNames: 'John',
+          childFamilyName: 'Johnson'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Williams',
+          childFirstNames: 'John',
+          childFamilyName: 'Williams'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'Jane Doe',
+          childFirstNames: 'Jane',
+          childFamilyName: 'Doe'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.DEATH,
+          name: 'Robert Smith',
+          deceasedFirstNames: 'Robert',
+          deceasedFamilyName: 'Smith',
+          informantFirstNames: 'George',
+          informantFamilyName: 'Pope',
+          spouseFirstNames: 'Lily',
+          spouseFamilyName: 'Smith'
         }
-      )
+      ]
 
-      expect(allDocumentsCountCheck).toHaveProperty('body.hits.total.value', 12)
+      await addRecords({ records: dataset, client: t.elasticClient })
 
       const searchParams = await formatSearchParams(
         {
           parameters: {
-            name: 'Lily Pope'
+            name: 'George Pope'
           }
         },
         false
@@ -234,27 +448,127 @@ describe('search tests', () => {
 
       const searchResult = await t.elasticClient.search(searchParams)
 
-      expect(searchResult).toHaveProperty('hits.total.value', 1)
+      const hits = searchResult.hits.hits.map((hit) => ({
+        name: (hit._source as { name: string }).name,
+        score: hit._score
+      }))
+
+      expect(hits).toEqual([{ name: 'Robert Smith', score: 0.2876821 }])
+    })
+    it('finds the same Death event with a higher score when searching with name of deceased', async () => {
+      const t = await setupTestCases(setup)
+
+      const dataset = [
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Smith',
+          childFirstNames: 'John',
+          childFamilyName: 'Smith'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Johnson',
+          childFirstNames: 'John',
+          childFamilyName: 'Johnson'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Williams',
+          childFirstNames: 'John',
+          childFamilyName: 'Williams'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'Jane Doe',
+          childFirstNames: 'Jane',
+          childFamilyName: 'Doe'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.DEATH,
+          name: 'Robert Smith',
+          deceasedFirstNames: 'Robert',
+          deceasedFamilyName: 'Smith',
+          informantFirstNames: 'George',
+          informantFamilyName: 'Pope',
+          spouseFirstNames: 'Lily',
+          spouseFamilyName: 'Smith'
+        }
+      ]
+
+      await addRecords({ records: dataset, client: t.elasticClient })
+
+      const searchParams = await formatSearchParams(
+        {
+          parameters: {
+            name: 'Robert Smith'
+          }
+        },
+        false
+      )
+
+      const searchResult = await t.elasticClient.search(searchParams)
+
+      const hits = searchResult.hits.hits.map((hit) => ({
+        name: (hit._source as { name: string }).name,
+        score: hit._score
+      }))
+
+      expect(hits).toEqual([
+        { name: 'Robert Smith', score: 6.7852893 },
+        { name: 'John Smith', score: 2.6264062 }
+      ])
     })
     it('does not find any hits when searching with a name that does not match any of the name fields', async () => {
       const t = await setupTestCases(setup)
 
-      await addRecords({ client: t.elasticClient })
-
-      const allDocumentsCountCheck = await t.elasticClient.search(
+      const dataset = [
         {
-          index: OPENCRVS_INDEX_NAME,
-          body: {
-            query: { match_all: {} }
-          }
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Smith',
+          childFirstNames: 'John',
+          childFamilyName: 'Smith'
         },
         {
-          meta: true,
-          ignore: [404]
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Johnson',
+          childFirstNames: 'John',
+          childFamilyName: 'Johnson'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'John Williams',
+          childFirstNames: 'John',
+          childFamilyName: 'Williams'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.BIRTH,
+          name: 'Jane Doe',
+          childFirstNames: 'Jane',
+          childFamilyName: 'Doe'
+        },
+        {
+          compositionId: uuid(),
+          event: EVENT.DEATH,
+          name: 'Robert Smith',
+          deceasedFirstNames: 'Robert',
+          deceasedFamilyName: 'Smith',
+          informantFirstNames: 'George',
+          informantFamilyName: 'Pope',
+          spouseFirstNames: 'Lily',
+          spouseFamilyName: 'Smith'
         }
-      )
+      ]
 
-      expect(allDocumentsCountCheck).toHaveProperty('body.hits.total.value', 12)
+      await addRecords({ records: dataset, client: t.elasticClient })
 
       const searchParams = await formatSearchParams(
         {
@@ -272,104 +586,17 @@ describe('search tests', () => {
   })
 })
 
-const childFirstNames = [
-  'John',
-  'Emma',
-  'Noah',
-  'Olivia',
-  'Aiden',
-  'Ava',
-  'Caden',
-  'John',
-  'John',
-  'Johnny'
-]
-
-const motherFirstNames = [
-  'Jessica',
-  'Ashley',
-  'Sarah',
-  'Amanda',
-  'Jennifer',
-  'Emily',
-  'Melissa',
-  'Nicole',
-  'Stephanie',
-  'Elizabeth'
-]
-
-const familyNames = [
-  'Smith',
-  'Johnson',
-  'Williams',
-  'Brown',
-  'Johnson',
-  'Garcia',
-  'Miller',
-  'Davis',
-  'Rodriguez',
-  'Martinez'
-]
-
-const generateBirthRecord = (id: string, i: number) => {
-  const familyName = familyNames[i]
-  return {
-    compositionId: id,
-    childFirstNames: childFirstNames[i],
-    childFamilyName: familyName,
-    name: `${childFirstNames[i]} ${familyName}`,
-    motherFirstNames: motherFirstNames[i],
-    motherFamilyName: familyName,
-    event: EVENT.BIRTH
-  }
-}
-
-const addRecords = async ({ client }: { client: elasticsearch.Client }) => {
-  const bulkOperations: any[] = []
-
-  for (let i = 0; i < 10; i++) {
-    const id = uuid()
-    const record = generateBirthRecord(id, i)
-
-    bulkOperations.push(
-      { index: { _index: OPENCRVS_INDEX_NAME, _id: id } },
-      record
-    )
-  }
-
-  const deathRecordId = uuid()
-  const deathRecord = {
-    event: EVENT.DEATH,
-    compositionId: deathRecordId,
-    name: 'Robert Smith',
-    deceasedFirstNames: 'Robert',
-    deceasedFamilyName: 'Smith',
-    informantFirstNames: 'George',
-    informantFamilyName: 'Henry',
-    spouseFirstNames: 'Lily',
-    spouseFamilyName: 'Pope'
-  }
-
-  const marriageRecordId = uuid()
-  const marriageRecord = {
-    event: EVENT.MARRIAGE,
-    compositionId: marriageRecordId,
-    brideFirstNames: 'Jane',
-    brideFamilyName: 'Austen',
-    groomFirstNames: 'James',
-    groomFamilyName: 'Ford',
-    witnessOneFirstNames: 'Michael',
-    witnessOneFamilyName: 'Andrews'
-  }
-
-  bulkOperations.push(
-    { index: { _index: OPENCRVS_INDEX_NAME, _id: deathRecordId } },
-    deathRecord
-  )
-  bulkOperations.push(
-    { index: { _index: OPENCRVS_INDEX_NAME, _id: marriageRecordId } },
-    marriageRecord
-  )
+const addRecords = async ({
+  records,
+  client
+}: {
+  records: any[]
+  client: elasticsearch.Client
+}) => {
+  const bulkOperations = records.flatMap((doc) => [
+    { index: { _index: OPENCRVS_INDEX_NAME, _id: doc.compositionId } },
+    doc
+  ])
 
   try {
     const bulkResponse = await client.bulk({ body: bulkOperations })
