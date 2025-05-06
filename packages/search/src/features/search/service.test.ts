@@ -253,8 +253,7 @@ describe('elasticsearch params formatter', () => {
                             'witnessTwoFirstNames',
                             'witnessTwoFamilyName'
                           ],
-                          type: 'cross_fields',
-                          operator: 'and'
+                          fuzziness: 'AUTO'
                         }
                       }
                     }

@@ -124,8 +124,7 @@ describe('elasticsearch db helper', () => {
                           'witnessTwoFirstNames',
                           'witnessTwoFamilyName'
                         ],
-                        type: 'cross_fields',
-                        operator: 'and'
+                        fuzziness: 'AUTO'
                       }
                     }
                   }

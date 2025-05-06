@@ -98,8 +98,7 @@ export async function advancedQueryBuilder(
                     'witnessTwoFirstNames',
                     'witnessTwoFamilyName'
                   ],
-                  type: 'cross_fields',
-                  operator: 'and'
+                  fuzziness: 'AUTO'
                 }
               }
             }
