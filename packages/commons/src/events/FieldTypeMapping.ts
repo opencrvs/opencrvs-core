@@ -43,8 +43,6 @@ import {
   FieldValue,
   FieldUpdateValueSchema,
   NumberFieldValue,
-  NonEmptyTextValue,
-  TextValue,
   DataFieldValue
 } from './FieldValue'
 import {
