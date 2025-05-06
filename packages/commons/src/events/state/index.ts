@@ -19,7 +19,7 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus } from '../EventMetadata'
+import { EventStatus, Flag } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
@@ -63,6 +63,29 @@ function getStatusFromActions(actions: Array<Action>) {
         return status
     }
   }, EventStatus.CREATED)
+}
+
+function getFlagsFromActions(actions: Action[]): Flag[] {
+  const flags: Flag[] = []
+  const actionStatus = actions
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .reduce(
+      (actionStatuses, { type, status }) => ({
+        ...actionStatuses,
+        [type]: status
+      }),
+      {} as Record<ActionType, ActionStatus>
+    )
+
+  Object.entries(actionStatus).forEach(([type, status]) => {
+    if (status === ActionStatus.Accepted) {
+      return
+    }
+
+    const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
+    flags.push(flag satisfies Flag)
+  })
+  return flags
 }
 
 function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
@@ -206,7 +229,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     trackingId: event.trackingId,
     registrationNumber,
     updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
-    flags: ['@ToDo']
+    flags: getFlagsFromActions(event.actions)
   })
 }
 
