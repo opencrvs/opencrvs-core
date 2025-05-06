@@ -16,14 +16,21 @@ import { stringify } from 'query-string'
 import { Accordion } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
-import { EventConfig, FieldValue } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  FieldType,
+  FieldValue,
+  Inferred,
+  SearchField
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import {
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
-  getDefaultSearchFields
+  getDefaultSearchFields,
+  SearchKey
 } from './utils'
 
 const MIN_PARAMS_TO_SEARCH = 2
@@ -52,6 +59,23 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
+function enhanceFieldWithSearchKind(
+  field: Inferred,
+  searchField: SearchField
+): Inferred {
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+  switch (field.type) {
+    case FieldType.DATE:
+      return searchField.config.type === SearchKey.EXACT ||
+        searchField.config.type === SearchKey.RANGE
+        ? { ...field, kind: searchField.config.type }
+        : field
+
+    default:
+      return field
+  }
+}
+
 function getSectionFields(
   event: EventConfig,
   formValues: Record<string, FieldValue>,
@@ -66,8 +90,20 @@ function getSectionFields(
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
-    const advancedSearchFields = allUniqueFields.filter((field) =>
-      advancedSearchFieldId.includes(field.id)
+
+    const fieldConfigMap = new Map(section.fields.map((f) => [f.fieldId, f]))
+
+    const advancedSearchFields: Inferred[] = allUniqueFields.reduce(
+      (acc: Inferred[], field: Inferred) => {
+        if (advancedSearchFieldId.includes(field.id)) {
+          const searchField = fieldConfigMap.get(field.id)
+          acc.push(
+            searchField ? enhanceFieldWithSearchKind(field, searchField) : field
+          )
+        }
+        return acc
+      },
+      []
     )
 
     const combinedFields = [...metadataFields, ...advancedSearchFields]

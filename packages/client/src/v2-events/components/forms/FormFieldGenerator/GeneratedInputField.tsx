@@ -40,7 +40,8 @@ import {
   isEmailFieldType,
   isDataFieldType,
   EventConfig,
-  getDeclarationFields
+  getDeclarationFields,
+  DateField as DateFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
@@ -158,6 +159,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <DateField.Input
             {...inputProps}
+            kind={(fieldDefinition as DateFieldType).kind}
             value={field.value}
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)

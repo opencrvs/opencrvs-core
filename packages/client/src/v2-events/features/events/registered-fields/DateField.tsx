@@ -17,6 +17,7 @@ import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
+import { SearchKey } from '@client/v2-events/features/events/AdvancedSearch/utils'
 
 const messages = defineMessages({
   dateFormat: {
@@ -31,10 +32,12 @@ const EMPTY_DATE = '--'
 function DateInput({
   onChange,
   value = '',
+  kind = SearchKey.EXACT,
   ...props
 }: DateFieldProps & {
   onChange: (newValue: string) => void
   value: string
+  kind: typeof SearchKey.EXACT | typeof SearchKey.RANGE
 }) {
   /**
    * Component library returns '--' for empty dates when input has been touched.

@@ -161,6 +161,7 @@ export type EmailField = z.infer<typeof EmailField>
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
   defaultValue: DateValue.optional(),
+  kind: z.enum(['EXACT', 'RANGE']).default('EXACT'),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
