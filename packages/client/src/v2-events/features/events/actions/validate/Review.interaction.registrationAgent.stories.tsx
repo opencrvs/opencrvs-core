@@ -198,11 +198,13 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
     const modal = within(await canvas.findByRole('dialog'))
 
     await step('Archive is disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
-      })
+      await waitFor(async () => {
+        const archiveButton = await modal.findByRole('button', {
+          name: 'Archive'
+        })
 
-      await expect(archiveButton).toBeDisabled()
+        await expect(archiveButton.hasAttribute('disabled')).toBe(true)
+      })
     })
 
     await step('Add description', async () => {
@@ -214,11 +216,12 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
     })
 
     await step('Archive is not disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
+      await waitFor(async () => {
+        const archiveButton = await modal.findByRole('button', {
+          name: 'Archive'
+        })
+        await expect(archiveButton).toBeEnabled()
       })
-
-      await expect(archiveButton).not.toBeDisabled()
     })
 
     await step('Mark as a duplicate', async () => {
@@ -230,13 +233,15 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
     })
 
     await step('Archive is not disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
+      await waitFor(async () => {
+        const archiveButton = await modal.findByRole('button', {
+          name: 'Archive'
+        })
+        await expect(archiveButton).toBeEnabled()
+
+        await userEvent.click(archiveButton)
       })
 
-      await expect(archiveButton).not.toBeDisabled()
-
-      await userEvent.click(archiveButton)
       await within(canvasElement).findByText('All events')
 
       await waitFor(async () => {
