@@ -13,7 +13,7 @@ import { ActionConfig } from './ActionConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { AdvancedSearchConfig } from './AdvancedSearchConfig'
+import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
 import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
@@ -60,13 +60,21 @@ export const EventConfig = z
     }
 
     const invalidFields = event.advancedSearch.flatMap((section) =>
-      section.fields.filter((field) => !fieldIds.includes(field.fieldId))
+      // Check if the fieldId is not in the fieldIds array
+      // and also not in the metadataFields array
+      section.fields.filter(
+        (field) =>
+          !(
+            fieldIds.includes(field.fieldId) ||
+            (EventFieldId.options as string[]).includes(field.fieldId)
+          )
+      )
     )
 
     if (invalidFields.length > 0) {
       ctx.addIssue({
         code: 'custom',
-        message: `Advanced search id must match a field id in fields array.
+        message: `Advanced search id must match a field id of form fields or pre-defined metadata fields.
     Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
       .map((f) => f.fieldId)
       .join(', ')}`,

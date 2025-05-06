@@ -39,8 +39,7 @@ import {
   getActionAnnotationFields,
   getDeclaration,
   getDeclarationFields,
-  isPageVisible,
-  isVerificationPage,
+  getVisibleVerificationPageIds,
   omitHiddenFields,
   omitHiddenPaginatedFields
 } from './utils'
@@ -96,13 +95,10 @@ export function generateActionAnnotationInput(
 
   const annotation = fieldConfigsToActionPayload(annotationFields)
 
-  const visibleVerificationPageIds = findRecordActionPages(
-    configuration,
-    action
+  const visibleVerificationPageIds = getVisibleVerificationPageIds(
+    findRecordActionPages(configuration, action),
+    annotation
   )
-    .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
-    .map((page) => page.id)
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
@@ -157,7 +153,8 @@ export const eventPayloadGenerator = {
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdByRole: '@todo',
-          createdAtLocation: '@todo'
+          createdAtLocation: '@todo',
+          updatedAtLocation: '@todo'
         }
       } satisfies Draft,
       input
@@ -425,6 +422,7 @@ export function generateActionDocument({
     createdByRole: 'FIELD_AGENT',
     id: getUUID(),
     createdAtLocation: 'TODO',
+    updatedAtLocation: 'TODO',
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
     ...defaults,
@@ -533,7 +531,7 @@ export const eventQueryDataGenerator = (
   createdBy: overrides.createdBy ?? getUUID(),
   createdAtLocation: overrides.createdAtLocation ?? getUUID(),
   updatedAtLocation: overrides.updatedAtLocation ?? getUUID(),
-  modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
+  updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
   updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',

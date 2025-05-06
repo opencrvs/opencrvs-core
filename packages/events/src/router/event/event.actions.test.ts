@@ -173,11 +173,10 @@ test('Action data accepts partial changes', async () => {
   })
 
   const events = await client.event.list()
-
   expect(events).toEqual([
     expect.objectContaining({
       ...stateAfterVillageRemoval,
-      modifiedAt: expect.any(String)
+      updatedAt: expect.any(String)
     })
   ])
 })
