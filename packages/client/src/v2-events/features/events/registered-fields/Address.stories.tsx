@@ -32,9 +32,11 @@ const meta: Meta<typeof FormFieldGenerator> = {
   args: { onChange: fn() },
   decorators: [
     (Story) => (
-      <TRPCProvider>
-        <Story />
-      </TRPCProvider>
+      <React.Suspense>
+        <TRPCProvider>
+          <Story />
+        </TRPCProvider>
+      </React.Suspense>
     )
   ]
 }

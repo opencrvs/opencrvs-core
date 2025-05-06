@@ -25,7 +25,9 @@ import {
   AdministrativeAreas,
   isFieldVisible,
   alwaysTrue,
-  AddressType
+  AddressType,
+  never,
+  isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -247,6 +249,10 @@ const ADMIN_STRUCTURE = [
   {
     id: 'urbanOrRural',
     conditionals: [
+      {
+        type: ConditionalType.DISPLAY_ON_REVIEW,
+        conditional: never()
+      },
       {
         type: ConditionalType.SHOW,
         conditional: and(
@@ -477,7 +483,7 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
         .filter(
           (field) =>
             field.value &&
-            isFieldVisible(field.field satisfies FieldConfig, value)
+            isFieldDisplayedOnReview(field.field satisfies FieldConfig, value)
         )
         .map((field) => (
           <React.Fragment key={field.field.id}>
