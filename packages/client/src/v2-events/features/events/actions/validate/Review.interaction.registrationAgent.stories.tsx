@@ -46,14 +46,16 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof Review> = {
   title: 'Validate/Review/Interaction/Registration Agent',
+  beforeEach: () => {
+    declarationTrpcMsw.events.reset()
+    declarationTrpcMsw.drafts.reset()
+  },
   loaders: [
     () => {
       window.localStorage.setItem(
         'opencrvs',
         generator.user.token.registrationAgent
       )
-      declarationTrpcMsw.events.reset()
-      declarationTrpcMsw.drafts.reset()
     }
   ]
 }
@@ -118,9 +120,15 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for approval' })
-      )
+
+      await waitFor(async () => {
+        const sendForApprovalButton = await canvas.findByRole('button', {
+          name: 'Send for approval'
+        })
+
+        await expect(sendForApprovalButton).toBeEnabled()
+        await userEvent.click(sendForApprovalButton)
+      })
 
       const modal = within(await canvas.findByRole('dialog'))
 
