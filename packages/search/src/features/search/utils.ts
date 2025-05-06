@@ -38,31 +38,73 @@ export async function advancedQueryBuilder(
 
   if (params.name) {
     must.push({
-      multi_match: {
-        query: params.name,
-        fields: [
-          'childFirstNames',
-          'childFamilyName',
-          'motherFirstNames',
-          'motherFamilyName',
-          'fatherFirstNames',
-          'fatherFamilyName',
-          'informantFirstNames',
-          'informantFamilyName',
-          'deceasedFirstNames',
-          'deceasedFamilyName',
-          'spouseFirstNames',
-          'spouseFamilyName',
-          'brideFirstNames',
-          'brideFamilyName',
-          'groomFirstNames',
-          'groomFamilyName',
-          'witnessOneFirstNames',
-          'witnessOneFamilyName',
-          'witnessTwoFirstNames',
-          'witnessTwoFamilyName'
+      bool: {
+        should: [
+          {
+            bool: {
+              filter: { term: { event: 'birth' } },
+              must: {
+                multi_match: {
+                  query: params.name,
+                  fields: [
+                    'name^3',
+                    'childFirstNames^2',
+                    'childFamilyName',
+                    'informantFirstNames',
+                    'informantFamilyName',
+                    'motherFirstNames',
+                    'motherFamilyName',
+                    'fatherFirstNames',
+                    'fatherFamilyName'
+                  ],
+                  fuzziness: 'AUTO'
+                }
+              }
+            }
+          },
+          {
+            bool: {
+              filter: { term: { event: 'death' } },
+              must: {
+                multi_match: {
+                  query: params.name,
+                  fields: [
+                    'name^3',
+                    'deceasedFirstNames^2',
+                    'deceasedFamilyName',
+                    'informantFirstNames',
+                    'informantFamilyName',
+                    'spouseFirstNames',
+                    'spouseFamilyName'
+                  ],
+                  fuzziness: 'AUTO'
+                }
+              }
+            }
+          },
+          {
+            bool: {
+              filter: { term: { event: 'marriage' } },
+              must: {
+                multi_match: {
+                  query: params.name,
+                  fields: [
+                    'brideFirstNames^6',
+                    'brideFamilyName^6',
+                    'groomFirstNames^6',
+                    'groomFamilyName^6',
+                    'witnessOneFirstNames',
+                    'witnessOneFamilyName',
+                    'witnessTwoFirstNames',
+                    'witnessTwoFamilyName'
+                  ],
+                  fuzziness: 'AUTO'
+                }
+              }
+            }
+          }
         ],
-        fuzziness: 'AUTO'
+        minimum_should_match: 1
       }
     })
   }
