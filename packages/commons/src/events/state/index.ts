@@ -205,7 +205,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     declaration: aggregateActionDeclarations(activeActions),
     trackingId: event.trackingId,
     registrationNumber,
-    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions)
+    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
+    flags: ['@ToDo']
   })
 }
 

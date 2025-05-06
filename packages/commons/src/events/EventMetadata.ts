@@ -27,6 +27,9 @@ export const EventStatus = {
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
+export const Flag = z.string()
+export type Flag = z.infer<typeof Flag>
+
 export const eventStatuses = Object.values(EventStatus)
 export const EventStatuses = z.nativeEnum(EventStatus)
 
@@ -48,7 +51,8 @@ export const EventMetadata = z.object({
   assignedTo: z.string().nullish(),
   updatedBy: z.string(),
   trackingId: z.string(),
-  registrationNumber: z.string().nullish()
+  registrationNumber: z.string().nullish(),
+  flags: z.array(Flag)
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
@@ -128,5 +132,10 @@ export const eventMetadataLabelMap: Record<
     id: 'event.registrationNumber.label',
     defaultMessage: 'Registration Number',
     description: 'Registration Number'
+  },
+  'event.flags': {
+    id: 'event.flags.label',
+    defaultMessage: 'Flags',
+    description: 'Flags'
   }
 }
