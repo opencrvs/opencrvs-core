@@ -40,11 +40,11 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof Review> = {
   title: 'Validate/Review/Interaction/Local Registrar',
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  },
   loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
     () => {
       window.localStorage.setItem(
         'opencrvs',

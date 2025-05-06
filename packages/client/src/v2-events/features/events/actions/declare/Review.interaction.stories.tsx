@@ -80,11 +80,11 @@ const mockUser = {
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  },
   loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
     () => {
       window.localStorage.setItem(
         'opencrvs',
@@ -158,11 +158,11 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 }
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  },
   loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
     () => {
       window.localStorage.setItem(
         'opencrvs',
@@ -230,11 +230,11 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 }
 
 export const ReviewForFieldAgentCompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  },
   loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
     () => {
       window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
     }
@@ -300,11 +300,11 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 }
 
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  },
   loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
     () => {
       window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
     }
