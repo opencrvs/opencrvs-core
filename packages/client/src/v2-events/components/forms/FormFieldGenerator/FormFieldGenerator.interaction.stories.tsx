@@ -218,7 +218,6 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
         fields={tennisStyleFields}
         id="my-form"
         initialValues={initialValues}
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
         }}
@@ -300,7 +299,6 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
         fields={tennisStyleFields}
         id="my-form"
         initialValues={initialValues}
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
         }}

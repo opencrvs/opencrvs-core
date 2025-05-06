@@ -49,7 +49,7 @@ interface FormFieldGeneratorProps {
   /** form id */
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
-  setAllFieldsDirty?: boolean
+  validateAllFields?: boolean
   onChange: (values: EventState) => void
   readonlyMode?: boolean
   className?: string
@@ -68,7 +68,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     className,
     eventConfig,
     fieldsToShowValidationErrors,
-    setAllFieldsDirty = false,
+    validateAllFields = false,
     readonlyMode,
     id
   }) => {
@@ -138,13 +138,13 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               initialValues={initialValues}
               readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}
-              setAllFieldsDirty={setAllFieldsDirty}
               setAllTouchedFields={setAllTouchedFields}
               setErrors={formikProps.setErrors}
               setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}
+              validateAllFields={validateAllFields}
               values={formikProps.values}
               onChange={formikOnChange}
             />

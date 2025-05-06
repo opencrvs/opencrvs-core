@@ -49,12 +49,13 @@ type AllProps = {
    * Update the form values in the non-formik state.
    */
   onChange: (values: EventState) => void
-  setAllFieldsDirty: boolean
+  validateAllFields: boolean
   /**
    * Update the touched values in the non-formik state.
    */
   setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
   fieldsToShowValidationErrors?: FieldConfig[]
+  onSuccessfulValidation?: () => void
 } & UsedFormikProps
 
 /**
@@ -132,7 +133,7 @@ export function FormSectionComponent({
   onChange,
   resetForm,
   setErrors,
-  setAllFieldsDirty,
+  validateAllFields,
   fieldsToShowValidationErrors
 }: AllProps) {
   const intl = useIntl()
@@ -229,19 +230,13 @@ export function FormSectionComponent({
   )
 
   useEffect(() => {
-    if (setAllFieldsDirty) {
+    if (validateAllFields) {
       showValidationErrors(fieldsWithDotSeparator)
     }
 
     focusElementByHash()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useEffect(() => {
-    if (setAllFieldsDirty) {
-      showValidationErrors(fieldsWithDotSeparator)
-    }
-  }, [setAllFieldsDirty, fieldsWithDotSeparator, showValidationErrors])
 
   useEffect(() => {
     const userChangedForm = !isEqual(values, prevValuesRef.current)
@@ -257,7 +252,7 @@ export function FormSectionComponent({
     if (sectionChanged) {
       resetForm()
 
-      const fieldsToValidate = setAllFieldsDirty
+      const fieldsToValidate = validateAllFields
         ? fieldsWithDotSeparator
         : (fieldsToShowValidationErrors ?? [])
 
@@ -275,13 +270,19 @@ export function FormSectionComponent({
     resetForm,
     fieldsWithDotSeparator,
     fieldsToShowValidationErrors,
-    setAllFieldsDirty,
+    validateAllFields,
     showValidationErrors
   ])
 
   // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
   // Address is the only deep value.
   const completeForm = { ...initialValues, ...form }
+
+  const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
+    const fieldErrors = errors[field.id]?.errors
+    const hasErrors = fieldErrors && fieldErrors.length > 0
+    return isFieldVisible(field, completeForm) && hasErrors
+  })
 
   return (
     <section className={className}>
