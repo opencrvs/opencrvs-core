@@ -630,7 +630,7 @@ components:
                                   description: Maximum length of the text
                                 type:
                                   type: string
-                                  enum: &a6
+                                  enum: &a7
                                     - text
                                     - password
                                 prefix:
@@ -667,7 +667,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: &a7
+                              default: &a8
                                 type: text
                           required:
                             - id
@@ -1023,7 +1023,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: &a8
+                              default: &a9
                                 rows: 4
                           required:
                             - id
@@ -1330,7 +1330,7 @@ components:
                                         - h3
                                         - h2
                                         - h1
-                              default: &a9 {}
+                              default: &a10 {}
                           required:
                             - id
                             - label
@@ -1502,7 +1502,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: &a10
+                                      enum: &a11
                                         - NORMAL
                                         - LARGE
                           required:
@@ -1667,7 +1667,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: &a11 {}
+                              default: &a12 {}
                           required:
                             - id
                             - label
@@ -2260,7 +2260,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: &a12
+                                      enum: &a13
                                         - full
                                         - auto
                                       description: Whether the file upload button should take the full width of the
@@ -2284,7 +2284,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: &a13
+                              default: &a14
                                 maxFileSize: 5242880
                           required:
                             - id
@@ -2566,7 +2566,7 @@ components:
                                   description: Parent location
                                 type:
                                   type: string
-                                  enum: &a14
+                                  enum: &a15
                                     - ADMIN_STRUCTURE
                                     - HEALTH_FACILITY
                                     - CRVS_OFFICE
@@ -3285,7 +3285,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: &a15
+                              default: &a16
                                 maxFileSize: 5242880
                           required:
                             - id
@@ -3428,7 +3428,7 @@ components:
                                 maxLength:
                                   type: number
                                   description: Maximum length of the text
-                              default: &a16
+                              default: &a17
                                 maxLength: 10
                           required:
                             - id
@@ -3614,7 +3614,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: &a17
+                              default: &a18
                                 maxFileSize: 5242880
                           required:
                             - id
@@ -3911,26 +3911,113 @@ components:
               fields:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    fieldId:
-                      type: string
-                    config:
-                      type: object
+                  oneOf:
+                    - type: object
                       properties:
-                        type:
+                        config:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum: &a6
+                                - FUZZY
+                                - EXACT
+                                - RANGE
+                              description: Determines the type of field
+                          required:
+                            - type
+                        options:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              value:
+                                type: string
+                                description: The value of the option
+                              label:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                    description: The identifier of the translation referred in translation CSV files
+                                  defaultMessage:
+                                    type: string
+                                    description: Default translation message
+                                  description:
+                                    type: string
+                                    description: Describe the translation for a translator to be able to identify
+                                      it.
+                                required:
+                                  - id
+                                  - defaultMessage
+                                  - description
+                                description: The label of the option
+                            required:
+                              - value
+                              - label
+                        fieldId:
+                          type: string
+                        fieldType:
                           type: string
                           enum:
-                            - FUZZY
-                            - EXACT
-                            - RANGE
-                          description: Determines the type of field
+                            - field
                       required:
-                        - type
-                      description: Configuration options for the field
-                  required:
-                    - fieldId
-                default: []
+                        - config
+                        - fieldId
+                        - fieldType
+                    - type: object
+                      properties:
+                        config:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum: *a6
+                              description: Determines the type of field
+                          required:
+                            - type
+                        options:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              value:
+                                type: string
+                                description: The value of the option
+                              label:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                    description: The identifier of the translation referred in translation CSV files
+                                  defaultMessage:
+                                    type: string
+                                    description: Default translation message
+                                  description:
+                                    type: string
+                                    description: Describe the translation for a translator to be able to identify
+                                      it.
+                                required:
+                                  - id
+                                  - defaultMessage
+                                  - description
+                                description: The label of the option
+                            required:
+                              - value
+                              - label
+                        fieldId:
+                          type: string
+                          enum:
+                            - trackingId
+                            - status
+                        fieldType:
+                          type: string
+                          enum:
+                            - event
+                      required:
+                        - config
+                        - fieldId
+                        - fieldType
                 description: Advanced search fields.
             required:
               - title
@@ -4020,7 +4107,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: &a18 []
+          default: &a19 []
         draft:
           type: boolean
         type:
@@ -4404,7 +4491,7 @@ components:
                             description: Maximum length of the text
                           type:
                             type: string
-                            enum: *a6
+                            enum: *a7
                           prefix:
                             type: object
                             properties:
@@ -4439,7 +4526,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a7
+                        default: *a8
                     required:
                       - id
                       - label
@@ -4794,7 +4881,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a8
+                        default: *a9
                     required:
                       - id
                       - label
@@ -5092,7 +5179,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a9
+                        default: *a10
                     required:
                       - id
                       - label
@@ -5264,7 +5351,7 @@ components:
                             properties:
                               size:
                                 type: string
-                                enum: *a10
+                                enum: *a11
                     required:
                       - id
                       - label
@@ -5427,7 +5514,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a11
+                        default: *a12
                     required:
                       - id
                       - label
@@ -6016,7 +6103,7 @@ components:
                             properties:
                               width:
                                 type: string
-                                enum: *a12
+                                enum: *a13
                                 description: Whether the file upload button should take the full width of the
                                   container or not
                           fileName:
@@ -6038,7 +6125,7 @@ components:
                               - description
                         required:
                           - maxFileSize
-                        default: *a13
+                        default: *a14
                     required:
                       - id
                       - label
@@ -6319,7 +6406,7 @@ components:
                             description: Parent location
                           type:
                             type: string
-                            enum: *a14
+                            enum: *a15
                         required:
                           - type
                         description: Administrative area options
@@ -7035,7 +7122,7 @@ components:
                             description: List of allowed file formats for the signature
                         required:
                           - maxFileSize
-                        default: *a15
+                        default: *a16
                     required:
                       - id
                       - label
@@ -7177,7 +7264,7 @@ components:
                           maxLength:
                             type: number
                             description: Maximum length of the text
-                        default: *a16
+                        default: *a17
                     required:
                       - id
                       - label
@@ -7362,7 +7449,7 @@ components:
                             description: List of allowed file formats for the signature
                         required:
                           - maxFileSize
-                        default: *a17
+                        default: *a18
                     required:
                       - id
                       - label
@@ -7641,7 +7728,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -8025,7 +8112,7 @@ components:
                             description: Maximum length of the text
                           type:
                             type: string
-                            enum: *a6
+                            enum: *a7
                           prefix:
                             type: object
                             properties:
@@ -8060,7 +8147,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a7
+                        default: *a8
                     required:
                       - id
                       - label
@@ -8415,7 +8502,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a8
+                        default: *a9
                     required:
                       - id
                       - label
@@ -8713,7 +8800,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a9
+                        default: *a10
                     required:
                       - id
                       - label
@@ -8885,7 +8972,7 @@ components:
                             properties:
                               size:
                                 type: string
-                                enum: *a10
+                                enum: *a11
                     required:
                       - id
                       - label
@@ -9048,7 +9135,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a11
+                        default: *a12
                     required:
                       - id
                       - label
@@ -9637,7 +9724,7 @@ components:
                             properties:
                               width:
                                 type: string
-                                enum: *a12
+                                enum: *a13
                                 description: Whether the file upload button should take the full width of the
                                   container or not
                           fileName:
@@ -9659,7 +9746,7 @@ components:
                               - description
                         required:
                           - maxFileSize
-                        default: *a13
+                        default: *a14
                     required:
                       - id
                       - label
@@ -9940,7 +10027,7 @@ components:
                             description: Parent location
                           type:
                             type: string
-                            enum: *a14
+                            enum: *a15
                         required:
                           - type
                         description: Administrative area options
@@ -10656,7 +10743,7 @@ components:
                             description: List of allowed file formats for the signature
                         required:
                           - maxFileSize
-                        default: *a15
+                        default: *a16
                     required:
                       - id
                       - label
@@ -10798,7 +10885,7 @@ components:
                           maxLength:
                             type: number
                             description: Maximum length of the text
-                        default: *a16
+                        default: *a17
                     required:
                       - id
                       - label
@@ -10983,7 +11070,7 @@ components:
                             description: List of allowed file formats for the signature
                         required:
                           - maxFileSize
-                        default: *a17
+                        default: *a18
                     required:
                       - id
                       - label
@@ -11262,7 +11349,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -11321,7 +11408,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -11380,7 +11467,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -11439,7 +11526,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -11823,7 +11910,7 @@ components:
                             description: Maximum length of the text
                           type:
                             type: string
-                            enum: *a6
+                            enum: *a7
                           prefix:
                             type: object
                             properties:
@@ -11858,7 +11945,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a7
+                        default: *a8
                     required:
                       - id
                       - label
@@ -12213,7 +12300,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a8
+                        default: *a9
                     required:
                       - id
                       - label
@@ -12511,7 +12598,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a9
+                        default: *a10
                     required:
                       - id
                       - label
@@ -12683,7 +12770,7 @@ components:
                             properties:
                               size:
                                 type: string
-                                enum: *a10
+                                enum: *a11
                     required:
                       - id
                       - label
@@ -12846,7 +12933,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a11
+                        default: *a12
                     required:
                       - id
                       - label
@@ -13435,7 +13522,7 @@ components:
                             properties:
                               width:
                                 type: string
-                                enum: *a12
+                                enum: *a13
                                 description: Whether the file upload button should take the full width of the
                                   container or not
                           fileName:
@@ -13457,7 +13544,7 @@ components:
                               - description
                         required:
                           - maxFileSize
-                        default: *a13
+                        default: *a14
                     required:
                       - id
                       - label
@@ -13738,7 +13825,7 @@ components:
                             description: Parent location
                           type:
                             type: string
-                            enum: *a14
+                            enum: *a15
                         required:
                           - type
                         description: Administrative area options
@@ -14454,7 +14541,7 @@ components:
                             description: List of allowed file formats for the signature
                         required:
                           - maxFileSize
-                        default: *a15
+                        default: *a16
                     required:
                       - id
                       - label
@@ -14596,7 +14683,7 @@ components:
                           maxLength:
                             type: number
                             description: Maximum length of the text
-                        default: *a16
+                        default: *a17
                     required:
                       - id
                       - label
@@ -14781,7 +14868,7 @@ components:
                             description: List of allowed file formats for the signature
                         required:
                           - maxFileSize
-                        default: *a17
+                        default: *a18
                     required:
                       - id
                       - label
@@ -15060,7 +15147,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -15119,7 +15206,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -15532,7 +15619,7 @@ components:
                                       description: Maximum length of the text
                                     type:
                                       type: string
-                                      enum: *a6
+                                      enum: *a7
                                     prefix:
                                       type: object
                                       properties:
@@ -15567,7 +15654,7 @@ components:
                                         - id
                                         - defaultMessage
                                         - description
-                                  default: *a7
+                                  default: *a8
                               required:
                                 - id
                                 - label
@@ -15924,7 +16011,7 @@ components:
                                         - id
                                         - defaultMessage
                                         - description
-                                  default: *a8
+                                  default: *a9
                               required:
                                 - id
                                 - label
@@ -16224,7 +16311,7 @@ components:
                                         fontVariant:
                                           type: string
                                           enum: *a4
-                                  default: *a9
+                                  default: *a10
                               required:
                                 - id
                                 - label
@@ -16397,7 +16484,7 @@ components:
                                       properties:
                                         size:
                                           type: string
-                                          enum: *a10
+                                          enum: *a11
                               required:
                                 - id
                                 - label
@@ -16561,7 +16648,7 @@ components:
                                         fontVariant:
                                           type: string
                                           enum: *a4
-                                  default: *a11
+                                  default: *a12
                               required:
                                 - id
                                 - label
@@ -17154,7 +17241,7 @@ components:
                                       properties:
                                         width:
                                           type: string
-                                          enum: *a12
+                                          enum: *a13
                                           description: Whether the file upload button should take the full width of the
                                             container or not
                                     fileName:
@@ -17176,7 +17263,7 @@ components:
                                         - description
                                   required:
                                     - maxFileSize
-                                  default: *a13
+                                  default: *a14
                               required:
                                 - id
                                 - label
@@ -17459,7 +17546,7 @@ components:
                                       description: Parent location
                                     type:
                                       type: string
-                                      enum: *a14
+                                      enum: *a15
                                   required:
                                     - type
                                   description: Administrative area options
@@ -18180,7 +18267,7 @@ components:
                                       description: List of allowed file formats for the signature
                                   required:
                                     - maxFileSize
-                                  default: *a15
+                                  default: *a16
                               required:
                                 - id
                                 - label
@@ -18323,7 +18410,7 @@ components:
                                     maxLength:
                                       type: number
                                       description: Maximum length of the text
-                                  default: *a16
+                                  default: *a17
                               required:
                                 - id
                                 - label
@@ -18509,7 +18596,7 @@ components:
                                       description: List of allowed file formats for the signature
                                   required:
                                     - maxFileSize
-                                  default: *a17
+                                  default: *a18
                               required:
                                 - id
                                 - label
@@ -19126,7 +19213,7 @@ components:
                                       description: Maximum length of the text
                                     type:
                                       type: string
-                                      enum: *a6
+                                      enum: *a7
                                     prefix:
                                       type: object
                                       properties:
@@ -19161,7 +19248,7 @@ components:
                                         - id
                                         - defaultMessage
                                         - description
-                                  default: *a7
+                                  default: *a8
                               required:
                                 - id
                                 - label
@@ -19518,7 +19605,7 @@ components:
                                         - id
                                         - defaultMessage
                                         - description
-                                  default: *a8
+                                  default: *a9
                               required:
                                 - id
                                 - label
@@ -19818,7 +19905,7 @@ components:
                                         fontVariant:
                                           type: string
                                           enum: *a4
-                                  default: *a9
+                                  default: *a10
                               required:
                                 - id
                                 - label
@@ -19991,7 +20078,7 @@ components:
                                       properties:
                                         size:
                                           type: string
-                                          enum: *a10
+                                          enum: *a11
                               required:
                                 - id
                                 - label
@@ -20155,7 +20242,7 @@ components:
                                         fontVariant:
                                           type: string
                                           enum: *a4
-                                  default: *a11
+                                  default: *a12
                               required:
                                 - id
                                 - label
@@ -20748,7 +20835,7 @@ components:
                                       properties:
                                         width:
                                           type: string
-                                          enum: *a12
+                                          enum: *a13
                                           description: Whether the file upload button should take the full width of the
                                             container or not
                                     fileName:
@@ -20770,7 +20857,7 @@ components:
                                         - description
                                   required:
                                     - maxFileSize
-                                  default: *a13
+                                  default: *a14
                               required:
                                 - id
                                 - label
@@ -21053,7 +21140,7 @@ components:
                                       description: Parent location
                                     type:
                                       type: string
-                                      enum: *a14
+                                      enum: *a15
                                   required:
                                     - type
                                   description: Administrative area options
@@ -21774,7 +21861,7 @@ components:
                                       description: List of allowed file formats for the signature
                                   required:
                                     - maxFileSize
-                                  default: *a15
+                                  default: *a16
                               required:
                                 - id
                                 - label
@@ -21917,7 +22004,7 @@ components:
                                     maxLength:
                                       type: number
                                       description: Maximum length of the text
-                                  default: *a16
+                                  default: *a17
                               required:
                                 - id
                                 - label
@@ -22103,7 +22190,7 @@ components:
                                       description: List of allowed file formats for the signature
                                   required:
                                     - maxFileSize
-                                  default: *a17
+                                  default: *a18
                               required:
                                 - id
                                 - label
@@ -22487,7 +22574,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -22877,7 +22964,7 @@ components:
                                   description: Maximum length of the text
                                 type:
                                   type: string
-                                  enum: *a6
+                                  enum: *a7
                                 prefix:
                                   type: object
                                   properties:
@@ -22912,7 +22999,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a7
+                              default: *a8
                           required:
                             - id
                             - label
@@ -23267,7 +23354,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a8
+                              default: *a9
                           required:
                             - id
                             - label
@@ -23565,7 +23652,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a9
+                              default: *a10
                           required:
                             - id
                             - label
@@ -23737,7 +23824,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: *a10
+                                      enum: *a11
                           required:
                             - id
                             - label
@@ -23900,7 +23987,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a11
+                              default: *a12
                           required:
                             - id
                             - label
@@ -24489,7 +24576,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: *a12
+                                      enum: *a13
                                       description: Whether the file upload button should take the full width of the
                                         container or not
                                 fileName:
@@ -24511,7 +24598,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: *a13
+                              default: *a14
                           required:
                             - id
                             - label
@@ -24792,7 +24879,7 @@ components:
                                   description: Parent location
                                 type:
                                   type: string
-                                  enum: *a14
+                                  enum: *a15
                               required:
                                 - type
                               description: Administrative area options
@@ -25508,7 +25595,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: *a15
+                              default: *a16
                           required:
                             - id
                             - label
@@ -25650,7 +25737,7 @@ components:
                                 maxLength:
                                   type: number
                                   description: Maximum length of the text
-                              default: *a16
+                              default: *a17
                           required:
                             - id
                             - label
@@ -25835,7 +25922,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: *a17
+                              default: *a18
                           required:
                             - id
                             - label
@@ -26449,7 +26536,7 @@ components:
                                   description: Maximum length of the text
                                 type:
                                   type: string
-                                  enum: *a6
+                                  enum: *a7
                                 prefix:
                                   type: object
                                   properties:
@@ -26484,7 +26571,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a7
+                              default: *a8
                           required:
                             - id
                             - label
@@ -26839,7 +26926,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a8
+                              default: *a9
                           required:
                             - id
                             - label
@@ -27137,7 +27224,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a9
+                              default: *a10
                           required:
                             - id
                             - label
@@ -27309,7 +27396,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: *a10
+                                      enum: *a11
                           required:
                             - id
                             - label
@@ -27472,7 +27559,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a11
+                              default: *a12
                           required:
                             - id
                             - label
@@ -28061,7 +28148,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: *a12
+                                      enum: *a13
                                       description: Whether the file upload button should take the full width of the
                                         container or not
                                 fileName:
@@ -28083,7 +28170,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: *a13
+                              default: *a14
                           required:
                             - id
                             - label
@@ -28364,7 +28451,7 @@ components:
                                   description: Parent location
                                 type:
                                   type: string
-                                  enum: *a14
+                                  enum: *a15
                               required:
                                 - type
                               description: Administrative area options
@@ -29080,7 +29167,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: *a15
+                              default: *a16
                           required:
                             - id
                             - label
@@ -29222,7 +29309,7 @@ components:
                                 maxLength:
                                   type: number
                                   description: Maximum length of the text
-                              default: *a16
+                              default: *a17
                           required:
                             - id
                             - label
@@ -29407,7 +29494,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: *a17
+                              default: *a18
                           required:
                             - id
                             - label
@@ -30117,7 +30204,7 @@ components:
                                   description: Maximum length of the text
                                 type:
                                   type: string
-                                  enum: *a6
+                                  enum: *a7
                                 prefix:
                                   type: object
                                   properties:
@@ -30152,7 +30239,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a7
+                              default: *a8
                           required:
                             - id
                             - label
@@ -30507,7 +30594,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a8
+                              default: *a9
                           required:
                             - id
                             - label
@@ -30805,7 +30892,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a9
+                              default: *a10
                           required:
                             - id
                             - label
@@ -30977,7 +31064,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: *a10
+                                      enum: *a11
                           required:
                             - id
                             - label
@@ -31140,7 +31227,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a11
+                              default: *a12
                           required:
                             - id
                             - label
@@ -31729,7 +31816,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: *a12
+                                      enum: *a13
                                       description: Whether the file upload button should take the full width of the
                                         container or not
                                 fileName:
@@ -31751,7 +31838,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: *a13
+                              default: *a14
                           required:
                             - id
                             - label
@@ -32032,7 +32119,7 @@ components:
                                   description: Parent location
                                 type:
                                   type: string
-                                  enum: *a14
+                                  enum: *a15
                               required:
                                 - type
                               description: Administrative area options
@@ -32748,7 +32835,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: *a15
+                              default: *a16
                           required:
                             - id
                             - label
@@ -32890,7 +32977,7 @@ components:
                                 maxLength:
                                   type: number
                                   description: Maximum length of the text
-                              default: *a16
+                              default: *a17
                           required:
                             - id
                             - label
@@ -33075,7 +33162,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: *a17
+                              default: *a18
                           required:
                             - id
                             - label
@@ -33689,7 +33776,7 @@ components:
                                   description: Maximum length of the text
                                 type:
                                   type: string
-                                  enum: *a6
+                                  enum: *a7
                                 prefix:
                                   type: object
                                   properties:
@@ -33724,7 +33811,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a7
+                              default: *a8
                           required:
                             - id
                             - label
@@ -34079,7 +34166,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a8
+                              default: *a9
                           required:
                             - id
                             - label
@@ -34377,7 +34464,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a9
+                              default: *a10
                           required:
                             - id
                             - label
@@ -34549,7 +34636,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: *a10
+                                      enum: *a11
                           required:
                             - id
                             - label
@@ -34712,7 +34799,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a11
+                              default: *a12
                           required:
                             - id
                             - label
@@ -35301,7 +35388,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: *a12
+                                      enum: *a13
                                       description: Whether the file upload button should take the full width of the
                                         container or not
                                 fileName:
@@ -35323,7 +35410,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: *a13
+                              default: *a14
                           required:
                             - id
                             - label
@@ -35604,7 +35691,7 @@ components:
                                   description: Parent location
                                 type:
                                   type: string
-                                  enum: *a14
+                                  enum: *a15
                               required:
                                 - type
                               description: Administrative area options
@@ -36320,7 +36407,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: *a15
+                              default: *a16
                           required:
                             - id
                             - label
@@ -36462,7 +36549,7 @@ components:
                                 maxLength:
                                   type: number
                                   description: Maximum length of the text
-                              default: *a16
+                              default: *a17
                           required:
                             - id
                             - label
@@ -36647,7 +36734,7 @@ components:
                                   description: List of allowed file formats for the signature
                               required:
                                 - maxFileSize
-                              default: *a17
+                              default: *a18
                           required:
                             - id
                             - label
@@ -37028,7 +37115,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -37087,7 +37174,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
