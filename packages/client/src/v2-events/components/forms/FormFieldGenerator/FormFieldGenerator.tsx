@@ -58,6 +58,7 @@ interface FormFieldGeneratorProps {
   eventConfig?: EventConfig
   /** Default field values. Might equal to declaration, when a declaration form is rendered. */
   initialValues?: EventState
+  onAllFieldsValidated?: (success: boolean) => void
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
@@ -70,7 +71,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     fieldsToShowValidationErrors,
     validateAllFields = false,
     readonlyMode,
-    id
+    id,
+    onAllFieldsValidated
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
@@ -146,6 +148,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               touched={formikProps.touched}
               validateAllFields={validateAllFields}
               values={formikProps.values}
+              onAllFieldsValidated={onAllFieldsValidated}
               onChange={formikOnChange}
             />
           )

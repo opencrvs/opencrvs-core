@@ -55,7 +55,7 @@ type AllProps = {
    */
   setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
   fieldsToShowValidationErrors?: FieldConfig[]
-  onSuccessfulValidation?: () => void
+  onAllFieldsValidated?: (success: boolean) => void
 } & UsedFormikProps
 
 /**
@@ -134,7 +134,8 @@ export function FormSectionComponent({
   resetForm,
   setErrors,
   validateAllFields,
-  fieldsToShowValidationErrors
+  fieldsToShowValidationErrors,
+  onAllFieldsValidated
 }: AllProps) {
   const intl = useIntl()
   const prevValuesRef = useRef(values)
@@ -283,6 +284,18 @@ export function FormSectionComponent({
     const hasErrors = fieldErrors && fieldErrors.length > 0
     return isFieldVisible(field, completeForm) && hasErrors
   })
+
+  console.log('hasAnyValidationErrors')
+  console.log(hasAnyValidationErrors)
+
+  useEffect(() => {
+    if (validateAllFields) {
+      showValidationErrors(fieldsWithDotSeparator)
+      onAllFieldsValidated?.(!hasAnyValidationErrors)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validateAllFields])
 
   return (
     <section className={className}>

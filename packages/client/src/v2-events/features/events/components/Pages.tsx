@@ -55,20 +55,32 @@ export function Pages({
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
+  const [validateAllFields, setValidateAllFields] = useState(false)
 
-  // If page changes, scroll to the top of the page using the anchor element ID
   useEffect(() => {
+    // If page changes, scroll to the top of the page using the anchor element ID
     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
   }, [pageId])
 
-  function onNextPage() {
+  function switchToNextPage() {
     const nextPageIdx = pageIdx + 1
     const nextPage =
       nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
 
+    setValidateAllFields(false)
     // If there is a next page on the form available, navigate to it.
     // Otherwise, submit the form.
     return nextPage ? onPageChange(nextPage.id) : onSubmit()
+  }
+
+  function onNextPage() {
+    if (validateBeforeNextPage) {
+      // TODO CIHAN: vaihtoehto tässä ite validoida?
+      setValidateAllFields(true)
+      return
+    }
+
+    switchToNextPage()
   }
 
   function onPreviousPage() {
@@ -77,6 +89,7 @@ export function Pages({
       previousPageIdx >= 0 ? visiblePages[previousPageIdx] : undefined
 
     if (previousPage) {
+      setValidateAllFields(false)
       return onPageChange(previousPage.id)
     }
   }
@@ -95,9 +108,14 @@ export function Pages({
       eventConfig={eventConfig}
       fields={page.fields}
       id="locationForm"
-      // TODO CIHAN
       initialValues={{ ...form, ...declaration }}
-      validateAllFields={false}
+      validateAllFields={validateAllFields}
+      onAllFieldsValidated={(success) => {
+        setValidateAllFields(false)
+        if (success) {
+          switchToNextPage()
+        }
+      }}
       onChange={(values) => setFormData(values)}
     />
   )
