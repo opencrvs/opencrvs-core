@@ -324,7 +324,7 @@ const BirthSection: React.FC<BirthSectionProps> = ({
       </Accordion>
 
       {showWarningMessage && !isAdvancedSearchFormValid(formState) && (
-        <ErrorTextWrapper>
+        <ErrorTextWrapper id="error-wrapper">
           <ErrorText id="error-text">{`${intl.formatMessage(
             errorMessages.searchParamCountError
           )}`}</ErrorText>
@@ -523,8 +523,8 @@ const DeathSection: React.FC<DeathSectionProps> = ({
       </Accordion>
 
       {showWarningMessage && !isAdvancedSearchFormValid(formState) && (
-        <ErrorTextWrapper>
-          <ErrorText>{`${intl.formatMessage(
+        <ErrorTextWrapper id="error-wrapper">
+          <ErrorText id="error-text">{`${intl.formatMessage(
             errorMessages.searchParamCountError
           )}`}</ErrorText>
         </ErrorTextWrapper>
