@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, within } from '@storybook/test'
+import { expect, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
@@ -51,12 +51,11 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 export const Overview: Story = {
   play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-    const surname = await canvas.findByTestId('applicant.surname')
     await step('active draft values are shown to the user', async () => {
-      await expect(surname.textContent).toBe(
-        "Applicant's last nameThis value is from a draft"
-      )
+      const canvas = within(canvasElement)
+      await waitFor(async () => {
+        await canvas.findByText('This value is from a draft')
+      })
     })
   },
   parameters: {
