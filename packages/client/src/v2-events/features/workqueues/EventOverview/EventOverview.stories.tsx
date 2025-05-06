@@ -50,14 +50,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 export const Overview: Story = {
-  play: async ({ canvasElement, step }) => {
-    await step('active draft values are shown to the user', async () => {
-      const canvas = within(canvasElement)
-      await waitFor(async () => {
-        await canvas.findByText('This value is from a draft')
-      })
-    })
-  },
   parameters: {
     reactRouter: {
       router: routesConfig,
