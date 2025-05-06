@@ -232,12 +232,12 @@ export const SearchResult = ({
           ...doc,
           event: intl.formatMessage(eventConfig.label),
           createdAt: formattedDuration(new Date(doc.createdAt)),
-          modifiedAt: formattedDuration(new Date(doc.modifiedAt)),
+          modifiedAt: formattedDuration(new Date(doc.updatedAt)),
           status: intl.formatMessage(
             {
               id: `v2.events.status`,
               defaultMessage:
-                '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+                '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
             },
             {
               status: getEventStatus()
