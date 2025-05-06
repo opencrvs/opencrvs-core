@@ -579,7 +579,7 @@ components:
                                 type:
                                   type: string
                                   enum:
-                                    &a6
+                                    &a7
                                     - text
                                     - password
                                 prefix:
@@ -609,7 +609,7 @@ components:
                                     - defaultMessage
                                     - description
                               default:
-                                &a7
+                                &a8
                                 type: text
                           required:
                             - id
@@ -891,7 +891,7 @@ components:
                                     - defaultMessage
                                     - description
                               default:
-                                &a8
+                                &a9
                                 rows: 4
                           required:
                             - id
@@ -1140,7 +1140,7 @@ components:
                                         - h2
                                         - h1
                               default:
-                                &a9 {}
+                                &a10 {}
                           required:
                             - id
                             - label
@@ -1279,7 +1279,7 @@ components:
                                     size:
                                       type: string
                                       enum:
-                                        &a10
+                                        &a11
                                         - NORMAL
                                         - LARGE
                           required:
@@ -1413,7 +1413,7 @@ components:
                                       type: string
                                       enum: *a4
                               default:
-                                &a11 {}
+                                &a12 {}
                           required:
                             - id
                             - label
@@ -1890,7 +1890,7 @@ components:
                                     width:
                                       type: string
                                       enum:
-                                        &a12
+                                        &a13
                                         - full
                                         - auto
                                 fileName:
@@ -1909,7 +1909,7 @@ components:
                               required:
                                 - maxFileSize
                               default:
-                                &a13
+                                &a14
                                 maxFileSize: 5242880
                           required:
                             - id
@@ -2137,7 +2137,7 @@ components:
                                 type:
                                   type: string
                                   enum:
-                                    &a14
+                                    &a15
                                     - ADMIN_STRUCTURE
                                     - HEALTH_FACILITY
                                     - CRVS_OFFICE
@@ -2713,7 +2713,7 @@ components:
                               required:
                                 - maxFileSize
                               default:
-                                &a15
+                                &a16
                                 maxFileSize: 5242880
                           required:
                             - id
@@ -2829,7 +2829,7 @@ components:
                                 maxLength:
                                   type: number
                               default:
-                                &a16
+                                &a17
                                 maxLength: 10
                           required:
                             - id
@@ -2980,7 +2980,7 @@ components:
                               required:
                                 - maxFileSize
                               default:
-                                &a17
+                                &a18
                                 maxFileSize: 5242880
                           required:
                             - id
@@ -3223,26 +3223,100 @@ components:
               fields:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    fieldId:
-                      type: string
-                    config:
-                      type: object
+                  oneOf:
+                    - type: object
                       properties:
-                        type:
+                        config:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                &a6
+                                - FUZZY
+                                - EXACT
+                                - RANGE
+                              description: Determines the type of field
+                          required:
+                            - type
+                        options:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              value:
+                                type: string
+                              label:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                  defaultMessage:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - id
+                                  - defaultMessage
+                                  - description
+                            required:
+                              - value
+                              - label
+                        fieldId:
+                          type: string
+                        fieldType:
+                          type: string
+                          const: field
+                      required:
+                        - config
+                        - fieldId
+                        - fieldType
+                    - type: object
+                      properties:
+                        config:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum: *a6
+                              description: Determines the type of field
+                          required:
+                            - type
+                        options:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              value:
+                                type: string
+                              label:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                  defaultMessage:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - id
+                                  - defaultMessage
+                                  - description
+                            required:
+                              - value
+                              - label
+                        fieldId:
                           type: string
                           enum:
-                            - FUZZY
-                            - EXACT
-                            - RANGE
-                          description: Determines the type of field
+                            - trackingId
+                            - status
+                        fieldType:
+                          type: string
+                          const: event
                       required:
-                        - type
-                      description: Configuration options for the field
-                  required:
-                    - fieldId
-                default: []
+                        - config
+                        - fieldId
+                        - fieldType
                 description: Advanced search fields.
             required:
               - title
@@ -3322,7 +3396,7 @@ components:
                   - type
                   - conditional
           default:
-            &a18 []
+            &a19 []
         draft:
           type: boolean
         type:
@@ -3641,7 +3715,7 @@ components:
                             type: number
                           type:
                             type: string
-                            enum: *a6
+                            enum: *a7
                           prefix:
                             type: object
                             properties:
@@ -3668,7 +3742,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a7
+                        default: *a8
                     required:
                       - id
                       - label
@@ -3948,7 +4022,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a8
+                        default: *a9
                     required:
                       - id
                       - label
@@ -4186,7 +4260,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a9
+                        default: *a10
                     required:
                       - id
                       - label
@@ -4324,7 +4398,7 @@ components:
                             properties:
                               size:
                                 type: string
-                                enum: *a10
+                                enum: *a11
                     required:
                       - id
                       - label
@@ -4455,7 +4529,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a11
+                        default: *a12
                     required:
                       - id
                       - label
@@ -4926,7 +5000,7 @@ components:
                             properties:
                               width:
                                 type: string
-                                enum: *a12
+                                enum: *a13
                           fileName:
                             type: object
                             properties:
@@ -4942,7 +5016,7 @@ components:
                               - description
                         required:
                           - maxFileSize
-                        default: *a13
+                        default: *a14
                     required:
                       - id
                       - label
@@ -5168,7 +5242,7 @@ components:
                               - $declaration
                           type:
                             type: string
-                            enum: *a14
+                            enum: *a15
                         required:
                           - type
                     required:
@@ -5740,7 +5814,7 @@ components:
                               enum: *a5
                         required:
                           - maxFileSize
-                        default: *a15
+                        default: *a16
                     required:
                       - id
                       - label
@@ -5854,7 +5928,7 @@ components:
                         properties:
                           maxLength:
                             type: number
-                        default: *a16
+                        default: *a17
                     required:
                       - id
                       - label
@@ -6003,7 +6077,7 @@ components:
                               enum: *a5
                         required:
                           - maxFileSize
-                        default: *a17
+                        default: *a18
                     required:
                       - id
                       - label
@@ -6232,7 +6306,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -6551,7 +6625,7 @@ components:
                             type: number
                           type:
                             type: string
-                            enum: *a6
+                            enum: *a7
                           prefix:
                             type: object
                             properties:
@@ -6578,7 +6652,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a7
+                        default: *a8
                     required:
                       - id
                       - label
@@ -6858,7 +6932,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a8
+                        default: *a9
                     required:
                       - id
                       - label
@@ -7096,7 +7170,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a9
+                        default: *a10
                     required:
                       - id
                       - label
@@ -7234,7 +7308,7 @@ components:
                             properties:
                               size:
                                 type: string
-                                enum: *a10
+                                enum: *a11
                     required:
                       - id
                       - label
@@ -7365,7 +7439,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a11
+                        default: *a12
                     required:
                       - id
                       - label
@@ -7836,7 +7910,7 @@ components:
                             properties:
                               width:
                                 type: string
-                                enum: *a12
+                                enum: *a13
                           fileName:
                             type: object
                             properties:
@@ -7852,7 +7926,7 @@ components:
                               - description
                         required:
                           - maxFileSize
-                        default: *a13
+                        default: *a14
                     required:
                       - id
                       - label
@@ -8078,7 +8152,7 @@ components:
                               - $declaration
                           type:
                             type: string
-                            enum: *a14
+                            enum: *a15
                         required:
                           - type
                     required:
@@ -8650,7 +8724,7 @@ components:
                               enum: *a5
                         required:
                           - maxFileSize
-                        default: *a15
+                        default: *a16
                     required:
                       - id
                       - label
@@ -8764,7 +8838,7 @@ components:
                         properties:
                           maxLength:
                             type: number
-                        default: *a16
+                        default: *a17
                     required:
                       - id
                       - label
@@ -8913,7 +8987,7 @@ components:
                               enum: *a5
                         required:
                           - maxFileSize
-                        default: *a17
+                        default: *a18
                     required:
                       - id
                       - label
@@ -9142,7 +9216,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -9190,7 +9264,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -9238,7 +9312,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -9286,7 +9360,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -9605,7 +9679,7 @@ components:
                             type: number
                           type:
                             type: string
-                            enum: *a6
+                            enum: *a7
                           prefix:
                             type: object
                             properties:
@@ -9632,7 +9706,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a7
+                        default: *a8
                     required:
                       - id
                       - label
@@ -9912,7 +9986,7 @@ components:
                               - id
                               - defaultMessage
                               - description
-                        default: *a8
+                        default: *a9
                     required:
                       - id
                       - label
@@ -10150,7 +10224,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a9
+                        default: *a10
                     required:
                       - id
                       - label
@@ -10288,7 +10362,7 @@ components:
                             properties:
                               size:
                                 type: string
-                                enum: *a10
+                                enum: *a11
                     required:
                       - id
                       - label
@@ -10419,7 +10493,7 @@ components:
                               fontVariant:
                                 type: string
                                 enum: *a4
-                        default: *a11
+                        default: *a12
                     required:
                       - id
                       - label
@@ -10890,7 +10964,7 @@ components:
                             properties:
                               width:
                                 type: string
-                                enum: *a12
+                                enum: *a13
                           fileName:
                             type: object
                             properties:
@@ -10906,7 +10980,7 @@ components:
                               - description
                         required:
                           - maxFileSize
-                        default: *a13
+                        default: *a14
                     required:
                       - id
                       - label
@@ -11132,7 +11206,7 @@ components:
                               - $declaration
                           type:
                             type: string
-                            enum: *a14
+                            enum: *a15
                         required:
                           - type
                     required:
@@ -11704,7 +11778,7 @@ components:
                               enum: *a5
                         required:
                           - maxFileSize
-                        default: *a15
+                        default: *a16
                     required:
                       - id
                       - label
@@ -11818,7 +11892,7 @@ components:
                         properties:
                           maxLength:
                             type: number
-                        default: *a16
+                        default: *a17
                     required:
                       - id
                       - label
@@ -11967,7 +12041,7 @@ components:
                               enum: *a5
                         required:
                           - maxFileSize
-                        default: *a17
+                        default: *a18
                     required:
                       - id
                       - label
@@ -12196,7 +12270,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -12244,7 +12318,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -12584,7 +12658,7 @@ components:
                                       type: number
                                     type:
                                       type: string
-                                      enum: *a6
+                                      enum: *a7
                                     prefix:
                                       type: object
                                       properties:
@@ -12611,7 +12685,7 @@ components:
                                         - id
                                         - defaultMessage
                                         - description
-                                  default: *a7
+                                  default: *a8
                               required:
                                 - id
                                 - label
@@ -12891,7 +12965,7 @@ components:
                                         - id
                                         - defaultMessage
                                         - description
-                                  default: *a8
+                                  default: *a9
                               required:
                                 - id
                                 - label
@@ -13129,7 +13203,7 @@ components:
                                         fontVariant:
                                           type: string
                                           enum: *a4
-                                  default: *a9
+                                  default: *a10
                               required:
                                 - id
                                 - label
@@ -13267,7 +13341,7 @@ components:
                                       properties:
                                         size:
                                           type: string
-                                          enum: *a10
+                                          enum: *a11
                               required:
                                 - id
                                 - label
@@ -13398,7 +13472,7 @@ components:
                                         fontVariant:
                                           type: string
                                           enum: *a4
-                                  default: *a11
+                                  default: *a12
                               required:
                                 - id
                                 - label
@@ -13869,7 +13943,7 @@ components:
                                       properties:
                                         width:
                                           type: string
-                                          enum: *a12
+                                          enum: *a13
                                     fileName:
                                       type: object
                                       properties:
@@ -13885,7 +13959,7 @@ components:
                                         - description
                                   required:
                                     - maxFileSize
-                                  default: *a13
+                                  default: *a14
                               required:
                                 - id
                                 - label
@@ -14111,7 +14185,7 @@ components:
                                         - $declaration
                                     type:
                                       type: string
-                                      enum: *a14
+                                      enum: *a15
                                   required:
                                     - type
                               required:
@@ -14683,7 +14757,7 @@ components:
                                         enum: *a5
                                   required:
                                     - maxFileSize
-                                  default: *a15
+                                  default: *a16
                               required:
                                 - id
                                 - label
@@ -14797,7 +14871,7 @@ components:
                                   properties:
                                     maxLength:
                                       type: number
-                                  default: *a16
+                                  default: *a17
                               required:
                                 - id
                                 - label
@@ -14946,7 +15020,7 @@ components:
                                         enum: *a5
                                   required:
                                     - maxFileSize
-                                  default: *a17
+                                  default: *a18
                               required:
                                 - id
                                 - label
@@ -15451,7 +15525,7 @@ components:
                                       type: number
                                     type:
                                       type: string
-                                      enum: *a6
+                                      enum: *a7
                                     prefix:
                                       type: object
                                       properties:
@@ -15478,7 +15552,7 @@ components:
                                         - id
                                         - defaultMessage
                                         - description
-                                  default: *a7
+                                  default: *a8
                               required:
                                 - id
                                 - label
@@ -15758,7 +15832,7 @@ components:
                                         - id
                                         - defaultMessage
                                         - description
-                                  default: *a8
+                                  default: *a9
                               required:
                                 - id
                                 - label
@@ -15996,7 +16070,7 @@ components:
                                         fontVariant:
                                           type: string
                                           enum: *a4
-                                  default: *a9
+                                  default: *a10
                               required:
                                 - id
                                 - label
@@ -16134,7 +16208,7 @@ components:
                                       properties:
                                         size:
                                           type: string
-                                          enum: *a10
+                                          enum: *a11
                               required:
                                 - id
                                 - label
@@ -16265,7 +16339,7 @@ components:
                                         fontVariant:
                                           type: string
                                           enum: *a4
-                                  default: *a11
+                                  default: *a12
                               required:
                                 - id
                                 - label
@@ -16736,7 +16810,7 @@ components:
                                       properties:
                                         width:
                                           type: string
-                                          enum: *a12
+                                          enum: *a13
                                     fileName:
                                       type: object
                                       properties:
@@ -16752,7 +16826,7 @@ components:
                                         - description
                                   required:
                                     - maxFileSize
-                                  default: *a13
+                                  default: *a14
                               required:
                                 - id
                                 - label
@@ -16978,7 +17052,7 @@ components:
                                         - $declaration
                                     type:
                                       type: string
-                                      enum: *a14
+                                      enum: *a15
                                   required:
                                     - type
                               required:
@@ -17550,7 +17624,7 @@ components:
                                         enum: *a5
                                   required:
                                     - maxFileSize
-                                  default: *a15
+                                  default: *a16
                               required:
                                 - id
                                 - label
@@ -17664,7 +17738,7 @@ components:
                                   properties:
                                     maxLength:
                                       type: number
-                                  default: *a16
+                                  default: *a17
                               required:
                                 - id
                                 - label
@@ -17813,7 +17887,7 @@ components:
                                         enum: *a5
                                   required:
                                     - maxFileSize
-                                  default: *a17
+                                  default: *a18
                               required:
                                 - id
                                 - label
@@ -18125,7 +18199,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -18449,7 +18523,7 @@ components:
                                   type: number
                                 type:
                                   type: string
-                                  enum: *a6
+                                  enum: *a7
                                 prefix:
                                   type: object
                                   properties:
@@ -18476,7 +18550,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a7
+                              default: *a8
                           required:
                             - id
                             - label
@@ -18756,7 +18830,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a8
+                              default: *a9
                           required:
                             - id
                             - label
@@ -18994,7 +19068,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a9
+                              default: *a10
                           required:
                             - id
                             - label
@@ -19132,7 +19206,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: *a10
+                                      enum: *a11
                           required:
                             - id
                             - label
@@ -19263,7 +19337,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a11
+                              default: *a12
                           required:
                             - id
                             - label
@@ -19734,7 +19808,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: *a12
+                                      enum: *a13
                                 fileName:
                                   type: object
                                   properties:
@@ -19750,7 +19824,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: *a13
+                              default: *a14
                           required:
                             - id
                             - label
@@ -19976,7 +20050,7 @@ components:
                                     - $declaration
                                 type:
                                   type: string
-                                  enum: *a14
+                                  enum: *a15
                               required:
                                 - type
                           required:
@@ -20548,7 +20622,7 @@ components:
                                     enum: *a5
                               required:
                                 - maxFileSize
-                              default: *a15
+                              default: *a16
                           required:
                             - id
                             - label
@@ -20662,7 +20736,7 @@ components:
                               properties:
                                 maxLength:
                                   type: number
-                              default: *a16
+                              default: *a17
                           required:
                             - id
                             - label
@@ -20811,7 +20885,7 @@ components:
                                     enum: *a5
                               required:
                                 - maxFileSize
-                              default: *a17
+                              default: *a18
                           required:
                             - id
                             - label
@@ -21316,7 +21390,7 @@ components:
                                   type: number
                                 type:
                                   type: string
-                                  enum: *a6
+                                  enum: *a7
                                 prefix:
                                   type: object
                                   properties:
@@ -21343,7 +21417,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a7
+                              default: *a8
                           required:
                             - id
                             - label
@@ -21623,7 +21697,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a8
+                              default: *a9
                           required:
                             - id
                             - label
@@ -21861,7 +21935,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a9
+                              default: *a10
                           required:
                             - id
                             - label
@@ -21999,7 +22073,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: *a10
+                                      enum: *a11
                           required:
                             - id
                             - label
@@ -22130,7 +22204,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a11
+                              default: *a12
                           required:
                             - id
                             - label
@@ -22601,7 +22675,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: *a12
+                                      enum: *a13
                                 fileName:
                                   type: object
                                   properties:
@@ -22617,7 +22691,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: *a13
+                              default: *a14
                           required:
                             - id
                             - label
@@ -22843,7 +22917,7 @@ components:
                                     - $declaration
                                 type:
                                   type: string
-                                  enum: *a14
+                                  enum: *a15
                               required:
                                 - type
                           required:
@@ -23415,7 +23489,7 @@ components:
                                     enum: *a5
                               required:
                                 - maxFileSize
-                              default: *a15
+                              default: *a16
                           required:
                             - id
                             - label
@@ -23529,7 +23603,7 @@ components:
                               properties:
                                 maxLength:
                                   type: number
-                              default: *a16
+                              default: *a17
                           required:
                             - id
                             - label
@@ -23678,7 +23752,7 @@ components:
                                     enum: *a5
                               required:
                                 - maxFileSize
-                              default: *a17
+                              default: *a18
                           required:
                             - id
                             - label
@@ -24262,7 +24336,7 @@ components:
                                   type: number
                                 type:
                                   type: string
-                                  enum: *a6
+                                  enum: *a7
                                 prefix:
                                   type: object
                                   properties:
@@ -24289,7 +24363,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a7
+                              default: *a8
                           required:
                             - id
                             - label
@@ -24569,7 +24643,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a8
+                              default: *a9
                           required:
                             - id
                             - label
@@ -24807,7 +24881,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a9
+                              default: *a10
                           required:
                             - id
                             - label
@@ -24945,7 +25019,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: *a10
+                                      enum: *a11
                           required:
                             - id
                             - label
@@ -25076,7 +25150,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a11
+                              default: *a12
                           required:
                             - id
                             - label
@@ -25547,7 +25621,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: *a12
+                                      enum: *a13
                                 fileName:
                                   type: object
                                   properties:
@@ -25563,7 +25637,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: *a13
+                              default: *a14
                           required:
                             - id
                             - label
@@ -25789,7 +25863,7 @@ components:
                                     - $declaration
                                 type:
                                   type: string
-                                  enum: *a14
+                                  enum: *a15
                               required:
                                 - type
                           required:
@@ -26361,7 +26435,7 @@ components:
                                     enum: *a5
                               required:
                                 - maxFileSize
-                              default: *a15
+                              default: *a16
                           required:
                             - id
                             - label
@@ -26475,7 +26549,7 @@ components:
                               properties:
                                 maxLength:
                                   type: number
-                              default: *a16
+                              default: *a17
                           required:
                             - id
                             - label
@@ -26624,7 +26698,7 @@ components:
                                     enum: *a5
                               required:
                                 - maxFileSize
-                              default: *a17
+                              default: *a18
                           required:
                             - id
                             - label
@@ -27129,7 +27203,7 @@ components:
                                   type: number
                                 type:
                                   type: string
-                                  enum: *a6
+                                  enum: *a7
                                 prefix:
                                   type: object
                                   properties:
@@ -27156,7 +27230,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a7
+                              default: *a8
                           required:
                             - id
                             - label
@@ -27436,7 +27510,7 @@ components:
                                     - id
                                     - defaultMessage
                                     - description
-                              default: *a8
+                              default: *a9
                           required:
                             - id
                             - label
@@ -27674,7 +27748,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a9
+                              default: *a10
                           required:
                             - id
                             - label
@@ -27812,7 +27886,7 @@ components:
                                   properties:
                                     size:
                                       type: string
-                                      enum: *a10
+                                      enum: *a11
                           required:
                             - id
                             - label
@@ -27943,7 +28017,7 @@ components:
                                     fontVariant:
                                       type: string
                                       enum: *a4
-                              default: *a11
+                              default: *a12
                           required:
                             - id
                             - label
@@ -28414,7 +28488,7 @@ components:
                                   properties:
                                     width:
                                       type: string
-                                      enum: *a12
+                                      enum: *a13
                                 fileName:
                                   type: object
                                   properties:
@@ -28430,7 +28504,7 @@ components:
                                     - description
                               required:
                                 - maxFileSize
-                              default: *a13
+                              default: *a14
                           required:
                             - id
                             - label
@@ -28656,7 +28730,7 @@ components:
                                     - $declaration
                                 type:
                                   type: string
-                                  enum: *a14
+                                  enum: *a15
                               required:
                                 - type
                           required:
@@ -29228,7 +29302,7 @@ components:
                                     enum: *a5
                               required:
                                 - maxFileSize
-                              default: *a15
+                              default: *a16
                           required:
                             - id
                             - label
@@ -29342,7 +29416,7 @@ components:
                               properties:
                                 maxLength:
                                   type: number
-                              default: *a16
+                              default: *a17
                           required:
                             - id
                             - label
@@ -29491,7 +29565,7 @@ components:
                                     enum: *a5
                               required:
                                 - maxFileSize
-                              default: *a17
+                              default: *a18
                           required:
                             - id
                             - label
@@ -29801,7 +29875,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -29849,7 +29923,7 @@ components:
                 required:
                   - type
                   - conditional
-          default: *a18
+          default: *a19
         draft:
           type: boolean
         type:
@@ -30010,6 +30084,8 @@ components:
                   createdAt:
                     type: string
                     format: date-time
+                  updatedAtLocation:
+                    type: string
                   status:
                     type: string
                     const: Rejected
@@ -30368,10 +30444,12 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
           enum:
-            &a19
+            &a20
             - Requested
             - Accepted
             - Rejected
@@ -30387,7 +30465,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ValidateAction:
@@ -30682,9 +30759,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -30697,7 +30776,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RejectAction:
@@ -30992,9 +31070,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -31007,7 +31087,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     MarkAsDuplicateAction:
@@ -31302,9 +31381,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -31317,7 +31398,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ArchiveAction:
@@ -31612,9 +31692,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -31627,7 +31709,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     NotifiedAction:
@@ -31922,9 +32003,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -31937,7 +32020,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RegisterAction:
@@ -32232,9 +32314,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -32249,7 +32333,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     DeclareAction:
@@ -32544,9 +32627,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -32559,7 +32644,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     AssignedAction:
@@ -32854,9 +32938,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -32871,7 +32957,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -33167,9 +33252,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -33182,7 +33269,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ApprovedCorrectionAction:
@@ -33477,9 +33563,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -33494,7 +33582,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -33790,9 +33877,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -33807,7 +33896,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -34103,9 +34191,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -34120,7 +34210,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -34416,9 +34505,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -34431,7 +34522,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ReadAction:
@@ -34726,9 +34816,11 @@ components:
                   - district2
         createdAtLocation:
           type: string
+        updatedAtLocation:
+          type: string
         status:
           type: string
-          enum: *a19
+          enum: *a20
         originalActionId:
           type: string
         type:
@@ -34741,7 +34833,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ActionInput:
@@ -34907,7 +34998,7 @@ components:
                   - state
                   - district2
           default:
-            &a20 {}
+            &a21 {}
         annotation:
           type: object
           additionalProperties:
@@ -35205,7 +35296,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -35505,7 +35596,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -35802,7 +35893,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -36097,7 +36188,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -36392,7 +36483,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -36687,7 +36778,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -36982,7 +37073,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -37277,7 +37368,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -37575,7 +37666,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -37873,7 +37964,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -38168,7 +38259,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -38463,7 +38554,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -38761,7 +38852,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
@@ -39059,7 +39150,7 @@ components:
                   - addressType
                   - state
                   - district2
-          default: *a20
+          default: *a21
         annotation:
           type: object
           additionalProperties:
