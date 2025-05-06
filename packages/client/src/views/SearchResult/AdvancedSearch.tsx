@@ -325,7 +325,7 @@ const BirthSection: React.FC<BirthSectionProps> = ({
 
       {showWarningMessage && !isAdvancedSearchFormValid(formState) && (
         <ErrorTextWrapper>
-          <ErrorText>{`${intl.formatMessage(
+          <ErrorText id="error-text">{`${intl.formatMessage(
             errorMessages.searchParamCountError
           )}`}</ErrorText>
         </ErrorTextWrapper>

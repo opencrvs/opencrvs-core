@@ -41,10 +41,10 @@ describe('should render both birth and death tabs', () => {
 })
 
 describe('when advancedSearchPage renders with no active params in store', () => {
-  it('renders searchbutton as disabled', async () => {
+  it('renders searchbutton as enabled', async () => {
     expect(
       testComponent.find('#search').hostNodes().props().disabled
-    ).toBeTruthy()
+    ).toBeFalsy()
   })
   it('renders all accordions as closed', async () => {
     expect(
