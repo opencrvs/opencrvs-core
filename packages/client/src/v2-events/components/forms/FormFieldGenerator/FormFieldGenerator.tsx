@@ -65,21 +65,32 @@ interface FormFieldGeneratorProps {
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
-  (props) => {
+  ({
+    onChange,
+    fields,
+    initialValues,
+    className,
+    declaration,
+    eventConfig,
+    fieldsToShowValidationErrors,
+    setAllFieldsDirty = false,
+    readonlyMode,
+    id
+  }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
 
     const formikOnChange = (values: EventState) =>
-      props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
+      onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
     const user = useUserAddress()
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(props.fields, {
+        ...mapFieldsToValues(fields, {
           $user: user
         }),
-        ...props.initialValues
+        ...initialValues
       })
 
     return (
@@ -89,7 +100,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
           getValidationErrorsForForm(
-            props.fields,
+            fields,
             makeFormikFieldIdsOpenCRVSCompatible(values)
           )
         }
@@ -120,19 +131,19 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
 
           return (
             <FormSectionComponent
-              className={props.className}
-              declaration={props.declaration}
+              className={className}
+              declaration={declaration}
               // @TODO: Formik does not type errors well. Actual error message differs from the type.
               // This was previously cast on FormSectionComponent level.
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               errors={formikProps.errors as any}
-              eventConfig={props.eventConfig}
-              fields={props.fields}
-              fieldsToShowValidationErrors={props.fieldsToShowValidationErrors}
-              id={props.id}
-              readonlyMode={props.readonlyMode}
+              eventConfig={eventConfig}
+              fields={fields}
+              fieldsToShowValidationErrors={fieldsToShowValidationErrors}
+              id={id}
+              readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}
-              setAllFieldsDirty={props.setAllFieldsDirty || false}
+              setAllFieldsDirty={setAllFieldsDirty}
               setAllTouchedFields={setAllTouchedFields}
               setErrors={formikProps.setErrors}
               setFieldValue={formikProps.setFieldValue}
