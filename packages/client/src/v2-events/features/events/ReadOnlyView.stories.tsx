@@ -13,6 +13,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import { within } from '@testing-library/dom'
+import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
   generateEventDocument,
@@ -65,15 +66,29 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    const dropdown = await canvas.findAllByTestId('action-dropdownMenu')
-    dropdown[0].click()
+    await step('Finds view record menu item in action menu', async () => {
+      const actionButton = await canvas.findByRole('button', {
+        name: 'Action'
+      })
+      await userEvent.click(actionButton)
+    })
+
+    await step('User is taken to the view record page', async () => {
+      await userEvent.click(await canvas.findByText('View record'))
+
+      await waitFor(async () => {
+        await canvas.findByText('Riku This value is from a draft')
+        await canvas.findByText('Tennis club membership application')
+      })
+    })
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
         eventId: tennisClubMembershipEventDocument.id
-      })
+      }),
+      chromatic: { disableSnapshot: true }
     },
     msw: {
       handlers: {

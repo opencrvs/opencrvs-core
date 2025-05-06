@@ -112,9 +112,14 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based on content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Register' })
-      )
+      await waitFor(async () => {
+        const registerButton = await canvas.findByRole('button', {
+          name: 'Register'
+        })
+
+        await expect(registerButton).toBeEnabled()
+        await userEvent.click(registerButton)
+      })
 
       const modal = within(await canvas.findByRole('dialog'))
 
