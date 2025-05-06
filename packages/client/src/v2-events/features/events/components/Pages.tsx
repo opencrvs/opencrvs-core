@@ -100,11 +100,11 @@ export function Pages({
 
   const fields = (
     <FormFieldGenerator
-      declaration={declaration}
       eventConfig={eventConfig}
       fields={page.fields}
       id="locationForm"
-      initialValues={form}
+      // TODO CIHAN
+      initialValues={{ ...form, ...declaration }}
       setAllFieldsDirty={shouldValidate}
       onChange={(values) => setFormData(values)}
     />

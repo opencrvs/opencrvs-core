@@ -39,7 +39,7 @@ import { GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
   id: string
-  declaration?: EventState
+  initialValues?: EventState
   eventConfig?: EventConfig
   fields: FieldConfig[]
   className?: string
@@ -122,7 +122,7 @@ export function FormSectionComponent({
   touched,
   setAllTouchedFields,
   className,
-  declaration,
+  initialValues = {},
   readonlyMode,
   id,
   errors: errorsWithDotSeparator,
@@ -155,10 +155,6 @@ export function FormSectionComponent({
   const form = makeFormikFieldIdsOpenCRVSCompatible(
     makeDatesFormatted(fieldsWithDotSeparator, values)
   )
-
-  // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-  // Address is the only deep value.
-  const completeForm = { ...(declaration ?? {}), ...form }
 
   const showValidationErrors = useCallback(
     (formFields: FieldConfig[]) => {
@@ -282,6 +278,10 @@ export function FormSectionComponent({
     setAllFieldsDirty,
     showValidationErrors
   ])
+
+  // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
+  // Address is the only deep value.
+  const completeForm = { ...initialValues, ...form }
 
   return (
     <section className={className}>

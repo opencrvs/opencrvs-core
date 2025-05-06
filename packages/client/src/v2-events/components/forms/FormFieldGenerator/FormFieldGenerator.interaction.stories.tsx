@@ -106,7 +106,6 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
-        declaration={declaration}
         fields={fields}
         id="my-form"
         initialValues={declaration}
@@ -216,7 +215,6 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
 
     return (
       <StyledFormFieldGenerator
-        declaration={declaration}
         fields={tennisStyleFields}
         id="my-form"
         initialValues={initialValues}
@@ -299,7 +297,6 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
 
     return (
       <StyledFormFieldGenerator
-        declaration={declaration}
         fields={tennisStyleFields}
         id="my-form"
         initialValues={initialValues}

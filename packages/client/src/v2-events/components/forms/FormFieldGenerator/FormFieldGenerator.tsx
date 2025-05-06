@@ -56,8 +56,6 @@ interface FormFieldGeneratorProps {
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
-  /** Latest declaration before any editing has happened. Used for context. @TODO: Check whether declaration and initialValues could be mutually exclusive. */
-  declaration?: EventState
   /** Default field values. Might equal to declaration, when a declaration form is rendered. */
   initialValues?: EventState
 }
@@ -68,7 +66,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     fields,
     initialValues,
     className,
-    declaration,
     eventConfig,
     fieldsToShowValidationErrors,
     setAllFieldsDirty = false,
@@ -130,7 +127,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           return (
             <FormSectionComponent
               className={className}
-              declaration={declaration}
               // @TODO: Formik does not type errors well. Actual error message differs from the type.
               // This was previously cast on FormSectionComponent level.
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -139,6 +135,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               fields={fields}
               fieldsToShowValidationErrors={fieldsToShowValidationErrors}
               id={id}
+              initialValues={initialValues}
               readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}
               setAllFieldsDirty={setAllFieldsDirty}
