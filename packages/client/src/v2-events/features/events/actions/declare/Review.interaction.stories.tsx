@@ -81,10 +81,17 @@ const mockUser = {
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
     declarationTrpcMsw.events.reset()
     declarationTrpcMsw.drafts.reset()
   },
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -154,12 +161,15 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
     declarationTrpcMsw.events.reset()
     declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
   },
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -223,9 +233,12 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
   beforeEach: () => {
     declarationTrpcMsw.events.reset()
     declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
   },
+  loaders: [
+    () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -290,9 +303,12 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
     declarationTrpcMsw.events.reset()
     declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
   },
+  loaders: [
+    () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,

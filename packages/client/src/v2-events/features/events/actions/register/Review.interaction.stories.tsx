@@ -41,10 +41,17 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 const meta: Meta<typeof Review> = {
   title: 'Register/Review/Interaction/Local Registrar',
   beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
     declarationTrpcMsw.events.reset()
     declarationTrpcMsw.drafts.reset()
-  }
+  },
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+    }
+  ]
 }
 
 export default meta
