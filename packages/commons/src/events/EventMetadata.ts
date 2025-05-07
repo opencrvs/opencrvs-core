@@ -44,7 +44,7 @@ export const EventMetadata = z.object({
   updatedByUserRole: z.string(),
   createdAtLocation: z.string(),
   updatedAtLocation: z.string(),
-  modifiedAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
   assignedTo: z.string().nullish(),
   updatedBy: z.string(),
   trackingId: z.string(),
@@ -99,7 +99,7 @@ export const eventMetadataLabelMap: Record<
     defaultMessage: 'ID',
     description: 'ID'
   },
-  'event.modifiedAt': {
+  'event.updatedAt': {
     id: 'event.modifiedAt.label',
     defaultMessage: 'Updated',
     description: 'Modified At'

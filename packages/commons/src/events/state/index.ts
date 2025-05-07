@@ -51,6 +51,7 @@ function getStatusFromActions(actions: Array<Action>) {
       case ActionType.NOTIFY:
         return EventStatus.NOTIFIED
       case ActionType.PRINT_CERTIFICATE:
+        return EventStatus.CERTIFIED
       case ActionType.ASSIGN:
       case ActionType.UNASSIGN:
       case ActionType.REQUEST_CORRECTION:
@@ -196,11 +197,11 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     status: getStatusFromActions(event.actions),
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
-    createdAtLocation: creationAction.createdAtLocation,
-    modifiedAt: latestAction.createdAt,
+    createdAtLocation: creationAction.createdAtLocation ?? '', // @todo remove using empty string
+    updatedAtLocation: creationAction.updatedAtLocation ?? '', // @todo remove using empty string
+    updatedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
-    updatedAtLocation: event.updatedAtLocation,
     declaration: aggregateActionDeclarations(activeActions),
     trackingId: event.trackingId,
     registrationNumber,
@@ -251,7 +252,7 @@ export function applyDraftsToEventIndex(
   eventIndex: EventIndex,
   drafts: Draft[]
 ) {
-  const indexedAt = eventIndex.modifiedAt
+  const indexedAt = eventIndex.updatedAt
 
   const activeDrafts = drafts
     .filter(({ createdAt }) => new Date(createdAt) > new Date(indexedAt))

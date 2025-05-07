@@ -25,7 +25,8 @@ import {
   EventIndex,
   getOrThrow,
   RootWorkqueueConfig,
-  workqueues
+  workqueues,
+  WorkQueueColumnConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -128,7 +129,7 @@ function Workqueue({
 
   const validEvents = orderBy(
     events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
-    ['modifiedAt'],
+    ['updatedAt'],
     ['desc']
   )
 
@@ -161,7 +162,7 @@ function Workqueue({
         (outboxEvent) => outboxEvent.id === event.id
       )
       const isInDrafts = drafts
-        .filter((draft) => draft.createdAt > event.modifiedAt)
+        .filter((draft) => draft.createdAt > event.updatedAt)
         .some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
@@ -171,6 +172,7 @@ function Workqueue({
         if (isInDrafts) {
           return 'DRAFT'
         }
+
         return event.status
       }
 
@@ -196,13 +198,13 @@ function Workqueue({
         ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
-        modifiedAt: formattedDuration(new Date(event.modifiedAt)),
+        modifiedAt: formattedDuration(new Date(event.updatedAt)),
 
         status: intl.formatMessage(
           {
-            id: `events.status`,
+            id: 'v2.events.status',
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} NOTIFIED {In progress} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
           },
           {
             status: getEventStatus()
@@ -241,7 +243,7 @@ function Workqueue({
 
   function getDefaultColumns(): Array<Column> {
     return workqueueConfig.defaultColumns.map(
-      (column): Column => ({
+      (column: string): Column => ({
         label:
           column in defaultColumns
             ? intl.formatMessage(
@@ -259,7 +261,7 @@ function Workqueue({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     const configuredColumns: Array<Column> = workqueueConfig.columns.map(
-      (column) => ({
+      (column: WorkQueueColumnConfig) => ({
         label: intl.formatMessage(column.label),
         width: 35,
         key: column.id,

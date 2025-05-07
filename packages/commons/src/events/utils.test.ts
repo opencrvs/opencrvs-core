@@ -20,7 +20,8 @@ const commonAction = {
   createdBy: 'user-id-1',
   createdByRole: 'user-role-1',
   createdAtLocation: 'location-id-1',
-  transactionId: 'transaction-id-1'
+  transactionId: 'transaction-id-1',
+  updatedAtLocation: 'location-id-2'
 }
 
 const testCases: { actions: Action[]; expected: Action | undefined }[] = [

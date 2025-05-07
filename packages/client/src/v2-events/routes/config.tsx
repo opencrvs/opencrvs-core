@@ -167,7 +167,11 @@ export const routesConfig = {
     },
     {
       path: ROUTES.V2.ADVANCED_SEARCH.path,
-      element: <AdvancedSearch />
+      element: (
+        <WorkqueueLayout>
+          <AdvancedSearch />
+        </WorkqueueLayout>
+      )
     },
     {
       path: ROUTES.V2.SEARCH_RESULT.path,

@@ -241,3 +241,17 @@ export function getAssignmentStatus(
     ? AssignmentStatus.ASSIGNED_TO_SELF
     : AssignmentStatus.ASSIGNED_TO_OTHERS
 }
+
+export function filterEmptyValues(
+  obj: Record<string, unknown>
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([, v]) =>
+        v !== '' &&
+        v !== null &&
+        v !== undefined &&
+        !(typeof v === 'number' && isNaN(v))
+    )
+  )
+}

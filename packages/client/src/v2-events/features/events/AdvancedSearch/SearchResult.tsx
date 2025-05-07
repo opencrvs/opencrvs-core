@@ -158,14 +158,14 @@ const messages = defineMessages(messagesToDefine)
 
 interface Props {
   workqueueConfig: (typeof workqueues)['all']
-  currentEvent: EventConfig
+  eventConfig: EventConfig
   searchParams: Record<string, string>
   queryData: EventIndex[]
 }
 
 export const SearchResult = ({
   workqueueConfig,
-  currentEvent,
+  eventConfig,
   searchParams,
   queryData
 }: Props) => {
@@ -224,20 +224,20 @@ export const SearchResult = ({
         const status = doc.status
 
         const title = flattenedIntl.formatMessage(
-          currentEvent.summary.title.label,
+          eventConfig.summary.title.label,
           doc
         )
 
         return {
           ...doc,
-          event: intl.formatMessage(currentEvent.label),
+          event: intl.formatMessage(eventConfig.label),
           createdAt: formattedDuration(new Date(doc.createdAt)),
-          modifiedAt: formattedDuration(new Date(doc.modifiedAt)),
+          modifiedAt: formattedDuration(new Date(doc.updatedAt)),
           status: intl.formatMessage(
             {
               id: `v2.events.status`,
               defaultMessage:
-                '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+                '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
             },
             {
               status: getEventStatus()
@@ -304,7 +304,12 @@ export const SearchResult = ({
       isMobileSize={false}
       noContent={total < 1}
       noResultText={noResultText}
-      tabBarContent={<SearchModifierComponent searchParams={searchParams} />}
+      tabBarContent={
+        <SearchModifierComponent
+          eventType={eventConfig.id}
+          searchParams={searchParams}
+        />
+      }
       title={`${intl.formatMessage(messages.searchResult)} ${
         ' (' + total + ')'
       }`}
