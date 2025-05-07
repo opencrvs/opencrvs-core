@@ -49,12 +49,19 @@ type AllProps = {
    * Update the form values in the non-formik state.
    */
   onChange: (values: EventState) => void
-  validateAllFields: boolean
   /**
    * Update the touched values in the non-formik state.
    */
   setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
   fieldsToShowValidationErrors?: FieldConfig[]
+  /**
+   * When set to true, all fields will be marked as touched and any validation errors will be shown to user
+   */
+  validateAllFields: boolean
+  /**
+   * Used in conjunction with 'validateAllFields'. When validateAllFields is switched from false to true,
+   * this callback is called with success true if all fields are valid, or false if there are any validation errors.
+   */
   onAllFieldsValidated?: (success: boolean) => void
 } & UsedFormikProps
 
