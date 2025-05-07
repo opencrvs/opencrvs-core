@@ -63,7 +63,8 @@ export function Pages({
   }, [pageId])
 
   function switchToNextPage() {
-    // Reset the validateAllFields state to false.
+    // When switching to next page, reset the validateAllFields state to false.
+    // Otherwise we would be seeing validation errors right away on the next page.
     setValidateAllFields(false)
 
     const nextPageIdx = pageIdx + 1
