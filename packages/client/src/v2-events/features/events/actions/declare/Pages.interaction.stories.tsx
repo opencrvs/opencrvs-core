@@ -64,7 +64,8 @@ function createDraftHandlers() {
           createdBy: 'test-user',
           createdByRole: 'test-role',
           createdAtLocation: 'test-location',
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          status: ActionStatus.Requested
         }
       }
       spy(req)
