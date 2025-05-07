@@ -1056,9 +1056,25 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
-                              description: Date in the format YYYY-MM-DD
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
+                                  description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                    "YYYY-MM-DD"}'
                             parent:
                               type: object
                               properties:
@@ -2140,9 +2156,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -2616,9 +2648,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -3154,9 +3202,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -3471,9 +3535,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -3659,9 +3739,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -4919,9 +5015,25 @@ components:
                       id:
                         type: string
                       defaultValue:
-                        type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
+                        anyOf:
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                          - type: object
+                            properties:
+                              rangeStart:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              rangeEnd:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - rangeStart
+                              - rangeEnd
+                            description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                              "YYYY-MM-DD"}'
                       parent:
                         type: object
                         properties:
@@ -5991,9 +6103,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -6457,9 +6585,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -6995,9 +7139,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -7310,9 +7470,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -7497,9 +7673,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -8545,9 +8737,25 @@ components:
                       id:
                         type: string
                       defaultValue:
-                        type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
+                        anyOf:
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                          - type: object
+                            properties:
+                              rangeStart:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              rangeEnd:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - rangeStart
+                              - rangeEnd
+                            description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                              "YYYY-MM-DD"}'
                       parent:
                         type: object
                         properties:
@@ -9617,9 +9825,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -10083,9 +10307,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -10621,9 +10861,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -10936,9 +11192,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -11123,9 +11395,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -12348,9 +12636,25 @@ components:
                       id:
                         type: string
                       defaultValue:
-                        type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
+                        anyOf:
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                          - type: object
+                            properties:
+                              rangeStart:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              rangeEnd:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - rangeStart
+                              - rangeEnd
+                            description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                              "YYYY-MM-DD"}'
                       parent:
                         type: object
                         properties:
@@ -13420,9 +13724,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -13886,9 +14206,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -14424,9 +14760,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -14739,9 +15091,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -14926,9 +15294,25 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
+                          - anyOf:
+                              - type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                    description: Date in the format YYYY-MM-DD
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
+                                description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                  "YYYY-MM-DD"}'
                           - type: number
                           - type: boolean
                       parent:
@@ -16064,9 +16448,25 @@ components:
                                 id:
                                   type: string
                                 defaultValue:
-                                  type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                  anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 parent:
                                   type: object
                                   properties:
@@ -17143,9 +17543,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -17612,9 +18028,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -18154,9 +18586,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -18471,9 +18919,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -18659,9 +19123,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -19663,9 +20143,25 @@ components:
                                 id:
                                   type: string
                                 defaultValue:
-                                  type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                  anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 parent:
                                   type: object
                                   properties:
@@ -20742,9 +21238,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -21211,9 +21723,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -21753,9 +22281,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -22070,9 +22614,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -22258,9 +22818,25 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
-                                      description: Date in the format YYYY-MM-DD
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                              description: Date in the format YYYY-MM-DD
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
+                                          description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                            "YYYY-MM-DD"}'
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -23417,9 +23993,25 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
-                              description: Date in the format YYYY-MM-DD
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
+                                  description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                    "YYYY-MM-DD"}'
                             parent:
                               type: object
                               properties:
@@ -24489,9 +25081,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -24955,9 +25563,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -25493,9 +26117,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -25808,9 +26448,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -25995,9 +26651,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -26994,9 +27666,25 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
-                              description: Date in the format YYYY-MM-DD
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
+                                  description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                    "YYYY-MM-DD"}'
                             parent:
                               type: object
                               properties:
@@ -28066,9 +28754,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -28532,9 +29236,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -29070,9 +29790,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -29385,9 +30121,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -29572,9 +30324,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -30667,9 +31435,25 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
-                              description: Date in the format YYYY-MM-DD
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
+                                  description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                    "YYYY-MM-DD"}'
                             parent:
                               type: object
                               properties:
@@ -31739,9 +32523,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -32205,9 +33005,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -32743,9 +33559,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -33058,9 +33890,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -33245,9 +34093,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -34244,9 +35108,25 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
-                              description: Date in the format YYYY-MM-DD
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
+                                  description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                    "YYYY-MM-DD"}'
                             parent:
                               type: object
                               properties:
@@ -35316,9 +36196,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -35782,9 +36678,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -36320,9 +37232,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -36635,9 +37563,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:
@@ -36822,9 +37766,25 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                          description: Date in the format YYYY-MM-DD
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
+                                      description: 'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd:
+                                        "YYYY-MM-DD"}'
                                 - type: number
                                 - type: boolean
                             parent:

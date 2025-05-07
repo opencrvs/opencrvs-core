@@ -902,8 +902,20 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
                             parent:
                               type: object
                               properties:
@@ -1777,8 +1789,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -2165,8 +2189,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -2595,8 +2631,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -2852,8 +2900,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -3005,8 +3065,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -4040,8 +4112,20 @@ components:
                       id:
                         type: string
                       defaultValue:
-                        type: string
-                        format: date
+                        anyOf:
+                          - type: string
+                            format: date
+                          - type: object
+                            properties:
+                              rangeStart:
+                                type: string
+                                format: date
+                              rangeEnd:
+                                type: string
+                                format: date
+                            required:
+                              - rangeStart
+                              - rangeEnd
                       parent:
                         type: object
                         properties:
@@ -4898,8 +4982,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -5272,8 +5368,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -5702,8 +5810,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -5955,8 +6075,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -6106,8 +6238,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -6955,8 +7099,20 @@ components:
                       id:
                         type: string
                       defaultValue:
-                        type: string
-                        format: date
+                        anyOf:
+                          - type: string
+                            format: date
+                          - type: object
+                            properties:
+                              rangeStart:
+                                type: string
+                                format: date
+                              rangeEnd:
+                                type: string
+                                format: date
+                            required:
+                              - rangeStart
+                              - rangeEnd
                       parent:
                         type: object
                         properties:
@@ -7813,8 +7969,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -8187,8 +8355,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -8617,8 +8797,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -8870,8 +9062,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -9021,8 +9225,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -10014,8 +10230,20 @@ components:
                       id:
                         type: string
                       defaultValue:
-                        type: string
-                        format: date
+                        anyOf:
+                          - type: string
+                            format: date
+                          - type: object
+                            properties:
+                              rangeStart:
+                                type: string
+                                format: date
+                              rangeEnd:
+                                type: string
+                                format: date
+                            required:
+                              - rangeStart
+                              - rangeEnd
                       parent:
                         type: object
                         properties:
@@ -10872,8 +11100,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -11246,8 +11486,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -11676,8 +11928,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -11929,8 +12193,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -12080,8 +12356,20 @@ components:
                           - type: string
                           - type: string
                             minLength: 1
-                          - type: string
-                            format: date
+                          - anyOf:
+                              - type: string
+                                format: date
+                              - type: object
+                                properties:
+                                  rangeStart:
+                                    type: string
+                                    format: date
+                                  rangeEnd:
+                                    type: string
+                                    format: date
+                                required:
+                                  - rangeStart
+                                  - rangeEnd
                           - type: number
                           - type: boolean
                       parent:
@@ -12998,8 +13286,20 @@ components:
                                 id:
                                   type: string
                                 defaultValue:
-                                  type: string
-                                  format: date
+                                  anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 parent:
                                   type: object
                                   properties:
@@ -13856,8 +14156,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -14230,8 +14542,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -14660,8 +14984,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -14913,8 +15249,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -15064,8 +15412,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -15870,8 +16230,20 @@ components:
                                 id:
                                   type: string
                                 defaultValue:
-                                  type: string
-                                  format: date
+                                  anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 parent:
                                   type: object
                                   properties:
@@ -16728,8 +17100,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -17102,8 +17486,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -17532,8 +17928,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -17785,8 +18193,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -17936,8 +18356,20 @@ components:
                                     - type: string
                                     - type: string
                                       minLength: 1
-                                    - type: string
-                                      format: date
+                                    - anyOf:
+                                        - type: string
+                                          format: date
+                                        - type: object
+                                          properties:
+                                            rangeStart:
+                                              type: string
+                                              format: date
+                                            rangeEnd:
+                                              type: string
+                                              format: date
+                                          required:
+                                            - rangeStart
+                                            - rangeEnd
                                     - type: number
                                     - type: boolean
                                 parent:
@@ -18873,8 +19305,20 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
                             parent:
                               type: object
                               properties:
@@ -19731,8 +20175,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -20105,8 +20561,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -20535,8 +21003,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -20788,8 +21268,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -20939,8 +21431,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -21745,8 +22249,20 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
                             parent:
                               type: object
                               properties:
@@ -22603,8 +23119,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -22977,8 +23505,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -23407,8 +23947,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -23660,8 +24212,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -23811,8 +24375,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -24696,8 +25272,20 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
                             parent:
                               type: object
                               properties:
@@ -25554,8 +26142,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -25928,8 +26528,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -26358,8 +26970,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -26611,8 +27235,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -26762,8 +27398,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -27568,8 +28216,20 @@ components:
                             id:
                               type: string
                             defaultValue:
-                              type: string
-                              format: date
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: object
+                                  properties:
+                                    rangeStart:
+                                      type: string
+                                      format: date
+                                    rangeEnd:
+                                      type: string
+                                      format: date
+                                  required:
+                                    - rangeStart
+                                    - rangeEnd
                             parent:
                               type: object
                               properties:
@@ -28426,8 +29086,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -28800,8 +29472,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -29230,8 +29914,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -29483,8 +30179,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -29634,8 +30342,20 @@ components:
                                 - type: string
                                 - type: string
                                   minLength: 1
-                                - type: string
-                                  format: date
+                                - anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: object
+                                      properties:
+                                        rangeStart:
+                                          type: string
+                                          format: date
+                                        rangeEnd:
+                                          type: string
+                                          format: date
+                                      required:
+                                        - rangeStart
+                                        - rangeEnd
                                 - type: number
                                 - type: boolean
                             parent:
@@ -30224,8 +30944,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -30362,8 +31094,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -30539,8 +31283,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -30677,8 +31433,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -30850,8 +31618,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -30988,8 +31768,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -31161,8 +31953,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -31299,8 +32103,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -31472,8 +32288,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -31610,8 +32438,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -31783,8 +32623,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -31921,8 +32773,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -32094,8 +32958,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -32232,8 +33108,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -32407,8 +33295,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -32545,8 +33445,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -32718,8 +33630,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -32856,8 +33780,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -33032,8 +33968,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -33170,8 +34118,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -33343,8 +34303,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -33481,8 +34453,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -33657,8 +34641,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -33795,8 +34791,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -33971,8 +34979,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -34109,8 +35129,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -34285,8 +35317,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -34423,8 +35467,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -34596,8 +35652,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -34734,8 +35802,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -34917,8 +35997,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -35057,8 +36149,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -35216,8 +36320,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -35355,8 +36471,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -35516,8 +36644,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -35655,8 +36795,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -35813,8 +36965,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -35952,8 +37116,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -36108,8 +37284,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -36247,8 +37435,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -36403,8 +37603,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -36542,8 +37754,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -36698,8 +37922,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -36837,8 +38073,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -36993,8 +38241,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -37132,8 +38392,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -37288,8 +38560,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -37427,8 +38711,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -37586,8 +38882,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -37725,8 +39033,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -37884,8 +39204,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -38023,8 +39355,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -38179,8 +39523,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -38318,8 +39674,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -38474,8 +39842,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -38613,8 +39993,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -38772,8 +40164,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -38911,8 +40315,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -39070,8 +40486,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
@@ -39209,8 +40637,20 @@ components:
           additionalProperties:
             anyOf:
               - type: string
-              - type: string
-                format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: object
+                    properties:
+                      rangeStart:
+                        type: string
+                        format: date
+                      rangeEnd:
+                        type: string
+                        format: date
+                    required:
+                      - rangeStart
+                      - rangeEnd
               - type: boolean
               - type: number
               - type: object
