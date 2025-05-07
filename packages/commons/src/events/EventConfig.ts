@@ -13,10 +13,11 @@ import { ActionConfig } from './ActionConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { AdvancedSearchConfig } from './AdvancedSearchConfig'
-import { findAllFields } from './utils'
+import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
+import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { FieldType } from './FieldType'
 extendZodWithOpenApi(z)
 
 /**
@@ -31,6 +32,8 @@ export const EventConfig = z
       .describe(
         'A machine-readable identifier for the event, e.g. "birth" or "death"'
       ),
+    dateOfEvent: z.object({ fieldId: z.string() }).optional(),
+    title: TranslationConfig,
     summary: SummaryConfig,
     label: TranslationConfig,
     actions: z.array(ActionConfig),
@@ -57,18 +60,46 @@ export const EventConfig = z
     }
 
     const invalidFields = event.advancedSearch.flatMap((section) =>
-      section.fields.filter((field) => !fieldIds.includes(field.fieldId))
+      // Check if the fieldId is not in the fieldIds array
+      // and also not in the metadataFields array
+      section.fields.filter(
+        (field) =>
+          !(
+            fieldIds.includes(field.fieldId) ||
+            (EventFieldId.options as string[]).includes(field.fieldId)
+          )
+      )
     )
 
     if (invalidFields.length > 0) {
       ctx.addIssue({
         code: 'custom',
-        message: `Advanced search id must match a field id in fields array.
+        message: `Advanced search id must match a field id of form fields or pre-defined metadata fields.
     Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
       .map((f) => f.fieldId)
       .join(', ')}`,
         path: ['advancedSearch']
       })
+    }
+
+    if (event.dateOfEvent) {
+      const eventDateFieldId = getDeclarationFields(event).find(
+        ({ id }) => id === event.dateOfEvent?.fieldId
+      )
+      if (!eventDateFieldId) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Date of event field id must match a field id in fields array.
+          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.fieldId}`,
+          path: ['dateOfEvent']
+        })
+      } else if (eventDateFieldId.type !== FieldType.DATE) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
+          path: ['dateOfEvent.fieldType']
+        })
+      }
     }
   })
   .openapi({

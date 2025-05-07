@@ -8,12 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  defineConditional,
-  field,
-  never,
-  not
-} from '../conditionals/conditionals'
+import { defineConditional, never, not } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
 import {
   defineActionForm,
@@ -23,6 +18,7 @@ import { ConditionalType } from '../events/Conditional'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
+import { field } from '../events/field'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -952,21 +948,12 @@ export const tennisClubMembershipEvent = defineConfig({
     description: 'This is what this event is referred as in the system',
     id: 'event.tennis-club-membership.label'
   },
+  title: {
+    defaultMessage: '{applicant.firstname} {applicant.surname}',
+    description: 'This is the title of the summary',
+    id: 'v2.event.tennis-club-membership.title'
+  },
   summary: {
-    title: {
-      id: 'event.tennis-club-membership.summary.title',
-      label: {
-        defaultMessage: '{applicant.firstname} {applicant.surname}',
-        description: 'This is the title of the summary',
-        id: 'v2.event.tennis-club-membership.summary.title'
-      },
-      emptyValueMessage: {
-        defaultMessage: 'Membership application',
-        description:
-          'This is the message shown when the applicant name is missing',
-        id: 'event.tennis-club-membership.summary.title.empty'
-      }
-    },
     fields: [
       {
         id: 'applicant.firstname',
@@ -1330,14 +1317,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description: 'This is what this event is referred as in the system',
         id: 'v2.event.tennis-club-membership.search'
       },
-      fields: [
-        {
-          fieldId: 'applicant.firstname'
-        },
-        {
-          fieldId: 'applicant.dob'
-        }
-      ]
+      fields: [field('applicant.dob').exact()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
