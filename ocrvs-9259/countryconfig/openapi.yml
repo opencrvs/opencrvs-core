@@ -83,44 +83,29 @@ components:
         id:
           type: string
           description: A machine-readable identifier for the event, e.g. "birth" or "death"
+        dateOfEvent:
+          type: object
+          properties:
+            fieldId:
+              type: string
+          required:
+            - fieldId
+        title:
+          type: object
+          properties:
+            id:
+              type: string
+            defaultMessage:
+              type: string
+            description:
+              type: string
+          required:
+            - id
+            - defaultMessage
+            - description
         summary:
           type: object
           properties:
-            title:
-              type: object
-              properties:
-                id:
-                  type: string
-                label:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    defaultMessage:
-                      type: string
-                    description:
-                      type: string
-                  required:
-                    - id
-                    - defaultMessage
-                    - description
-                emptyValueMessage:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    defaultMessage:
-                      type: string
-                    description:
-                      type: string
-                  required:
-                    - id
-                    - defaultMessage
-                    - description
-              required:
-                - id
-                - label
-              description: Title of summary view.
             fields:
               type: array
               items:
@@ -223,7 +208,6 @@ components:
                     description: Field directly referencing event data with field id
               description: Fields rendered in summary view.
           required:
-            - title
             - fields
           description: Configuration for summary in event.
         label:
@@ -3324,6 +3308,7 @@ components:
           default: []
       required:
         - id
+        - title
         - summary
         - label
         - actions
@@ -30062,6 +30047,13 @@ components:
           type: string
         type:
           type: string
+        dateOfEvent:
+          type: object
+          properties:
+            fieldId:
+              type: string
+          required:
+            - fieldId
         createdAt:
           type: string
           format: date-time
