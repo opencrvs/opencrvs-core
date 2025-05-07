@@ -20,7 +20,7 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, Flag, ZodDate } from '../EventMetadata'
+import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
@@ -68,15 +68,16 @@ function getStatusFromActions(actions: Array<Action>) {
 
 function getFlagsFromActions(actions: Action[]): Flag[] {
   const flags: Flag[] = []
-  const actionStatus = actions
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-    .reduce(
-      (actionStatuses, { type, status }) => ({
-        ...actionStatuses,
-        [type]: status
-      }),
-      {} as Record<ActionType, ActionStatus>
-    )
+  const sortedactions = actions.sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
+  const actionStatus = sortedactions.reduce(
+    (actionStatuses, { type, status }) => ({
+      ...actionStatuses,
+      [type]: status
+    }),
+    {} as Record<ActionType, ActionStatus>
+  )
 
   Object.entries(actionStatus).forEach(([type, status]) => {
     if (status === ActionStatus.Accepted) {
@@ -86,6 +87,24 @@ function getFlagsFromActions(actions: Action[]): Flag[] {
     const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
     flags.push(flag satisfies Flag)
   })
+
+  const isCertificatePrinted = sortedactions.reduce<boolean>(
+    (prev, { type }) => {
+      if (type === ActionType.PRINT_CERTIFICATE) {
+        return true
+      }
+      if (type === ActionType.APPROVE_CORRECTION) {
+        return false
+      }
+      return prev
+    },
+    false
+  )
+
+  if (isCertificatePrinted) {
+    flags.push(CustomFlags.CERTIFICATE_PRINTED)
+  }
+
   return flags
 }
 

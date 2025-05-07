@@ -29,14 +29,21 @@ export const EventStatus = {
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
+export const CustomFlags = {
+  CERTIFICATE_PRINTED: 'certificate-printed'
+} as const
+export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
+
 export const Flag = z
   .string()
   .regex(
     new RegExp(
       `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
     ),
-    'Flag must be in the format ActionType:ActionAtatus (lowerCase)'
+    'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
+  .or(z.nativeEnum(CustomFlags))
+
 export type Flag = z.infer<typeof Flag>
 
 export const eventStatuses = Object.values(EventStatus)
