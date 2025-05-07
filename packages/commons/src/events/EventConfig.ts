@@ -14,10 +14,11 @@ import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
+import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { FieldType } from './FieldType'
 extendZodWithOpenApi(z)
-import { findAllFields } from './utils'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -31,6 +32,8 @@ export const EventConfig = z
       .describe(
         'A machine-readable identifier for the event, e.g. "birth" or "death"'
       ),
+    dateOfEvent: z.object({ fieldId: z.string() }).optional(),
+    title: TranslationConfig,
     summary: SummaryConfig,
     label: TranslationConfig,
     actions: z.array(ActionConfig),
@@ -77,6 +80,26 @@ export const EventConfig = z
       .join(', ')}`,
         path: ['advancedSearch']
       })
+    }
+
+    if (event.dateOfEvent) {
+      const eventDateFieldId = getDeclarationFields(event).find(
+        ({ id }) => id === event.dateOfEvent?.fieldId
+      )
+      if (!eventDateFieldId) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Date of event field id must match a field id in fields array.
+          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.fieldId}`,
+          path: ['dateOfEvent']
+        })
+      } else if (eventDateFieldId.type !== FieldType.DATE) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
+          path: ['dateOfEvent.fieldType']
+        })
+      }
     }
   })
   .openapi({
