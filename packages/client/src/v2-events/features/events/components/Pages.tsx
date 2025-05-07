@@ -75,7 +75,6 @@ export function Pages({
 
   function onNextPage() {
     if (validateBeforeNextPage) {
-      // TODO CIHAN: vaihtoehto tässä ite validoida?
       setValidateAllFields(true)
       return
     }
