@@ -38,6 +38,7 @@ export const ActionType = {
   ASSIGN: 'ASSIGN',
   UNASSIGN: 'UNASSIGN'
 } as const
+
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
 export const ConfirmableActions = [

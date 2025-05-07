@@ -127,13 +127,18 @@ async function clearStorage() {
 clearStorage()
 
 const preview: Preview = {
-  loaders: [mswLoader],
-  beforeEach: async () => {
-    await clearStorage()
-    queryClient.clear()
+  loaders: [
+    mswLoader,
+    async () => {
+      await clearStorage()
+      queryClient.clear()
 
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-  },
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+    }
+  ],
   decorators: [
     (Story, context) => {
       return (
