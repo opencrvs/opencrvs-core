@@ -49,37 +49,45 @@ interface FormFieldGeneratorProps {
   /** form id */
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
-  setAllFieldsDirty: boolean
+  validateAllFields?: boolean
   onChange: (values: EventState) => void
   readonlyMode?: boolean
   className?: string
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
-  /** Current active form that is in edit mode. */
-  form: EventState
-  /** Latest declaration before any editing has happened. Used for context. @TODO: Check whether declaration and initialValues could be mutually exclusive. */
-  declaration?: EventState
   /** Default field values. Might equal to declaration, when a declaration form is rendered. */
   initialValues?: EventState
+  onAllFieldsValidated?: (success: boolean) => void
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
-  (props) => {
+  ({
+    onChange,
+    fields,
+    initialValues,
+    className,
+    eventConfig,
+    fieldsToShowValidationErrors,
+    validateAllFields = false,
+    readonlyMode,
+    id,
+    onAllFieldsValidated
+  }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
 
     const formikOnChange = (values: EventState) =>
-      props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
+      onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
     const user = useUserAddress()
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(props.fields, {
+        ...mapFieldsToValues(fields, {
           $user: user
         }),
-        ...props.initialValues
+        ...initialValues
       })
 
     return (
@@ -89,7 +97,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
           getValidationErrorsForForm(
-            props.fields,
+            fields,
             makeFormikFieldIdsOpenCRVSCompatible(values)
           )
         }
@@ -101,7 +109,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
 
           useEffect(() => {
             /**
-             * Because 'enableReinitialize' prop is set to 'true' above, whenver initialValue changes,
+             * Because 'enableReinitialize' prop is set to 'true' above, whenever initialValue changes,
              * formik lose track of touched fields. This is a workaround to save all the fields that
              * have been touched for once during the form manipulation. So that we can show validation
              * errors for all fields that have been touched.
@@ -117,28 +125,30 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               })
             }
           }, [touched])
+
           return (
             <FormSectionComponent
-              className={props.className}
-              declaration={props.declaration}
+              className={className}
               // @TODO: Formik does not type errors well. Actual error message differs from the type.
               // This was previously cast on FormSectionComponent level.
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               errors={formikProps.errors as any}
-              eventConfig={props.eventConfig}
-              fields={props.fields}
-              fieldsToShowValidationErrors={props.fieldsToShowValidationErrors}
-              id={props.id}
-              readonlyMode={props.readonlyMode}
+              eventConfig={eventConfig}
+              fields={fields}
+              fieldsToShowValidationErrors={fieldsToShowValidationErrors}
+              id={id}
+              initialValues={initialValues}
+              readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}
-              setAllFieldsDirty={props.setAllFieldsDirty}
               setAllTouchedFields={setAllTouchedFields}
               setErrors={formikProps.setErrors}
               setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}
+              validateAllFields={validateAllFields}
               values={formikProps.values}
+              onAllFieldsValidated={onAllFieldsValidated}
               onChange={formikOnChange}
             />
           )

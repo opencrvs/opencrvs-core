@@ -35,9 +35,11 @@ function SelectInput({
   }))
 
   const inputValue = selectedOption?.value ?? ''
+
   return (
     <SelectComponent
       {...props}
+      data-testid={props['data-testid'] || `select__${props.id}`}
       options={formattedOptions}
       value={inputValue}
       onChange={onChange}
