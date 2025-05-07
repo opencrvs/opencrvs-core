@@ -62,11 +62,10 @@ function EventOverview({ event }: { event: EventDocument }) {
     'event.registrationNumber': registrationNumber
   }
 
-  const { summary } = eventConfiguration
-  const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
-  const fallbackTitle = summary.title.emptyValueMessage
-    ? intl.formatMessage(summary.title.emptyValueMessage)
-    : ''
+  const title = intl.formatMessage(
+    eventConfiguration.title,
+    flattenedEventIndex
+  )
 
   const actions = getAcceptedActions(event)
 
@@ -74,7 +73,7 @@ function EventOverview({ event }: { event: EventDocument }) {
     <Content
       icon={() => <IconWithName name={''} status={status} />}
       size={ContentSize.LARGE}
-      title={title || fallbackTitle}
+      title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >

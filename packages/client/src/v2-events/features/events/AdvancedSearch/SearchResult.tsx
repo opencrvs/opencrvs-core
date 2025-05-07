@@ -223,10 +223,7 @@ export const SearchResult = ({
         const titleColumnId = workqueueConfig.columns[0].id
         const status = doc.status
 
-        const title = flattenedIntl.formatMessage(
-          eventConfig.summary.title.label,
-          doc
-        )
+        const title = flattenedIntl.formatMessage(eventConfig.title, doc)
 
         return {
           ...doc,
