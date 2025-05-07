@@ -205,7 +205,8 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Archive is disabled', async () => {
-      const modal = within(await canvas.findByRole('dialog'))
+      const modal = within(canvas.getByRole('dialog'))
+
       await waitFor(async () => {
         const archiveButton = modal.getByRole('button', { name: 'Archive' })
         await expect(archiveButton).toBeDisabled()
@@ -213,12 +214,15 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Add description', async () => {
-      const modal = within(await canvas.findByRole('dialog'))
-      const descriptionInput = await modal.findByRole('textbox')
+      const modal = within(canvas.getByRole('dialog'))
 
-      await fireEvent.change(descriptionInput, {
-        target: { value: 'Wrong data' }
-      })
+      await waitFor(async () =>
+        expect(modal.getByRole('textbox')).toBeInTheDocument()
+      )
+
+      const descriptionInput = modal.getByRole('textbox')
+      await userEvent.clear(descriptionInput)
+      await userEvent.type(descriptionInput, 'Wrong data')
     })
 
     await step('Archive is not disabled', async () => {
@@ -232,26 +236,36 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Mark as a duplicate', async () => {
-      const modal = within(await canvas.findByRole('dialog'))
-      const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
+      const modal = within(canvas.getByRole('dialog'))
+
+      await waitFor(async () =>
+        expect(
+          modal.getByRole('checkbox', { name: 'Mark as a duplicate' })
+        ).toBeInTheDocument()
+      )
+
+      const checkbox = modal.getByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
-
-      await userEvent.click(markAsDuplicateCheckbox)
+      await userEvent.click(checkbox)
     })
 
-    await step('Archive is not disabled', async () => {
-      const modal = within(await canvas.findByRole('dialog'))
-      await waitFor(async () => {
-        const archiveButton = await modal.findByRole('button', {
-          name: 'Archive'
-        })
-        await expect(archiveButton).toBeEnabled()
+    await step('Archive is not disabled (after duplicate)', async () => {
+      const modal = within(canvas.getByRole('dialog'))
 
-        await userEvent.click(archiveButton)
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeEnabled()
       })
 
-      await within(canvasElement).findByText('All events')
+      const archiveButton = modal.getByRole('button', { name: 'Archive' })
+      await userEvent.click(archiveButton)
+
+      await waitFor(async () =>
+        expect(
+          within(canvasElement).getByText('All events')
+        ).toBeInTheDocument()
+      )
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
