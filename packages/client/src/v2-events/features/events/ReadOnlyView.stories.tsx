@@ -61,9 +61,17 @@ const eventId = eventDocument.id
 const draft = generateEventDraftDocument(eventId)
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-  },
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('Finds view record menu item in action menu', async () => {

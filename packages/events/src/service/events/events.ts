@@ -276,13 +276,16 @@ export async function addAction(
     createdBy,
     createdByRole,
     token,
-    createdAtLocation,
+    updatedAtLocation,
     status
   }: {
     eventId: string
     createdBy: string
     createdByRole: string
-    createdAtLocation: string
+    /**
+     * The location where the action was created. This is used for auditing purposes.
+     */
+    updatedAtLocation: string
     token: string
     transactionId: string
     status: ActionStatus
@@ -327,7 +330,7 @@ export async function addAction(
             createdBy,
             createdByRole,
             createdAt: now,
-            createdAtLocation,
+            updatedAtLocation,
             id: getUUID(),
             status
           }
@@ -344,7 +347,7 @@ export async function addAction(
     createdBy,
     createdByRole,
     createdAt: now,
-    createdAtLocation,
+    updatedAtLocation,
     id: actionId,
     status: status
   }
@@ -370,7 +373,7 @@ export async function addAction(
             createdBy,
             createdByRole,
             createdAt: now,
-            createdAtLocation,
+            updatedAtLocation,
             id: actionId,
             status: status
           }

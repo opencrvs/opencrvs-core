@@ -156,32 +156,38 @@ export const user = {
  *
  * Generate conditional rules for event.
  */
-export const event = {
-  hasAction: (action: ActionType) =>
-    defineConditional({
-      type: 'object',
-      properties: {
-        $event: {
-          type: 'object',
-          properties: {
-            actions: {
-              type: 'array',
-              contains: {
-                type: 'object',
-                properties: {
-                  type: {
-                    const: action
-                  }
-                },
-                required: ['type']
+export function createEventConditionals() {
+  return {
+    /**
+     * Checks if the event contains a specific action type.
+     * @param action - The action type to check for.
+     */
+    hasAction: (action: ActionType) =>
+      defineConditional({
+        type: 'object',
+        properties: {
+          $event: {
+            type: 'object',
+            properties: {
+              actions: {
+                type: 'array',
+                contains: {
+                  type: 'object',
+                  properties: {
+                    type: {
+                      const: action
+                    }
+                  },
+                  required: ['type']
+                }
               }
-            }
-          },
-          required: ['actions']
-        }
-      },
-      required: ['$event']
-    })
+            },
+            required: ['actions']
+          }
+        },
+        required: ['$event']
+      })
+  }
 }
 
 function getDateFromNow(days: number) {
@@ -242,7 +248,8 @@ function isFieldReference(value: unknown): value is FieldReference {
  *  and(field('foo').isEqualTo('bar'), field('baz').isUndefined())
  *
  */
-export function field(fieldId: string) {
+
+export function createFieldConditionals(fieldId: string) {
   const getDateRange = (
     date: string,
     clause: 'formatMinimum' | 'formatMaximum'
@@ -259,10 +266,6 @@ export function field(fieldId: string) {
   })
 
   return {
-    /**
-     * @private Internal property used for field reference tracking.
-     */
-    _fieldId: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () =>
@@ -449,6 +452,7 @@ export function field(fieldId: string) {
           }
         },
         required: [fieldId]
-      })
+      }),
+    getId: () => ({ fieldId })
   }
 }

@@ -80,11 +80,22 @@ const mockUser = {
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -151,15 +162,21 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 }
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-  },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -220,12 +237,18 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 }
 
 export const ReviewForFieldAgentCompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-  },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -287,12 +310,18 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 }
 
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-  },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,

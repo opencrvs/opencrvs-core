@@ -81,10 +81,16 @@ function EventSelector() {
       return setNoEventSelectedError(true)
     }
     const transactionId = createTemporaryId()
+    const eventConfig = eventConfigurations.find(({ id }) => id === eventType)
+
+    if (!eventConfig) {
+      throw new Error(`Configuration for event '${eventType}' not found`)
+    }
 
     createEvent.mutate({
       type: eventType,
-      transactionId
+      transactionId,
+      dateOfEvent: eventConfig.dateOfEvent
     })
 
     clearForm()
