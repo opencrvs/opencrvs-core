@@ -231,6 +231,7 @@ export function FormSectionComponent({
   )
 
   useEffect(() => {
+    void setTouched({})
     if (validateAllFields) {
       showValidationErrors(fieldsWithDotSeparator)
     }
@@ -284,9 +285,6 @@ export function FormSectionComponent({
     const hasErrors = fieldErrors && fieldErrors.length > 0
     return isFieldVisible(field, completeForm) && hasErrors
   })
-
-  console.log('hasAnyValidationErrors')
-  console.log(hasAnyValidationErrors)
 
   useEffect(() => {
     if (validateAllFields) {
