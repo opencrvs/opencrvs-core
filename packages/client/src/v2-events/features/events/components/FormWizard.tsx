@@ -75,7 +75,7 @@ export const FormWizard = ({
               role="button"
               size="large"
               type="primary"
-              onClick={() => onNextPage()}
+              onClick={onNextPage}
             >
               {continueButtonText}
             </Button>

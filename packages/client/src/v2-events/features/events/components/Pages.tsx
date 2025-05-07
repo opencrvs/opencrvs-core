@@ -63,17 +63,21 @@ export function Pages({
   }, [pageId])
 
   function switchToNextPage() {
+    // Reset the validateAllFields state to false.
+    setValidateAllFields(false)
+
     const nextPageIdx = pageIdx + 1
     const nextPage =
       nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
 
-    setValidateAllFields(false)
     // If there is a next page on the form available, navigate to it.
     // Otherwise, submit the form.
     return nextPage ? onPageChange(nextPage.id) : onSubmit()
   }
 
   function onNextPage() {
+    // If we are in validateBeforeNextPage mode, we need to validate all fields before moving to the next page.
+    // In this case, the actual switching of the page is done on the 'onAllFieldsValidated' callback.
     if (validateBeforeNextPage) {
       setValidateAllFields(true)
       return
@@ -107,7 +111,9 @@ export function Pages({
       eventConfig={eventConfig}
       fields={page.fields}
       id="locationForm"
-      initialValues={{ ...form, ...declaration }}
+      // As initial values we use both the provided declaration data (previously saved to the event)
+      // and the form data (which is currently being edited).
+      initialValues={{ ...declaration, ...form }}
       validateAllFields={validateAllFields}
       onAllFieldsValidated={(success) => {
         setValidateAllFields(false)
