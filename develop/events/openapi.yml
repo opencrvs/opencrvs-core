@@ -3923,6 +3923,7 @@ components:
                                 - FUZZY
                                 - EXACT
                                 - RANGE
+                                - ANY_OF
                               description: Determines the type of field
                           required:
                             - type
