@@ -39,7 +39,7 @@ import { GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
   id: string
-  declaration?: EventState
+  initialValues?: EventState
   eventConfig?: EventConfig
   fields: FieldConfig[]
   className?: string
@@ -49,12 +49,20 @@ type AllProps = {
    * Update the form values in the non-formik state.
    */
   onChange: (values: EventState) => void
-  setAllFieldsDirty: boolean
   /**
    * Update the touched values in the non-formik state.
    */
   setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
   fieldsToShowValidationErrors?: FieldConfig[]
+  /**
+   * When set to true, all fields will be marked as touched and any validation errors will be shown to user
+   */
+  validateAllFields: boolean
+  /**
+   * Used in conjunction with 'validateAllFields'. When validateAllFields is switched from false to true,
+   * this callback is called with success true if all fields are valid, or false if there are any validation errors.
+   */
+  onAllFieldsValidated?: (success: boolean) => void
 } & UsedFormikProps
 
 /**
@@ -122,7 +130,7 @@ export function FormSectionComponent({
   touched,
   setAllTouchedFields,
   className,
-  declaration,
+  initialValues = {},
   readonlyMode,
   id,
   errors: errorsWithDotSeparator,
@@ -132,8 +140,9 @@ export function FormSectionComponent({
   onChange,
   resetForm,
   setErrors,
-  setAllFieldsDirty,
-  fieldsToShowValidationErrors
+  validateAllFields,
+  fieldsToShowValidationErrors,
+  onAllFieldsValidated
 }: AllProps) {
   const intl = useIntl()
   const prevValuesRef = useRef(values)
@@ -156,14 +165,14 @@ export function FormSectionComponent({
     makeDatesFormatted(fieldsWithDotSeparator, values)
   )
 
-  // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-  // Address is the only deep value.
-  const completeForm = { ...(declaration ?? {}), ...form }
-
   const showValidationErrors = useCallback(
     (formFields: FieldConfig[]) => {
-      const touchedForm = formFields.reduce<Record<string, boolean>>(
-        (acc, { id: fieldId }) => {
+      const formattedFieldIds = formFields.map(({ id: fieldId }) =>
+        makeFormFieldIdFormikCompatible(fieldId)
+      )
+
+      const touchedForm = formattedFieldIds.reduce<Record<string, boolean>>(
+        (acc, fieldId) => {
           acc[fieldId] = true
           return acc
         },
@@ -229,7 +238,8 @@ export function FormSectionComponent({
   )
 
   useEffect(() => {
-    if (setAllFieldsDirty) {
+    void setTouched({})
+    if (validateAllFields) {
       showValidationErrors(fieldsWithDotSeparator)
     }
 
@@ -251,7 +261,7 @@ export function FormSectionComponent({
     if (sectionChanged) {
       resetForm()
 
-      const fieldsToValidate = setAllFieldsDirty
+      const fieldsToValidate = validateAllFields
         ? fieldsWithDotSeparator
         : (fieldsToShowValidationErrors ?? [])
 
@@ -269,9 +279,28 @@ export function FormSectionComponent({
     resetForm,
     fieldsWithDotSeparator,
     fieldsToShowValidationErrors,
-    setAllFieldsDirty,
+    validateAllFields,
     showValidationErrors
   ])
+
+  // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
+  // Address is the only deep value.
+  const completeForm = { ...initialValues, ...form }
+
+  const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
+    const fieldErrors = errors[field.id]?.errors
+    const hasErrors = fieldErrors && fieldErrors.length > 0
+    return isFieldVisible(field, completeForm) && hasErrors
+  })
+
+  useEffect(() => {
+    if (validateAllFields) {
+      showValidationErrors(fieldsWithDotSeparator)
+      onAllFieldsValidated?.(!hasAnyValidationErrors)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validateAllFields])
 
   return (
     <section className={className}>
