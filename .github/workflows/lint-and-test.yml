@@ -244,6 +244,7 @@ jobs:
           include-hidden-files: true
           path: |
             .
+            !**/.git
             !**/node_modules
   lint-client:
     name: Lint client
