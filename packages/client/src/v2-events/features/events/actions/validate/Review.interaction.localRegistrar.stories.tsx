@@ -45,11 +45,15 @@ const meta: Meta<typeof Review> = {
       declarationTrpcMsw.events.reset()
       declarationTrpcMsw.drafts.reset()
     },
-    () => {
+    async () => {
       window.localStorage.setItem(
         'opencrvs',
         generator.user.token.localRegistrar
       )
+
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ]
 }

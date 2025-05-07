@@ -85,11 +85,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
       declarationTrpcMsw.events.reset()
       declarationTrpcMsw.drafts.reset()
     },
-    () => {
+    async () => {
       window.localStorage.setItem(
         'opencrvs',
         generator.user.token.localRegistrar
       )
+
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ],
   parameters: {
@@ -163,11 +167,14 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
       declarationTrpcMsw.events.reset()
       declarationTrpcMsw.drafts.reset()
     },
-    () => {
+    async () => {
       window.localStorage.setItem(
         'opencrvs',
         generator.user.token.registrationAgent
       )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ],
   parameters: {
@@ -235,8 +242,11 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
       declarationTrpcMsw.events.reset()
       declarationTrpcMsw.drafts.reset()
     },
-    () => {
+    async () => {
       window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ],
   parameters: {
@@ -305,8 +315,11 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
       declarationTrpcMsw.events.reset()
       declarationTrpcMsw.drafts.reset()
     },
-    () => {
+    async () => {
       window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ],
   parameters: {
