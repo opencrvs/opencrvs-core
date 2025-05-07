@@ -30,15 +30,8 @@ const Field = BaseField.extend({
   emptyValueMessage: TranslationConfig.optional()
 }).describe('Custom configured field')
 
-const Title = z.object({
-  id: z.string(),
-  label: TranslationConfig.describe('Title content'),
-  emptyValueMessage: TranslationConfig.optional()
-})
-
 export const SummaryConfig = z
   .object({
-    title: Title.describe('Title of summary view.'),
     fields: z
       .array(z.union([Field, ReferenceField]))
       .describe('Fields rendered in summary view.')

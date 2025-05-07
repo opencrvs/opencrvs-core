@@ -129,7 +129,7 @@ function Workqueue({
 
   const validEvents = orderBy(
     events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
-    ['modifiedAt'],
+    ['updatedAt'],
     ['desc']
   )
 
@@ -162,7 +162,7 @@ function Workqueue({
         (outboxEvent) => outboxEvent.id === event.id
       )
       const isInDrafts = drafts
-        .filter((draft) => draft.createdAt > event.modifiedAt)
+        .filter((draft) => draft.createdAt > event.updatedAt)
         .some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
@@ -172,13 +172,14 @@ function Workqueue({
         if (isInDrafts) {
           return 'DRAFT'
         }
+
         return event.status
       }
 
       const titleColumnId = workqueueConfig.columns[0].id
 
       const title = flattenedIntl.formatMessage(
-        eventConfig.summary.title.label,
+        eventConfig.title,
         flattenEventIndex(event)
       )
 
@@ -197,13 +198,13 @@ function Workqueue({
         ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
-        modifiedAt: formattedDuration(new Date(event.modifiedAt)),
+        modifiedAt: formattedDuration(new Date(event.updatedAt)),
 
         status: intl.formatMessage(
           {
-            id: `events.status`,
+            id: 'v2.events.status',
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} NOTIFIED {In progress} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
           },
           {
             status: getEventStatus()

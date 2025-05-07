@@ -14,18 +14,18 @@ import {
   user,
   and,
   or,
-  field,
   not,
   ConditionalParameters,
   UserConditionalParameters,
   EventConditionalParameters,
-  event,
   FormConditionalParameters
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus } from '../events/ActionDocument'
+import { field } from '../events/field'
+import { event } from '../events/event'
 
 /*  eslint-disable max-lines */
 
@@ -487,6 +487,7 @@ describe('"event" conditionals', () => {
         trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
+        dateOfEvent: { fieldId: 'child.dob' },
         updatedAtLocation: '123456',
         actions: [
           {

@@ -202,7 +202,7 @@ export function createStoriesFromScenarios(
     (acc, { name, actions, expected }) => {
       acc[name] = {
         loaders: [
-          () => {
+          async () => {
             window.localStorage.setItem(
               'opencrvs',
               // eslint-disable-next-line no-nested-ternary
@@ -212,6 +212,10 @@ export function createStoriesFromScenarios(
                   ? generator.user.token.fieldAgent
                   : generator.user.token.registrationAgent
             )
+
+            // Tests are generated dynamically, and it causes intermittent failures when global state
+            // gets out of whack. This is a workaround to ensure that the state is reset
+            await new Promise((resolve) => setTimeout(resolve, 50))
 
             return {}
           }
