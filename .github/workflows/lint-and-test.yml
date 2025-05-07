@@ -164,6 +164,8 @@ jobs:
   prepare-client-tests:
     name: Prepare client tests
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     outputs:
       chromatic_required: ${{ steps.detect-changes.outputs.chromatic_required }}
     steps:
@@ -244,6 +246,7 @@ jobs:
           include-hidden-files: true
           path: |
             .
+            !**/.git
             !**/node_modules
   lint-client:
     name: Lint client
