@@ -33,9 +33,9 @@ export const Flag = z
   .string()
   .regex(
     new RegExp(
-      `^(${Object.values(ActionType).join('|')}):(${Object.values(ActionStatus).join('|')})$`
+      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
     ),
-    'Flag must be in the format ActionType:ActionStatus'
+    'Flag must be in the format ActionType:ActionAtatus (lowerCase)'
   )
 export type Flag = z.infer<typeof Flag>
 
