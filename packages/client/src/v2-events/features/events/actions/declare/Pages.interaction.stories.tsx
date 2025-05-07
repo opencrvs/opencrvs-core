@@ -59,7 +59,6 @@ function createDraftHandlers() {
         transactionId: req.transactionId,
         createdAt: new Date().toISOString(),
         action: {
-          status: ActionStatus.Accepted,
           ...req,
           declaration: req.declaration || {},
           createdBy: 'test-user',
