@@ -191,9 +191,17 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     const canvas = within(canvasElement)
 
     await step('Open reject modal', async () => {
-      const rejectButton = await canvas.findByRole('button', { name: 'Reject' })
+      const rejectButton = await canvas.findByRole('button', {
+        name: 'Reject'
+      })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
-      await canvas.findByRole('dialog')
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
     await step('Archive is disabled', async () => {
@@ -294,12 +302,18 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
       const rejectButton = await canvas.findByRole('button', {
         name: 'Reject'
       })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
-    const modal = within(await canvas.findByRole('dialog'))
-
     await step('Send For Update is disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -308,6 +322,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Add description', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const descriptionInput = await modal.findByRole('textbox')
 
       await fireEvent.change(descriptionInput, {
@@ -316,6 +331,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Send For Update is not disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -324,6 +340,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Mark as a duplicate', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
@@ -332,6 +349,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Send For Update is disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -340,6 +358,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Unmark as a duplicate', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
@@ -348,6 +367,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Send For Update is not disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })

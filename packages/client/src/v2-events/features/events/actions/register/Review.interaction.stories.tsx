@@ -191,9 +191,17 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     const canvas = within(canvasElement)
 
     await step('Open reject modal', async () => {
-      const rejectButton = await canvas.findByRole('button', { name: 'Reject' })
+      const rejectButton = await canvas.findByRole('button', {
+        name: 'Reject'
+      })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
-      await canvas.findByRole('dialog')
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
     await step('Archive is disabled', async () => {
@@ -297,7 +305,14 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
       const rejectButton = await canvas.findByRole('button', {
         name: 'Reject'
       })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
     const modal = within(await canvas.findByRole('dialog'))
