@@ -42,12 +42,6 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'applicant.firstname': 'Tanya',
-          'applicant.id': '2370934578',
-          'applicant.surname': 'McQuaid',
-          'applicant.dob': '1975-01-02'
-        }}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -93,9 +87,13 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'applicant.firstname': 'Tanya',
+          'applicant.id': '2370934578',
+          'applicant.surname': 'McQuaid',
+          'applicant.dob': '1975-01-02'
+        }}
         onChange={noop}
       />
     )
@@ -111,11 +109,6 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'recommender.none': true,
-          'recommender.firstname': 'John',
-          'applicant.firstname': 'Rasheed'
-        }}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -147,9 +140,12 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'recommender.none': true,
+          'recommender.firstname': 'John',
+          'applicant.firstname': 'Rasheed'
+        }}
         onChange={noop}
       />
     )
@@ -165,11 +161,6 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'recommender.none': false,
-          'recommender.firstname': 'John',
-          'applicant.firstname': 'Rasheed'
-        }}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -198,9 +189,12 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'recommender.none': false,
+          'recommender.firstname': 'John',
+          'applicant.firstname': 'Rasheed'
+        }}
         onChange={noop}
       />
     )

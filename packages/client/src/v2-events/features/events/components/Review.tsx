@@ -485,11 +485,9 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
-                  form={annotation}
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
-                  setAllFieldsDirty={false}
                   onChange={onAnnotationChange}
                 />
               </ReviewContainter>

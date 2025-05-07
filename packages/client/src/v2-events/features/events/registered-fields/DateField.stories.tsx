@@ -76,10 +76,8 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
             required: true
           }
         ]}
-        form={formData}
         id="my-form"
         initialValues={formData}
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
           setFormData(data)
