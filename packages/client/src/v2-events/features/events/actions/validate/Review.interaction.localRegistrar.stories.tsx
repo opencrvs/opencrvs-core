@@ -187,25 +187,21 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     const canvas = within(canvasElement)
 
     await step('Open reject modal', async () => {
-      const rejectButton = await canvas.findByRole('button', {
-        name: 'Reject'
-      })
+      const rejectButton = await canvas.findByRole('button', { name: 'Reject' })
       await userEvent.click(rejectButton)
+      await canvas.findByRole('dialog')
     })
 
-    const modal = within(await canvas.findByRole('dialog'))
-
     await step('Archive is disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       await waitFor(async () => {
-        const archiveButton = await modal.findByRole('button', {
-          name: 'Archive'
-        })
-
-        await expect(archiveButton.hasAttribute('disabled')).toBe(true)
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeDisabled()
       })
     })
 
     await step('Add description', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const descriptionInput = await modal.findByRole('textbox')
 
       await fireEvent.change(descriptionInput, {
@@ -214,6 +210,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Archive is not disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       await waitFor(async () => {
         const archiveButton = await modal.findByRole('button', {
           name: 'Archive'
@@ -223,6 +220,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Mark as a duplicate', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
@@ -231,6 +229,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Archive is not disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       await waitFor(async () => {
         const archiveButton = await modal.findByRole('button', {
           name: 'Archive'
