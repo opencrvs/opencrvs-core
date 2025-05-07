@@ -30,6 +30,8 @@ export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 export const eventStatuses = Object.values(EventStatus)
 export const EventStatuses = z.nativeEnum(EventStatus)
 
+export const ZodDate = z.string().date()
+
 /**
  * Event metadata exposed to client.
  *
@@ -40,11 +42,12 @@ export const EventMetadata = z.object({
   type: z.string(),
   status: EventStatuses,
   createdAt: z.string().datetime(),
+  dateOfEvent: ZodDate.nullish(),
   createdBy: z.string(),
   updatedByUserRole: z.string(),
   createdAtLocation: z.string(),
   updatedAtLocation: z.string(),
-  modifiedAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
   assignedTo: z.string().nullish(),
   updatedBy: z.string(),
   trackingId: z.string(),
@@ -74,6 +77,11 @@ export const eventMetadataLabelMap: Record<
     defaultMessage: 'Created',
     description: 'Created At'
   },
+  'event.dateOfEvent': {
+    id: 'event.dateOfEvent.label',
+    defaultMessage: 'Date of Event',
+    description: 'Date of Event'
+  },
   'event.createdAtLocation': {
     id: 'event.createdAtLocation.label',
     defaultMessage: 'Location',
@@ -99,7 +107,7 @@ export const eventMetadataLabelMap: Record<
     defaultMessage: 'ID',
     description: 'ID'
   },
-  'event.modifiedAt': {
+  'event.updatedAt': {
     id: 'event.modifiedAt.label',
     defaultMessage: 'Updated',
     description: 'Modified At'

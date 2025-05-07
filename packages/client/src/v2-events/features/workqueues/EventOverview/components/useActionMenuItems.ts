@@ -19,7 +19,8 @@ import {
   EventStatus,
   SCOPES,
   ACTION_ALLOWED_SCOPES,
-  hasAnyOfScopes
+  hasAnyOfScopes,
+  IndexMap
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -147,7 +148,7 @@ export const actionLabels = {
     description: 'Label for delete button in dropdown menu',
     id: 'v2.event.birth.action.delete.label'
   }
-}
+} as const
 
 /**
  * @returns a list of action menu items based on the event state and scopes provided.

@@ -20,7 +20,8 @@ import {
   CreatedAction,
   getCurrentEventState,
   ActionStatus,
-  getUUID
+  getUUID,
+  EventInput
 } from '@opencrvs/commons/client'
 
 import {
@@ -100,9 +101,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
 
 export function useCreateEvent() {
   const trpc = useTRPC()
-  const options = trpc.event.create.mutationOptions<{
-    transactionId: string
-  }>()
+  const options = trpc.event.create.mutationOptions<EventInput>()
 
   const overrides = queryClient.getMutationDefaults(
     trpcOptionsProxy.event.create.mutationKey()
