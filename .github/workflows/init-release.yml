@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Release - Start a new release
+name: Release - Start a new release 
 on:
   workflow_dispatch:
     inputs:
@@ -19,70 +19,98 @@ jobs:
   release_workflow:
     runs-on: ubuntu-latest
     steps:
-      - id: release_workflow_dry_run
-        name: gitflow-workflow-action release workflows
-        if: github.event_name == 'workflow_dispatch'
+      - name: Determine the Base Branch
+        id: get_base_branch
+        run: |
+          version="${{ inputs.version }}"
+
+          if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version was provided as input: $version" >&2
+            echo "Please follow semver format for versioning, e/g 1.7.2"
+            exit 1
+          fi
+
+          IFS='.' read -r x y z <<< "$version"
+          if [ "$z" = "0" ]; then
+            base_branch="develop"
+          else
+            previous_version="$((x)).$((y)).$((z-1))"
+            base_branch="release/$previous_version"
+          fi
+          echo "target_branch=master" >> $GITHUB_OUTPUT
+          echo "base_branch=$base_branch" >> $GITHUB_OUTPUT
+                 
+      - name: Start a new release ${{ inputs.version }} from ${{ steps.get_base_branch.outputs.base_branch }}
         uses: hoangvvo/gitflow-workflow-action@0.3.8
         with:
-          develop_branch: "develop"
-          main_branch: "master"
-          dry_run: true
+          develop_branch: ${{ steps.get_base_branch.outputs.base_branch }}
+          main_branch: ${{ steps.get_base_branch.outputs.target_branch }}
+          merge_back_from_main: false
+          version: ${{ inputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - id: generate_pr_summary
-        name: generate pr summary
-        if: ${{ steps.release_workflow_dry_run.outputs.type == 'release' && steps.release_workflow_dry_run.outputs.pull_numbers_in_release }}
+
+      - name: Trigger workflow in opencrvs-countryconfig
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
-            const pull_numbers_in_release = "${{ steps.release_workflow_dry_run.outputs.pull_numbers_in_release }}";
-            const mergedPrNumbers = Array.from(new Set(pull_numbers_in_release.split(',').map(Number)));
-            // Get the PRs and parse the release summary
-            const mergedPrs = await Promise.all(mergedPrNumbers.map(async (prNumber) => {
-              const pr = await github.rest.pulls.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: prNumber
-              });
-              if (!pr.data.body) {
-                return;
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'opencrvs-countryconfig',
+              workflow_id: 'init-release.yml',
+              ref: context.ref,
+              inputs: {
+                version: '${{ inputs.version }}'
               }
-              const regex = /\#\# What does this PR do\?([\s\S]*?)\n\#\#/gm;
-              let match = regex.exec(pr.data.body)?.[1]?.trim();
-              // try to remove empty lines
-              match = match?.split('\n').map(s => s.trim()).filter(Boolean).map(
-                s => s.startsWith('-') || s.startsWith('*') ? s : `* ${s}`
-              ).join('\n');
+            })
 
-              let type = 0 // patch
-              if (pr.data.body.includes("[x] Major")) {
-                type = 2 // major
-              } else if (pr.data.body.includes("[x] Minor")) {
-                type = 1 // minor
-              }
-
-              return {
-                summary: `${pr.data.title}\n${match}`,
-                type,
-              }
-            })).then((prs) => prs.filter(Boolean));
-
-            const releaseSummary = mergedPrs.map((pr) => pr.summary).join('\n\n');
-            core.setOutput('release_summary', releaseSummary);
-
-            const versionIncrementType = Math.max(...mergedPrs.map((pr) => pr.type));
-            const versionIncrement = ['patch', 'minor', 'major'][versionIncrementType] || 'patch';
-            core.setOutput('version_increment', versionIncrement);
-        
-      - id: release_workflow
-        name: gitflow-workflow-action release workflows
-        uses: hoangvvo/gitflow-workflow-action@0.3.8
+      
+      - name: Checkout the release branch
+        uses: actions/checkout@v4
         with:
-          develop_branch: "develop"
-          main_branch: "master"
-          version: ${{ inputs.version }}
-          release_summary: ${{ steps.generate_pr_summary.outputs.release_summary }}
-          version_increment: ${{ steps.generate_pr_summary.outputs.version_increment }}
+          ref: "release/${{ inputs.version }}"
+
+      - name: Clear auto-generated PR comment
+        run: |
+          REPO="${{ github.repository }}"
+          PR_BRANCH="release/${{ inputs.version }}"
+          PR_NUMBER=$(gh pr list --head "$PR_BRANCH" --repo "$REPO" --json number -q '.[0].number')
+          cd "$GITHUB_WORKSPACE"
+          if [ -f .github/TEMPLATES/RELEASE_PR_TEMPLATE.md ]; then
+            BODY=$(jq -Rs . < .github/TEMPLATES/RELEASE_PR_TEMPLATE.md)
+          else
+            BODY=$(jq -n --arg body "" '$body')
+          fi
+          echo "{\"body\": $BODY}" > body.json
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            /repos/"$REPO"/issues/"$PR_NUMBER" \
+            --input body.json 
+          rm body.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+      - name: Update version numbers and CHANGELOG
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
+          git add .
+          git commit -m "chore: update version to ${{ inputs.version }}"
+
+          sed -i '1,2d' CHANGELOG.md
+          cp CHANGELOG.md COPY_CHANGELOG.md
+          {
+            echo "# Changelog"
+            echo ""
+            echo "## ${{ inputs.version }} Release Candidate"
+            echo ""
+            cat COPY_CHANGELOG.md 
+          } > CHANGELOG.md
+          git add CHANGELOG.md
+          git commit -m "docs: update changelog for ${{ inputs.version }} release candidate"
+          git push origin "release/${{ inputs.version }}"

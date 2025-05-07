@@ -14,12 +14,13 @@ import {
   Action,
   ActionDocument,
   ActionStatus,
+  ActionUpdate,
   EventState,
   RegisterAction
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus } from '../EventMetadata'
+import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
@@ -97,7 +98,9 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-function aggregateActionDeclarations(actions: Array<ActionDocument>) {
+function aggregateActionDeclarations(
+  actions: Array<ActionDocument>
+): ActionUpdate {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
@@ -191,6 +194,15 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const registrationNumber = registrationAction?.registrationNumber ?? null
 
+  const declaration = aggregateActionDeclarations(activeActions)
+
+  let dateOfEvent: string | null = event.createdAt.split('T')[0]
+
+  if (event.dateOfEvent) {
+    const parsedDate = ZodDate.safeParse(declaration[event.dateOfEvent.fieldId])
+    dateOfEvent = parsedDate.success ? parsedDate.data : null
+  }
+
   return deepDropNulls({
     id: event.id,
     type: event.type,
@@ -198,14 +210,15 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation ?? '', // @todo remove using empty string
-    updatedAtLocation: creationAction.updatedAtLocation ?? '', // @todo remove using empty string
     updatedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
-    declaration: aggregateActionDeclarations(activeActions),
+    updatedAtLocation: event.updatedAtLocation,
+    declaration,
     trackingId: event.trackingId,
     registrationNumber,
-    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions)
+    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
+    dateOfEvent
   })
 }
 
