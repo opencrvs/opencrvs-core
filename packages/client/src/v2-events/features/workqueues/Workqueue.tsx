@@ -269,6 +269,7 @@ function Workqueue({
         isSorted: sortedCol === column.id
       })
     )
+
     const allColumns = configuredColumns.concat(getDefaultColumns())
 
     if (width > theme.grid.breakpoints.lg) {
@@ -281,6 +282,7 @@ function Workqueue({
   const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
 
   const isShowPagination = totalPages >= 1
+
   return (
     <WQContentWrapper
       error={false}
