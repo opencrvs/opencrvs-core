@@ -113,27 +113,41 @@ const RegStatus = {
   Created: 'CREATED'
 } as const
 
+export const SearchType = {
+  FUZZY: 'fuzzy',
+  EXACT: 'exact',
+  ANY_OF: 'anyOf',
+  RANGE: 'range'
+} as const
+
 type Condition =
-  | { type: 'fuzzy'; term: string }
-  | { type: 'exact'; term: string }
-  | { type: 'range'; gte: string; lte: string }
-  | { type: 'anyOf'; terms: string[] }
+  | { type: typeof SearchType.FUZZY; term: string }
+  | { type: typeof SearchType.EXACT; term: string }
+  | { type: typeof SearchType.RANGE; gte: string; lte: string }
+  | { type: typeof SearchType.ANY_OF; terms: string[] }
 
 export const ADVANCED_SEARCH_KEY = 'and'
 
-function buildCondition(type: string, value: string): Condition {
+export const SearchKey = Object.fromEntries(
+  Object.keys(SearchType).map((key) => [key, key])
+) as { [K in keyof typeof SearchType]: K }
+
+function buildCondition(
+  type: keyof typeof SearchType,
+  value: string
+): Condition {
   switch (type) {
-    case 'FUZZY':
-      return { type: 'fuzzy', term: value }
-    case 'EXACT':
-      return { type: 'exact', term: value }
-    case 'ANY_OF':
-      return { type: 'anyOf', terms: value.split(',') }
-    case 'RANGE':
+    case SearchKey.FUZZY:
+      return { type: SearchType.FUZZY, term: value }
+    case SearchKey.EXACT:
+      return { type: SearchType.EXACT, term: value }
+    case SearchKey.ANY_OF:
+      return { type: SearchType.ANY_OF, terms: value.split(',') }
+    case SearchKey.RANGE:
       const [gte, lte] = value.split(',')
-      return { type: 'range', gte, lte }
+      return { type: SearchType.RANGE, gte, lte }
     default:
-      return { type: 'exact', term: value } // Fallback to exact match
+      return { type: SearchType.EXACT, term: value } // Fallback to exact match
   }
 }
 
@@ -145,7 +159,10 @@ function buildDataConditionFromSearchKeys(
   searchKeys: {
     fieldId: string
     config?: {
-      type: 'FUZZY' | 'EXACT' | 'RANGE'
+      type:
+        | typeof SearchKey.EXACT
+        | typeof SearchKey.FUZZY
+        | typeof SearchKey.RANGE
     }
     fieldType: 'field' | 'event'
   }[],

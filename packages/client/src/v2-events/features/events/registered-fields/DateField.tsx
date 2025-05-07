@@ -12,11 +12,13 @@
 import format from 'date-fns/format'
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { DateValue } from '@opencrvs/commons/client'
+import { DateKind, DateValue } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
+import { SearchKey } from '@client/v2-events/features/events/AdvancedSearch/utils'
+import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 
 const messages = defineMessages({
   dateFormat: {
@@ -31,10 +33,12 @@ const EMPTY_DATE = '--'
 function DateInput({
   onChange,
   value = '',
+  kind = SearchKey.EXACT,
   ...props
 }: DateFieldProps & {
   onChange: (newValue: string) => void
   value: string
+  kind: DateKind
 }) {
   /**
    * Component library returns '--' for empty dates when input has been touched.
@@ -44,28 +48,47 @@ function DateInput({
   const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
 
   return (
-    <DateFieldComponent
-      {...props}
-      data-testid={`${props.id}`}
-      value={value}
-      onBlur={(e) => {
-        const segmentType = String(e.target.id.split('-').pop())
-        const val = e.target.value
-        const dateSegmentVals = value.split('-')
+    <>
+      {kind === SearchKey.EXACT ? (
+        <DateFieldComponent
+          {...props}
+          data-testid={`${props.id}`}
+          value={value}
+          onBlur={(e) => {
+            const segmentType = String(e.target.id.split('-').pop())
+            const val = e.target.value
+            const dateSegmentVals = value.split('-')
 
-        // Add possibly missing leading 0 for days and months
-        if (segmentType === 'dd' && val.length === 1) {
-          cleanOnChange(`${dateSegmentVals[0]}-${dateSegmentVals[1]}-0${val}`)
-        }
+            // Add possibly missing leading 0 for days and months
+            if (segmentType === 'dd' && val.length === 1) {
+              cleanOnChange(
+                `${dateSegmentVals[0]}-${dateSegmentVals[1]}-0${val}`
+              )
+            }
 
-        if (segmentType === 'mm' && val.length === 1) {
-          cleanOnChange(`${dateSegmentVals[0]}-0${val}-${dateSegmentVals[2]}`)
-        }
+            if (segmentType === 'mm' && val.length === 1) {
+              cleanOnChange(
+                `${dateSegmentVals[0]}-0${val}-${dateSegmentVals[2]}`
+              )
+            }
 
-        return props.onBlur && props.onBlur(e)
-      }}
-      onChange={cleanOnChange}
-    />
+            return props.onBlur && props.onBlur(e)
+          }}
+          onChange={cleanOnChange}
+        />
+      ) : (
+        <DateRangePickerForFormField
+          inputProps={props}
+          value={{
+            exact: value,
+            isDateRangeActive: true,
+            rangeStart: '',
+            rangeEnd: ''
+          }}
+          onChange={(val) => console.log(val)}
+        />
+      )}
+    </>
   )
 }
 

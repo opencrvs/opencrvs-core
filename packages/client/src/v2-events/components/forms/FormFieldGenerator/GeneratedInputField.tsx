@@ -158,6 +158,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <DateField.Input
             {...inputProps}
+            kind={field.config.kind}
             value={field.value}
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
