@@ -10,17 +10,19 @@
  */
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
-import * as React from 'react'
-import { createRoot } from 'react-dom/client'
-import { App } from '@client/App'
-import { createStore } from '@client/store'
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
+import { createStore } from '@client/store'
+import * as React from 'react'
+import { createRoot } from 'react-dom/client'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
 import { SubmissionController } from '@client/SubmissionController'
-import WebFont from 'webfontloader'
+import * as Sentry from '@sentry/react'
 import { BrowserTracing } from '@sentry/tracing'
+import { createBrowserRouter } from 'react-router-dom'
+import WebFont from 'webfontloader'
+import { App, routesConfig } from './App'
+import { APPLICATION_VERSION } from './utils/constants'
 
 WebFont.load({
   google: {
@@ -30,7 +32,7 @@ WebFont.load({
 
 storage.configStorage('OpenCRVS')
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 if (
   window.location.hostname !== 'localhost' &&
@@ -39,7 +41,7 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      release: import.meta.env.REACT_APP_VERSION,
+      release: APPLICATION_VERSION,
       environment: import.meta.env.NODE_ENV,
       integrations: [new BrowserTracing()],
 
@@ -60,6 +62,9 @@ window.addEventListener('online', userReconnectedToast)
 
 const container = document.getElementById('root')
 const root = createRoot(container!)
-root.render(<App store={store} history={history} />)
+
+const router = createBrowserRouter(routesConfig)
+
+root.render(<App router={router} store={store} />)
 
 new SubmissionController(store).start()

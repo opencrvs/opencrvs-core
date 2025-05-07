@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AxiosError } from 'axios'
-import { RouterAction, push, goBack as back } from 'connected-react-router'
 import {
   IApplicationConfigResponse,
   IApplicationConfig,
@@ -18,15 +17,6 @@ import {
   ITokenResponse,
   NotificationEvent
 } from '@login/utils/authApi'
-import {
-  PHONE_NUMBER_VERIFICATION,
-  FORGOTTEN_ITEM,
-  RECOVERY_CODE_ENTRY,
-  SECURITY_QUESTION,
-  UPDATE_PASSWORD,
-  STEP_ONE,
-  SUCCESS
-} from '@login/navigation/routes'
 
 export const CONFIG_LOAD = 'login/CONFIG_LOAD'
 export const CONFIG_LOADED = 'login/CONFIG_LOADED'
@@ -58,7 +48,7 @@ export enum FORGOTTEN_ITEMS {
   PASSWORD = 'password'
 }
 
-export type ApplicationConfigAction = {
+type ApplicationConfigAction = {
   type: typeof CONFIG_LOAD
 }
 
@@ -74,7 +64,7 @@ export type ApplicationConfigFailed = {
 
 export type AuthenticationDataAction = {
   type: typeof AUTHENTICATE
-  payload: IAuthenticationData
+  payload: IAuthenticationData & { inAppRedirect: () => void }
 }
 export type AuthenticationFieldValidationAction = {
   type: typeof AUTHENTICATE_VALIDATE
@@ -87,7 +77,7 @@ export type AuthenticationResetAction = {
 
 export type AuthenticateResponseAction = {
   type: typeof AUTHENTICATION_COMPLETED
-  payload: IAuthenticateResponse
+  payload: IAuthenticateResponse & { inAppRedirect: () => void }
 }
 
 export type AuthenticationFailedAction = {
@@ -130,18 +120,17 @@ export type VerifyCodeFailedAction = {
   payload: Error
 }
 
-export type GoToAppAction = {
+type GoToAppAction = {
   type: typeof GOTO_APP
   payload: string
 }
 
-export type StoreReloadModalVisibilityAction = {
+type StoreReloadModalVisibilityAction = {
   type: typeof RELOAD_MODAL_VISIBILITY
   payload: { visibility: boolean }
 }
 
 export type Action =
-  | RouterAction
   | ApplicationConfigAction
   | ApplicationConfigLoaded
   | ApplicationConfigFailed
@@ -159,10 +148,6 @@ export type Action =
   | AuthenticationResetAction
   | StoreClientRedirectRouteAction
   | StoreReloadModalVisibilityAction
-
-export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
-  type: CONFIG_LOAD
-})
 
 export const resetSubmissionError = (): AuthenticationResetAction => {
   return {
@@ -184,7 +169,11 @@ export const applicationConfigFailedAction = (
 })
 
 export const authenticate = (
-  values: IAuthenticationData
+  values: IAuthenticationData,
+  /**
+   * fallback redirection if system does not return token
+   */
+  inAppRedirect: () => void
 ): AuthenticationDataAction | AuthenticationFieldValidationAction => {
   if (!values.username || !values.password) {
     return {
@@ -199,15 +188,16 @@ export const authenticate = (
 
   return {
     type: AUTHENTICATE,
-    payload: cleanedData
+    payload: { ...cleanedData, inAppRedirect }
   }
 }
 
 export const completeAuthentication = (
-  response: IAuthenticateResponse
+  response: IAuthenticateResponse,
+  inAppRedirect: () => void
 ): AuthenticateResponseAction => ({
   type: AUTHENTICATION_COMPLETED,
-  payload: response
+  payload: { ...response, inAppRedirect }
 })
 
 export const failAuthentication = (
@@ -252,15 +242,6 @@ export const storeClientRedirectRoute = (
   }
 }
 
-export const storeReloadModalVisibility = (
-  visibility: boolean
-): StoreReloadModalVisibilityAction => {
-  return {
-    type: RELOAD_MODAL_VISIBILITY,
-    payload: { visibility }
-  }
-}
-
 export const verifyCode = (values: IVerifyCodeNumbers): VerifyCodeAction => {
   const code = Object.values(values).join('')
   return {
@@ -280,49 +261,3 @@ export const failVerifyCode = (error: AxiosError): VerifyCodeFailedAction => ({
   type: VERIFY_CODE_FAILED,
   payload: error
 })
-export function goBack() {
-  return back()
-}
-export const gotoApp = (appId: string): GoToAppAction => ({
-  type: GOTO_APP,
-  payload: appId
-})
-export function goToForgottenItemForm() {
-  return push(FORGOTTEN_ITEM)
-}
-export function goToPhoneNumberVerificationForm(forgottenItem: string) {
-  return push(PHONE_NUMBER_VERIFICATION, { forgottenItem })
-}
-export function goToRecoveryCodeEntryForm(
-  nonce: string,
-  forgottenItem: string,
-  mobile?: string,
-  email?: string
-) {
-  return push(RECOVERY_CODE_ENTRY, {
-    nonce,
-    mobile,
-    email,
-    forgottenItem
-  })
-}
-export function goToSecurityQuestionForm(
-  nonce: string,
-  securityQuestionKey: string,
-  forgottenItem: string
-) {
-  return push(SECURITY_QUESTION, {
-    nonce,
-    securityQuestionKey,
-    forgottenItem
-  })
-}
-export function goToUpdatePasswordForm(nonce: string) {
-  return push(UPDATE_PASSWORD, { nonce })
-}
-export function goToSuccessPage(forgottenItem: string) {
-  return push(SUCCESS, { forgottenItem })
-}
-export function goToHome() {
-  return push(STEP_ONE)
-}

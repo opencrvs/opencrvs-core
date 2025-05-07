@@ -44,7 +44,7 @@ export type PaymentReconciliation = Omit<
   }
 }
 
-export function isPaymentReconciliation(
+function isPaymentReconciliation(
   resource: Resource
 ): resource is PaymentReconciliation {
   return resource.resourceType === 'PaymentReconciliation'

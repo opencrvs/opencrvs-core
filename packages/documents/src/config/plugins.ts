@@ -38,7 +38,10 @@ export default function getPlugins() {
       options: {
         client: {
           environment: process.env.DOMAIN,
-          dsn: SENTRY_DSN
+          dsn: SENTRY_DSN,
+          initialScope: {
+            tags: { service: 'documents' }
+          }
         },
         catchLogErrors: true
       }

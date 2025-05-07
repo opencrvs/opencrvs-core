@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@user-mgnt/server'
-import User, { IUser, UserRole } from '@user-mgnt/model/user'
+import User, { IUser } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
-import { Types } from 'mongoose'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin', 'demo'] },
+  { scope: [SCOPES.USER_CREATE] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -37,13 +37,10 @@ const mockUser = {
     }
   ],
   username: 'j.doe1',
-  identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
-  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
+  role: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
-  scope: ['register'],
   deviceId: 'D444',
   password: 'test',
   signature: {
@@ -81,25 +78,6 @@ describe('createUser handler', () => {
       ['', { status: 200 }]
     )
 
-    mockingoose(UserRole).toReturn(
-      {
-        _id: '6348acd2e1a47ca32e79f46f',
-        labels: [
-          {
-            lang: 'en',
-            label: 'Field Agent'
-          },
-          {
-            lang: 'fr',
-            label: 'Agent de terrain'
-          }
-        ],
-        createdAt: '1685959052687',
-        updatedAt: '1685959052687'
-      },
-      'findOne'
-    )
-
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',
@@ -112,11 +90,9 @@ describe('createUser handler', () => {
           }
         ],
         username: 'j.doe1',
-        identifiers: [{ system: 'NID', value: '1234' }],
         emailForNotification: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        systemRole: 'FIELD_AGENT',
-        role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
+        role: 'FIELD_AGENT',
         primaryOfficeId: '321',
         deviceId: 'D444',
         password: 'test'
@@ -128,7 +104,6 @@ describe('createUser handler', () => {
 
     const expectedPractitioner = {
       resourceType: 'Practitioner',
-      identifier: [{ system: 'NID', value: '1234' }],
       telecom: [
         { system: 'phone', value: '+880123445568' },
         { system: 'email', value: 'j.doe@gmail.com' }
@@ -139,25 +114,17 @@ describe('createUser handler', () => {
     const expectedPractitionerROle = {
       resourceType: 'PractitionerRole',
       practitioner: { reference: 'Practitioner/123' },
+      location: [{ reference: 'Location/321' }],
       code: [
         {
           coding: [
             {
-              system: 'http://opencrvs.org/specs/roles',
-              code: 'FIELD_AGENT'
-            }
-          ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"Field Agent"},{"lang":"fr","label":"Agent de terrain"}]'
+              code: 'FIELD_AGENT',
+              system: 'http://opencrvs.org/specs/roles'
             }
           ]
         }
-      ],
-      location: [{ reference: 'Location/321' }]
+      ]
     }
 
     expect(fetch.mock.calls.length).toBe(4)
@@ -221,6 +188,7 @@ describe('createUser handler', () => {
 
   it('return an error and rollsback if a practitionerRole Id isnt returned', async () => {
     fetch.mockResponses(
+      [JSON.stringify({ refUrl: 'mock.minio.com' }), { status: 200 }],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201 }],
       ['', { status: 200 }]
@@ -234,12 +202,11 @@ describe('createUser handler', () => {
         Authorization: `Bearer ${token}`
       }
     })
-
-    expect(fetch.mock.calls.length).toBe(3)
-    expect(fetch.mock.calls[2][0]).toEqual(
+    expect(fetch.mock.calls.length).toBe(4)
+    expect(fetch.mock.calls[3][0]).toEqual(
       'http://localhost:3447/fhir/Practitioner/123'
     )
-    expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
+    expect(fetch.mock.calls[3][1].method).toEqual('DELETE')
     expect(res.statusCode).toBe(500)
   })
 

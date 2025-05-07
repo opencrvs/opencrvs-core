@@ -19,8 +19,8 @@ import {
   selectOption
 } from '@client/tests/util'
 import { SystemList } from '@client/views/SysAdmin/Config/Systems/Systems'
-import { useParams } from 'react-router'
-import { describe, Mock } from 'vitest'
+
+import { describe } from 'vitest'
 import {
   activateSystem,
   deactivateSystem,
@@ -34,13 +34,11 @@ describe('render system integration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
-    component = await createTestComponent(<SystemList />, {
-      store,
-      history
-    })
-    ;(useParams as Mock).mockImplementation(() => ({}))
+    ;({ component } = await createTestComponent(<SystemList />, {
+      store
+    }))
   })
 
   it('Render system integrations properly ', async () => {
@@ -78,13 +76,16 @@ describe('render create system integrations', () => {
   ]
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
-    component = await createTestComponent(<SystemList />, {
-      store,
-      history,
-      graphqlMocks: mocks
-    })
+    const { component: testComponent } = await createTestComponent(
+      <SystemList />,
+      {
+        store,
+        graphqlMocks: mocks
+      }
+    )
+    component = testComponent
   })
 
   it('should show the system creation modal after click the create button', async () => {
@@ -164,13 +165,16 @@ describe('render create webhook system integrations', () => {
   ]
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
-    component = await createTestComponent(<SystemList />, {
-      store,
-      history,
-      graphqlMocks: mocks
-    })
+    const { component: testComponent } = await createTestComponent(
+      <SystemList />,
+      {
+        store,
+        graphqlMocks: mocks
+      }
+    )
+    component = testComponent
   })
 
   it('should show the system creation modal after click the create button', async () => {
@@ -234,7 +238,7 @@ describe('render toggle settings', () => {
 
   describe('delete system integration', () => {
     beforeEach(async () => {
-      const { store, history } = createStore()
+      const { store } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
 
@@ -258,21 +262,32 @@ describe('render toggle settings', () => {
         }
       ]
 
-      component = await createTestComponent(<SystemList />, {
-        store,
-        history,
-        graphqlMocks: mocks
-      })
+      const { component: testComponent } = await createTestComponent(
+        <SystemList />,
+        {
+          store,
+          graphqlMocks: mocks
+        }
+      )
+      component = testComponent
     })
 
     it('should delete system successfully', async () => {
       component
-        .find('#toggleMenuToggleButton')
+        .find('#toggleMenu-4a7ba5bc-46c7-469e-8d61-20dd4d86e79a-dropdownMenu')
         .hostNodes()
         .first()
         .simulate('click')
 
-      component.find('#toggleMenuItem3').hostNodes().simulate('click')
+      component
+        .find(
+          '#toggleMenu-4a7ba5bc-46c7-469e-8d61-20dd4d86e79a-Dropdown-Content'
+        )
+        .find('li')
+        .hostNodes()
+        .at(3)
+        .simulate('click')
+
       component.find('#delete').hostNodes().simulate('click')
       component.update()
       const modal = await waitForElement(component, '#systemToDeleteSuccess')
@@ -282,7 +297,7 @@ describe('render toggle settings', () => {
 
   describe('deactivate system integration', () => {
     beforeEach(async () => {
-      const { store, history } = createStore()
+      const { store } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
 
@@ -306,21 +321,31 @@ describe('render toggle settings', () => {
         }
       ]
 
-      component = await createTestComponent(<SystemList />, {
-        store,
-        history,
-        graphqlMocks: mocks
-      })
+      const { component: testComponent } = await createTestComponent(
+        <SystemList />,
+        {
+          store,
+          graphqlMocks: mocks
+        }
+      )
+      component = testComponent
     })
 
     it('should deactivated system successfully', async () => {
       component
-        .find('#toggleMenuToggleButton')
+        .find('#toggleMenu-4a7ba5bc-46c7-469e-8d61-20dd4d86e79a-dropdownMenu')
         .hostNodes()
         .first()
         .simulate('click')
 
-      component.find('#toggleMenuItem2').hostNodes().simulate('click')
+      component
+        .find(
+          '#toggleMenu-4a7ba5bc-46c7-469e-8d61-20dd4d86e79a-Dropdown-Content'
+        )
+        .find('li')
+        .hostNodes()
+        .at(2)
+        .simulate('click')
       component.find('#confirm').hostNodes().simulate('click')
       component.update()
       const modal = await waitForElement(
@@ -333,7 +358,7 @@ describe('render toggle settings', () => {
 
   describe('active system integration', () => {
     beforeEach(async () => {
-      const { store, history } = createStore()
+      const { store } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
 
@@ -356,21 +381,34 @@ describe('render toggle settings', () => {
         }
       ]
 
-      component = await createTestComponent(<SystemList />, {
-        store,
-        history,
-        graphqlMocks: mocks
-      })
+      const { component: testComponent } = await createTestComponent(
+        <SystemList />,
+        {
+          store,
+          graphqlMocks: mocks
+        }
+      )
+      component = testComponent
     })
 
     it('should active system successfully', async () => {
       component
-        .find('#toggleMenuToggleButton')
+        .find('#toggleMenu-5923118f-c633-40c6-ba97-c3e3cbb412aa-dropdownMenu')
         .hostNodes()
         .last()
         .simulate('click')
 
-      component.find('#toggleMenuItem1').hostNodes().simulate('click')
+      component
+        .find(
+          '#toggleMenu-5923118f-c633-40c6-ba97-c3e3cbb412aa-Dropdown-Content'
+        )
+        .hostNodes()
+        .last()
+        .find('li')
+        .hostNodes()
+        .at(1)
+        .simulate('click')
+
       component.find('#confirm').hostNodes().simulate('click')
       component.update()
       const modal = await waitForElement(

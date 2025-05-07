@@ -10,7 +10,7 @@
  */
 import { IFormData } from '@client/forms'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use'
 
 export function getMarriageRegistrationSectionTransformer(
@@ -32,7 +32,7 @@ export function getMarriageRegistrationSectionTransformer(
   }
 
   if (queryData[sectionId].type && queryData[sectionId].type === 'MARRIAGE') {
-    transformedData[sectionId].type = Event.Marriage
+    transformedData[sectionId].type = EventType.Marriage
   }
 
   if (queryData[sectionId].status) {
@@ -41,6 +41,19 @@ export function getMarriageRegistrationSectionTransformer(
       queryData[sectionId].status as GQLRegWorkflow[],
       sectionId
     )
+  }
+
+  if (
+    Array.isArray(queryData[sectionId].certificates) &&
+    queryData[sectionId].certificates.length > 0
+  ) {
+    const currentCertificate =
+      queryData[sectionId].certificates[
+        queryData[sectionId].certificates.length - 1
+      ]
+    if (currentCertificate?.collector?.relationship === 'PRINT_IN_ADVANCE') {
+      transformedData[sectionId].certificates = [currentCertificate]
+    }
   }
 }
 

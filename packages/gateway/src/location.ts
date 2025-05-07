@@ -60,3 +60,18 @@ export const fetchLocationChildren = async (id: UUID) => {
 
   return response.json() as Promise<SavedLocation[]>
 }
+
+const FETCH_ALL_LOCATION_HIERARCHY = (id: UUID) =>
+  new URL(`/locations/${id}/hierarchy`, APPLICATION_CONFIG_URL)
+
+export const fetchLocationHierarchy = async (id: UUID) => {
+  const response = await fetch(FETCH_ALL_LOCATION_HIERARCHY(id))
+
+  if (!response.ok) {
+    throw new Error(
+      `Couldn't fetch the hierarchy of a location from config: ${await response.text()}`
+    )
+  }
+
+  return response.json() as Promise<SavedLocation[]>
+}

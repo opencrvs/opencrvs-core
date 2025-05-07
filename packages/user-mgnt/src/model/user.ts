@@ -8,12 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Document, model, Schema, Types } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import {
-  UserRole as CommonUserRole,
-  userScopes
-} from '@opencrvs/commons/authentication'
+import { Document, model, Schema } from 'mongoose'
 
 export enum AUDIT_REASON {
   TERMINATED,
@@ -36,18 +32,18 @@ export interface IUserName {
   family: string
   given: string[]
 }
-
-interface IIdentifier {
-  system: string
-  value: string
-}
 export interface ISecurityQuestionAnswer {
   questionKey: string
   answerHash: string
 }
-interface ISignature {
+export interface ISignature {
   type: string
   data: string
+}
+export interface ISignatureAttachment {
+  contentType: string
+  url: string
+  creation: string
 }
 interface ILocalRegistrar {
   name: IUserName[]
@@ -75,6 +71,7 @@ export interface ISearch {
     dateOfEvent?: string
     dateOfEventStart?: string
     dateOfEventEnd?: string
+    timePeriodFrom?: string
     registrationNumber?: string
     trackingId?: string
     dateOfRegistration?: string
@@ -127,18 +124,15 @@ export interface IAvatar {
 export interface IUser {
   name: IUserName[]
   username: string
-  identifiers: IIdentifier[]
   email: string
   mobile?: string
   emailForNotification?: string
   passwordHash: string
   oldPasswordHash?: string
   salt: string
-  systemRole: CommonUserRole
-  role: Types.ObjectId
+  role: string
   practitionerId: string
   primaryOfficeId: string
-  scope: string[]
   signature: ISignature
   localRegistrar?: ILocalRegistrar
   status: string
@@ -228,6 +222,7 @@ const AdvanceSearchParameters = new Schema(
     dateOfEvent: { type: String },
     dateOfEventStart: { type: String },
     dateOfEventEnd: { type: String },
+    timePeriodFrom: { type: String },
     registrationNumber: { type: String },
     trackingId: { type: String },
     dateOfRegistration: { type: String },
@@ -307,11 +302,9 @@ const userSchema = new Schema({
   passwordHash: { type: String, required: true },
   oldPasswordHash: { type: String },
   salt: { type: String, required: true },
-  systemRole: { type: String, required: true },
-  role: { type: Schema.Types.ObjectId, ref: 'UserRole' },
+  role: { type: String },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
-  scope: { type: [String], enum: Object.values(userScopes), required: true },
   status: {
     type: String,
     enum: [
@@ -330,31 +323,4 @@ const userSchema = new Schema({
   searches: [SearchesSchema]
 })
 
-export interface IUserRole {
-  labels: Label[]
-}
-
-type Label = {
-  lang: string
-  label: string
-}
-
-export interface IUserRoleModel extends IUserRole, Document {}
-
-const LabelSchema = new Schema(
-  {
-    lang: String,
-    label: String
-  },
-  { _id: false }
-)
-
-const UserRoleSchema = new Schema(
-  {
-    labels: [LabelSchema]
-  },
-  { timestamps: true }
-)
-
-export const UserRole = model<IUserRoleModel>('UserRole', UserRoleSchema)
 export default model<IUserModel>('User', userSchema)

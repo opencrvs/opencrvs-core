@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ILanguageState } from '@client/i18n/reducer'
 import {
   AdminStructure,
   CRVSOffice,
@@ -15,21 +16,21 @@ import {
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import { ILanguageState } from '@client/i18n/reducer'
+import { System } from '@client/utils/gateway'
 import {
-  ILocationDataResponse,
-  IFacilitiesDataResponse,
-  IContentResponse,
-  IApplicationConfigResponse,
+  CertificateConfiguration,
   IApplicationConfig,
   IApplicationConfigAnonymous,
-  LoadFormsResponse,
-  LoadValidatorsResponse,
+  IApplicationConfigResponse,
+  IContentResponse,
+  IFacilitiesDataResponse,
+  ILocationDataResponse,
   LoadConditionalsResponse,
+  LoadFormsResponse,
   LoadHandlebarHelpersResponse,
-  CertificateConfiguration
+  ICertificateData,
+  LoadValidatorsResponse
 } from '@client/utils/referenceApi'
-import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
 const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
@@ -110,23 +111,15 @@ type ApplicationConfigLoadedAction = {
   payload: IApplicationConfigResponse
 }
 
-const CERTIFICATE_LOAD_FAILED = 'OFFLINE/CERTIFICATE_LOAD_FAILED'
-type CertificateLoadFailedAction = {
-  type: typeof CERTIFICATE_LOAD_FAILED
-  payload: Error
+export const CERTIFICATES_LOADED = 'OFFLINE/CERTIFICATES_LOADED'
+type CertificatesLoadedAction = {
+  type: typeof CERTIFICATES_LOADED
+  payload: ICertificateData[]
 }
 
-export const CERTIFICATE_CONFIGURATION_LOADED =
-  'OFFLINE/CERTIFICATE_CONFIGURATION_LOADED'
-type CertificateConfigurationLoadedAction = {
-  type: typeof CERTIFICATE_CONFIGURATION_LOADED
-  payload: CertificateConfiguration
-}
-
-export const CERTIFICATE_CONFIGURATION_LOAD_FAILED =
-  'OFFLINE/CERTIFICATE_CONFIGURATION_LOAD_FAILED'
-type CertificateConfigurationLoadFailedAction = {
-  type: typeof CERTIFICATE_CONFIGURATION_LOAD_FAILED
+export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
+type CertificatesLoadFailedAction = {
+  type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error
 }
 
@@ -267,24 +260,10 @@ export const configLoaded = (
   payload: payload
 })
 
-export const certificateLoadFailed = (
-  payload: CertificateLoadFailedAction['payload']
-): CertificateLoadFailedAction => ({
-  type: CERTIFICATE_LOAD_FAILED,
-  payload
-})
-
-export const certificateConfigurationLoaded = (
-  payload: CertificateConfiguration
-): CertificateConfigurationLoadedAction => ({
-  type: CERTIFICATE_CONFIGURATION_LOADED,
-  payload
-})
-
-export const certificateConfigurationLoadFailed = (
-  payload: CertificateConfigurationLoadFailedAction['payload']
-): CertificateConfigurationLoadFailedAction => ({
-  type: CERTIFICATE_CONFIGURATION_LOAD_FAILED,
+export const certificatesLoaded = (
+  payload: ICertificateData[]
+): CertificatesLoadedAction => ({
+  type: CERTIFICATES_LOADED,
   payload
 })
 
@@ -293,12 +272,6 @@ export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   payload: error
 })
 
-export const updateOfflineConfigData = (payload: {
-  config: IApplicationConfig
-}): ApplicationConfigUpdatedAction => ({
-  type: UPDATE_OFFLINE_CONFIG,
-  payload: payload
-})
 export const updateOfflineSystems = (payload: {
   systems: System[]
 }): UpdateOfflineSystemsAction => ({
@@ -358,12 +331,11 @@ export type Action =
   | ContentFailedAction
   | ContentLoadedAction
   | ApplicationConfigLoadedAction
+  | CertificatesLoadedAction
+  | CertificatesLoadFailedAction
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | CertificateLoadFailedAction
-  | CertificateConfigurationLoadedAction
-  | CertificateConfigurationLoadFailedAction
   | UpdateOfflineSystemsAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>

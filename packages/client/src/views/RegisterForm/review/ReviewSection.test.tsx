@@ -14,18 +14,20 @@ import {
   storeDeclaration
 } from '@client/declarations'
 import {
-  // BirthSection,
-  ViewType,
-  // DeathSection,
-  LOCATION_SEARCH_INPUT,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  IForm
+  IForm,
+  // DeathSection,
+  LOCATION_SEARCH_INPUT,
+  TEXT,
   // MarriageSection
+  // BirthSection,
+  ViewType
 } from '@client/forms'
-import { Event as DeclarationEvent, RegStatus } from '@client/utils/gateway'
+import { formMessages } from '@client/i18n/messages'
+import { formatUrl } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-import * as profileSelectors from '@client/profile/profileSelectors'
+import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
@@ -34,26 +36,32 @@ import {
   mockOfflineData,
   mockOfflineDataDispatch,
   resizeWindow,
+  setScopes,
+  TestComponentWithRouteMock,
   userDetails
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { isMobileDevice } from '@client/utils/commonUtils'
+import { SCOPES } from '@opencrvs/commons/client'
+import {
+  EventType as DeclarationEvent,
+  EventType,
+  RegStatus
+} from '@client/utils/gateway'
 import {
   renderSelectDynamicLabel,
   ReviewSection
 } from '@client/views/RegisterForm/review/ReviewSection'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { v4 as uuid } from 'uuid'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
-import { formMessages } from '@client/i18n/messages'
-import { vi, Mock, SpyInstance } from 'vitest'
-import { offlineDataReady } from '@client/offline/actions'
+import { v4 as uuid } from 'uuid'
+import { Mock, SpyInstance, vi } from 'vitest'
 
-const { store, history } = createStore()
+const { store } = createStore()
 const mockHandler = vi.fn()
 
-const draft = createDeclaration(DeclarationEvent.Birth)
+const draft = createDeclaration(EventType.Birth)
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: {
@@ -73,18 +81,18 @@ draft.data = {
 const declaredBirthDeclaration = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.Birth
+  EventType.Birth
 )
 const rejectedDraftBirth = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.Birth,
+  EventType.Birth,
   RegStatus.Rejected
 )
 const rejectedDraftDeath = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.Death,
+  EventType.Death,
   RegStatus.Rejected
 )
 const rejectedDraftMarriage = createReviewDeclaration(
@@ -101,7 +109,7 @@ describe('when in device of large viewport', () => {
   beforeEach(async () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
-    form = await getRegisterFormFromStore(store, DeclarationEvent.Birth)
+    form = await getRegisterFormFromStore(store, EventType.Birth)
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     Object.assign(window, { outerWidth: 1034 })
 
@@ -112,9 +120,10 @@ describe('when in device of large viewport', () => {
   const intl = createIntl({ locale: 'en' })
 
   describe('when user is in the review page', () => {
-    let reviewSectionComponent: ReactWrapper<{}, {}>
+    let reviewSectionComponent: TestComponentWithRouteMock['component']
+    let reviewSectionRouter: TestComponentWithRouteMock['router']
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           form={form}
@@ -124,9 +133,13 @@ describe('when in device of large viewport', () => {
           onChangeReviewForm={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        {
+          store,
+          initialEntries: [formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {})]
+        }
       )
       reviewSectionComponent = testComponent
+      reviewSectionRouter = router
       await waitForElement(reviewSectionComponent, '#review_header')
     })
 
@@ -164,7 +177,7 @@ describe('when in device of large viewport', () => {
           .simulate('click')
         reviewSectionComponent.update()
         await flushPromises()
-        expect(history.location.pathname).toContain('reviews')
+        expect(reviewSectionRouter.state.location.pathname).toContain('reviews')
       })
     })
 
@@ -230,8 +243,9 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      const testComponent = await createTestComponent(
+      setScopes([SCOPES.RECORD_REGISTER], store)
+
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           form={form}
@@ -240,7 +254,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -256,7 +270,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected death declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -265,7 +279,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -281,7 +295,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected marriage declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -290,7 +304,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -304,10 +318,16 @@ describe('when in device of large viewport', () => {
   })
 
   describe('when user is in the review page to validate birth declaration', () => {
-    let reviewSectionComponent: ReactWrapper<{}, {}>
+    let reviewSectionComponent: TestComponentWithRouteMock['component']
+    let reviewSectionRouter: TestComponentWithRouteMock['router']
+
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
-      const testComponent = await createTestComponent(
+      setScopes(
+        [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_SUBMIT_FOR_UPDATES],
+        store
+      )
+
+      const { component: testComponent, router } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -316,9 +336,10 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
+      reviewSectionRouter = router
     })
 
     it('Should click the validator Declaration Button', async () => {
@@ -358,7 +379,7 @@ describe('when in device of large viewport', () => {
           .simulate('click')
         reviewSectionComponent.update()
         await flushPromises()
-        expect(history.location.pathname).toContain('reviews')
+        expect(reviewSectionRouter.state.location.pathname).toContain('reviews')
       })
     })
   })
@@ -371,7 +392,7 @@ describe('when in device of large viewport', () => {
     })
 
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      setScopes([SCOPES.RECORD_REGISTER], store)
       const form = {
         sections: [
           {
@@ -464,13 +485,9 @@ describe('when in device of large viewport', () => {
         documents: {}
       }
 
-      const simpleDraft = createReviewDeclaration(
-        uuid(),
-        data,
-        DeclarationEvent.Birth
-      )
+      const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -479,13 +496,287 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
 
     it('renders selected location label', () => {
       expect(reviewSectionComponent.find('#Hospital')).toBeTruthy()
+    })
+  })
+
+  describe('when form has a postfix with no value', () => {
+    let reviewSectionComponent: ReactWrapper<{}, {}>
+
+    beforeAll(() => {
+      vi.resetAllMocks()
+    })
+
+    beforeEach(async () => {
+      setScopes([SCOPES.RECORD_REGISTER], store)
+      const form = {
+        sections: [
+          {
+            id: 'registration',
+            viewType: 'hidden',
+            name: {
+              defaultMessage: 'Registration'
+            },
+            groups: []
+          },
+          {
+            id: 'child',
+            viewType: 'form' as ViewType,
+            title: formMessages.childTitle,
+            name: formMessages.childTitle,
+            groups: [
+              {
+                id: 'child-view-group',
+                fields: [
+                  {
+                    name: 'weight',
+                    type: 'NUMBER',
+                    required: false,
+                    validator: [],
+                    postfix: 'kg',
+                    label: {
+                      defaultMessage: 'Weight',
+                      id: 'weight'
+                    }
+                  },
+                  {
+                    name: 'height',
+                    type: 'NUMBER',
+                    required: false,
+                    validator: [],
+                    postfix: 'inches',
+                    label: {
+                      defaultMessage: 'Height',
+                      id: 'height'
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'documents',
+            name: formMessages.documentsName,
+            title: formMessages.documentsTitle,
+            viewType: 'form' as ViewType,
+            groups: [
+              {
+                id: 'documents-view-group',
+                fields: []
+              }
+            ]
+          },
+          {
+            id: 'preview',
+            viewType: 'preview',
+            name: {
+              defaultMessage: 'Preview'
+            },
+            title: {
+              defaultMessage: 'Preview'
+            },
+            groups: [
+              {
+                id: 'preview-view-group',
+                fields: []
+              }
+            ]
+          }
+        ]
+      } satisfies IForm
+
+      const data = {
+        child: {
+          weight: 67
+        },
+        documents: {}
+      }
+
+      const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
+
+      const { component: testComponent } = await createTestComponent(
+        <ReviewSection
+          form={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          draft={simpleDraft}
+          rejectDeclarationClickEvent={mockHandler}
+          submitClickEvent={mockHandler}
+          userDetails={userDetails}
+        />,
+        { store }
+      )
+      reviewSectionComponent = testComponent
+    })
+
+    it('should not render postfix', () => {
+      const text = reviewSectionComponent.text()
+
+      expect(text).toContain('kg')
+      expect(text).not.toContain('inches')
+    })
+  })
+
+  describe('when form has empty field in a group', () => {
+    let reviewSectionComponent: ReactWrapper<{}, {}>
+
+    beforeAll(() => {
+      vi.resetAllMocks()
+    })
+
+    beforeEach(async () => {
+      setScopes([SCOPES.RECORD_REGISTER], store)
+      const form = {
+        sections: [
+          {
+            id: 'registration',
+            viewType: 'hidden',
+            name: {
+              defaultMessage: 'Registration',
+              description: 'Form section name for Registration',
+              id: 'form.section.declaration.name'
+            },
+            groups: []
+          },
+          {
+            id: 'child',
+            viewType: 'form' as ViewType,
+            title: formMessages.childTitle,
+            name: formMessages.childTitle,
+            groups: [
+              {
+                id: 'child-view-group',
+                fields: [
+                  {
+                    name: 'addressLine1Placeofbirth',
+                    type: TEXT,
+                    required: false,
+                    validator: [],
+                    previewGroup: 'address',
+                    label: {
+                      defaultMessage: 'TestAddress 1',
+                      id: 'test1'
+                    }
+                  },
+                  {
+                    name: 'addressLine2Placeofbirth',
+                    type: TEXT,
+                    required: false,
+                    validator: [],
+                    previewGroup: 'address',
+                    label: {
+                      defaultMessage: 'TestAddress 2',
+                      id: 'test2'
+                    }
+                  },
+                  {
+                    name: 'addressLine3Placeofbirth',
+                    type: TEXT,
+                    required: false,
+                    validator: [],
+                    previewGroup: 'address',
+                    label: {
+                      defaultMessage: 'TestAddress 3',
+                      id: 'test3'
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'documents',
+            name: formMessages.documentsName,
+            title: formMessages.documentsTitle,
+            viewType: 'form' as ViewType,
+            groups: [
+              {
+                id: 'documents-view-group',
+                fields: [
+                  {
+                    name: 'uploadDocForMother',
+                    extraValue: 'MOTHER',
+                    type: DOCUMENT_UPLOADER_WITH_OPTION,
+                    label: formMessages.uploadDocForMother,
+                    required: true,
+                    validator: [],
+                    options: [
+                      {
+                        label: formMessages.docTypeBirthCert,
+                        value: 'BIRTH_CERTIFICATE'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'preview',
+            viewType: 'preview',
+            name: {
+              defaultMessage: 'Preview',
+              description: 'Form section name for Preview',
+              id: 'register.form.section.preview.name'
+            },
+            title: {
+              defaultMessage: 'Preview',
+              description: 'Form section title for Preview',
+              id: 'register.form.section.preview.title'
+            },
+            groups: [
+              {
+                id: 'preview-view-group',
+                fields: []
+              }
+            ]
+          }
+        ]
+      } satisfies IForm
+
+      const data = {
+        child: {
+          addressLine1Placeofbirth: 'District 9',
+          addressLine2Placeofbirth: '',
+          addressLine3Placeofbirth: 'Suburb 7'
+        },
+        documents: {}
+      }
+
+      const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
+
+      const { component: testComponent } = await createTestComponent(
+        <ReviewSection
+          form={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          draft={simpleDraft}
+          rejectDeclarationClickEvent={mockHandler}
+          submitClickEvent={mockHandler}
+          userDetails={userDetails}
+        />,
+        { store }
+      )
+      reviewSectionComponent = testComponent
+    })
+
+    it('renders only fields with values', () => {
+      const addressList = reviewSectionComponent.find({
+        'data-test-id': 'row-value-TestAddress'
+      })
+
+      const innerHtml = addressList
+        .children()
+        .map((n) => n.html())
+        .join('')
+
+      const addressLines = innerHtml.split('<br>')
+
+      expect(addressLines.length).toBe(2)
     })
   })
 })
@@ -503,7 +794,7 @@ describe('when in device of small viewport', () => {
   beforeEach(async () => {
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     userAgentMock.mockReturnValue('Android')
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+    setScopes([SCOPES.RECORD_REGISTER], store)
     const form = {
       sections: [
         {
@@ -613,7 +904,7 @@ describe('when in device of small viewport', () => {
       DeclarationEvent.Birth
     )
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewSection
         form={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -623,7 +914,7 @@ describe('when in device of small viewport', () => {
         onChangeReviewForm={mockHandler}
         userDetails={userDetails}
       />,
-      { store, history }
+      { store }
     )
 
     reviewSectionComponent = testComponent

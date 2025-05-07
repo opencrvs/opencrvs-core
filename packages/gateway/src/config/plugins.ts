@@ -22,7 +22,7 @@ export const getPlugins = () => {
   const swaggerOptions: HapiSwagger.RegisterOptions = {
     info: {
       title: 'Gateway API Documentation',
-      version: '1.3.0'
+      version: '1.7.0'
     },
     definitionPrefix: 'useLabel',
     basePath: '/v1/',
@@ -57,7 +57,10 @@ export const getPlugins = () => {
       options: {
         client: {
           dsn: SENTRY_DSN,
-          environment: process.env.DOMAIN
+          environment: process.env.DOMAIN,
+          initialScope: {
+            tags: { service: 'gateway' }
+          }
         },
         catchLogErrors: true
       }

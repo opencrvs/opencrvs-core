@@ -9,26 +9,49 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as routes from '@login/navigation/routes'
-import { createTestApp } from '@login/tests/util'
+import { createTestApp, flushPromises } from '@login/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+
+//mock api calls
+const server = setupServer(
+  rest.post(`${window.config.AUTH_API_URL}/changePassword`, (_, res, _2) => {
+    return res()
+  })
+)
+
+// Enable API mocking before tests.
+beforeAll(() => {
+  server.listen()
+})
+
+// Reset any runtime request handlers we may add during the tests.
+afterEach(() => server.resetHandlers())
+
+// Disable API mocking after the tests are done.
+afterAll(() => server.close())
 
 describe('Test password update form', () => {
   let app: ReactWrapper
-  let history: History
 
   beforeEach(async () => {
-    const appBundle = await createTestApp()
-    app = appBundle.app
-    history = appBundle.history
-
-    history.replace(routes.UPDATE_PASSWORD, {
-      nonce: '123456789'
+    const appBundle = await createTestApp({
+      initialEntries: [
+        {
+          pathname: routes.UPDATE_PASSWORD,
+          state: {
+            nonce: '123456789'
+          }
+        }
+      ]
     })
+    app = appBundle.app
+
     app.update()
   })
 
-  it('it shows passwords missmatch error when Continue button is pressed', async () => {
+  it('it shows passwords missmatch error when Continue button is pressed', () => {
     app
       .find('#NewPassword')
       .hostNodes()
@@ -47,7 +70,7 @@ describe('Test password update form', () => {
     )
   })
 
-  it('it passes validations', () => {
+  it('it passes validations', async () => {
     app
       .find('#NewPassword')
       .hostNodes()
@@ -61,6 +84,7 @@ describe('Test password update form', () => {
         target: { value: '0crvsPassword' }
       })
     app.find('#continue-button').hostNodes().simulate('submit')
+    await flushPromises()
     expect(app.text()).toContain('Passwords match')
   })
 

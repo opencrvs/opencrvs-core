@@ -27,7 +27,7 @@ interface IWorkQueueMessages
 const messagesToDefine: IWorkQueueMessages = {
   noRecordsDraft: {
     id: 'wq.noRecords.draft',
-    defaultMessage: 'No records in progress',
+    defaultMessage: 'No records in my drafts',
     description: 'No records messages for empty draft tab'
   },
   noRecordsFieldAgents: {

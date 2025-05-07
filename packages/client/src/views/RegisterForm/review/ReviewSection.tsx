@@ -68,15 +68,14 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
-  NID_VERIFICATION_BUTTON,
   WARNING,
   DIVIDER,
   HIDDEN
 } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
-  getListOfLocations,
   getSectionFields,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
@@ -93,7 +92,7 @@ import {
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { goToPageGroup } from '@client/navigation'
+import { generateGoToPageGroupUrl } from '@client/navigation'
 import {
   ILocation,
   IOfflineData,
@@ -104,7 +103,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
-import { Scope } from '@client/utils/authUtils'
+
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import {
   formatPlainDate,
@@ -120,7 +119,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { ReviewHeader } from './ReviewHeader'
-import { IValidationResult } from '@client/utils/validate'
+import { getListOfLocations, IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadField/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -132,11 +131,14 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { ListReview } from '@opencrvs/components/lib/ListReview'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
-import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { Button } from '@opencrvs/components/lib/Button'
 import { UserDetails } from '@client/utils/userUtils'
 import { FormFieldGenerator } from '@client/components/form'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -270,14 +272,13 @@ interface IProps {
   form: IForm
   pageRoute: string
   rejectDeclarationClickEvent?: () => void
-  goToPageGroup: typeof goToPageGroup
   modifyDeclaration: typeof modifyDeclaration
   submitClickEvent: (
     declaration: IDeclaration,
     submissionStatus: string,
     action: SubmissionAction
   ) => void
-  scope: Scope | null
+  scope: Scope[] | null
   offlineCountryConfiguration: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm
@@ -302,7 +303,7 @@ export interface IErrorsBySection {
   [sectionId: string]: Errors
 }
 
-type FullProps = IProps & IntlShapeProps
+type FullProps = IProps & IntlShapeProps & RouteComponentProps
 
 function renderSelectOrRadioLabel(
   value: IFormFieldValue,
@@ -542,25 +543,6 @@ const renderValue = (
     )
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
-  if (field.type === NID_VERIFICATION_BUTTON) {
-    return (
-      <VerificationButton
-        onClick={() => {}}
-        labelForVerified={intl.formatMessage(
-          formMessageDescriptors.nidVerified
-        )}
-        labelForUnverified={intl.formatMessage(
-          formMessageDescriptors.nidNotVerified
-        )}
-        labelForOffline={intl.formatMessage(formMessageDescriptors.nidOffline)}
-        reviewLabelForUnverified={intl.formatMessage(
-          formMessageDescriptors.nidNotVerifiedReviewSection
-        )}
-        status={value ? 'verified' : 'unverified'}
-        useAsReviewLabel={true}
-      />
-    )
-  }
 
   if (typeof value === 'boolean') {
     return value
@@ -568,7 +550,7 @@ const renderValue = (
       : intl.formatMessage(buttonMessages.no)
   }
 
-  if (typeof value === 'string' || typeof value === 'number') {
+  if (value && (typeof value === 'string' || typeof value === 'number')) {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
@@ -812,44 +794,44 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     groupId: string,
     fieldName?: string
   ) => {
-    const { draft, pageRoute, goToPageGroup } = this.props
+    const { draft, pageRoute } = this.props
     const declaration = draft
     declaration.review = true
-    goToPageGroup(
-      pageRoute,
-      declaration.id,
-      sectionId,
-      groupId,
-      declaration.event.toLowerCase(),
-      fieldName
+
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute,
+        declarationId: declaration.id,
+        pageId: sectionId,
+        groupId,
+        event: declaration.event.toLowerCase(),
+        fieldNameHash: fieldName
+      })
     )
   }
 
   replaceHandler(sectionId: string, groupId: string) {
-    const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
+    const { draft, pageRoute, writeDeclaration } = this.props
     const declaration = draft
     declaration.data[sectionId] = {}
     writeDeclaration(declaration)
-    goToPageGroup(
-      pageRoute,
-      declaration.id,
-      sectionId,
-      groupId,
-      declaration.event.toLowerCase()
+
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute,
+        declarationId: declaration.id,
+        pageId: sectionId,
+        groupId,
+        event: declaration.event.toLowerCase()
+      })
     )
   }
 
   userHasRegisterScope() {
     if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('register')
-    } else {
-      return false
-    }
-  }
-
-  userHasValidateScope() {
-    if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('validate')
+      return (
+        this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
+      )
     } else {
       return false
     }
@@ -1102,7 +1084,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         .map((field) =>
           this.getValueOrError(section, draft.data, field, errorsOnFields)
         )
-        .filter((value) => value)
+        .filter((value) => value.props.children)
       let completeValue = values[0]
       values.shift()
       values.forEach(
@@ -1146,7 +1128,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               true
             )
           )
-          .filter((value) => value)
+          .filter((value) => value.props.children)
         let previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
         previousValues.shift()
         previousValues.forEach(
@@ -1536,7 +1518,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       return false
     }
     return (
-      event === Event.Birth &&
+      event === EventType.Birth &&
       ((section.id === 'mother' && !!data.mother?.detailsExist) ||
         (section.id === 'father' && !!data.father?.detailsExist))
     )
@@ -1545,7 +1527,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   isLastNameFirst = () => {
     const { form, draft: declaration } = this.props
     const fields = form.sections.find((section) =>
-      declaration.event === Event.Birth
+      declaration.event === EventType.Birth
         ? section.id === 'child'
         : section.id === 'deceased'
     )?.groups[0]?.fields
@@ -1858,8 +1840,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     action={
                       viewRecord ||
                       isDuplicate ||
-                      declaration.registrationStatus ===
-                        RegStatus.CorrectionRequested ? null : (
+                      isCorrection(declaration) ? null : (
                         <Link
                           font="reg16"
                           element="button"
@@ -1980,8 +1961,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         <ReviewAction
                           completeDeclaration={isComplete}
                           totalFileSizeExceeded={totalFileSizeExceeded}
-                          declarationToBeValidated={this.userHasValidateScope()}
-                          declarationToBeRegistered={this.userHasRegisterScope()}
                           alreadyRejectedDeclaration={
                             this.props.draft.registrationStatus === REJECTED
                           }
@@ -2109,22 +2088,27 @@ function fieldToReadOnlyFields(field: IFormField): IFormField {
   }
   return readyOnlyField
 }
-export const ReviewSection = connect(
-  (state: IStoreState, { form }: { form: IForm }) => {
-    const registrationSection = form.sections.find(
-      ({ id }) => id === 'registration'
-    )
-    const documentsSection = form.sections.find(({ id }) => id === 'documents')
-    if (!registrationSection || !documentsSection) {
-      throw new Error('"registration" & "documents" are required sections')
-    }
-    return {
-      registrationSection,
-      documentsSection,
-      scope: getScope(state),
-      offlineCountryConfiguration: getOfflineData(state),
-      language: getLanguage(state)
-    }
-  },
-  { goToPageGroup, writeDeclaration, modifyDeclaration }
-)(injectIntl(ReviewSectionComp))
+
+export const ReviewSection = withRouter(
+  connect(
+    (state: IStoreState, { form }: { form: IForm }) => {
+      const registrationSection = form.sections.find(
+        ({ id }) => id === 'registration'
+      )
+      const documentsSection = form.sections.find(
+        ({ id }) => id === 'documents'
+      )
+      if (!registrationSection || !documentsSection) {
+        throw new Error('"registration" & "documents" are required sections')
+      }
+      return {
+        registrationSection,
+        documentsSection,
+        scope: getScope(state),
+        offlineCountryConfiguration: getOfflineData(state),
+        language: getLanguage(state)
+      }
+    },
+    { writeDeclaration, modifyDeclaration }
+  )(injectIntl(ReviewSectionComp))
+)

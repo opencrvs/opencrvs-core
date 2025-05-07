@@ -16,10 +16,13 @@ type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 
 type IPillSize = 'small' | 'medium'
 
+type IPillTheme = 'light' | 'dark'
+
 export interface IPillProps {
-  label: string
+  label: React.ReactNode
   type?: IPillType
   size?: IPillSize
+  pillTheme?: IPillTheme
 }
 
 const heightMap: Record<IPillSize, string> = {
@@ -32,21 +35,35 @@ const fontMap: Record<IPillSize, IFont> = {
   medium: 'bold16'
 }
 
-const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
-  --background-color: ${({ type, theme }) => `
+const StyledPill = styled.span<{
+  size: IPillSize
+  type: IPillType
+  pillTheme: IPillTheme
+}>`
+  --lighterShade: ${({ type, theme }) => `
     ${type === 'active' ? theme.colors.greenLighter : ''}
     ${type === 'inactive' ? theme.colors.redLighter : ''}
     ${type === 'pending' ? theme.colors.orangeLighter : ''}
     ${type === 'default' ? theme.colors.primaryLighter : ''}
   `};
 
-  --color: ${({ type, theme }) => `
+  --darkerShade: ${({ type, theme }) => `
   ${type === 'active' ? theme.colors.positiveDarker : ''}
   ${type === 'inactive' ? theme.colors.negativeDarker : ''}
   ${type === 'pending' ? theme.colors.neutralDarker : ''}
   ${type === 'default' ? theme.colors.primaryDarker : ''}
 `};
 
+  ${({ pillTheme }) =>
+    pillTheme === 'dark'
+      ? `
+    --color: var(--lighterShade);
+    --background-color: var(--darkerShade);
+    `
+      : `
+    --color: var(--darkerShade);
+    --background-color: var(--lighterShade);
+  `}
   color: var(--color);
   background: var(--background-color);
   height: ${({ size }) => heightMap[size]};
@@ -61,10 +78,11 @@ export function Pill({
   label,
   type = 'default',
   size = 'small',
+  pillTheme = 'light',
   ...rest
 }: IPillProps) {
   return (
-    <StyledPill type={type} size={size} {...rest}>
+    <StyledPill type={type} size={size} pillTheme={pillTheme} {...rest}>
       {label}
     </StyledPill>
   )

@@ -8,17 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as mongoose from 'mongoose'
+import mongoose from 'mongoose'
 import { start, stop } from '@config/config/database'
 import { logger } from '@opencrvs/commons'
 
 jest.mock('mongoose', () => ({
-  connection: {
-    on: jest.fn()
-  },
-  set: () => {},
-  connect: () => Promise.reject(),
-  disconnect: () => {}
+  default: {
+    connection: {
+      on: jest.fn()
+    },
+    set: () => {},
+    connect: () => Promise.reject(),
+    disconnect: () => {}
+  }
 }))
 const wait = (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time))

@@ -65,11 +65,6 @@ export const extractCommentFragmentValue = (
   return fragmentValue
 }
 
-export const sentenceCase = (str: string): string =>
-  str.replace(/\w\S*/g, (txt: string) => {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-  })
-
 export const mergeArraysRemovingEmptyStrings = (
   strArrayA: string[],
   strArrayB: string[]

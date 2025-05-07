@@ -16,32 +16,16 @@ import {
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
-import {
-  goToCreateNewUser,
-  goToCreateNewUserWithLocationId,
-  goToReviewUserDetails,
-  goToTeamSearch,
-  goToTeamUserList,
-  goToUserProfile
-} from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
-import {
-  LANG_EN,
-  NATL_ADMIN_ROLES,
-  SYS_ADMIN_ROLES
-} from '@client/utils/constants'
+import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap, getLocalisedName } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import {
-  getAddressName,
-  UserStatus,
-  canDeactivateUser,
-  getUserRoleIntlKey
-} from '@client/views/SysAdmin/Team/utils'
+import { getAddressName, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Pill } from '@opencrvs/components/lib/Pill'
@@ -59,35 +43,39 @@ import {
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { parse } from 'query-string'
-import * as React from 'react'
 import {
   injectIntl,
   useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
-import { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
   withOnlineStatus,
   LoadingIndicator
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
-import { Query as QueryType, User } from '@client/utils/gateway'
+import { SearchUsersQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
-import { HOME } from '@client/navigation/routes'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import * as routes from '@client/navigation/routes'
+import { UserSection } from '@client/forms'
+import { stringify } from 'querystring'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
 
-const { useState } = React
+type User = NonNullable<
+  NonNullable<NonNullable<SearchUsersQuery['searchUsers']>['results']>[number]
+>
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -181,18 +169,9 @@ type BaseProps = {
   offlineOffices: ILocation[]
   userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
-  goToCreateNewUser: typeof goToCreateNewUser
-  goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
-  goToReviewUserDetails: typeof goToReviewUserDetails
-  goToTeamSearch: typeof goToTeamSearch
-  goToTeamUserList: typeof goToTeamUserList
-  goToUserProfile: typeof goToUserProfile
 }
 
-type IProps = BaseProps &
-  IntlShapeProps &
-  RouteComponentProps &
-  IOnlineStatusProps
+type IProps = BaseProps & IntlShapeProps & IOnlineStatusProps
 
 interface IStatusProps {
   status: string
@@ -229,6 +208,9 @@ export const Status = (statusProps: IStatusProps) => {
 }
 
 function UserListComponent(props: IProps) {
+  const location = useLocation()
+  const navigate = useNavigate()
+
   const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
   const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
     useState(false)
@@ -238,26 +220,13 @@ function UserListComponent(props: IProps) {
   const [showResetPasswordSuccess, setShowResetPasswordSuccess] =
     useState(false)
   const [showResetPasswordError, setResetPasswordError] = useState(false)
-  const {
-    intl,
-    userDetails,
-    goToReviewUserDetails,
-    goToCreateNewUser,
-    goToCreateNewUserWithLocationId,
-    goToTeamSearch,
-    goToUserProfile,
-    offlineOffices,
-    isOnline,
-    offlineCountryConfig,
-    location: { search }
-  } = props
-  const isNatlSysAdmin = userDetails?.systemRole
-    ? NATL_ADMIN_ROLES.includes(userDetails.systemRole)
-      ? true
-      : false
-    : false
+  const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
+    usePermissions()
 
-  const { locationId } = parse(search) as unknown as ISearchParams
+  const { intl, userDetails, offlineOffices, isOnline, offlineCountryConfig } =
+    props
+
+  const { locationId } = parse(location.search) as unknown as ISearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
     useState<ToggleModal>({
       modalVisible: false,
@@ -279,6 +248,9 @@ function UserListComponent(props: IProps) {
     ({ id }) => locationId === id
   )
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
+
+  const isMultipleOfficeUnderJurisdiction =
+    offlineOffices.filter(canAccessOffice).length > 1
 
   const getParentLocation = ({ partOf }: ILocation) => {
     const parentLocationId = partOf.split('/')[1]
@@ -397,12 +369,17 @@ function UserListComponent(props: IProps) {
   )
 
   const getMenuItems = useCallback(
-    function getMenuItems(user: User, userDetails: UserDetails | null) {
+    function getMenuItems(user: User) {
       const menuItems = [
         {
           label: intl.formatMessage(messages.editUserDetailsTitle),
           handler: () => {
-            goToReviewUserDetails(user.id as string)
+            navigate(
+              formatUrl(routes.REVIEW_USER_DETAILS, {
+                userId: user.id,
+                sectionId: UserSection.Preview
+              })
+            )
           }
         }
       ]
@@ -433,11 +410,7 @@ function UserListComponent(props: IProps) {
         })
       }
 
-      if (
-        userDetails &&
-        user.status === 'active' &&
-        canDeactivateUser(user.id, userDetails)
-      ) {
+      if (user.status === 'active') {
         menuItems.push({
           label: intl.formatMessage(messages.deactivate),
           handler: () => toggleUserActivationModal(user)
@@ -454,39 +427,14 @@ function UserListComponent(props: IProps) {
       return menuItems
     },
     [
-      goToReviewUserDetails,
       intl,
       resendInvite,
       toggleUserActivationModal,
       toggleUsernameReminderModal,
-      toggleUserResetPasswordModal
+      toggleUserResetPasswordModal,
+      navigate
     ]
   )
-
-  function getViewOnly(
-    locationId: string,
-    userDetails: UserDetails | null,
-    onlyNational: boolean
-  ) {
-    if (
-      userDetails &&
-      userDetails.systemRole &&
-      userDetails.primaryOffice &&
-      SYS_ADMIN_ROLES.includes(userDetails.systemRole) &&
-      locationId === userDetails.primaryOffice.id &&
-      !onlyNational
-    ) {
-      return false
-    } else if (
-      userDetails &&
-      userDetails.systemRole &&
-      NATL_ADMIN_ROLES.includes(userDetails.systemRole)
-    ) {
-      return false
-    } else {
-      return true
-    }
-  }
 
   const getUserName = (user: User) => {
     const userName =
@@ -500,8 +448,6 @@ function UserListComponent(props: IProps) {
 
   const StatusMenu = useCallback(
     function StatusMenu({
-      userDetails,
-      locationId,
       user,
       index,
       status,
@@ -514,12 +460,6 @@ function UserListComponent(props: IProps) {
       status?: string
       underInvestigation?: boolean
     }) {
-      const canEditUserDetails =
-        userDetails?.systemRole === 'NATIONAL_SYSTEM_ADMIN' ||
-        (userDetails?.systemRole === 'LOCAL_SYSTEM_ADMIN' &&
-          userDetails?.primaryOffice?.id === locationId)
-          ? true
-          : false
       return (
         <Stack
           alignItems="center"
@@ -529,24 +469,24 @@ function UserListComponent(props: IProps) {
         >
           {underInvestigation && <SearchRed />}
           <Status status={status || 'pending'} />
-          {canEditUserDetails && (
+          {canEditUser(user) && (
             <ToggleMenu
               id={`user-item-${index}-menu`}
               toggleButton={
                 <Icon name="DotsThreeVertical" color="primary" size="large" />
               }
-              menuItems={getMenuItems(user, userDetails)}
+              menuItems={getMenuItems(user)}
             />
           )}
         </Stack>
       )
     },
-    [getMenuItems]
+    [canEditUser, getMenuItems]
   )
 
   const generateUserContents = useCallback(
     function generateUserContents(
-      data: QueryType,
+      data: SearchUsersQuery,
       locationId: string,
       userDetails: UserDetails | null
     ) {
@@ -557,24 +497,35 @@ function UserListComponent(props: IProps) {
       return data.searchUsers.results.map((user, index) => {
         if (user !== null) {
           const name = getLocalisedName(intl, user.name[0])
-
-          const role = intl.formatMessage({
-            id: getUserRoleIntlKey(user.role._id)
-          })
+          const role = intl.formatMessage(user.role.label)
           const avatar = user.avatar
 
           return {
             image: (
-              <AvatarSmall
-                name={name}
-                avatar={avatar || undefined}
-                onClick={() => goToUserProfile(String(user.id))}
-              />
+              <Link
+                onClick={() =>
+                  navigate(
+                    formatUrl(routes.USER_PROFILE, {
+                      userId: String(user.id)
+                    })
+                  )
+                }
+                disabled={!canReadUser(user)}
+              >
+                <AvatarSmall name={name} avatar={avatar || undefined} />
+              </Link>
             ),
             label: (
               <Link
                 id="profile-link"
-                onClick={() => goToUserProfile(String(user.id))}
+                onClick={() =>
+                  navigate(
+                    formatUrl(routes.USER_PROFILE, {
+                      userId: String(user.id)
+                    })
+                  )
+                }
+                disabled={!canReadUser(user)}
               >
                 {name}
               </Link>
@@ -598,48 +549,60 @@ function UserListComponent(props: IProps) {
         }
       })
     },
-    [StatusMenu, intl, goToUserProfile]
+    [StatusMenu, intl, navigate, canReadUser]
   )
 
   const onClickAddUser = useCallback(
     function onClickAddUser() {
-      ;(searchedLocation &&
-        goToCreateNewUserWithLocationId(searchedLocation.id)) ||
-        goToCreateNewUser()
+      if (searchedLocation) {
+        navigate(
+          formatUrl(routes.CREATE_USER_ON_LOCATION, {
+            locationId: searchedLocation.id
+          })
+        )
+      }
     },
-    [goToCreateNewUser, goToCreateNewUserWithLocationId, searchedLocation]
+    [searchedLocation, navigate]
   )
 
   function onChangeLocation() {
-    goToTeamSearch(
-      searchedLocation && {
-        selectedLocation: {
-          id: searchedLocation.id,
-          searchableText: searchedLocation.name,
-          displayLabel: searchedLocation.name
+    if (searchedLocation) {
+      navigate(routes.TEAM_SEARCH, {
+        state: {
+          selectedLocation: {
+            id: searchedLocation.id,
+            searchableText: searchedLocation?.name,
+            displayLabel: searchedLocation?.name
+          }
         }
-      }
-    )
+      })
+    }
   }
 
-  const LocationButton = (
-    locationId: string,
-    userDetails: UserDetails | null,
-    onlyNational: boolean
-  ) => {
+  const LocationButton = (locationId: string) => {
     const buttons: React.ReactElement[] = []
-    if (!getViewOnly(locationId, userDetails, onlyNational)) {
+    if (isMultipleOfficeUnderJurisdiction) {
       buttons.push(
         <LocationPicker
           key={`location-picker-${locationId}`}
           selectedLocationId={locationId}
           onChangeLocation={(locationId) => {
-            props.goToTeamUserList(locationId)
+            navigate({
+              pathname: routes.TEAM_USER_LIST,
+              search: stringify({
+                locationId
+              })
+            })
+
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
-          requiredLocationTypes={'CRVS_OFFICE'}
+          locationFilter={(location) =>
+            location.type === 'CRVS_OFFICE' && canAccessOffice(location)
+          }
         />
       )
+    }
+    if (canAddOfficeUsers({ id: locationId })) {
       buttons.push(
         <Button
           id="add-user"
@@ -661,7 +624,7 @@ function UserListComponent(props: IProps) {
       locationId,
       userDetails
     }: {
-      data: any
+      data: SearchUsersQuery
       locationId: string
       userDetails: UserDetails | null
     }) {
@@ -699,20 +662,22 @@ function UserListComponent(props: IProps) {
                 }
               />
             )}
-            <UserAuditActionModal
-              show={toggleActivation.modalVisible}
-              user={toggleActivation.selectedUser}
-              onClose={() => toggleUserActivationModal()}
-              onConfirmRefetchQueries={[
-                {
-                  query: SEARCH_USERS,
-                  variables: {
-                    primaryOfficeId: locationId,
-                    count: recordCount
+            {toggleActivation.selectedUser?.id ? (
+              <UserAuditActionModal
+                show={toggleActivation.modalVisible}
+                userId={toggleActivation.selectedUser.id}
+                onClose={() => toggleUserActivationModal()}
+                onConfirmRefetchQueries={[
+                  {
+                    query: SEARCH_USERS,
+                    variables: {
+                      primaryOfficeId: locationId,
+                      count: recordCount
+                    }
                   }
-                }
-              ]}
-            />
+                ]}
+              />
+            ) : null}
 
             <ResponsiveModal
               id="username-reminder-modal"
@@ -826,20 +791,19 @@ function UserListComponent(props: IProps) {
    * it can happen that it gets removed as part of the login redirect mechanism causing the user to land on /team/users without a search parameter
    */
   if (!locationId) {
-    return <Redirect to={HOME} />
+    return <Navigate to={routes.HOME} />
   }
 
   return (
     <SysAdminContentWrapper
       changeTeamLocation={
-        (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
-        undefined
+        isMultipleOfficeUnderJurisdiction ? onChangeLocation : undefined
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
     >
       {isOnline ? (
-        <Query
+        <Query<SearchUsersQuery>
           query={SEARCH_USERS}
           variables={{
             primaryOfficeId: locationId,
@@ -859,11 +823,7 @@ function UserListComponent(props: IProps) {
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
                 size={ContentSize.NORMAL}
-                topActionButtons={LocationButton(
-                  locationId,
-                  userDetails,
-                  isNatlSysAdmin
-                )}
+                topActionButtons={LocationButton(locationId)}
               >
                 {error ? (
                   <ErrorText id="user_loading_error">
@@ -878,7 +838,7 @@ function UserListComponent(props: IProps) {
                   <Loading>
                     <LoadingIndicator loading={true} />
                   </Loading>
-                ) : (
+                ) : data ? (
                   <>
                     <Header id="header">
                       {(searchedLocation &&
@@ -901,7 +861,7 @@ function UserListComponent(props: IProps) {
                       userDetails={userDetails}
                     />
                   </>
-                )}
+                ) : null}
               </Content>
             )
           }}
@@ -990,18 +950,8 @@ function UserListComponent(props: IProps) {
   )
 }
 
-export const UserList = connect(
-  (state: IStoreState) => ({
-    offlineOffices: Object.values(getOfflineData(state).offices),
-    userDetails: getUserDetails(state),
-    offlineCountryConfig: getOfflineData(state)
-  }),
-  {
-    goToCreateNewUser,
-    goToCreateNewUserWithLocationId,
-    goToReviewUserDetails,
-    goToTeamSearch,
-    goToUserProfile,
-    goToTeamUserList
-  }
-)(withTheme(injectIntl(withOnlineStatus(UserListComponent))))
+export const UserList = connect((state: IStoreState) => ({
+  offlineOffices: Object.values(getOfflineData(state).offices),
+  userDetails: getUserDetails(state),
+  offlineCountryConfig: getOfflineData(state)
+}))(withTheme(injectIntl(withOnlineStatus(UserListComponent))))

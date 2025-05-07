@@ -13,27 +13,11 @@ import {
   allUsersEmailPayloadSchema
 } from '@notification/features/email/all-user-handler'
 import {
-  sendBirthDeclarationConfirmation,
-  sendBirthRegistrationConfirmation,
-  sendBirthRejectionConfirmation,
-  inProgressNotificationSchema,
-  declarationNotificationSchema,
-  registrationNotificationSchema,
-  rejectionNotificationSchema,
-  sendBirthInProgressConfirmation
-} from '@notification/features/sms/birth-handler'
-import {
   sendCorrectionApprovedNotification,
   sendCorrectionApprovedNotificationInput,
   sendCorrectionRejectedNotification,
   sendCorrectionRejectedNotificationInput
 } from '@notification/features/sms/correction'
-import {
-  sendDeathDeclarationConfirmation,
-  sendDeathRegistrationConfirmation,
-  sendDeathRejectionConfirmation,
-  sendDeathInProgressConfirmation
-} from '@notification/features/sms/death-handler'
 import {
   sendUserCredentials,
   retrieveUserName,
@@ -63,15 +47,7 @@ import {
   birthSentForUpdatesNotification,
   deathSentForUpdatesNotification
 } from '@notification/features/sentForUpdates/handler'
-
-const enum RouteScope {
-  DECLARE = 'declare',
-  VALIDATE = 'validate',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  SYSADMIN = 'sysadmin',
-  NATIONAL_SYSTEM_ADMIN = 'natlsysadmin'
-}
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const recordValidation: RouteOptionsValidate = {
   payload: Joi.object()
@@ -211,156 +187,13 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       path: '/death/sent-for-updates',
       handler: deathSentForUpdatesNotification,
       options: {
+        auth: {
+          scope: [SCOPES.RECORD_SUBMIT_FOR_UPDATES]
+        },
         tags: ['api'],
         description:
           'Sends a notification to country config for rejected death declaration',
         validate: recordValidation
-      }
-    },
-    {
-      method: 'POST',
-      path: '/birthInProgressSMS',
-      handler: sendBirthInProgressConfirmation,
-      options: {
-        tags: ['api'],
-        description: 'Sends an sms to a user for birth in-progress entry',
-        auth: {
-          scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
-          ]
-        },
-        validate: {
-          payload: inProgressNotificationSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/birthDeclarationSMS',
-      handler: sendBirthDeclarationConfirmation,
-      options: {
-        tags: ['api'],
-        description:
-          'Sends an sms or email to a user for birth declaration entry',
-        auth: {
-          scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
-          ]
-        },
-        validate: {
-          payload: declarationNotificationSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/birthRegistrationSMS',
-      handler: sendBirthRegistrationConfirmation,
-      options: {
-        tags: ['api'],
-        description:
-          'Sends an sms or email to a user for birth registration entry',
-        auth: {
-          scope: [RouteScope.REGISTER]
-        },
-        validate: {
-          payload: registrationNotificationSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/birthRejectionSMS',
-      handler: sendBirthRejectionConfirmation,
-      options: {
-        tags: ['api'],
-        description:
-          'Sends an sms or email to a user for birth declaration rejection entry',
-        auth: {
-          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
-        },
-        validate: {
-          payload: rejectionNotificationSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/deathInProgressSMS',
-      handler: sendDeathInProgressConfirmation,
-      options: {
-        tags: ['api'],
-        description:
-          'Sends an sms or email to a user for death in-progress entry',
-        auth: {
-          scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
-          ]
-        },
-        validate: {
-          payload: inProgressNotificationSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/deathDeclarationSMS',
-      handler: sendDeathDeclarationConfirmation,
-      options: {
-        tags: ['api'],
-        description:
-          'Sends an sms or email to a user for death declaration entry',
-        auth: {
-          scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
-          ]
-        },
-        validate: {
-          payload: declarationNotificationSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/deathRegistrationSMS',
-      handler: sendDeathRegistrationConfirmation,
-      options: {
-        tags: ['api'],
-        description: 'Sends an sms to a user for death registration entry',
-        auth: {
-          scope: [RouteScope.REGISTER]
-        },
-        validate: {
-          payload: registrationNotificationSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/deathRejectionSMS',
-      handler: sendDeathRejectionConfirmation,
-      options: {
-        tags: ['api'],
-        description:
-          'Sends an sms to a user for death declaration rejection entry',
-        auth: {
-          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
-        },
-        validate: {
-          payload: rejectionNotificationSchema
-        }
       }
     },
     {
@@ -371,7 +204,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
         },
         validate: {
           payload: userCredentialsNotificationSchema
@@ -386,7 +219,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: sendCorrectionRejectedNotificationInput
@@ -401,7 +234,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: sendCorrectionApprovedNotificationInput
@@ -416,7 +249,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with new temporary password',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
         },
         validate: {
           payload: userPasswordResetNotificationSchema
@@ -454,7 +287,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.NATIONAL_SYSTEM_ADMIN]
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         description: 'Sends emails to all users given in payload',
         validate: {

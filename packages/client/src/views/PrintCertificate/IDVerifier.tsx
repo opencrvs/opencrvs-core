@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -64,23 +64,15 @@ interface IIDVerifierProps {
   actionProps: IVerifierActionProps
 }
 
-interface IIDVerifierState {
-  showPrompt: boolean
-}
+const IDVerifierComponent = (props: IIDVerifierProps & IntlShapeProps) => {
+  const { collectorInformation, intl, actionProps, id, title } = props
+  const [showPrompt, setShowPrompt] = useState(false)
 
-class IDVerifierComponent extends React.Component<
-  IIDVerifierProps & IntlShapeProps,
-  IIDVerifierState
-> {
-  state = { showPrompt: false }
-
-  togglePrompt = () => {
-    this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
+  const togglePrompt = () => {
+    setShowPrompt((prev) => !prev)
   }
 
-  renderLabelValue = () => {
-    const { collectorInformation, intl } = this.props
-
+  const renderLabelValue = () => {
     return (
       <>
         {collectorInformation.iD && (
@@ -139,81 +131,73 @@ class IDVerifierComponent extends React.Component<
     )
   }
 
-  render() {
-    const { positiveAction, negativeAction } = this.props.actionProps
-    const { showPrompt } = this.state
-    const { intl, id } = this.props
-    const isIssueUrl = window.location.href.includes('issue')
-    const modalTitle = isIssueUrl
-      ? intl.formatMessage(issueMessages.idCheckWithoutVerify)
-      : intl.formatMessage(certificateMessages.idCheckDialogTitle)
+  const { positiveAction, negativeAction } = actionProps
+  const isIssueUrl = window.location.href.includes('issue')
+  const modalTitle = isIssueUrl
+    ? intl.formatMessage(issueMessages.idCheckWithoutVerify)
+    : intl.formatMessage(certificateMessages.idCheckDialogTitle)
 
-    return (
-      <div id={id}>
-        <Content
-          title={this.props.title}
-          size={ContentSize.SMALL}
-          showTitleOnMobile
-          bottomActionDirection="column"
-          bottomActionButtons={[
-            <Button
-              key="verifyNegative"
-              id="verifyNegative"
-              type="negative"
-              size="large"
-              fullWidth
-              onClick={this.togglePrompt}
-            >
-              <Icon name="X" size="large" />
-              {negativeAction.label}
-            </Button>,
-            <Button
-              key="verifyPositive"
-              id="verifyPositive"
-              type="positive"
-              size="large"
-              fullWidth
-              onClick={positiveAction.handler}
-            >
-              <Icon name="Check" size="large" />
-              {positiveAction.label}
-            </Button>
-          ]}
-        >
-          <Container>{this.renderLabelValue()}</Container>
-        </Content>
+  return (
+    <div id={id}>
+      <Content
+        title={title}
+        size={ContentSize.SMALL}
+        showTitleOnMobile
+        bottomActionDirection="column"
+        bottomActionButtons={[
+          <Button
+            key="verifyNegative"
+            id="verifyNegative"
+            type="negative"
+            size="large"
+            fullWidth
+            onClick={togglePrompt}
+          >
+            <Icon name="X" size="large" />
+            {negativeAction.label}
+          </Button>,
+          <Button
+            key="verifyPositive"
+            id="verifyPositive"
+            type="positive"
+            size="large"
+            fullWidth
+            onClick={positiveAction.handler}
+          >
+            <Icon name="Check" size="large" />
+            {positiveAction.label}
+          </Button>
+        ]}
+      >
+        <Container>{renderLabelValue()}</Container>
+      </Content>
 
-        <ResponsiveModal
-          id="withoutVerificationPrompt"
-          show={showPrompt}
-          title={modalTitle}
-          contentHeight={96}
-          handleClose={this.togglePrompt}
-          actions={[
-            <TertiaryButton
-              id="cancel"
-              key="cancel"
-              onClick={this.togglePrompt}
-            >
-              {intl.formatMessage(certificateMessages.idCheckDialogCancel)}
-            </TertiaryButton>,
-            <PrimaryButton
-              id="send"
-              key="continue"
-              onClick={() => {
-                this.props.actionProps.negativeAction.handler()
-                this.togglePrompt()
-              }}
-            >
-              {intl.formatMessage(certificateMessages.idCheckDialogConfirm)}
-            </PrimaryButton>
-          ]}
-        >
-          {intl.formatMessage(certificateMessages.idCheckDialogDescription)}
-        </ResponsiveModal>
-      </div>
-    )
-  }
+      <ResponsiveModal
+        id="withoutVerificationPrompt"
+        show={showPrompt}
+        title={modalTitle}
+        contentHeight={96}
+        handleClose={togglePrompt}
+        actions={[
+          <TertiaryButton id="cancel" key="cancel" onClick={togglePrompt}>
+            {intl.formatMessage(certificateMessages.idCheckDialogCancel)}
+          </TertiaryButton>,
+          <PrimaryButton
+            id="send"
+            key="continue"
+            onClick={() => {
+              actionProps.negativeAction.handler()
+              togglePrompt()
+            }}
+          >
+            {intl.formatMessage(certificateMessages.idCheckDialogConfirm)}
+          </PrimaryButton>
+        ]}
+      >
+        {intl.formatMessage(certificateMessages.idCheckDialogDescription)}
+      </ResponsiveModal>
+    </div>
+  )
 }
 
 export const IDVerifier = injectIntl(IDVerifierComponent)

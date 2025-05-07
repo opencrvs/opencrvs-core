@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import {
-  RegisterForm,
-  RouteProps
-} from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP,
@@ -23,9 +20,13 @@ import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration
 import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
 import { IForm } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
-import { Redirect } from 'react-router'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 interface IFormProps {
   declaration?: IDeclaration
@@ -34,29 +35,28 @@ interface IFormProps {
   duplicate?: boolean
 }
 
-const pageRoute: { [key in Event]: string } = {
+const pageRoute: { [key in EventType]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   death: DRAFT_DEATH_FORM_PAGE_GROUP,
   marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
 }
 
-class DeclarationFormView extends React.Component<IFormProps & RouteProps> {
-  render() {
-    const { declaration, ...rest } = this.props
-    if (!declaration) {
-      return <Redirect to={HOME} />
-    }
-    return <RegisterForm declaration={declaration} {...rest} />
+const DeclarationFormView = (props: RouteComponentProps<IFormProps>) => {
+  const { declaration, ...rest } = props
+
+  if (!declaration) {
+    return <Navigate to={HOME} />
   }
+
+  return <RegisterForm declaration={declaration} {...rest} />
 }
 
-function mapStatetoProps(state: IStoreState, props: RouteProps) {
-  const { match } = props
+function mapStatetoProps(state: IStoreState, props: RouteComponentProps) {
   const declaration = state.declarationsState.declarations.find(
-    ({ id }) => id === match.params.declarationId
+    ({ id }) => id === props.router.params.declarationId
   )
 
-  const event = declaration?.event || Event.Birth
+  const event = declaration?.event || EventType.Birth
   const registerForm = getRegisterForm(state)[event]
 
   return {
@@ -66,6 +66,6 @@ function mapStatetoProps(state: IStoreState, props: RouteProps) {
   }
 }
 
-export const DeclarationForm = connect<IFormProps, {}, RouteProps, IStoreState>(
-  mapStatetoProps
-)(DeclarationFormView)
+export const DeclarationForm = withRouter(
+  connect(mapStatetoProps)(DeclarationFormView)
+)

@@ -1,10 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    "monorepo:lerna",
-    ":semanticCommits"
-  ],
+  "extends": ["config:recommended", "monorepo:lerna", ":semanticCommits"],
+  "rebaseWhen": "never",
+  "prConcurrentLimit": 3,
   "lockFileMaintenance": {
     "enabled": true
   },

@@ -50,7 +50,7 @@ describe('Token verifier module', () => {
         '111',
         // @ts-ignore
         { headers: { authorization: 'Bearer: 111' } },
-        'true',
+        true,
         'http://auth.opencrvs.org'
       )
       expect(result.isValid).toBe(true)
@@ -86,7 +86,7 @@ describe('Token verifier module', () => {
         '111',
         // @ts-ignore
         { headers: { authorization: 'Bearer: 111' } },
-        'false',
+        false,
         'http://auth.opencrvs.org'
       )
       expect(result.isValid).toBe(true)

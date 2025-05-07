@@ -106,19 +106,18 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__option {
-    height: 40px;
     cursor: pointer;
     border-radius: 4px;
-    margin-bottom: 2px;
+    padding: 10px 16px;
     ${({ theme }) => theme.fonts.reg18};
     background-color: ${({ theme }) => theme.colors.white};
   }
 
   .react-select__option--is-focused {
-    background-color: ${({ theme }) => theme.colors.grey100};
+    background-color: ${({ theme }) => theme.colors.grey50};
     color: ${({ theme }) => theme.colors.copy};
     &:active {
-      background: ${({ theme }) => theme.colors.grey200};
+      background: ${({ theme }) => theme.colors.grey100};
       color: ${({ theme }) => theme.colors.copy};
     }
   }

@@ -10,7 +10,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import { ITokenPayload } from '@user-mgnt/utils/token'
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 
 export const statuses = {
   PENDING: 'pending',

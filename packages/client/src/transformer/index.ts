@@ -26,7 +26,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   isFieldButton,
   isFieldHttp,
-  isFieldRedirect,
+  isFieldLinkButton,
   isRadioGroupWithNestedField,
   serializeFieldValue
 } from '@client/forms/utils'
@@ -166,7 +166,7 @@ const toCorrectionValue = (
 }
 
 function isMetaTypeField(field: IFormField): boolean {
-  return isFieldHttp(field) || isFieldRedirect(field)
+  return isFieldHttp(field) || isFieldLinkButton(field)
 }
 export function getChangedValues(
   formDefinition: IForm,
@@ -435,7 +435,14 @@ export const gqlToDraftTransformer = (
       transformedData[section.id]._fhirID = queryData[section.id].id
     }
     if (section.mapping && section.mapping.query) {
-      section.mapping.query(transformedData, queryData, section.id)
+      section.mapping.query(
+        transformedData,
+        queryData,
+        section.id,
+        undefined,
+        undefined,
+        offlineData
+      )
     }
     if (section.mapping?.template) {
       if (!transformedData.template) {
@@ -468,7 +475,7 @@ export const gqlToDraftTransformer = (
   }
 
   if (queryData.user?.role) {
-    transformedData.user.role = queryData.user.role._id
+    transformedData.user.role = queryData.user.role.id
   }
 
   return transformedData

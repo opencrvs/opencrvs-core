@@ -12,101 +12,90 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockDeclarationData,
-  createRouterProps
+  TestComponentWithRouteMock
 } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
+
 import * as React from 'react'
 import { CorrectionSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
-let wrapper: ReactWrapper<{}, {}>
+let wrapper: TestComponentWithRouteMock
 
 const birthDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
   data: mockDeclarationData,
-  event: Event.Birth
+  event: EventType.Birth
 }
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('Correction reason form', () => {
   describe('for an declaration', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
-      wrapper = await createTestComponent(
-        <CorrectionForm
-          {...createRouterProps(
-            formatUrl(CERTIFICATE_CORRECTION, {
-              declarationId: birthDeclaration.id,
-              pageId: CorrectionSection.Reason
-            }),
-            { isNavigatedInsideApp: false },
-            {
-              matchParams: {
-                declarationId: birthDeclaration.id,
-                pageId: CorrectionSection.Reason
-              }
-            }
-          )}
-        />,
-        {
-          store,
-          history
-        }
-      )
+      wrapper = await createTestComponent(<CorrectionForm />, {
+        store,
+        path: CERTIFICATE_CORRECTION,
+        initialEntries: [
+          formatUrl(CERTIFICATE_CORRECTION, {
+            declarationId: birthDeclaration.id,
+            pageId: CorrectionSection.Reason
+          })
+        ]
+      })
     })
     it('should disable the continue button if no reason is selected', () => {
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeTruthy()
     })
 
     it('should not disable the continue button if a reason is selected', () => {
-      wrapper
+      wrapper.component
         .find('#type_CLERICAL_ERROR')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
-      wrapper.update()
+      wrapper.component.update()
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeFalsy()
     })
 
     it('should to go summary page', () => {
-      wrapper
+      wrapper.component
         .find('#type_CLERICAL_ERROR')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
-      wrapper.update()
+      wrapper.component.update()
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeFalsy()
     })
 
     it('should disable the continue button if other option is selected without specifying the reason', () => {
-      wrapper
+      wrapper.component
         .find('#type_OTHER')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
-      wrapper.update()
+      wrapper.component.update()
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeTruthy()
     })
 
     it('should not disable the continue button if other option is selected with the reason specified', () => {
-      wrapper
+      wrapper.component
         .find('#type_OTHER')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
-      wrapper.update()
+      wrapper.component.update()
 
-      wrapper
+      wrapper.component
         .find('input[name="type.nestedFields.otherReason"]')
         .simulate('change', {
           target: {
@@ -114,18 +103,20 @@ describe('Correction reason form', () => {
             value: 'Misspelling'
           }
         })
-      wrapper.update()
+      wrapper.component.update()
 
       expect(
-        wrapper.find('#confirm_form').hostNodes().props().disabled
+        wrapper.component.find('#confirm_form').hostNodes().props().disabled
       ).toBeFalsy()
     })
 
     it('should cancel the correction when the cross button is pressed', () => {
-      wrapper.find('#crcl-btn').hostNodes().simulate('click')
-      wrapper.update()
+      wrapper.component.find('#crcl-btn').hostNodes().simulate('click')
+      wrapper.component.update()
 
-      expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
+      expect(wrapper.router.state.location.pathname).toContain(
+        WORKQUEUE_TABS.readyForReview
+      )
     })
   })
 })

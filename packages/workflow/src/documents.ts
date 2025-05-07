@@ -36,24 +36,6 @@ export async function uploadFileToMinio(
   return res.refUrl
 }
 
-async function uploadSVGToMinio(
-  fileData: string,
-  authHeader: IAuthHeader
-): Promise<string> {
-  const suffix = '/upload-svg'
-  const request = {
-    method: 'POST',
-    headers: {
-      ...authHeader,
-      'Content-Type': 'image/svg+xml'
-    },
-    body: fileData
-  }
-  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, request)
-  const res = await result.json()
-  return res.refUrl
-}
-
 export async function uploadCertificateAttachmentsToDocumentsStore<
   T extends CertifyInput | IssueInput
 >(certificateDetails: T, authHeader: IAuthHeader): Promise<T> {
@@ -64,12 +46,6 @@ export async function uploadCertificateAttachmentsToDocumentsStore<
     for (const affidavit of certificateDetails.collector.affidavit) {
       affidavit.data = await uploadFileToMinio(affidavit.data, authHeader)
     }
-  }
-  if ('data' in certificateDetails) {
-    certificateDetails.data = await uploadSVGToMinio(
-      certificateDetails.data,
-      authHeader
-    )
   }
   return certificateDetails
 }

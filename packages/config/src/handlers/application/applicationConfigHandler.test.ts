@@ -18,7 +18,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 
 const token = jwt.sign(
-  { scope: ['natlsysadmin'] },
+  { scope: ['config.update:all'] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -37,11 +37,6 @@ const mockConfig = {
   BIRTH: {
     REGISTRATION_TARGET: 45,
     LATE_REGISTRATION_TARGET: 365,
-    FEE: {
-      ON_TIME: 0,
-      LATE: 0,
-      DELAYED: 0
-    },
     PRINT_IN_ADVANCE: true
   },
   COUNTRY_LOGO: {
@@ -54,18 +49,10 @@ const mockConfig = {
   },
   DEATH: {
     REGISTRATION_TARGET: 45,
-    FEE: {
-      ON_TIME: 0,
-      DELAYED: 0
-    },
     PRINT_IN_ADVANCE: true
   },
   MARRIAGE: {
     REGISTRATION_TARGET: 45,
-    FEE: {
-      ON_TIME: 0,
-      DELAYED: 0
-    },
     PRINT_IN_ADVANCE: true
   },
   PHONE_NUMBER_PATTERN: '^0(7|9)[0-9]{8}$',
@@ -75,8 +62,6 @@ const mockConfig = {
   },
   MARRIAGE_REGISTRATION: false,
   DATE_OF_BIRTH_UNKNOWN: false,
-  INFORMANT_SIGNATURE: true,
-  INFORMANT_SIGNATURE_REQUIRED: true,
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
@@ -123,23 +108,5 @@ describe('applicationHandler', () => {
       url: '/publicConfig'
     })
     expect(res.statusCode).toBe(200)
-  })
-
-  it('return error when tries to save invalid data', async () => {
-    mockingoose(ApplicationConfig).toReturn(null, 'findOne')
-    mockingoose(ApplicationConfig).toReturn({}, 'update')
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/getCertificate',
-      payload: {
-        APPLICATION_NAME: 1234
-      },
-      headers: {
-        Authorization: `${token}`
-      }
-    })
-
-    expect(res.statusCode).toBe(400)
   })
 })

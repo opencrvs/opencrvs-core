@@ -18,6 +18,7 @@ export type IAdvancedSearchParamState = {
   dateOfEvent?: string
   dateOfEventStart?: string
   dateOfEventEnd?: string
+  timePeriodFrom?: string
   registrationNumber?: string
   trackingId?: string
   dateOfRegistration?: string
@@ -61,6 +62,7 @@ export type IAdvancedSearchParamState = {
   informantDoBStart?: string
   informantDoBEnd?: string
   searchId?: string
+  bookmarkName?: string
 }
 
 export const advancedSearchInitialState: IAdvancedSearchParamState = {
@@ -69,6 +71,7 @@ export const advancedSearchInitialState: IAdvancedSearchParamState = {
   dateOfEvent: '',
   dateOfEventStart: '',
   dateOfEventEnd: '',
+  timePeriodFrom: '',
   registrationNumber: '',
   eventCountry: '',
   trackingId: '',

@@ -52,7 +52,9 @@ import {
   getResourceFromBundleById,
   TransactionResponse,
   TaskIdentifierSystem,
-  Location
+  Location,
+  PractitionerRole,
+  URLReference
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -69,7 +71,8 @@ import { badRequest, internal } from '@hapi/boom'
 import { getUserOrSystem, isSystem } from './user'
 import {
   getLoggedInPractitionerResource,
-  getPractitionerOfficeId
+  getPractitionerOfficeId,
+  getPractitionerRoleByPractitionerId
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
 import { fetchLocationHierarchy } from '@workflow/utils/location'
@@ -218,7 +221,8 @@ export function createDocumentReferenceEntryForCertificate(
   temporaryRelatedPersonId: UUID,
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
-  attachmentUrl?: string,
+  certifierReference?: ResourceIdentifier,
+  certificateTemplateId?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
   return {
@@ -236,9 +240,23 @@ export function createDocumentReferenceEntryForCertificate(
             reference: `urn:uuid:${temporaryRelatedPersonId}`
           }
         },
+        ...(certifierReference
+          ? [
+              {
+                url: 'http://opencrvs.org/specs/extension/certifier' as const,
+                valueReference: {
+                  reference: certifierReference
+                }
+              }
+            ]
+          : []),
         {
           url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
           valueBoolean: hasShowedVerifiedDocument
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/certificateTemplateId',
+          valueString: certificateTemplateId
         },
         ...(paymentUrl
           ? [
@@ -259,16 +277,7 @@ export function createDocumentReferenceEntryForCertificate(
           }
         ]
       },
-      content: attachmentUrl
-        ? [
-            {
-              attachment: {
-                contentType: 'application/pdf',
-                data: attachmentUrl
-              }
-            }
-          ]
-        : [],
+      content: [],
       status: 'current'
     }
   }
@@ -288,7 +297,7 @@ export function createRelatedPersonEntries(
   collectorDetails: CertifyInput['collector'],
   temporaryRelatedPersonId: UUID,
   record: RegisteredRecord | CertifiedRecord
-): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] {
+): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] | [] {
   const knownRelationships = z.enum([
     'MOTHER',
     'FATHER',
@@ -342,7 +351,7 @@ export function createRelatedPersonEntries(
             ({ use, firstNames, familyName }) => ({
               use,
               given: firstNames.split(' '),
-              family: [familyName]
+              family: familyName
             })
           ),
           identifier: collectorDetails.identifier.map(({ id, type }) => ({
@@ -683,13 +692,16 @@ export async function createViewTask(
   return viewedTask
 }
 
-export function createDownloadTask(
-  previousTask: SavedTask,
-  extensionUrl:
-    | 'http://opencrvs.org/specs/extension/regDownloaded'
-    | 'http://opencrvs.org/specs/extension/regAssigned'
-) {
-  return createNewTaskResource(previousTask, [{ url: extensionUrl }])
+export function createDownloadTask(previousTask: SavedTask) {
+  return createNewTaskResource(previousTask, [
+    { url: 'http://opencrvs.org/specs/extension/regAssigned' }
+  ])
+}
+
+export function createRetrieveTask(previousTask: SavedTask) {
+  return createNewTaskResource(previousTask, [
+    { url: 'http://opencrvs.org/specs/extension/regDownloaded' }
+  ])
 }
 
 export function createRejectTask(
@@ -763,7 +775,10 @@ export function createWaitingForValidationTask(
   }
 }
 
-export function createRegisterTask(previousTask: SavedTask): Task {
+export function createRegisterTask(
+  previousTask: SavedTask,
+  comment?: string
+): Task {
   const timeLoggedMSExtension = previousTask.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
   )
@@ -774,7 +789,7 @@ export function createRegisterTask(previousTask: SavedTask): Task {
     'REGISTERED'
   )
 
-  const comments = previousTask?.note?.[0]?.text
+  const comments = comment ?? previousTask?.note?.[0]?.text
 
   return {
     ...registeredTask,
@@ -912,12 +927,37 @@ export async function createUnassignedTask(
   return unassignedTask
 }
 
-export function createCertifiedTask(previousTask: SavedTask): SavedTask {
-  return createNewTaskResource(previousTask, [], 'CERTIFIED')
+export function createCertifiedTask(
+  previousTask: SavedTask,
+  certificateTemplateId: string
+): SavedTask {
+  return createNewTaskResource(
+    previousTask,
+    [
+      {
+        url: 'http://opencrvs.org/specs/extension/certificateTemplateId',
+        valueString: certificateTemplateId
+      }
+    ],
+    'CERTIFIED'
+  )
 }
 
-export function createIssuedTask(previousTask: SavedTask): SavedTask {
-  return createNewTaskResource(previousTask, [], 'ISSUED')
+export function createIssuedTask(
+  previousTask: SavedTask,
+  paymentReconciliation?: BundleEntry<PaymentReconciliation>
+): SavedTask {
+  const nextExtentions: Extension[] = paymentReconciliation?.fullUrl
+    ? [
+        {
+          url: 'http://opencrvs.org/specs/extension/paymentDetails',
+          valueReference: {
+            reference: paymentReconciliation.fullUrl
+          }
+        }
+      ]
+    : []
+  return createNewTaskResource(previousTask, nextExtentions, 'ISSUED')
 }
 
 export function createVerifyRecordTask(
@@ -1141,6 +1181,29 @@ export async function sendBundleToHearth(
   return responseBundle
 }
 
+export async function getPractitionerRoleFromToken(
+  token: string
+): Promise<BundleEntry<PractitionerRole>> {
+  const userOrSystem = await getUserOrSystem(token)
+
+  const practitionerId = userOrSystem ? userOrSystem.practitionerId : null
+
+  if (!practitionerId) {
+    throw new Error(`Practitioner ID not found!`)
+  }
+
+  const practitionerRoleBundle = (await getPractitionerRoleByPractitionerId(
+    practitionerId as UUID
+  )) as Bundle<PractitionerRole>
+
+  const practitionerRoleResource = practitionerRoleBundle.entry[0].resource
+  return {
+    fullUrl:
+      `/fhir/PractitionerRole/${practitionerRoleResource.id}/_history/${practitionerRoleResource.meta?.versionId}` as URLReference,
+    resource: practitionerRoleResource
+  }
+}
+
 function findSavedReference(
   temporaryReference: URNReference,
   resourceBundle: Bundle,
@@ -1225,7 +1288,7 @@ function toSavedTask(
 
 function toSavedRelatedPerson(
   relatedPersion: RelatedPerson & {
-    patient: { reference: `urn:uuid:${string}` }
+    patient: { reference: `urn:uuid:${UUID}` }
   },
   id: UUID,
   resourceBundle: Bundle,
@@ -1367,13 +1430,59 @@ export function toSavedBundle<T extends Resource>(
           fullUrl: responseBundle.entry[index].response.location,
           resource: toSavedTask(
             {
-              ...entry.resource,
-              focus: { reference: entry.resource.focus.reference }
+              ...(entry.resource as Task),
+              focus: {
+                reference: entry.resource.focus.reference
+              }
             },
             urlReferenceToUUID(responseBundle.entry[index].response.location),
             resourceBundle,
             responseBundle
           )
+        }
+      }
+      if (
+        isTask(entry.resource) &&
+        entry.resource.extension &&
+        entry.resource.extension.some(
+          (x) => x.url === 'http://opencrvs.org/specs/extension/paymentDetails'
+        )
+      ) {
+        return {
+          ...entry,
+          fullUrl: responseBundle.entry[index].response.location,
+          resource: {
+            ...entry.resource,
+            id: urlReferenceToUUID(
+              responseBundle.entry[index].response.location
+            ),
+            extension: entry.resource.extension.map((x: any) => {
+              if (
+                x.url ===
+                  'http://opencrvs.org/specs/extension/paymentDetails' &&
+                x.valueReference &&
+                x.valueReference.reference &&
+                resourceBundle.entry.some(
+                  (y) => y.fullUrl === x.valueReference.reference
+                )
+              ) {
+                const newLocation = responseBundle.entry.find((y) =>
+                  y.response.location.includes('PaymentReconciliation')
+                )?.response.location
+
+                if (newLocation) {
+                  return {
+                    ...x,
+                    valueReference: {
+                      ...x.valueReference,
+                      reference: newLocation
+                    }
+                  }
+                }
+              }
+              return x
+            })
+          }
         }
       }
 

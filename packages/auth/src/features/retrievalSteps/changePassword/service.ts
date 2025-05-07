@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@auth/constants'
+import { env } from '@auth/environment'
 import { resolve } from 'url'
 
 export async function changePassword(
@@ -18,7 +18,7 @@ export async function changePassword(
   remoteAddress: string,
   userAgent: string
 ) {
-  const url = resolve(USER_MANAGEMENT_URL, '/changePassword')
+  const url = resolve(env.USER_MANAGEMENT_URL, '/changePassword')
 
   const res = await fetch(url, {
     method: 'POST',

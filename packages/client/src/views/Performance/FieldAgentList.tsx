@@ -8,40 +8,38 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { formatTimeDuration } from '@client/DateUtils'
+import { AvatarSmall } from '@client/components/Avatar'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
-import { formatTimeDuration } from '@client/DateUtils'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToFieldAgentList, goToPerformanceHome } from '@client/navigation'
+import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import format from '@client/utils/date-formatting'
+import type { GQLSearchFieldAgentResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { SortArrow } from '@opencrvs/components/lib/icons'
-import { AvatarSmall } from '@client/components/Avatar'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Table } from '@opencrvs/components/lib/Table'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import type { GQLSearchFieldAgentResult } from '@client/utils/gateway-deprecated-do-not-use'
+import { SortArrow } from '@opencrvs/components/lib/icons'
 import { orderBy } from 'lodash'
-import { parse } from 'query-string'
+import { parse, stringify } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import { ILocation } from '@client/offline/reducer'
-import format from '@client/utils/date-formatting'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Avatar, Event } from '@client/utils/gateway'
+import { Avatar, EventType } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getLanguage } from '@client/i18n/selectors'
-import { getUserRole } from '@client/utils'
+import { useLocation, useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -80,14 +78,7 @@ interface IConnectProps {
   offlineOffices: { [key: string]: ILocation }
 }
 
-interface IDispatchProps {
-  goToPerformanceHome: typeof goToPerformanceHome
-  goToFieldAgentList: typeof goToFieldAgentList
-}
-type IProps = RouteComponentProps &
-  WrappedComponentProps &
-  IConnectProps &
-  IDispatchProps
+type IProps = WrappedComponentProps & IConnectProps
 
 export enum EVENT_OPTIONS {
   BIRTH = 'BIRTH',
@@ -155,17 +146,17 @@ function getAverageCompletionTimeComponent(
 }
 
 function FieldAgentListComponent(props: IProps) {
+  const { intl, offlineOffices } = props
+
+  const navigate = useNavigate()
+  const location = useLocation()
   const {
-    intl,
-    location: { search },
-    offlineOffices
-  } = props
-  const {
-    event = Event.Birth,
+    event = EventType.Birth,
     locationId,
     timeStart,
     timeEnd
-  } = parse(search) as unknown as ISearchParams
+  } = parse(location.search) as unknown as ISearchParams
+
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
@@ -175,7 +166,6 @@ function FieldAgentListComponent(props: IProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
   const offices = generateLocations(offlineOffices, intl)
-  const language = useSelector(getLanguage)
 
   const isOfficeSelected = offices.some((office) => office.id === locationId)
 
@@ -323,7 +313,7 @@ function FieldAgentListComponent(props: IProps) {
     const content =
       data &&
       data.results &&
-      data.results.map((row, idx) => {
+      data.results.map((row) => {
         if (row === null) {
           return {
             name: '',
@@ -343,7 +333,7 @@ function FieldAgentListComponent(props: IProps) {
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
           rawName: row.fullName || '',
-          role: (row.role && getUserRole(language, row.role)) || '',
+          role: (row.role && intl.formatMessage(row.role.label)) || '',
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
           totalDeclarations: String(row.totalNumberOfDeclarationStarted),
@@ -406,20 +396,38 @@ function FieldAgentListComponent(props: IProps) {
               selectedLocationId={locationId}
               disabled={true}
               onChangeLocation={(newLocationId) => {
-                props.goToFieldAgentList(timeStart, timeEnd, newLocationId)
+                navigate({
+                  pathname: routes.PERFORMANCE_FIELD_AGENT_LIST,
+                  search: stringify({
+                    locationId: newLocationId,
+                    timeStart,
+                    timeEnd
+                  })
+                })
               }}
-              requiredJurisdictionTypes={
+              locationFilter={
                 window.config.FIELD_AGENT_AUDIT_LOCATIONS
+                  ? ({ jurisdictionType }) =>
+                      Boolean(
+                        jurisdictionType &&
+                          window.config.FIELD_AGENT_AUDIT_LOCATIONS.split(
+                            ','
+                          ).includes(jurisdictionType)
+                      )
+                  : undefined
               }
             />
             <PerformanceSelect
               onChange={(option) => {
-                props.goToFieldAgentList(
-                  timeStart,
-                  timeEnd,
-                  locationId,
-                  option.value
-                )
+                navigate({
+                  pathname: routes.PERFORMANCE_FIELD_AGENT_LIST,
+                  search: stringify({
+                    locationId,
+                    timeStart,
+                    timeEnd,
+                    event: option.value
+                  })
+                })
               }}
               id="event-select"
               withLightTheme={true}
@@ -428,11 +436,11 @@ function FieldAgentListComponent(props: IProps) {
               options={[
                 {
                   label: intl.formatMessage(messages.eventOptionForBirths),
-                  value: Event.Birth
+                  value: EventType.Birth
                 },
                 {
                   label: intl.formatMessage(messages.eventOptionForDeaths),
-                  value: Event.Death
+                  value: EventType.Death
                 }
               ]}
             />
@@ -440,11 +448,14 @@ function FieldAgentListComponent(props: IProps) {
               startDate={dateStart}
               endDate={dateEnd}
               onDatesChange={({ startDate, endDate }) =>
-                props.goToFieldAgentList(
-                  startDate.toISOString(),
-                  endDate.toISOString(),
-                  locationId
-                )
+                navigate({
+                  pathname: routes.PERFORMANCE_FIELD_AGENT_LIST,
+                  search: stringify({
+                    locationId,
+                    timeStart: startDate.toISOString(),
+                    timeEnd: endDate.toISOString()
+                  })
+                })
               }
             />
             <PerformanceSelect
@@ -555,12 +566,9 @@ function FieldAgentListComponent(props: IProps) {
   )
 }
 
-export const FieldAgentList = connect(
-  (state: IStoreState) => {
-    const offlineOffices = getOfflineData(state).offices
-    return {
-      offlineOffices
-    }
-  },
-  { goToPerformanceHome, goToFieldAgentList }
-)(injectIntl(FieldAgentListComponent))
+export const FieldAgentList = connect((state: IStoreState) => {
+  const offlineOffices = getOfflineData(state).offices
+  return {
+    offlineOffices
+  }
+})(injectIntl(FieldAgentListComponent))

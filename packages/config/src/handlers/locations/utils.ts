@@ -108,7 +108,7 @@ export const composeFhirLocation = (
   }
 }
 
-export function setExtensions(
+function setExtensions(
   malePopulations: Statistics,
   femalePopulations: Statistics,
   totalPopulations: Statistics,

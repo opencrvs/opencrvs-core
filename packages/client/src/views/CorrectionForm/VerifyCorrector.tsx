@@ -18,10 +18,9 @@ import {
 import { IForm, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 import {
-  goBack,
-  goToPageGroup,
-  goToHomeTab,
-  formatUrl
+  formatUrl,
+  generateGoToHomeTabUrl,
+  generateGoToPageGroupUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import {
@@ -31,20 +30,25 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import {
   CERTIFICATE_CORRECTION_REVIEW,
   REGISTRAR_HOME_TAB
 } from '@client/navigation/routes'
 import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 import { TimeMounted } from '@client/components/TimeMounted'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { UserDetails } from '@client/utils/userUtils'
+import { LoadingSpinner } from '@client/components/DraftLoadingSpinner'
 
 interface INameField {
   firstNamesField: string
@@ -68,11 +72,6 @@ export interface ICertificateCorrectorDefinition {
   [corrector: string]: ICertificateCorrectorField
 }
 
-interface IMatchParams {
-  declarationId: string
-  corrector: string
-}
-
 interface IStateProps {
   declaration: IDeclaration
   form: ICertificateCorrectorDefinition
@@ -81,20 +80,32 @@ interface IStateProps {
   user: UserDetails | null
 }
 interface IDispatchProps {
-  goBack: typeof goBack
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
-  goToPageGroup: typeof goToPageGroup
-  goToHomeTab: typeof goToHomeTab
 }
 
-type IOwnProps = RouteComponentProps<IMatchParams>
+type IOwnProps = RouteComponentProps
 
 type IFullProps = IStateProps & IDispatchProps & IOwnProps & IntlShapeProps
 
-class VerifyCorrectorComponent extends React.Component<IFullProps> {
-  handleVerification = (hasShowedVerifiedDocument: boolean) => {
-    const declaration = this.props.declaration
+const CHILD = 'child'
+const FATHER = 'father'
+const INFORMANT = 'informant'
+const MOTHER = 'mother'
+
+const VerifyCorrectorComponent = ({
+  declaration,
+  form,
+  registerForm,
+  config,
+  user,
+  modifyDeclaration,
+  writeDeclaration,
+  intl,
+  router
+}: IFullProps) => {
+  const { corrector } = router.params
+  const handleVerification = (hasShowedVerifiedDocument: boolean) => {
     const changed = {
       ...declaration,
       data: {
@@ -105,24 +116,24 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         }
       }
     }
-    this.props.modifyDeclaration(changed)
+    modifyDeclaration(changed)
+    writeDeclaration(changed)
 
-    this.props.writeDeclaration(changed)
-
-    this.props.goToPageGroup(
-      CERTIFICATE_CORRECTION_REVIEW,
-      this.props.declaration.id,
-      ReviewSection.Review,
-      'review-view-group',
-      this.props.declaration.event
+    router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute: CERTIFICATE_CORRECTION_REVIEW,
+        declarationId: declaration.id,
+        pageId: ReviewSection.Review,
+        groupId: 'review-view-group',
+        event: declaration.event
+      })
     )
   }
 
-  getGenericCorrectorInfo = (corrector: string): ICorrectorInfo => {
-    const { intl, declaration, form, registerForm, config, user } = this.props
+  const getGenericCorrectorInfo = (corrector: string): ICorrectorInfo => {
     const info = declaration.data[corrector]
     //TODO :: we have to get form defination from new certificateCorrectorDefination
-    const showInfoFor = ['mother', 'father', 'child', 'informant']
+    const showInfoFor = [MOTHER, FATHER, CHILD, INFORMANT]
 
     const eventRegistrationInput = draftToGqlTransformer(
       registerForm,
@@ -138,11 +149,11 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     if (showInfoFor.includes(corrector)) {
       const fields = form[corrector]
       const iD =
-        (corrector === 'informant'
+        (corrector === INFORMANT
           ? eventRegistrationInput[informantType]?.identifier?.[0]?.id
           : undefined) ?? eventRegistrationInput[corrector]?.identifier?.[0]?.id
       const iDType =
-        (corrector === 'informant'
+        (corrector === INFORMANT
           ? eventRegistrationInput[informantType]?.identifier?.[0]?.type
           : undefined) ??
         eventRegistrationInput[corrector]?.identifier?.[0]?.type
@@ -181,86 +192,90 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         nationality,
         age
       }
-    } else {
-      return {
-        iD: '',
-        iDType: '',
-        firstNames: '',
-        familyName: '',
-        birthDate: '',
-        nationality: '',
-        age: ''
-      }
+    }
+    return {
+      iD: '',
+      iDType: '',
+      firstNames: '',
+      familyName: '',
+      birthDate: '',
+      nationality: '',
+      age: ''
     }
   }
 
-  logTime = (timeMs: number) => {
-    const declaration = this.props.declaration
-    if (!declaration.timeLoggedMS) {
-      declaration.timeLoggedMS = 0
-    }
-    declaration.timeLoggedMS += timeMs
-    this.props.modifyDeclaration(declaration)
+  const logTime = (timeMs: number) => {
+    const updatedDeclaration = { ...declaration }
+
+    updatedDeclaration.timeLoggedMS = updatedDeclaration.timeLoggedMS ?? 0
+    updatedDeclaration.timeLoggedMS += timeMs
+    modifyDeclaration(updatedDeclaration)
   }
 
-  render() {
-    const { corrector } = this.props.match.params
-    const { intl, declaration } = this.props
-    if (!declaration) {
-      return (
-        <Redirect
-          to={formatUrl(REGISTRAR_HOME_TAB, {
-            tabId: WORKQUEUE_TABS.readyForReview,
-            selectorId: ''
-          })}
-        />
-      )
-    }
-    const correctorInfo = this.getGenericCorrectorInfo(corrector)
-    const hasNoInfo = Object.values(correctorInfo).every(
-      (property) => property === undefined || property === ''
-    )
-
+  if (!declaration) {
     return (
-      <TimeMounted onUnmount={this.logTime}>
-        <ActionPageLight
-          goBack={this.props.goBack}
-          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
-          title={intl.formatMessage(messages.title)}
-          hideBackground
-        >
-          {
-            <IDVerifier
-              id="idVerifier"
-              title={intl.formatMessage(messages.idCheckTitle)}
-              correctorInformation={(!hasNoInfo && correctorInfo) || undefined}
-              actionProps={{
-                positiveAction: {
-                  label: intl.formatMessage(messages.idCheckVerify),
-                  handler: () => {
-                    this.handleVerification(true)
-                  }
-                },
-                negativeAction: {
-                  label: intl.formatMessage(messages.idCheckWithoutVerify),
-                  handler: () => {
-                    this.handleVerification(false)
-                  }
-                }
-              }}
-            />
-          }
-        </ActionPageLight>
-      </TimeMounted>
+      <Navigate
+        to={formatUrl(REGISTRAR_HOME_TAB, {
+          tabId: WORKQUEUE_TABS.readyForReview,
+          selectorId: ''
+        })}
+      />
     )
   }
+
+  if (declaration.writingDraft) {
+    return <LoadingSpinner />
+  }
+  const correctorInfo = getGenericCorrectorInfo(corrector!)
+  const hasNoInfo = Object.values(correctorInfo).every(
+    (property) => property === undefined || property === ''
+  )
+
+  return (
+    <TimeMounted onUnmount={logTime}>
+      <ActionPageLight
+        goBack={() => router.navigate(-1)}
+        goHome={() =>
+          router.navigate(
+            generateGoToHomeTabUrl({
+              tabId: WORKQUEUE_TABS.readyForReview
+            })
+          )
+        }
+        title={intl.formatMessage(messages.title)}
+        hideBackground
+      >
+        {
+          <IDVerifier
+            id="idVerifier"
+            title={intl.formatMessage(messages.idCheckTitle)}
+            correctorInformation={(!hasNoInfo && correctorInfo) || undefined}
+            actionProps={{
+              positiveAction: {
+                label: intl.formatMessage(messages.idCheckVerify),
+                handler: () => {
+                  handleVerification(true)
+                }
+              },
+              negativeAction: {
+                label: intl.formatMessage(messages.idCheckWithoutVerify),
+                handler: () => {
+                  handleVerification(false)
+                }
+              }
+            }}
+          />
+        }
+      </ActionPageLight>
+    </TimeMounted>
+  )
 }
 
 const mapStateToProps = (
   state: IStoreState,
   ownProps: IOwnProps
 ): IStateProps => {
-  const { declarationId } = ownProps.match.params
+  const { declarationId } = ownProps.router.match.params
 
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === declarationId
@@ -275,10 +290,9 @@ const mapStateToProps = (
   }
 }
 
-export const VerifyCorrector = connect(mapStateToProps, {
-  goBack,
-  modifyDeclaration,
-  writeDeclaration,
-  goToPageGroup,
-  goToHomeTab
-})(injectIntl(VerifyCorrectorComponent))
+export const VerifyCorrector = withRouter(
+  connect(mapStateToProps, {
+    modifyDeclaration,
+    writeDeclaration
+  })(injectIntl(VerifyCorrectorComponent))
+)

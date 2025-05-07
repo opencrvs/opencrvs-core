@@ -185,7 +185,7 @@ export const testFhirBundle: StrictBundle<
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueReference: { reference: 'Location/123' }
+            valueReference: { reference: 'Location/123' as `Location/${UUID}` }
           }
         ]
       }
@@ -197,7 +197,7 @@ export const testFhirBundle: StrictBundle<
         active: true,
         name: [
           {
-            family: ['অনিক'],
+            family: 'অনিক',
             given: ['অনিক'],
             use: 'bn'
           }
@@ -213,7 +213,7 @@ export const testFhirBundle: StrictBundle<
         name: [
           {
             given: ['Jane'],
-            family: ['Doe'],
+            family: 'Doe',
             use: 'bn'
           }
         ],
@@ -234,7 +234,7 @@ export const testFhirBundle: StrictBundle<
         name: [
           {
             given: ['Jack'],
-            family: ['Doe'],
+            family: 'Doe',
             use: 'en'
           }
         ],
@@ -313,141 +313,3 @@ export const testFhirTaskBundle: Saved<Bundle<Task>> = {
   ]
 }
 
-type PatientIdentifier = NonNullable<Patient['identifier']>[number]
-
-const drnIdentifier = {
-  type: {
-    coding: [
-      {
-        system: 'http://opencrvs.org/specs/identifier-type',
-        code: 'DEATH_REGISTRATION_NUMBER'
-      }
-    ]
-  },
-  value: '2022DSNEYUG'
-} satisfies PatientIdentifier
-
-const nidIdentifier = {
-  value: '654654666',
-  type: {
-    coding: [
-      {
-        system: 'http://opencrvs.org/specs/identifier-type',
-        code: 'NATIONAL_ID'
-      }
-    ]
-  }
-} satisfies PatientIdentifier
-
-const brnIdentifier = {
-  type: {
-    coding: [
-      {
-        system: 'http://opencrvs.org/specs/identifier-type',
-        code: 'BIRTH_REGISTRATION_NUMBER'
-      }
-    ]
-  },
-  value: '2022BSNEYUG'
-} satisfies PatientIdentifier
-
-const mosipPsutTokenIdentifier = {
-  type: {
-    coding: [
-      {
-        system: 'http://opencrvs.org/specs/identifier-type',
-        code: 'MOSIP_PSUT_TOKEN_ID'
-      }
-    ]
-  },
-  value: '257803821990055124230310596669133515'
-} as fhir3.CodeableConcept
-
-const birthPatientIdentifier = {
-  type: {
-    coding: [
-      {
-        system: 'http://opencrvs.org/specs/identifier-type',
-        code: 'BIRTH_PATIENT_ENTRY'
-      }
-    ]
-  },
-  value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
-} as fhir3.CodeableConcept
-
-export const mosipDeceasedPatientMock: Saved<Patient> = {
-  resourceType: 'Patient',
-  active: true,
-  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1' as UUID,
-  name: [
-    {
-      use: 'en',
-      given: ['Sakib Al'],
-      family: ['Hasan']
-    }
-  ],
-  gender: 'male',
-  deceased: true,
-  birthDate: '1990-09-01',
-  identifier: [nidIdentifier, drnIdentifier]
-}
-
-export const mosipUpdatedDeceasedPatientMock = {
-  resourceType: 'Patient',
-  active: true,
-  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
-  name: [
-    {
-      use: 'en',
-      given: ['Sakib Al'],
-      family: ['Hasan']
-    }
-  ],
-  gender: 'male',
-  deceased: true,
-  birthDate: '1990-09-01',
-  identifier: [nidIdentifier, drnIdentifier, birthPatientIdentifier]
-}
-
-const mosipBirthPatientMock = {
-  resourceType: 'Patient',
-  active: true,
-  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d2',
-  name: [
-    {
-      use: 'bn',
-      given: ['Sakib Al'],
-      family: ['Hasan']
-    }
-  ],
-  gender: 'male',
-  birthDate: '1990-09-01',
-  multipleBirthInteger: 1,
-  identifier: [brnIdentifier, mosipPsutTokenIdentifier]
-}
-
-export const mosipBirthPatientBundleMock = {
-  resourceType: 'Bundle',
-  type: 'document',
-  entry: [
-    {
-      fullUrl: `urn:uuid:888` as URNReference,
-      resource: mosipBirthPatientMock
-    }
-  ]
-}
-
-export const mosipSuccessMock = {
-  transactionID: '5763906453',
-  version: '1.0',
-  id: 'mosip.identity.auth',
-  errors: null,
-  responseTime: '2022-08-30T08:15:11.033Z',
-  response: {
-    authStatus: true,
-    authToken: '257803821990055124230310596669133515'
-  }
-}
-export const mosipConfigMock = [
-  { status: 'active', name: 'Sweet Health', integratingSystemType: 'MOSIP' }
-]

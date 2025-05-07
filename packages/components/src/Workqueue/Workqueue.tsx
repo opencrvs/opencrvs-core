@@ -108,7 +108,8 @@ export enum COLUMNS {
   NOTIFICATION_SENT = 'notificationSent',
   NAME = 'name',
   TRACKING_ID = 'trackingId',
-  REGISTRATION_NO = 'registrationNumber'
+  REGISTRATION_NO = 'registrationNumber',
+  NONE = 'none'
 }
 
 export enum SORT_ORDER {
@@ -184,7 +185,7 @@ const WorkqueueComp = ({
                 width={preference.width}
                 onClick={
                   preference.sortFunction
-                    ? () => preference.sortFunction!(preference.key)
+                    ? () => preference.sortFunction?.(preference.key)
                     : undefined
                 }
                 clickable={Boolean(preference.sortFunction)}

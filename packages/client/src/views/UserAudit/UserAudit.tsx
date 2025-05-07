@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useQuery } from '@apollo/client'
 import React, { useState } from 'react'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
@@ -16,55 +17,48 @@ import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { IntlShape, useIntl } from 'react-intl'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router-dom'
 import { GET_USER } from '@client/user/queries'
 import { getLocalisedName } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
-import styled from 'styled-components'
-import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { Button } from '@opencrvs/components/lib/Button'
-import {
-  getUserRoleIntlKey,
-  canDeactivateUser
-} from '@client/views/SysAdmin/Team/utils'
-import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import { Loader } from '@opencrvs/components/lib/Loader'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { ProfileMenu } from '@client/components/ProfileMenu'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { useDispatch, useSelector } from 'react-redux'
-import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
+import { useSelector } from 'react-redux'
+import { formatUrl } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
-import { Summary } from '@opencrvs/components/lib/Summary'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import {
   GetUserQuery,
   GetUserQueryVariables,
-  User,
-  SystemRoleType
+  HumanName
 } from '@client/utils/gateway'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { useQuery } from '@apollo/client'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { AppBar, Link } from '@opencrvs/components/lib'
-import { ProfileMenu } from '@client/components/ProfileMenu'
-import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { Scope } from '@client/utils/authUtils'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Loader } from '@opencrvs/components/lib/Loader'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Summary } from '@opencrvs/components/lib/Summary'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+import styled from 'styled-components'
+import * as routes from '@client/navigation/routes'
+import { UserSection } from '@client/forms'
+import { stringify } from 'query-string'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
-
-interface IRouteProps {
-  userId: string
-}
 
 const transformUserQueryResult = (
   userData: NonNullable<GetUserQuery['getUser']>,
@@ -86,7 +80,6 @@ const transformUserQueryResult = (
         ''
     },
     name: getLocalisedName(intl, userData.name[0]),
-    systemRole: userData.systemRole,
     role: userData.role,
     number: userData.mobile,
     email: userData.email,
@@ -103,37 +96,11 @@ const transformUserQueryResult = (
   }
 }
 
-function canEditUserDetails(
-  targetUser: Pick<User, 'systemRole'> & {
-    primaryOffice?: { id: string } | null
-  },
-  loggedInUser: Pick<User, 'systemRole'> & {
-    primaryOffice?: { id: string } | null
-  },
-  scopes: Scope
-) {
-  if (!scopes.includes('sysadmin')) {
-    return false
-  }
-  if (loggedInUser.systemRole === SystemRoleType.NationalSystemAdmin) {
-    return true
-  }
-  const usersInTheSameOffice =
-    loggedInUser.primaryOffice?.id === targetUser?.primaryOffice?.id
-
-  if (
-    loggedInUser.systemRole === SystemRoleType.LocalSystemAdmin &&
-    usersInTheSameOffice
-  ) {
-    return true
-  }
-  return false
-}
-
 export const UserAudit = () => {
   const intl = useIntl()
-  const { userId } = useParams<IRouteProps>()
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { userId } = useParams()
+
   const [showResendInviteSuccess, setShowResendInviteSuccess] =
     useState<boolean>(false)
   const [showResendInviteError, setShowResendInviteError] =
@@ -154,10 +121,13 @@ export const UserAudit = () => {
   const { data, loading, error } = useQuery<
     GetUserQuery,
     GetUserQueryVariables
-  >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
+  >(GET_USER, {
+    variables: { userId: userId! },
+    fetchPolicy: 'cache-and-network'
+  })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
-  const userRole =
-    user && intl.formatMessage({ id: getUserRoleIntlKey(user.role._id) })
+  const userRole = user && intl.formatMessage(user.role.label)
+  const { canEditUser } = usePermissions()
 
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
@@ -225,7 +195,13 @@ export const UserAudit = () => {
     const menuItems: { label: string; handler: () => void }[] = [
       {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
-        handler: () => dispatch(goToReviewUserDetails(userId))
+        handler: () =>
+          navigate(
+            formatUrl(routes.REVIEW_USER_DETAILS, {
+              userId,
+              sectionId: UserSection.Preview
+            })
+          )
       }
     ]
 
@@ -246,11 +222,7 @@ export const UserAudit = () => {
       )
     }
 
-    if (
-      status === 'active' &&
-      userDetails &&
-      canDeactivateUser(userId, userDetails)
-    ) {
+    if (status === 'active') {
       menuItems.push({
         label: intl.formatMessage(sysMessages.deactivate),
         handler: () => toggleUserActivationModal()
@@ -302,7 +274,7 @@ export const UserAudit = () => {
                     user.id as string,
                     user.status as string
                   )}
-                  hide={!canEditUserDetails(user, userDetails, scope)}
+                  hide={!canEditUser(user)}
                 />
               </>
             )
@@ -343,7 +315,7 @@ export const UserAudit = () => {
                       user.id as string,
                       user.status as string
                     )}
-                    hide={!canEditUserDetails(user, userDetails, scope)}
+                    hide={!canEditUser(user)}
                   />
                 ]
               : []
@@ -359,7 +331,12 @@ export const UserAudit = () => {
                   <Link
                     id="office-link"
                     onClick={() =>
-                      dispatch(goToTeamUserList(user.primaryOffice!.id))
+                      navigate({
+                        pathname: routes.TEAM_USER_LIST,
+                        search: stringify({
+                          locationId: user.primaryOffice.id
+                        })
+                      })
                     }
                   >
                     {user.primaryOffice && user.primaryOffice.displayLabel}
@@ -380,23 +357,24 @@ export const UserAudit = () => {
               <UserAuditHistory
                 practitionerId={user.practitionerId}
                 practitionerName={user.name}
-                loggedInUserRole={userDetails!.systemRole}
               />
             )}
           </>
-          <UserAuditActionModal
-            show={modalVisible}
-            user={data.getUser! as User}
-            onClose={() => toggleUserActivationModal()}
-            onConfirmRefetchQueries={[
-              {
-                query: GET_USER,
-                variables: {
-                  userId: userId
+          {data.getUser?.id ? (
+            <UserAuditActionModal
+              show={modalVisible}
+              userId={data.getUser?.id}
+              onClose={() => toggleUserActivationModal()}
+              onConfirmRefetchQueries={[
+                {
+                  query: GET_USER,
+                  variables: {
+                    userId: userId
+                  }
                 }
-              }
-            ]}
-          />
+              ]}
+            />
+          ) : null}
           <ResponsiveModal
             id="username-reminder-modal"
             show={toggleUsernameReminder}
@@ -418,7 +396,7 @@ export const UserAudit = () => {
                 id="username-reminder-send"
                 key="username-reminder-send"
                 onClick={() => {
-                  if (toggleUsernameReminder) {
+                  if (toggleUsernameReminder && userId) {
                     usernameReminder(userId)
                   }
                   toggleUsernameReminderModal()
@@ -457,7 +435,7 @@ export const UserAudit = () => {
                 id="reset-password-send"
                 key="reset-password-send"
                 onClick={() => {
-                  if (toggleResetPassword) {
+                  if (toggleResetPassword && userId) {
                     resetPassword(userId)
                   }
                   toggleUserResetPasswordModal()

@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ITextInputProps, IRef, TextInput } from '../TextInput/TextInput'
+import { ITextInputProps, TextInput } from '../TextInput/TextInput'
 
 export interface IProps {
   id: string
@@ -103,15 +103,15 @@ export function TimeField(props: ITimeFieldProps) {
     }
   }, [props.value])
 
-  const hh = React.useRef<IRef>(null)
-  const mm = React.useRef<IRef>(null)
+  const hh = React.useRef<HTMLInputElement>(null)
+  const mm = React.useRef<HTMLInputElement>(null)
 
   function change(event: React.ChangeEvent<HTMLInputElement>) {
     const val = event.target.value
     if (event.target.id.includes('hh')) {
       if (Number(val) < 0 || Number(val) > 23) return
       if (val.length === 2 && mm?.current !== null) {
-        mm.current.focusField()
+        mm.current.focus()
       }
       setState((state) => ({ ...state, hh: val }))
     } else if (event.target.id.includes('mm')) {

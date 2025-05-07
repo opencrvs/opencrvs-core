@@ -14,7 +14,7 @@ import { Client } from '@elastic/elasticsearch'
 import { SearchDocument } from '@opencrvs/commons/types'
 
 const ES_HOST = process.env.ES_HOST || 'localhost:9200'
-const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
+const ELASTICSEARCH_INDEX_NAME = process.env.ELASTICSEARCH_INDEX_NAME || 'ocrvs'
 
 export const client = new Client({
   node: `http://${ES_HOST}`

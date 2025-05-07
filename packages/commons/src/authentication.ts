@@ -10,76 +10,186 @@
  */
 
 import { IAuthHeader } from './http'
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
+import { Nominal } from './nominal'
+import { z } from 'zod'
 
-/** All the scopes user can be assigned to */
-export const userScopes = {
-  demo: 'demo',
-  declare: 'declare',
-  register: 'register',
-  certify: 'certify',
-  performance: 'performance',
-  systemAdmin: 'sysadmin',
-  validate: 'validate',
-  nationalSystemAdmin: 'natlsysadmin',
-  /** Bypasses the rate limiting in gateway. Useful for data seeder. */
-  bypassRateLimit: 'bypassratelimit',
-  teams: 'teams',
-  config: 'config'
-} as const
-
-export const userRoleScopes = {
-  FIELD_AGENT: [userScopes.declare],
-  REGISTRATION_AGENT: [
-    userScopes.validate,
-    userScopes.performance,
-    userScopes.certify
-  ],
-  LOCAL_REGISTRAR: [
-    userScopes.register,
-    userScopes.performance,
-    userScopes.certify
-  ],
-  LOCAL_SYSTEM_ADMIN: [userScopes.systemAdmin],
-  NATIONAL_SYSTEM_ADMIN: [
-    userScopes.systemAdmin,
-    userScopes.nationalSystemAdmin
-  ],
-  PERFORMANCE_MANAGEMENT: [userScopes.performance],
-  NATIONAL_REGISTRAR: [
-    userScopes.register,
-    userScopes.performance,
-    userScopes.certify,
-    userScopes.config,
-    userScopes.teams
-  ]
-}
+import { Scope, SCOPES } from './scopes'
+export { scopes, Scope, SCOPES } from './scopes'
 
 /** All the scopes system/integration can be assigned to */
-export const systemScopes = {
-  recordsearch: 'recordsearch',
-  declare: 'declare',
-  notificationApi: 'notification-api',
-  validatorApi: 'validator-api',
-  ageVerificationApi: 'age-verification-api',
-  webhook: 'webhook',
-  nationalId: 'nationalId'
+export const SYSTEM_INTEGRATION_SCOPES = {
+  recordsearch: SCOPES.RECORDSEARCH,
+  webhook: SCOPES.WEBHOOK,
+  nationalId: SCOPES.NATIONALID
 } as const
 
-export const systemRoleScopes = {
-  HEALTH: [systemScopes.declare, systemScopes.notificationApi],
-  NATIONAL_ID: [systemScopes.nationalId],
-  EXTERNAL_VALIDATION: [systemScopes.validatorApi],
-  AGE_CHECK: [systemScopes.declare, systemScopes.ageVerificationApi],
-  RECORD_SEARCH: [systemScopes.recordsearch],
-  WEBHOOK: [systemScopes.webhook]
-}
+export const DEFAULT_ROLES_DEFINITION = [
+  {
+    id: 'FIELD_AGENT',
+    label: {
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      id: 'userRole.fieldAgent'
+    },
+    scopes: [
+      // new scopes
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE
+    ]
+  },
+  {
+    id: 'REGISTRATION_AGENT',
+    label: {
+      defaultMessage: 'Registration Agent',
+      description: 'Name for user role Registration Agent',
+      id: 'userRole.registrationAgent'
+    },
+    scopes: [
+      SCOPES.PERFORMANCE,
+      SCOPES.CERTIFY,
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_DECLARATION_ARCHIVE,
+      SCOPES.RECORD_DECLARATION_REINSTATE,
+      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+      SCOPES.RECORD_REGISTRATION_PRINT,
+      SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+      SCOPES.RECORD_EXPORT_RECORDS,
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+      SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+      SCOPES.RECORD_CREATE_COMMENTS,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE
+    ]
+  },
+  {
+    id: 'LOCAL_REGISTRAR',
+    label: {
+      defaultMessage: 'Local Registrar',
+      description: 'Name for user role Local Registrar',
+      id: 'userRole.localRegistrar'
+    },
+    scopes: [
+      SCOPES.PERFORMANCE,
+      SCOPES.CERTIFY,
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_REVIEW_DUPLICATES,
+      SCOPES.RECORD_DECLARATION_ARCHIVE,
+      SCOPES.RECORD_DECLARATION_REINSTATE,
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_REGISTRATION_PRINT,
+      SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+      SCOPES.RECORD_EXPORT_RECORDS,
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+      SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+      SCOPES.RECORD_CREATE_COMMENTS,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE
+    ]
+  },
+  {
+    id: 'LOCAL_SYSTEM_ADMIN',
+    label: {
+      defaultMessage: 'Local System Admin',
+      description: 'Name for user role Local System Admin',
+      id: 'userRole.localSystemAdmin'
+    },
+    scopes: [
+      SCOPES.SYSADMIN,
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_CREATE_MY_JURISDICTION,
+      SCOPES.USER_UPDATE_MY_JURISDICTION,
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+      // 'organisation.read-users' ?
+    ]
+  },
+  {
+    id: 'NATIONAL_SYSTEM_ADMIN',
+    label: {
+      defaultMessage: 'National System Admin',
+      description: 'Name for user role National System Admin',
+      id: 'userRole.nationalSystemAdmin'
+    },
+    scopes: [
+      SCOPES.SYSADMIN,
+      SCOPES.NATLSYSADMIN,
+      SCOPES.USER_CREATE,
+      SCOPES.USER_READ,
+      SCOPES.USER_UPDATE,
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+      // 'organisation.read-users' ?
+    ]
+  },
+  {
+    id: 'PERFORMANCE_MANAGER',
+    label: {
+      defaultMessage: 'Performance Manager',
+      description: 'Name for user role Performance Manager',
+      id: 'userRole.performanceManager'
+    },
+    scopes: [
+      SCOPES.PERFORMANCE,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+    ]
+  }
+] satisfies Array<{
+  id: string
+  label: { defaultMessage: string; description: string; id: string }
+  scopes: Scope[]
+}>
 
-export type UserRole = keyof typeof userRoleScopes
-export type UserScope = (typeof userScopes)[keyof typeof userScopes]
-export type SystemRole = keyof typeof systemRoleScopes
-export type SystemScope = (typeof systemScopes)[keyof typeof systemScopes]
-export type Scope = UserScope | SystemScope
+export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
+  HEALTH: [SCOPES.NOTIFICATION_API],
+  NATIONAL_ID: [SCOPES.NATIONALID],
+  RECORD_SEARCH: [SCOPES.RECORDSEARCH],
+  WEBHOOK: [SCOPES.WEBHOOK]
+} satisfies Record<string, Scope[]>
+
+/*
+ * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
+ * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
+ */
+
+/** All the scopes user can be assigned to – old & new */
+export type UserScope =
+  | (typeof SCOPES)[keyof typeof SCOPES]
+  | 'profile.electronic-signature'
+
+export type SystemScope =
+  (typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES)[keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES][number]
 
 export interface ITokenPayload {
   sub: string
@@ -112,3 +222,14 @@ export const getTokenPayload = (token: string): ITokenPayload => {
   }
   return decoded
 }
+
+export const getUserId = (token: TokenWithBearer): string => {
+  const tokenPayload = getTokenPayload(token.split(' ')[1])
+  return tokenPayload.sub
+}
+
+export const TokenWithBearer = z
+  .string()
+  .regex(/^Bearer\s/) as z.ZodType<`Bearer ${string}`>
+export type TokenWithBearer = z.infer<typeof TokenWithBearer>
+export type Token = Nominal<string, 'TokenWithoutBearer'>

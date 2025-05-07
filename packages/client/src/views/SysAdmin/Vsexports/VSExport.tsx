@@ -8,31 +8,31 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import styled from 'styled-components'
-import { useIntl } from 'react-intl'
-import { BodyContent, Content } from '@opencrvs/components/lib/Content'
-import { messages } from '@client/i18n/messages/views/config'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
+import { Link } from '@client/../../components/lib'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Query } from '@client/components/Query'
-import { GET_TOTAL_VSEXPORT } from './queries'
+import { messages } from '@client/i18n/messages/views/config'
+import { EventType, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
 import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
-import { Link } from '@client/../../components/lib'
-import { chunk, sortBy } from 'lodash'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { BodyContent, Content } from '@opencrvs/components/lib/Content'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Toast } from '@opencrvs/components/lib/Toast'
+import { chunk, sortBy } from 'lodash'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import styled from 'styled-components'
+import { GET_TOTAL_VSEXPORT } from './queries'
 
 const DEFAULT_LIST_SIZE = 12
 
@@ -62,16 +62,16 @@ async function downloadURI(uri: string, name: string) {
 
 const VSExport = () => {
   const intl = useIntl()
-  const [activeTabId, setActiveTabId] = React.useState(Event.Birth)
+  const [activeTabId, setActiveTabId] = React.useState(EventType.Birth)
   const [documentDownloadError, setDocumentDownloadError] =
     React.useState(false)
   const tabSections = [
     {
-      id: Event.Birth,
+      id: EventType.Birth,
       title: intl.formatMessage(messages.birthTabTitleExport)
     },
     {
-      id: Event.Death,
+      id: EventType.Death,
       title: intl.formatMessage(messages.deathTabTitleExport)
     }
   ]
@@ -143,7 +143,7 @@ const VSExport = () => {
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
-            onPageChange={(page: any) => setCurrentPageNumber(page)}
+            onPageChange={(page: number) => setCurrentPageNumber(page)}
           />
         )}
       </>

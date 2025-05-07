@@ -24,7 +24,8 @@ export const office: SavedLocation = {
   status: 'active',
   mode: 'instance',
   partOf: {
-    reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+    reference:
+      'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb' as `Location/${UUID}`
   },
   type: {
     coding: [
@@ -67,7 +68,8 @@ export const district: SavedLocation = {
   status: 'active',
   mode: 'instance',
   partOf: {
-    reference: 'Location/ed6195ff-0f83-4852-832e-dc9db07151ff'
+    reference:
+      'Location/ed6195ff-0f83-4852-832e-dc9db07151ff' as `Location/${UUID}`
   },
   type: {
     coding: [
@@ -111,7 +113,7 @@ export const state: SavedLocation = {
   status: 'active',
   mode: 'instance',
   partOf: {
-    reference: 'Location/0'
+    reference: 'Location/0' as `Location/${UUID}`
   },
   type: {
     coding: [

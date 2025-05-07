@@ -12,6 +12,7 @@ import * as React from 'react'
 import * as Recharts from 'recharts'
 import { ITheme } from '../theme'
 import styled, { withTheme } from 'styled-components'
+import { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
 
 const {
   CartesianGrid,
@@ -33,14 +34,16 @@ const Container = styled.div`
   ${({ theme }) => theme.fonts.bold14};
 `
 
+export interface IDataPoint {
+  payload: { payload: { registrationPercentage: string } }[]
+}
+
 interface IProps {
   data: ILineDataPoint[]
   dataKeys: string[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mouseMoveHandler: (data: any) => void
+  mouseMoveHandler: CategoricalChartFunc
   mouseLeaveHandler: () => void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  tooltipContent: (dataPoint: any) => React.ReactNode
+  tooltipContent: (dataPoint: IDataPoint) => React.ReactNode
   legendContent: () => React.ReactNode
   theme: ITheme
   chartTop: number

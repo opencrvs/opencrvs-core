@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { storage } from '@client/storage'
-import { APPLICATION_VERSION, LANG_EN } from '@client/utils/constants'
 import { IUserData } from '@client/declarations'
-import React from 'react'
-import { GetSystemRolesQuery, Role } from '@client/utils/gateway'
+import { storage } from '@client/storage'
+import { APPLICATION_VERSION } from '@client/utils/constants'
+import { useEffect, useState } from 'react'
 
 export async function validateApplicationVersion() {
   const runningVer = localStorage.getItem('running-version')
@@ -35,28 +34,25 @@ export function isNavigatorOnline() {
   return navigator.onLine
 }
 
-export function useOnlineStatus() {
-  const [isOnline, setOnline] = React.useState(isNavigatorOnline())
-  const ONLINE_CHECK_INTERVAL = 500
-  React.useEffect(() => {
-    const intervalID = setInterval(
-      () => setOnline(isNavigatorOnline()),
-      ONLINE_CHECK_INTERVAL
-    )
+const ONLINE = 'online'
+const OFFLINE = 'offline'
 
-    return () => clearInterval(intervalID)
+export function useOnlineStatus() {
+  const [isOnline, setOnline] = useState(isNavigatorOnline())
+
+  useEffect(() => {
+    const handleConnectionChange = () => {
+      setOnline(isNavigatorOnline())
+    }
+
+    window.addEventListener(ONLINE, handleConnectionChange)
+    window.addEventListener(OFFLINE, handleConnectionChange)
+
+    return () => {
+      window.removeEventListener(ONLINE, handleConnectionChange)
+      window.removeEventListener(OFFLINE, handleConnectionChange)
+    }
   }, [])
+
   return isOnline
 }
-
-export function getUserRole(lang: string, role: Role) {
-  const defaultLabel = role?.labels?.find((label) => label.lang === LANG_EN)
-  const label = role?.labels?.find((label) => label.lang === lang)
-  return label?.label || defaultLabel?.label
-}
-
-export type RolesInput = (Omit<Role, '_id'> & { _id?: string })[]
-
-export type ISystemRole = NonNullable<
-  GetSystemRolesQuery['getSystemRoles']
->[number]

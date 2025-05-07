@@ -1,0 +1,334 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Deploy PR to feature environment
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number'
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ inputs.pr_number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate_stack_name_and_branch:
+    runs-on: ubuntu-22.04
+    outputs:
+      slugified_branch: ${{  steps.slugify_bname.outputs.stack  }}
+      branch_name: ${{  steps.set_branch_and_pr_number.outputs.BRANCH_NAME  }}
+      pr_number: ${{  steps.set_branch_and_pr_number.outputs.PR_NUMBER  }}
+      author: ${{  steps.get_author.outputs.AUTHOR  }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get branch name (when manually triggered)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
+          BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
+
+      - name: Get PR Information
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
+
+      - name: Check for "🚀 Ready to deploy" label
+        run: |
+          labels=$(gh pr view $PR_NUMBER --json labels --jq '.labels[].name')
+          if [[ "$labels" != *"🚀 Ready to deploy"* ]]; then
+            echo "Label '🚀 Ready to deploy' not found. Exiting."
+            exit 1
+          else
+            echo "Label '🚀 Ready to deploy' found. Continuing."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get PR Author
+        id: get_author
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
+          echo "PR is created by $AUTHOR"
+          echo "AUTHOR=$(echo $AUTHOR)" >> $GITHUB_ENV
+          echo "::set-output name=AUTHOR::$AUTHOR"
+
+      - name: Get Branch Name (on PR creation)
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        run: |
+          echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
+
+      - name: Set the branch name as output
+        id: set_branch_and_pr_number
+        run: |
+          echo "BRANCH_NAME=$(echo ${{  env.BRANCH_NAME  }})" >> $GITHUB_OUTPUT
+          echo "PR_NUMBER=$(echo ${{  env.PR_NUMBER  }})" >> $GITHUB_OUTPUT
+
+      - name: Slugify the branch name
+        id: slugify_bname
+        uses: actions/github-script@v7
+        with:
+          script: |
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .substr(0, 35)
+                .replace(/[^a-zA-Z0-9]+$/g, '');
+            }
+            core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
+
+  trigger-build:
+    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    needs: generate_stack_name_and_branch
+    uses: ./.github/workflows/build-images-from-branch.yml
+    with:
+      branch_name: ${{  needs.generate_stack_name_and_branch.outputs.branch_name  }}
+    secrets: inherit
+
+  trigger-e2e:
+    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    runs-on: ubuntu-22.04
+    needs: generate_stack_name_and_branch
+    environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
+    outputs:
+      run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
+      deployment_link: ${{ steps.print-links.outputs.deployment_link }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Parse the branch name and set it as environment variable
+        run: |
+          BRANCH_NAME=${{ needs.generate_stack_name_and_branch.outputs.branch_name }}
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+
+      - name: Get PR Information (when manually triggered)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
+          HEAD_COMMIT_HASH=$(echo "$PR_DATA" | jq -r '.headRefOid' | cut -c1-7)
+          echo "HEAD_COMMIT_HASH=${HEAD_COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Get Head Commit Hash (on PR creation)
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        id: vars
+        run: |
+          COMMIT_HASH=$(git rev-parse --short=7 ${{ github.event.pull_request.head.sha }})
+          echo "HEAD_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Check if branch exists in opencrvs-farajaland repo
+        run: |
+          FARAJALAND_REPO=https://github.com/opencrvs/opencrvs-farajaland
+          if git ls-remote --heads $FARAJALAND_REPO ${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
+            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
+          else
+            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/develop | cut -c1-7)
+          fi
+          echo "FARAJALAND_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Output Variables
+        run: |
+          echo "PR Branch: ${{ env.BRANCH_NAME }}"
+          echo "PR Head Commit Hash: ${{ env.HEAD_COMMIT_HASH }}"
+          echo "Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}"
+
+      - name: Parse the stack name
+        id: generate_stack
+        run: |
+          stack=${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
+          echo "stack=${stack}" >> $GITHUB_OUTPUT
+      - name: Trigger E2E Workflow
+        id: dispatch_e2e
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'opencrvs',
+              repo: 'e2e',
+              event_type: 'run_e2e',
+              client_payload: {
+                actor: '${{ needs.generate_stack_name_and_branch.outputs.author }}',
+                'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
+                'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
+                stack: '${{  steps.generate_stack.outputs.stack  }}'
+              }
+            });
+
+            console.log(result);
+            await new Promise(resolve => setTimeout(resolve, 10000));
+
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: 'opencrvs',
+              repo: 'e2e',
+              event: 'repository_dispatch',
+              per_page: 1
+            });
+
+            if (runs.data.workflow_runs.length > 0) {
+              const runId = runs.data.workflow_runs[0].id;
+              console.log(`Captured runId: ${runId}`);
+
+              // Set the runId as an output
+              core.setOutput('run_id', runId);
+            } else {
+              throw new Error('No workflow run found.');
+            }
+
+      - name: Print link to E2E workflow run
+        id: print-links
+        run: |
+          E2E_RUN_LINK="https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.run_id }}"
+          DEPLOYMENT_LINK="https://${{ steps.generate_stack.outputs.stack }}.opencrvs.dev"
+
+          echo "See your E2E deployment run details here: $E2E_RUN_LINK" >> $GITHUB_STEP_SUMMARY
+          echo "All deployments & E2E of this environment you can see here: https://github.com/opencrvs/e2e/deployments/${{ steps.generate_stack.outputs.stack }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "If everything goes alright, you should see your stack getting deployed here: $DEPLOYMENT_LINK" >> $GITHUB_STEP_SUMMARY
+
+          echo "deployment_link=$DEPLOYMENT_LINK" >> $GITHUB_OUTPUT
+
+  listen-e2e:
+    needs: [trigger-e2e, generate_stack_name_and_branch]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Wait for Environment Deployment (Deploy Job)
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const owner = 'opencrvs';
+            const repo = 'e2e';
+            const runId = ${{ needs.trigger-e2e.outputs.run_id }};
+            const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
+            const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
+
+            let deployJobCompleted = false;
+
+            // Check if deploy job has completed
+            while (!deployJobCompleted) {
+              const workflowRun = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+              const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+
+              const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / seed-data / seed-data');
+              const cancelled = jobs.data.jobs.find(job => job.conclusion === 'cancelled');
+
+              if (cancelled) {
+                throw new Error('E2E workflow was cancelled');
+              }
+
+              if (deployJob && deployJob.status === 'completed') {
+                deployJobCompleted = true;
+
+                if (deployJob.conclusion !== 'success') {
+                  throw new Error('Deploy job failed');
+                }
+
+                console.log('Deploy job completed successfully');
+              }
+
+              if(workflowRun.data.status === 'completed') {
+                deployJobCompleted = true;
+
+                if (workflowRun.data.conclusion !== 'success') {
+                  throw new Error('E2E workflow failed');
+                }
+              }
+
+              if (!deployJobCompleted) {
+                await new Promise(resolve => setTimeout(resolve, 10000));
+              }
+            }
+
+            // Check if the comment already exists
+            const comments = await github.rest.issues.listComments({
+              owner: 'opencrvs',
+              repo: 'opencrvs-core',
+              issue_number: prNumber
+            });
+
+            const existingComment = comments.data.find(comment => comment.body.includes(deployMessage));
+            if (!existingComment) {
+              // Add PR comment if it doesn't exist
+              await github.rest.issues.createComment({
+                owner: 'opencrvs',
+                repo: 'opencrvs-core',
+                issue_number: prNumber,
+                body: deployMessage
+              });
+              console.log('PR comment added');
+            } else {
+              console.log('PR comment already exists, skipping...');
+            }
+
+      - name: Wait for E2E Workflow Completion
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const owner = 'opencrvs';
+            const repo = 'e2e';
+            const runId = ${{ needs.trigger-e2e.outputs.run_id }};
+            let status = 'in_progress';
+
+            while (status === 'in_progress' || status === 'queued') {
+              const run = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+
+              status = run.data.status;
+              console.log(`Current status: ${status}`);
+
+              if (status === 'in_progress' || status === 'queued') {
+                await new Promise(resolve => setTimeout(resolve, 10000));
+              }
+            }
+
+            if (status === 'completed') {
+              const conclusion = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+              console.log(`Workflow finished with conclusion: ${conclusion.data.conclusion}`);
+              if (conclusion.data.conclusion !== 'success') {
+                throw new Error('E2E workflow failed');
+              }
+            }

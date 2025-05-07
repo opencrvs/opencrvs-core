@@ -84,18 +84,17 @@ import {
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
   Address,
-  findLastOfficeFromSavedBundle,
   findLastOfficeLocationFromSavedBundle,
   notCorrectedHistory,
   findResourceFromBundleById,
   getUserRoleFromHistory,
   SavedOffice
 } from '@opencrvs/commons/types'
-
+import { findAssignment } from '@opencrvs/commons/assignment'
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 
 import { Context } from '@gateway/graphql/context'
-import * as validateUUID from 'uuid-validate'
+import validateUUID from 'uuid-validate'
 import { fetchTaskByCompositionIdFromHearth } from '@gateway/features/fhir/service'
 import { TaskInput } from 'fhir/r3'
 
@@ -183,11 +182,8 @@ export const typeResolvers: GQLResolver = {
     middleName(name: fhir3.HumanName) {
       return name.given?.at(1) ?? ''
     },
-    familyName(name) {
-      if (!name.family) {
-        return null
-      }
-      return Array.isArray(name.family) ? name.family.join(' ') : name.family
+    familyName(name: fhir3.HumanName) {
+      return name.family
     },
     marriedLastName(name) {
       if (!name.suffix) {
@@ -449,8 +445,9 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
+      const record = context.dataSources.recordsAPI.getRecord()
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        record,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -464,8 +461,9 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
+      const record = context.dataSources.recordsAPI.getRecord()
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        record,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -483,8 +481,9 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
+      const record = context.dataSources.recordsAPI.getRecord()
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        record,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -508,8 +507,9 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
+
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -524,7 +524,7 @@ export const typeResolvers: GQLResolver = {
         return
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -539,7 +539,7 @@ export const typeResolvers: GQLResolver = {
         return
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -554,7 +554,7 @@ export const typeResolvers: GQLResolver = {
         return
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -577,7 +577,7 @@ export const typeResolvers: GQLResolver = {
         return
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const reasonNotApplyingExtension = findExtension(
@@ -604,7 +604,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -631,7 +631,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -654,7 +654,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -669,7 +669,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -684,7 +684,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -699,7 +699,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -742,7 +742,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -765,7 +765,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -845,27 +845,6 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async mosipAid(task: Task) {
-      const mosipAidType =
-        task &&
-        task.code &&
-        task.code.coding &&
-        task.code.coding[0] &&
-        task.code.coding[0].code
-
-      if (mosipAidType !== 'BIRTH') {
-        return null
-      }
-
-      const foundIdentifier =
-        task.identifier &&
-        task.identifier.find(
-          (identifier: Identifier) =>
-            identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/mosip-aid`
-        )
-
-      return (foundIdentifier && foundIdentifier.value) || null
-    },
     async attachments(task: Task, _, context) {
       if (!task.focus) {
         throw new Error(
@@ -873,7 +852,9 @@ export const typeResolvers: GQLResolver = {
         )
       }
 
-      const composition = getComposition(context.record!)
+      const composition = getComposition(
+        context.dataSources.recordsAPI.getRecord()
+      )
       const docSection = findCompositionSection(
         ATTACHMENT_DOCS_CODE,
         composition
@@ -886,7 +867,7 @@ export const typeResolvers: GQLResolver = {
       )
       return docRefReferences.map(async (docRefReference) =>
         getResourceFromBundleById(
-          context.record!,
+          context.dataSources.recordsAPI.getRecord(),
           resourceIdentifierToUUID(docRefReference)
         )
       )
@@ -895,14 +876,16 @@ export const typeResolvers: GQLResolver = {
       if (!task.focus) {
         return null
       }
-      const composition = getComposition(context.record!)
+      const composition = getComposition(
+        context.dataSources.recordsAPI.getRecord()
+      )
       const patientSection = findCompositionSection(INFORMANT_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
 
       const relatedPerson = getResourceFromBundleById<RelatedPerson>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(patientSection.entry[0].reference)
       )
 
@@ -921,13 +904,15 @@ export const typeResolvers: GQLResolver = {
       if (!task.focus) {
         return null
       }
-      const composition = getComposition(context.record!)
+      const composition = getComposition(
+        context.dataSources.recordsAPI.getRecord()
+      )
       const patientSection = findCompositionSection(INFORMANT_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
       const relatedPerson = getResourceFromBundleById<RelatedPerson>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(patientSection.entry[0].reference)
       )
 
@@ -1114,8 +1099,9 @@ export const typeResolvers: GQLResolver = {
       return (foundIdentifier && foundIdentifier.value) || null
     },
     status: async (task: Saved<Task>, _, context) => {
-      return context.record?.entry
-        .map(({ resource }) => resource)
+      return context.dataSources.recordsAPI
+        .fetchRecord()
+        ?.entry.map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
         .sort(sortDescending)
     },
@@ -1134,7 +1120,9 @@ export const typeResolvers: GQLResolver = {
         )
       }
 
-      const composition = getComposition(context.record!)
+      const composition = getComposition(
+        context.dataSources.recordsAPI.getRecord()
+      )
       const duplicateCompositionIds =
         composition.relatesTo &&
         composition.relatesTo.map((duplicate) => {
@@ -1173,25 +1161,17 @@ export const typeResolvers: GQLResolver = {
     },
     certificates: resolveCertificates,
     assignment: async (task, _, context) => {
-      const assignmentExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
-        task.extension
-      )
-      const office =
-        context.record && findLastOfficeFromSavedBundle(context.record)
+      const record = context.dataSources.recordsAPI.getRecord()
 
-      if (assignmentExtension && context.record) {
-        const regLastUserExtension = findExtension(
-          `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-          task.extension
-        )!
+      if (!record) {
+        return null
+      }
+      const assignment = findAssignment(record)
 
-        const practitionerId = resourceIdentifierToUUID(
-          regLastUserExtension.valueReference.reference
-        )
-
+      if (assignment) {
+        const practitionerId = assignment?.practitioner.id
         const user = findResourceFromBundleById<Practitioner>(
-          context.record,
+          record,
           practitionerId
         )!
 
@@ -1199,7 +1179,7 @@ export const typeResolvers: GQLResolver = {
           practitionerId: user.id,
           firstName: user.name[0].given?.join(' '),
           lastName: user.name[0].family,
-          officeName: office?.name || ''
+          officeName: assignment?.office.name || ''
         }
       }
 
@@ -1225,7 +1205,8 @@ export const typeResolvers: GQLResolver = {
     reason: (task: Task) => (task.reason && task.reason.text) || null,
     timestamp: (task) => task.lastModified,
     comments: (task) => task.note,
-    location: async (task, _, { dataSources, record }) => {
+    location: async (task, _, context) => {
+      const record = context.dataSources.recordsAPI.fetchRecord()
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension as Extension[]
@@ -1324,7 +1305,8 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Certificate: {
-    async collector(docRef: DocumentReference, _, context) {
+    async collector(parent: { docRef: DocumentReference }, _, context) {
+      const { docRef } = parent
       const relatedPersonRef =
         docRef.extension &&
         findExtension(
@@ -1336,13 +1318,14 @@ export const typeResolvers: GQLResolver = {
       }
 
       return getResourceFromBundleById<RelatedPerson>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(
           relatedPersonRef.valueReference.reference as ResourceIdentifier
         )
       )
     },
-    async hasShowedVerifiedDocument(docRef: DocumentReference, _) {
+    async hasShowedVerifiedDocument(parent: { docRef: DocumentReference }, _) {
+      const { docRef } = parent
       const hasShowedDocument = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
         docRef.extension as Extension[]
@@ -1357,6 +1340,65 @@ export const typeResolvers: GQLResolver = {
       }
 
       return false
+    },
+    async certifier(
+      parent: { docRef: DocumentReference; task: Saved<Task> },
+      _,
+      context
+    ) {
+      const { docRef, task } = parent
+      const practitionerRef =
+        docRef.extension &&
+        findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/certifier`,
+          docRef.extension
+        )
+
+      if (!practitionerRef) return null
+
+      const practitionerId = resourceIdentifierToUUID(
+        practitionerRef.valueReference.reference as ResourceIdentifier
+      )
+      const practitionerRoleBundle =
+        await context.dataSources.fhirAPI.getPractitionerRoleByPractitionerId(
+          practitionerId
+        )
+
+      const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
+
+      const practitionerRoleHistory =
+        await context.dataSources.fhirAPI.getPractionerRoleHistory(
+          practitionerRoleId
+        )
+      const result = practitionerRoleHistory.find(
+        (it) =>
+          it?.meta?.lastUpdated &&
+          task.lastModified &&
+          it?.meta?.lastUpdated <= task.lastModified!
+      )
+
+      const targetCode = result?.code?.find((element) => {
+        return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
+      })
+
+      const roleId = targetCode?.coding?.[0].code
+      const userResponse =
+        await context.dataSources.usersAPI.getUserByPractitionerId(
+          practitionerId
+        )
+
+      const allRoles = await context.dataSources.countryConfigAPI.getRoles()
+      const role = allRoles.find((role) => role.id === roleId)?.id
+
+      return { ...userResponse, role }
+    },
+    certificateTemplateId(parent: { docRef: DocumentReference }, _) {
+      const docRef = parent.docRef
+      const certificateTemplateId = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/certificateTemplateId`,
+        docRef.extension as Extension[]
+      )
+      return certificateTemplateId?.valueString
     }
   },
   Identifier: {
@@ -1396,7 +1438,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       const practitioner = getResourceFromBundleById<Practitioner>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(
           encounterParticipant.individual.reference as ResourceIdentifier
         )
@@ -1420,7 +1462,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       const practitioner = getResourceFromBundleById<Practitioner>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(encounterParticipant.individual.reference)
       )
       return (
@@ -1461,9 +1503,9 @@ export const typeResolvers: GQLResolver = {
       if (!encounter) {
         return []
       }
-
-      return context
-        .record!.entry.map((entry) => entry.resource)
+      const record = context.dataSources.recordsAPI.getRecord()
+      return record.entry
+        .map((entry) => entry.resource)
         .filter(isDocumentReference)
         .filter((x) => x.subject?.reference === encounter)
     },
@@ -1483,7 +1525,7 @@ export const typeResolvers: GQLResolver = {
       const paymentId = paymentReference.split('/')[1]
       const paymentReconciliation =
         getResourceFromBundleById<PaymentReconciliation>(
-          context.record!,
+          context.dataSources.recordsAPI.getRecord(),
           paymentId
         )
 
@@ -1492,9 +1534,9 @@ export const typeResolvers: GQLResolver = {
           'PaymentReconciliation resource not found even when task has payment extension. This should never happen'
         )
       }
-
-      const documentReference = context
-        .record!.entry.map((entry) => entry.resource)
+      const record = context.dataSources.recordsAPI.getRecord()
+      const documentReference = record.entry
+        .map((entry) => entry.resource)
         .filter(isDocumentReference)
         .filter(
           (x) => x.subject?.reference === `PaymentReconciliation/${paymentId}`
@@ -1522,7 +1564,6 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
         task.extension as Extension[]
       )
-
       if (hasShowedDocument?.valueString) {
         return Boolean(hasShowedDocument?.valueString)
       }
@@ -1533,7 +1574,13 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
-
+    certificateTemplateId: (task: Task) => {
+      const certificateTemplateId = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/certificateTemplateId`,
+        task.extension as Extension[]
+      )
+      return certificateTemplateId?.valueString
+    },
     noSupportingDocumentationRequired: (task: Task) => {
       const hasShowedDocument = findExtension(
         NO_SUPPORTING_DOCUMENTATION_REQUIRED,
@@ -1613,27 +1660,18 @@ export const typeResolvers: GQLResolver = {
       const practitionerRoleHistory =
         await dataSources.fhirAPI.getPractionerRoleHistory(practitionerRoleId)
 
+      const roleId = getUserRoleFromHistory(
+        practitionerRoleHistory,
+        task.lastModified
+      )
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
         resourceIdentifierToUUID(user.valueReference.reference)
       )
 
-      const { role, systemRole } = getUserRoleFromHistory(
-        practitionerRoleHistory,
-        task.lastModified
-      )
+      const allRoles = await dataSources.countryConfigAPI.getRoles()
+      const role = allRoles.find((role) => role.id === roleId)?.id
 
-      if (role && systemRole) {
-        return {
-          ...userResponse,
-          role: {
-            ...userResponse.role,
-            labels: JSON.parse(role)
-          },
-          systemRole
-        }
-      }
-
-      return userResponse
+      return { ...userResponse, role }
     },
     system: async (task: Task, _: any) => {
       const systemIdentifier = task.identifier?.find(
@@ -1645,7 +1683,8 @@ export const typeResolvers: GQLResolver = {
       }
       return JSON.parse(systemIdentifier.value)
     },
-    location: async (task: Task, _: any, { record }) => {
+    location: async (task: Task, _: any, context) => {
+      const record = context.dataSources.recordsAPI.fetchRecord()
       const officeExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension
@@ -1682,7 +1721,11 @@ export const typeResolvers: GQLResolver = {
     input: (task) => task.input || [],
     output: (task) => task.output || [],
     certificates: resolveCertificates,
-    signature: async (task: Task, _: any, context) => {
+    signature: async (
+      task: Task,
+      _: any,
+      { headers: authHeader, ...context }
+    ) => {
       const action = getActionFromTask(task)
       const status = getStatusFromTask(task)
       if (
@@ -1706,18 +1749,23 @@ export const typeResolvers: GQLResolver = {
         user.valueReference.reference
       )
       const practitioner = getResourceFromBundleById<Practitioner>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         practitionerId
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
-      const signature = signatureExtension && signatureExtension.valueSignature
-      return (
-        signature && {
-          type: signature.contentType,
-          data: signature.blob
-        }
-      )
+      const presignedUrl =
+        signatureExtension &&
+        getPresignedUrlFromUri(
+          signatureExtension.valueAttachment.url,
+          authHeader
+        )
+      if (!presignedUrl) return null
+
+      return {
+        type: signatureExtension.valueAttachment.contentType,
+        data: presignedUrl
+      }
     },
     duplicateOf: (task: Task) => {
       const extensions = task.extension || []
@@ -2234,8 +2282,11 @@ async function resolveCertificates(
       return null
     }
 
-    return dataSources.fhirAPI.getDocumentReference(
-      resourceIdentifierToUUID(certSection.entry[0].reference)
-    )
+    return {
+      task,
+      docRef: dataSources.fhirAPI.getDocumentReference(
+        resourceIdentifierToUUID(certSection.entry[0].reference)
+      )
+    }
   })
 }
