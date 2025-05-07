@@ -214,7 +214,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Add description', async () => {
-      const modal = within(canvas.getByRole('dialog'))
+      const modal = within(await canvas.findByRole('dialog'))
 
       await waitFor(async () =>
         expect(modal.getByRole('textbox')).toBeInTheDocument()
@@ -236,7 +236,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Mark as a duplicate', async () => {
-      const modal = within(canvas.getByRole('dialog'))
+      const modal = within(await canvas.findByRole('dialog'))
 
       await waitFor(async () =>
         expect(
@@ -251,7 +251,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Archive is not disabled (after duplicate)', async () => {
-      const modal = within(canvas.getByRole('dialog'))
+      const modal = within(await canvas.findByRole('dialog'))
 
       await waitFor(async () => {
         const archiveButton = modal.getByRole('button', { name: 'Archive' })
