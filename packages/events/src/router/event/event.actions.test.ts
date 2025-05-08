@@ -12,6 +12,8 @@
 import {
   ActionType,
   AddressType,
+  EventIndex,
+  EventStatus,
   getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
@@ -176,8 +178,16 @@ test('Action data accepts partial changes', async () => {
   expect(events).toEqual([
     expect.objectContaining({
       ...stateAfterVillageRemoval,
-      updatedAt: expect.any(String)
-    })
+      legalStatuses: {
+        [EventStatus.DECLARED]: {
+          createdAt: stateAfterVillageRemoval.updatedAt,
+          createdAtLocation:
+            stateAfterVillageRemoval.updatedAtLocation as string,
+          createdBy: stateAfterVillageRemoval.updatedBy as string
+        }
+      },
+      updatedAt: stateAfterVillageRemoval.updatedAt
+    } satisfies EventIndex)
   ])
 })
 

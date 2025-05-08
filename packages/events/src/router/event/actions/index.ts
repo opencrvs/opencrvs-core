@@ -199,8 +199,7 @@ export function getDefaultActionProcedures(
             eventId,
             createdBy: user.id,
             createdByRole: user.role,
-            // updatedAtLocation is set to the office of the user who created the action
-            updatedAtLocation: user.primaryOfficeId,
+            createdAtLocation: user.primaryOfficeId,
             token,
             transactionId,
             status
@@ -249,7 +248,7 @@ export function getDefaultActionProcedures(
             eventId,
             createdBy: user.id,
             createdByRole: user.role,
-            updatedAtLocation: user.primaryOfficeId,
+            createdAtLocation: user.primaryOfficeId,
             token,
             transactionId,
             status: ActionStatus.Accepted
@@ -293,7 +292,7 @@ export function getDefaultActionProcedures(
           ...input,
           originalActionId: actionId,
           type: actionType,
-          updatedAtLocation: ctx.user.primaryOfficeId
+          createdAtLocation: ctx.user.primaryOfficeId
         })
       })
   }

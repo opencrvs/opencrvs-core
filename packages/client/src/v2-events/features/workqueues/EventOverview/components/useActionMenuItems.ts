@@ -52,6 +52,7 @@ function getAssignmentActions(
 /**
  * Actions that can be performed on an event based on its status and user scope.
  */
+
 function getUserActionsByStatus(
   status: EventStatus,
   assignmentActions: ActionType[],

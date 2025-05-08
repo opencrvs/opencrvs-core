@@ -70,7 +70,6 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      updatedAtLocation: uuid(),
       actions: [
         {
           type: ActionType.CREATE,

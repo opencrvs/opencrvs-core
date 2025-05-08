@@ -175,6 +175,35 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
     (a): a is ActionDocument => a.status === ActionStatus.Accepted
   )
 }
+
+function getLegalStatuses(acceptedActions: ActionDocument[]) {
+  const declared = acceptedActions.find(
+    (action) => action.type === ActionType.DECLARE
+  )
+
+  const registered = acceptedActions.find(
+    (action) => action.type === ActionType.REGISTER
+  )
+
+  return {
+    [EventStatus.DECLARED]: declared
+      ? {
+          createdAt: declared.createdAt,
+          createdBy: declared.createdBy,
+          createdAtLocation: declared.createdAtLocation
+        }
+      : null,
+    [EventStatus.REGISTERED]: registered
+      ? {
+          createdAt: registered.createdAt,
+          createdBy: registered.createdBy,
+          createdAtLocation: registered.createdAtLocation,
+          registrationNumber: registered.registrationNumber
+        }
+      : null
+  }
+}
+
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -184,17 +213,18 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const activeActions = getAcceptedActions(event)
-  const latestAction = activeActions[activeActions.length - 1]
+  const acceptedActions = getAcceptedActions(event)
+  const latestAcceptedAction = acceptedActions[acceptedActions.length - 1]
+  const latestAction = event.actions[event.actions.length - 1]
 
-  const registrationAction = activeActions.find(
+  const registrationAction = acceptedActions.find(
     (a): a is RegisterAction =>
       a.type === ActionType.REGISTER && a.status === ActionStatus.Accepted
   )
 
   const registrationNumber = registrationAction?.registrationNumber ?? null
 
-  const declaration = aggregateActionDeclarations(activeActions)
+  const declaration = aggregateActionDeclarations(acceptedActions)
 
   let dateOfEvent: string | null = event.createdAt.split('T')[0]
 
@@ -207,16 +237,18 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     id: event.id,
     type: event.type,
     status: getStatusFromActions(event.actions),
-    createdAt: event.createdAt,
+    legalStatuses: getLegalStatuses(acceptedActions),
+    createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
-    createdAtLocation: creationAction.createdAtLocation ?? '', // @todo remove using empty string
+    createdAtLocation: creationAction.createdAtLocation,
     updatedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(activeActions),
+    assignedTo: getAssignedUserFromActions(acceptedActions),
     updatedBy: latestAction.createdBy,
-    updatedAtLocation: event.updatedAtLocation,
+    updatedAtLocation: latestAction.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
     registrationNumber,
+    // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole
     updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
     dateOfEvent
   })

@@ -177,7 +177,8 @@ export async function createIndex(
             properties: formFieldsToDataMapping(formFields)
           },
           trackingId: { type: 'keyword' },
-          registrationNumber: { type: 'keyword' }
+          // @todo:
+          legalStatuses: {}
         } satisfies EventIndexMapping
       }
     }

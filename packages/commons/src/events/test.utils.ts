@@ -153,8 +153,7 @@ export const eventPayloadGenerator = {
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdByRole: '@todo',
-          createdAtLocation: '@todo',
-          updatedAtLocation: '@todo'
+          createdAtLocation: '@todo'
         }
       } satisfies Draft,
       input
@@ -422,7 +421,6 @@ export function generateActionDocument({
     createdByRole: 'FIELD_AGENT',
     id: getUUID(),
     createdAtLocation: 'TODO',
-    updatedAtLocation: 'TODO',
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
     ...defaults,
@@ -492,8 +490,7 @@ export function generateEventDocument({
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     updatedAt: new Date(Date.now() - 1000).toISOString(),
-    dateOfEvent: configuration.dateOfEvent,
-    updatedAtLocation: getUUID()
+    dateOfEvent: configuration.dateOfEvent
   }
 }
 
@@ -541,6 +538,7 @@ export const eventQueryDataGenerator = (
     'applicant.surname': 'Doe',
     'applicant.dob': '1999-11-11'
   },
+  legalStatuses: overrides.legalStatuses ?? {},
   trackingId: overrides.trackingId ?? 'M3F8YQ'
 })
 

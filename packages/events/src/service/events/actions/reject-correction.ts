@@ -23,13 +23,13 @@ export async function rejectCorrection(
     createdBy,
     createdByRole,
     token,
-    updatedAtLocation,
+    createdAtLocation,
     transactionId
   }: {
     eventId: string
     createdBy: string
     createdByRole: string
-    updatedAtLocation: string
+    createdAtLocation: string
     token: string
     transactionId: string
   }
@@ -49,7 +49,7 @@ export async function rejectCorrection(
     createdBy,
     createdByRole,
     token,
-    updatedAtLocation,
+    createdAtLocation,
     transactionId,
     status: ActionStatus.Accepted
   })

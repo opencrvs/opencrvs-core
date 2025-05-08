@@ -83,6 +83,7 @@ export const usePrintableCertificate = ({
   if (!language || !certificateConfig) {
     return { svgCode: null }
   }
+
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
@@ -120,12 +121,12 @@ export const usePrintableCertificate = ({
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
+      language: language,
+      config,
       $state: currentEventState,
       $declaration: base64ReplacedTemplate,
       locations,
-      users: base64ReplacedUsersWithSignature,
-      language,
-      config
+      users: base64ReplacedUsersWithSignature
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)

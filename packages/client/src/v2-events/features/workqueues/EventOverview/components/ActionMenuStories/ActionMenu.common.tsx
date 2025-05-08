@@ -136,7 +136,6 @@ function getMockEvent(
     createdAt: '2025-04-18T08:34:20.711Z',
     updatedAt: '2025-04-18T10:40:59.442Z',
     trackingId: '75HT9J',
-    updatedAtLocation: '03c4aab4-cd46-4fb1-b30d-2e3b7ba0bfe8',
     actions: actions
       .filter((action) => Object.keys(mockActions).includes(action))
       .map((action) => {

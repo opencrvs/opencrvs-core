@@ -41,8 +41,7 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string().optional(),
-  updatedAtLocation: z.string().optional(),
+  createdAtLocation: z.string(),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
@@ -177,10 +176,7 @@ export type ActionDocument = z.infer<typeof ActionDocument>
 
 export const AsyncRejectActionDocument = ActionBase.omit({
   declaration: true,
-  annotation: true,
-  createdBy: true,
-  createdByRole: true,
-  createdAtLocation: true
+  annotation: true
 }).merge(
   z.object({
     type: z.enum(ConfirmableActions),
