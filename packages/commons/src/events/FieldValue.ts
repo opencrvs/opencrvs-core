@@ -37,10 +37,20 @@ import {
 export const TextValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
 
-export const DateValue = z
+export const DateSingleValue = z
   .string()
   .date()
   .describe('Date in the format YYYY-MM-DD')
+
+export const DateRangeValue = z
+  .object({
+    rangeStart: DateSingleValue,
+    rangeEnd: DateSingleValue
+  })
+  .describe(
+    'Date Range in the format {rangeStart: "YYYY-MM-DD", rangeEnd: "YYYY-MM-DD"}'
+  )
+export const DateValue = DateSingleValue.or(DateRangeValue)
 
 export const EmailValue = z.string().email()
 
@@ -53,7 +63,7 @@ export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export const FieldValue = z.union([
   TextValue,
-  DateValue,
+  DateSingleValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
@@ -99,6 +109,7 @@ export type FieldValueSchema =
  * FieldValueInputSchema uses Input types which have set optional values as nullish
  * */
 export type FieldUpdateValueSchema =
+  | typeof DateValue
   | typeof FileFieldValue
   | typeof FileFieldWithOptionValue
   | typeof CheckboxFieldValue

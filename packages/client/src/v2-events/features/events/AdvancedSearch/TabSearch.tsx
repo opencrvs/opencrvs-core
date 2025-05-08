@@ -59,7 +59,7 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
-function enhanceFieldWithSearchKind(
+function enhanceFieldWithSearchFieldConfig(
   field: Inferred,
   searchField: SearchField
 ): Inferred {
@@ -73,6 +73,27 @@ function enhanceFieldWithSearchKind(
 
     default:
       return field
+  }
+}
+
+function enhanceEventFieldsWithSearchFieldConfig(
+  event: EventConfig,
+  searchFieldConfigMap: Map<string, SearchField>
+) {
+  return {
+    ...event,
+    declaration: {
+      ...event.declaration,
+      pages: event.declaration.pages.map((page) => ({
+        ...page,
+        fields: page.fields.map((field) => {
+          const searchField = searchFieldConfigMap.get(field.id)
+          return searchField
+            ? enhanceFieldWithSearchFieldConfig(field, searchField)
+            : field
+        })
+      }))
+    }
   }
 }
 
@@ -90,16 +111,10 @@ function getSectionFields(
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
-
-    const fieldConfigMap = new Map(section.fields.map((f) => [f.fieldId, f]))
-
     const advancedSearchFields: Inferred[] = allUniqueFields.reduce(
       (acc: Inferred[], field: Inferred) => {
         if (advancedSearchFieldId.includes(field.id)) {
-          const searchField = fieldConfigMap.get(field.id)
-          acc.push(
-            searchField ? enhanceFieldWithSearchKind(field, searchField) : field
-          )
+          acc.push(field)
         }
         return acc
       },
@@ -155,6 +170,11 @@ export function TabSearch({
   const navigate = useNavigate()
 
   const prevEventId = React.useRef(currentEvent.id)
+  const searchFieldConfigMap = new Map(
+    currentEvent.advancedSearch.flatMap((x) =>
+      x.fields.map((f) => [f.fieldId, f])
+    )
+  )
 
   React.useEffect(() => {
     // only reset formValues if another event search tab is selected
@@ -164,6 +184,11 @@ export function TabSearch({
     }
   }, [currentEvent])
 
+  const modifiedCurrentEvent = enhanceEventFieldsWithSearchFieldConfig(
+    currentEvent,
+    searchFieldConfigMap
+  )
+
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
     setFormValues((prev) => ({
       ...prev,
@@ -172,11 +197,11 @@ export function TabSearch({
   }
 
   const advancedSearchFieldErrors = flattenFieldErrors(
-    getAdvancedSearchFieldErrors(currentEvent, formValues)
+    getAdvancedSearchFieldErrors(modifiedCurrentEvent, formValues)
   )
 
   const SectionFields = getSectionFields(
-    currentEvent,
+    modifiedCurrentEvent,
     formValues,
     handleFieldChange,
     intl,
@@ -186,7 +211,7 @@ export function TabSearch({
   const handleSearch = () => {
     const searchParams = stringify(filterEmptyValues(formValues))
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
-      eventType: currentEvent.id
+      eventType: modifiedCurrentEvent.id
     })
 
     navigate(`${navigateTo}?${searchParams.toString()}`)
