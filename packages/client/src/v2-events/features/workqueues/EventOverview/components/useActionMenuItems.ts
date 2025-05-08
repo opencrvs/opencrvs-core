@@ -234,6 +234,7 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
         deleteEvent({
           eventId
         })
+        navigate(ROUTES.V2.buildPath({}))
       }
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
