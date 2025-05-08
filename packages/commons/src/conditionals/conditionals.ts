@@ -452,6 +452,7 @@ export function createFieldConditionals(fieldId: string) {
           }
         },
         required: [fieldId]
-      })
+      }),
+    getId: () => ({ fieldId })
   }
 }

@@ -12,7 +12,8 @@ import { z } from 'zod'
 
 export const EventInput = z.object({
   transactionId: z.string(),
-  type: z.string()
+  type: z.string(),
+  dateOfEvent: z.object({ fieldId: z.string() }).optional()
 })
 
 export type EventInput = z.infer<typeof EventInput>

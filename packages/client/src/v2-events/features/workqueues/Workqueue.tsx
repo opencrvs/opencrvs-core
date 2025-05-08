@@ -178,10 +178,17 @@ function Workqueue({
 
       const titleColumnId = workqueueConfig.columns[0].id
 
-      const title = flattenedIntl.formatMessage(
-        eventConfig.summary.title.label,
+      const formattedTitle = flattenedIntl.formatMessage(
+        eventConfig.title,
         flattenEventIndex(event)
       )
+
+      const fallbackTitle = eventConfig.fallbackTitle
+        ? intl.formatMessage(eventConfig.fallbackTitle)
+        : null
+
+      const useFallbackTitle = formattedTitle.trim() === ''
+      const title = useFallbackTitle ? fallbackTitle : formattedTitle
 
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
@@ -214,6 +221,7 @@ function Workqueue({
           TitleColumn
         ) : (
           <TextButton
+            color={useFallbackTitle ? 'red' : 'primary'}
             onClick={() => {
               return navigate(
                 ROUTES.V2.EVENTS.OVERVIEW.buildPath({
@@ -269,6 +277,7 @@ function Workqueue({
         isSorted: sortedCol === column.id
       })
     )
+
     const allColumns = configuredColumns.concat(getDefaultColumns())
 
     if (width > theme.grid.breakpoints.lg) {
@@ -281,6 +290,7 @@ function Workqueue({
   const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
 
   const isShowPagination = totalPages >= 1
+
   return (
     <WQContentWrapper
       error={false}
