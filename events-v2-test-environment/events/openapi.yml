@@ -76,6 +76,24 @@ components:
             - id
             - defaultMessage
             - description
+        fallbackTitle:
+          type: object
+          properties:
+            id:
+              type: string
+              description: The identifier of the translation referred in translation CSV files
+            defaultMessage:
+              type: string
+              description: Default translation message
+            description:
+              type: string
+              description: Describe the translation for a translator to be able to identify
+                it.
+          required:
+            - id
+            - defaultMessage
+            - description
+          description: This is a fallback title if actual title resolves to empty string
         summary:
           type: object
           properties:
@@ -3923,6 +3941,7 @@ components:
                                 - FUZZY
                                 - EXACT
                                 - RANGE
+                                - ANY_OF
                               description: Determines the type of field
                           required:
                             - type
