@@ -209,8 +209,8 @@ export const DraftShownInForm: Story = {
     await userEvent.click(await canvas.findByText(/Declare/))
 
     await expect(
-      await canvas.findByTestId('text__applicant____surname')
-    ).toHaveValue('Draft')
+      (await canvas.findByTestId('row-value-applicant.surname')).textContent
+    ).toBe('Draft')
   }
 }
 

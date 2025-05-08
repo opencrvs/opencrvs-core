@@ -16,7 +16,8 @@ import {
   FieldValue,
   QueryInputType,
   SearchField,
-  EventFieldId
+  EventFieldId,
+  MatchType
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
@@ -57,8 +58,7 @@ export const flattenFieldErrors = (fieldErrors: Errors) =>
   Object.values(fieldErrors).flatMap((errObj) => errObj.errors)
 
 const defaultSearchFieldGenerator: Record<
-  // this should be strictly typed, not just any string
-  string,
+  EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
   [EventFieldId.enum.trackingId]: (_) => ({
@@ -82,19 +82,21 @@ const defaultSearchFieldGenerator: Record<
   })
 }
 
+function isEventFieldId(id: string): id is EventFieldId {
+  return Object.values(EventFieldId.enum).includes(id as EventFieldId)
+}
+
 export const getDefaultSearchFields = (
   section: AdvancedSearchConfig
 ): FieldConfig[] => {
   const searchFields: FieldConfig[] = []
-
   section.fields.forEach((fieldConfig) => {
-    const generator = defaultSearchFieldGenerator[fieldConfig.fieldId]
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (generator) {
+    const fieldId = fieldConfig.fieldId
+    if (isEventFieldId(fieldId)) {
+      const generator = defaultSearchFieldGenerator[fieldId]
       searchFields.push(generator(fieldConfig))
     }
   })
-
   return searchFields
 }
 
@@ -121,7 +123,7 @@ type Condition =
 
 export const ADVANCED_SEARCH_KEY = 'and'
 
-function buildCondition(type: string, value: string): Condition {
+function buildCondition(type: MatchType, value: string): Condition {
   switch (type) {
     case 'FUZZY':
       return { type: 'fuzzy', term: value }
@@ -145,7 +147,7 @@ function buildDataConditionFromSearchKeys(
   searchKeys: {
     fieldId: string
     config?: {
-      type: 'FUZZY' | 'EXACT' | 'RANGE'
+      type: MatchType
     }
     fieldType: 'field' | 'event'
   }[],
