@@ -103,6 +103,20 @@ components:
             - id
             - defaultMessage
             - description
+        fallbackTitle:
+          type: object
+          properties:
+            id:
+              type: string
+            defaultMessage:
+              type: string
+            description:
+              type: string
+          required:
+            - id
+            - defaultMessage
+            - description
+          description: This is a fallback title if actual title resolves to empty string
         summary:
           type: object
           properties:
@@ -3220,6 +3234,7 @@ components:
                                 - FUZZY
                                 - EXACT
                                 - RANGE
+                                - ANY_OF
                               description: Determines the type of field
                           required:
                             - type
