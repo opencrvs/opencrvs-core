@@ -315,11 +315,6 @@ jobs:
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
 
-      - name: Fetch full Git history
-        run: git fetch --prune --unshallow
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run Chromatic
         run: yarn run chromatic
         working-directory: packages/client
