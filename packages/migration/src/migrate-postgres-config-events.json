@@ -1,0 +1,7 @@
+{
+  "url": "postgres://events_user:password@localhost:5432/events",
+  "schema": "secure",
+  "migration-file-language": "sql",
+  "migrations-dir": "src/migrations/events",
+  "template-file-name": "../../node_modules/node-pg-migrate/templates/migration-template.sql"
+}
