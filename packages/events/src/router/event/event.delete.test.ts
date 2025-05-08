@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, DraftInput, SCOPES } from '@opencrvs/commons'
+import { ActionStatus, ActionType, DraftInput, SCOPES } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
@@ -130,7 +130,8 @@ describe('check unreferenced draft attachments are deleted while final action su
           }
         },
         transactionId: `transactionId-${n}`,
-        eventId: event.id
+        eventId: event.id,
+        status: ActionStatus.Requested
       }
     }
     const getDeclaration = (n: number) => {

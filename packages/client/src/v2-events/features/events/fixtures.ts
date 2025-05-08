@@ -29,6 +29,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   assignedTo: null,
   updatedBy: 'system',
   updatedByUserRole: 'system',
+  flags: [],
   declaration: {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',

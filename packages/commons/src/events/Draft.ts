@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod'
-import { ActionBase } from './ActionDocument'
+import { ActionBase, ActionStatus } from './ActionDocument'
 import { BaseActionInput } from './ActionInput'
 import { ActionTypes } from './ActionType'
 
@@ -30,7 +30,12 @@ export const Draft = z.object({
 })
 
 export const DraftInput = BaseActionInput.extend({
-  type: ActionTypes
+  type: ActionTypes,
+  status: z.enum([
+    ActionStatus.Requested,
+    ActionStatus.Accepted,
+    ActionStatus.Rejected
+  ])
 })
 
 export type Draft = z.infer<typeof Draft>

@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionStatus, ActionType, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
@@ -108,7 +108,8 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
       }
     },
     transactionId: 'transactionId',
-    eventId: originalEvent.id
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)
@@ -146,7 +147,8 @@ test(`${ActionType.UNASSIGN} is idempotent`, async () => {
       }
     },
     transactionId: 'transactionId',
-    eventId: originalEvent.id
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)
