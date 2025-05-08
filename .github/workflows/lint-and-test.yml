@@ -320,7 +320,7 @@ jobs:
           git clone --bare https://github.com/opencrvs/opencrvs-core.git .git
           git config --local --bool core.bare false
           git reset --hard
-          git fetch --prune --unshallow
+          git fetch --prune
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
