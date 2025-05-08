@@ -173,9 +173,20 @@ function DeclarationActionComponent({ children, actionType }: Props) {
       return {}
     }
 
-    return getActionAnnotation({
+    const prevActionAnnotation = getActionAnnotation({
       event,
       actionType: previousActionType
+    })
+
+    // If we found annotation data from the previous action, use that.
+    if (Object.keys(prevActionAnnotation).length) {
+      return prevActionAnnotation
+    }
+
+    // As a fallback, lets see if there is a notify action annotation and use that.
+    return getActionAnnotation({
+      event,
+      actionType: ActionType.NOTIFY
     })
   }, [event, actionType])
 
