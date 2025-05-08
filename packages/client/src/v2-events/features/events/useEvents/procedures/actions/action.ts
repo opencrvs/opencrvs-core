@@ -267,8 +267,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       throw new Error('Event configuration not found')
     }
 
-    const actionConfiguration = eventConfiguration.actions.find(
-      (action) => action.type === actionType
+    // Let's find the action configuration. For NOTIFY action, we can use the DECLARE action configuration.
+    const actionConfiguration = eventConfiguration.actions.find((action) =>
+      actionType === ActionType.NOTIFY
+        ? action.type === ActionType.DECLARE
+        : action.type === actionType
     )
 
     const originalDeclaration = params.fullEvent
