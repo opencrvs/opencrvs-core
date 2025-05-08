@@ -34,6 +34,9 @@ export const EventConfig = z
       ),
     dateOfEvent: z.object({ fieldId: z.string() }).optional(),
     title: TranslationConfig,
+    fallbackTitle: TranslationConfig.optional().describe(
+      'This is a fallback title if actual title resolves to empty string'
+    ),
     summary: SummaryConfig,
     label: TranslationConfig,
     actions: z.array(ActionConfig),
