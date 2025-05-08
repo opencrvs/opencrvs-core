@@ -9,16 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, expect, waitFor } from '@storybook/test'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { screen } from '@testing-library/dom'
 import {
   Action,
   ActionStatus,
   ActionType,
+  ActionTypes,
   EventDocument,
-  getUUID
+  getUUID,
+  IndexMap,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -175,23 +179,14 @@ export const enum AssertType {
   DISABLED = 'DISABLED'
 }
 
-export const hiddenActions = Object.values(ActionType).reduce(
-  (acc, action) => {
-    acc[action] = AssertType.HIDDEN
-    return acc
-  },
-  {} as Record<ActionType, AssertType>
-)
-
-function getActionByLabel(label: string): ActionType {
-  const actionEntry = Object.entries(actionLabels).filter(
-    ([key, value]) => value.defaultMessage === label
+export const getHiddenActions = () =>
+  Object.values(ActionTypes.Values).reduce(
+    (acc, action) => {
+      acc[action] = AssertType.HIDDEN
+      return acc
+    },
+    {} as Record<ActionType, AssertType>
   )
-  if (actionEntry.length === 0) {
-    throw new Error(`Action with label ${label} not found`)
-  }
-  return actionEntry[0][0] as ActionType
-}
 
 export interface Scenario {
   name: string
@@ -206,59 +201,71 @@ export function createStoriesFromScenarios(
   return scenarios.reduce(
     (acc, { name, actions, expected }) => {
       acc[name] = {
-        beforeEach: () => {
-          window.localStorage.setItem(
-            'opencrvs',
-            // eslint-disable-next-line no-nested-ternary
-            role === UserRoles.LOCAL_REGISTRAR
-              ? generator.user.token.localRegistrar
-              : role === UserRoles.FIELD_AGENT
-                ? generator.user.token.fieldAgent
-                : generator.user.token.registrationAgent
-          )
-        },
-        name: name,
+        loaders: [
+          async () => {
+            window.localStorage.setItem(
+              'opencrvs',
+              // eslint-disable-next-line no-nested-ternary
+              role === UserRoles.LOCAL_REGISTRAR
+                ? generator.user.token.localRegistrar
+                : role === UserRoles.FIELD_AGENT
+                  ? generator.user.token.fieldAgent
+                  : generator.user.token.registrationAgent
+            )
+
+            // Tests are generated dynamically, and it causes intermittent failures when global state
+            // gets out of whack. This is a workaround to ensure that the state is reset
+            await new Promise((resolve) => setTimeout(resolve, 50))
+
+            return {}
+          }
+        ],
+        name,
         parameters: {
-          chromatic: {
-            disableSnapshot: true
-          },
           layout: 'centered',
+          chromatic: { disableSnapshot: true },
           msw: {
             handlers: {
               event: [
-                tRPCMsw.event.get.query(() => {
-                  return getMockEvent(actions, role)
-                })
+                tRPCMsw.event.get.query(() => getMockEvent(actions, role))
               ]
             }
           }
         },
-        render: function Component() {
-          return (
-            <React.Suspense fallback={<span>{'Loading...'}</span>}>
-              <ActionMenu eventId="some-event" />
-            </React.Suspense>
-          )
-        },
-        play: async ({ canvasElement }) => {
-          const canvas = within(canvasElement)
-          await waitFor(async () => {
-            const actionButton = await canvas.findByRole('button', {
-              name: 'Action'
-            })
-            await expect(actionButton).toBeVisible()
-            await userEvent.click(actionButton)
+        render: () => (
+          <React.Suspense fallback={<span>{'Loading…'}</span>}>
+            <ActionMenu eventId="some-event" />
+          </React.Suspense>
+        ),
+        play: async () => {
+          const actionButton = await screen.findByRole('button', {
+            name: 'Action'
           })
-          const actionVisibility = { ...hiddenActions }
-          const actionItems = canvasElement.querySelectorAll('li')
-          actionItems.forEach(
-            (li) =>
-              (actionVisibility[getActionByLabel(li.innerText)] =
-                li.hasAttribute('disabled')
-                  ? AssertType.DISABLED
-                  : AssertType.ENABLED)
-          )
-          await expect(actionVisibility).toEqual(expected)
+
+          await expect(actionButton).toBeVisible()
+          await userEvent.click(actionButton)
+
+          // We want to ensure compiler knows that action labels is a subset of action types.
+          const actionLabelsAsPartial: IndexMap<TranslationConfig> =
+            actionLabels
+
+          for (const [action, expectedState] of Object.entries(expected)) {
+            const label = actionLabelsAsPartial[action]?.defaultMessage
+            if (!label) {
+              continue
+            } else if (expectedState === AssertType.HIDDEN) {
+              await expect(screen.queryByText(label)).not.toBeInTheDocument()
+            } else {
+              const item = await screen.findByText(label)
+
+              await waitFor(async () => {
+                const isDisabled = item.hasAttribute('disabled')
+                await expect(isDisabled).toBe(
+                  expectedState === AssertType.DISABLED
+                )
+              })
+            }
+          }
         }
       } satisfies StoryObj<typeof ActionMenu>
       return acc

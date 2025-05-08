@@ -14,7 +14,7 @@ import { AssignmentStatus } from '@client/v2-events/utils'
 import { ActionMenu } from '../../ActionMenu'
 import {
   baseMeta,
-  hiddenActions,
+  getHiddenActions,
   createStoriesFromScenarios,
   AssertType,
   Scenario,
@@ -38,7 +38,7 @@ const registeredScenariosForFieldAgent: Scenario[] = [
       ActionType.UNASSIGN
     ],
     expected: {
-      ...hiddenActions,
+      ...getHiddenActions(),
       [ActionType.READ]: AssertType.ENABLED
     }
   },
@@ -54,7 +54,7 @@ const registeredScenariosForFieldAgent: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
-      ...hiddenActions,
+      ...getHiddenActions(),
       [ActionType.READ]: AssertType.ENABLED
     }
   }

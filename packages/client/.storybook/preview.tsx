@@ -127,13 +127,22 @@ async function clearStorage() {
 clearStorage()
 
 const preview: Preview = {
-  loaders: [mswLoader],
-  beforeEach: async () => {
-    await clearStorage()
-    queryClient.clear()
+  loaders: [
+    mswLoader,
+    async () => {
+      await clearStorage()
+      queryClient.clear()
 
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-  },
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   decorators: [
     (Story, context) => {
       return (
