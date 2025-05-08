@@ -231,6 +231,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'occupation',
     'educationalAttainment',
     'nationality',
+    'primaryAddressSameAsOtherPrimary',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Mother`)
   ],
   father: [

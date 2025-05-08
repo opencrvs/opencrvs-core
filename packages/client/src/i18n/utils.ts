@@ -26,5 +26,6 @@ export async function getPreferredLanguage() {
 }
 
 export function storeLanguage(language: string) {
+  window.__localeId__ = language
   storage.setItem('language', language)
 }
