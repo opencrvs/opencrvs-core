@@ -317,11 +317,9 @@ jobs:
 
       - name: Fetch full Git history
         run: |
-          git clone --bare https://github.com/opencrvs/opencrvs-core.git temp.git
-          mv temp.git .git
-          rm -rf temp.git
+          git clone --bare https://github.com/opencrvs/opencrvs-core.git .git
           git config --local --bool core.bare false
-          git pull
+          git reset --hard
           git fetch --prune --unshallow
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
