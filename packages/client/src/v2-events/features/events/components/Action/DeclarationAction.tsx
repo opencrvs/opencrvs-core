@@ -178,6 +178,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
       actionType: previousActionType
     })
 
+    // If we found annotation data from the previous action, use that.
     if (Object.keys(prevActionAnnotation).length) {
       return prevActionAnnotation
     }
