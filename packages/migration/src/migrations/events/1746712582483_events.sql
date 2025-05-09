@@ -11,6 +11,14 @@ CREATE TABLE secure.events (
   updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
+CREATE TABLE secure.drafts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id uuid NOT NULL REFERENCES secure.events(id),
+  transaction_id text UNIQUE NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  action jsonb NOT NULL
+);
+
 CREATE TYPE secure.action_status AS ENUM (
   'Requested',
   'Accepted',
