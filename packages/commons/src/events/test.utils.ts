@@ -119,11 +119,11 @@ export function generateActionAnnotationInput(
 export const eventPayloadGenerator = {
   create: (input: Partial<EventInput> = {}) => ({
     transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP'
+    type: input.type ?? 'tennis-club-membership'
   }),
   patch: (id: string, input: Partial<EventInput> = {}) => ({
     transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+    type: input.type ?? 'tennis-club-membership',
     id
   }),
   draft: (

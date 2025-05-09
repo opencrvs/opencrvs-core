@@ -18,7 +18,7 @@ import {
 
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
-  type: 'TENNIS_CLUB_MEMBERSHIP',
+  type: 'tennis-club-membership',
   trackingId: 'TEST12',
   status: 'CREATED',
   createdAt: '2023-03-01T00:00:00.000Z',
@@ -37,7 +37,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
 }
 
 export const tennisClubMembershipEventDocument: EventDocument = {
-  type: 'TENNIS_CLUB_MEMBERSHIP',
+  type: 'tennis-club-membership',
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
   trackingId: 'TEST12',
   createdAt: '2025-01-23T05:30:02.615Z',
@@ -132,7 +132,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
 export const tennisClubMembershipEvents: EventIndex[] = [
   {
     id: '7e7c2e73-9d11-49ea-aefc-44c3be6d155a',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'CREATED',
     createdAt: '2025-05-07T10:03:37.480Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -152,7 +152,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: '064f0a99-d5d9-47a8-a58e-f296cec309d7',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'CREATED',
     createdAt: '2025-05-06T07:26:31.861Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -172,7 +172,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: 'a315c49f-533c-4642-b48f-4051ff0362f8',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'REGISTERED',
     createdAt: '2025-05-07T10:02:52.145Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -192,7 +192,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: '1a6f0ab9-7f00-4482-b381-0c606f064ea9',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'REGISTERED',
     createdAt: '2025-05-06T07:24:09.628Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -212,7 +212,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: '0900dca9-24ab-44e4-8f40-844a3e944942',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'REGISTERED',
     createdAt: '2025-05-07T10:03:16.743Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -232,7 +232,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: 'bb754ee8-ea25-4cb7-9670-d94f7cdb095d',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'REGISTERED',
     createdAt: '2025-05-07T10:01:09.688Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -252,7 +252,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: '7d4174e8-0b90-4493-8c39-dcd5377c0c51',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'REGISTERED',
     createdAt: '2025-05-07T11:00:48.166Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -272,7 +272,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: '3d584ec8-12c7-405f-94db-bfd6293ba448',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'DECLARED',
     createdAt: '2025-05-07T11:01:14.370Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -292,7 +292,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: 'e622417f-cf6c-48b8-b31c-5f1402742388',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'DECLARED',
     createdAt: '2025-05-07T11:02:03.131Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -312,7 +312,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: '7f29f4e6-fd60-4e5b-b61c-5636a76d60bf',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'DECLARED',
     createdAt: '2025-05-07T11:01:39.813Z',
     createdBy: '6819b8d47544402e381183ee',
@@ -332,7 +332,7 @@ export const tennisClubMembershipEvents: EventIndex[] = [
   },
   {
     id: '738ed25b-ca42-4777-9072-82404ffcdd22',
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     status: 'DECLARED',
     createdAt: '2025-05-07T11:02:31.890Z',
     createdBy: '6819b8d47544402e381183ee',

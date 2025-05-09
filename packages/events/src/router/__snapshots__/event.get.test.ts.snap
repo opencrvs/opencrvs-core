@@ -34,7 +34,7 @@ exports[`Returns event 1`] = `
   "createdAt": "<createdAt />",
   "id": "<id />",
   "transactionId": "<transactionId />",
-  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "type": "tennis-club-membership",
   "updatedAt": "<updatedAt />",
 }
 `;
@@ -125,7 +125,7 @@ exports[`Returns event with all actions resolved 1`] = `
   "createdAt": "<createdAt />",
   "id": "<id />",
   "transactionId": "<transactionId />",
-  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "type": "tennis-club-membership",
   "updatedAt": "<updatedAt />",
 }
 `;
