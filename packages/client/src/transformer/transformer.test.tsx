@@ -87,7 +87,8 @@ describe('when draft data is transformed to graphql', () => {
           data,
           '9633042c-ca34-4b9f-959b-9d16909fd85c',
           userDetails,
-          mockOfflineData
+          mockOfflineData,
+          undefined
         ).eventLocation.type
       ).toBe('PRIVATE_HOME')
     })
@@ -109,7 +110,8 @@ describe('when draft data is transformed to graphql', () => {
           data,
           '9633042c-ca34-4b9f-959b-9d16909fd85c',
           userDetails,
-          mockOfflineData
+          mockOfflineData,
+          undefined
         ).father
       ).toEqual({
         detailsExist: false
@@ -120,7 +122,8 @@ describe('when draft data is transformed to graphql', () => {
           data,
           '9633042c-ca34-4b9f-959b-9d16909fd85c',
           userDetails,
-          mockOfflineData
+          mockOfflineData,
+          undefined
         ).registration.inCompleteFields
       ).toContain('father/father-view-group/reasonNotApplying')
     })
@@ -139,7 +142,8 @@ describe('when draft data is transformed to graphql', () => {
           data,
           '9633042c-ca34-4b9f-959b-9d16909fd85c',
           userDetails,
-          mockOfflineData
+          mockOfflineData,
+          undefined
         ).registration.inCompleteFields
       ).toContain('child/child-view-group/placeOfBirth')
     })
@@ -158,7 +162,8 @@ describe('when draft data is transformed to graphql', () => {
           data,
           '9633042c-ca34-4b9f-959b-9d16909fd85c',
           userDetails,
-          mockOfflineData
+          mockOfflineData,
+          undefined
         ).registration.inCompleteFields
       ).toBeDefined()
     })
