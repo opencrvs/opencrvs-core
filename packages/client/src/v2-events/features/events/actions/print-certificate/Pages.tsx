@@ -15,13 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  ActionType,
-  EventConfig,
-  getOrThrow,
-  isFieldVisible
-} from '@opencrvs/commons/client'
-
+import { ActionType, EventConfig, getOrThrow } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -87,18 +81,6 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId])
 
-  // Allow the user to continue from the current page only if they have filled all the visible required fields.
-  const currentPage = formPages.find((p) => p.id === currentPageId)
-  const currentlyRequiredFields = currentPage?.fields.filter(
-    (field) => isFieldVisible(field, annotation) && field.required
-  )
-
-  const isAllRequiredFieldsFilled = currentlyRequiredFields?.every((field) =>
-    Boolean(annotation[field.id])
-  )
-
-  const isTemplateSelected = Boolean(annotation[CERT_TEMPLATE_ID])
-
   return (
     <FormLayout
       appbarIcon={<Print />}
@@ -107,7 +89,6 @@ export function Pages() {
       {modal}
       <PagesComponent
         declaration={event.declaration}
-        disableContinue={!isAllRequiredFieldsFilled || !isTemplateSelected}
         eventConfig={configuration}
         form={annotation}
         formPages={formPages.map((page) => {
@@ -126,14 +107,15 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={searchParams.from === 'review'}
-        onPageChange={(nextPageId: string) =>
-          navigate(
+        validateBeforeNextPage={true}
+        onPageChange={(nextPageId: string) => {
+          return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
               eventId,
               pageId: nextPageId
             })
           )
-        }
+        }}
         onSubmit={() => {
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(

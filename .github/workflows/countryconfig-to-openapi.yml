@@ -1,0 +1,56 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Build and Deploy OpenAPI HTML
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate OpenAPI
+        run: bash build.sh
+        working-directory: packages/api-docs
+
+      - name: Deploy to GitHub Pages
+        working-directory: packages/api-docs
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/\//-/g')
+          TARGET_DIR="tmp-pages"
+
+          git clone --depth 1 --branch gh-pages "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" $TARGET_DIR || (
+            mkdir $TARGET_DIR && cd $TARGET_DIR && git init && git checkout -b gh-pages && cd ..
+          )
+
+          rm -rf $TARGET_DIR/$BRANCH_NAME
+          mkdir -p $TARGET_DIR/$BRANCH_NAME
+          cp -r build/* $TARGET_DIR/$BRANCH_NAME/
+
+          cd $TARGET_DIR
+          git add .
+          git commit -m "Update OpenAPI HTML for $BRANCH_NAME @ $GITHUB_SHA" || echo "No changes"
+          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" gh-pages

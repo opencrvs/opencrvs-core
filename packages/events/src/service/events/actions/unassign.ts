@@ -25,13 +25,15 @@ export async function unassignRecord(
   {
     eventId,
     createdBy,
+    createdByRole,
     token,
-    createdAtLocation,
+    updatedAtLocation,
     transactionId
   }: {
     eventId: string
     createdBy: string
-    createdAtLocation: string
+    createdByRole: string
+    updatedAtLocation: string
     token: string
     transactionId: string
   }
@@ -53,8 +55,9 @@ export async function unassignRecord(
     return addAction(input, {
       eventId,
       createdBy,
+      createdByRole,
       token,
-      createdAtLocation,
+      updatedAtLocation,
       transactionId,
       status: ActionStatus.Accepted
     })

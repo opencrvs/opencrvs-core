@@ -16,7 +16,7 @@ import {
   AnnotationActionType,
   EventConfig,
   isPageVisible,
-  isVerificationPage,
+  getVisibleVerificationPageIds,
   annotationActions,
   findRecordActionPages,
   DeclarationUpdateActionType,
@@ -28,17 +28,71 @@ import {
   EventDocument,
   deepMerge,
   deepDropNulls,
-  omitHiddenFields
+  omitHiddenFields,
+  EventState,
+  Inferred,
+  isFieldVisible,
+  errorMessages,
+  runFieldValidations
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
 import { ActionMiddlewareOptions } from '@events/router/middleware/utils'
 import {
-  getFormFieldErrors,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
   throwWhenNotEmpty
 } from './utils'
+
+export function getFieldErrors(
+  fields: Inferred[],
+  data: ActionUpdate,
+  declaration: EventState = {}
+) {
+  const visibleFields = fields.filter((field) =>
+    isFieldVisible(field, { ...data, ...declaration })
+  )
+
+  const visibleFieldIds = visibleFields.map((field) => field.id)
+
+  const hiddenFieldIds = fields
+    .filter(
+      (field) =>
+        // If field is not visible and not in the visible fields list, it is a hidden field
+        // We need to check against the visible fields list because there might be fields with same ids, one of which is visible and others are hidden
+        !isFieldVisible(field, data) && !visibleFieldIds.includes(field.id)
+    )
+    .map((field) => field.id)
+
+  // Add errors if there are any hidden fields sent in the payloa
+  const hiddenFieldErrors = hiddenFieldIds.flatMap((fieldId) => {
+    if (data[fieldId as keyof typeof data]) {
+      return {
+        message: errorMessages.hiddenField.defaultMessage,
+        id: fieldId,
+        value: data[fieldId as keyof typeof data]
+      }
+    }
+
+    return []
+  })
+
+  // For visible fields, run the field validations as configured
+  const visibleFieldErrors = visibleFields.flatMap((field) => {
+    const fieldErrors = runFieldValidations({
+      field,
+      values: data
+    })
+
+    return fieldErrors.errors.map((error) => ({
+      message: error.message.defaultMessage,
+      id: field.id,
+      value: data[field.id as keyof typeof data]
+    }))
+  })
+
+  return [...hiddenFieldErrors, ...visibleFieldErrors]
+}
 
 function validateDeclarationUpdateAction({
   eventConfig,
@@ -83,9 +137,14 @@ function validateDeclarationUpdateAction({
   }
 
   // 4. Validate declaration update against conditional rules, taking into account conditional pages.
-  const declarationErrors = declarationConfig.pages
+  const allVisiblePageFields = declarationConfig.pages
     .filter((page) => isPageVisible(page, cleanedDeclaration))
-    .flatMap((page) => getFormFieldErrors(page.fields, cleanedDeclaration))
+    .flatMap((page) => page.fields)
+
+  const declarationErrors = getFieldErrors(
+    allVisiblePageFields,
+    cleanedDeclaration
+  )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
@@ -99,10 +158,7 @@ function validateDeclarationUpdateAction({
     deepDropNulls(annotation ?? {})
   )
 
-  const annotationErrors = getFormFieldErrors(
-    reviewFields,
-    visibleAnnotationFields
-  )
+  const annotationErrors = getFieldErrors(reviewFields, visibleAnnotationFields)
 
   return [...declarationErrors, ...annotationErrors]
 }
@@ -110,25 +166,27 @@ function validateDeclarationUpdateAction({
 function validateActionAnnotation({
   eventConfig,
   actionType,
-  annotation = {}
+  annotation = {},
+  declaration = {}
 }: {
   eventConfig: EventConfig
   actionType: AnnotationActionType
   annotation?: ActionUpdate
+  declaration: EventState
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
-  const visibleVerificationPageIds = pages
-    .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
-    .map((page) => page.id)
+  const visibleVerificationPageIds = getVisibleVerificationPageIds(
+    pages,
+    annotation
+  )
 
   const formFields = pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
 
   const errors = [
-    ...getFormFieldErrors(formFields, annotation),
+    ...getFieldErrors(formFields, annotation, declaration),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
@@ -138,6 +196,7 @@ function validateActionAnnotation({
 export function validateAction(actionType: ActionType) {
   return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
     const event = await getEventById(input.eventId)
+    const declaration = getCurrentEventState(event).declaration
 
     const eventConfig = await getEventConfigurationById({
       token: ctx.token,
@@ -165,7 +224,8 @@ export function validateAction(actionType: ActionType) {
       const errors = validateActionAnnotation({
         eventConfig,
         annotation: input.annotation,
-        actionType: annotationActionParse.data
+        actionType: annotationActionParse.data,
+        declaration
       })
 
       throwWhenNotEmpty(errors)

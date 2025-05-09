@@ -21,20 +21,23 @@ import type {
   TDocumentDefinitions,
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
-import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
 import format from 'date-fns/format'
 import isValid from 'date-fns/isValid'
+import { Location } from '@events/service/locations/locations'
 import {
   EventIndex,
   EventState,
   User,
-  LanguageConfig
+  LanguageConfig,
+  FieldValue,
+  EventConfig
 } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
+import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 interface FontFamilyTypes {
   normal: string
@@ -72,8 +75,8 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 function formatAllNonStringValues(
   templateData: EventState,
   intl: IntlShape
-): Record<string, string> {
-  const formattedData: Record<string, string> = {}
+): Record<string, FieldValue> {
+  const formattedData: Record<string, FieldValue> = {}
 
   for (const key of Object.keys(templateData)) {
     const value = templateData[key]
@@ -90,9 +93,10 @@ function formatAllNonStringValues(
         .join(', ')
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
-      formattedData[key] = JSON.stringify(
-        formatAllNonStringValues(value as EventState, intl)
-      )
+      formattedData[key] = formatAllNonStringValues(
+        value satisfies EventState,
+        intl
+      ) as FieldValue
     } else {
       formattedData[key] = String(value)
     }
@@ -109,7 +113,8 @@ export function compileSvg({
   $declaration,
   locations,
   users,
-  language
+  language,
+  config
 }: {
   templateString: string
   $state: EventIndex
@@ -117,8 +122,9 @@ export function compileSvg({
   locations: Location[]
   users: User[]
   language: LanguageConfig
+  config: EventConfig
 }): string {
-  const intl: IntlShape = createIntl(
+  const intl = createIntl(
     {
       locale: language.lang,
       messages: language.messages
@@ -141,29 +147,231 @@ export function compileSvg({
   }
 
   Handlebars.registerHelper(
-    'formatDate',
+    '$formatDate',
     function (dateString: string, formatString: string) {
       const date = new Date(dateString)
       return isValid(date) ? format(date, formatString) : ''
     }
   )
 
-  Handlebars.registerHelper('findUserById', function (u: User[], id: string) {
-    const user = u.find((usr) => usr.id === id)
+  Handlebars.registerHelper(
+    '$findUserById',
+    function (id: string, propertyName: keyof User) {
+      const user = users.find((usr) => usr.id === id)
+      if (!user) {
+        return ''
+      } else if (propertyName === 'name') {
+        return getUsersFullName(user.name, 'en')
+      }
+      return user[propertyName]
+    }
+  )
 
-    return user ? getUsersFullName(user.name, 'en') : ''
-  })
+  /**
+   * Handlebars helper: $lookup
+   *
+   * Usage: {{$lookup 'child.address.other' 'district'}}
+   *
+   * Resolves a value from the given property path within the `$declaration` object,
+   * and optionally returns a nested field from the resolved value.
+   *
+   * Behavior:
+   * 1. The helper expects `$declaration` to be passed as the `data` parameter.
+   * 2. It serializes the `$declaration` object into a stringified form using `useFormDataStringifier`.
+   * 3. It then extracts the value from the `propertyPath` provided, and return it.
+   *
+   * This helper is useful for extracting specific properties from complex structures like `child.address.other`
+   * when you need to access deeply nested fields in the declaration.
+   */
+  Handlebars.registerHelper(
+    '$lookup',
+    function (data: typeof $declaration, propertyPath: string) {
+      if (data !== $declaration) {
+        const warning =
+          '$lookup currently only supports $declaration as a parameter.'
+        // eslint-disable-next-line no-console
+        console.warn(warning)
+        return warning
+      }
+
+      const stringify = getFormDataStringifier(intl, locations)
+      const formFieldWithResolvedValue = stringify(
+        config.declaration.pages.flatMap((x) => x.fields),
+        $declaration
+      )
+
+      return formFieldWithResolvedValue[propertyPath]
+    }
+  )
+
+  /**
+   * Handlebars helper: $location
+   *
+   * Usage: {{$location locationId propName}}
+   *
+   * This helper retrieves a specific part of an address (location, district, province, or country)
+   * based on the provided location ID.
+   *
+   * It uses the `useStringifier` function from `LocationSearch` to resolve the full address object,
+   * and returns the value of the requested property.
+   *
+   * Parameters:
+   * - locationId (string): ID of the target location
+   * - propName (string): One of 'location', 'district', 'province', or 'country'
+   *
+   * Returns:
+   * - The name corresponding to the requested property, or undefined if not available.
+   */
+  Handlebars.registerHelper(
+    '$location',
+    function (
+      locationId: string,
+      propName: 'location' | 'district' | 'province' | 'country'
+    ) {
+      const location = locations.find((loc) => loc.id === locationId)
+      const district = locations.find((loc) => loc.id === location?.partOf)
+      const province = locations.find((loc) => loc.id === district?.partOf)
+
+      const country = intl.formatMessage({
+        id: `countries.${window.config.COUNTRY}`,
+        defaultMessage: 'Farajaland',
+        description: 'Country name'
+      })
+
+      const address = {
+        location: location?.name || '',
+        district: district?.name || '',
+        province: province?.name || '',
+        country: country
+      }
+
+      return address[propName]
+    }
+  )
+
+  /**
+   * Handlebars helper: $intl
+   *
+   * Usage example in SVG template:
+   *   <tspan>{{ $intl 'constants' (lookup $declaration "child.gender") }}</tspan>
+   *
+   * This helper dynamically constructs a translation key by joining multiple string parts
+   * (e.g., 'constants.male') and uses `intl.formatMessage` to fetch the localized translation.
+   *
+   * In the example above, `"child.gender"` resolves to a value like `"male"` which forms
+   * part of the translation key: `constants.male`.
+   *
+   * - If any of the parts is undefined (e.g., gender not provided), it returns an empty string to prevent rendering issues.
+   * - If the translation for the constructed ID is missing, it falls back to showing: 'Missing translation for [id]'.
+   *
+   * This is especially useful in templates where dynamic values (like gender, marital status, etc.)
+   * need to be translated using i18n keys constructed from user-provided data.
+   */
+  Handlebars.registerHelper(
+    '$intl',
+
+    function (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this: any,
+      ...args: [...(string | undefined)[], Handlebars.HelperOptions]
+    ) {
+      // If even one of the parts is undefined, then return empty string
+      const idParts = args.slice(0, -1)
+      if (idParts.some((part) => part === undefined)) {
+        return ''
+      }
+
+      const id = idParts.join('.')
+
+      return intl.formatMessage({
+        id,
+        defaultMessage: 'Missing translation for ' + id
+      })
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  /**
+   * Handlebars helper: $OR
+   * Returns the first truthy value between v1 and v2.
+   */
+  Handlebars.registerHelper(
+    '$OR',
+    function (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      v1: any,
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      v2: any
+    ) {
+      return !!v1 ? v1 : v2
+    }
+  )
+
+  /**
+   * Handlebars helper: ifCond
+   *
+   * Usage example in template:
+   *   {{#ifCond value1 '===' value2}} ... {{/ifCond}}
+   *
+   * This helper compares two values (`v1` and `v2`) using the specified operator and
+   * conditionally renders a block based on the result of the comparison.
+   *
+   * Supported operators:
+   *   - '===' : strict equality
+   *   - '!==' : strict inequality
+   *   - '<', '<=', '>', '>=' : numeric/string comparisons
+   *   - '&&' : both values must be truthy
+   *   - '||' : at least one value must be truthy
+   *
+   * If the condition is met, it renders the main block (`options.fn(this)`),
+   * otherwise it renders the `else` block (`options.inverse(this)`).
+   *
+   * This helper is useful for adding conditional logic directly within Handlebars templates.
+   */
+  Handlebars.registerHelper(
+    'ifCond',
+    function (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      this: any,
+      v1: string,
+      operator: string,
+      v2: string,
+      options: Handlebars.HelperOptions
+    ) {
+      switch (operator) {
+        case '===':
+          return v1 === v2 ? options.fn(this) : options.inverse(this)
+        case '!==':
+          return v1 !== v2 ? options.fn(this) : options.inverse(this)
+        case '<':
+          return v1 < v2 ? options.fn(this) : options.inverse(this)
+        case '<=':
+          return v1 <= v2 ? options.fn(this) : options.inverse(this)
+        case '>':
+          return v1 > v2 ? options.fn(this) : options.inverse(this)
+        case '>=':
+          return v1 >= v2 ? options.fn(this) : options.inverse(this)
+        case '&&':
+          return v1 && v2 ? options.fn(this) : options.inverse(this)
+        case '||':
+          return v1 || v2 ? options.fn(this) : options.inverse(this)
+        default:
+          return options.inverse(this)
+      }
+    }
+  )
 
   const template = Handlebars.compile(templateString)
   $declaration = formatAllNonStringValues($declaration, intl)
-  const output = template({
+  const data = {
     $declaration,
     $state,
     $references: {
       locations,
       users
     }
-  })
+  }
+  const output = template(data)
   return output
 }
 
@@ -191,6 +399,7 @@ src: url("${url}") format("truetype");
   const serializer = new XMLSerializer()
   return serializer.serializeToString(svg)
 }
+
 export function svgToPdfTemplate(
   svg: string,
   certificateFonts: CertificateConfiguration

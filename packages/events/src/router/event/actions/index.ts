@@ -11,7 +11,7 @@
 import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
-import { SCOPES, getUUID } from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -23,7 +23,8 @@ import {
   ArchiveActionInput,
   PrintCertificateActionInput,
   DeclareActionInput,
-  ValidateActionInput
+  ValidateActionInput,
+  ACTION_ALLOWED_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import {
@@ -46,54 +47,42 @@ import {
  * Configuration for different action types which use the default confirmation flow.
  *
  * @typedef {Object} ACTION_PROCEDURE_CONFIG
- * @property {Scope[]} scopes - The authorization scopes required to perform this action
  * @property {z.ZodType} inputSchema - The Zod schema for validating the action input
  * @property {z.ZodType|undefined} notifyApiPayloadSchema - Schema for notify API response payload if applicable. This will be sent either in the initial HTTP 200 response, or when the action is asynchronously accepted.
  * @property {boolean} validatePayload - Whether the payload should be strictly validated against the inputSchema schema
  */
 const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
-    scopes: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
     notifyApiPayloadSchema: undefined,
     validatePayload: false,
     inputSchema: NotifyActionInput
   },
   [ActionType.DECLARE]: {
-    scopes: [
-      SCOPES.RECORD_DECLARE,
-      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-      SCOPES.RECORD_REGISTER
-    ],
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
     inputSchema: DeclareActionInput
   },
   [ActionType.VALIDATE]: {
-    scopes: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER],
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
     inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
-    scopes: [SCOPES.RECORD_REGISTER],
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
     validatePayload: true,
     inputSchema: RegisterActionInput
   },
   [ActionType.REJECT]: {
-    scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
     inputSchema: RejectDeclarationActionInput
   },
   [ActionType.ARCHIVE]: {
-    scopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
     inputSchema: ArchiveActionInput
   },
   [ActionType.PRINT_CERTIFICATE]: {
-    scopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
     inputSchema: PrintCertificateActionInput
@@ -131,8 +120,7 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const { scopes, notifyApiPayloadSchema, validatePayload, inputSchema } =
-    actionConfig
+  const { notifyApiPayloadSchema, validatePayload, inputSchema } = actionConfig
 
   let acceptInputFields = z.object({ actionId: z.string() })
 
@@ -140,7 +128,10 @@ export function getDefaultActionProcedures(
     acceptInputFields = acceptInputFields.merge(notifyApiPayloadSchema)
   }
 
-  const requireScopesMiddleware = requiresAnyOfScopes(scopes)
+  const requireScopesMiddleware = requiresAnyOfScopes(
+    ACTION_ALLOWED_SCOPES[actionType]
+  )
+
   const validatePayloadMiddleware = validatePayload
     ? middleware.validateAction(actionType)
     : async ({ next }: MiddlewareOptions) => next()
@@ -149,11 +140,17 @@ export function getDefaultActionProcedures(
     request: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema)
+      .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, transactionId } = input
         const actionId = getUUID()
+
+        if (ctx.isDuplicateAction) {
+          return ctx.event
+        }
+
         const event = await getEventById(eventId)
 
         const { responseStatus, body } = await requestActionConfirmation(
@@ -201,7 +198,9 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
-            createdAtLocation: user.primaryOfficeId,
+            createdByRole: user.role,
+            // updatedAtLocation is set to the office of the user who created the action
+            updatedAtLocation: user.primaryOfficeId,
             token,
             transactionId,
             status
@@ -249,7 +248,8 @@ export function getDefaultActionProcedures(
           {
             eventId,
             createdBy: user.id,
-            createdAtLocation: user.primaryOfficeId,
+            createdByRole: user.role,
+            updatedAtLocation: user.primaryOfficeId,
             token,
             transactionId,
             status: ActionStatus.Accepted
@@ -266,7 +266,7 @@ export function getDefaultActionProcedures(
           transactionId: z.string()
         })
       )
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)
         const action = event.actions.find((a) => a.id === actionId)
@@ -292,7 +292,8 @@ export function getDefaultActionProcedures(
         return addAsyncRejectAction({
           ...input,
           originalActionId: actionId,
-          type: actionType
+          type: actionType,
+          updatedAtLocation: ctx.user.primaryOfficeId
         })
       })
   }

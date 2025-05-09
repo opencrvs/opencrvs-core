@@ -39,8 +39,7 @@ import {
   getActionAnnotationFields,
   getDeclaration,
   getDeclarationFields,
-  isPageVisible,
-  isVerificationPage,
+  getVisibleVerificationPageIds,
   omitHiddenFields,
   omitHiddenPaginatedFields
 } from './utils'
@@ -96,13 +95,10 @@ export function generateActionAnnotationInput(
 
   const annotation = fieldConfigsToActionPayload(annotationFields)
 
-  const visibleVerificationPageIds = findRecordActionPages(
-    configuration,
-    action
+  const visibleVerificationPageIds = getVisibleVerificationPageIds(
+    findRecordActionPages(configuration, action),
+    annotation
   )
-    .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
-    .map((page) => page.id)
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
@@ -141,6 +137,7 @@ export const eventPayloadGenerator = {
         createdAt: new Date().toISOString(),
         transactionId: getUUID(),
         action: {
+          transactionId: getUUID(),
           type: actionType,
           status: ActionStatus.Accepted,
           declaration: {
@@ -155,7 +152,9 @@ export const eventPayloadGenerator = {
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
-          createdAtLocation: '@todo'
+          createdByRole: '@todo',
+          createdAtLocation: '@todo',
+          updatedAtLocation: '@todo'
         }
       } satisfies Draft,
       input
@@ -420,12 +419,15 @@ export function generateActionDocument({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
+    createdByRole: 'FIELD_AGENT',
     id: getUUID(),
     createdAtLocation: 'TODO',
+    updatedAtLocation: 'TODO',
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
     ...defaults,
-    status: ActionStatus.Accepted
+    status: ActionStatus.Accepted,
+    transactionId: getUUID()
   } satisfies ActionBase
 
   switch (action) {
@@ -489,7 +491,9 @@ export function generateEventDocument({
     id: getUUID(),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
-    updatedAt: new Date(Date.now() - 1000).toISOString()
+    updatedAt: new Date(Date.now() - 1000).toISOString(),
+    dateOfEvent: configuration.dateOfEvent,
+    updatedAtLocation: getUUID()
   }
 }
 
@@ -526,9 +530,11 @@ export const eventQueryDataGenerator = (
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   createdBy: overrides.createdBy ?? getUUID(),
   createdAtLocation: overrides.createdAtLocation ?? getUUID(),
-  modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
+  updatedAtLocation: overrides.updatedAtLocation ?? getUUID(),
+  updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
+  updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
   declaration: overrides.declaration ?? {
     'recommender.none': true,
     'applicant.firstname': 'Danny',

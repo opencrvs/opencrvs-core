@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { z } from 'zod'
 import { EnableConditional, ShowConditional } from './Conditional'
 import { PageConfig } from './PageConfig'
@@ -15,6 +16,9 @@ import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
+
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 /**
  * By default, when conditionals are not defined, action is visible and enabled to the user.
@@ -149,19 +153,30 @@ export type InferredActionConfig =
   | z.infer<typeof RejectCorrectionConfig>
   | z.infer<typeof ApproveCorrectionConfig>
 
-export const ActionConfig = z.discriminatedUnion('type', [
-  DeclareConfig,
-  ValidateConfig,
-  RejectDeclarationConfig,
-  MarkedAsDuplicateConfig,
-  ArchiveConfig,
-  RegisterConfig,
-  DeleteConfig,
-  PrintCertificateActionConfig,
-  RequestCorrectionConfig,
-  RejectCorrectionConfig,
-  ApproveCorrectionConfig
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
+export const ActionConfig = z
+  .discriminatedUnion('type', [
+    /*
+     * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
+     * and treat them as "models" instead of duplicating the data structure in each endpoint.
+     */
+    DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
+    ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
+    RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
+    MarkedAsDuplicateConfig.openapi({ ref: 'MarkedAsDuplicateActionConfig' }),
+    ArchiveConfig.openapi({ ref: 'ArchiveActionConfig' }),
+    RegisterConfig.openapi({ ref: 'RegisterActionConfig' }),
+    DeleteConfig.openapi({ ref: 'DeleteActionConfig' }),
+    PrintCertificateActionConfig.openapi({
+      ref: 'PrintCertificateActionConfig'
+    }),
+    RequestCorrectionConfig.openapi({ ref: 'RequestCorrectionActionConfig' }),
+    RejectCorrectionConfig.openapi({ ref: 'RejectCorrectionActionConfig' }),
+    ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' })
+  ])
+  .openapi({ ref: 'ActionConfig' }) as unknown as z.ZodDiscriminatedUnion<
+  'type',
+  AllActionConfigFields[]
+>
 
 export type ActionConfig = InferredActionConfig
 

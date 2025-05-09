@@ -72,12 +72,12 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
               id: 'storybook.date.label',
               defaultMessage: 'Date input',
               description: 'The title for the date input'
-            }
+            },
+            required: true
           }
         ]}
-        form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={formData}
         onChange={(data) => {
           args.onChange(data)
           setFormData(data)

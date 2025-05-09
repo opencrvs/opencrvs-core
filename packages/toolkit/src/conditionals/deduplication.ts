@@ -37,7 +37,7 @@ export function field(fieldId: string) {
           fuzziness: options.fuzziness ?? 'AUTO:4,7',
           boost: options.boost ?? 1
         }
-      } as const),
+      }) as const,
     strictMatches: (options: { boost?: number } = {}) =>
       ({
         fieldId,
@@ -45,7 +45,7 @@ export function field(fieldId: string) {
         options: {
           boost: options.boost ?? 1
         }
-      } as const),
+      }) as const,
     dateRangeMatches: (options: {
       days: number
       origin: string
@@ -59,7 +59,7 @@ export function field(fieldId: string) {
           origin: options.origin,
           boost: options.boost ?? 1
         }
-      } as const),
+      }) as const,
     dateDistanceMatches: (options: {
       days: number
       origin: string
@@ -73,6 +73,6 @@ export function field(fieldId: string) {
           origin: options.origin,
           boost: options.boost ?? 1
         }
-      } as const)
+      }) as const
   }
 }

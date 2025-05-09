@@ -19,7 +19,8 @@ import {
   ActionType,
   getActionAnnotation,
   getDeclaration,
-  getActionReview
+  getActionReview,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -38,6 +39,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { getScope } from '@client/profile/profileSelectors'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -60,8 +62,7 @@ export function Review() {
 
   const previousAnnotation = getActionAnnotation({
     event,
-    actionType: ActionType.VALIDATE,
-    drafts: []
+    actionType: ActionType.VALIDATE
   })
 
   const annotation = getAnnotation(previousAnnotation)
@@ -73,7 +74,9 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const previousFormValues = getCurrentEventState(event).declaration
+
+  const currentEventState = getCurrentEventState(event)
+  const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
   const scopes = useSelector(getScope) ?? undefined
@@ -108,7 +111,7 @@ export function Review() {
           {
             from: 'review'
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -194,11 +197,16 @@ export function Review() {
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
+          icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleValidation}
-          onReject={handleRejection}
+          onReject={
+            currentEventState.status === EventStatus.REJECTED
+              ? undefined
+              : handleRejection
+          }
         />
         {modal}
       </ReviewComponent.Body>

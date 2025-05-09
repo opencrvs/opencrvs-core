@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { IntlShape } from 'react-intl'
+import { Location } from '@events/service/locations/locations'
 import {
   EventState,
   AddressFieldValue,
@@ -23,14 +25,16 @@ import {
   AdministrativeAreas,
   isFieldVisible,
   alwaysTrue,
-  AddressType
+  AddressType,
+  never,
+  isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import {
   formDataStringifierFactory,
-  useSimpleFieldStringifier
-} from '@client/v2-events/hooks/useSimpleFieldStringifier'
+  stringifySimpleField
+} from '@client/v2-events/hooks/useFormDataStringifier'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -246,6 +250,10 @@ const ADMIN_STRUCTURE = [
     id: 'urbanOrRural',
     conditionals: [
       {
+        type: ConditionalType.DISPLAY_ON_REVIEW,
+        conditional: never()
+      },
+      {
         type: ConditionalType.SHOW,
         conditional: and(
           isDomesticAddress(),
@@ -454,9 +462,7 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
-      form={value}
       initialValues={{ ...defaultValue, ...value }}
-      setAllFieldsDirty={false}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />
   )
@@ -475,7 +481,7 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
         .filter(
           (field) =>
             field.value &&
-            isFieldVisible(field.field satisfies FieldConfig, value)
+            isFieldDisplayedOnReview(field.field satisfies FieldConfig, value)
         )
         .map((field) => (
           <React.Fragment key={field.field.id}>
@@ -491,20 +497,23 @@ function AddressOutput({ value }: { value?: AddressFieldValue }) {
   )
 }
 
-function useStringifier() {
-  const fieldStringifier = useSimpleFieldStringifier()
+function stringify(
+  intl: IntlShape,
+  locations: Location[],
+  value: AddressFieldValue
+) {
+  const fieldStringifier = stringifySimpleField(intl, locations)
+
   /*
    * As address is just a collection of other form fields, its string formatter just redirects the data back to
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
   const formStringifier = formDataStringifierFactory(fieldStringifier)
-  return (value: AddressFieldValue) => {
-    return formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
-  }
+  return formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
 }
 
 export const Address = {
   Input: AddressInput,
   Output: AddressOutput,
-  useStringifier: useStringifier
+  stringify
 }

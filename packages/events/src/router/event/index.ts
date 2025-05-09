@@ -11,21 +11,25 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { SCOPES, getUUID } from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import {
   ActionType,
   Draft,
   DraftInput,
   EventIndex,
   EventInput,
-  EventSearchIndex,
   ActionStatus,
   ApproveCorrectionActionInput,
   EventConfig,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
   AssignActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  ACTION_ALLOWED_SCOPES,
+  CONFIG_GET_ALLOWED_SCOPES,
+  CONFIG_SEARCH_ALLOWED_SCOPES,
+  QueryType,
+  DeleteActionInput
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -62,32 +66,26 @@ function validateEventType({
   }
 }
 
-const RECORD_READ_SCOPES = [
-  SCOPES.RECORD_DECLARE,
-  SCOPES.RECORD_READ,
-  SCOPES.RECORD_SUBMIT_INCOMPLETE,
-  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_EXPORT_RECORDS
-]
-
 export const eventRouter = router({
   config: router({
     get: publicProcedure
-      .use(
-        requiresAnyOfScopes([
-          ...RECORD_READ_SCOPES,
-          SCOPES.CONFIG,
-          SCOPES.CONFIG_UPDATE_ALL
-        ])
-      )
+      .meta({
+        openapi: {
+          summary: 'List event configurations',
+          method: 'GET',
+          path: '/events/config',
+          tags: ['Events']
+        }
+      })
+      .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+      .input(z.void())
       .output(z.array(EventConfig))
       .query(async (options) => {
         return getEventConfigurations(options.ctx.token)
       })
   }),
   create: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.CREATE]))
     .input(EventInput)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
@@ -101,13 +99,14 @@ export const eventRouter = router({
       return createEvent({
         eventInput: options.input,
         createdBy: options.ctx.user.id,
+        createdByRole: options.ctx.user.role,
         createdAtLocation: options.ctx.user.primaryOfficeId,
         transactionId: options.input.transactionId
       })
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
-    .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
@@ -121,7 +120,8 @@ export const eventRouter = router({
         {
           eventId: event.id,
           createdBy: ctx.user.id,
-          createdAtLocation: ctx.user.primaryOfficeId,
+          createdByRole: ctx.user.role,
+          updatedAtLocation: ctx.user.primaryOfficeId,
           token: ctx.token,
           transactionId: getUUID(),
           status: ActionStatus.Accepted
@@ -131,8 +131,9 @@ export const eventRouter = router({
       return updatedEvent
     }),
   delete: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_DECLARE]))
-    .input(z.object({ eventId: z.string() }))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))
+    .input(DeleteActionInput)
+    .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
@@ -146,6 +147,7 @@ export const eventRouter = router({
       return createDraft(options.input, {
         eventId,
         createdBy: options.ctx.user.id,
+        createdByRole: options.ctx.user.role,
         createdAtLocation: options.ctx.user.primaryOfficeId,
         token: options.ctx.token,
         transactionId: options.input.transactionId
@@ -170,7 +172,8 @@ export const eventRouter = router({
           return assignRecord({
             input: options.input,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            createdByRole: options.ctx.user.role,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token
           })
         }),
@@ -181,7 +184,8 @@ export const eventRouter = router({
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            createdByRole: options.ctx.user.role,
+            updatedAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -190,52 +194,80 @@ export const eventRouter = router({
     correction: router({
       request: publicProcedure
         .use(
-          requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION])
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.REQUEST_CORRECTION]
+          )
         )
         .input(RequestCorrectionActionInput)
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
-        .mutation(async (options) => {
-          return addAction(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId,
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+
+          return addAction(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdByRole: ctx.user.role,
+            updatedAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId,
             status: ActionStatus.Accepted
           })
         }),
       approve: publicProcedure
-        .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
+        .use(
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.APPROVE_CORRECTION]
+          )
+        )
         .input(ApproveCorrectionActionInput)
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
-        .mutation(async (options) => {
-          return approveCorrection(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+          return approveCorrection(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdByRole: ctx.user.role,
+            updatedAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId
           })
         }),
       reject: publicProcedure
-        .use(requiresAnyOfScopes([SCOPES.RECORD_REGISTRATION_CORRECT]))
+        .use(
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.REJECT_CORRECTION]
+          )
+        )
         .input(RejectCorrectionActionInput)
-        .mutation(async (options) => {
-          return rejectCorrection(options.input, {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+        .use(middleware.requireAssignment)
+        .use(middleware.validateAction(ActionType.REJECT_CORRECTION))
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+          return rejectCorrection(input, {
+            eventId: input.eventId,
+            createdBy: ctx.user.id,
+            createdByRole: ctx.user.role,
+            updatedAtLocation: ctx.user.primaryOfficeId,
+            token: ctx.token,
+            transactionId: input.transactionId
           })
         })
     })
   }),
   list: publicProcedure
-    .use(requiresAnyOfScopes(RECORD_READ_SCOPES))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
     .query(getIndexedEvents),
-  search: publicProcedure.input(EventSearchIndex).query(async ({ input }) => {
-    return getIndex(input)
-  })
+  search: publicProcedure
+    .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
+    .input(QueryType)
+    .query(async ({ input }) => getIndex(input))
 })

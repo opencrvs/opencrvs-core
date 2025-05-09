@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set } from 'lodash'
-import { WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { cloneDeep, isEqual, set, groupBy, omit } from 'lodash'
+import { useIntl } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -24,15 +24,12 @@ import {
   isFieldVisible,
   AddressType,
   TranslationConfig,
-  deepMerge
+  IndexMap
 } from '@opencrvs/commons/client'
-import { TEXT } from '@client/forms'
 import {
-  evalExpressionInFieldDefinition,
-  getDependentFields,
-  hasDefaultValueDependencyInfo,
   makeDatesFormatted,
-  makeFormFieldIdFormikCompatible
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import {
   makeFormFieldIdsFormikCompatible,
@@ -42,18 +39,31 @@ import { GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
   id: string
-  declaration?: EventState
+  initialValues?: EventState
   eventConfig?: EventConfig
   fields: FieldConfig[]
   className?: string
   readonlyMode?: boolean
   errors: Record<string, { errors: { message: TranslationConfig }[] }>
+  /**
+   * Update the form values in the non-formik state.
+   */
   onChange: (values: EventState) => void
-  setAllFieldsDirty: boolean
+  /**
+   * Update the touched values in the non-formik state.
+   */
   setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
   fieldsToShowValidationErrors?: FieldConfig[]
-} & IntlShapeProps &
-  UsedFormikProps
+  /**
+   * When set to true, all fields will be marked as touched and any validation errors will be shown to user
+   */
+  validateAllFields: boolean
+  /**
+   * Used in conjunction with 'validateAllFields'. When validateAllFields is switched from false to true,
+   * this callback is called with success true if all fields are valid, or false if there are any validation errors.
+   */
+  onAllFieldsValidated?: (success: boolean) => void
+} & UsedFormikProps
 
 /**
  * Fields are explicitly defined here to avoid confusion between what is actually used out of all the passed props.
@@ -66,6 +76,7 @@ type UsedFormikProps = Pick<
   | 'touched'
   | 'resetForm'
   | 'setFieldValue'
+  | 'setErrors'
 >
 
 const fadeIn = keyframes`
@@ -81,186 +92,251 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-export class FormSectionComponent extends React.Component<AllProps> {
-  componentDidUpdate(prevProps: AllProps) {
-    const userChangedForm = !isEqual(this.props.values, prevProps.values)
-    const sectionChanged = prevProps.id !== this.props.id
+/**
+ * Given a parent field id, retrieve the ids of all its child field ids.
+ * Used to reset the values of child fields when a parent field changes.
+ */
+function retrieveChildFieldIds(
+  parentId: string,
+  fieldParentMap: IndexMap<FieldConfig[]>
+): string[] {
+  const childFields = fieldParentMap[parentId]
 
+  if (!childFields) {
+    return []
+  }
+
+  return childFields.map((childField) => childField.id)
+}
+
+function focusElementByHash() {
+  const hash = window.location.hash.slice(1)
+  if (!hash) {
+    return
+  }
+
+  const input =
+    document.querySelector<HTMLElement>(`input[id*="${hash}"]`) ??
+    document.querySelector<HTMLElement>(`${window.location.hash} input`)
+
+  input?.focus()
+  window.scrollTo(0, document.documentElement.scrollTop - 100)
+}
+
+// @TODO: Clarify and unify the naming of the props. What is from formik and what is from the state.
+export function FormSectionComponent({
+  values,
+  fields: fieldsWithDotSeparator,
+  touched,
+  setAllTouchedFields,
+  className,
+  initialValues = {},
+  readonlyMode,
+  id,
+  errors: errorsWithDotSeparator,
+  eventConfig,
+  setValues,
+  setTouched,
+  onChange,
+  resetForm,
+  setErrors,
+  validateAllFields,
+  fieldsToShowValidationErrors,
+  onAllFieldsValidated
+}: AllProps) {
+  const intl = useIntl()
+  const prevValuesRef = useRef(values)
+  const prevIdRef = useRef(id)
+
+  const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
+    ...field,
+    id: makeFormFieldIdFormikCompatible(field.id)
+  }))
+
+  // Create a reference map of parent fields and their their children for quick access.
+  // This is used to reset the values of child fields when a parent field changes.
+  const fieldsByParentId: IndexMap<FieldConfig[]> = useMemo(
+    () => groupBy(fieldsWithDotSeparator, (field) => field.parent?._fieldId),
+    [fieldsWithDotSeparator]
+  )
+
+  const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
+  const form = makeFormikFieldIdsOpenCRVSCompatible(
+    makeDatesFormatted(fieldsWithDotSeparator, values)
+  )
+
+  const showValidationErrors = useCallback(
+    (formFields: FieldConfig[]) => {
+      const formattedFieldIds = formFields.map(({ id: fieldId }) =>
+        makeFormFieldIdFormikCompatible(fieldId)
+      )
+
+      const touchedForm = formattedFieldIds.reduce<Record<string, boolean>>(
+        (acc, fieldId) => {
+          acc[fieldId] = true
+          return acc
+        },
+        {}
+      )
+      void setTouched(touchedForm)
+    },
+    [setTouched]
+  )
+
+  const onFieldValueChange = useCallback(
+    (formikFieldId: string, value: FieldValue | undefined) => {
+      const updatedValues = cloneDeep(values)
+      const updatedErrors = cloneDeep(errorsWithDotSeparator)
+
+      const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
+
+      const childIds = retrieveChildFieldIds(ocrvsFieldId, fieldsByParentId)
+
+      // update the value of the field that was changed
+      set(updatedValues, formikFieldId, value)
+
+      // reset the children values of the changed field. (e.g. When changing informant.relation, empty out phone number, email and others.)
+      for (const childId of childIds) {
+        set(updatedValues, makeFormFieldIdFormikCompatible(childId), undefined)
+        set(updatedErrors, childId, { errors: [] })
+      }
+
+      // @TODO: we should not reference field id 'country' directly.
+      if (formikFieldId === 'country') {
+        const defaultCountry = window.config.COUNTRY || 'FAR'
+        set(
+          updatedValues,
+          'addressType',
+          value === defaultCountry
+            ? AddressType.DOMESTIC
+            : AddressType.INTERNATIONAL
+        )
+      }
+
+      const formikChildIds = childIds.map((childId) =>
+        makeFormFieldIdFormikCompatible(childId)
+      )
+      const updatedTouched = omit(touched, formikChildIds)
+
+      // @TODO: Formik does not type errors well. Actual error message differs from the type.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      void setErrors(updatedErrors as any)
+      void setValues(updatedValues)
+      void setTouched(updatedTouched)
+      void setAllTouchedFields(updatedTouched)
+    },
+    [
+      values,
+      setValues,
+      fieldsByParentId,
+      setTouched,
+      touched,
+      errorsWithDotSeparator,
+      setErrors,
+      setAllTouchedFields
+    ]
+  )
+
+  useEffect(() => {
+    void setTouched({})
+    if (validateAllFields) {
+      showValidationErrors(fieldsWithDotSeparator)
+    }
+
+    focusElementByHash()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const userChangedForm = !isEqual(values, prevValuesRef.current)
+
+    const sectionChanged = prevIdRef.current !== id
+
+    // Formik does not allow controlling the form state 'easily'.
+    // We propagate changes to the non-formik state from formik
     if (userChangedForm) {
-      prevProps.onChange(this.props.values)
+      onChange(values)
     }
 
     if (sectionChanged) {
-      prevProps.resetForm()
-      if (this.props.setAllFieldsDirty) {
-        this.showValidationErrors(this.props.fields)
-      } else if (
-        this.props.fieldsToShowValidationErrors &&
-        this.props.fieldsToShowValidationErrors.length > 0
-      ) {
-        this.showValidationErrors(this.props.fieldsToShowValidationErrors)
+      resetForm()
+
+      const fieldsToValidate = validateAllFields
+        ? fieldsWithDotSeparator
+        : (fieldsToShowValidationErrors ?? [])
+
+      if (fieldsToValidate.length) {
+        showValidationErrors(fieldsToValidate)
       }
     }
-  }
 
-  componentDidMount() {
-    if (this.props.setAllFieldsDirty) {
-      this.showValidationErrors(this.props.fields)
+    prevValuesRef.current = values
+    prevIdRef.current = id
+  }, [
+    values,
+    id,
+    onChange,
+    resetForm,
+    fieldsWithDotSeparator,
+    fieldsToShowValidationErrors,
+    validateAllFields,
+    showValidationErrors
+  ])
+
+  // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
+  // Address is the only deep value.
+  const completeForm = { ...initialValues, ...form }
+
+  const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
+    const fieldErrors = errors[field.id]?.errors
+    const hasErrors = fieldErrors && fieldErrors.length > 0
+    return isFieldVisible(field, completeForm) && hasErrors
+  })
+
+  useEffect(() => {
+    if (validateAllFields) {
+      showValidationErrors(fieldsWithDotSeparator)
+      onAllFieldsValidated?.(!hasAnyValidationErrors)
     }
 
-    if (window.location.hash) {
-      setTimeout(() => {
-        const newScroll = document.documentElement.scrollTop - 100
-        window.scrollTo(0, newScroll)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validateAllFields])
 
-        const focusedElementId = window.location.hash.replace('#', '')
-        let focusedElement = document.querySelector(
-          `input[id*="${focusedElementId}"]`
-        ) as HTMLElement | null
-
-        if (focusedElement === null) {
-          // Handling for Select
-          focusedElement = document.querySelector(
-            `${window.location.hash} input`
-          ) as HTMLElement | null
-
-          focusedElement?.focus()
-        } else {
-          // Handling for Input
-          focusedElement.focus()
-        }
-      }, 0)
-    }
-  }
-
-  showValidationErrors(fields: FieldConfig[]) {
-    const touched = fields.reduce((memo, field) => {
-      return { ...memo, [field.id]: true }
-    }, {})
-
-    void this.props.setTouched(touched)
-  }
-
-  setFieldValuesWithDependency = (
-    fieldId: string,
-    value: FieldValue | undefined
-  ) => {
-    const updatedValues = cloneDeep(this.props.values)
-    set(updatedValues, fieldId, value)
-
-    if (fieldId === 'country') {
-      set(
-        updatedValues,
-        'addressType',
-        value === (window.config.COUNTRY || 'FAR')
-          ? AddressType.DOMESTIC
-          : AddressType.INTERNATIONAL
-      )
-    }
-    const updateDependentFields = (id: string) => {
-      const dependentFields = getDependentFields(this.props.fields, id)
-      for (const field of dependentFields) {
-        if (
-          !field.defaultValue ||
-          !hasDefaultValueDependencyInfo(field.defaultValue)
-        ) {
-          continue
+  return (
+    <section className={className}>
+      {fieldsWithFormikSeparator.map((field) => {
+        if (!isFieldVisible(field, completeForm)) {
+          return null
         }
 
-        updatedValues[field.id] = evalExpressionInFieldDefinition(
-          field.defaultValue.expression,
-          { $form: updatedValues }
+        const isDisabled = !isFieldEnabled(field, completeForm)
+        const visibleError = errors[field.id]?.errors[0]?.message
+        const error = visibleError ? intl.formatMessage(visibleError) : ''
+
+        return (
+          <FormItem
+            key={field.id}
+            ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
+          >
+            <Field name={field.id}>
+              {({ field: formikField }: FieldProps) => (
+                <GeneratedInputField
+                  disabled={isDisabled}
+                  error={isDisabled ? '' : error}
+                  eventConfig={eventConfig}
+                  fieldDefinition={field}
+                  form={completeForm}
+                  readonlyMode={readonlyMode}
+                  touched={touched[field.id] ?? false}
+                  value={formikField.value}
+                  onBlur={formikField.onBlur}
+                  onFieldValueChange={onFieldValueChange}
+                />
+              )}
+            </Field>
+          </FormItem>
         )
-        updateDependentFields(field.id)
-      }
-    }
-
-    updateDependentFields(fieldId)
-
-    void this.props.setValues(updatedValues)
-  }
-
-  resetDependentSelectValues = (fieldId: string) => {
-    const fields = this.props.fields
-    const fieldsToReset = fields.filter(
-      (field) => field.type === TEXT && field.dependsOn?.includes(fieldId)
-    )
-
-    fieldsToReset.forEach((fieldToReset) => {
-      void this.props.setFieldValue(fieldToReset.id, '')
-      this.resetDependentSelectValues(fieldToReset.id)
-    })
-  }
-
-  render() {
-    const {
-      values,
-      fields: fieldsWithDotIds,
-      touched,
-      intl,
-      className,
-      declaration,
-      readonlyMode
-    } = this.props
-
-    const language = this.props.intl.locale
-
-    const errors = makeFormFieldIdsFormikCompatible(this.props.errors)
-
-    const fields = fieldsWithDotIds.map((field) => ({
-      ...field,
-      id: makeFormFieldIdFormikCompatible(field.id)
-    }))
-
-    const valuesWithFormattedDate = makeDatesFormatted(fieldsWithDotIds, values)
-    const form = makeFormikFieldIdsOpenCRVSCompatible(valuesWithFormattedDate)
-
-    // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-    // Address is the only deep value.
-    const completeForm = { ...(declaration ?? {}), ...form }
-
-    return (
-      <section className={className}>
-        {fields.map((field) => {
-          let error: string
-          const visibleError = errors[field.id]?.errors[0]?.message
-
-          if (visibleError) {
-            error = intl.formatMessage(visibleError)
-          }
-
-          if (!isFieldVisible(field, completeForm)) {
-            return null
-          }
-
-          const isDisabled = !isFieldEnabled(field, completeForm)
-
-          return (
-            <FormItem
-              key={`${field.id}${language}`}
-              ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
-            >
-              <Field name={field.id}>
-                {(formikFieldProps: FieldProps) => {
-                  return (
-                    <GeneratedInputField
-                      {...formikFieldProps.field}
-                      disabled={isDisabled}
-                      error={isDisabled ? '' : error}
-                      eventConfig={this.props.eventConfig}
-                      fieldDefinition={field}
-                      form={completeForm}
-                      readonlyMode={readonlyMode}
-                      setFieldValue={this.setFieldValuesWithDependency}
-                      touched={touched[field.id] ?? false}
-                    />
-                  )
-                }}
-              </Field>
-            </FormItem>
-          )
-        })}
-      </section>
-    )
-  }
+      })}
+    </section>
+  )
 }

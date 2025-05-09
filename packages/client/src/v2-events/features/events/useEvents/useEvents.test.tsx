@@ -22,6 +22,7 @@ import {
   ActionType,
   EventDocument,
   EventInput,
+  getUUID,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
@@ -61,15 +62,18 @@ const createHandler = trpcHandler(async ({ request }) => {
     trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
+    updatedAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
     actions: [
       {
         type: ActionType.CREATE,
         id: '_REAL_ACTION_UUID_',
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
         createdBy: '6733309827b97e6483877188',
+        createdByRole: 'some-user-role',
         createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
         declaration: {},
-        status: ActionStatus.Accepted
+        status: ActionStatus.Accepted,
+        transactionId: getUUID()
       }
     ]
   })

@@ -11,11 +11,15 @@
 
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
-import { SummaryConfig } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  getDeclarationFields,
+  areConditionsMet,
+  SummaryConfig
+} from '@opencrvs/commons/client'
 import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { RecursiveStringRecord } from '@client/v2-events/hooks/useSimpleFieldStringifier'
-
+import { Output } from '@client/v2-events/features/events/components/Output'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
@@ -37,7 +41,7 @@ function getDefaultFields(
       value: {
         id: 'v2.event.summary.status.value',
         defaultMessage:
-          '{event.status, select, CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+          '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
         description: 'Status of the event'
       }
     },
@@ -91,38 +95,69 @@ function getDefaultFields(
 
 export function EventSummary({
   event,
-  summary,
-  eventLabel
+  eventConfiguration
 }: {
-  event: Record<string, FieldValue | null | RecursiveStringRecord>
-  summary: SummaryConfig
-  /**
-   * Event label to be displayed in the summary page.
-   * This label is used for translation purposes and should not be stored in the event data.
-   */
-  eventLabel: TranslationConfig
+  event: Record<string, FieldValue | null>
+  eventConfiguration: EventConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const defaultFields = getDefaultFields(eventLabel)
+  const { summary, label } = eventConfiguration
+  const defaultFields = getDefaultFields(label)
   const summaryPageFields = [...defaultFields, ...summary.fields]
+  const declarationFields = getDeclarationFields(eventConfiguration)
+
+  const fields = summaryPageFields.map((field) => {
+    if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
+      return null
+    }
+
+    if ('fieldId' in field) {
+      const config = declarationFields.find((f) => f.id === field.fieldId)
+      const value = event[field.fieldId] ?? undefined
+
+      if (!config) {
+        return null
+      }
+
+      return {
+        id: field.fieldId,
+        label: config.label,
+        emptyValueMessage: field.emptyValueMessage,
+        value: Output({
+          field: config,
+          showPreviouslyMissingValuesAsChanged: false,
+          value: value
+        })
+      }
+    }
+
+    return {
+      id: field.id,
+      label: field.label,
+      emptyValueMessage: field.emptyValueMessage,
+      value: intl.formatMessage(field.value, event)
+    }
+  })
 
   return (
     <>
       <Summary id="summary">
-        {summaryPageFields.map((field) => {
-          return (
-            <Summary.Row
-              key={field.id}
-              data-testid={field.id}
-              label={intl.formatMessage(field.label)}
-              placeholder={
-                field.emptyValueMessage &&
-                intl.formatMessage(field.emptyValueMessage)
-              }
-              value={intl.formatMessage(field.value, event)}
-            />
-          )
-        })}
+        {fields
+          .filter((f): f is NonNullable<typeof f> => f !== null)
+          .map((field) => {
+            return (
+              <Summary.Row
+                key={field.id}
+                data-testid={field.id}
+                label={intl.formatMessage(field.label)}
+                placeholder={
+                  field.emptyValueMessage &&
+                  intl.formatMessage(field.emptyValueMessage)
+                }
+                value={field.value}
+              />
+            )
+          })}
       </Summary>
     </>
   )

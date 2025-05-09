@@ -43,7 +43,7 @@ import {
   FieldValue,
   FieldUpdateValueSchema,
   NumberFieldValue,
-  RequiredTextValue,
+  NonEmptyTextValue,
   TextValue,
   DataFieldValue
 } from './FieldValue'
@@ -97,8 +97,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.SIGNATURE:
-    case FieldType.HIDDEN:
-      schema = required ? RequiredTextValue : TextValue
+      schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
       schema = NumberFieldValue

@@ -18,9 +18,15 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
 import { EventConfig, FieldValue } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { getAllUniqueFields } from '@client/v2-events/utils'
+import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
+import {
+  flattenFieldErrors,
+  getAdvancedSearchFieldErrors,
+  getDefaultSearchFields
+} from './utils'
+
+const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -48,7 +54,6 @@ const messages = defineMessages(messagesToDefine)
 
 function getSectionFields(
   event: EventConfig,
-  formValues: Record<string, FieldValue>,
   handleFieldChange: (fieldId: string, value: FieldValue) => void,
   intl: IntlShape,
   fieldValues?: Record<string, string>
@@ -56,6 +61,7 @@ function getSectionFields(
   const advancedSearchSections = event.advancedSearch
   const allUniqueFields = getAllUniqueFields(event)
   return advancedSearchSections.map((section) => {
+    const metadataFields = getDefaultSearchFields(section)
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
@@ -63,9 +69,11 @@ function getSectionFields(
       advancedSearchFieldId.includes(field.id)
     )
 
-    const modifiedFields = advancedSearchFields.map((f) => ({
+    const combinedFields = [...metadataFields, ...advancedSearchFields]
+    const modifiedFields = combinedFields.map((f) => ({
       ...f,
-      required: false as const // advanced search fields need not be required
+      required: false as const, // advanced search fields need not be required
+      defaultValue: undefined // advanced search fields need no default or initial value
     }))
 
     return (
@@ -79,10 +87,8 @@ function getSectionFields(
       >
         <FormFieldGenerator
           fields={modifiedFields}
-          form={formValues}
           id={section.title.id}
           initialValues={fieldValues}
-          setAllFieldsDirty={false}
           onChange={(updatedValues) => {
             Object.entries(updatedValues).forEach(([fieldId, value]) => {
               handleFieldChange(fieldId, value)
@@ -107,11 +113,16 @@ export function TabSearch({
     Record<string, FieldValue>
   >(fieldValues ?? {})
 
-  const hasEnoughParams = Object.entries(formValues).length > 0
   const navigate = useNavigate()
 
+  const prevEventId = React.useRef(currentEvent.id)
+
   React.useEffect(() => {
-    setFormValues({})
+    // only reset formValues if another event search tab is selected
+    if (prevEventId.current !== currentEvent.id) {
+      setFormValues({})
+      prevEventId.current = currentEvent.id
+    }
   }, [currentEvent])
 
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
@@ -125,8 +136,15 @@ export function TabSearch({
     getAdvancedSearchFieldErrors(currentEvent, formValues)
   )
 
+  const SectionFields = getSectionFields(
+    currentEvent,
+    handleFieldChange,
+    intl,
+    fieldValues
+  )
+
   const handleSearch = () => {
-    const searchParams = stringify(formValues)
+    const searchParams = stringify(filterEmptyValues(formValues))
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: currentEvent.id
     })
@@ -134,13 +152,8 @@ export function TabSearch({
     navigate(`${navigateTo}?${searchParams.toString()}`)
   }
 
-  const SectionFields = getSectionFields(
-    currentEvent,
-    formValues,
-    handleFieldChange,
-    intl,
-    fieldValues
-  )
+  const hasEnoughParams =
+    Object.entries(filterEmptyValues(formValues)).length >= MIN_PARAMS_TO_SEARCH
 
   const Search = (
     <SearchButton

@@ -10,7 +10,6 @@
  */
 
 import { flattenDeep, omitBy, mergeWith, isArray, isObject } from 'lodash'
-import { workqueues } from '../workqueues'
 import {
   ActionType,
   DeclarationActionType,
@@ -19,14 +18,12 @@ import {
 } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
-import { WorkqueueConfig } from './WorkqueueConfig'
 import { Action, ActionUpdate, EventState } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
-import { isFieldVisible, validate } from '../conditionals/validate'
+import { isConditionMet, isFieldVisible } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID } from '../uuid'
-import { formatISO } from 'date-fns'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
@@ -70,18 +67,8 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   return []
 }
 
-export const getAllAnnotationFields = (config: EventConfig): FieldConfig[] => {
+function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
   return flattenDeep(config.actions.map(getActionAnnotationFields))
-}
-
-/**
- * @returns All the fields in the event configuration.
- */
-export const findAllFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep([
-    ...getDeclarationFields(config),
-    ...getAllAnnotationFields(config)
-  ])
 }
 
 /**
@@ -125,39 +112,34 @@ export function getActionReviewFields(
   return getActionReview(configuration, actionType).fields
 }
 
-export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
-  workqueueConfigs.map((workqueue) => {
-    const rootWorkqueue = Object.values(workqueues).find(
-      (wq) => wq.id === workqueue.id
-    )
-    if (!rootWorkqueue) {
-      throw new Error(
-        `Invalid workqueue configuration: workqueue not found with id: ${workqueue.id}`
-      )
-    }
-  })
-}
-
 export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   if (!page.conditional) {
     return true
   }
 
-  return validate(page.conditional, {
-    $form: formValues,
-    $now: formatISO(new Date(), { representation: 'date' })
-  })
+  return isConditionMet(page.conditional, formValues)
 }
 
-export function omitHiddenFields(fields: FieldConfig[], values: EventState) {
-  return omitBy(values, (_, fieldId) => {
-    const field = fields.find((f) => f.id === fieldId)
+export function omitHiddenFields<T extends EventState | ActionUpdate>(
+  fields: FieldConfig[],
+  values: T,
+  visibleVerificationPageIds: string[] = []
+) {
+  return omitBy<T>(values, (_, fieldId) => {
+    // We dont want to omit visible verification page values
+    if (visibleVerificationPageIds.includes(fieldId)) {
+      return false
+    }
 
-    if (!field) {
+    // There can be multiple field configurations with the same id, with e.g. different options and conditions
+    const fieldConfigs = fields.filter((f) => f.id === fieldId)
+
+    if (!fieldConfigs.length) {
       return true
     }
 
-    return !isFieldVisible(field, values)
+    // As long as one of the field configs is visible, the field should be included
+    return fieldConfigs.every((f) => !isFieldVisible(f, values))
   })
 }
 
@@ -215,6 +197,59 @@ export function isVerificationPage(
   return page.type === PageTypes.enum.VERIFICATION
 }
 
+export function getVisibleVerificationPageIds(
+  pages: PageConfig[],
+  annotation: ActionUpdate
+): string[] {
+  return pages
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, annotation))
+    .map((page) => page.id)
+}
+
+export function getActionVerificationPageIds(
+  actionConfig: ActionConfig,
+  annotation: ActionUpdate
+): string[] {
+  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
+    return [
+      ...getVisibleVerificationPageIds(actionConfig.onboardingForm, annotation),
+      ...getVisibleVerificationPageIds(
+        actionConfig.additionalDetailsForm,
+        annotation
+      )
+    ]
+  }
+
+  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
+    return getVisibleVerificationPageIds(
+      actionConfig.printForm.pages,
+      annotation
+    )
+  }
+
+  return []
+}
+
+export function omitHiddenAnnotationFields(
+  actionConfig: ActionConfig,
+  declaration: EventState,
+  annotation: ActionUpdate
+) {
+  const annotationFields = getActionAnnotationFields(actionConfig)
+
+  const visibleVerificationPageIds = getActionVerificationPageIds(
+    actionConfig,
+    annotation
+  )
+
+  return omitHiddenFields(
+    annotationFields,
+    { ...declaration, ...annotation },
+    visibleVerificationPageIds
+  )
+}
+
 export function deepMerge<T extends Record<string, unknown>>(
   currentDocument: T,
   actionDocument: T
@@ -257,4 +292,14 @@ export type IndexMap<T> = {
 
 export function isWriteAction(actionType: ActionType): boolean {
   return writeActions.safeParse(actionType).success
+}
+
+/**
+ * @returns All the fields in the event configuration.
+ */
+export const findAllFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep([
+    ...getDeclarationFields(config),
+    ...getAllAnnotationFields(config)
+  ])
 }

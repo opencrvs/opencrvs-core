@@ -10,26 +10,42 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { SelectOption } from './FieldConfig'
+
+export const MatchType = z.enum(['FUZZY', 'EXACT', 'RANGE', 'ANY_OF'])
+export type MatchType = z.infer<typeof MatchType>
+
+const BaseField = z.object({
+  config: z.object({
+    type: MatchType.describe('Determines the type of field')
+  }),
+  options: z.array(SelectOption).optional()
+})
+
+export const FieldConfigSchema = BaseField.extend({
+  fieldId: z.string(),
+  fieldType: z.literal('field')
+})
+
+export const EventFieldId = z.enum(['trackingId', 'status'])
+export type EventFieldId = z.infer<typeof EventFieldId>
+
+export const EventFieldConfigSchema = BaseField.extend({
+  fieldId: EventFieldId,
+  fieldType: z.literal('event')
+})
+
+export const SearchField = z.discriminatedUnion('fieldType', [
+  FieldConfigSchema,
+  EventFieldConfigSchema
+])
+
+export type SearchField = z.infer<typeof SearchField>
 
 export const AdvancedSearchConfig = z.object({
   title: TranslationConfig.describe('Advanced search tab title'),
-  fields: z
-    .array(
-      z.object({
-        fieldId: z.string(),
-        config: z
-          .object({
-            type: z
-              .enum(['FUZZY', 'EXACT', 'RANGE'])
-              .describe('Determines the type of field')
-          })
-          .optional()
-          .describe('Configuration options for the field')
-      })
-    )
-    .optional()
-    .default([])
-    .describe('Advanced search fields.')
+  fields: z.array(SearchField).describe('Advanced search fields.')
 })
 
+export type AdvancedSearchConfigInput = z.infer<typeof AdvancedSearchConfig>
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>
