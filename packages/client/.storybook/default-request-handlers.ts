@@ -2046,7 +2046,7 @@ export const handlers = {
         certificates: [
           {
             id: 'tennis-club-membership-certificate',
-            event: 'TENNIS_CLUB_MEMBERSHIP',
+            event: 'tennis-club-membership',
             label: {
               id: 'certificates.tennis-club-membership.certificate.copy',
               defaultMessage: 'Tennis Club Membership Certificate copy',
@@ -2071,7 +2071,7 @@ export const handlers = {
           },
           {
             id: 'tennis-club-membership-certified-certificate',
-            event: 'TENNIS_CLUB_MEMBERSHIP',
+            event: 'tennis-club-membership',
             label: {
               id: 'certificates.tennis-club-membership.certificate.certified-copy',
               defaultMessage:
