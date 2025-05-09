@@ -13,13 +13,16 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  eventQueryDataGenerator,
+  EventStatus,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import {
   tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument,
-  tennisClubMembershipEvents
+  tennisClubMembershipEventDocument
 } from '@client/v2-events/features/events/fixtures'
 import { WorkqueueIndex } from './index'
 
@@ -46,6 +49,8 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
+
+const queryData = Array.from({ length: 12 }, () => eventQueryDataGenerator())
 
 export const Workqueue: Story = {
   parameters: {
@@ -83,7 +88,7 @@ export const AllEventsWorkqueueWithPagination: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.list.query(() => {
-            return tennisClubMembershipEvents
+            return queryData
           })
         ]
       }
@@ -106,8 +111,8 @@ export const ReadyToPrintWorkqueue: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.list.query(() => {
-            return tennisClubMembershipEvents.filter(
-              (record) => record.status === 'REGISTERED'
+            return queryData.filter(
+              (record) => record.status === EventStatus.REGISTERED
             )
           })
         ]
@@ -131,8 +136,8 @@ export const ReadyForReviewWorkqueue: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.list.query(() => {
-            return tennisClubMembershipEvents.filter(
-              (record) => record.status === 'DECLARED'
+            return queryData.filter(
+              (record) => record.status === EventStatus.DECLARED
             )
           })
         ]

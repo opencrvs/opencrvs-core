@@ -12,10 +12,10 @@ import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
   eventQueryDataGenerator,
+  EventStatus,
   tennisClubMembershipEvent,
   workqueues
 } from '@opencrvs/commons/client'
-import { tennisClubMembershipEvents } from '../fixtures'
 import { SearchResult } from './SearchResult'
 
 const meta: Meta<typeof SearchResult> = {
@@ -25,6 +25,8 @@ const meta: Meta<typeof SearchResult> = {
     layout: 'centered'
   }
 }
+
+const queryData = Array.from({ length: 12 }, () => eventQueryDataGenerator())
 
 const mockSearchParams = {
   'applicant.firstname': 'Danny',
@@ -39,7 +41,16 @@ export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
       <React.Suspense>
         <SearchResult
           eventConfig={tennisClubMembershipEvent}
-          queryData={[eventQueryDataGenerator()]}
+          queryData={[
+            eventQueryDataGenerator({
+              declaration: {
+                'recommender.none': true,
+                'applicant.firstname': 'Danny',
+                'applicant.surname': 'Doe',
+                'applicant.dob': '1999-11-11'
+              }
+            })
+          ]}
           searchParams={mockSearchParams}
           workqueueConfig={workqueues['all']}
         />
@@ -55,10 +66,10 @@ export const SearchResultWithMultipleItems: StoryObj<typeof SearchResult> = {
       <React.Suspense>
         <SearchResult
           eventConfig={tennisClubMembershipEvent}
-          queryData={tennisClubMembershipEvents.filter(
-            (e) => e.status === 'REGISTERED'
+          queryData={queryData.filter(
+            (e) => e.status === EventStatus.REGISTERED
           )}
-          searchParams={{ status: 'REGISTERED' }}
+          searchParams={{ status: EventStatus.REGISTERED }}
           workqueueConfig={workqueues['all']}
         />
       </React.Suspense>
