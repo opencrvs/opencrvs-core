@@ -7,6 +7,9 @@
 - **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
 - **Redis replaced with Valkey**, version was bumped from 5 to 8. [#6720](https://github.com/opencrvs/opencrvs-core/issues/6720)
 
+### Bug fixes
+- When the building the graphql payload from form data, we now check if a field was changed. If so then include it in the payload even if it might have been changed to an empty value.[#9369](https://github.com/opencrvs/opencrvs-core/issues/9369)
+
 ### Improvements
 
 - Improved text color for disabled text inputs and dropdowns
