@@ -69,7 +69,13 @@ export { PagesIndex as Pages, ReviewIndex as Review }
 - Use constants through object pattern. e.g.`ActionType.DECLARE` over `'DECLARE'`. In most situations, it does not matter. However, changing the names will get much easier.
 - When building new features, prefer to import them through `index.ts`. Managing imports will be cleaner and easier that way. See (`/layouts`)
 
-## Writing tests using Storybook and Chromatic
+## Writing and running tests using Storybook and Chromatic
+
+**Note: If running tests locally fails, make sure you have restarted all the services.**
+
+```
+page.evaluate: ReferenceError: Cannot access 'StorybookTestRunnerError' before initialization
+```
 
 - Chromatic does visual testing against the storybook library. Each view should have a visual test attached to it.
 - When building more elaborate test cases, use [storybook interaction tests](https://storybook.js.org/docs/writing-tests/component-testing#write-a-component-test)

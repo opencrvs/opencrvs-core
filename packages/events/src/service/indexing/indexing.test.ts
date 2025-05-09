@@ -32,7 +32,7 @@ test('indexes all records from MongoDB with one function call', async () => {
   }
 
   const body = await esClient.search({
-    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
+    index: getEventIndexName('tennis-club-membership'),
     body: {
       query: {
         match_all: {}
@@ -51,7 +51,7 @@ test('records are automatically indexed when they are created', async () => {
 
   const esClient = getOrCreateClient()
   const body = await esClient.search({
-    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
+    index: getEventIndexName('tennis-club-membership'),
     body: {
       query: {
         match_all: {}

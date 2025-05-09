@@ -57,7 +57,7 @@ const createHandler = trpcHandler(async ({ request }) => {
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
   return HttpResponse.json({
-    type: 'TENNIS_CLUB_MEMBERSHIP',
+    type: 'tennis-club-membership',
     id: '_REAL_UUID_',
     trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
@@ -171,7 +171,7 @@ describe('events that have unsynced actions', () => {
 
     // eslint-disable-next-line @typescript-eslint/await-thenable
     await createEventHook.result.current.mutate({
-      type: 'TENNIS_CLUB_MEMBERSHIP',
+      type: 'tennis-club-membership',
       transactionId: '_TEST_TRANSACTION_'
     })
 
@@ -190,7 +190,7 @@ describe('events that have unsynced actions', () => {
     createEventHook
   }) => {
     await createEventHook.result.current.mutateAsync({
-      type: 'TENNIS_CLUB_MEMBERSHIP',
+      type: 'tennis-club-membership',
       transactionId: '_TEST_TRANSACTION_'
     })
     // Wait for backend to sync

@@ -39,7 +39,7 @@ test('Throws error without proper scope', async () => {
   await expect(
     client.event.search({
       type: 'and',
-      eventType: 'TENNIS_CLUB_MEMBERSHIP',
+      eventType: 'tennis-club-membership',
       data: {
         'applicant.firstname': 'Unique'
       }
@@ -80,7 +80,7 @@ test('Returns empty list when no events match search criteria', async () => {
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    eventType: 'tennis-club-membership',
     data: {
       applicant____firstname: { type: 'exact', term: 'Johnson' }
     }
@@ -164,7 +164,7 @@ test('Returns events that match the text field criteria of applicant', async () 
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    eventType: 'tennis-club-membership',
     data: {
       applicant____firstname: { type: 'exact', term: 'John' },
       applicant____dob: { type: 'exact', term: '2000-01-01' }
@@ -228,7 +228,7 @@ test('Returns events that match date of birth of applicant', async () => {
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    eventType: 'tennis-club-membership',
     data: {
       applicant____dob: { type: 'exact', term: '2000-01-01' }
     }
@@ -291,7 +291,7 @@ test('Does not return events when searching with a similar but different date of
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    eventType: 'tennis-club-membership',
     data: {
       applicant____dob: { type: 'exact', term: '1999-11-11' } // search with same day and month
     }
@@ -329,7 +329,7 @@ test('Returns single document after creation', async () => {
 
   const response = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    eventType: 'tennis-club-membership',
     data: {
       applicant____firstname: {
         type: 'exact',
@@ -410,7 +410,7 @@ test('Returns multiple documents after creation', async () => {
 
   const response = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    eventType: 'tennis-club-membership',
     data: {
       applicant____firstname: {
         type: 'exact',
@@ -496,7 +496,7 @@ test('Returns no documents when search params are not matched', async () => {
 
   const response = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    eventType: 'tennis-club-membership',
     data: {
       applicant____firstname: {
         type: 'exact',
@@ -543,7 +543,7 @@ test('Throws error when search params are not matching proper schema', async () 
   await expect(
     client.event.search({
       type: 'and',
-      eventType: 'TENNIS_CLUB_MEMBERSHIP',
+      eventType: 'tennis-club-membership',
       data: {
         applicant____firstname: 'Johnny' // invalid schema
       }

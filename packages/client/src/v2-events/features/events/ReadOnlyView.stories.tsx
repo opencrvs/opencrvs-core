@@ -95,9 +95,9 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
         eventId: tennisClubMembershipEventDocument.id
-      }),
-      chromatic: { disableSnapshot: true }
+      })
     },
+    chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
         event: [

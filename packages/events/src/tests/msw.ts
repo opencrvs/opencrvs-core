@@ -29,7 +29,7 @@ const handlers = [
   http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEvent,
-      { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
+      { ...tennisClubMembershipEvent, id: 'tennis-club-membership-premium' }
     ])
   }),
   // event.delete.test.ts
@@ -41,7 +41,7 @@ const handlers = [
     return HttpResponse.json({ ok: true })
   }),
   http.post(
-    `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/:action`,
+    `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/:action`,
     (ctx) => {
       const payload =
         ctx.params.action === ActionType.REGISTER

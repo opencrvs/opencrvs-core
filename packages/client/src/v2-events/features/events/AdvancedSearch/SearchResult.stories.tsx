@@ -12,6 +12,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
   eventQueryDataGenerator,
+  EventStatus,
   tennisClubMembershipEvent,
   workqueues
 } from '@opencrvs/commons/client'
@@ -24,6 +25,8 @@ const meta: Meta<typeof SearchResult> = {
     layout: 'centered'
   }
 }
+
+const queryData = Array.from({ length: 12 }, () => eventQueryDataGenerator())
 
 const mockSearchParams = {
   'applicant.firstname': 'Danny',
@@ -38,7 +41,50 @@ export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
       <React.Suspense>
         <SearchResult
           eventConfig={tennisClubMembershipEvent}
-          queryData={[eventQueryDataGenerator()]}
+          queryData={[
+            eventQueryDataGenerator({
+              declaration: {
+                'recommender.none': true,
+                'applicant.firstname': 'Danny',
+                'applicant.surname': 'Doe',
+                'applicant.dob': '1999-11-11'
+              }
+            })
+          ]}
+          searchParams={mockSearchParams}
+          workqueueConfig={workqueues['all']}
+        />
+      </React.Suspense>
+    )
+  }
+}
+
+export const SearchResultWithMultipleItems: StoryObj<typeof SearchResult> = {
+  name: 'Search Results With Multiple Items',
+  render: function Component() {
+    return (
+      <React.Suspense>
+        <SearchResult
+          eventConfig={tennisClubMembershipEvent}
+          queryData={queryData.filter(
+            (e) => e.status === EventStatus.REGISTERED
+          )}
+          searchParams={{ status: EventStatus.REGISTERED }}
+          workqueueConfig={workqueues['all']}
+        />
+      </React.Suspense>
+    )
+  }
+}
+
+export const NoSearchResult: StoryObj<typeof SearchResult> = {
+  name: 'No Search Result',
+  render: function Component() {
+    return (
+      <React.Suspense>
+        <SearchResult
+          eventConfig={tennisClubMembershipEvent}
+          queryData={[]}
           searchParams={mockSearchParams}
           workqueueConfig={workqueues['all']}
         />
