@@ -120,14 +120,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   /*
    * Initialize the form state
    */
-
-  const setInitialFormValues = useEventFormData(
-    (state) => state.setInitialFormValues
-  )
-
-  const setInitialAnnotation = useActionAnnotation(
-    (state) => state.setInitialAnnotation
-  )
+  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
   const eventDrafts = drafts
     .filter((d) => d.eventId === event.id)
@@ -191,8 +185,13 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   }, [event, actionType])
 
   useEffect(() => {
-    setInitialFormValues(eventStateWithDrafts.declaration)
-    setInitialAnnotation({ ...previousActionAnnotation, ...actionAnnotation })
+    setFormValues({ ...formValues, ...eventStateWithDrafts.declaration })
+
+    setAnnotation({
+      ...annotation,
+      ...previousActionAnnotation,
+      ...actionAnnotation
+    })
 
     return () => {
       /*
@@ -200,6 +199,9 @@ function DeclarationActionComponent({ children, actionType }: Props) {
        * staged drafts the user has for this event id and type
        */
       setLocalDraft(null)
+
+      // TODO CIHAN: do we want or need to do this?
+      // setFormValues({})
     }
 
     /*

@@ -64,8 +64,6 @@ const eventDocument = generateEventDocument({
 
 const eventId = eventDocument.id
 
-const draft = generateEventDraftDocument(eventId, ActionType.REGISTER)
-
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
   name: [
@@ -80,6 +78,10 @@ const mockUser = {
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
+  beforeEach: () => {
+    // For this test, we want to have empty form values in zustand state
+    useEventFormData.setState({ formValues: {} })
+  },
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()
@@ -310,6 +312,10 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 }
 
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
+  beforeEach: () => {
+    // For this test, we want to have empty form values in zustand state
+    useEventFormData.setState({ formValues: {} })
+  },
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()
@@ -389,11 +395,6 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 }
 
 export const ChangeFieldInReview: Story = {
-  beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
-    })
-  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -406,7 +407,7 @@ export const ChangeFieldInReview: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [draft]
+            return [generateEventDraftDocument(eventId, ActionType.REGISTER)]
           })
         ],
         events: [
