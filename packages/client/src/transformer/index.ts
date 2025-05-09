@@ -237,10 +237,11 @@ export function getChangedValues(
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
-  draftData: IFormData,
+  currentFormData: IFormData,
   draftId: string,
   userDetails: UserDetails | null,
-  offlineCountryConfig: IOfflineData
+  offlineCountryConfig: IOfflineData,
+  previousFormData: IFormData | undefined
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -249,24 +250,24 @@ export const draftToGqlTransformer = (
   const transformedData: TransformedData = { createdAt: new Date() }
   const inCompleteFieldList: string[] = []
   formDefinition.sections.forEach((section) => {
-    if (!draftData[section.id]) {
-      draftData[section.id] = {}
+    if (!currentFormData[section.id]) {
+      currentFormData[section.id] = {}
     }
     if (!transformedData[section.id]) {
       transformedData[section.id] = {}
     }
     getVisibleSectionGroupsBasedOnConditions(
       section,
-      draftData[section.id],
-      draftData,
+      currentFormData[section.id],
+      currentFormData,
       userDetails
     ).forEach((groupDef) => {
       groupDef.fields.forEach((fieldDef) => {
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,
-          draftData[section.id],
+          currentFormData[section.id],
           offlineCountryConfig,
-          draftData,
+          currentFormData,
           userDetails
         )
         if (
@@ -275,8 +276,8 @@ export const draftToGqlTransformer = (
           !isFieldButton(fieldDef) &&
           !conditionalActions.includes('hide') &&
           !conditionalActions.includes('disable') &&
-          (draftData[section.id][fieldDef.name] === undefined ||
-            draftData[section.id][fieldDef.name] === '')
+          (currentFormData[section.id][fieldDef.name] === undefined ||
+            currentFormData[section.id][fieldDef.name] === '')
         ) {
           /* eslint-disable no-console */
           console.error(
@@ -290,39 +291,52 @@ export const draftToGqlTransformer = (
           return
         }
 
+        /*
+         * Ideally all the changed fields should be included in the
+         * transformedData but due to how we use the "hide" conditional
+         * action to only visually hide the fields but the data is still
+         * present in the formData, we need to exclude those
+         */
         if (
-          draftData[section.id][fieldDef.name] !== null &&
-          draftData[section.id][fieldDef.name] !== undefined &&
-          draftData[section.id][fieldDef.name] !== '' &&
-          (!conditionalActions.includes('hide') ||
-            fieldDef.name === 'detailsExist') // https://github.com/opencrvs/opencrvs-core/issues/7821#issuecomment-2514398986
+          (!conditionalActions.includes('hide') &&
+            previousFormData &&
+            hasFieldChanged(
+              fieldDef,
+              currentFormData[section.id],
+              previousFormData[section.id]
+            )) ||
+          (currentFormData[section.id][fieldDef.name] !== null &&
+            currentFormData[section.id][fieldDef.name] !== undefined &&
+            currentFormData[section.id][fieldDef.name] !== '' &&
+            (!conditionalActions.includes('hide') ||
+              fieldDef.name === 'detailsExist')) // https://github.com/opencrvs/opencrvs-core/issues/7821#issuecomment-2514398986
         ) {
           if (fieldDef.mapping && fieldDef.mapping.mutation) {
             fieldDef.mapping.mutation(
               transformedData,
-              draftData,
+              currentFormData,
               section.id,
               fieldDef
             )
             nestedFieldsMapping(
               transformedData,
-              draftData,
+              currentFormData,
               section.id,
               fieldDef,
               'mutation'
             )
           } else {
             transformedData[section.id][fieldDef.name] =
-              draftData[section.id][fieldDef.name]
+              currentFormData[section.id][fieldDef.name]
           }
         }
       })
     })
-    if (draftData[section.id]._fhirID) {
-      transformedData[section.id]._fhirID = draftData[section.id]._fhirID
+    if (currentFormData[section.id]._fhirID) {
+      transformedData[section.id]._fhirID = currentFormData[section.id]._fhirID
     }
     if (section.mapping && section.mapping.mutation) {
-      section.mapping.mutation(transformedData, draftData, section.id)
+      section.mapping.mutation(transformedData, currentFormData, section.id)
     }
     if (
       transformedData[section.id] &&
@@ -331,8 +345,8 @@ export const draftToGqlTransformer = (
       delete transformedData[section.id]
     }
   })
-  if (draftData._fhirIDMap) {
-    transformedData._fhirIDMap = draftData._fhirIDMap
+  if (currentFormData._fhirIDMap) {
+    transformedData._fhirIDMap = currentFormData._fhirIDMap
   }
   if (inCompleteFieldList && inCompleteFieldList.length > 0) {
     if (transformedData.registration) {
