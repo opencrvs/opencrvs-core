@@ -199,6 +199,9 @@ function DeclarationActionComponent({ children, actionType }: Props) {
        * staged drafts the user has for this event id and type
        */
       setLocalDraft(null)
+
+      // TODO CIHAN: do we want or need to do this?
+      // setFormValues({})
     }
 
     /*
