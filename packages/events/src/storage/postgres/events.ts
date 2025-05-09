@@ -9,8 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createPool } from 'slonik'
+import { createPool, createSqlTag, DatabasePool } from 'slonik'
 import { env } from '@events/environment'
+import * as z from 'zod'
 
 const url = env.EVENTS_POSTGRES_URL
-export const db = createPool(url)
+let db: DatabasePool | null = null
+
+export const getClient = async (): Promise<DatabasePool> => {
+  if (!db) {
+    db = await createPool(url)
+  }
+  return db
+}
+
+export const sql = createSqlTag({
+  typeAliases: {
+    'events.id': z.object({
+      id: z.string().uuid()
+    })
+  }
+})
