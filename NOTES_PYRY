@@ -1,0 +1,117 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import { DraftInput, Draft, ActionStatus } from '@opencrvs/commons/events'
+
+import * as events from '@events/storage/mongodb/events'
+import { getClient, sql } from '@events/storage/postgres/events'
+
+export async function createDraft(
+  input: DraftInput,
+  {
+    createdBy,
+    createdByRole,
+    createdAtLocation,
+    transactionId
+  }: {
+    createdBy: string
+    createdByRole: string
+    createdAtLocation: string
+    transactionId: string
+  }
+) {
+  const db = await getClient()
+
+  return await db.transaction(async (trx) => {
+    const eventId = await trx.oneFirst(sql.typeAlias('events.id')`
+      INSERT INTO secure.events (
+        transaction_id,
+        type,
+        data,
+        tracking_id
+      )
+      VALUES (
+        ${transactionId},
+        ${input.type},
+        ${sql.jsonb(input)},
+        ${input.trackingId}
+      )
+      ON CONFLICT (transaction_id)
+      DO UPDATE SET updated_at = now()
+      RETURNING id
+    `)
+
+    const actionId = await trx.oneFirst(sql`
+      INSERT INTO secure.event_actions (
+        transaction_id,
+        event_id,
+        action_type,
+        declaration,
+        annotations,
+        status,
+        created_by,
+        created_by_role,
+        created_at_location
+      )
+      VALUES (
+        ${transactionId},
+        ${eventId},
+        ${input.type},
+        ${sql.jsonb(input.declaration ?? {})},
+        ${sql.jsonb(input.annotations ?? {})},
+        'Accepted',
+        ${createdBy},
+        ${createdByRole},
+        ${createdAtLocation}
+      )
+      ON CONFLICT (transaction_id) DO NOTHING
+      RETURNING id
+    `)
+
+    return {
+      eventId,
+      actionId, // may be null if already existed
+      transactionId
+    }
+  })
+}
+
+export async function getDraftsByUserId(createdBy: string) {
+  const db = await events.getClient()
+  const collection = db.collection<Draft>('drafts')
+
+  const drafts = await collection
+    .find({ 'action.createdBy': createdBy })
+    .toArray()
+
+  return drafts
+}
+
+export async function getDraftsForAction(
+  eventId: string,
+  createdBy: string,
+  actionType: string
+) {
+  const db = await events.getClient()
+  const collection = db.collection<Draft>('drafts')
+
+  const drafts = await collection
+    .find({ eventId, 'action.createdBy': createdBy, 'action.type': actionType })
+    .toArray()
+
+  return drafts
+}
+
+export async function deleteDraftsByEventId(eventId: string) {
+  const db = await events.getClient()
+  const collection = db.collection<Draft>('drafts')
+  await collection.deleteMany({ eventId: eventId })
+}
