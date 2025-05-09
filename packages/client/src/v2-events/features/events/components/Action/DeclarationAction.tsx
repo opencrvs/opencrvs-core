@@ -120,10 +120,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   /*
    * Initialize the form state
    */
-
-  const setInitialFormValues = useEventFormData(
-    (state) => state.setInitialFormValues
-  )
+  const setFormValues = useEventFormData((state) => state.setFormValues)
 
   const setInitialAnnotation = useActionAnnotation(
     (state) => state.setInitialAnnotation
@@ -153,6 +150,10 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   const eventStateWithDrafts = useMemo(
     () => getCurrentEventStateWithDrafts(event, eventDrafts),
     [eventDrafts, event]
+  )
+
+  const initialForm = useEventFormData((state) =>
+    state.getFormValues(eventStateWithDrafts.declaration)
   )
 
   const actionAnnotation = useMemo(() => {
@@ -191,7 +192,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   }, [event, actionType])
 
   useEffect(() => {
-    setInitialFormValues(eventStateWithDrafts.declaration)
+    setFormValues(initialForm)
     setInitialAnnotation({ ...previousActionAnnotation, ...actionAnnotation })
 
     return () => {
