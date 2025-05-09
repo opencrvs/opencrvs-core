@@ -33,3 +33,4 @@ CREATE TABLE secure.event_actions (
 
 DROP TABLE secure.event_actions;
 DROP TABLE secure.events;
+DROP TYPE secure.action_status;
