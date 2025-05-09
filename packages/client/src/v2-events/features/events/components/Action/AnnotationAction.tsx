@@ -106,6 +106,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   }, [eventDrafts])
 
   useEffect(() => {
+    // TODO CIHAN: fix this too
     setAnnotation(actionAnnotation)
 
     return () => {
