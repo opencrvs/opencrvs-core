@@ -15,8 +15,8 @@ import {
   tennisClubMembershipEvent,
   workqueues
 } from '@opencrvs/commons/client'
-import { SearchResult } from './SearchResult'
 import { tennisClubMembershipEvents } from '../fixtures'
+import { SearchResult } from './SearchResult'
 
 const meta: Meta<typeof SearchResult> = {
   title: 'Components/SearchResult',
