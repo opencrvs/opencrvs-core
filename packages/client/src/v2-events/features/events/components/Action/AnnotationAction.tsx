@@ -78,9 +78,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   /*
    * Initialize the form state
    */
-  const setInitialAnnotation = useActionAnnotation(
-    (state) => state.setInitialAnnotation
-  )
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
   const eventDrafts = drafts
     .filter((d) => d.eventId === event.id)
@@ -108,7 +106,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   }, [eventDrafts])
 
   useEffect(() => {
-    setInitialAnnotation(actionAnnotation)
+    setAnnotation(actionAnnotation)
 
     return () => {
       /*
