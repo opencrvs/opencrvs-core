@@ -16,6 +16,7 @@ import {
   workqueues
 } from '@opencrvs/commons/client'
 import { SearchResult } from './SearchResult'
+import { tennisClubMembershipEvents } from '../fixtures'
 
 const meta: Meta<typeof SearchResult> = {
   title: 'Components/SearchResult',
@@ -39,6 +40,40 @@ export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
         <SearchResult
           eventConfig={tennisClubMembershipEvent}
           queryData={[eventQueryDataGenerator()]}
+          searchParams={mockSearchParams}
+          workqueueConfig={workqueues['all']}
+        />
+      </React.Suspense>
+    )
+  }
+}
+
+export const SearchResultWithMultipleItems: StoryObj<typeof SearchResult> = {
+  name: 'Search Results With Multiple Items',
+  render: function Component() {
+    return (
+      <React.Suspense>
+        <SearchResult
+          eventConfig={tennisClubMembershipEvent}
+          queryData={tennisClubMembershipEvents.filter(
+            (e) => e.status === 'REGISTERED'
+          )}
+          searchParams={{ status: 'REGISTERED' }}
+          workqueueConfig={workqueues['all']}
+        />
+      </React.Suspense>
+    )
+  }
+}
+
+export const NoSearchResult: StoryObj<typeof SearchResult> = {
+  name: 'No Search Result',
+  render: function Component() {
+    return (
+      <React.Suspense>
+        <SearchResult
+          eventConfig={tennisClubMembershipEvent}
+          queryData={[]}
           searchParams={mockSearchParams}
           workqueueConfig={workqueues['all']}
         />
