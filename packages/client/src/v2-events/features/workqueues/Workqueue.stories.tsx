@@ -17,9 +17,11 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import {
   tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEvents
 } from '@client/v2-events/features/events/fixtures'
 import { WorkqueueIndex } from './index'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 
 const meta: Meta<typeof WorkqueueIndex> = {
   title: 'Workqueue',
@@ -59,6 +61,102 @@ export const Workqueue: Story = {
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const AllEventsWorkqueueWithPagination: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+        slug: 'all'
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.list.query(() => {
+            return tennisClubMembershipEvents
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const ReadyToPrintWorkqueue: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+        slug: 'registered'
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.list.query(() => {
+            return tennisClubMembershipEvents.filter(
+              (record) => record.status === 'REGISTERED'
+            )
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const ReadyForReviewWorkqueue: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+        slug: 'inReview'
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.list.query(() => {
+            return tennisClubMembershipEvents.filter(
+              (record) => record.status === 'DECLARED'
+            )
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const NoResults: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+        slug: 'inReview'
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.list.query(() => {
+            return []
           })
         ]
       }
