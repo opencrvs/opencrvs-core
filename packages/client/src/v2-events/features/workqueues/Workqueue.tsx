@@ -277,10 +277,11 @@ function Workqueue({
     }
   }
 
-  const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
+  const totalPages = validEvents.length
+    ? Math.ceil(validEvents.length / limit)
+    : 0
 
-  const isShowPagination = totalPages >= 1
-
+  const isShowPagination = totalPages > 1
   return (
     <WQContentWrapper
       error={false}
@@ -289,9 +290,10 @@ function Workqueue({
       loading={false} // @TODO: Handle these on top level
       noContent={workqueue.length === 0}
       noResultText={'No results'}
-      paginationId={Math.round(offset / limit)}
+      paginationId={currentPageNumber}
       title={intl.formatMessage(workqueueConfig.title)}
       totalPages={totalPages}
+      onPageChange={(page) => setCurrentPageNumber(page)}
     >
       <ReactTooltip id="validateTooltip">
         <ToolTipContainer>
@@ -305,13 +307,6 @@ function Workqueue({
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
       />
-      {validEvents.length > limit && (
-        <Pagination
-          currentPage={currentPageNumber}
-          totalPages={Math.ceil(validEvents.length / limit)}
-          onPageChange={(page) => setCurrentPageNumber(page)}
-        />
-      )}
       <FabContainer>
         <Link to={ROUTES.V2.EVENTS.CREATE.path}>
           <FloatingActionButton
