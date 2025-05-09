@@ -48,7 +48,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 const messages = defineMessages({
@@ -118,7 +118,6 @@ function Workqueue({
 }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const intl = useIntl()
-  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -178,17 +177,7 @@ function Workqueue({
 
       const titleColumnId = workqueueConfig.columns[0].id
 
-      const formattedTitle = flattenedIntl.formatMessage(
-        eventConfig.title,
-        flattenEventIndex(event)
-      )
-
-      const fallbackTitle = eventConfig.fallbackTitle
-        ? intl.formatMessage(eventConfig.fallbackTitle)
-        : null
-
-      const useFallbackTitle = formattedTitle.trim() === ''
-      const title = useFallbackTitle ? fallbackTitle : formattedTitle
+      const { useFallbackTitle, title } = useEventTitle(event.type, event)
 
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
