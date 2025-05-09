@@ -973,6 +973,34 @@ export async function writeDeclarationByUser(
   return declaration
 }
 
+export async function writeDeclarationByUserWithoutStateUpdate(
+  userId: string,
+  declaration: IDeclaration
+) {
+  const uID = userId || (await getCurrentUserID())
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
+
+  if (currentUserData) {
+    currentUserData.declarations = [
+      ...currentUserData.declarations.filter(
+        (savedDeclaration) => savedDeclaration.id !== declaration.id
+      ),
+      declaration
+    ]
+  } else {
+    currentUserData = {
+      userID: uID,
+      declarations: [declaration]
+    }
+    allUserData.push(currentUserData)
+  }
+
+  await storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  return declaration
+}
+
 export async function deleteDeclarationByUser(
   userId: string,
   declarationId: string,
