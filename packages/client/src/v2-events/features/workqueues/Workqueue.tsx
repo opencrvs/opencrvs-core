@@ -48,7 +48,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useEventTitle } from '@client/v2-events/features/events/useEvents/title'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 const messages = defineMessages({

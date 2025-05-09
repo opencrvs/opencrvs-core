@@ -30,7 +30,7 @@ import {
   flattenEventIndex,
   getUserIdsFromActions
 } from '@client/v2-events/utils'
-import { useEventTitle } from '@client/v2-events/features/events/useEvents/title'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
