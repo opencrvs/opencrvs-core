@@ -78,6 +78,10 @@ const mockUser = {
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
+  beforeEach: () => {
+    // For this test, we want to have empty form values in zustand state
+    useEventFormData.setState({ formValues: {} })
+  },
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()
@@ -309,6 +313,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
+    // For this test, we want to have empty form values in zustand state
     useEventFormData.setState({ formValues: {} })
   },
   loaders: [
