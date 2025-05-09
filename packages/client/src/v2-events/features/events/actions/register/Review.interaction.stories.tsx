@@ -214,7 +214,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
     })
 
     await step('Add description', async () => {
-      const modal = within(await canvas.findByRole('dialog'))
+      const modal = within(canvas.getByRole('dialog'))
 
       await waitFor(async () =>
         expect(modal.getByRole('textbox')).toBeInTheDocument()
