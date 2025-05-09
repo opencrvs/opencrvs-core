@@ -62,10 +62,17 @@ function EventOverview({ event }: { event: EventDocument }) {
     'event.registrationNumber': registrationNumber
   }
 
-  const title = intl.formatMessage(
+  const formattedTitle = intl.formatMessage(
     eventConfiguration.title,
     flattenedEventIndex
   )
+
+  const fallbackTitle = eventConfiguration.fallbackTitle
+    ? intl.formatMessage(eventConfiguration.fallbackTitle)
+    : null
+
+  const useFallbackTitle = formattedTitle.trim() === ''
+  const title = useFallbackTitle ? fallbackTitle : formattedTitle
 
   const actions = getAcceptedActions(event)
 
