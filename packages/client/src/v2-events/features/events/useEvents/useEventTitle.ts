@@ -13,6 +13,10 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { flattenEventIndex } from '@client/v2-events/utils'
 
+/**
+ * Returns the title of an event.
+ * If the event has a fallback title, it will be used if the event title is empty.
+ */
 export function useEventTitle(eventType: string, eventIndex: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(eventType)
   const intl = useIntlFormatMessageWithFlattenedParams()
@@ -27,6 +31,7 @@ export function useEventTitle(eventType: string, eventIndex: EventIndex) {
     : null
 
   const useFallbackTitle = formattedTitle.trim() === ''
+
   return {
     useFallbackTitle,
     title: useFallbackTitle ? fallbackTitle : formattedTitle
