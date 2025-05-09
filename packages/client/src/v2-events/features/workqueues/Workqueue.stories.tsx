@@ -13,6 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import {
@@ -21,7 +22,6 @@ import {
   tennisClubMembershipEvents
 } from '@client/v2-events/features/events/fixtures'
 import { WorkqueueIndex } from './index'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 
 const meta: Meta<typeof WorkqueueIndex> = {
   title: 'Workqueue',
