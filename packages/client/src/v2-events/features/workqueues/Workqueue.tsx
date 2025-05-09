@@ -15,7 +15,10 @@ import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -335,24 +338,21 @@ function Workqueue({
 }
 
 export function WorkqueueContainer() {
-  // @TODO: We need to revisit on how the workqueue id is passed.
-  // We'll follow up during 'workqueue' feature.
-  const workqueueId = 'all'
-  const { getEvents } = useEvents()
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
-  const [events] = getEvents.useSuspenseQuery()
-
-  const eventConfigs = useEventConfigurations()
+  const { getEvents } = useEvents()
 
   const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
+    workqueueSlug in workqueues
+      ? workqueues[workqueueSlug as keyof typeof workqueues]
       : null
 
   if (!workqueueConfig) {
     return null
   }
+
+  const [events] = getEvents.useSuspenseQuery()
+  const eventConfigs = useEventConfigurations()
 
   return (
     <Workqueue
