@@ -23,7 +23,6 @@ import { ROUTES } from '@client/v2-events/routes'
 
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -31,6 +30,7 @@ import {
   flattenEventIndex,
   getUserIdsFromActions
 } from '@client/v2-events/utils'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/title'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
@@ -47,7 +47,6 @@ import { EventOverviewProvider } from './EventOverviewContext'
  */
 function EventOverview({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const intl = useIntlFormatMessageWithFlattenedParams()
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status, registrationNumber } = eventIndex
   const { getRemoteDrafts } = useDrafts()
@@ -62,17 +61,7 @@ function EventOverview({ event }: { event: EventDocument }) {
     'event.registrationNumber': registrationNumber
   }
 
-  const formattedTitle = intl.formatMessage(
-    eventConfiguration.title,
-    flattenedEventIndex
-  )
-
-  const fallbackTitle = eventConfiguration.fallbackTitle
-    ? intl.formatMessage(eventConfiguration.fallbackTitle)
-    : null
-
-  const useFallbackTitle = formattedTitle.trim() === ''
-  const title = useFallbackTitle ? fallbackTitle : formattedTitle
+  const { title } = useEventTitle(event.type, eventIndex)
 
   const actions = getAcceptedActions(event)
 
