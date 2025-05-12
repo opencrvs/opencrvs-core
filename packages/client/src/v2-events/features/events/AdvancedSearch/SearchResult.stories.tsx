@@ -48,7 +48,8 @@ export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
                 'applicant.firstname': 'Danny',
                 'applicant.surname': 'Doe',
                 'applicant.dob': '1999-11-11'
-              }
+              },
+              status: EventStatus.REGISTERED
             })
           ]}
           searchParams={mockSearchParams}
