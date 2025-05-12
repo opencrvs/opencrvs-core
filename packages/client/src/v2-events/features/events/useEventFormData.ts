@@ -48,10 +48,8 @@ function removeUndefinedKeys(data: EventState) {
 export const useEventFormData = create<EventFormData>()((set, get) => ({
   formValues: {},
   touchedFields: {},
-  getFormValues: (initialValues?: EventState) => {
-    // console.log('getFormValues', get().formValues, initialValues)
-    return get().formValues || initialValues || {}
-  },
+  getFormValues: (initialValues?: EventState) =>
+    get().formValues || initialValues || {},
   setFormValues: (form: EventState) => {
     const formValues = removeUndefinedKeys(form)
     return set(() => ({ formValues }))
