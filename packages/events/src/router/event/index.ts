@@ -266,7 +266,10 @@ export const eventRouter = router({
   list: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
-    .query(getIndexedEvents),
+    .query(async ({ ctx }) => {
+      const userId = ctx.user.id
+      return getIndexedEvents(userId)
+    }),
   search: publicProcedure
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)

@@ -272,7 +272,7 @@ export async function deleteEventIndex(event: EventDocument) {
   return response
 }
 
-export async function getIndexedEvents() {
+export async function getIndexedEvents(userId: string) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.existsAlias({
@@ -288,6 +288,28 @@ export async function getIndexedEvents() {
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
+    query: {
+      // We basically want to fetch all events,
+      // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
+      bool: {
+        should: [
+          {
+            bool: {
+              must_not: [{ term: { status: 'CREATED' } }]
+            }
+          },
+          {
+            bool: {
+              must: [
+                { term: { status: 'CREATED' } },
+                { term: { createdBy: userId } }
+              ]
+            }
+          }
+        ],
+        minimum_should_match: 1
+      }
+    },
     size: 10000,
     request_cache: false
   })
