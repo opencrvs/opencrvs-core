@@ -18,7 +18,8 @@ import {
   getActionAnnotation,
   DeclarationUpdateActionType,
   ActionType,
-  Action
+  Action,
+  deepMerge
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -188,13 +189,19 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     // Use the form values from the zustand state, so that filled form state is not lost
     // If user e.g. enters the 'screen lock' flow while filling form.
     // Then use form values from drafts.
-    setFormValues({ ...formValues, ...eventStateWithDrafts.declaration })
+    const initialFormValues = deepMerge(
+      formValues || {},
+      eventStateWithDrafts.declaration
+    )
 
-    setAnnotation({
-      ...annotation,
-      ...previousActionAnnotation,
-      ...actionAnnotation
-    })
+    setFormValues(initialFormValues)
+
+    const initialAnnotation = deepMerge(
+      deepMerge(annotation || {}, previousActionAnnotation),
+      actionAnnotation
+    )
+
+    setAnnotation(initialAnnotation)
 
     return () => {
       /*
@@ -202,9 +209,6 @@ function DeclarationActionComponent({ children, actionType }: Props) {
        * staged drafts the user has for this event id and type
        */
       setLocalDraft(null)
-
-      // TODO CIHAN: do we want or need to do this?
-      // setFormValues({})
     }
 
     /*
