@@ -125,6 +125,8 @@ function Workqueue({
   const drafts = getRemoteDrafts()
   const navigate = useNavigate()
   const { width } = useWindowSize()
+  const [sortedCol, setSortedCol] = useState('modifiedAt')
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
   const validEvents = orderBy(
     events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
@@ -224,9 +226,6 @@ function Workqueue({
         )
       }
     })
-
-  const [sortedCol, setSortedCol] = useState('modifiedAt')
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
   function onColumnClick(columnName: string) {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
