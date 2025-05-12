@@ -207,6 +207,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     id: event.id,
     type: event.type,
     status: getStatusFromActions(event.actions),
+    // TODO CIHAN:
+    // requestStatus: 'Requested',
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation ?? '', // @todo remove using empty string
