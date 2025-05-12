@@ -19,7 +19,8 @@ import {
   ActionType,
   getActionAnnotation,
   getDeclaration,
-  getActionReview
+  getActionReview,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -73,7 +74,9 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const previousFormValues = getCurrentEventState(event).declaration
+
+  const currentEventState = getCurrentEventState(event)
+  const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
   const scopes = useSelector(getScope) ?? undefined
@@ -199,7 +202,11 @@ export function Review() {
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleValidation}
-          onReject={handleRejection}
+          onReject={
+            currentEventState.status === EventStatus.REJECTED
+              ? undefined
+              : handleRejection
+          }
         />
         {modal}
       </ReviewComponent.Body>

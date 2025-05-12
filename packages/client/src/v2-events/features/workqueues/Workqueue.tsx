@@ -48,7 +48,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 const messages = defineMessages({
@@ -118,7 +118,6 @@ function Workqueue({
 }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const intl = useIntl()
-  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -178,10 +177,7 @@ function Workqueue({
 
       const titleColumnId = workqueueConfig.columns[0].id
 
-      const title = flattenedIntl.formatMessage(
-        eventConfig.title,
-        flattenEventIndex(event)
-      )
+      const { useFallbackTitle, title } = useEventTitle(event.type, event)
 
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
@@ -214,6 +210,7 @@ function Workqueue({
           TitleColumn
         ) : (
           <TextButton
+            color={useFallbackTitle ? 'red' : 'primary'}
             onClick={() => {
               return navigate(
                 ROUTES.V2.EVENTS.OVERVIEW.buildPath({
@@ -269,6 +266,7 @@ function Workqueue({
         isSorted: sortedCol === column.id
       })
     )
+
     const allColumns = configuredColumns.concat(getDefaultColumns())
 
     if (width > theme.grid.breakpoints.lg) {
@@ -281,6 +279,7 @@ function Workqueue({
   const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
 
   const isShowPagination = totalPages >= 1
+
   return (
     <WQContentWrapper
       error={false}

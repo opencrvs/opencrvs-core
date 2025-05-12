@@ -145,12 +145,17 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
 }
 
 export const ReviewForRegistrationAgentComplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-  },
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -194,12 +199,17 @@ export const ReviewForRegistrationAgentComplete: Story = {
 }
 
 export const ReviewForRegistrationAgentIncomplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-  },
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -237,9 +247,14 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
   }
 }
 export const ReviewForFieldAgentComplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-  },
+  loaders: [
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -283,9 +298,14 @@ export const ReviewForFieldAgentComplete: Story = {
 }
 
 export const ReviewForFieldAgentIncomplete: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-  },
+  loaders: [
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,

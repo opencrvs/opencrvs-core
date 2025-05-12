@@ -14,7 +14,7 @@ import { AssignmentStatus } from '@client/v2-events/utils'
 import { ActionMenu } from '../../ActionMenu'
 import {
   baseMeta,
-  hiddenActions,
+  getHiddenActions,
   createStoriesFromScenarios,
   AssertType,
   Scenario,
@@ -37,7 +37,7 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.UNASSIGN
     ],
     expected: {
-      ...hiddenActions,
+      ...getHiddenActions(),
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.VALIDATE]: AssertType.DISABLED
@@ -52,7 +52,7 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.REJECT
     ],
     expected: {
-      ...hiddenActions,
+      ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.VALIDATE]: AssertType.ENABLED
@@ -67,7 +67,7 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.REJECT
     ],
     expected: {
-      ...hiddenActions,
+      ...getHiddenActions(),
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.VALIDATE]: AssertType.DISABLED
     }
