@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/commons/types'
 import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
-import { sendBundleToHearth } from '@workflow/records/fhir'
+import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
 import { getSystem } from '@workflow/features/user/utils'
 import { internal } from '@hapi/boom'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
@@ -113,12 +113,15 @@ export async function eventNotificationHandler(
     ]
   }
 
-  // console.log(
-  //   'savedBundleWithRegLastUserAndBusinessStatus :>> ',
-  //   savedBundleWithRegLastUserAndBusinessStatus
-  // )
+  const responseBundle = await sendBundleToHearth(
+    savedBundleWithRegLastUserAndBusinessStatus
+  )
 
-  // TODO: FIXME: Check for duplicates before saving
+  const savedBundle = toSavedBundle(
+    savedBundleWithRegLastUserAndBusinessStatus,
+    responseBundle
+  )
+
   const duplicateCheckResponse = await fetch(
     new URL('check-duplicates', SEARCH_URL).href,
     {
@@ -127,13 +130,13 @@ export async function eventNotificationHandler(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(savedBundleWithRegLastUserAndBusinessStatus)
+      body: JSON.stringify(savedBundle)
     }
   )
 
-  // if (!duplicateCheckResponse.ok) {
-  //   throw internal('Failed to check for duplicates from search microservice')
-  // }
+  if (!duplicateCheckResponse.ok) {
+    throw internal('Failed to check for duplicates from search microservice')
+  }
 
   const response: any = await duplicateCheckResponse.json()
 
@@ -142,15 +145,12 @@ export async function eventNotificationHandler(
   console.log('<<<<<<< ================================== <<<<<<<')
 
   // If duplicates found, add them to the composition
-  if (response.duplicates && response.duplicates.length > 0) {
+  if (response.duplicateIds && response.duplicateIds.length > 0) {
     // got duplicates
     // // TODO: FIXME: save to the bundle and hearth
-    throw internal('Duplicates found !!!')
+    console.log('Got duplicatesId  =======>>>>>>> >>>>>>>> >>>>>>>> >>>>>>>> ')
+    // throw internal('Duplicates found !!!')
   }
-
-  const responseBundle = await sendBundleToHearth(
-    savedBundleWithRegLastUserAndBusinessStatus
-  )
   const compositionId = findCompositionIdFromTransactionResponse(responseBundle)
 
   const updatedBundle = await getValidRecordById(compositionId!, token, true)

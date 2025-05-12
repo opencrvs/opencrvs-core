@@ -284,11 +284,6 @@ export async function checkDuplicatesHandler(
   try {
     const document = composeDocument(bundle)
 
-    console.log(
-      'search checkDuplicatesHandler >>>>>>>  document >>>>>>> ',
-      document
-    )
-
     const duplicates =
       document.event === EVENT.BIRTH
         ? await searchForBirthDuplicates(document, client)
