@@ -67,7 +67,6 @@ function getStatusFromActions(actions: Array<Action>) {
 }
 
 function getFlagsFromActions(actions: Action[]): Flag[] {
-  const flags: Flag[] = []
   const sortedactions = actions.sort((a, b) =>
     a.createdAt.localeCompare(b.createdAt)
   )
@@ -79,14 +78,12 @@ function getFlagsFromActions(actions: Action[]): Flag[] {
     {} as Record<ActionType, ActionStatus>
   )
 
-  Object.entries(actionStatus).forEach(([type, status]) => {
-    if (status === ActionStatus.Accepted) {
-      return
-    }
-
-    const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
-    flags.push(flag satisfies Flag)
-  })
+  const flags = Object.entries(actionStatus)
+    .filter(([type, status]) => status !== ActionStatus.Accepted)
+    .map(([type, status]) => {
+      const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
+      return flag satisfies Flag
+    })
 
   const isCertificatePrinted = sortedactions.reduce<boolean>(
     (prev, { type }) => {
