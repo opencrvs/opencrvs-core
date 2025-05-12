@@ -287,30 +287,32 @@ export async function getIndexedEvents(userId: string) {
     return []
   }
 
+  const query = {
+    // We basically want to fetch all events,
+    // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
+    bool: {
+      should: [
+        {
+          bool: {
+            must_not: [{ term: { status: EventStatus.CREATED } }]
+          }
+        },
+        {
+          bool: {
+            must: [
+              { term: { status: EventStatus.CREATED } },
+              { term: { createdBy: userId } }
+            ]
+          }
+        }
+      ],
+      minimum_should_match: 1
+    }
+  } as estypes.QueryDslQueryContainer
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
-    query: {
-      // We basically want to fetch all events,
-      // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
-      bool: {
-        should: [
-          {
-            bool: {
-              must_not: [{ term: { status: EventStatus.CREATED } }]
-            }
-          },
-          {
-            bool: {
-              must: [
-                { term: { status: EventStatus.CREATED } },
-                { term: { createdBy: userId } }
-              ]
-            }
-          }
-        ],
-        minimum_should_match: 1
-      }
-    },
+    query,
     size: 10000,
     request_cache: false
   })

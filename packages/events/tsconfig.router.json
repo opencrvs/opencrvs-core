@@ -8,6 +8,6 @@
     "rootDir": "./src",
     "emitDeclarationOnly": true
   },
-  "include": ["src/router.ts", "src/global.d.ts"],
+  "include": ["src/router.ts"],
   "exclude": ["node_modules", "dist"]
 }

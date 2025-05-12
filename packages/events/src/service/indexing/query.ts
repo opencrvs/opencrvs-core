@@ -68,7 +68,7 @@ function generateQuery(
     throw new Error(`Unsupported query type: ${value.type}`)
   }) satisfies estypes.QueryDslQueryContainer[]
 
-  return { bool: { must } }
+  return { bool: { must } } as estypes.QueryDslQueryContainer
 }
 
 function buildClause(clause: QueryExpression) {
@@ -161,7 +161,7 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
-  return { bool: { must } }
+  return { bool: { must } } as estypes.QueryDslQueryContainer
 }
 
 export function buildElasticQueryFromSearchPayload(input: QueryType) {
@@ -180,5 +180,7 @@ export function buildElasticQueryFromSearchPayload(input: QueryType) {
   }
 
   // default fallback (shouldn't happen if input is validated correctly)
-  return { bool: { must_not: { match_all: {} } } }
+  return {
+    bool: { must_not: { match_all: {} } }
+  } as estypes.QueryDslQueryContainer
 }
