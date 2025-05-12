@@ -112,6 +112,7 @@ export function useDrafts() {
 
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
+
   return {
     setLocalDraft: setDraft,
     getLocalDraftOrDefault: getLocalDraftOrDefault,
@@ -123,6 +124,7 @@ export function useDrafts() {
       createDraft.mutate({
         eventId: localDraft.eventId,
         declaration: localDraft.action.declaration,
+        annotation: localDraft.action.annotation,
         transactionId: localDraft.transactionId,
         type: localDraft.action.type
       })
