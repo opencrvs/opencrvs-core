@@ -37,6 +37,7 @@ const Range = z.object({
   gte: z.string(),
   lte: z.string()
 })
+const Not = z.object({ type: z.literal('not'), term: z.string() })
 
 const Within = z.object({ type: z.literal('within'), location: z.string() })
 
@@ -46,7 +47,7 @@ const DateCondition = z.union([Exact, Range])
 // this keeps recursive inference intact and allows `z.infer<typeof QueryInput>` to work correctly.
 export const QueryInput: ZodType = z.lazy(() =>
   z.union([
-    z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf]),
+    z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf, Not]),
     z.record(z.string(), QueryInput)
   ])
 )
@@ -56,6 +57,7 @@ export type BaseInput =
   | z.infer<typeof Range>
   | z.infer<typeof Within>
   | z.infer<typeof AnyOf>
+  | z.infer<typeof Not>
 
 type QueryMap = {
   [key: string]: BaseInput | QueryMap
@@ -77,6 +79,7 @@ const QueryExpression = z
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
+    flags: z.optional(z.array(z.union([AnyOf, Not]))),
     data: QueryInput
   })
   .partial()
