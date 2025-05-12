@@ -35,6 +35,8 @@ import {
 import { capitalize } from 'lodash'
 import { resolveLocationChildren } from './location'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { composeDocument } from '@search/features/registration/birth/service'
+import { SavedBundle } from '@opencrvs/commons/types'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -266,5 +268,42 @@ export async function searchForDeathDeDuplication(
   } catch (err) {
     logger.error(`Search for death duplications : error : ${err}`)
     return internal(err)
+  }
+}
+
+// TODO: FIXME: de-dup endpoint handler
+export async function checkDuplicatesHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  console.log('Entering checkDuplicatesHandler >>>>>>> ')
+  const bundle = request.payload as SavedBundle
+
+  const client = getOrCreateClient()
+
+  try {
+    const document = composeDocument(bundle)
+
+    console.log(
+      'search checkDuplicatesHandler >>>>>>>  document >>>>>>> ',
+      document
+    )
+
+    const duplicates =
+      document.event === EVENT.BIRTH
+        ? await searchForBirthDuplicates(document, client)
+        : await searchForDeathDuplicates(document, client)
+
+    const duplicateIds = findDuplicateIds(duplicates)
+
+    console.log(
+      'search checkDuplicatesHandler >>>>>>> duplicateIds :>> ',
+      duplicateIds
+    )
+
+    return h.response({ duplicateIds }).code(200)
+  } catch (error) {
+    logger.error(`Search/checkDuplicatesHandler: error: ${error}`)
+    return internal(error)
   }
 }

@@ -15,7 +15,8 @@ import {
   advancedRecordSearch,
   searchAssignment,
   searchForBirthDeDuplication,
-  searchForDeathDeDuplication
+  searchForDeathDeDuplication,
+  checkDuplicatesHandler
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -298,6 +299,16 @@ export const getRoutes = () => {
             jobId: Joi.string().uuid()
           })
         }
+      }
+    },
+    // TODO: FIXME: route -> endpoint
+    {
+      method: 'POST',
+      path: '/check-duplicates',
+      handler: checkDuplicatesHandler,
+      config: {
+        tags: ['api'],
+        description: 'Check for duplicate records from FHIR bundle'
       }
     }
   ]

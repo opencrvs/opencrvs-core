@@ -189,6 +189,8 @@ export function getTaskFromSavedBundle<T extends SavedBundle>(
 ): SavedTask {
   const task = bundle.entry.map(({ resource }) => resource).find(isTask)
 
+  console.log('getTaskFromSavedBundle >>>>>>> task :>> ', task)
+
   if (!task || !isSaved(task)) {
     throw new Error('No task found in bundle')
   }

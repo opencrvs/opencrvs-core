@@ -31,11 +31,13 @@ import {
 } from '@workflow/features/registration/utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getValidRecordById } from '@workflow/records'
+import { SEARCH_URL } from '@workflow/constants'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  console.log('>>>>>>> ======== entering eventNotificationHandler  >>>>>>>>')
   const bundle = request.payload as Bundle<Resource>
   const token = getToken(request)
 
@@ -111,6 +113,41 @@ export async function eventNotificationHandler(
     ]
   }
 
+  // console.log(
+  //   'savedBundleWithRegLastUserAndBusinessStatus :>> ',
+  //   savedBundleWithRegLastUserAndBusinessStatus
+  // )
+
+  // TODO: FIXME: Check for duplicates before saving
+  const duplicateCheckResponse = await fetch(
+    new URL('check-duplicates', SEARCH_URL).href,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(savedBundleWithRegLastUserAndBusinessStatus)
+    }
+  )
+
+  // if (!duplicateCheckResponse.ok) {
+  //   throw internal('Failed to check for duplicates from search microservice')
+  // }
+
+  const response: any = await duplicateCheckResponse.json()
+
+  console.log('>>>>>>> ========= duplicateCheckResponse ========= >>>>>>>>')
+  console.log('response :>> ', response)
+  console.log('<<<<<<< ================================== <<<<<<<')
+
+  // If duplicates found, add them to the composition
+  if (response.duplicates && response.duplicates.length > 0) {
+    // got duplicates
+    // // TODO: FIXME: save to the bundle and hearth
+    throw internal('Duplicates found !!!')
+  }
+
   const responseBundle = await sendBundleToHearth(
     savedBundleWithRegLastUserAndBusinessStatus
   )
@@ -119,6 +156,7 @@ export async function eventNotificationHandler(
   const updatedBundle = await getValidRecordById(compositionId!, token, true)
 
   await indexBundle(updatedBundle, token)
+
   await auditEvent('sent-notification', updatedBundle, token)
 
   return h.response(updatedBundle).code(200)
