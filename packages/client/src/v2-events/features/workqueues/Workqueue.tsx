@@ -127,6 +127,7 @@ function Workqueue({
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState('modifiedAt')
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
+  const { getEventTitle } = useEventTitle()
 
   const validEvents = orderBy(
     events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
@@ -177,10 +178,8 @@ function Workqueue({
         return event.status
       }
 
+      const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
       const titleColumnId = workqueueConfig.columns[0].id
-
-      const { useFallbackTitle, title } = useEventTitle(event.type, event)
-
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
           <IconWithName name={title} status={getEventStatus()} />
@@ -328,9 +327,7 @@ export function WorkqueueContainer() {
   const workqueueId = 'all'
   const { getEvents } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
   const [events] = getEvents.useSuspenseQuery()
-
   const eventConfigs = useEventConfigurations()
 
   const workqueueConfig =
