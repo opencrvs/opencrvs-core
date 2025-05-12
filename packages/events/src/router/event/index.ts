@@ -251,6 +251,7 @@ export const eventRouter = router({
           if (ctx.isDuplicateAction) {
             return ctx.event
           }
+
           return rejectCorrection(input, {
             eventId: input.eventId,
             createdBy: ctx.user.id,
