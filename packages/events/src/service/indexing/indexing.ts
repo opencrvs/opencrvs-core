@@ -17,6 +17,7 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
+  EventStatus,
   FieldConfig,
   FieldType,
   getCurrentEventState,
@@ -295,13 +296,13 @@ export async function getIndexedEvents(userId: string) {
         should: [
           {
             bool: {
-              must_not: [{ term: { status: 'CREATED' } }]
+              must_not: [{ term: { status: EventStatus.CREATED } }]
             }
           },
           {
             bool: {
               must: [
-                { term: { status: 'CREATED' } },
+                { term: { status: EventStatus.CREATED } },
                 { term: { createdBy: userId } }
               ]
             }
