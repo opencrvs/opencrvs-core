@@ -24,6 +24,7 @@ import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
+import { getOrThrow } from '../../utils'
 
 function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -176,34 +177,105 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   )
 }
 
-function getLegalStatuses(acceptedActions: ActionDocument[]) {
-  const declared = acceptedActions.find(
-    (action) => action.type === ActionType.DECLARE
+function getActionRequests(actionType: ActionType, actions: Action[]) {
+  const filtered = actions.filter((action) => action.type === actionType)
+
+  const accept = filtered.find(
+    (action) => action.status === ActionStatus.Accepted
   )
 
-  const registered = acceptedActions.find(
-    (action) => action.type === ActionType.REGISTER
+  const request = filtered.find(
+    (action) => action.status === ActionStatus.Requested
+  )
+
+  const reject = filtered.find(
+    (action) => action.status === ActionStatus.Rejected
   )
 
   return {
-    [EventStatus.DECLARED]: declared
-      ? {
-          createdAt: declared.createdAt,
-          createdBy: declared.createdBy,
-          createdAtLocation: declared.createdAtLocation
-        }
-      : null,
-    [EventStatus.REGISTERED]: registered
-      ? {
-          createdAt: registered.createdAt,
-          createdBy: registered.createdBy,
-          createdAtLocation: registered.createdAtLocation,
-          registrationNumber: registered.registrationNumber
-        }
-      : null
+    reject,
+    accept,
+    request
   }
 }
 
+function getDeclarationActionCreationMetadata(
+  actionType: ActionType,
+  actions: Action[]
+) {
+  const { accept: acceptAction, request: requestAction } = getActionRequests(
+    actionType,
+    actions
+  )
+
+  if (!acceptAction) {
+    return null
+  }
+
+  const registrationNumber =
+    acceptAction.type === ActionType.REGISTER
+      ? (acceptAction as RegisterAction).registrationNumber
+      : null
+
+  return {
+    // When 3rd party API returns 200 OK, we can assume that the request was accepted, and persist single 'accepted' action
+    createdAt: requestAction?.createdAt ?? acceptAction.createdAt,
+    createdBy: requestAction?.createdBy ?? acceptAction.createdBy,
+    createdAtLocation:
+      requestAction?.createdAtLocation ?? acceptAction.createdAtLocation,
+    acceptedAt: acceptAction.createdAt,
+    registrationNumber
+  }
+}
+
+function getDeclarationActionUpdateMetadata(actions: Action[]) {
+  const createAction = getOrThrow(
+    actions.find((action) => action.type === ActionType.CREATE),
+    'Event has no creation action'
+  )
+
+  return [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER].reduce(
+    (metadata, actionType) => {
+      const { accept, request } = getActionRequests(actionType, actions)
+
+      return {
+        createdAt:
+          request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
+        createdBy:
+          request?.createdBy ?? accept?.createdBy ?? metadata.createdAt,
+        createdAtLocation:
+          request?.createdAtLocation ??
+          accept?.createdAtLocation ??
+          metadata.createdAt
+      }
+    },
+    {
+      createdAt: createAction.createdAt,
+      createdBy: createAction.createdBy,
+      createdAtLocation: createAction.createdAtLocation
+    }
+  )
+}
+
+function getLegalStatuses(actions: Action[]) {
+  return {
+    [EventStatus.DECLARED]: getDeclarationActionCreationMetadata(
+      ActionType.DECLARE,
+      actions
+    ),
+    [EventStatus.REGISTERED]: getDeclarationActionCreationMetadata(
+      ActionType.REGISTER,
+      actions
+    )
+  }
+}
+
+const DEFAULT_DATE_OF_EVENT_PROPERTY = 'createdAt' satisfies keyof EventDocument
+
+/**
+ * @returns the current state of the event based on the actions taken.
+ * @see EventIndex for the description of the returned object.
+ */
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -214,40 +286,34 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
   }
 
   const acceptedActions = getAcceptedActions(event)
-  const latestAcceptedAction = acceptedActions[acceptedActions.length - 1]
-  const latestAction = event.actions[event.actions.length - 1]
 
-  const registrationAction = acceptedActions.find(
-    (a): a is RegisterAction =>
-      a.type === ActionType.REGISTER && a.status === ActionStatus.Accepted
+  const declarationUpdateMetadata = getDeclarationActionUpdateMetadata(
+    event.actions
   )
-
-  const registrationNumber = registrationAction?.registrationNumber ?? null
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
-  let dateOfEvent: string | null = event.createdAt.split('T')[0]
-
-  if (event.dateOfEvent) {
-    const parsedDate = ZodDate.safeParse(declaration[event.dateOfEvent.fieldId])
-    dateOfEvent = parsedDate.success ? parsedDate.data : null
-  }
+  const dateOfEvent =
+    ZodDate.safeParse(
+      event.dateOfEvent?.fieldId
+        ? declaration[event.dateOfEvent.fieldId]
+        : event[DEFAULT_DATE_OF_EVENT_PROPERTY]
+    ).data ?? null
 
   return deepDropNulls({
     id: event.id,
     type: event.type,
     status: getStatusFromActions(event.actions),
-    legalStatuses: getLegalStatuses(acceptedActions),
+    legalStatuses: getLegalStatuses(event.actions),
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
-    updatedAt: latestAction.createdAt,
+    updatedAt: declarationUpdateMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
-    updatedBy: latestAction.createdBy,
-    updatedAtLocation: latestAction.createdAtLocation,
+    updatedBy: declarationUpdateMetadata.createdBy,
+    updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
-    registrationNumber,
     // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole
     updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
     dateOfEvent

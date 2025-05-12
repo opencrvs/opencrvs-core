@@ -33,10 +33,23 @@ export const EventStatuses = z.nativeEnum(EventStatus)
 export const ZodDate = z.string().date()
 
 export const ActionCreationMetadata = z.object({
-  createdAt: z.string().datetime(),
-  createdBy: z.string(),
-  createdAtLocation: z.string()
+  createdAt: z
+    .string()
+    .datetime()
+    .describe('The timestamp when the action request was created.'),
+  createdBy: z
+    .string()
+    .describe('ID of the user who created the action request.'),
+  createdAtLocation: z
+    .string()
+    .describe('Location of the user who created the action request.'),
+  acceptedAt: z
+    .string()
+    .datetime()
+    .describe('Timestamp when the action request was accepted.')
 })
+
+export type ActionCreationMetadata = z.infer<typeof ActionCreationMetadata>
 
 export const RegistrationCreationMetadata = ActionCreationMetadata.extend({
   registrationNumber: z
@@ -45,6 +58,10 @@ export const RegistrationCreationMetadata = ActionCreationMetadata.extend({
       'Registration number of the event. Always present for accepted registrations.'
     )
 })
+
+export type RegistrationCreationMetadata = z.infer<
+  typeof RegistrationCreationMetadata
+>
 
 // @TODO: In the future REVOKE should be added to the list of statuses
 export const LegalStatuses = z.object({
@@ -74,18 +91,18 @@ export const EventMetadata = z.object({
   createdBy: z.string().describe('ID of the user who created the event.'),
   updatedByUserRole: z
     .string()
-    .describe('Role of the user who last performed an action on the event.'),
+    .describe('Role of the user who last updated the declaration.'),
   createdAtLocation: z
     .string()
     .describe('Location of the user who created the event.'),
   updatedAtLocation: z
     .string()
     .nullish()
-    .describe('Location of the user who last updated the event.'),
+    .describe('Location of the user who last updated the declaration.'),
   updatedAt: z
     .string()
     .datetime()
-    .describe('Timestamp of the most recent update, including read actions.'),
+    .describe('Timestamp of the most recent declaration update.'),
   assignedTo: z
     .string()
     .nullish()
@@ -93,7 +110,7 @@ export const EventMetadata = z.object({
   updatedBy: z
     .string()
     .nullish()
-    .describe('ID of the user (platform or API) who last updated the event.'),
+    .describe('ID of the user who last updated the declaration.'),
   trackingId: z
     .string()
     .describe(

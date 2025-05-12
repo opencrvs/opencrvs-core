@@ -292,6 +292,8 @@ export function getDefaultActionProcedures(
           ...input,
           originalActionId: actionId,
           type: actionType,
+          createdBy: ctx.user.id,
+          createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId
         })
       })

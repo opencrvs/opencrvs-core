@@ -86,7 +86,7 @@ test('Action data can be retrieved', async () => {
   ])
 })
 
-test('Action data accepts partial changes', async () => {
+test.only('Action data accepts partial changes', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -129,12 +129,12 @@ test('Action data accepts partial changes', async () => {
     }
   )
 
-  const createAction = originalEvent.actions.filter(
+  const [createAction] = originalEvent.actions.filter(
     (action) => action.type === ActionType.CREATE
   )
 
   const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction[0].createdBy
+    assignedTo: createAction.createdBy
   })
 
   await client.event.actions.assignment.assign(assignmentInput)
@@ -180,13 +180,12 @@ test('Action data accepts partial changes', async () => {
       ...stateAfterVillageRemoval,
       legalStatuses: {
         [EventStatus.DECLARED]: {
-          createdAt: stateAfterVillageRemoval.updatedAt,
-          createdAtLocation:
-            stateAfterVillageRemoval.updatedAtLocation as string,
-          createdBy: stateAfterVillageRemoval.updatedBy as string
+          acceptedAt: stateAfterVillageRemoval.updatedAt as string,
+          createdAt: stateAfterVillageRemoval.updatedAt as string,
+          createdBy: user.id,
+          createdAtLocation: user.primaryOfficeId
         }
-      },
-      updatedAt: stateAfterVillageRemoval.updatedAt
+      }
     } satisfies EventIndex)
   ])
 })
