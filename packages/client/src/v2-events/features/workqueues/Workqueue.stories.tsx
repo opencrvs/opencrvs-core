@@ -126,7 +126,7 @@ export const ReadyForReviewWorkqueue: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-        slug: 'inReview'
+        slug: 'in-review'
       })
     },
     msw: {
@@ -151,7 +151,7 @@ export const NoResults: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-        slug: 'inReview'
+        slug: 'in-review'
       })
     },
     msw: {
