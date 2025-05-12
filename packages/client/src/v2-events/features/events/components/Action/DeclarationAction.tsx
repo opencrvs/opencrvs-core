@@ -185,6 +185,9 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   }, [event, actionType])
 
   useEffect(() => {
+    // Use the form values from the zustand state, so that filled form state is not lost
+    // If user e.g. enters the 'screen lock' flow while filling form.
+    // Then use form values from drafts.
     setFormValues({ ...formValues, ...eventStateWithDrafts.declaration })
 
     setAnnotation({

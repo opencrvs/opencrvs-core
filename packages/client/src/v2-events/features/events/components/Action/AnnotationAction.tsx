@@ -106,6 +106,9 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   }, [eventDrafts])
 
   useEffect(() => {
+    // Use the annotation values from the zustand state, so that filled form state is not lost
+    // If user e.g. enters the 'screen lock' flow while filling form.
+    // Then use annotation values from drafts.
     setAnnotation({ ...annotation, ...actionAnnotation })
 
     return () => {
