@@ -37,7 +37,7 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
-import { Pagination, Link as TextButton } from '@opencrvs/components'
+import { Link as TextButton } from '@opencrvs/components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -120,6 +120,8 @@ function Workqueue({
   eventConfigs: EventConfig[]
 }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const [sortedCol, setSortedCol] = useState('modifiedAt')
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
   const intl = useIntl()
   const theme = useTheme()
   const { getOutbox } = useEvents()
