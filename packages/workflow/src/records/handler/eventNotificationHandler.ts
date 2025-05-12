@@ -14,13 +14,17 @@ import {
   Bundle,
   EVENT_TYPE,
   findCompositionIdFromTransactionResponse,
+  getComposition,
+  getTaskFromSavedBundle,
+  getTrackingId,
   Resource,
   StringExtensionType,
   Task
 } from '@opencrvs/commons/types'
 import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
-import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
+import { sendBundleToHearth } from '@workflow/records/fhir'
+// import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
 import { getSystem } from '@workflow/features/user/utils'
 import { internal } from '@hapi/boom'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
@@ -32,12 +36,12 @@ import {
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getValidRecordById } from '@workflow/records'
 import { SEARCH_URL } from '@workflow/constants'
+import { updateTaskWithDuplicateIds } from '@workflow/utils/duplicate-checker'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  console.log('>>>>>>> ======== entering eventNotificationHandler  >>>>>>>>')
   const bundle = request.payload as Bundle<Resource>
   const token = getToken(request)
 
@@ -117,10 +121,8 @@ export async function eventNotificationHandler(
     savedBundleWithRegLastUserAndBusinessStatus
   )
 
-  const savedBundle = toSavedBundle(
-    savedBundleWithRegLastUserAndBusinessStatus,
-    responseBundle
-  )
+  const compositionId = findCompositionIdFromTransactionResponse(responseBundle)
+  const updatedBundle = await getValidRecordById(compositionId!, token, true)
 
   const duplicateCheckResponse = await fetch(
     new URL('check-duplicates', SEARCH_URL).href,
@@ -130,7 +132,7 @@ export async function eventNotificationHandler(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(savedBundle)
+      body: JSON.stringify(updatedBundle)
     }
   )
 
@@ -140,20 +142,21 @@ export async function eventNotificationHandler(
 
   const response: any = await duplicateCheckResponse.json()
 
-  console.log('>>>>>>> ========= duplicateCheckResponse ========= >>>>>>>>')
-  console.log('response :>> ', response)
-  console.log('<<<<<<< ================================== <<<<<<<')
-
-  // If duplicates found, add them to the composition
   if (response.duplicateIds && response.duplicateIds.length > 0) {
-    // got duplicates
-    // // TODO: FIXME: save to the bundle and hearth
-    console.log('Got duplicatesId  =======>>>>>>> >>>>>>>> >>>>>>>> >>>>>>>> ')
     // throw internal('Duplicates found !!!')
+    await indexBundle(updatedBundle, token)
+    let task = getTaskFromSavedBundle(updatedBundle)
+    task = updateTaskWithDuplicateIds(task, response.duplicateIds)
+    await sendBundleToHearth({
+      ...updatedBundle,
+      entry: [{ resource: task }]
+    })
+    return {
+      compositionId: getComposition(updatedBundle).id,
+      trackingId: getTrackingId(updatedBundle),
+      isPotentiallyDuplicate: true
+    }
   }
-  const compositionId = findCompositionIdFromTransactionResponse(responseBundle)
-
-  const updatedBundle = await getValidRecordById(compositionId!, token, true)
 
   await indexBundle(updatedBundle, token)
 

@@ -35,8 +35,10 @@ import {
 import { capitalize } from 'lodash'
 import { resolveLocationChildren } from './location'
 import { SCOPES } from '@opencrvs/commons/authentication'
-import { composeDocument } from '@search/features/registration/birth/service'
+import { composeDocument as composeBirthDocument } from '@search/features/registration/birth/service'
+import { composeDocument as composeDeathDocument } from '@search/features/registration/death/service'
 import { SavedBundle } from '@opencrvs/commons/types'
+import { getEventType } from '@search/utils/event'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -271,18 +273,27 @@ export async function searchForDeathDeDuplication(
   }
 }
 
-// TODO: FIXME: de-dup endpoint handler
 export async function checkDuplicatesHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  console.log('Entering checkDuplicatesHandler >>>>>>> ')
   const bundle = request.payload as SavedBundle
 
   const client = getOrCreateClient()
 
   try {
-    const document = composeDocument(bundle)
+    const event = getEventType(bundle)
+
+    let document
+    if (event === 'BIRTH') {
+      document = composeBirthDocument(bundle)
+    } else if (event === 'DEATH') {
+      document = composeDeathDocument(bundle)
+    }
+
+    if (!document) {
+      throw new Error('Failed to convert the bundle to document')
+    }
 
     const duplicates =
       document.event === EVENT.BIRTH
@@ -290,11 +301,6 @@ export async function checkDuplicatesHandler(
         : await searchForDeathDuplicates(document, client)
 
     const duplicateIds = findDuplicateIds(duplicates)
-
-    console.log(
-      'search checkDuplicatesHandler >>>>>>> duplicateIds :>> ',
-      duplicateIds
-    )
 
     return h.response({ duplicateIds }).code(200)
   } catch (error) {

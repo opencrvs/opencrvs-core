@@ -301,7 +301,6 @@ export const getRoutes = () => {
         }
       }
     },
-    // TODO: FIXME: route -> endpoint
     {
       method: 'POST',
       path: '/check-duplicates',
