@@ -229,10 +229,12 @@ function DateRangeInput({
           <DateRangePicker
             closeModalFromHOC={() => setModalVisible(false)}
             endDate={
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               (dateValue.rangeEnd && new Date(dateValue.rangeEnd)) ||
               new Date(Date.now())
             }
             startDate={
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               (dateValue.rangeStart && new Date(dateValue.rangeStart)) ||
               startOfMonth(subYears(new Date(Date.now()), 1))
             }
@@ -245,7 +247,7 @@ function DateRangeInput({
   )
 }
 
-function DateRangeOutput({ value }: { value?: string }) {
+function DateRangeOutput({ value }: { value?: string | [string, string] }) {
   const intl = useIntl()
   const parsed = DateRangeFieldValue.safeParse(value)
 
