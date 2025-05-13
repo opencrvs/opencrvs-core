@@ -27,6 +27,6 @@ export async function start(host = REDIS_HOST, port?: number) {
       port
     }
   })
-    .on('error', (err) => logger.warn('Redis Client Error', err))
+    .on('error', (err) => logger.error('Redis Client Error', err))
     .connect()
 }
