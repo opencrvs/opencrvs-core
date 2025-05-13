@@ -20,7 +20,7 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, ZodDate } from '../EventMetadata'
+import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
@@ -64,6 +64,45 @@ function getStatusFromActions(actions: Array<Action>) {
         return status
     }
   }, EventStatus.CREATED)
+}
+
+function getFlagsFromActions(actions: Action[]): Flag[] {
+  const sortedactions = actions.sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
+  const actionStatus = sortedactions.reduce(
+    (actionStatuses, { type, status }) => ({
+      ...actionStatuses,
+      [type]: status
+    }),
+    {} as Record<ActionType, ActionStatus>
+  )
+
+  const flags = Object.entries(actionStatus)
+    .filter(([type, status]) => status !== ActionStatus.Accepted)
+    .map(([type, status]) => {
+      const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
+      return flag satisfies Flag
+    })
+
+  const isCertificatePrinted = sortedactions.reduce<boolean>(
+    (prev, { type }) => {
+      if (type === ActionType.PRINT_CERTIFICATE) {
+        return true
+      }
+      if (type === ActionType.APPROVE_CORRECTION) {
+        return false
+      }
+      return prev
+    },
+    false
+  )
+
+  if (isCertificatePrinted) {
+    flags.push(CustomFlags.CERTIFICATE_PRINTED)
+  }
+
+  return flags
 }
 
 function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
@@ -218,7 +257,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     trackingId: event.trackingId,
     registrationNumber,
     updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
-    dateOfEvent
+    dateOfEvent,
+    flags: getFlagsFromActions(event.actions)
   })
 }
 

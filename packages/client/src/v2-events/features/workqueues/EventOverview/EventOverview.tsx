@@ -64,7 +64,7 @@ function EventOverview({ event }: { event: EventDocument }) {
     ? getUsersFullName(getUser(eventIndex.assignedTo).name, intl.locale)
     : null
 
-  const flattenedEventIndex = {
+  const { flags, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
