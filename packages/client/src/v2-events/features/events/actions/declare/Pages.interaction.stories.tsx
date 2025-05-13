@@ -63,13 +63,13 @@ function createDraftHandlers() {
         transactionId: req.transactionId,
         createdAt: new Date().toISOString(),
         action: {
-          status: ActionStatus.Accepted,
           ...req,
           declaration: req.declaration || {},
           createdBy: 'test-user',
           createdByRole: 'test-role',
           createdAtLocation: 'test-location',
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          status: ActionStatus.Requested
         }
       }
       spy(req)

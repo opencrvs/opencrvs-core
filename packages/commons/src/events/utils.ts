@@ -18,7 +18,12 @@ import {
 } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
-import { Action, ActionUpdate, EventState } from './ActionDocument'
+import {
+  Action,
+  ActionStatus,
+  ActionUpdate,
+  EventState
+} from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isConditionMet, isFieldVisible } from '../conditionals/validate'
 import { Draft } from './Draft'
@@ -174,7 +179,7 @@ export function createEmptyDraft(
   eventId: string,
   draftId: string,
   actionType: ActionType
-) {
+): Draft {
   return {
     id: draftId,
     eventId,
@@ -186,7 +191,10 @@ export function createEmptyDraft(
       annotation: {},
       createdAt: new Date().toISOString(),
       createdBy: '@todo',
-      createdAtLocation: '@todo'
+      createdAtLocation: '@todo',
+      status: ActionStatus.Requested,
+      transactionId: '@todo',
+      createdByRole: '@todo'
     }
   }
 }
