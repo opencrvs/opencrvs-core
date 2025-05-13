@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { REDIS_HOST, REDIS_PASSWORD, REDIS_USERNAME } from '@gateway/constants'
+import { logger } from '@opencrvs/commons'
 import { createClient } from 'redis'
 
 export let redis: ReturnType<typeof createClient>
@@ -25,5 +26,7 @@ export async function start(host = REDIS_HOST, port?: number) {
       host,
       port
     }
-  }).connect()
+  })
+    .on('error', (err) => logger.warn('Redis Client Error', err))
+    .connect()
 }
