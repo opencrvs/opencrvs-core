@@ -50,7 +50,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M50 700H535" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <path d="M50 184H534" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <text fill="#C86E00" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
-      <tspan x="215.483" y="199.76">No. {{ $lookup 'legalStatuses.REGISTERED.createdBy' }}</tspan>
+      <tspan x="215.483" y="199.76">No. {{ $lookup 'legalStatuses.REGISTERED.registrationNumber' }}</tspan>
     </text>
     <path d="M50 206H534" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
