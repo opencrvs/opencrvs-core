@@ -62,27 +62,18 @@ function enhanceFieldWithSearchFieldConfig(
   field: Inferred,
   searchField: SearchField
 ): Inferred {
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
-  switch (field.type) {
-    case FieldType.DATE:
-      return searchField.config.type === 'range'
-        ? {
-            ...field,
-            validation: [],
-            type: FieldType.DATE_RANGE,
-            defaultValue: undefined
-          }
-        : field
-
-    default:
-      return field
+  if (field.type === FieldType.DATE && searchField.config.type === 'range') {
+    return {
+      ...field,
+      validation: [],
+      type: FieldType.DATE_RANGE,
+      defaultValue: undefined
+    }
   }
+  return field
 }
 
-function enhanceEventFieldsWithSearchFieldConfig(
-  event: EventConfig,
-  searchFieldConfigMap: Map<string, SearchField>
-) {
+function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
   return {
     ...event,
     declaration: {
@@ -90,7 +81,9 @@ function enhanceEventFieldsWithSearchFieldConfig(
       pages: event.declaration.pages.map((page) => ({
         ...page,
         fields: page.fields.map((field) => {
-          const searchField = searchFieldConfigMap.get(field.id)
+          const searchField = event.advancedSearch
+            .flatMap((x) => x.fields)
+            .find((f) => f.fieldId === field.id)
           return searchField
             ? enhanceFieldWithSearchFieldConfig(field, searchField)
             : field
@@ -113,14 +106,8 @@ function getSectionFields(
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
-    const advancedSearchFields: Inferred[] = allUniqueFields.reduce(
-      (acc: Inferred[], field: Inferred) => {
-        if (advancedSearchFieldId.includes(field.id)) {
-          acc.push(field)
-        }
-        return acc
-      },
-      []
+    const advancedSearchFields: Inferred[] = allUniqueFields.filter(
+      (field: Inferred) => advancedSearchFieldId.includes(field.id)
     )
 
     const combinedFields = [...metadataFields, ...advancedSearchFields]
@@ -170,11 +157,6 @@ export function TabSearch({
   const navigate = useNavigate()
 
   const prevEventId = React.useRef(currentEvent.id)
-  const searchFieldConfigMap = new Map(
-    currentEvent.advancedSearch.flatMap((x) =>
-      x.fields.map((f) => [f.fieldId, f])
-    )
-  )
 
   React.useEffect(() => {
     // only reset formValues if another event search tab is selected
@@ -184,10 +166,7 @@ export function TabSearch({
     }
   }, [currentEvent])
 
-  const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(
-    currentEvent,
-    searchFieldConfigMap
-  )
+  const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(currentEvent)
 
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
     setFormValues((prev) => ({
@@ -209,9 +188,7 @@ export function TabSearch({
 
   const handleSearch = () => {
     const nonEmptyValues = filterEmptyValues(formValues)
-    const searchParams = stringify(nonEmptyValues, {
-      arrayFormat: 'comma'
-    })
+    const searchParams = stringify(nonEmptyValues, { arrayFormat: 'comma' })
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: enhancedEvent.id
     })
