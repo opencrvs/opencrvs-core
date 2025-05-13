@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DraftInput, Draft, ActionStatus } from '@opencrvs/commons/events'
+import { DraftInput, ActionStatus, Draft } from '@opencrvs/commons/events'
 
-import { getUUID } from '@opencrvs/commons'
-import * as events from '@events/storage/mongodb/events'
+import { getClient, sql } from '@events/storage/postgres/events'
 
 export async function createDraft(
   input: DraftInput,
@@ -31,45 +30,59 @@ export async function createDraft(
     transactionId: string
   }
 ) {
-  const db = await events.getClient()
-  const now = new Date().toISOString()
+  const db = await getClient()
 
-  const draft: Draft = {
-    id: getUUID(),
-    eventId: eventId,
-    createdAt: now,
-    transactionId,
-    action: {
-      ...input,
-      status: ActionStatus.Accepted,
-      type: input.type,
-      createdBy,
-      createdByRole,
-      createdAt: now,
-      createdAtLocation
-    }
-  }
-
-  await db.collection<Draft>('drafts').updateOne(
-    // Match by transactionId
-    { transactionId },
-    // Update document
-    { $set: draft },
-    // Insert if not found
-    { upsert: true }
-  )
+  const draft = await db.one(sql.typeAlias('draft')`
+    INSERT INTO secure.event_action_drafts (
+      event_id,
+      transaction_id,
+      action_type,
+      declaration,
+      annotations,
+      status,
+      created_by,
+      created_by_role,
+      created_at_location
+    )
+    VALUES (
+      ${eventId},
+      ${transactionId},
+      ${input.type},
+      ${sql.jsonb(input.declaration)},
+      ${sql.jsonb(input.annotation)},
+      ${ActionStatus.Accepted},
+      ${createdBy},
+      ${createdByRole},
+      ${createdAtLocation} 
+    )
+    ON CONFLICT (transaction_id) DO UPDATE
+    SET declaration = EXCLUDED.declaration,
+        annotations = EXCLUDED.annotations,
+        created_at = now()
+    RETURNING 
+      id,
+      event_id AS "eventId",
+      transaction_id AS "transactionId",
+      declaration,
+      annotations
+  `)
 
   return draft
 }
 
 export async function getDraftsByUserId(createdBy: string) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
-
-  const drafts = await collection
-    .find({ 'action.createdBy': createdBy })
-    .toArray()
-
+  const db = await getClient()
+  const drafts = await db.any(sql.typeAlias('draft')`
+    SELECT
+      id,
+      event_id AS "eventId",
+      transaction_id AS "transactionId",
+      declaration,
+      annotations
+    FROM
+      secure.event_action_drafts
+    WHERE created_by = ${createdBy}
+  `)
   return drafts
 }
 
@@ -78,18 +91,28 @@ export async function getDraftsForAction(
   createdBy: string,
   actionType: string
 ) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
+  const db = await getClient()
+  const drafts = await db.any(sql.typeAlias('draft')`
+    SELECT
+      id,
+      event_id AS "eventId",
+      transaction_id AS "transactionId",
+      declaration,
+      annotations
+    FROM
+      secure.event_action_drafts
+    WHERE
+      event_id = ${eventId}
+      AND created_by = ${createdBy}
+      AND action_type = ${actionType}
+  `)
 
-  const drafts = await collection
-    .find({ eventId, 'action.createdBy': createdBy, 'action.type': actionType })
-    .toArray()
-
-  return drafts
+  return [...drafts]
 }
 
 export async function deleteDraftsByEventId(eventId: string) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
-  await collection.deleteMany({ eventId: eventId })
+  const db = await getClient()
+  await db.any(sql.typeAlias('void')`
+    DELETE FROM secure.event_action_drafts WHERE event_id = ${eventId}
+  `)
 }

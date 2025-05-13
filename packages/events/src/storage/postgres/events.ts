@@ -10,8 +10,9 @@
  */
 
 import { createPool, createSqlTag, DatabasePool } from 'slonik'
-import { env } from '@events/environment'
 import * as z from 'zod'
+import { Draft } from '@opencrvs/commons'
+import { env } from '@events/environment'
 
 const url = env.EVENTS_POSTGRES_URL
 let db: DatabasePool | null = null
@@ -25,8 +26,7 @@ export const getClient = async (): Promise<DatabasePool> => {
 
 export const sql = createSqlTag({
   typeAliases: {
-    'events.id': z.object({
-      id: z.string().uuid()
-    })
+    void: z.object({}),
+    draft: Draft
   }
 })
