@@ -420,12 +420,12 @@ export function generateActionDocument({
     createdBy: getUUID(),
     createdByRole: 'FIELD_AGENT',
     id: getUUID(),
-    createdAtLocation: 'TODO',
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
-    ...defaults,
     status: ActionStatus.Accepted,
-    transactionId: getUUID()
+    transactionId: getUUID(),
+    ...defaults
   } satisfies ActionBase
 
   switch (action) {

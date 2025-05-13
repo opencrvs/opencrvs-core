@@ -15,16 +15,14 @@ import {
   ActionDocument,
   ActionStatus,
   ActionUpdate,
-  EventState,
-  RegisterAction
+  EventState
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
-import { getOrThrow } from '../../utils'
+import { getDeclarationActionUpdateMetadata, getLegalStatuses } from './utils'
 
 function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -175,99 +173,6 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(
     (a): a is ActionDocument => a.status === ActionStatus.Accepted
   )
-}
-
-function getActionRequests(actionType: ActionType, actions: Action[]) {
-  const filtered = actions.filter((action) => action.type === actionType)
-
-  const accept = filtered.find(
-    (action) => action.status === ActionStatus.Accepted
-  )
-
-  const request = filtered.find(
-    (action) => action.status === ActionStatus.Requested
-  )
-
-  const reject = filtered.find(
-    (action) => action.status === ActionStatus.Rejected
-  )
-
-  return {
-    reject,
-    accept,
-    request
-  }
-}
-
-function getDeclarationActionCreationMetadata(
-  actionType: ActionType,
-  actions: Action[]
-) {
-  const { accept: acceptAction, request: requestAction } = getActionRequests(
-    actionType,
-    actions
-  )
-
-  if (!acceptAction) {
-    return null
-  }
-
-  const registrationNumber =
-    acceptAction.type === ActionType.REGISTER
-      ? (acceptAction as RegisterAction).registrationNumber
-      : null
-
-  return {
-    // When 3rd party API returns 200 OK, we can assume that the request was accepted, and persist single 'accepted' action
-    createdAt: requestAction?.createdAt ?? acceptAction.createdAt,
-    createdBy: requestAction?.createdBy ?? acceptAction.createdBy,
-    createdAtLocation:
-      requestAction?.createdAtLocation ?? acceptAction.createdAtLocation,
-    acceptedAt: acceptAction.createdAt,
-    registrationNumber
-  }
-}
-
-function getDeclarationActionUpdateMetadata(actions: Action[]) {
-  const createAction = getOrThrow(
-    actions.find((action) => action.type === ActionType.CREATE),
-    'Event has no creation action'
-  )
-
-  return [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER].reduce(
-    (metadata, actionType) => {
-      const { accept, request } = getActionRequests(actionType, actions)
-
-      return {
-        createdAt:
-          request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
-        createdBy:
-          request?.createdBy ?? accept?.createdBy ?? metadata.createdAt,
-        createdAtLocation:
-          request?.createdAtLocation ??
-          accept?.createdAtLocation ??
-          metadata.createdAt
-      }
-    },
-    {
-      createdAt: createAction.createdAt,
-      createdBy: createAction.createdBy,
-      createdAtLocation: createAction.createdAtLocation
-    }
-  )
-}
-
-function getLegalStatuses(actions: Action[]) {
-  return {
-    [EventStatus.DECLARED]: getDeclarationActionCreationMetadata(
-      ActionType.DECLARE,
-      actions
-    ),
-    [EventStatus.REGISTERED]: getDeclarationActionCreationMetadata(
-      ActionType.REGISTER,
-      actions
-    )
-  }
 }
 
 const DEFAULT_DATE_OF_EVENT_PROPERTY = 'createdAt' satisfies keyof EventDocument
