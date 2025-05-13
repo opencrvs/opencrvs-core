@@ -22,10 +22,14 @@ import {
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {
-  title: 'Declare/Interaction'
+  title: 'Declare/Interaction',
+  beforeEach: () => {
+    useEventFormData.setState({ formValues: {} })
+  }
 }
 
 export default meta
@@ -59,13 +63,13 @@ function createDraftHandlers() {
         transactionId: req.transactionId,
         createdAt: new Date().toISOString(),
         action: {
-          status: ActionStatus.Accepted,
           ...req,
           declaration: req.declaration || {},
           createdBy: 'test-user',
           createdByRole: 'test-role',
           createdAtLocation: 'test-location',
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          status: ActionStatus.Requested
         }
       }
       spy(req)
@@ -109,15 +113,20 @@ export const SaveAndExit: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('Fill the applicant details', async () => {
-      await userEvent.type(
-        await canvas.findByTestId('text__applicant____firstname'),
-        'Clearly'
+      const applicantFirstNameInput = await canvas.findByTestId(
+        'text__applicant____firstname'
       )
 
-      await userEvent.type(
-        await canvas.findByTestId('text__applicant____surname'),
-        'Draft'
+      const applicantSurnameInput = await canvas.findByTestId(
+        'text__applicant____surname'
       )
+
+      await waitFor(async () => expect(applicantFirstNameInput).toBeEnabled())
+      await waitFor(async () => expect(applicantSurnameInput).toBeEnabled())
+
+      await userEvent.type(applicantFirstNameInput, 'Clearly')
+      await userEvent.type(applicantSurnameInput, 'Draft')
+
       const continueButton = await canvas.findByText('Continue')
       await userEvent.click(continueButton)
     })
@@ -137,7 +146,8 @@ export const SaveAndExit: Story = {
     })
 
     await waitFor(async () => expect(spy).toHaveBeenCalled())
-    await canvas.findByText('Clearly Draft')
+    await waitFor(async () => canvas.findByText('Clearly Draft'))
+
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
     await expect(recordInCreatedState).not.toBeInTheDocument()
   }
@@ -176,15 +186,18 @@ export const DraftShownInForm: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('Fill the applicant details', async () => {
-      await userEvent.type(
-        await canvas.findByTestId('text__applicant____firstname'),
-        'Clearly'
+      const applicantFirstNameInput = await canvas.findByTestId(
+        'text__applicant____firstname'
+      )
+      const applicantSurnameInput = await canvas.findByTestId(
+        'text__applicant____surname'
       )
 
-      await userEvent.type(
-        await canvas.findByTestId('text__applicant____surname'),
-        'Draft'
-      )
+      await waitFor(async () => expect(applicantFirstNameInput).toBeEnabled())
+      await waitFor(async () => expect(applicantSurnameInput).toBeEnabled())
+
+      await userEvent.type(applicantFirstNameInput, 'Clearly')
+      await userEvent.type(applicantSurnameInput, 'Draft')
     })
     const continueButton = await canvas.findByText('Continue')
     await userEvent.click(continueButton)
@@ -200,8 +213,8 @@ export const DraftShownInForm: Story = {
     await userEvent.click(await canvas.findByText(/Declare/))
 
     await expect(
-      await canvas.findByTestId('text__applicant____surname')
-    ).toHaveValue('Draft')
+      (await canvas.findByTestId('row-value-applicant.surname')).textContent
+    ).toBe('Draft')
   }
 }
 
@@ -216,15 +229,19 @@ export const FilledPagesVisibleInReview: Story = {
     ).toBeInTheDocument()
 
     await step('Fill the applicant details', async () => {
-      await userEvent.type(
-        await canvas.findByTestId('text__applicant____firstname'),
-        'John'
+      const applicantFirstNameInput = await canvas.findByTestId(
+        'text__applicant____firstname'
+      )
+      const applicantSurnameInput = await canvas.findByTestId(
+        'text__applicant____surname'
       )
 
-      await userEvent.type(
-        await canvas.findByTestId('text__applicant____surname'),
-        'Doe'
-      )
+      await waitFor(async () => expect(applicantFirstNameInput).toBeEnabled())
+      await waitFor(async () => expect(applicantSurnameInput).toBeEnabled())
+
+      await userEvent.type(applicantFirstNameInput, 'John')
+
+      await userEvent.type(applicantSurnameInput, 'Doe')
 
       const continueButton = await canvas.findByText('Continue')
       await userEvent.click(continueButton)
@@ -272,15 +289,18 @@ export const CanSubmitValidlyFilledForm: Story = {
     await canvas.findByText(/Who is applying for the membership?/)
 
     await step('Fill the applicant details', async () => {
-      await userEvent.type(
-        await canvas.findByTestId('text__applicant____firstname'),
-        'John'
+      const applicantFirstNameInput = await canvas.findByTestId(
+        'text__applicant____firstname'
+      )
+      const applicantSurnameInput = await canvas.findByTestId(
+        'text__applicant____surname'
       )
 
-      await userEvent.type(
-        await canvas.findByTestId('text__applicant____surname'),
-        'Doe'
-      )
+      await waitFor(async () => expect(applicantFirstNameInput).toBeEnabled())
+      await waitFor(async () => expect(applicantSurnameInput).toBeEnabled())
+
+      await userEvent.type(applicantFirstNameInput, 'John')
+      await userEvent.type(applicantSurnameInput, 'Doe')
 
       await userEvent.type(await canvas.findByPlaceholderText('dd'), '11')
 
@@ -305,15 +325,18 @@ export const CanSubmitValidlyFilledForm: Story = {
 
     // First fill in the recommenders name, but then click 'No recommender'. This should not cause validation errors on review page.
     await step('Fill the recommenders details', async () => {
-      await userEvent.type(
-        await canvas.findByTestId('text__recommender____firstname'),
-        'John'
+      const recommenderFirstNameInput = await canvas.findByTestId(
+        'text__recommender____firstname'
+      )
+      const recommenderSurnameInput = await canvas.findByTestId(
+        'text__recommender____surname'
       )
 
-      await userEvent.type(
-        await canvas.findByTestId('text__recommender____surname'),
-        'Dory'
-      )
+      await waitFor(async () => expect(recommenderFirstNameInput).toBeEnabled())
+      await waitFor(async () => expect(recommenderSurnameInput).toBeEnabled())
+
+      await userEvent.type(recommenderFirstNameInput, 'John')
+      await userEvent.type(recommenderSurnameInput, 'Dory')
 
       await userEvent.click(await canvas.findByLabelText('No recommender'))
 

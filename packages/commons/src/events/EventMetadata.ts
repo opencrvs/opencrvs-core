@@ -11,6 +11,8 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { ActionType } from './ActionType'
+import { ActionStatus } from './ActionDocument'
 
 /**
  * Event statuses recognized by the system
@@ -27,8 +29,27 @@ export const EventStatus = {
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
+export const CustomFlags = {
+  CERTIFICATE_PRINTED: 'certificate-printed'
+} as const
+export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
+
+export const Flag = z
+  .string()
+  .regex(
+    new RegExp(
+      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
+    ),
+    'Flag must be in the format ActionType:ActionStatus (lowerCase)'
+  )
+  .or(z.nativeEnum(CustomFlags))
+
+export type Flag = z.infer<typeof Flag>
+
 export const eventStatuses = Object.values(EventStatus)
 export const EventStatuses = z.nativeEnum(EventStatus)
+
+export const ZodDate = z.string().date()
 
 /**
  * Event metadata exposed to client.
@@ -40,6 +61,7 @@ export const EventMetadata = z.object({
   type: z.string(),
   status: EventStatuses,
   createdAt: z.string().datetime(),
+  dateOfEvent: ZodDate.nullish(),
   createdBy: z.string(),
   updatedByUserRole: z.string(),
   createdAtLocation: z.string(),
@@ -48,7 +70,8 @@ export const EventMetadata = z.object({
   assignedTo: z.string().nullish(),
   updatedBy: z.string(),
   trackingId: z.string(),
-  registrationNumber: z.string().nullish()
+  registrationNumber: z.string().nullish(),
+  flags: z.array(Flag)
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
@@ -73,6 +96,11 @@ export const eventMetadataLabelMap: Record<
     id: 'event.createdAt.label',
     defaultMessage: 'Created',
     description: 'Created At'
+  },
+  'event.dateOfEvent': {
+    id: 'event.dateOfEvent.label',
+    defaultMessage: 'Date of Event',
+    description: 'Date of Event'
   },
   'event.createdAtLocation': {
     id: 'event.createdAtLocation.label',
@@ -128,5 +156,10 @@ export const eventMetadataLabelMap: Record<
     id: 'event.registrationNumber.label',
     defaultMessage: 'Registration Number',
     description: 'Registration Number'
+  },
+  'event.flags': {
+    id: 'event.flags.label',
+    defaultMessage: 'Flags',
+    description: 'Flags'
   }
 }

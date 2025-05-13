@@ -112,3 +112,23 @@ test('Returns aggregated event with updated status and values', async () => {
   expect(updatedEvents[0].status).toBe(EventStatus.DECLARED)
   expect(updatedEvents[0].declaration).toEqual(updatedDeclaration)
 })
+
+test('Does not return draft events unless they are created by the fetching user', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  // Create 3 events created by the fetching user
+  await client.event.create(generator.event.create())
+  await client.event.create(generator.event.create())
+  await client.event.create(generator.event.create())
+
+  // Create 2 events created by other users
+  const { user: otherUser } = await setupTestCase()
+  const otherClient = createTestClient(otherUser)
+  await otherClient.event.create(generator.event.create())
+  await otherClient.event.create(generator.event.create())
+
+  const events = await client.event.list()
+
+  expect(events).toHaveLength(3)
+})

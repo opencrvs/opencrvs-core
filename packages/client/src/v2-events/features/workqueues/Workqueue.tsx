@@ -48,7 +48,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 const messages = defineMessages({
@@ -118,7 +118,6 @@ function Workqueue({
 }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const intl = useIntl()
-  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -126,6 +125,9 @@ function Workqueue({
   const drafts = getRemoteDrafts()
   const navigate = useNavigate()
   const { width } = useWindowSize()
+  const [sortedCol, setSortedCol] = useState('modifiedAt')
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
+  const { getEventTitle } = useEventTitle()
 
   const validEvents = orderBy(
     events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
@@ -176,13 +178,8 @@ function Workqueue({
         return event.status
       }
 
+      const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
       const titleColumnId = workqueueConfig.columns[0].id
-
-      const title = flattenedIntl.formatMessage(
-        eventConfig.summary.title.label,
-        flattenEventIndex(event)
-      )
-
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
           <IconWithName name={title} status={getEventStatus()} />
@@ -214,6 +211,7 @@ function Workqueue({
           TitleColumn
         ) : (
           <TextButton
+            color={useFallbackTitle ? 'red' : 'primary'}
             onClick={() => {
               return navigate(
                 ROUTES.V2.EVENTS.OVERVIEW.buildPath({
@@ -227,9 +225,6 @@ function Workqueue({
         )
       }
     })
-
-  const [sortedCol, setSortedCol] = useState('modifiedAt')
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
   function onColumnClick(columnName: string) {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -269,6 +264,7 @@ function Workqueue({
         isSorted: sortedCol === column.id
       })
     )
+
     const allColumns = configuredColumns.concat(getDefaultColumns())
 
     if (width > theme.grid.breakpoints.lg) {
@@ -281,6 +277,7 @@ function Workqueue({
   const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
 
   const isShowPagination = totalPages >= 1
+
   return (
     <WQContentWrapper
       error={false}
@@ -330,9 +327,7 @@ export function WorkqueueContainer() {
   const workqueueId = 'all'
   const { getEvents } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
   const [events] = getEvents.useSuspenseQuery()
-
   const eventConfigs = useEventConfigurations()
 
   const workqueueConfig =

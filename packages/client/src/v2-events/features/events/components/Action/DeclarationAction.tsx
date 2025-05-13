@@ -18,7 +18,8 @@ import {
   getActionAnnotation,
   DeclarationUpdateActionType,
   ActionType,
-  Action
+  Action,
+  deepMerge
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -120,14 +121,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   /*
    * Initialize the form state
    */
-
-  const setInitialFormValues = useEventFormData(
-    (state) => state.setInitialFormValues
-  )
-
-  const setInitialAnnotation = useActionAnnotation(
-    (state) => state.setInitialAnnotation
-  )
+  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
   const eventDrafts = drafts
     .filter((d) => d.eventId === event.id)
@@ -173,15 +168,40 @@ function DeclarationActionComponent({ children, actionType }: Props) {
       return {}
     }
 
-    return getActionAnnotation({
+    const prevActionAnnotation = getActionAnnotation({
       event,
       actionType: previousActionType
+    })
+
+    // If we found annotation data from the previous action, use that.
+    if (Object.keys(prevActionAnnotation).length) {
+      return prevActionAnnotation
+    }
+
+    // As a fallback, lets see if there is a notify action annotation and use that.
+    return getActionAnnotation({
+      event,
+      actionType: ActionType.NOTIFY
     })
   }, [event, actionType])
 
   useEffect(() => {
-    setInitialFormValues(eventStateWithDrafts.declaration)
-    setInitialAnnotation({ ...previousActionAnnotation, ...actionAnnotation })
+    // Use the form values from the zustand state, so that filled form state is not lost
+    // If user e.g. enters the 'screen lock' flow while filling form.
+    // Then use form values from drafts.
+    const initialFormValues = deepMerge(
+      formValues || {},
+      eventStateWithDrafts.declaration
+    )
+
+    setFormValues(initialFormValues)
+
+    const initialAnnotation = deepMerge(
+      deepMerge(annotation || {}, previousActionAnnotation),
+      actionAnnotation
+    )
+
+    setAnnotation(initialAnnotation)
 
     return () => {
       /*

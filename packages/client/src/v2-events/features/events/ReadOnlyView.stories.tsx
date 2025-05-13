@@ -13,6 +13,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import { within } from '@testing-library/dom'
+import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
   generateEventDocument,
@@ -60,20 +61,42 @@ const eventId = eventDocument.id
 const draft = generateEventDraftDocument(eventId)
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-  },
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    const dropdown = await canvas.findAllByTestId('action-dropdownMenu')
-    dropdown[0].click()
+    await step('Finds view record menu item in action menu', async () => {
+      const actionButton = await canvas.findByRole('button', {
+        name: 'Action'
+      })
+      await userEvent.click(actionButton)
+    })
+
+    await step('User is taken to the view record page', async () => {
+      await userEvent.click(await canvas.findByText('View record'))
+
+      await waitFor(async () => {
+        await canvas.findByText('Riku This value is from a draft')
+        await canvas.findByText('Tennis club membership application')
+      })
+    })
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
         eventId: tennisClubMembershipEventDocument.id
-      })
+      }),
+      chromatic: { disableSnapshot: true }
     },
     msw: {
       handlers: {

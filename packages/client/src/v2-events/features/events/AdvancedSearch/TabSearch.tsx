@@ -29,8 +29,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import {
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
-  getDefaultSearchFields,
-  MatchType
+  getDefaultSearchFields
 } from './utils'
 
 const MIN_PARAMS_TO_SEARCH = 2
@@ -63,9 +62,10 @@ function enhanceFieldWithSearchFieldConfig(
   field: Inferred,
   searchField: SearchField
 ): Inferred {
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (field.type) {
     case FieldType.DATE:
-      return searchField.config.type === MatchType.range
+      return searchField.config.type === 'range'
         ? {
             ...field,
             validation: [],
@@ -102,7 +102,6 @@ function enhanceEventFieldsWithSearchFieldConfig(
 
 function getSectionFields(
   event: EventConfig,
-  formValues: Record<string, FieldValue>,
   handleFieldChange: (fieldId: string, value: FieldValue) => void,
   intl: IntlShape,
   fieldValues?: Record<string, string>
@@ -142,10 +141,8 @@ function getSectionFields(
       >
         <FormFieldGenerator
           fields={modifiedFields}
-          form={formValues}
           id={section.title.id}
           initialValues={fieldValues}
-          setAllFieldsDirty={false}
           onChange={(updatedValues) => {
             Object.entries(updatedValues).forEach(([fieldId, value]) => {
               handleFieldChange(fieldId, value)
@@ -205,7 +202,6 @@ export function TabSearch({
 
   const SectionFields = getSectionFields(
     enhancedEvent,
-    formValues,
     handleFieldChange,
     intl,
     fieldValues

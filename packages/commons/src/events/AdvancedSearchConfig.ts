@@ -13,6 +13,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { SelectOption } from './FieldConfig'
 
 const MatchType = z.enum(['fuzzy', 'exact', 'range'])
+export type MatchType = z.infer<typeof MatchType>
 
 const BaseField = z.object({
   config: z.object({

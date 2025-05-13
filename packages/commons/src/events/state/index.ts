@@ -14,12 +14,13 @@ import {
   Action,
   ActionDocument,
   ActionStatus,
+  ActionUpdate,
   EventState,
   RegisterAction
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus } from '../EventMetadata'
+import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
@@ -65,6 +66,45 @@ function getStatusFromActions(actions: Array<Action>) {
   }, EventStatus.CREATED)
 }
 
+function getFlagsFromActions(actions: Action[]): Flag[] {
+  const sortedactions = actions.sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
+  const actionStatus = sortedactions.reduce(
+    (actionStatuses, { type, status }) => ({
+      ...actionStatuses,
+      [type]: status
+    }),
+    {} as Record<ActionType, ActionStatus>
+  )
+
+  const flags = Object.entries(actionStatus)
+    .filter(([type, status]) => status !== ActionStatus.Accepted)
+    .map(([type, status]) => {
+      const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
+      return flag satisfies Flag
+    })
+
+  const isCertificatePrinted = sortedactions.reduce<boolean>(
+    (prev, { type }) => {
+      if (type === ActionType.PRINT_CERTIFICATE) {
+        return true
+      }
+      if (type === ActionType.APPROVE_CORRECTION) {
+        return false
+      }
+      return prev
+    },
+    false
+  )
+
+  if (isCertificatePrinted) {
+    flags.push(CustomFlags.CERTIFICATE_PRINTED)
+  }
+
+  return flags
+}
+
 function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
   const actionsWithRoles = actions
     .filter(
@@ -97,7 +137,9 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-function aggregateActionDeclarations(actions: Array<ActionDocument>) {
+function aggregateActionDeclarations(
+  actions: Array<ActionDocument>
+): ActionUpdate {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
@@ -193,6 +235,15 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const registrationNumber = registrationAction?.registrationNumber ?? null
 
+  const declaration = aggregateActionDeclarations(activeActions)
+
+  let dateOfEvent: string | null = event.createdAt.split('T')[0]
+
+  if (event.dateOfEvent) {
+    const parsedDate = ZodDate.safeParse(declaration[event.dateOfEvent.fieldId])
+    dateOfEvent = parsedDate.success ? parsedDate.data : null
+  }
+
   return deepDropNulls({
     id: event.id,
     type: event.type,
@@ -200,14 +251,16 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation ?? '', // @todo remove using empty string
-    updatedAtLocation: creationAction.updatedAtLocation ?? '', // @todo remove using empty string
     updatedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,
-    declaration: aggregateActionDeclarations(activeActions),
+    updatedAtLocation: event.updatedAtLocation,
+    declaration,
     trackingId: event.trackingId,
     registrationNumber,
-    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions)
+    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
+    dateOfEvent,
+    flags: getFlagsFromActions(event.actions)
   })
 }
 

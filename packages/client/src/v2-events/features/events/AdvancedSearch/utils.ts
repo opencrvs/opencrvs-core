@@ -16,7 +16,8 @@ import {
   FieldValue,
   QueryInputType,
   SearchField,
-  EventFieldId
+  EventFieldId,
+  MatchType
 } from '@opencrvs/commons/client'
 import { FieldType } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
@@ -58,8 +59,7 @@ export const flattenFieldErrors = (fieldErrors: Errors) =>
   Object.values(fieldErrors).flatMap((errObj) => errObj.errors)
 
 const defaultSearchFieldGenerator: Record<
-  // this should be strictly typed, not just any string
-  string,
+  EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
   [EventFieldId.enum.trackingId]: (_) => ({
@@ -83,19 +83,21 @@ const defaultSearchFieldGenerator: Record<
   })
 }
 
+function isEventFieldId(id: string): id is EventFieldId {
+  return Object.values(EventFieldId.enum).includes(id as EventFieldId)
+}
+
 export const getDefaultSearchFields = (
   section: AdvancedSearchConfig
 ): FieldConfig[] => {
   const searchFields: FieldConfig[] = []
-
   section.fields.forEach((fieldConfig) => {
-    const generator = defaultSearchFieldGenerator[fieldConfig.fieldId]
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (generator) {
+    const fieldId = fieldConfig.fieldId
+    if (isEventFieldId(fieldId)) {
+      const generator = defaultSearchFieldGenerator[fieldId]
       searchFields.push(generator(fieldConfig))
     }
   })
-
   return searchFields
 }
 
@@ -114,37 +116,34 @@ const RegStatus = {
   Created: 'CREATED'
 } as const
 
-export const MatchType = {
-  fuzzy: 'fuzzy',
-  exact: 'exact',
-  anyOf: 'anyOf',
-  range: 'range'
-} as const
+// export const MatchType = {
+//   fuzzy: 'fuzzy',
+//   exact: 'exact',
+//   anyOf: 'anyOf',
+//   range: 'range'
+// } as const
 
 type Condition =
-  | { type: typeof MatchType.fuzzy; term: string }
-  | { type: typeof MatchType.exact; term: string }
-  | { type: typeof MatchType.range; gte: string; lte: string }
-  | { type: typeof MatchType.anyOf; terms: string[] }
+  | { type: 'fuzzy'; term: string }
+  | { type: 'exact'; term: string }
+  | { type: 'range'; gte: string; lte: string }
+  | { type: 'anyOf'; terms: string[] }
 
 export const ADVANCED_SEARCH_KEY = 'and'
 
-function buildCondition(
-  value: string,
-  type: keyof typeof MatchType = MatchType.exact
-): Condition {
+function buildCondition(value: string, type: MatchType = 'exact'): Condition {
   switch (type) {
-    case MatchType.fuzzy:
-      return { type: MatchType.fuzzy, term: value }
-    case MatchType.exact:
-      return { type: MatchType.exact, term: value }
-    case MatchType.anyOf:
-      return { type: MatchType.anyOf, terms: value.split(',') }
-    case MatchType.range:
+    case 'fuzzy':
+      return { type: 'fuzzy', term: value }
+    case 'exact':
+      return { type: 'exact', term: value }
+    case 'anyOf':
+      return { type: 'anyOf', terms: value.split(',') }
+    case 'range':
       const [gte, lte] = value.split(',')
-      return { type: MatchType.range, gte, lte }
+      return { type: 'range', gte, lte }
     default:
-      return { type: MatchType.exact, term: value } // Fallback to exact match
+      return { type: 'exact', term: value } // Fallback to exact match
   }
 }
 
@@ -174,10 +173,7 @@ function buildDataConditionFromSearchKeys(
   searchKeys: {
     fieldId: string
     config?: {
-      type:
-        | typeof MatchType.exact
-        | typeof MatchType.fuzzy
-        | typeof MatchType.range
+      type: MatchType
     }
     fieldType: 'field' | 'event'
     fieldConfig?: FieldConfig
@@ -200,8 +196,8 @@ function buildDataConditionFromSearchKeys(
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
         // but "2023-01-01" should be treated as an exact match
         const searchType =
-          config?.type === MatchType.range && value.split(',').length === 1
-            ? MatchType.exact
+          config?.type === 'range' && value.split(',').length === 1
+            ? 'exact'
             : config?.type
         const condition = buildCondition(value, searchType)
         const transformedKey = fieldIdEdited.replace(/\./g, '____')

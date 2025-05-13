@@ -23,7 +23,6 @@ import { ROUTES } from '@client/v2-events/routes'
 
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -31,6 +30,7 @@ import {
   flattenEventIndex,
   getUserIdsFromActions
 } from '@client/v2-events/utils'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
@@ -47,14 +47,13 @@ import { EventOverviewProvider } from './EventOverviewContext'
  */
 function EventOverview({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const intl = useIntlFormatMessageWithFlattenedParams()
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status, registrationNumber } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
   const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
 
-  const flattenedEventIndex = {
+  const { flags, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
@@ -62,11 +61,8 @@ function EventOverview({ event }: { event: EventDocument }) {
     'event.registrationNumber': registrationNumber
   }
 
-  const { summary } = eventConfiguration
-  const title = intl.formatMessage(summary.title.label, flattenedEventIndex)
-  const fallbackTitle = summary.title.emptyValueMessage
-    ? intl.formatMessage(summary.title.emptyValueMessage)
-    : ''
+  const { getEventTitle } = useEventTitle()
+  const { title } = getEventTitle(eventConfiguration, eventIndex)
 
   const actions = getAcceptedActions(event)
 
@@ -74,7 +70,7 @@ function EventOverview({ event }: { event: EventDocument }) {
     <Content
       icon={() => <IconWithName name={''} status={status} />}
       size={ContentSize.LARGE}
-      title={title || fallbackTitle}
+      title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >

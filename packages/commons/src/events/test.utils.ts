@@ -492,7 +492,8 @@ export function generateEventDocument({
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     updatedAt: new Date(Date.now() - 1000).toISOString(),
-    updatedAtLocation: 'TODO'
+    dateOfEvent: configuration.dateOfEvent,
+    updatedAtLocation: getUUID()
   }
 }
 
@@ -534,6 +535,7 @@ export const eventQueryDataGenerator = (
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
   updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
+  flags: [],
   declaration: overrides.declaration ?? {
     'recommender.none': true,
     'applicant.firstname': 'Danny',
