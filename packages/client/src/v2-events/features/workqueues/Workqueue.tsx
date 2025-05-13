@@ -119,9 +119,6 @@ function Workqueue({
   offset: number
   eventConfigs: EventConfig[]
 }) {
-  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const [sortedCol, setSortedCol] = useState('modifiedAt')
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
   const intl = useIntl()
   const theme = useTheme()
   const { getOutbox } = useEvents()
@@ -130,6 +127,7 @@ function Workqueue({
   const drafts = getRemoteDrafts()
   const navigate = useNavigate()
   const { width } = useWindowSize()
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const [sortedCol, setSortedCol] = useState('modifiedAt')
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
   const { getEventTitle } = useEventTitle()
