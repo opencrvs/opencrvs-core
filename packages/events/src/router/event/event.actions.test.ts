@@ -86,7 +86,7 @@ test('Action data can be retrieved', async () => {
   ])
 })
 
-test.only('Action data accepts partial changes', async () => {
+test('Action data accepts partial changes', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
