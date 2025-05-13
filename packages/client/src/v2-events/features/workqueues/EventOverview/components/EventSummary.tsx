@@ -35,13 +35,13 @@ function getDefaultFields(
       id: 'assignedTo',
       label: {
         id: 'v2.event.summary.assignedTo.label',
-        defaultMessage: 'Assigned To',
-        description: 'Assigned To label'
+        defaultMessage: 'Assigned to',
+        description: 'Assigned to label'
       },
       value: {
         id: 'v2.event.summary.assignedTo.value',
         defaultMessage: '{event.assignedTo}',
-        description: 'Assigned To value'
+        description: 'Assigned to value'
       },
       emptyValueMessage: {
         id: 'v2.event.summary.assignedTo.empty',
