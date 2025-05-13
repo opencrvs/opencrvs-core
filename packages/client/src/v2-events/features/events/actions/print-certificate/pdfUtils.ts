@@ -25,6 +25,7 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import format from 'date-fns/format'
 import isValid from 'date-fns/isValid'
 import { Location } from '@events/service/locations/locations'
+import { get, has } from 'lodash'
 import {
   EventIndex,
   EventState,
@@ -170,39 +171,34 @@ export function compileSvg({
   /**
    * Handlebars helper: $lookup
    *
-   * Usage: {{$lookup 'child.address.other' 'district'}}
-   *
-   * Resolves a value from the given property path within the `$declaration` object,
+   * Resolves a value from the given property path within the combined $state and $declaration objects.
    * and optionally returns a nested field from the resolved value.
-   *
-   * Behavior:
-   * 1. The helper expects `$declaration` to be passed as the `data` parameter.
-   * 2. It serializes the `$declaration` object into a stringified form using `useFormDataStringifier`.
-   * 3. It then extracts the value from the `propertyPath` provided, and return it.
    *
    * This helper is useful for extracting specific properties from complex structures like `child.address.other`
    * when you need to access deeply nested fields in the declaration.
+   *
+   *  @param propertyPath - $declaration or $state property to look up without the top-level property name. NOTE: We do not support mixing of 'deep objects' and dot-separated flat objects. See examples.
+   *  @returns - a nested field from the resolved value.
+   *
+   * @example {'foo.bar.baz': 'quix' } // $lookup 'foo.bar.baz' => 'quix'
+   * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookup 'foo.bar.baz' => {'baz': 'quix'}
+   * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => undefined
    */
-  Handlebars.registerHelper(
-    '$lookup',
-    function (data: typeof $declaration, propertyPath: string) {
-      if (data !== $declaration) {
-        const warning =
-          '$lookup currently only supports $declaration as a parameter.'
-        // eslint-disable-next-line no-console
-        console.warn(warning)
-        return warning
-      }
-
-      const stringify = getFormDataStringifier(intl, locations)
-      const formFieldWithResolvedValue = stringify(
+  function $lookup(propertyPath: string) {
+    const stringify = getFormDataStringifier(intl, locations)
+    const { declaration, ...others } = $state
+    const formFieldWithResolvedValue: Record<string, any> = {
+      ...stringify(
         config.declaration.pages.flatMap((x) => x.fields),
-        $declaration
-      )
-
-      return formFieldWithResolvedValue[propertyPath]
+        declaration
+      ),
+      ...others
     }
-  )
+
+    return get(formFieldWithResolvedValue, propertyPath)
+  }
+
+  Handlebars.registerHelper('$lookup', $lookup)
 
   /**
    * Handlebars helper: $location
@@ -228,6 +224,7 @@ export function compileSvg({
       locationId: string,
       propName: 'location' | 'district' | 'province' | 'country'
     ) {
+      console.log('locationId', locationId)
       const location = locations.find((loc) => loc.id === locationId)
       const district = locations.find((loc) => loc.id === location?.partOf)
       const province = locations.find((loc) => loc.id === district?.partOf)
