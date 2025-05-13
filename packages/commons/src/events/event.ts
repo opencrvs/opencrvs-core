@@ -12,7 +12,9 @@
 import { createEventConditionals } from '../conditionals/conditionals'
 import { createEventFieldConfig } from '../event-config/event-configuration'
 import { EventFieldId } from './AdvancedSearchConfig'
+import { EventMetadata } from './EventMetadata'
 import { SelectOption } from './FieldConfig'
+import { z } from 'zod'
 
 /**
  * Creates a function that acts like a callable + static method container.
@@ -29,3 +31,16 @@ function eventFn(fieldId: EventFieldId, options?: SelectOption[]) {
 const event = Object.assign(eventFn, createEventConditionals())
 
 export { event }
+
+export const EventMetadataParameter = z.object({
+  $event: z.enum(Object.keys(EventMetadata) as [string, ...string[]])
+})
+export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
+
+export function eventMetadata(
+  field: keyof EventMetadata
+): EventMetadataParameter {
+  return {
+    $event: field
+  }
+}
