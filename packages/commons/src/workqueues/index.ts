@@ -15,6 +15,7 @@ import { registeredWorkqueue } from './readyToPrint'
 export { RootWorkqueueConfig } from './WorkqueueConfig'
 export { defaultColumns } from './defaultColumns'
 
+/** @knipignore */
 export const workqueues = {
   all: allWorkqueue,
   registered: registeredWorkqueue,
