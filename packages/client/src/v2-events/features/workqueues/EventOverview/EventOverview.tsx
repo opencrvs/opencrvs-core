@@ -50,7 +50,13 @@ import {
 /**
  * Renders the event overview page, including the event summary and history.
  */
-function EventOverview({ event }: { event: EventDocument }) {
+function EventOverview({
+  event,
+  onAction
+}: {
+  event: EventDocument
+  onAction: () => void
+}) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status, registrationNumber } = eventIndex
@@ -84,7 +90,9 @@ function EventOverview({ event }: { event: EventDocument }) {
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
-      topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
+      topActionButtons={[
+        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />
+      ]}
     >
       <EventSummary
         event={flattenedEventIndex}
@@ -100,7 +108,13 @@ function EventOverviewContainer() {
   const { getEvent } = useEvents()
   const { getUsers } = useUsers()
 
-  const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
+  const getEventQuery = getEvent.useQuery(params.eventId)
+  const fullEvent = getEventQuery.data
+
+  if (!fullEvent) {
+    return
+  }
+
   const activeActions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(activeActions)
   const [users] = getUsers.useSuspenseQuery(userIds)
@@ -108,7 +122,12 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview event={fullEvent} />
+      <EventOverview
+        event={fullEvent}
+        onAction={async () => {
+          await getEventQuery.refetch()
+        }}
+      />
     </EventOverviewProvider>
   )
 }

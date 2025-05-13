@@ -22,7 +22,13 @@ import { messages } from '@client/i18n/messages/views/action'
 import { getScope } from '@client/profile/profileSelectors'
 import { useActionMenuItems } from './useActionMenuItems'
 
-export function ActionMenu({ eventId }: { eventId: string }) {
+export function ActionMenu({
+  eventId,
+  onAction
+}: {
+  eventId: string
+  onAction: () => void
+}) {
   const intl = useIntl()
   const events = useEvents()
   const scopes = useSelector(getScope)
@@ -49,7 +55,10 @@ export function ActionMenu({ eventId }: { eventId: string }) {
               <DropdownMenu.Item
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
-                onClick={async () => action.onClick(event.id)}
+                onClick={async () => {
+                  await action.onClick(event.id)
+                  onAction()
+                }}
               >
                 {intl.formatMessage(action.label)}
               </DropdownMenu.Item>
