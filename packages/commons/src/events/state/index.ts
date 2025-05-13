@@ -220,9 +220,7 @@ const DEFAULT_DATE_OF_EVENT_PROPERTY = 'createdAt' satisfies keyof EventDocument
  * @returns the current state of the event based on the actions taken.
  * @see EventIndex for the description of the returned object.
  */
-export function getCurrentEventState(
-  event: EventDocument
-): NonNullableDeep<EventIndex> {
+export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
   )
