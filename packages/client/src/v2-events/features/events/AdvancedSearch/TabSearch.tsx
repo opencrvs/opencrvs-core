@@ -16,14 +16,21 @@ import { stringify } from 'query-string'
 import { Accordion } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
-import { EventConfig, FieldValue } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  FieldType,
+  FieldValue,
+  Inferred,
+  SearchField
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import {
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
-  getDefaultSearchFields
+  getDefaultSearchFields,
+  MatchType
 } from './utils'
 
 const MIN_PARAMS_TO_SEARCH = 2
@@ -52,6 +59,47 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
+function enhanceFieldWithSearchFieldConfig(
+  field: Inferred,
+  searchField: SearchField
+): Inferred {
+  switch (field.type) {
+    case FieldType.DATE:
+      return searchField.config.type === MatchType.range
+        ? {
+            ...field,
+            validation: [],
+            type: FieldType.DATE_RANGE,
+            defaultValue: undefined
+          }
+        : field
+
+    default:
+      return field
+  }
+}
+
+function enhanceEventFieldsWithSearchFieldConfig(
+  event: EventConfig,
+  searchFieldConfigMap: Map<string, SearchField>
+) {
+  return {
+    ...event,
+    declaration: {
+      ...event.declaration,
+      pages: event.declaration.pages.map((page) => ({
+        ...page,
+        fields: page.fields.map((field) => {
+          const searchField = searchFieldConfigMap.get(field.id)
+          return searchField
+            ? enhanceFieldWithSearchFieldConfig(field, searchField)
+            : field
+        })
+      }))
+    }
+  }
+}
+
 function getSectionFields(
   event: EventConfig,
   formValues: Record<string, FieldValue>,
@@ -66,8 +114,14 @@ function getSectionFields(
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
-    const advancedSearchFields = allUniqueFields.filter((field) =>
-      advancedSearchFieldId.includes(field.id)
+    const advancedSearchFields: Inferred[] = allUniqueFields.reduce(
+      (acc: Inferred[], field: Inferred) => {
+        if (advancedSearchFieldId.includes(field.id)) {
+          acc.push(field)
+        }
+        return acc
+      },
+      []
     )
 
     const combinedFields = [...metadataFields, ...advancedSearchFields]
@@ -119,6 +173,11 @@ export function TabSearch({
   const navigate = useNavigate()
 
   const prevEventId = React.useRef(currentEvent.id)
+  const searchFieldConfigMap = new Map(
+    currentEvent.advancedSearch.flatMap((x) =>
+      x.fields.map((f) => [f.fieldId, f])
+    )
+  )
 
   React.useEffect(() => {
     // only reset formValues if another event search tab is selected
@@ -128,6 +187,11 @@ export function TabSearch({
     }
   }, [currentEvent])
 
+  const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(
+    currentEvent,
+    searchFieldConfigMap
+  )
+
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
     setFormValues((prev) => ({
       ...prev,
@@ -136,11 +200,11 @@ export function TabSearch({
   }
 
   const advancedSearchFieldErrors = flattenFieldErrors(
-    getAdvancedSearchFieldErrors(currentEvent, formValues)
+    getAdvancedSearchFieldErrors(enhancedEvent, formValues)
   )
 
   const SectionFields = getSectionFields(
-    currentEvent,
+    enhancedEvent,
     formValues,
     handleFieldChange,
     intl,
@@ -148,9 +212,12 @@ export function TabSearch({
   )
 
   const handleSearch = () => {
-    const searchParams = stringify(filterEmptyValues(formValues))
+    const nonEmptyValues = filterEmptyValues(formValues)
+    const searchParams = stringify(nonEmptyValues, {
+      arrayFormat: 'comma'
+    })
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
-      eventType: currentEvent.id
+      eventType: enhancedEvent.id
     })
 
     navigate(`${navigateTo}?${searchParams.toString()}`)

@@ -18,6 +18,7 @@ import {
   SearchField,
   EventFieldId
 } from '@opencrvs/commons/client'
+import { FieldType } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
   Errors,
@@ -113,27 +114,37 @@ const RegStatus = {
   Created: 'CREATED'
 } as const
 
+export const MatchType = {
+  fuzzy: 'fuzzy',
+  exact: 'exact',
+  anyOf: 'anyOf',
+  range: 'range'
+} as const
+
 type Condition =
-  | { type: 'fuzzy'; term: string }
-  | { type: 'exact'; term: string }
-  | { type: 'range'; gte: string; lte: string }
-  | { type: 'anyOf'; terms: string[] }
+  | { type: typeof MatchType.fuzzy; term: string }
+  | { type: typeof MatchType.exact; term: string }
+  | { type: typeof MatchType.range; gte: string; lte: string }
+  | { type: typeof MatchType.anyOf; terms: string[] }
 
 export const ADVANCED_SEARCH_KEY = 'and'
 
-function buildCondition(type: string, value: string): Condition {
+function buildCondition(
+  value: string,
+  type: keyof typeof MatchType = MatchType.exact
+): Condition {
   switch (type) {
-    case 'FUZZY':
-      return { type: 'fuzzy', term: value }
-    case 'EXACT':
-      return { type: 'exact', term: value }
-    case 'ANY_OF':
-      return { type: 'anyOf', terms: value.split(',') }
-    case 'RANGE':
+    case MatchType.fuzzy:
+      return { type: MatchType.fuzzy, term: value }
+    case MatchType.exact:
+      return { type: MatchType.exact, term: value }
+    case MatchType.anyOf:
+      return { type: MatchType.anyOf, terms: value.split(',') }
+    case MatchType.range:
       const [gte, lte] = value.split(',')
-      return { type: 'range', gte, lte }
+      return { type: MatchType.range, gte, lte }
     default:
-      return { type: 'exact', term: value } // Fallback to exact match
+      return { type: MatchType.exact, term: value } // Fallback to exact match
   }
 }
 
@@ -141,26 +152,58 @@ function buildConditionForStatus(): Condition {
   return { type: 'anyOf', terms: Object.values(RegStatus) }
 }
 
+function formatValue(
+  rawInput: Record<string, FieldValue>,
+  fieldId: string,
+  fieldConfig?: FieldConfig
+): string {
+  const value = rawInput[fieldId]
+
+  if (
+    fieldConfig &&
+    fieldConfig.type === FieldType.DATE_RANGE &&
+    Array.isArray(value) &&
+    value.length === 2
+  ) {
+    return `${value[0]},${value[1]}`
+  }
+  return String(value)
+}
+
 function buildDataConditionFromSearchKeys(
   searchKeys: {
     fieldId: string
     config?: {
-      type: 'FUZZY' | 'EXACT' | 'RANGE'
+      type:
+        | typeof MatchType.exact
+        | typeof MatchType.fuzzy
+        | typeof MatchType.range
     }
     fieldType: 'field' | 'event'
+    fieldConfig?: FieldConfig
   }[],
   rawInput: Record<string, string> // values from UI or query string
 ): Record<string, Condition> {
   return searchKeys.reduce(
-    (result: Record<string, Condition>, { fieldId, config, fieldType }) => {
+    (
+      result: Record<string, Condition>,
+      { fieldId, config, fieldType, fieldConfig }
+    ) => {
       const fieldIdEdited = fieldType === 'event' ? `event.${fieldId}` : fieldId
-      const value = rawInput[fieldIdEdited]
+      const value = formatValue(rawInput, fieldIdEdited, fieldConfig)
 
       if (fieldIdEdited === 'event.status' && value === 'ALL') {
         const transformedKey = fieldIdEdited.replace(/\./g, '____')
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
-        const condition = buildCondition(config?.type ?? 'EXACT', value)
+        // Handle the case where we want to search by range but the value is not a comma-separated string
+        // e.g. "2023-01-01,2023-12-31" should be treated as a range
+        // but "2023-01-01" should be treated as an exact match
+        const searchType =
+          config?.type === MatchType.range && value.split(',').length === 1
+            ? MatchType.exact
+            : config?.type
+        const condition = buildCondition(value, searchType)
         const transformedKey = fieldIdEdited.replace(/\./g, '____')
         result[transformedKey] = condition
       }
@@ -181,7 +224,10 @@ export function buildDataCondition(
     section.fields.map((field) => ({
       fieldId: field.fieldId,
       config: field.config, // assuming field structure has a `config` prop
-      fieldType: field.fieldType
+      fieldType: field.fieldType,
+      fieldConfig: eventConfig.declaration.pages
+        .flatMap((page) => page.fields)
+        .find((f) => f.id === field.fieldId)
     }))
   )
 
