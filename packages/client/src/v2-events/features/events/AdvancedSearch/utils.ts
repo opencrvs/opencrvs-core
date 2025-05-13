@@ -16,8 +16,7 @@ import {
   FieldValue,
   QueryInputType,
   SearchField,
-  EventFieldId,
-  MatchType
+  EventFieldId
 } from '@opencrvs/commons/client'
 import { FieldType } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
@@ -116,12 +115,12 @@ const RegStatus = {
   Created: 'CREATED'
 } as const
 
-// export const MatchType = {
-//   fuzzy: 'fuzzy',
-//   exact: 'exact',
-//   anyOf: 'anyOf',
-//   range: 'range'
-// } as const
+export const MatchType = {
+  fuzzy: 'fuzzy',
+  exact: 'exact',
+  anyOf: 'anyOf',
+  range: 'range'
+} as const
 
 type Condition =
   | { type: 'fuzzy'; term: string }
@@ -131,15 +130,18 @@ type Condition =
 
 export const ADVANCED_SEARCH_KEY = 'and'
 
-function buildCondition(value: string, type: MatchType = 'exact'): Condition {
+function buildCondition(
+  value: string,
+  type: keyof typeof MatchType = 'exact'
+): Condition {
   switch (type) {
-    case 'fuzzy':
+    case MatchType.fuzzy:
       return { type: 'fuzzy', term: value }
-    case 'exact':
+    case MatchType.exact:
       return { type: 'exact', term: value }
-    case 'anyOf':
+    case MatchType.anyOf:
       return { type: 'anyOf', terms: value.split(',') }
-    case 'range':
+    case MatchType.range:
       const [gte, lte] = value.split(',')
       return { type: 'range', gte, lte }
     default:
@@ -173,7 +175,7 @@ function buildDataConditionFromSearchKeys(
   searchKeys: {
     fieldId: string
     config?: {
-      type: MatchType
+      type: keyof typeof MatchType
     }
     fieldType: 'field' | 'event'
     fieldConfig?: FieldConfig
