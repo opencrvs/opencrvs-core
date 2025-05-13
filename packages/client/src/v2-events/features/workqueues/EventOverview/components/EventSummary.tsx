@@ -32,6 +32,24 @@ function getDefaultFields(
 ): SummaryConfig['fields'] {
   return [
     {
+      id: 'assignedTo',
+      label: {
+        id: 'v2.event.summary.assignedTo.label',
+        defaultMessage: 'Assigned To',
+        description: 'Assigned To label'
+      },
+      value: {
+        id: 'v2.event.summary.assignedTo.value',
+        defaultMessage: '{event.assignedTo}',
+        description: 'Assigned To value'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.assignedTo.empty',
+        defaultMessage: 'Not assigned',
+        description: 'Not assigned message'
+      }
+    },
+    {
       id: 'status',
       label: {
         id: 'v2.event.summary.status.label',
