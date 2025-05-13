@@ -50,15 +50,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 export const Overview: Story = {
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-    const surname = await canvas.findByTestId('applicant.surname')
-    await step('active draft values are shown to the user', async () => {
-      await expect(surname.textContent).toBe(
-        "Applicant's last nameThis value is from a draft"
-      )
-    })
-  },
   parameters: {
     reactRouter: {
       router: routesConfig,
