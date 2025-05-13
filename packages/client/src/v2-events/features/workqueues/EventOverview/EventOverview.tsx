@@ -61,7 +61,8 @@ function EventOverview({ event }: { event: EventDocument }) {
     'event.registrationNumber': registrationNumber
   }
 
-  const { title } = useEventTitle(event.type, eventIndex)
+  const { getEventTitle } = useEventTitle()
+  const { title } = getEventTitle(eventConfiguration, eventIndex)
 
   const actions = getAcceptedActions(event)
 

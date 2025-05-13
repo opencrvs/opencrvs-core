@@ -68,11 +68,7 @@ function generateQuery(
     throw new Error(`Unsupported query type: ${value.type}`)
   }) satisfies estypes.QueryDslQueryContainer[]
 
-  return {
-    bool: {
-      must
-    }
-  } as estypes.QueryDslQueryContainer
+  return { bool: { must } } as estypes.QueryDslQueryContainer
 }
 
 function buildClause(clause: QueryExpression) {
