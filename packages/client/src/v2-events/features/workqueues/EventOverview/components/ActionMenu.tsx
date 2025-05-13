@@ -27,7 +27,7 @@ export function ActionMenu({
   onAction
 }: {
   eventId: string
-  onAction: () => void
+  onAction?: () => void
 }) {
   const intl = useIntl()
   const events = useEvents()
@@ -57,7 +57,7 @@ export function ActionMenu({
                 disabled={'disabled' in action ? action.disabled : false}
                 onClick={async () => {
                   await action.onClick(event.id)
-                  onAction()
+                  onAction?.()
                 }}
               >
                 {intl.formatMessage(action.label)}
