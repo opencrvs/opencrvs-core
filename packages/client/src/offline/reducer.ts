@@ -91,14 +91,15 @@ export interface CRVSOffice extends ILocation {
   physicalType: 'Building'
 }
 
+export interface IForms {
+  version: string
+  birth: ISerializedForm
+  death: ISerializedForm
+  marriage: ISerializedForm
+}
 export interface IOfflineData {
   locations: ILocationDataResponse
-  forms: {
-    version: string
-    birth: ISerializedForm
-    death: ISerializedForm
-    marriage: ISerializedForm
-  }
+  forms: IForms
   facilities: IFacilitiesDataResponse
   offices: IOfficesDataResponse
   languages: ILanguage[]
@@ -256,7 +257,7 @@ const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
 })
 
 const RETRY_TIMEOUT = 5000
-
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 function delay(cmd: RunCmd<any>, time: number) {
   return Cmd.list(
     [Cmd.run(() => new Promise((resolve) => setTimeout(resolve, time))), cmd],

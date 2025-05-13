@@ -542,12 +542,12 @@ const AdvancedSearch = () => {
     advancedSearchParamState.event === TabId.BIRTH && canSearchBirthRecords
       ? TabId.BIRTH
       : advancedSearchParamState.event === TabId.DEATH && canSearchDeathRecords
-      ? TabId.DEATH
-      : canSearchBirthRecords
-      ? TabId.BIRTH
-      : canSearchDeathRecords
-      ? TabId.DEATH
-      : ''
+        ? TabId.DEATH
+        : canSearchBirthRecords
+          ? TabId.BIRTH
+          : canSearchDeathRecords
+            ? TabId.DEATH
+            : ''
 
   const dispatch = useDispatch()
   const tabSections = [

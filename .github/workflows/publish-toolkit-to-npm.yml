@@ -16,11 +16,11 @@ on:
         required: true
   push:
     branches:
-      - develop
+      - '*'
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,14 +34,15 @@ jobs:
       - name: Check if version exists on npm
         id: check-version
         run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          if npm view @opencrvs/toolkit@$PACKAGE_VERSION > /dev/null 2>&1; then
-            echo "Version $PACKAGE_VERSION already exists on npm."
-            echo "version-exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "Version $PACKAGE_VERSION does not exist on npm."
-            echo "version-exists=false" >> $GITHUB_OUTPUT
-          fi
+          PACKAGE_VERSION=$(node -p "require('../../package.json').version")
+          TOOLKIT_VERSION=$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)
+          if npm view @opencrvs/toolkit@$TOOLKIT_VERSION > /dev/null 2>&1; then
+          echo "Version $TOOLKIT_VERSION already exists on npm."
+          echo "version-exists=true" >> $GITHUB_OUTPUT
+            else
+          echo "Version $TOOLKIT_VERSION does not exist on npm."
+          echo "version-exists=false" >> $GITHUB_OUTPUT
+            fi
         working-directory: packages/toolkit
 
       - name: Install dependencies
@@ -57,6 +58,14 @@ jobs:
       - name: Authenticate to npm
         if: steps.check-version.outputs.version-exists == 'false'
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        working-directory: packages/toolkit
+
+      - name: Update package.json version
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: |
+          PACKAGE_VERSION=$(node -p "require('../../package.json').version")
+          TOOLKIT_VERSION=$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)
+          jq --arg version "$TOOLKIT_VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
         working-directory: packages/toolkit
 
       - name: Publish to npm

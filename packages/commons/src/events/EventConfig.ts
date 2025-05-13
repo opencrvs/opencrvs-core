@@ -10,35 +10,66 @@
  */
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
-import { TranslationConfig } from './TranslationConfig'
-import { SummaryConfig } from './SummaryConfig'
-import { WorkqueueConfig } from './WorkqueueConfig'
-import { FormConfig, FormConfigInput, FormPage } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
+import { SummaryConfig } from './SummaryConfig'
+import { TranslationConfig } from './TranslationConfig'
+import { WorkqueueConfig } from './WorkqueueConfig'
+import { AdvancedSearchConfig } from './AdvancedSearchConfig'
+import { findAllFields } from './utils'
+import { DeclarationFormConfig } from './FormConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
  *
  * `Event.parse(config)` will throw an error if the configuration is invalid.
  */
-export const EventConfig = z.object({
-  id: z
-    .string()
-    .describe(
-      'A machine-readable identifier for the event, e.g. "birth" or "death"'
-    ),
-  summary: SummaryConfig,
-  label: TranslationConfig,
-  actions: z.array(ActionConfig),
-  workqueues: z.array(WorkqueueConfig),
-  deduplication: z.array(DeduplicationConfig).optional().default([])
-})
+export const EventConfig = z
+  .object({
+    id: z
+      .string()
+      .describe(
+        'A machine-readable identifier for the event, e.g. "birth" or "death"'
+      ),
+    summary: SummaryConfig,
+    label: TranslationConfig,
+    actions: z.array(ActionConfig),
+    declaration: DeclarationFormConfig,
+    workqueues: z.array(WorkqueueConfig),
+    deduplication: z.array(DeduplicationConfig).optional().default([]),
+    advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
+  })
+  .superRefine((event, ctx) => {
+    const allFields = findAllFields(event)
+    const fieldIds = allFields.map((field) => field.id)
+
+    const advancedSearchFields = event.advancedSearch.flatMap((section) =>
+      section.fields.flatMap((field) => field.fieldId)
+    )
+
+    const advancedSearchFieldsSet = new Set(advancedSearchFields)
+
+    if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Advanced search field ids must be unique',
+        path: ['advancedSearch']
+      })
+    }
+
+    const invalidFields = event.advancedSearch.flatMap((section) =>
+      section.fields.filter((field) => !fieldIds.includes(field.fieldId))
+    )
+
+    if (invalidFields.length > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Advanced search id must match a field id in fields array.
+    Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
+      .map((f) => f.fieldId)
+      .join(', ')}`,
+        path: ['advancedSearch']
+      })
+    }
+  })
 
 export type EventConfig = z.infer<typeof EventConfig>
-export type EventConfigInput = z.input<typeof EventConfig>
-
-export const defineForm = (form: FormConfigInput): FormConfig =>
-  FormConfig.parse(form)
-
-export const defineFormPage = (formPage: FormPage): FormPage =>
-  FormPage.parse(formPage)

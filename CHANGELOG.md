@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.8.0 Release candidate
+
+### New features
+
+- **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
+
+### Improvements
+
+- Improved text color for disabled text inputs and dropdowns
+- **Github runners upgraded** to latest Ubuntu LTS release 24.04 [#7045](https://github.com/opencrvs/opencrvs-core/issues/7045)
+- **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
+- **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
+
 ## [1.7.1](https://github.com/opencrvs/opencrvs-core/compare/v1.7.0...v1.7.1)
 
 ### Bug fixes
@@ -33,8 +46,10 @@
 - Introduced a new customisable UI component: Banner [#8276](https://github.com/opencrvs/opencrvs-core/issues/8276)
 - Auth now allows exchanging user's token for a new record-specific token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
 - A new GraphQL mutation `upsertRegistrationIdentifier` is added to allow updating the patient identifiers of a registration record such as NID [#8034](https://github.com/opencrvs/opencrvs-core/pull/8034)
+- A new GraphQL mutation `updateField` is added to allow updating any field in a record [#8291](https://github.com/opencrvs/opencrvs-core/pull/8291)
 - Updated GraphQL mutation `confirmRegistration` to allow adding a `comment` for record audit [#8197](https://github.com/opencrvs/opencrvs-core/pull/8197)
 - Add `isAgeInYearsBetween` validator to enable validation that will constraint a date to be only valid if it falls within a specified date range. The `isInformantOfLegalAge` validator is now deprecated and removed in favor of `isAgeInYearsBetween` validator [#7636](https://github.com/opencrvs/opencrvs-core/issues/7636)
+- Allow countries to customise the format of the full name in the sytem for `sytem users` and `citizens` e.g `{LastName} {MiddleName} {Firstname}`, in any case where one of the name is not provided e.g no `MiddleName`, we'll simply render e.g `{LastName} {FirstName}` without any extra spaces if that's the order set in `country-config`. [#6830](https://github.com/opencrvs/opencrvs-core/issues/6830)
 
 ### Improvements
 
@@ -59,18 +74,21 @@
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 - Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
 
-## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.4)
+## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.3...v1.6.4)
 
 ### Bug fixes
 
 - Fix migration issue discovered when restoring an OpenCRVS instance with a large number of records. `$push used too much memory and cannot spill to disk. Memory limit: 104857600 bytes` [#9116](https://github.com/opencrvs/opencrvs-core/issues/9116)
 
-
 ## [1.6.3](https://github.com/opencrvs/opencrvs-core/compare/v1.6.2...v1.6.3)
+
+### Improvements
+
+- For countries where local phone numbers start with 0, we now ensure the prefix remains unchanged when converting to and from the international format.
+- Add 6th level support for addresses [#6956](https://github.com/opencrvs/opencrvs-core/issues/6956)
 
 ### Bug fixes
 
-- Add 6th level support for addresses [#6956](https://github.com/opencrvs/opencrvs-core/issues/6956)
 - Fix rendering of Custom Date fields [#8885](https://github.com/opencrvs/opencrvs-core/issues/8885)
 - Fix slow render of location options [#8562](https://github.com/opencrvs/opencrvs-core/pull/8562)
 
@@ -82,10 +100,6 @@
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 - Fix stale validations showing for document uploader with options form field
 - Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations , the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
-
-### Improvements
-
-- Support for 6th administrative level
 
 ## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
 

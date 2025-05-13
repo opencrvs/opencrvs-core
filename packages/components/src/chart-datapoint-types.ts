@@ -17,8 +17,7 @@ export interface IDataPoint {
   description?: string
   categoricalData?: ICategoryDataPoint[]
 }
-
-export interface ICategoryDataPoint {
+interface ICategoryDataPoint {
   name: string
   label: string
   icon: () => React.ReactNode

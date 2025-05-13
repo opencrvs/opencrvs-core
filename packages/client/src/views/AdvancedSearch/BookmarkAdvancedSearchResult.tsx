@@ -70,8 +70,8 @@ export function BookmarkAdvancedSearchResult() {
             notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
               ? 'loading'
               : notificationStatus === NOTIFICATION_STATUS.ERROR
-              ? 'error'
-              : 'success'
+                ? 'error'
+                : 'success'
           }
           onClose={() => {
             setNotificationStatus(NOTIFICATION_STATUS.IDLE)

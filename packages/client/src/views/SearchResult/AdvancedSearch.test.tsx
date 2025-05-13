@@ -66,6 +66,7 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
         registrationStatuses: ['IN_PROGRESS']
       })
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     store.dispatch(setUserDetails(mockUserResponse as any))
     ;({ component: testComponent, router } = await createTestComponent(
       <AdvancedSearchConfig></AdvancedSearchConfig>,

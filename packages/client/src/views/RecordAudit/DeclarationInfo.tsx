@@ -80,16 +80,18 @@ export const GetDeclarationInfo = ({
     finalStatus === 'Declared' || finalStatus === 'Submitted'
       ? intl.formatMessage(constantsMessages.inReviewStatus)
       : finalStatus === 'In progress'
-      ? intl.formatMessage(constantsMessages.incompleteStatus)
-      : finalStatus === 'Rejected'
-      ? intl.formatMessage(constantsMessages.requiresUpdatesStatus)
-      : finalStatus === 'Registered'
-      ? intl.formatMessage(constantsMessages.registeredStatus)
-      : finalStatus === 'Archived'
-      ? intl.formatMessage(dynamicConstantsMessages.archived_declaration)
-      : finalStatus === 'Draft'
-      ? intl.formatMessage(dynamicConstantsMessages.draft)
-      : finalStatus
+        ? intl.formatMessage(constantsMessages.incompleteStatus)
+        : finalStatus === 'Rejected'
+          ? intl.formatMessage(constantsMessages.requiresUpdatesStatus)
+          : finalStatus === 'Registered'
+            ? intl.formatMessage(constantsMessages.registeredStatus)
+            : finalStatus === 'Archived'
+              ? intl.formatMessage(
+                  dynamicConstantsMessages.archived_declaration
+                )
+              : finalStatus === 'Draft'
+                ? intl.formatMessage(dynamicConstantsMessages.draft)
+                : finalStatus
 
   let info: ILabel = {
     status: declaration?.status && displayStatus,

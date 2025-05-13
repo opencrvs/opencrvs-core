@@ -12,7 +12,8 @@
 // eslint-disable-next-line import/no-unassigned-import
 import '@opencrvs/commons/monitoring'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-var-requires */
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import { createServer } from '@user-mgnt/server'

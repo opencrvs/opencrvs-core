@@ -219,7 +219,7 @@ export const ResponsiveModal = ({
       }}
     >
       <ScreenBlocker />
-      <ModalContent width={width} responsive={responsive}>
+      <ModalContent width={width} responsive={responsive} role="dialog">
         <Header
           responsive={responsive}
           hideBoxShadow={hideHeaderBoxShadow}
