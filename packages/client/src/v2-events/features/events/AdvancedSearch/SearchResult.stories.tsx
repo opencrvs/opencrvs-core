@@ -83,3 +83,5 @@ export const NoSearchResult: Story = {
     workqueueConfig: workqueues['all']
   }
 }
+
+// trigger the chromatic test
