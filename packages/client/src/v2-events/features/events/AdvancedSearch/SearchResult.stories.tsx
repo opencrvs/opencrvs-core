@@ -16,8 +16,8 @@ import {
   tennisClubMembershipEvent,
   workqueues
 } from '@opencrvs/commons/client'
-import { SearchResult } from './SearchResult'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { SearchResult } from './SearchResult'
 
 const meta: Meta<typeof SearchResult> = {
   title: 'Components/SearchResult',
