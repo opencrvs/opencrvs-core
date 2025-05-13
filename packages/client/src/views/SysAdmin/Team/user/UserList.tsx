@@ -497,7 +497,6 @@ function UserListComponent(props: IProps) {
       return data.searchUsers.results.map((user, index) => {
         if (user !== null) {
           const name = getLocalisedName(intl, user.name[0])
-
           const role = intl.formatMessage(user.role.label)
           const avatar = user.avatar
 

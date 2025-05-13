@@ -38,7 +38,7 @@ import {
   ResourceIdentifier,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
-import { UUID, logger } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import { createChunks } from '@metrics/utils/batchHelpers'
 
 interface IGroupedByGender {

@@ -13,7 +13,13 @@
 - **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
 - **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
 
-## 1.7.0 Release candidate
+## [1.7.1](https://github.com/opencrvs/opencrvs-core/compare/v1.7.0...v1.7.1)
+
+### Bug fixes
+
+- Use the first role assigned to a user for record history entry if no role found at the point of time when the action was performed [#9300](https://github.com/opencrvs/opencrvs-core/issues/9300)
+
+## [1.7.0](https://github.com/opencrvs/opencrvs-core/compare/v1.6.2...v1.7.0)
 
 ### Breaking changes
 
@@ -68,35 +74,32 @@
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 - Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
 
-## 1.6.3 Release candidate
+## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.3...v1.6.4)
 
 ### Bug fixes
 
-- Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations , the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
+- Fix migration issue discovered when restoring an OpenCRVS instance with a large number of records. `$push used too much memory and cannot spill to disk. Memory limit: 104857600 bytes` [#9116](https://github.com/opencrvs/opencrvs-core/issues/9116)
+
+## [1.6.3](https://github.com/opencrvs/opencrvs-core/compare/v1.6.2...v1.6.3)
 
 ### Improvements
 
 - For countries where local phone numbers start with 0, we now ensure the prefix remains unchanged when converting to and from the international format.
+- Add 6th level support for addresses [#6956](https://github.com/opencrvs/opencrvs-core/issues/6956)
 
 ### Bug fixes
 
 - Fix rendering of Custom Date fields [#8885](https://github.com/opencrvs/opencrvs-core/issues/8885)
+- Fix slow render of location options [#8562](https://github.com/opencrvs/opencrvs-core/pull/8562)
 
 ## [1.6.2](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.2)
 
-### Improvements
-
-- Support for 6th administrative level
-
-### Deprecated
-
-- `INFORMANT_SIGNATURE` & `INFORMANT_SIGNATURE_REQUIRED` are now deprecated and part of form config
-
 ### Bug fixes
 
+- Fix task history getting corrupted if a user views a record while it's in external validation [#8278](https://github.com/opencrvs/opencrvs-core/issues/8278)
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 - Fix stale validations showing for document uploader with options form field
-- Fix task history getting corrupted if a user views a record while it's in external validation [#8278](https://github.com/opencrvs/opencrvs-core/issues/8278)
+- Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations , the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
 
 ## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
 
