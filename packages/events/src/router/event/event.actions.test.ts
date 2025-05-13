@@ -10,6 +10,7 @@
  */
 
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   EventIndex,
@@ -207,7 +208,8 @@ test('READ action does not delete draft', async () => {
       }
     },
     transactionId: 'transactionId',
-    eventId: originalEvent.id
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)
@@ -240,7 +242,8 @@ test('Action other than READ deletes draft', async () => {
       }
     },
     transactionId: 'transactionId',
-    eventId: originalEvent.id
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)

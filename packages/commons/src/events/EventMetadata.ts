@@ -11,6 +11,8 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { ActionType } from './ActionType'
+import { ActionStatus } from './ActionDocument'
 
 /**
  * Event statuses recognized by the system
@@ -26,6 +28,23 @@ export const EventStatus = {
   ARCHIVED: 'ARCHIVED'
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
+
+export const CustomFlags = {
+  CERTIFICATE_PRINTED: 'certificate-printed'
+} as const
+export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
+
+export const Flag = z
+  .string()
+  .regex(
+    new RegExp(
+      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
+    ),
+    'Flag must be in the format ActionType:ActionStatus (lowerCase)'
+  )
+  .or(z.nativeEnum(CustomFlags))
+
+export type Flag = z.infer<typeof Flag>
 
 export const eventStatuses = Object.values(EventStatus)
 export const EventStatuses = z.nativeEnum(EventStatus)
@@ -114,8 +133,9 @@ export const EventMetadata = z.object({
   trackingId: z
     .string()
     .describe(
-      'System-generated tracking ID that can be used by informants or registrars to look up the event.'
-    )
+      'System-generated tracking ID used by informants or registrars to look up the event.'
+    ),
+  flags: z.array(Flag)
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
@@ -195,5 +215,10 @@ export const eventMetadataLabelMap: Record<
     id: 'event.trackingId.label',
     defaultMessage: 'Tracking ID',
     description: 'Tracking ID'
+  },
+  'event.flags': {
+    id: 'event.flags.label',
+    defaultMessage: 'Flags',
+    description: 'Flags'
   }
 }

@@ -22,10 +22,14 @@ import {
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {
-  title: 'Declare/Interaction'
+  title: 'Declare/Interaction',
+  beforeEach: () => {
+    useEventFormData.setState({ formValues: {} })
+  }
 }
 
 export default meta
@@ -59,13 +63,13 @@ function createDraftHandlers() {
         transactionId: req.transactionId,
         createdAt: new Date().toISOString(),
         action: {
-          status: ActionStatus.Accepted,
           ...req,
           declaration: req.declaration || {},
           createdBy: 'test-user',
           createdByRole: 'test-role',
           createdAtLocation: 'test-location',
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          status: ActionStatus.Requested
         }
       }
       spy(req)

@@ -532,6 +532,7 @@ export const eventQueryDataGenerator = (
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
   updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
+  flags: [],
   declaration: overrides.declaration ?? {
     'recommender.none': true,
     'applicant.firstname': 'Danny',
