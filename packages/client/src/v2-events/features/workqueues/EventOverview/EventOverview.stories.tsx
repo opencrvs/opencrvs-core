@@ -168,3 +168,50 @@ export const WithRejectedAction: Story = {
     }
   }
 }
+
+export const CihanTest: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return {
+              ...tennisClubMembershipEventDocument,
+              actions: tennisClubMembershipEventDocument.actions.concat([
+                {
+                  type: ActionType.ARCHIVE,
+                  status: ActionStatus.Rejected,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: new Date().toISOString(),
+                  createdBy: '123',
+                  createdAtLocation: '123'
+                }
+              ])
+            }
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument(
+                tennisClubMembershipEventDocument.id,
+                ActionType.REGISTER,
+                {
+                  'applicant.firstname': 'Baz',
+                  'applicant.surname': 'Foobar'
+                }
+              )
+            ]
+          })
+        ]
+      }
+    }
+  }
+}
