@@ -20,7 +20,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
       <tspan x="62" y="413.552">Date of certification&#10;</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="460.352">Imbobo District Office, Chiwala State, Farajaland</tspan>
+      <tspan x="62" y="460.352">{{$location (lookup $state "createdAtLocation") 'location'}}, {{$location (lookup $state "createdAtLocation") 'country'}}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="447.552">Place of certification&#10;</tspan>
@@ -35,7 +35,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M309.793 475.396L505.999 476.321" stroke="#CCCCCC" stroke-width="0.782258" stroke-dasharray="3.13 1.56" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
       <tspan x="366.248" y="489.656">
-       Registrar {{ $findUserById (lookup $state "updatedBy") "name"}}
+       Registrar {{$findUserById ($lookup 'legalStatuses.REGISTERED.createdBy') "name"}}
       </tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
@@ -50,11 +50,11 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M50 700H535" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <path d="M50 184H534" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <text fill="#C86E00" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
-      <tspan x="215.483" y="199.76">No. {{ lookup $state "registrationNumber" }}</tspan>
+      <tspan x="215.483" y="199.76">No. {{ $lookup 'legalStatuses.REGISTERED.createdBy' }}</tspan>
     </text>
     <path d="M50 206H534" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
-      <tspan x="70" y="229.76">Membership etails</tspan>
+      <tspan x="70" y="229.76">Membership details</tspan>
     </text>
     <path d="M70 233.5H514" stroke="#ECECEC" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
