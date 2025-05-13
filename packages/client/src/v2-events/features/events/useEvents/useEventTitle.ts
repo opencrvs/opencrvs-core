@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventIndex } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { EventConfig, EventIndex } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { flattenEventIndex } from '@client/v2-events/utils'
 
@@ -17,23 +16,29 @@ import { flattenEventIndex } from '@client/v2-events/utils'
  * Returns the title of an event.
  * If the event has a fallback title, it will be used if the event title is empty.
  */
-export function useEventTitle(eventType: string, eventIndex: EventIndex) {
-  const { eventConfiguration } = useEventConfiguration(eventType)
+export function useEventTitle() {
   const intl = useIntlFormatMessageWithFlattenedParams()
 
-  const formattedTitle = intl.formatMessage(
-    eventConfiguration.title,
-    flattenEventIndex(eventIndex)
-  )
+  function getEventTitle(
+    eventConfiguration: EventConfig,
+    eventIndex: EventIndex
+  ) {
+    const formattedTitle = intl.formatMessage(
+      eventConfiguration.title,
+      flattenEventIndex(eventIndex)
+    )
 
-  const fallbackTitle = eventConfiguration.fallbackTitle
-    ? intl.formatMessage(eventConfiguration.fallbackTitle)
-    : null
+    const fallbackTitle = eventConfiguration.fallbackTitle
+      ? intl.formatMessage(eventConfiguration.fallbackTitle)
+      : null
 
-  const useFallbackTitle = formattedTitle.trim() === ''
+    const useFallbackTitle = formattedTitle.trim() === ''
 
-  return {
-    useFallbackTitle,
-    title: useFallbackTitle ? fallbackTitle : formattedTitle
+    return {
+      useFallbackTitle,
+      title: useFallbackTitle ? fallbackTitle : formattedTitle
+    }
   }
+
+  return { getEventTitle }
 }
