@@ -121,12 +121,12 @@ export const usePrintableCertificate = ({
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
-      language: language,
-      config,
       $state: currentEventState,
       $declaration: base64ReplacedTemplate,
       locations,
-      users: base64ReplacedUsersWithSignature
+      users: base64ReplacedUsersWithSignature,
+      language,
+      config
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)

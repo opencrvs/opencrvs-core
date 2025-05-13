@@ -48,17 +48,19 @@ import { EventOverviewProvider } from './EventOverviewContext'
 function EventOverview({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event)
-  const { trackingId, status, registrationNumber } = eventIndex
+  const { trackingId, status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
   const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
 
-  const { flags, ...flattenedEventIndex } = {
+  const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
     'event.status': status,
-    'event.registrationNumber': registrationNumber
+    // @TODO: Go through different interfaces and ensure this is unified. (e.g. does print certificate and event overview use the same interface?)
+    'event.registrationNumber':
+      eventIndex.legalStatuses.REGISTERED?.registrationNumber // This should never be overridden by the draft.
   }
 
   const { getEventTitle } = useEventTitle()

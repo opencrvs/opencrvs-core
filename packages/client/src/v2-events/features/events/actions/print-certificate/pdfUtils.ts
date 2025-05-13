@@ -25,7 +25,7 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import format from 'date-fns/format'
 import isValid from 'date-fns/isValid'
 import { Location } from '@events/service/locations/locations'
-import { get, has } from 'lodash'
+import { get } from 'lodash'
 import {
   EventIndex,
   EventState,
@@ -224,7 +224,6 @@ export function compileSvg({
       locationId: string,
       propName: 'location' | 'district' | 'province' | 'country'
     ) {
-      console.log('locationId', locationId)
       const location = locations.find((loc) => loc.id === locationId)
       const district = locations.find((loc) => loc.id === location?.partOf)
       const province = locations.find((loc) => loc.id === district?.partOf)
