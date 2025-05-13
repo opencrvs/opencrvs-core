@@ -588,7 +588,7 @@ export const eventQueryDataGenerator = (
   overrides: Partial<EventIndex> = {}
 ): EventIndex => ({
   id: overrides.id ?? getUUID(),
-  type: overrides.type ?? 'tennis-club-membership',
+  type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
   status: overrides.status ?? getEventStatus(),
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   createdBy: overrides.createdBy ?? getUUID(),
