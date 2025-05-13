@@ -319,6 +319,7 @@ jobs:
         run: |
           git clone --bare https://github.com/opencrvs/opencrvs-core.git .git
           git config --local --bool core.bare false
+          git reset --hard
           git fetch --prune
           git checkout ${{ github.head_ref }}
           git reset --hard
