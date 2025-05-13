@@ -268,6 +268,7 @@ describe('getCurrentEventState()', () => {
       updatedByUserRole: registerRequestAction.createdByRole,
       updatedAtLocation: registerRequestAction.createdAtLocation,
       declaration: declareRequestAction.declaration,
+      flags: [],
       legalStatuses: {
         [EventStatus.DECLARED]: {
           createdAt: declareRequestAction.createdAt,
@@ -371,6 +372,7 @@ describe('getCurrentEventState()', () => {
       updatedByUserRole: registerAcceptAction.createdByRole,
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: declareAcceptAction.declaration,
+      flags: [],
       legalStatuses: {
         [EventStatus.DECLARED]: {
           createdAt: declareAcceptAction.createdAt,
