@@ -22,11 +22,7 @@ export const WorkqueueConfig = z
     name: TranslationConfig.describe(
       'Title of the workflow (both in navigation and on the page)'
     ),
-    /**
-     * Placeholder untill the following gets merged to develop
-     * https://github.com/opencrvs/opencrvs-core/blob/5fbe9854a88504a7a13fcc856b3e82594b70c38c/packages/commons/src/events/EventIndex.ts#L92-L93
-     */
-    query: z.string(),
+    query: QueryType,
     actions: z.array(
       z.object({
         type: z.string(),
