@@ -108,6 +108,7 @@ function EventOverviewContainer() {
   const { getEvent } = useEvents()
   const { getUsers } = useUsers()
 
+  // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = getEvent.useQuery(params.eventId)
   const fullEvent = getEventQuery.data
 
@@ -122,12 +123,7 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview
-        event={fullEvent}
-        onAction={async () => {
-          await getEventQuery.refetch()
-        }}
-      />
+      <EventOverview event={fullEvent} onAction={getEventQuery.refetch} />
     </EventOverviewProvider>
   )
 }
