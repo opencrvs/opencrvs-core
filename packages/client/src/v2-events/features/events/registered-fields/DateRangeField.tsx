@@ -26,7 +26,7 @@ import {
 import { Checkbox, Link } from '@opencrvs/components'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 
-export interface IDateRangePickerValue {
+interface IDateRangePickerValue {
   exact?: string
   rangeStart?: string
   rangeEnd?: string

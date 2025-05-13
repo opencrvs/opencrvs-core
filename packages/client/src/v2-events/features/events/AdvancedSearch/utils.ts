@@ -115,7 +115,7 @@ const RegStatus = {
   Created: 'CREATED'
 } as const
 
-export const MatchType = {
+const MatchType = {
   fuzzy: 'fuzzy',
   exact: 'exact',
   anyOf: 'anyOf',

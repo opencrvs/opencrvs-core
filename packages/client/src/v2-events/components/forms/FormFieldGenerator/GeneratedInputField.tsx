@@ -176,6 +176,7 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             value={field.value}
             onChange={(val) => {
+              //@TODO: We need to come up with a general solution for complex types.
               // @ts-ignore
               onFieldValueChange(fieldDefinition.id, val)
             }}
