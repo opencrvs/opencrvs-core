@@ -1718,7 +1718,8 @@ export const mockUserGraphqlOperation = {
       { user: mockCompleteFormData },
       '',
       userDetails,
-      mockOfflineData
+      mockOfflineData,
+      undefined
     )
   },
   result: {

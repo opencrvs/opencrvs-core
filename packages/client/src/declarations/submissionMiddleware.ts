@@ -86,7 +86,8 @@ function getGqlDetails(
     draft.data,
     draft.id,
     userDetails,
-    offlineData
+    offlineData,
+    draft.originalData
   )
   appendGqlMetadataFromDraft(draft, gqlDetails)
   return gqlDetails

@@ -195,7 +195,8 @@ describe('Correction summary', () => {
                   birthDeclaration.data,
                   birthDeclaration.id,
                   userDetails,
-                  mockOfflineData
+                  mockOfflineData,
+                  undefined
                 )
               },
               result: {
