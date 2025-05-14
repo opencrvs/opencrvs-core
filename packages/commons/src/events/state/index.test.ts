@@ -34,6 +34,7 @@ describe('getCurrentEventState()', () => {
       createdAt: event.actions[1].createdAt,
       createdBy: event.actions[1].createdBy,
       createdAtLocation: event.actions[1].createdAtLocation,
+      createdByRole: event.actions[1].createdByRole,
       acceptedAt: event.actions[1].createdAt
     })
 
@@ -41,6 +42,7 @@ describe('getCurrentEventState()', () => {
       createdAt: event.actions[2].createdAt,
       createdBy: event.actions[2].createdBy,
       createdAtLocation: event.actions[2].createdAtLocation,
+      createdByRole: event.actions[2].createdByRole,
       acceptedAt: event.actions[2].createdAt
     })
   })
@@ -146,6 +148,7 @@ describe('getCurrentEventState()', () => {
       createdAt: declareRequest?.createdAt,
       createdBy: declareRequest?.createdBy,
       createdAtLocation: declareRequest?.createdAtLocation,
+      createdByRole: declareRequest?.createdByRole,
       acceptedAt: declareAccept?.createdAt
     })
 
@@ -153,6 +156,7 @@ describe('getCurrentEventState()', () => {
       createdAt: registerRequest?.createdAt,
       createdBy: registerRequest?.createdBy,
       createdAtLocation: registerRequest?.createdAtLocation,
+      createdByRole: registerRequest?.createdByRole,
       acceptedAt: registerAccept?.createdAt
     })
   })
@@ -281,8 +285,8 @@ describe('getCurrentEventState()', () => {
           createdAt: registerRequestAction.createdAt,
           createdBy: registerRequestAction.createdBy,
           createdAtLocation: registerRequestAction.createdAtLocation,
-          acceptedAt: registerAcceptAction.createdByRole,
-          createdByRole: registerRequestAction.createdAtLocation,
+          acceptedAt: registerAcceptAction.createdAt,
+          createdByRole: registerRequestAction.createdByRole,
           // @ts-expect-error -- We do not have sufficient types for this in generator
           registrationNumber: registerAcceptAction.registrationNumber
         }

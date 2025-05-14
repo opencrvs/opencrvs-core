@@ -105,7 +105,9 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
           accept?.createdAtLocation ??
           metadata.createdAt,
         createdByRole:
-          request?.createdByRole ?? accept?.createdByRole ?? metadata.createdAt
+          request?.createdByRole ??
+          accept?.createdByRole ??
+          metadata.createdByRole
       }
     },
     {
