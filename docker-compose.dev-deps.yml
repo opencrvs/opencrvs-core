@@ -26,7 +26,7 @@ services:
       - '5432:5432'
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-      - ./packages/migration/src/migrations/postgres/0001-init-postgres.sql:/docker-entrypoint-initdb.d/0001-init-postgres.sql
+      - ./packages/migration/src/migrations/postgres/0001_init.sql:/docker-entrypoint-initdb.d/0001_init.sql
 
   redis:
     ports:

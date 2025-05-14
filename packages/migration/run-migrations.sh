@@ -11,7 +11,7 @@
 set -e # fail if any of the commands fails
 
 HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
-EVENTS_CONFIG=./build/dist/src/migrate-postgres-config-events.json
+EVENTS_CONFIG=./src/migrate-postgres-config-events.json
 OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
 APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js

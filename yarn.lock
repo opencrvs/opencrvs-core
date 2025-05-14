@@ -10038,6 +10038,15 @@
     "@types/node" "*"
     "@types/pdfkit" "*"
 
+"@types/pg@^8.15.1":
+  version "8.15.1"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.15.1.tgz#ee6fad7608d2348f55226a5fb5118efdab97ecf9"
+  integrity sha512-YKHrkGWBX5+ivzvOQ66I0fdqsQTsvxqM0AGP2i0XrVZ9DP5VA/deEbTf7VuLPGpY7fJB9uGbkZ6KjVhuHcrTkQ==
+  dependencies:
+    "@types/node" "*"
+    pg-protocol "*"
+    pg-types "^4.0.1"
+
 "@types/pretty-hrtime@^1.0.0":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@types/pretty-hrtime/-/pretty-hrtime-1.0.3.tgz#ee1bd8c9f7a01b3445786aad0ef23aba5f511a44"
@@ -23448,6 +23457,11 @@ pg-pool@^3.9.6:
   resolved "https://registry.yarnpkg.com/pg-pool/-/pg-pool-3.9.6.tgz#c6fde89dee615d6c262724e68a3a37e9593157fc"
   integrity sha512-rFen0G7adh1YmgvrmE5IPIqbb+IgEzENUm+tzm6MLLDSlPRoZVhzU1WdML9PV2W5GOdRA9qBKURlbt1OsXOsPw==
 
+pg-protocol@*:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/pg-protocol/-/pg-protocol-1.10.0.tgz#a473afcbb1c6e5dc3ac24869ba3dd563f8a1ae1b"
+  integrity sha512-IpdytjudNuLv8nhlHs/UrVBhU0e78J0oIS/0AVdTbWxSOkFUVdsHC/NrorO6nXsQNDTT1kzDSOMJubBQviX18Q==
+
 pg-protocol@^1.9.5:
   version "1.9.5"
   resolved "https://registry.yarnpkg.com/pg-protocol/-/pg-protocol-1.9.5.tgz#e544eff37d6ab79c26281d7c0b59ac9be4862686"
@@ -23471,7 +23485,7 @@ pg-types@^2.1.0:
     postgres-date "~1.0.4"
     postgres-interval "^1.1.0"
 
-pg-types@^4.0.2:
+pg-types@^4.0.1, pg-types@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/pg-types/-/pg-types-4.0.2.tgz#399209a57c326f162461faa870145bb0f918b76d"
   integrity sha512-cRL3JpS3lKMGsKaWndugWQoLOCoP+Cic8oseVcbr0qhPzYD5DWXK+RZ9LY9wxRf7RQia4SCwQlXk0q6FCPrVng==

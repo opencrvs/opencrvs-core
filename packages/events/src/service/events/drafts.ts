@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DraftInput, ActionStatus, Draft } from '@opencrvs/commons/events'
+import { DraftInput, ActionStatus } from '@opencrvs/commons/events'
 
 import { getClient, sql } from '@events/storage/postgres/events'
 
@@ -53,13 +53,13 @@ export async function createDraft(
       ${ActionStatus.Accepted},
       ${createdBy},
       ${createdByRole},
-      ${createdAtLocation} 
+      ${createdAtLocation}
     )
     ON CONFLICT (transaction_id) DO UPDATE
     SET declaration = EXCLUDED.declaration,
         annotations = EXCLUDED.annotations,
         created_at = now()
-    RETURNING 
+    RETURNING
       id,
       event_id AS "eventId",
       transaction_id AS "transactionId",
