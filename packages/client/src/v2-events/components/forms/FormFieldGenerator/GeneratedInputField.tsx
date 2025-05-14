@@ -24,6 +24,7 @@ import {
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
+  isDateRangeFieldType,
   isDividerFieldType,
   isFileFieldType,
   isFileFieldWithOptionType,
@@ -66,6 +67,7 @@ import { Address } from '@client/v2-events/features/events/registered-fields/Add
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
+import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
@@ -162,6 +164,22 @@ export const GeneratedInputField = React.memo(
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
             }
+          />
+        </InputField>
+      )
+    }
+
+    if (isDateRangeFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <DateRangeField.Input
+            {...inputProps}
+            value={field.value}
+            onChange={(val) => {
+              //@TODO: We need to come up with a general solution for complex types.
+              // @ts-ignore
+              onFieldValueChange(fieldDefinition.id, val)
+            }}
           />
         </InputField>
       )
