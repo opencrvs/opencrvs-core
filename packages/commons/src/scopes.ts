@@ -134,7 +134,22 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding'
+  USER_DATA_SEEDING: 'user.data-seeding',
+
+  /**
+   * Workqueue scopes - determine which workqueues are visible to users
+   */
+  WORKQUEUE_ASSIGNED_TO_YOU: 'workqueues.assigned-to-you',
+  WORKQUEUE_RECENT: 'workqueues.recent',
+  WORKQUEUE_REQUIRES_COMPLETION: 'workqueues.requires-completion',
+  WORKQUEUE_SENT_FOR_REVIEW: 'workqueues.sent-for-review',
+  WORKQUEUE_IN_REVIEW: 'workqueues.in-review',
+  WORKQUEUE_IN_REVIEW_ALL: 'workqueues.in-review-all',
+  WORKQUEUE_REQUIRES_UPDATES: 'workqueues.requires-updates',
+  WORKQUEUE_SENT_FOR_APPROVAL: 'workqueues.sent-for-approval',
+  WORKQUEUE_IN_EXTERNAL_VALIDATION: 'workqueues.in-external-validation',
+  WORKQUEUE_READY_TO_PRINT: 'workqueues.ready-to-print',
+  WORKQUEUE_READY_TO_ISSUE: 'workqueues.ready-to-issue'
 } as const
 
 export type Scope = (typeof SCOPES)[keyof typeof SCOPES]
