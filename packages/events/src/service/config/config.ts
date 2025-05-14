@@ -11,7 +11,7 @@
 
 import fetch from 'node-fetch'
 import { array } from 'zod'
-import { EventConfig, getOrThrow } from '@opencrvs/commons'
+import { EventConfig, getOrThrow, WorkqueueConfig } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 export async function getEventConfigurations(token: string) {
@@ -54,4 +54,19 @@ export async function getEventConfigurationById({
     }),
     `No configuration found for event type: ${eventType}`
   )
+}
+
+export async function getworkqueueConfigurations(token: string) {
+  const res = await fetch(new URL('/workqueue', env.COUNTRY_CONFIG_URL), {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch workqueue config')
+  }
+
+  return array(WorkqueueConfig).parse(await res.json())
 }
