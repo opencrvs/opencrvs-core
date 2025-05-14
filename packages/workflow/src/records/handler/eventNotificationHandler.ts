@@ -143,14 +143,14 @@ export async function eventNotificationHandler(
   const response: any = await duplicateCheckResponse.json()
 
   if (response.duplicateIds && response.duplicateIds.length > 0) {
-    // throw internal('Duplicates found !!!')
-    await indexBundle(updatedBundle, token)
     let task = getTaskFromSavedBundle(updatedBundle)
     task = updateTaskWithDuplicateIds(task, response.duplicateIds)
     await sendBundleToHearth({
       ...updatedBundle,
       entry: [{ resource: task }]
     })
+    await indexBundle(updatedBundle, token)
+
     return {
       compositionId: getComposition(updatedBundle).id,
       trackingId: getTrackingId(updatedBundle),
