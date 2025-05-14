@@ -80,7 +80,7 @@ function EventOverview({
   }
 
   const { getEventTitle } = useEventTitle()
-  const { title } = getEventTitle(eventConfiguration, eventIndex)
+  const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
   const actions = getAcceptedActions(event)
 
