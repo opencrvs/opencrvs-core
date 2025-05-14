@@ -99,11 +99,11 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
         createdAt:
           request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
         createdBy:
-          request?.createdBy ?? accept?.createdBy ?? metadata.createdAt,
+          request?.createdBy ?? accept?.createdBy ?? metadata.createdBy,
         createdAtLocation:
           request?.createdAtLocation ??
           accept?.createdAtLocation ??
-          metadata.createdAt,
+          metadata.createdAtLocation,
         createdByRole:
           request?.createdByRole ??
           accept?.createdByRole ??
