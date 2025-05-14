@@ -22,43 +22,43 @@ export function createFieldConfigs(fieldId: string) {
     /**
      * Creates a range configuration for the specified field.
      *
-     * @returns An object containing the field ID and a configuration object with a type of 'RANGE'.
+     * @returns An object containing the field ID and a configuration object with a type of 'range'.
      *
      * @example field('age').range()
      * // {
      * //   fieldId: 'age',
-     * //   config: { type: 'RANGE' }
+     * //   config: { type: 'range' }
      * // }
      */
     range: () => ({
       ...baseField,
-      config: { type: 'RANGE' as const }
+      config: { type: 'range' as const }
     }),
     /**
      * Creates a configuration for exact matching of the specified field.
-     * @returns  An object containing the field ID and a configuration object with a type of 'EXACT'.
+     * @returns  An object containing the field ID and a configuration object with a type of 'exact'.
      * @example field('dob').exact()
      * // {
      * //   fieldId: 'dob',
-     * //   config: { type: 'EXACT' }
+     * //   config: { type: 'exact' }
      * // }
      */
     exact: () => ({
       ...baseField,
-      config: { type: 'EXACT' as const }
+      config: { type: 'exact' as const }
     }),
     /**
      * Creates a configuration for fuzzy matching of the specified field.
-     * @returns  An object containing the field ID and a configuration object with a type of 'EXACT'.
+     * @returns  An object containing the field ID and a configuration object with a type of 'exact'.
      * @example field('name').fuzzy()
      * // {
      * //   fieldId: 'name',
-     * //   config: { type: 'FUZZY' }
+     * //   config: { type: 'fuzzy' }
      * // }
      */
     fuzzy: () => ({
       ...baseField,
-      config: { type: 'FUZZY' as const }
+      config: { type: 'fuzzy' as const }
     })
   }
 }

@@ -42,6 +42,9 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
+export const DateRangeFieldValue = DateValue.or(z.tuple([DateValue, DateValue]))
+export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
+
 export const EmailValue = z.string().email()
 
 export const CheckboxFieldValue = z.boolean()
@@ -54,6 +57,7 @@ export type DataFieldValue = z.infer<typeof DataFieldValue>
 export const FieldValue = z.union([
   TextValue,
   DateValue,
+  DateRangeFieldValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
@@ -69,6 +73,7 @@ export type FieldValue = z.infer<typeof FieldValue>
 export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
+  DateRangeFieldValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
@@ -99,6 +104,7 @@ export type FieldValueSchema =
  * FieldValueInputSchema uses Input types which have set optional values as nullish
  * */
 export type FieldUpdateValueSchema =
+  | typeof DateRangeFieldValue
   | typeof FileFieldValue
   | typeof FileFieldWithOptionValue
   | typeof CheckboxFieldValue
