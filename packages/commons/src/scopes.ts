@@ -222,7 +222,7 @@ const CreateUser = z.object({
 
 const ConfigurableScopes = z.discriminatedUnion('type', [CreateUser])
 
-function parseScope(scope: string) {
+export function parseScope(scope: string) {
   const maybeLiteralScope = literalScopes.safeParse(scope)
   if (maybeLiteralScope.success) {
     return {
@@ -250,6 +250,11 @@ function parseScope(scope: string) {
   return undefined
 }
 
+/*
+ * @deprecated
+ * scopes are configurable so all possible
+ * values can't be retrieved anymore
+ */
 export const scopes: Scope[] = Object.values(SCOPES)
 
 export type ParsedScopes = NonNullable<ReturnType<typeof parseScope>>
