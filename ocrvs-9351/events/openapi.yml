@@ -1208,6 +1208,174 @@ components:
                             id:
                               type: string
                             defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  items:
+                                    oneOf:
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'SHOW' conditional is defined, the component is shown to the
+                                      user only if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'ENABLE' conditional is defined, the component is enabled only
+                                      if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                      shown on the review page only if both the
+                                      'DISPLAY_ON_REVIEW' and 'SHOW' conditions
+                                      are met. This should only be used for
+                                      fields within declaration forms, as they
+                                      are the only ones with review pages.
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: The identifier of the translation referred in translation CSV files
+                                      defaultMessage:
+                                        type: string
+                                        description: Default translation message
+                                      description:
+                                        type: string
+                                        description: Describe the translation for a translator to be able to identify
+                                          it.
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              enum:
+                                - DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                  description: Text to display above the date input
+                          required:
+                            - id
+                            - label
+                            - type
+                          description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                            })"
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
                               type: string
                               minLength: 1
                             parent:
@@ -3938,10 +4106,9 @@ components:
                             type:
                               type: string
                               enum: &a6
-                                - FUZZY
-                                - EXACT
-                                - RANGE
-                                - ANY_OF
+                                - fuzzy
+                                - exact
+                                - range
                               description: Determines the type of field
                           required:
                             - type
@@ -5061,6 +5228,174 @@ components:
                       - label
                       - type
                     description: A single date input (dd-mm-YYYY)
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      defaultValue:
+                        anyOf:
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                          - type: array
+                            maxItems: 2
+                            minItems: 2
+                            items:
+                              oneOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                      parent:
+                        type: object
+                        properties:
+                          _fieldId:
+                            type: string
+                      conditionals:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - SHOW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'SHOW' conditional is defined, the component is shown to the
+                                user only if the condition is met
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - ENABLE
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'ENABLE' conditional is defined, the component is enabled only
+                                if the condition is met
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - DISPLAY_ON_REVIEW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                shown on the review page only if both the
+                                'DISPLAY_ON_REVIEW' and 'SHOW' conditions are
+                                met. This should only be used for fields within
+                                declaration forms, as they are the only ones
+                                with review pages.
+                        default: *a2
+                      required:
+                        type: boolean
+                        default: false
+                      placeholder:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The identifier of the translation referred in translation CSV files
+                          defaultMessage:
+                            type: string
+                            description: Default translation message
+                          description:
+                            type: string
+                            description: Describe the translation for a translator to be able to identify
+                              it.
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      validation:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator: {}
+                            message:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                          required:
+                            - validator
+                            - message
+                        default: *a3
+                      label:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The identifier of the translation referred in translation CSV files
+                          defaultMessage:
+                            type: string
+                            description: Default translation message
+                          description:
+                            type: string
+                            description: Describe the translation for a translator to be able to identify
+                              it.
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      hideLabel:
+                        type: boolean
+                        default: false
+                      type:
+                        type: string
+                        enum:
+                          - DATE_RANGE
+                      configuration:
+                        type: object
+                        properties:
+                          notice:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                            description: Text to display above the date input
+                    required:
+                      - id
+                      - label
+                      - type
+                    description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                      })"
                   - type: object
                     properties:
                       id:
@@ -8682,6 +9017,174 @@ components:
                       - label
                       - type
                     description: A single date input (dd-mm-YYYY)
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      defaultValue:
+                        anyOf:
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                          - type: array
+                            maxItems: 2
+                            minItems: 2
+                            items:
+                              oneOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                      parent:
+                        type: object
+                        properties:
+                          _fieldId:
+                            type: string
+                      conditionals:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - SHOW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'SHOW' conditional is defined, the component is shown to the
+                                user only if the condition is met
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - ENABLE
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'ENABLE' conditional is defined, the component is enabled only
+                                if the condition is met
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - DISPLAY_ON_REVIEW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                shown on the review page only if both the
+                                'DISPLAY_ON_REVIEW' and 'SHOW' conditions are
+                                met. This should only be used for fields within
+                                declaration forms, as they are the only ones
+                                with review pages.
+                        default: *a2
+                      required:
+                        type: boolean
+                        default: false
+                      placeholder:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The identifier of the translation referred in translation CSV files
+                          defaultMessage:
+                            type: string
+                            description: Default translation message
+                          description:
+                            type: string
+                            description: Describe the translation for a translator to be able to identify
+                              it.
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      validation:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator: {}
+                            message:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                          required:
+                            - validator
+                            - message
+                        default: *a3
+                      label:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The identifier of the translation referred in translation CSV files
+                          defaultMessage:
+                            type: string
+                            description: Default translation message
+                          description:
+                            type: string
+                            description: Describe the translation for a translator to be able to identify
+                              it.
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      hideLabel:
+                        type: boolean
+                        default: false
+                      type:
+                        type: string
+                        enum:
+                          - DATE_RANGE
+                      configuration:
+                        type: object
+                        properties:
+                          notice:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                            description: Text to display above the date input
+                    required:
+                      - id
+                      - label
+                      - type
+                    description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                      })"
                   - type: object
                     properties:
                       id:
@@ -12485,6 +12988,174 @@ components:
                       id:
                         type: string
                       defaultValue:
+                        anyOf:
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                          - type: array
+                            maxItems: 2
+                            minItems: 2
+                            items:
+                              oneOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                      parent:
+                        type: object
+                        properties:
+                          _fieldId:
+                            type: string
+                      conditionals:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - SHOW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'SHOW' conditional is defined, the component is shown to the
+                                user only if the condition is met
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - ENABLE
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'ENABLE' conditional is defined, the component is enabled only
+                                if the condition is met
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - DISPLAY_ON_REVIEW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                              description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                shown on the review page only if both the
+                                'DISPLAY_ON_REVIEW' and 'SHOW' conditions are
+                                met. This should only be used for fields within
+                                declaration forms, as they are the only ones
+                                with review pages.
+                        default: *a2
+                      required:
+                        type: boolean
+                        default: false
+                      placeholder:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The identifier of the translation referred in translation CSV files
+                          defaultMessage:
+                            type: string
+                            description: Default translation message
+                          description:
+                            type: string
+                            description: Describe the translation for a translator to be able to identify
+                              it.
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      validation:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator: {}
+                            message:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                          required:
+                            - validator
+                            - message
+                        default: *a3
+                      label:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The identifier of the translation referred in translation CSV files
+                          defaultMessage:
+                            type: string
+                            description: Default translation message
+                          description:
+                            type: string
+                            description: Describe the translation for a translator to be able to identify
+                              it.
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      hideLabel:
+                        type: boolean
+                        default: false
+                      type:
+                        type: string
+                        enum:
+                          - DATE_RANGE
+                      configuration:
+                        type: object
+                        properties:
+                          notice:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                            description: Text to display above the date input
+                    required:
+                      - id
+                      - label
+                      - type
+                    description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                      })"
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      defaultValue:
                         type: string
                         minLength: 1
                       parent:
@@ -16197,6 +16868,175 @@ components:
                                 id:
                                   type: string
                                 defaultValue:
+                                  anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: array
+                                      maxItems: 2
+                                      minItems: 2
+                                      items:
+                                        oneOf:
+                                          - type: string
+                                            format: date
+                                            description: Date in the format YYYY-MM-DD
+                                          - type: string
+                                            format: date
+                                            description: Date in the format YYYY-MM-DD
+                                parent:
+                                  type: object
+                                  properties:
+                                    _fieldId:
+                                      type: string
+                                conditionals:
+                                  type: array
+                                  items:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - SHOW
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'SHOW' conditional is defined, the component is shown to the
+                                          user only if the condition is met
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - ENABLE
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'ENABLE' conditional is defined, the component is enabled only
+                                          if the condition is met
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - DISPLAY_ON_REVIEW
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                          shown on the review page only if both
+                                          the 'DISPLAY_ON_REVIEW' and 'SHOW'
+                                          conditions are met. This should only
+                                          be used for fields within declaration
+                                          forms, as they are the only ones with
+                                          review pages.
+                                  default: *a2
+                                required:
+                                  type: boolean
+                                  default: false
+                                placeholder:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                validation:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      validator: {}
+                                      message:
+                                        type: object
+                                        properties:
+                                          id:
+                                            type: string
+                                            description: The identifier of the translation referred in translation CSV files
+                                          defaultMessage:
+                                            type: string
+                                            description: Default translation message
+                                          description:
+                                            type: string
+                                            description: Describe the translation for a translator to be able to identify
+                                              it.
+                                        required:
+                                          - id
+                                          - defaultMessage
+                                          - description
+                                    required:
+                                      - validator
+                                      - message
+                                  default: *a3
+                                label:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                hideLabel:
+                                  type: boolean
+                                  default: false
+                                type:
+                                  type: string
+                                  enum:
+                                    - DATE_RANGE
+                                configuration:
+                                  type: object
+                                  properties:
+                                    notice:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          description: The identifier of the translation referred in translation CSV files
+                                        defaultMessage:
+                                          type: string
+                                          description: Default translation message
+                                        description:
+                                          type: string
+                                          description: Describe the translation for a translator to be able to identify
+                                            it.
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
+                                      description: Text to display above the date input
+                              required:
+                                - id
+                                - label
+                                - type
+                              description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                                })"
+                            - type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultValue:
                                   type: string
                                   minLength: 1
                                 parent:
@@ -19786,6 +20626,175 @@ components:
                                 - label
                                 - type
                               description: A single date input (dd-mm-YYYY)
+                            - type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultValue:
+                                  anyOf:
+                                    - type: string
+                                      format: date
+                                      description: Date in the format YYYY-MM-DD
+                                    - type: array
+                                      maxItems: 2
+                                      minItems: 2
+                                      items:
+                                        oneOf:
+                                          - type: string
+                                            format: date
+                                            description: Date in the format YYYY-MM-DD
+                                          - type: string
+                                            format: date
+                                            description: Date in the format YYYY-MM-DD
+                                parent:
+                                  type: object
+                                  properties:
+                                    _fieldId:
+                                      type: string
+                                conditionals:
+                                  type: array
+                                  items:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - SHOW
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'SHOW' conditional is defined, the component is shown to the
+                                          user only if the condition is met
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - ENABLE
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'ENABLE' conditional is defined, the component is enabled only
+                                          if the condition is met
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - DISPLAY_ON_REVIEW
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                          shown on the review page only if both
+                                          the 'DISPLAY_ON_REVIEW' and 'SHOW'
+                                          conditions are met. This should only
+                                          be used for fields within declaration
+                                          forms, as they are the only ones with
+                                          review pages.
+                                  default: *a2
+                                required:
+                                  type: boolean
+                                  default: false
+                                placeholder:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                validation:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      validator: {}
+                                      message:
+                                        type: object
+                                        properties:
+                                          id:
+                                            type: string
+                                            description: The identifier of the translation referred in translation CSV files
+                                          defaultMessage:
+                                            type: string
+                                            description: Default translation message
+                                          description:
+                                            type: string
+                                            description: Describe the translation for a translator to be able to identify
+                                              it.
+                                        required:
+                                          - id
+                                          - defaultMessage
+                                          - description
+                                    required:
+                                      - validator
+                                      - message
+                                  default: *a3
+                                label:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                hideLabel:
+                                  type: boolean
+                                  default: false
+                                type:
+                                  type: string
+                                  enum:
+                                    - DATE_RANGE
+                                configuration:
+                                  type: object
+                                  properties:
+                                    notice:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          description: The identifier of the translation referred in translation CSV files
+                                        defaultMessage:
+                                          type: string
+                                          description: Default translation message
+                                        description:
+                                          type: string
+                                          description: Describe the translation for a translator to be able to identify
+                                            it.
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
+                                      description: Text to display above the date input
+                              required:
+                                - id
+                                - label
+                                - type
+                              description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                                })"
                             - type: object
                               properties:
                                 id:
@@ -23539,6 +24548,174 @@ components:
                             id:
                               type: string
                             defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  items:
+                                    oneOf:
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'SHOW' conditional is defined, the component is shown to the
+                                      user only if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'ENABLE' conditional is defined, the component is enabled only
+                                      if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                      shown on the review page only if both the
+                                      'DISPLAY_ON_REVIEW' and 'SHOW' conditions
+                                      are met. This should only be used for
+                                      fields within declaration forms, as they
+                                      are the only ones with review pages.
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: The identifier of the translation referred in translation CSV files
+                                      defaultMessage:
+                                        type: string
+                                        description: Default translation message
+                                      description:
+                                        type: string
+                                        description: Describe the translation for a translator to be able to identify
+                                          it.
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              enum:
+                                - DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                  description: Text to display above the date input
+                          required:
+                            - id
+                            - label
+                            - type
+                          description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                            })"
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
                               type: string
                               minLength: 1
                             parent:
@@ -27106,6 +28283,174 @@ components:
                             - label
                             - type
                           description: A single date input (dd-mm-YYYY)
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  items:
+                                    oneOf:
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'SHOW' conditional is defined, the component is shown to the
+                                      user only if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'ENABLE' conditional is defined, the component is enabled only
+                                      if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                      shown on the review page only if both the
+                                      'DISPLAY_ON_REVIEW' and 'SHOW' conditions
+                                      are met. This should only be used for
+                                      fields within declaration forms, as they
+                                      are the only ones with review pages.
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: The identifier of the translation referred in translation CSV files
+                                      defaultMessage:
+                                        type: string
+                                        description: Default translation message
+                                      description:
+                                        type: string
+                                        description: Describe the translation for a translator to be able to identify
+                                          it.
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              enum:
+                                - DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                  description: Text to display above the date input
+                          required:
+                            - id
+                            - label
+                            - type
+                          description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                            })"
                         - type: object
                           properties:
                             id:
@@ -30779,6 +32124,174 @@ components:
                             id:
                               type: string
                             defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  items:
+                                    oneOf:
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'SHOW' conditional is defined, the component is shown to the
+                                      user only if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'ENABLE' conditional is defined, the component is enabled only
+                                      if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                      shown on the review page only if both the
+                                      'DISPLAY_ON_REVIEW' and 'SHOW' conditions
+                                      are met. This should only be used for
+                                      fields within declaration forms, as they
+                                      are the only ones with review pages.
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: The identifier of the translation referred in translation CSV files
+                                      defaultMessage:
+                                        type: string
+                                        description: Default translation message
+                                      description:
+                                        type: string
+                                        description: Describe the translation for a translator to be able to identify
+                                          it.
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              enum:
+                                - DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                  description: Text to display above the date input
+                          required:
+                            - id
+                            - label
+                            - type
+                          description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                            })"
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
                               type: string
                               minLength: 1
                             parent:
@@ -34346,6 +35859,174 @@ components:
                             - label
                             - type
                           description: A single date input (dd-mm-YYYY)
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  items:
+                                    oneOf:
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                                      - type: string
+                                        format: date
+                                        description: Date in the format YYYY-MM-DD
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'SHOW' conditional is defined, the component is shown to the
+                                      user only if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'ENABLE' conditional is defined, the component is enabled only
+                                      if the condition is met
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        enum:
+                                          - DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                    description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+                                      shown on the review page only if both the
+                                      'DISPLAY_ON_REVIEW' and 'SHOW' conditions
+                                      are met. This should only be used for
+                                      fields within declaration forms, as they
+                                      are the only ones with review pages.
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: The identifier of the translation referred in translation CSV files
+                                      defaultMessage:
+                                        type: string
+                                        description: Default translation message
+                                      description:
+                                        type: string
+                                        description: Describe the translation for a translator to be able to identify
+                                          it.
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the translation referred in translation CSV files
+                                defaultMessage:
+                                  type: string
+                                  description: Default translation message
+                                description:
+                                  type: string
+                                  description: Describe the translation for a translator to be able to identify
+                                    it.
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              enum:
+                                - DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                  description: Text to display above the date input
+                          required:
+                            - id
+                            - label
+                            - type
+                          description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
+                            })"
                         - type: object
                           properties:
                             id:
