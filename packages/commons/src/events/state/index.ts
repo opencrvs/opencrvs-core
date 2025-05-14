@@ -174,11 +174,13 @@ function aggregateActionDeclarations(
   }, {})
 }
 
-type NonNullableDeep<T> = T extends (infer U)[]
-  ? NonNullableDeep<U>[]
-  : T extends object
-    ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-    : NonNullable<T>
+type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
+  ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+  : T extends (infer U)[]
+    ? NonNullableDeep<U>[]
+    : T extends object
+      ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+      : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values
