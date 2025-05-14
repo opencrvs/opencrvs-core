@@ -53,7 +53,7 @@ function EventOverview({ event }: { event: EventDocument }) {
   const drafts = getRemoteDrafts()
   const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
 
-  const flattenedEventIndex = {
+  const { flags, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
@@ -61,7 +61,8 @@ function EventOverview({ event }: { event: EventDocument }) {
     'event.registrationNumber': registrationNumber
   }
 
-  const { title } = useEventTitle(event.type, eventIndex)
+  const { getEventTitle } = useEventTitle()
+  const { title } = getEventTitle(eventConfiguration, eventIndex)
 
   const actions = getAcceptedActions(event)
 

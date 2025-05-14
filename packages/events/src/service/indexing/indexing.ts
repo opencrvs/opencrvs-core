@@ -17,6 +17,7 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
+  EventStatus,
   FieldConfig,
   FieldType,
   getCurrentEventState,
@@ -177,7 +178,8 @@ export async function createIndex(
             properties: formFieldsToDataMapping(formFields)
           },
           trackingId: { type: 'keyword' },
-          registrationNumber: { type: 'keyword' }
+          registrationNumber: { type: 'keyword' },
+          flags: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }
@@ -272,7 +274,7 @@ export async function deleteEventIndex(event: EventDocument) {
   return response
 }
 
-export async function getIndexedEvents() {
+export async function getIndexedEvents(userId: string) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.existsAlias({
@@ -286,8 +288,32 @@ export async function getIndexedEvents() {
     return []
   }
 
+  const query = {
+    // We basically want to fetch all events,
+    // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
+    bool: {
+      should: [
+        {
+          bool: {
+            must_not: [{ term: { status: EventStatus.CREATED } }]
+          }
+        },
+        {
+          bool: {
+            must: [
+              { term: { status: EventStatus.CREATED } },
+              { term: { createdBy: userId } }
+            ]
+          }
+        }
+      ],
+      minimum_should_match: 1
+    }
+  } as estypes.QueryDslQueryContainer
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
+    query,
     size: 10000,
     request_cache: false
   })
