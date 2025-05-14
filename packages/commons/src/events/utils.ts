@@ -9,7 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { flattenDeep, omitBy, mergeWith, isArray, isObject } from 'lodash'
+import {
+  flattenDeep,
+  omitBy,
+  mergeWith,
+  isArray,
+  isObject,
+  get,
+  has,
+  isNil
+} from 'lodash'
 import {
   ActionType,
   DeclarationActionType,
@@ -310,4 +319,43 @@ export const findAllFields = (config: EventConfig): FieldConfig[] => {
     ...getDeclarationFields(config),
     ...getAllAnnotationFields(config)
   ])
+}
+
+/**
+ * Returns the value of the object at the given path with the ability of resolving mixed paths. See examples.
+ *
+ * @param obj Entity we want to get the value from
+ * @param path property path e.g. `a.b.c`
+ * @param defaultValue
+ * @returns the value of the object at the given path.
+ */
+export function getMixedPath<T = unknown>(
+  obj: Record<string, unknown>,
+  path: string,
+  defaultValue?: T | undefined
+): T | undefined {
+  const parts = path.split('.')
+
+  // We don't know the type of the object at the path is.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const resolve = (current: unknown, segments: string[]): any => {
+    if (current == null || segments.length === 0) {
+      return current
+    }
+
+    // Try all compound segment combinations from longest to shortest
+    for (let i = segments.length; i > 0; i--) {
+      const compoundKey = segments.slice(0, i).join('.')
+
+      if (has(current, compoundKey)) {
+        const next = get(current, compoundKey)
+        return resolve(next, segments.slice(i))
+      }
+    }
+
+    return undefined
+  }
+
+  const result = resolve(obj, parts)
+  return isNil(result) ? defaultValue : result
 }

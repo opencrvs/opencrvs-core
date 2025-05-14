@@ -32,7 +32,8 @@ import {
   User,
   LanguageConfig,
   FieldValue,
-  EventConfig
+  EventConfig,
+  getMixedPath
 } from '@opencrvs/commons/client'
 
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -169,25 +170,23 @@ export function compileSvg({
   )
 
   /**
-   * Handlebars helper: $lookup
+   * Handlebars helper: $lookupResolved
    *
-   * Resolves a value from the given property path within the combined $state and $declaration objects.
-   * and optionally returns a nested field from the resolved value.
+   * Resolves a value from the given property path within the combined $state and $declaration objects. useful for extracting specific properties from complex structures like `child.address.other`
+   * and optionally returns a nested field from the resolved value. e.g. when defaultValue is set to $user.province, it resolves to the matching id.
    *
-   * This helper is useful for extracting specific properties from complex structures like `child.address.other`
-   * when you need to access deeply nested fields in the declaration.
-   *
-   *  @param propertyPath - $declaration or $state property to look up without the top-level property name. NOTE: We do not support mixing of 'deep objects' and dot-separated flat objects. See examples.
+   *  @param propertyPath - $declaration or $state property to look up without the top-level property name.
    *  @returns - a nested field from the resolved value.
    *
-   * @example {'foo.bar.baz': 'quix' } // $lookup 'foo.bar.baz' => 'quix'
-   * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookup 'foo.bar.baz' => {'baz': 'quix'}
-   * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => undefined
+   * @example {'foo.bar.baz': 'quix' } // $lookupResolved 'foo.bar.baz' => 'quix'
+   * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookupResolved 'foo.bar.baz' => 'quix'
+   * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookupResolved 'informant.address.other.district' => 'quix'
    */
-  function $lookup(propertyPath: string) {
+  function $lookupResolved(propertyPath: string) {
     const stringify = getFormDataStringifier(intl, locations)
     const { declaration, ...others } = $state
-    const formFieldWithResolvedValue: Record<string, any> = {
+
+    const formFieldWithResolvedValue: Record<string, unknown> = {
       ...stringify(
         config.declaration.pages.flatMap((x) => x.fields),
         declaration
@@ -195,10 +194,10 @@ export function compileSvg({
       ...others
     }
 
-    return get(formFieldWithResolvedValue, propertyPath)
+    return getMixedPath(formFieldWithResolvedValue, propertyPath)
   }
 
-  Handlebars.registerHelper('$lookup', $lookup)
+  Handlebars.registerHelper('$lookupResolved', $lookupResolved)
 
   /**
    * Handlebars helper: $location
