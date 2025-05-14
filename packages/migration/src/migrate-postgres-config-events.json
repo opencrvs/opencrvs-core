@@ -2,6 +2,5 @@
   "url": "postgres://events_migrator:migrator_password@localhost:5432/events",
   "schema": "app",
   "migrations-dir": "src/migrations/events",
-  "template-file-name": "../../node_modules/node-pg-migrate/templates/migration-template.ts",
-  "tsconfig": "tsconfig.json"
+  "template-file-name": "../../node_modules/node-pg-migrate/templates/migration-template.sql"
 }
