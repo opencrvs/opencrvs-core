@@ -71,6 +71,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
+    case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.SIGNATURE:
