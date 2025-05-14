@@ -89,7 +89,12 @@ export function FormHeader({
                 {intl.formatMessage(messages.saveExitButton)}
               </Button>
 
-              <Button size="small" type="secondary" onClick={onExit}>
+              <Button
+                data-testid="exit-button"
+                size="small"
+                type="secondary"
+                onClick={onExit}
+              >
                 <Icon name="X" />
                 {intl.formatMessage(messages.exitButton)}
               </Button>
@@ -109,7 +114,12 @@ export function FormHeader({
               )}
             </>
           ) : (
-            <Button size="small" type="icon" onClick={goToHome}>
+            <Button
+              data-testid="exit-button"
+              size="small"
+              type="icon"
+              onClick={goToHome}
+            >
               <Icon name="X" />
             </Button>
           )}
