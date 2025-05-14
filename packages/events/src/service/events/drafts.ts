@@ -81,7 +81,8 @@ export async function getDraftsByUserId(createdBy: string) {
       secure.event_action_drafts
     WHERE created_by = ${createdBy}
   `)
-  return drafts
+
+  return [...drafts]
 }
 
 export async function getDraftsForAction(
