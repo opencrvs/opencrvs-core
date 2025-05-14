@@ -78,6 +78,9 @@ export type EventMetadata = z.infer<typeof EventMetadata>
 
 export type EventMetadataKeys = `event.${keyof EventMetadata}`
 
+/**
+ * This ensures `event.field()` takes a key from `EventMetadata`
+ */
 export const EventMetadataParameter = z.object({
   $event: z.enum(Object.keys(EventMetadata) as [string, ...string[]])
 })
