@@ -70,9 +70,9 @@ export const usePrintableCertificate = ({
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
-  const currentState = getCurrentEventState(event)
-  const modifiedState = {
-    ...currentState,
+  const { declaration, ...metadata } = getCurrentEventState(event)
+  const modifiedMetadata = {
+    ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
     // the current certification date in the certificate preview on the review page.
     modifiedAt: new Date().toISOString()
@@ -87,8 +87,8 @@ export const usePrintableCertificate = ({
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
-    $state: modifiedState,
-    $declaration: currentState.declaration,
+    $metadata: modifiedMetadata,
+    $declaration: declaration,
     locations,
     users,
     language,
@@ -98,9 +98,10 @@ export const usePrintableCertificate = ({
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   const handleCertify = async (updatedEvent: EventDocument) => {
-    const currentEventState = getCurrentEventState(updatedEvent)
-    const base64ReplacedTemplate = await replaceMinioUrlWithBase64(
-      currentEventState.declaration,
+    const { declaration: updatedDeclaration, ...updatedMetadata } =
+      getCurrentEventState(updatedEvent)
+    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
+      updatedDeclaration,
       config
     )
 
@@ -121,8 +122,8 @@ export const usePrintableCertificate = ({
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
-      $state: currentEventState,
-      $declaration: base64ReplacedTemplate,
+      $metadata: updatedMetadata,
+      $declaration: declarationWithResolvedImages,
       locations,
       users: base64ReplacedUsersWithSignature,
       language,

@@ -197,7 +197,8 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   )
 }
 
-const DEFAULT_DATE_OF_EVENT_PROPERTY = 'createdAt' satisfies keyof EventDocument
+export const DEFAULT_DATE_OF_EVENT_PROPERTY =
+  'createdAt' satisfies keyof EventDocument
 
 /**
  * @returns the current state of the event based on the actions taken.

@@ -25,17 +25,20 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import format from 'date-fns/format'
 import isValid from 'date-fns/isValid'
 import { Location } from '@events/service/locations/locations'
-import { get } from 'lodash'
+import { isEqual } from 'lodash'
+
 import {
-  EventIndex,
   EventState,
   User,
   LanguageConfig,
   FieldValue,
   EventConfig,
-  getMixedPath
+  getMixedPath,
+  EventMetadata,
+  EventStatus,
+  DEFAULT_DATE_OF_EVENT_PROPERTY
 } from '@opencrvs/commons/client'
-
+import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
@@ -51,6 +54,144 @@ interface FontFamilyTypes {
 type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
+
+function findLocationById(
+  intl: IntlShape,
+  locationId: string | null | undefined,
+  locations: Location[]
+) {
+  const country = intl.formatMessage({
+    id: `countries.${window.config.COUNTRY}`,
+    defaultMessage: 'Farajaland',
+    description: 'Country name'
+  })
+
+  if (!locationId) {
+    return {
+      location: '',
+      district: '',
+      province: '',
+      country
+    }
+  }
+
+  const location = locations.find((loc) => loc.id === locationId)
+  const district = locations.find((loc) => loc.id === location?.partOf)
+  const province = locations.find((loc) => loc.id === district?.partOf)
+
+  return {
+    location: location?.name || '',
+    district: district?.name || '',
+    province: province?.name || '',
+    country: country
+  }
+}
+
+function findUserById(userId: string, users: User[]) {
+  const user = users.find((u) => u.id === userId)
+
+  if (!user) {
+    return {
+      name: '',
+      signature: ''
+    }
+  }
+
+  return {
+    name: getUsersFullName(user.name, 'en'),
+    signature: user.signatureFilename
+  }
+}
+
+export const stringifyEventMetadata = ({
+  metadata,
+  intl,
+  locations,
+  users
+}: {
+  metadata: NonNullable<EventMetadata>
+  intl: IntlShape
+  locations: Location[]
+  users: User[]
+}) => {
+  return {
+    assignedTo: findUserById(metadata.assignedTo ?? '', users),
+    // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
+    dateOfEvent: metadata.dateOfEvent
+      ? DateField.stringify(intl, metadata.dateOfEvent)
+      : DateField.stringify(intl, metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]),
+    createdAt: DateField.stringify(intl, metadata.createdAt),
+    createdBy: findUserById(metadata.createdBy, users),
+    createdAtLocation: findLocationById(
+      intl,
+      metadata.createdAtLocation,
+      locations
+    ),
+    updatedAt: DateField.stringify(intl, metadata.updatedAt),
+    updatedBy: metadata.updatedBy
+      ? findUserById(metadata.updatedBy, users)
+      : '',
+    id: metadata.id,
+    type: metadata.type,
+    trackingId: metadata.trackingId,
+    status: EventStatus.REGISTERED,
+    updatedByUserRole: metadata.updatedByUserRole,
+    updatedAtLocation: findLocationById(
+      intl,
+      metadata.updatedAtLocation,
+      locations
+    ),
+    flags: [],
+    legalStatuses: {
+      [EventStatus.DECLARED]: metadata.legalStatuses.DECLARED
+        ? {
+            createdAt: DateField.stringify(
+              intl,
+              metadata.legalStatuses.DECLARED.createdAt
+            ),
+            createdBy: findUserById(
+              metadata.legalStatuses.DECLARED.createdBy,
+              users
+            ),
+            createdAtLocation: findLocationById(
+              intl,
+              metadata.legalStatuses.DECLARED.createdAtLocation,
+              locations
+            ),
+            acceptedAt: DateField.stringify(
+              intl,
+              metadata.legalStatuses.DECLARED.acceptedAt
+            ),
+            createdByRole: metadata.legalStatuses.DECLARED.createdByRole
+          }
+        : null,
+      [EventStatus.REGISTERED]: metadata.legalStatuses.REGISTERED
+        ? {
+            createdAt: DateField.stringify(
+              intl,
+              metadata.legalStatuses.REGISTERED.createdAt
+            ),
+            createdBy: findUserById(
+              metadata.legalStatuses.REGISTERED.createdBy,
+              users
+            ),
+            createdAtLocation: findLocationById(
+              intl,
+              metadata.legalStatuses.REGISTERED.createdAtLocation,
+              locations
+            ),
+            acceptedAt: DateField.stringify(
+              intl,
+              metadata.legalStatuses.REGISTERED.acceptedAt
+            ),
+            createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
+            registrationNumber:
+              metadata.legalStatuses.REGISTERED.registrationNumber
+          }
+        : null
+    }
+  }
+}
 
 const certificateBaseTemplate = {
   definition: {
@@ -111,7 +252,7 @@ const cache = createIntlCache()
 
 export function compileSvg({
   templateString,
-  $state,
+  $metadata,
   $declaration,
   locations,
   users,
@@ -119,7 +260,7 @@ export function compileSvg({
   config
 }: {
   templateString: string
-  $state: EventIndex
+  $metadata: EventMetadata
   $declaration: EventState
   locations: Location[]
   users: User[]
@@ -148,101 +289,43 @@ export function compileSvg({
     Handlebars.registerHelper(helperName, helper)
   }
 
-  Handlebars.registerHelper(
-    '$formatDate',
-    function (dateString: string, formatString: string) {
-      const date = new Date(dateString)
-      return isValid(date) ? format(date, formatString) : ''
-    }
-  )
-
-  Handlebars.registerHelper(
-    '$findUserById',
-    function (id: string, propertyName: keyof User) {
-      const user = users.find((usr) => usr.id === id)
-      if (!user) {
-        return ''
-      } else if (propertyName === 'name') {
-        return getUsersFullName(user.name, 'en')
-      }
-      return user[propertyName]
-    }
-  )
-
   /**
-   * Handlebars helper: $lookupResolved
+   * Handlebars helper: $lookup
    *
    * Resolves a value from the given property path within the combined $state and $declaration objects. useful for extracting specific properties from complex structures like `child.address.other`
    * and optionally returns a nested field from the resolved value. e.g. when defaultValue is set to $user.province, it resolves to the matching id.
    *
+   * @param obj - Object to look up. This is for providing the same interface as the handlebars 'lookup'. It is not used as is.
    *  @param propertyPath - $declaration or $state property to look up without the top-level property name.
    *  @returns - a nested field from the resolved value.
    *
-   * @example {'foo.bar.baz': 'quix' } // $lookupResolved 'foo.bar.baz' => 'quix'
-   * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookupResolved 'foo.bar.baz' => 'quix'
-   * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookupResolved 'informant.address.other.district' => 'quix'
+   * @example {'foo.bar.baz': 'quix' } // $lookup 'foo.bar.baz' => 'quix'
+   * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookup 'foo.bar.baz' => 'quix'
+   * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
-  function $lookupResolved(propertyPath: string) {
-    const stringify = getFormDataStringifier(intl, locations)
-    const { declaration, ...others } = $state
+  function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
+    const stringifyDeclaration = getFormDataStringifier(intl, locations)
 
-    const formFieldWithResolvedValue: Record<string, unknown> = {
-      ...stringify(
-        config.declaration.pages.flatMap((x) => x.fields),
-        declaration
-      ),
-      ...others
+    const resolvedDeclaration = stringifyDeclaration(
+      config.declaration.pages.flatMap((x) => x.fields),
+      $declaration
+    )
+
+    const resolvedMetadata = stringifyEventMetadata({
+      metadata: $metadata,
+      intl,
+      locations,
+      users
+    })
+
+    if (isEqual($metadata, obj)) {
+      return getMixedPath(resolvedMetadata, propertyPath)
     }
 
-    return getMixedPath(formFieldWithResolvedValue, propertyPath)
+    return getMixedPath(resolvedDeclaration, propertyPath)
   }
 
-  Handlebars.registerHelper('$lookupResolved', $lookupResolved)
-
-  /**
-   * Handlebars helper: $location
-   *
-   * Usage: {{$location locationId propName}}
-   *
-   * This helper retrieves a specific part of an address (location, district, province, or country)
-   * based on the provided location ID.
-   *
-   * It uses the `useStringifier` function from `LocationSearch` to resolve the full address object,
-   * and returns the value of the requested property.
-   *
-   * Parameters:
-   * - locationId (string): ID of the target location
-   * - propName (string): One of 'location', 'district', 'province', or 'country'
-   *
-   * Returns:
-   * - The name corresponding to the requested property, or undefined if not available.
-   */
-  Handlebars.registerHelper(
-    '$location',
-    function (
-      locationId: string,
-      propName: 'location' | 'district' | 'province' | 'country'
-    ) {
-      const location = locations.find((loc) => loc.id === locationId)
-      const district = locations.find((loc) => loc.id === location?.partOf)
-      const province = locations.find((loc) => loc.id === district?.partOf)
-
-      const country = intl.formatMessage({
-        id: `countries.${window.config.COUNTRY}`,
-        defaultMessage: 'Farajaland',
-        description: 'Country name'
-      })
-
-      const address = {
-        location: location?.name || '',
-        district: district?.name || '',
-        province: province?.name || '',
-        country: country
-      }
-
-      return address[propName]
-    }
-  )
+  Handlebars.registerHelper('$lookup', $lookup)
 
   /**
    * Handlebars helper: $intl
@@ -291,7 +374,7 @@ export function compileSvg({
    * Returns the first truthy value between v1 and v2.
    */
   Handlebars.registerHelper(
-    '$OR',
+    '$or',
     function (
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       v1: any,
@@ -360,7 +443,7 @@ export function compileSvg({
   $declaration = formatAllNonStringValues($declaration, intl)
   const data = {
     $declaration,
-    $state,
+    $metadata,
     $references: {
       locations,
       users
