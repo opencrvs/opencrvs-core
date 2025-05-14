@@ -11,6 +11,8 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { ActionType } from './ActionType'
+import { ActionStatus } from './ActionDocument'
 
 /**
  * Event statuses recognized by the system
@@ -26,6 +28,23 @@ export const EventStatus = {
   ARCHIVED: 'ARCHIVED'
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
+
+export const CustomFlags = {
+  CERTIFICATE_PRINTED: 'certificate-printed'
+} as const
+export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
+
+export const Flag = z
+  .string()
+  .regex(
+    new RegExp(
+      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
+    ),
+    'Flag must be in the format ActionType:ActionStatus (lowerCase)'
+  )
+  .or(z.nativeEnum(CustomFlags))
+
+export type Flag = z.infer<typeof Flag>
 
 export const eventStatuses = Object.values(EventStatus)
 export const EventStatuses = z.nativeEnum(EventStatus)
@@ -51,12 +70,37 @@ export const EventMetadata = z.object({
   assignedTo: z.string().nullish(),
   updatedBy: z.string(),
   trackingId: z.string(),
-  registrationNumber: z.string().nullish()
+  registrationNumber: z.string().nullish(),
+  flags: z.array(Flag)
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
 
 export type EventMetadataKeys = `event.${keyof EventMetadata}`
+
+/**
+ * This ensures `event.field()` takes a key from `EventMetadata`
+ */
+export const EventMetadataParameter = z.object({
+  $event: z.enum([
+    'id',
+    'type',
+    'status',
+    'createdAt',
+    'dateOfEvent',
+    'createdBy',
+    'updatedByUserRole',
+    'createdAtLocation',
+    'updatedAtLocation',
+    'updatedAt',
+    'assignedTo',
+    'updatedBy',
+    'trackingId',
+    'registrationNumber',
+    'flags'
+  ])
+})
+export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
 
 /**
  * Mapping of event metadata keys to translation configuration.
@@ -136,5 +180,10 @@ export const eventMetadataLabelMap: Record<
     id: 'event.registrationNumber.label',
     defaultMessage: 'Registration Number',
     description: 'Registration Number'
+  },
+  'event.flags': {
+    id: 'event.flags.label',
+    defaultMessage: 'Flags',
+    description: 'Flags'
   }
 }

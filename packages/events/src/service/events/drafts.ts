@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DraftInput, ActionStatus } from '@opencrvs/commons/events'
+import { DraftInput } from '@opencrvs/commons/events'
 
 import { getClient, sql } from '@events/storage/postgres/events'
 
@@ -39,7 +39,6 @@ export async function createDraft(
       action_type,
       declaration,
       annotations,
-      status,
       created_by,
       created_by_role,
       created_at_location
@@ -50,7 +49,6 @@ export async function createDraft(
       ${input.type},
       ${sql.jsonb(input.declaration)},
       ${sql.jsonb(input.annotation)},
-      ${ActionStatus.Accepted},
       ${createdBy},
       ${createdByRole},
       ${createdAtLocation}

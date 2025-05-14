@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { route, string } from 'react-router-typesafe-routes/dom'
+import { route } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import { z } from 'zod'
 
@@ -17,9 +17,11 @@ export const routes = route(
   '',
   {},
   {
-    WORKQUEUE: route('workqueue', {
+    WORKQUEUE: route('workqueue/:slug', {
+      params: {
+        slug: zod(z.string()).default('all')
+      },
       searchParams: {
-        id: string(),
         limit: zod(z.number().min(1).max(100)).default(10),
         offset: zod(z.number().min(0)).default(0)
       }

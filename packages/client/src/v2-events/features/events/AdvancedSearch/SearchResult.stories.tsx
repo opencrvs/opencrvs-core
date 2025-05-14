@@ -12,9 +12,11 @@ import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
   eventQueryDataGenerator,
+  EventStatus,
   tennisClubMembershipEvent,
   workqueues
 } from '@opencrvs/commons/client'
+import { TRPCProvider } from '@client/v2-events/trpc'
 import { SearchResult } from './SearchResult'
 
 const meta: Meta<typeof SearchResult> = {
@@ -22,27 +24,65 @@ const meta: Meta<typeof SearchResult> = {
   component: SearchResult,
   parameters: {
     layout: 'centered'
-  }
+  },
+  decorators: [
+    (Story) => (
+      <TRPCProvider>
+        <Story />
+      </TRPCProvider>
+    )
+  ]
 }
+
+export default meta
+
+type Story = StoryObj<typeof SearchResult>
+
+const queryData = Array.from({ length: 12 }, () => eventQueryDataGenerator())
 
 const mockSearchParams = {
   'applicant.firstname': 'Danny',
   'applicant.dob': '1999-11-11'
 }
 
-export default meta
-export const DefaultSearchResult: StoryObj<typeof SearchResult> = {
+export const DefaultSearchResult: Story = {
   name: 'Default Search Result',
-  render: function Component() {
-    return (
-      <React.Suspense>
-        <SearchResult
-          eventConfig={tennisClubMembershipEvent}
-          queryData={[eventQueryDataGenerator()]}
-          searchParams={mockSearchParams}
-          workqueueConfig={workqueues['all']}
-        />
-      </React.Suspense>
-    )
+  args: {
+    eventConfig: tennisClubMembershipEvent,
+    queryData: [
+      eventQueryDataGenerator({
+        declaration: {
+          'recommender.none': true,
+          'applicant.firstname': 'Danny',
+          'applicant.surname': 'Doe',
+          'applicant.dob': '1999-11-11'
+        },
+        status: EventStatus.REGISTERED
+      })
+    ],
+    searchParams: mockSearchParams,
+    workqueueConfig: workqueues['all']
+  }
+}
+
+export const SearchResultWithMultipleItems: Story = {
+  name: 'Search Results With Multiple Items',
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
+  args: {
+    eventConfig: tennisClubMembershipEvent,
+    queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
+    searchParams: { status: EventStatus.REGISTERED },
+    workqueueConfig: workqueues['all']
+  }
+}
+export const NoSearchResult: Story = {
+  name: 'No Search Result',
+  args: {
+    eventConfig: tennisClubMembershipEvent,
+    queryData: [],
+    searchParams: mockSearchParams,
+    workqueueConfig: workqueues['all']
   }
 }

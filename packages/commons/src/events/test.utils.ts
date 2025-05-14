@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -47,6 +48,7 @@ import { FieldValue } from './FieldValue'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
+import { EventStatus } from './EventMetadata'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
@@ -521,12 +523,73 @@ export function generateEventDraftDocument(
   }
 }
 
+function getEventStatus(): EventStatus {
+  const statuses: EventStatus[] = [
+    EventStatus.CREATED,
+    EventStatus.REGISTERED,
+    EventStatus.DECLARED
+  ]
+  const randomIndex = Math.floor(Math.random() * 3)
+  return statuses[randomIndex]
+}
+
+function getTrackingId(): string {
+  const uuid = getUUID().replace(/-/g, '')
+  const trackingId = uuid.slice(0, 6).toUpperCase()
+  return trackingId
+}
+
+function getRandomApplicant(): Record<string, string | boolean> {
+  const firstNames = [
+    'Danny',
+    'John',
+    'Jane',
+    'Emily',
+    'Michael',
+    'Sarah',
+    'Chris',
+    'Jessica'
+  ]
+  const surnames = [
+    'Doe',
+    'Smith',
+    'Johnson',
+    'Brown',
+    'Williams',
+    'Jones',
+    'Garcia',
+    'Miller'
+  ]
+
+  function getRandomDate(start: Date, end: Date): string {
+    const randomDate = new Date(
+      start.getTime() + Math.random() * (end.getTime() - start.getTime())
+    )
+    return randomDate.toISOString().split('T')[0]
+  }
+
+  const randomFirstName =
+    firstNames[Math.floor(Math.random() * firstNames.length)]
+  const randomSurname = surnames[Math.floor(Math.random() * surnames.length)]
+  const randomDob = getRandomDate(
+    new Date('1990-01-01'),
+    new Date('2010-12-31')
+  )
+
+  return {
+    'recommender.none': true,
+    'applicant.firstname': randomFirstName,
+    'applicant.surname': randomSurname,
+    'applicant.dob': randomDob
+  }
+}
+
 export const eventQueryDataGenerator = (
   overrides: Partial<EventIndex> = {}
 ): EventIndex => ({
   id: overrides.id ?? getUUID(),
-  type: overrides.type ?? 'tennis-club-membership',
-  status: overrides.status ?? 'REGISTERED',
+  type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+  status: overrides.status ?? getEventStatus(),
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   createdBy: overrides.createdBy ?? getUUID(),
   createdAtLocation: overrides.createdAtLocation ?? getUUID(),
@@ -535,13 +598,9 @@ export const eventQueryDataGenerator = (
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
   updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
-  declaration: overrides.declaration ?? {
-    'recommender.none': true,
-    'applicant.firstname': 'Danny',
-    'applicant.surname': 'Doe',
-    'applicant.dob': '1999-11-11'
-  },
-  trackingId: overrides.trackingId ?? 'M3F8YQ'
+  flags: [],
+  declaration: overrides.declaration ?? getRandomApplicant(),
+  trackingId: overrides.trackingId ?? getTrackingId()
 })
 
 export const generateTranslationConfig = (

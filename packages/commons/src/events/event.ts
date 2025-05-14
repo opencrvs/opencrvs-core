@@ -12,6 +12,7 @@
 import { createEventConditionals } from '../conditionals/conditionals'
 import { createEventFieldConfig } from '../event-config/event-configuration'
 import { EventFieldId } from './AdvancedSearchConfig'
+import { EventMetadata, EventMetadataParameter } from './EventMetadata'
 import { SelectOption } from './FieldConfig'
 
 /**
@@ -26,6 +27,13 @@ function eventFn(fieldId: EventFieldId, options?: SelectOption[]) {
 }
 
 // Attach conditional helpers directly to the function
-const event = Object.assign(eventFn, createEventConditionals())
+const event = Object.assign(eventFn, {
+  ...createEventConditionals(),
+  field(field: keyof EventMetadata): EventMetadataParameter {
+    return {
+      $event: field
+    }
+  }
+})
 
 export { event }

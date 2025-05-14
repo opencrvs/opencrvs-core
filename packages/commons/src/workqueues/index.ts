@@ -20,5 +20,5 @@ export { defaultColumns } from './defaultColumns'
 export const workqueues = {
   all: allWorkqueue,
   registered: registeredWorkqueue,
-  inReview: inReviewWorkqueue
+  'in-review': inReviewWorkqueue
 }
