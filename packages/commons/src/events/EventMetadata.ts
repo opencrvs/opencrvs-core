@@ -78,6 +78,11 @@ export type EventMetadata = z.infer<typeof EventMetadata>
 
 export type EventMetadataKeys = `event.${keyof EventMetadata}`
 
+export const EventMetadataParameter = z.object({
+  $event: z.enum(Object.keys(EventMetadata) as [string, ...string[]])
+})
+export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
+
 /**
  * Mapping of event metadata keys to translation configuration.
  * Consider introducing type in same manner as we have in FieldConfig.

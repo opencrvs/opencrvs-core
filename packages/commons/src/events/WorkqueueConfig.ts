@@ -13,7 +13,8 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
 import { QueryType } from './EventIndex'
-import { eventMetadata, EventMetadataParameter } from './event'
+import { EventMetadataParameter } from './EventMetadata'
+import { event } from './event'
 
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
@@ -42,7 +43,7 @@ export const WorkqueueConfig = z
             defaultMessage: 'Date of Event',
             description: 'Label for workqueue column: dateOfEvent'
           },
-          value: eventMetadata('dateOfEvent')
+          value: event.field('dateOfEvent')
         }
       ])
   })
