@@ -73,6 +73,7 @@ function getDeclarationActionCreationMetadata(
     createdAtLocation:
       requestAction?.createdAtLocation ?? acceptAction.createdAtLocation,
     acceptedAt: acceptAction.createdAt,
+    createdByRole: requestAction?.createdByRole ?? acceptAction.createdByRole,
     registrationNumber
   }
 }
@@ -102,13 +103,16 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
         createdAtLocation:
           request?.createdAtLocation ??
           accept?.createdAtLocation ??
-          metadata.createdAt
+          metadata.createdAt,
+        createdByRole:
+          request?.createdByRole ?? accept?.createdByRole ?? metadata.createdAt
       }
     },
     {
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
-      createdAtLocation: createAction.createdAtLocation
+      createdAtLocation: createAction.createdAtLocation,
+      createdByRole: createAction.createdByRole
     }
   )
 }

@@ -21,7 +21,7 @@ import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
+import { deepMerge, findActiveDrafts } from '../utils'
 import { getDeclarationActionUpdateMetadata, getLegalStatuses } from './utils'
 
 function getStatusFromActions(actions: Array<Action>) {
@@ -78,7 +78,7 @@ function getFlagsFromActions(actions: Action[]): Flag[] {
   )
 
   const flags = Object.entries(actionStatus)
-    .filter(([type, status]) => status !== ActionStatus.Accepted)
+    .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
       const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
       return flag satisfies Flag
@@ -102,25 +102,6 @@ function getFlagsFromActions(actions: Action[]): Flag[] {
   }
 
   return flags
-}
-
-function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
-  const actionsWithRoles = actions
-    .filter(
-      (action) =>
-        !isWriteAction(action.type) && action.status !== ActionStatus.Rejected
-    )
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-
-  const lastAction = actionsWithRoles.at(-1)
-
-  if (!lastAction) {
-    throw new Error(
-      'Should never happen, at least CREATE action should be present'
-    )
-  }
-
-  return ActionDocument.parse(lastAction).createdByRole
 }
 
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
@@ -259,7 +240,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     declaration,
     trackingId: event.trackingId,
     // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole
-    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
+    updatedByUserRole: declarationUpdateMetadata.createdByRole,
     dateOfEvent,
     flags: getFlagsFromActions(event.actions)
   })

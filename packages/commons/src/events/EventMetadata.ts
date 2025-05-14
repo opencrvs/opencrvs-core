@@ -65,7 +65,10 @@ export const ActionCreationMetadata = z.object({
   acceptedAt: z
     .string()
     .datetime()
-    .describe('Timestamp when the action request was accepted.')
+    .describe('Timestamp when the action request was accepted.'),
+  createdByRole: z
+    .string()
+    .describe('Role of the user at the time of action request creation.')
 })
 
 export type ActionCreationMetadata = z.infer<typeof ActionCreationMetadata>

@@ -15,7 +15,8 @@ import {
   ActionBase,
   ActionDocument,
   ActionUpdate,
-  ActionStatus
+  ActionStatus,
+  EventState
 } from './ActionDocument'
 import {
   ArchiveActionInput,
@@ -61,7 +62,7 @@ function fieldConfigsToActionPayload(fields: FieldConfig[]) {
 export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType
-) {
+): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)

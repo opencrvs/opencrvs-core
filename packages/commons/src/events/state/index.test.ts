@@ -267,20 +267,22 @@ describe('getCurrentEventState()', () => {
       status: EventStatus.REGISTERED,
       updatedByUserRole: registerRequestAction.createdByRole,
       updatedAtLocation: registerRequestAction.createdAtLocation,
-      declaration: declareRequestAction.declaration,
+      declaration: deepDropNulls(declareRequestAction.declaration),
       flags: [],
       legalStatuses: {
         [EventStatus.DECLARED]: {
           createdAt: declareRequestAction.createdAt,
           createdBy: declareRequestAction.createdBy,
           createdAtLocation: declareRequestAction.createdAtLocation,
+          createdByRole: declareRequestAction.createdByRole,
           acceptedAt: declareAcceptAction.createdAt
         },
         [EventStatus.REGISTERED]: {
           createdAt: registerRequestAction.createdAt,
           createdBy: registerRequestAction.createdBy,
           createdAtLocation: registerRequestAction.createdAtLocation,
-          acceptedAt: registerAcceptAction.createdAt,
+          acceptedAt: registerAcceptAction.createdByRole,
+          createdByRole: registerRequestAction.createdAtLocation,
           // @ts-expect-error -- We do not have sufficient types for this in generator
           registrationNumber: registerAcceptAction.registrationNumber
         }
@@ -371,20 +373,22 @@ describe('getCurrentEventState()', () => {
       status: EventStatus.REGISTERED,
       updatedByUserRole: registerAcceptAction.createdByRole,
       updatedAtLocation: registerAcceptAction.createdAtLocation,
-      declaration: declareAcceptAction.declaration,
+      declaration: deepDropNulls(declareAcceptAction.declaration),
       flags: [],
       legalStatuses: {
         [EventStatus.DECLARED]: {
           createdAt: declareAcceptAction.createdAt,
           createdBy: declareAcceptAction.createdBy,
           createdAtLocation: declareAcceptAction.createdAtLocation,
-          acceptedAt: declareAcceptAction.createdAt
+          acceptedAt: declareAcceptAction.createdAt,
+          createdByRole: declareAcceptAction.createdByRole
         },
         [EventStatus.REGISTERED]: {
           createdAt: registerAcceptAction.createdAt,
           createdBy: registerAcceptAction.createdBy,
           createdAtLocation: registerAcceptAction.createdAtLocation,
           acceptedAt: registerAcceptAction.createdAt,
+          createdByRole: registerAcceptAction.createdByRole,
           // @ts-expect-error -- We do not have sufficient types for this in generator
           registrationNumber: registerAcceptAction.registrationNumber
         }

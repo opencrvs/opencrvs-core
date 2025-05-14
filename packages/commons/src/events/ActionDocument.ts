@@ -23,7 +23,9 @@ export type ActionUpdate = z.infer<typeof ActionUpdate>
 /**
  * EventState is an aggregate of all the actions that have been applied to event data.
  */
-export type EventState = Record<string, FieldValue>
+
+export const EventState = z.record(z.string(), FieldValue)
+export type EventState = z.infer<typeof EventState>
 
 export const ActionStatus = {
   Requested: 'Requested',

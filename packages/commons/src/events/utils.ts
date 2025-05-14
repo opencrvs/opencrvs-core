@@ -258,10 +258,10 @@ export function omitHiddenAnnotationFields(
   )
 }
 
-export function deepMerge<T extends Record<string, unknown>>(
-  currentDocument: T,
-  actionDocument: T
-): T {
+export function deepMerge<
+  T extends Record<string, unknown>,
+  K extends Record<string, unknown>
+>(currentDocument: T, actionDocument: K): T & K {
   return mergeWith(
     currentDocument,
     actionDocument,
