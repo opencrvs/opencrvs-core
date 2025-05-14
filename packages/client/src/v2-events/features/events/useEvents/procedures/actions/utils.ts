@@ -10,6 +10,7 @@
  */
 import {
   ActionInput,
+  ActionStatus,
   ActionType,
   EventDocument,
   getCurrentEventState
@@ -38,7 +39,8 @@ export function updateEventOptimistically<T extends ActionInput>(
           declaration: variables.declaration,
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
-          createdAtLocation: '@todo'
+          createdAtLocation: '@todo',
+          status: ActionStatus.Requested
         }
       ]
     }

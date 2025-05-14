@@ -15,7 +15,10 @@ import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -34,7 +37,7 @@ import {
   SORT_ORDER,
   Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
-import { Pagination, Link as TextButton } from '@opencrvs/components'
+import { Link as TextButton } from '@opencrvs/components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -116,7 +119,6 @@ function Workqueue({
   offset: number
   eventConfigs: EventConfig[]
 }) {
-  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const intl = useIntl()
   const theme = useTheme()
   const { getOutbox } = useEvents()
@@ -125,6 +127,10 @@ function Workqueue({
   const drafts = getRemoteDrafts()
   const navigate = useNavigate()
   const { width } = useWindowSize()
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const [sortedCol, setSortedCol] = useState('modifiedAt')
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
+  const { getEventTitle } = useEventTitle()
 
   const validEvents = orderBy(
     events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
@@ -175,10 +181,8 @@ function Workqueue({
         return event.status
       }
 
+      const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
       const titleColumnId = workqueueConfig.columns[0].id
-
-      const { useFallbackTitle, title } = useEventTitle(event.type, event)
-
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
           <IconWithName name={title} status={getEventStatus()} />
@@ -224,9 +228,6 @@ function Workqueue({
         )
       }
     })
-
-  const [sortedCol, setSortedCol] = useState('modifiedAt')
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
   function onColumnClick(columnName: string) {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -276,10 +277,11 @@ function Workqueue({
     }
   }
 
-  const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
+  const totalPages = validEvents.length
+    ? Math.ceil(validEvents.length / limit)
+    : 0
 
-  const isShowPagination = totalPages >= 1
-
+  const isShowPagination = totalPages > 1
   return (
     <WQContentWrapper
       error={false}
@@ -288,9 +290,10 @@ function Workqueue({
       loading={false} // @TODO: Handle these on top level
       noContent={workqueue.length === 0}
       noResultText={'No results'}
-      paginationId={Math.round(offset / limit)}
+      paginationId={currentPageNumber}
       title={intl.formatMessage(workqueueConfig.title)}
       totalPages={totalPages}
+      onPageChange={(page) => setCurrentPageNumber(page)}
     >
       <ReactTooltip id="validateTooltip">
         <ToolTipContainer>
@@ -304,13 +307,6 @@ function Workqueue({
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
       />
-      {validEvents.length > limit && (
-        <Pagination
-          currentPage={currentPageNumber}
-          totalPages={Math.ceil(validEvents.length / limit)}
-          onPageChange={(page) => setCurrentPageNumber(page)}
-        />
-      )}
       <FabContainer>
         <Link to={ROUTES.V2.EVENTS.CREATE.path}>
           <FloatingActionButton
@@ -324,24 +320,21 @@ function Workqueue({
 }
 
 export function WorkqueueContainer() {
-  // @TODO: We need to revisit on how the workqueue id is passed.
-  // We'll follow up during 'workqueue' feature.
-  const workqueueId = 'all'
-  const { getEvents } = useEvents()
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
-  const [events] = getEvents.useSuspenseQuery()
-
+  const { getEvents } = useEvents()
   const eventConfigs = useEventConfigurations()
 
   const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
+    workqueueSlug in workqueues
+      ? workqueues[workqueueSlug as keyof typeof workqueues]
       : null
 
   if (!workqueueConfig) {
     return null
   }
+
+  const [events] = getEvents.useSuspenseQuery()
 
   return (
     <Workqueue

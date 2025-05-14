@@ -35,15 +35,18 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
       (parentKey ? parentKey + INTERNAL_SEPARATOR : '') +
       key.replace(/\./g, INTERNAL_SEPARATOR)
     if (Array.isArray(value)) {
-      value.forEach((val, id) =>
-        Object.assign(
-          result,
-          convertDotToTripleUnderscore(
-            val,
-            (newKey ? newKey + INTERNAL_SEPARATOR : '') + id
+      value.forEach((val, id) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (typeof val === 'object' && val !== null) {
+          Object.assign(
+            result,
+            convertDotToTripleUnderscore(
+              val,
+              (newKey ? newKey + INTERNAL_SEPARATOR : '') + id
+            )
           )
-        )
-      )
+        }
+      })
       /* @TODO: Check if the typing is correct or is there a case where null could come in */
       /*  eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */
     } else if (typeof value === 'object' && value !== null) {

@@ -321,6 +321,8 @@ jobs:
           git config --local --bool core.bare false
           git reset --hard
           git fetch --prune
+          git checkout ${{ github.head_ref || github.ref_name }}
+          git reset --hard
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
