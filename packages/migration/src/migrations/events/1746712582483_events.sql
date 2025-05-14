@@ -43,7 +43,6 @@ CREATE TABLE event_action_drafts (
   action_type text NOT NULL,
   declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
   annotations jsonb DEFAULT '{}'::jsonb NOT NULL,
-  status action_status NOT NULL,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
   created_at_location text NOT NULL,
