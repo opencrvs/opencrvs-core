@@ -16,7 +16,6 @@ export * from './documents'
 export * from './workqueues'
 export * from './uuid'
 export * from './utils'
-export { MatchType } from './events/AdvancedSearchConfig'
 
 export * from './conditionals/validate'
 export { DEFAULT_ROLES_DEFINITION } from './authentication'
