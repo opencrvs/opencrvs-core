@@ -7552,62 +7552,62 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@slonik/driver@^47.1.0":
-  version "47.1.0"
-  resolved "https://registry.yarnpkg.com/@slonik/driver/-/driver-47.1.0.tgz#236f93a21fe63cf752eb75d66ead0fc0c062e1e9"
-  integrity sha512-JD86y82wP4C6wYi5CX6CJdtSTGCKBM6uakaszP6lHWRSERqugiFRmJ0ImJlJGhYXmhPDM3lGC9p3TEHxCVlpHA==
+"@slonik/driver@^46.8.0":
+  version "46.8.0"
+  resolved "https://registry.yarnpkg.com/@slonik/driver/-/driver-46.8.0.tgz#56e1a5842dbc8886a580fa7553bab998d0d9fac5"
+  integrity sha512-cA19zOfUHZenDhUt4xfLHbLRyd3V4mxc4ojkhERCn3hJpYwe7RpIV/85NvevbGjiiVIvXoVwwOOvz8XlCElJBg==
   dependencies:
-    "@slonik/types" "^47.1.0"
-    "@slonik/utilities" "^47.1.0"
+    "@slonik/types" "^46.8.0"
+    "@slonik/utilities" "^46.8.0"
     roarr "^7.21.1"
     serialize-error "^8.0.0"
     strict-event-emitter-types "^2.0.0"
 
-"@slonik/errors@^47.1.0":
-  version "47.1.0"
-  resolved "https://registry.yarnpkg.com/@slonik/errors/-/errors-47.1.0.tgz#654dfb911c7cf2980f9909cfa5363fbd187d0487"
-  integrity sha512-5AsOlY4r2HxKyDuvHRhdWXrY5ZtvAmuhnUnrMUiOba7X/OD471+UWI1CwmAESukEuIhUbaeEm6R/Rd4xApgbPw==
+"@slonik/errors@^46.8.0":
+  version "46.8.0"
+  resolved "https://registry.yarnpkg.com/@slonik/errors/-/errors-46.8.0.tgz#af57128f1d470c7bd8434322d82bb18937c82f07"
+  integrity sha512-tgAGNKNeG8696c7Vab6wvHkiTq2mz4dl+TgNJbucVr2Q4lvoO2dAT07+YplO4yCTLwH2thoy9gObA4fz+/Wjgw==
   dependencies:
-    "@slonik/types" "^47.1.0"
+    "@slonik/types" "^46.8.0"
 
-"@slonik/pg-driver@^47.1.0":
-  version "47.1.0"
-  resolved "https://registry.yarnpkg.com/@slonik/pg-driver/-/pg-driver-47.1.0.tgz#d53ee07aef6cf1f0982ca1219c53aa179a031ed1"
-  integrity sha512-KmNXe3mLrEowOsPJk9iATF10JhpzFoHy/3zZBpqbsSFT+wz1w+cqt/EuNeyANFaHHlMtrCvpENYiKkT4LKxmww==
+"@slonik/pg-driver@^46.8.0":
+  version "46.8.0"
+  resolved "https://registry.yarnpkg.com/@slonik/pg-driver/-/pg-driver-46.8.0.tgz#34acf6e10c7a6e9aa422711e5e635999a70df4a2"
+  integrity sha512-ene0QxhG/xpaWULuBhWGYND14NZolDCEQNnBvz31KtegWvAo9piZsK/DhVpHP/qww7JnVMrvXORTToXNUDiiNQ==
   dependencies:
-    "@slonik/driver" "^47.1.0"
-    "@slonik/errors" "^47.1.0"
-    "@slonik/sql-tag" "^47.1.0"
-    "@slonik/types" "^47.1.0"
-    "@slonik/utilities" "^47.1.0"
+    "@slonik/driver" "^46.8.0"
+    "@slonik/errors" "^46.8.0"
+    "@slonik/sql-tag" "^46.8.0"
+    "@slonik/types" "^46.8.0"
+    "@slonik/utilities" "^46.8.0"
     pg "^8.13.1"
     pg-query-stream "^4.9.6"
     pg-types "^4.0.2"
     postgres-array "^3.0.4"
 
-"@slonik/sql-tag@^47.1.0":
-  version "47.1.0"
-  resolved "https://registry.yarnpkg.com/@slonik/sql-tag/-/sql-tag-47.1.0.tgz#23b947e3d102b404a3ee3947842c045470ac3cf1"
-  integrity sha512-SxN21Qyk6sTF3oyAWfGpBsPLLl6QQt60u4seL0gMrEu+1I8JG8QoTr5ga1XnjMwifA8V/DG5GtpusixLlVLvqg==
+"@slonik/sql-tag@^46.8.0":
+  version "46.8.0"
+  resolved "https://registry.yarnpkg.com/@slonik/sql-tag/-/sql-tag-46.8.0.tgz#33f146c70b1f14388b0864b6560cfbc7c11181fc"
+  integrity sha512-jdUnlA7n/z16/3oFYZ9FAaf4VBkEUBx+oXjIdUQXMmyYiNwKqqjXiEteyHFMaEIY9710crrLQGWGXIKhipZ8Sw==
   dependencies:
-    "@slonik/errors" "^47.1.0"
-    "@slonik/types" "^47.1.0"
+    "@slonik/errors" "^46.8.0"
+    "@slonik/types" "^46.8.0"
     roarr "^7.21.1"
     safe-stable-stringify "^2.5.0"
     serialize-error "^8.0.0"
 
-"@slonik/types@^47.1.0":
-  version "47.1.0"
-  resolved "https://registry.yarnpkg.com/@slonik/types/-/types-47.1.0.tgz#3846fdd52ce3ca1c4220c035fea2a8793f5be8ea"
-  integrity sha512-lNDHxEUHk9Dl0wyg6eInHlm6ig6mHt9yG/AqjfPjNv6MgabAfoOrF/0EhfEa0JXzq75EfqftEKv9JQzE6DPiyg==
+"@slonik/types@^46.8.0":
+  version "46.8.0"
+  resolved "https://registry.yarnpkg.com/@slonik/types/-/types-46.8.0.tgz#cf41d0d36bd0fe40f639f6e9c6fe9395632f5bf2"
+  integrity sha512-Fl9aPDVQj7xd8Ny2+uEH8PQGwks3tiKn5Ttt86NMHcjuZaWyxlXUJejTZ6PquPwBS3jhsc95/c8awONXOgnORg==
 
-"@slonik/utilities@^47.1.0":
-  version "47.1.0"
-  resolved "https://registry.yarnpkg.com/@slonik/utilities/-/utilities-47.1.0.tgz#ea9dc83a149753338c21a86e1f5210e09f0885be"
-  integrity sha512-ItDCT9HXwuI9kT4QIZWoc7qTY1vhxe1+fcmgMvSpKwgb2HNx+Tv/3wF0NUyBn3O2umQGYUrrkW4DEBWDN1+4Cg==
+"@slonik/utilities@^46.8.0":
+  version "46.8.0"
+  resolved "https://registry.yarnpkg.com/@slonik/utilities/-/utilities-46.8.0.tgz#4b6bc12127f7d0a2299f2cd8d790a934d8113db2"
+  integrity sha512-1y6RM5JvAPEwQs5ei8+0CbTvmHAcKVkWm7112AJLiE/5+qV2OqrQkgDEB/Rug9aNAEGZv9/it0BdW5wNBEozAg==
   dependencies:
-    "@slonik/errors" "^47.1.0"
-    "@slonik/types" "^47.1.0"
+    "@slonik/errors" "^46.8.0"
+    "@slonik/types" "^46.8.0"
 
 "@smithy/abort-controller@^2.0.12":
   version "2.0.12"
@@ -10163,21 +10163,12 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16 || 17 || 18", "@types/react@18.3.1", "@types/react@>=16":
+"@types/react@*", "@types/react@16 || 17 || 18", "@types/react@18.3.1", "@types/react@>=16", "@types/react@^16":
   version "18.3.1"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.1.tgz#fed43985caa834a2084d002e4771e15dfcbdbe8e"
   integrity sha512-V0kuGBX3+prX+DQ/7r2qsv1NsdfnCLnTgnRJ1pYnxykBhGMz+qj+box5lq7XsO5mtZsBqpjwwTu/7wszPfMBcw==
   dependencies:
     "@types/prop-types" "*"
-    csstype "^3.0.2"
-
-"@types/react@^16":
-  version "16.14.63"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.14.63.tgz#0970c0bca7f23f630c85332cee00729d4ad53845"
-  integrity sha512-s83gano0fRBVEw3ejdLpjgvU83F0LIeeuXqdxfPZF/Sc2bhr60tEqCK1zZ+aLirBwRSD6V5zCtOsEjcwKow3JQ==
-  dependencies:
-    "@types/prop-types" "*"
-    "@types/scheduler" "^0.16"
     csstype "^3.0.2"
 
 "@types/readdir-glob@*":
@@ -10240,11 +10231,6 @@
   integrity sha512-7oxPGNQHXLHE48r/r/qjn7q0hlrs3kL7oZnGj0Wf/h9tj/6ibFyRkNbsDxaBBZ4XUZ0Dx5LGCyDJ04ytSofacQ==
   dependencies:
     htmlparser2 "^8.0.0"
-
-"@types/scheduler@^0.16":
-  version "0.16.8"
-  resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.8.tgz#ce5ace04cfeabe7ef87c0091e50752e36707deff"
-  integrity sha512-WZLiwShhwLRmeV6zH+GkbOFT6Z6VklCItrDioxUnv+u4Ll+8vKeFySoFyK/0ctcRpOmwAicELfmys1sDc/Rw+A==
 
 "@types/semver@^7.3.4":
   version "7.5.8"
@@ -16802,14 +16788,7 @@ fast-url-parser@1.1.3, fast-url-parser@^1.1.3:
   dependencies:
     punycode "^1.3.2"
 
-fast-xml-parser@4.2.5:
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-4.2.5.tgz#a6747a09296a6cb34f2ae634019bf1738f3b421f"
-  integrity sha512-B9/wizE4WngqQftFPmdaMYlXoJlJOYxGQOanC77fq9k8+Z0v5dDSVh+3glErdIROP//s/jgb7ZuxKfB8nVyo0g==
-  dependencies:
-    strnum "^1.0.5"
-
-fast-xml-parser@^4.1.3, fast-xml-parser@^4.2.2:
+fast-xml-parser@4.2.5, fast-xml-parser@4.4.1, fast-xml-parser@^4.1.3, fast-xml-parser@^4.2.2:
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-4.4.1.tgz#86dbf3f18edf8739326447bcaac31b4ae7f6514f"
   integrity sha512-xkjOecfnKGkSsOwtZ5Pz7Us/T6mrbPQrq0nh+aCO5V9nk5NLWmasAHumTKjiPJPWANe+kAZ84Jc8ooJkzZ88Sw==
@@ -22993,13 +22972,6 @@ p-limit@^2.0.0, p-limit@^2.2.0:
   dependencies:
     p-try "^2.0.0"
 
-p-limit@^6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-6.2.0.tgz#c254d22ba6aeef441a3564c5e6c2f2da59268a0f"
-  integrity sha512-kuUqqHNUqoIWp/c467RI4X6mmyuojY5jGutNU0wVTmEOOfcuwLqyMVoAi9MKi2Ak+5i9+nhmrK4ufZE8069kHA==
-  dependencies:
-    yocto-queue "^1.1.1"
-
 p-locate@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/p-locate/-/p-locate-2.0.0.tgz"
@@ -26021,20 +25993,19 @@ slice-ansi@^7.1.0:
     ansi-styles "^6.2.1"
     is-fullwidth-code-point "^5.0.0"
 
-slonik@^47.1.0:
-  version "47.1.0"
-  resolved "https://registry.yarnpkg.com/slonik/-/slonik-47.1.0.tgz#196ab431aa79bac795c6c39362195808baa87663"
-  integrity sha512-S/rdODj+cQ8hopoh18xbMul9rSCNzbX7LSzeK/62/iKXDRLDi60kvvsGjHuuVp4FxFPwszSuDATvZ8c8taCCMg==
+slonik@^46.8.0:
+  version "46.8.0"
+  resolved "https://registry.yarnpkg.com/slonik/-/slonik-46.8.0.tgz#8aa9fa4b073f4c8ba11c56ed52ae3dd744aef73d"
+  integrity sha512-1sBzz4k5eowrzaGvP0gdZ41p62K1FxC7tDpA/IWvyGpf7A51eGNoAVfrg/mL9+OifWnKuru9opHPrdE15UHpfg==
   dependencies:
     "@opentelemetry/api" "^1.9.0"
-    "@slonik/driver" "^47.1.0"
-    "@slonik/errors" "^47.1.0"
-    "@slonik/pg-driver" "^47.1.0"
-    "@slonik/sql-tag" "^47.1.0"
-    "@slonik/utilities" "^47.1.0"
+    "@slonik/driver" "^46.8.0"
+    "@slonik/errors" "^46.8.0"
+    "@slonik/pg-driver" "^46.8.0"
+    "@slonik/sql-tag" "^46.8.0"
+    "@slonik/utilities" "^46.8.0"
     get-stack-trace "^3.1.1"
     iso8601-duration "^1.3.0"
-    p-limit "^6.2.0"
     postgres-interval "^4.0.2"
     roarr "^7.21.1"
     serialize-error "^8.0.0"
@@ -29648,11 +29619,6 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
-
-yocto-queue@^1.1.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-1.2.1.tgz#36d7c4739f775b3cbc28e6136e21aa057adec418"
-  integrity sha512-AyeEbWOu/TAXdxlV9wmGcR0+yh2j3vYPGOECcIj2S7MkrLyC7ne+oye2BKTItt0ii2PHk4cDy+95+LshzbXnGg==
 
 yoctocolors-cjs@^2.1.2:
   version "2.1.2"
