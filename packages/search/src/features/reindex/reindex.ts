@@ -49,8 +49,6 @@ export const reindex = async () => {
     readableObjectMode: true,
     writableObjectMode: true,
     transform: (record: ValidRecord, _encoding, callback) => {
-      console.log(JSON.stringify(record, null, 2))
-
       const transformRecordToDocument = eventTransformers[getEventType(record)]
       callback(null, transformRecordToDocument(record))
     }
