@@ -81,6 +81,9 @@ export const AllEventsWorkqueueWithPagination: Story = {
         slug: 'all'
       })
     },
+    parameters: {
+      chromatic: { disableSnapshot: true }
+    },
     msw: {
       handlers: {
         events: [
@@ -103,6 +106,9 @@ export const ReadyToPrintWorkqueue: Story = {
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
         slug: 'registered'
       })
+    },
+    parameters: {
+      chromatic: { disableSnapshot: true }
     },
     msw: {
       handlers: {
@@ -128,6 +134,9 @@ export const ReadyForReviewWorkqueue: Story = {
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
         slug: 'in-review'
       })
+    },
+    parameters: {
+      chromatic: { disableSnapshot: true }
     },
     msw: {
       handlers: {

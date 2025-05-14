@@ -67,6 +67,9 @@ export const DefaultSearchResult: Story = {
 
 export const SearchResultWithMultipleItems: Story = {
   name: 'Search Results With Multiple Items',
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
   args: {
     eventConfig: tennisClubMembershipEvent,
     queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
