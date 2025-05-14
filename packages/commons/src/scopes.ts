@@ -130,7 +130,7 @@ export const SCOPES = {
   USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
-const literalScopes = z.union([
+const LiteralScopes = z.union([
   z.literal(SCOPES.NATLSYSADMIN),
   z.literal(SCOPES.BYPASSRATELIMIT),
   z.literal(SCOPES.DECLARE),
@@ -213,17 +213,17 @@ const rawConfigurableScopeRegex =
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
-const CreateUser = z.object({
+const CreateUserScope = z.object({
   type: z.literal('user.create'),
   options: z.object({
     role: z.array(z.string())
   })
 })
 
-const ConfigurableScopes = z.discriminatedUnion('type', [CreateUser])
+const ConfigurableScopes = z.discriminatedUnion('type', [CreateUserScope])
 
 export function parseScope(scope: string) {
-  const maybeLiteralScope = literalScopes.safeParse(scope)
+  const maybeLiteralScope = LiteralScopes.safeParse(scope)
   if (maybeLiteralScope.success) {
     return {
       type: maybeLiteralScope.data
@@ -258,7 +258,7 @@ export function parseScope(scope: string) {
 export const scopes: Scope[] = Object.values(SCOPES)
 
 export type ParsedScopes = NonNullable<ReturnType<typeof parseScope>>
-export type RawScopes = z.infer<typeof literalScopes> | (string & {})
+export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility
 export type Scope = RawScopes
