@@ -1022,6 +1022,137 @@ components:
                             id:
                               type: string
                             defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  prefixItems:
+                                    - type: string
+                                      format: date
+                                    - type: string
+                                      format: date
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      defaultMessage:
+                                        type: string
+                                      description:
+                                        type: string
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              const: DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                          required:
+                            - id
+                            - label
+                            - type
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
                               type: string
                               minLength: 1
                             parent:
@@ -3231,10 +3362,9 @@ components:
                               type: string
                               enum:
                                 &a6
-                                - FUZZY
-                                - EXACT
-                                - RANGE
-                                - ANY_OF
+                                - fuzzy
+                                - exact
+                                - range
                               description: Determines the type of field
                           required:
                             - type
@@ -4129,6 +4259,137 @@ components:
                       type:
                         type: string
                         const: DATE
+                      configuration:
+                        type: object
+                        properties:
+                          notice:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                    required:
+                      - id
+                      - label
+                      - type
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      defaultValue:
+                        anyOf:
+                          - type: string
+                            format: date
+                          - type: array
+                            maxItems: 2
+                            minItems: 2
+                            prefixItems:
+                              - type: string
+                                format: date
+                              - type: string
+                                format: date
+                      parent:
+                        type: object
+                        properties:
+                          _fieldId:
+                            type: string
+                      conditionals:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: SHOW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: ENABLE
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: DISPLAY_ON_REVIEW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                        default: *a2
+                      required:
+                        type: boolean
+                        default: false
+                      placeholder:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          defaultMessage:
+                            type: string
+                          description:
+                            type: string
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      validation:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator: {}
+                            message:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                          required:
+                            - validator
+                            - message
+                        default: *a3
+                      label:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          defaultMessage:
+                            type: string
+                          description:
+                            type: string
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      hideLabel:
+                        type: boolean
+                        default: false
+                      type:
+                        type: string
+                        const: DATE_RANGE
                       configuration:
                         type: object
                         properties:
@@ -7039,6 +7300,137 @@ components:
                       type:
                         type: string
                         const: DATE
+                      configuration:
+                        type: object
+                        properties:
+                          notice:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                    required:
+                      - id
+                      - label
+                      - type
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      defaultValue:
+                        anyOf:
+                          - type: string
+                            format: date
+                          - type: array
+                            maxItems: 2
+                            minItems: 2
+                            prefixItems:
+                              - type: string
+                                format: date
+                              - type: string
+                                format: date
+                      parent:
+                        type: object
+                        properties:
+                          _fieldId:
+                            type: string
+                      conditionals:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: SHOW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: ENABLE
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: DISPLAY_ON_REVIEW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                        default: *a2
+                      required:
+                        type: boolean
+                        default: false
+                      placeholder:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          defaultMessage:
+                            type: string
+                          description:
+                            type: string
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      validation:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator: {}
+                            message:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                          required:
+                            - validator
+                            - message
+                        default: *a3
+                      label:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          defaultMessage:
+                            type: string
+                          description:
+                            type: string
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      hideLabel:
+                        type: boolean
+                        default: false
+                      type:
+                        type: string
+                        const: DATE_RANGE
                       configuration:
                         type: object
                         properties:
@@ -10118,6 +10510,137 @@ components:
                       id:
                         type: string
                       defaultValue:
+                        anyOf:
+                          - type: string
+                            format: date
+                          - type: array
+                            maxItems: 2
+                            minItems: 2
+                            prefixItems:
+                              - type: string
+                                format: date
+                              - type: string
+                                format: date
+                      parent:
+                        type: object
+                        properties:
+                          _fieldId:
+                            type: string
+                      conditionals:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: SHOW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: ENABLE
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  const: DISPLAY_ON_REVIEW
+                                conditional: {}
+                              required:
+                                - type
+                                - conditional
+                        default: *a2
+                      required:
+                        type: boolean
+                        default: false
+                      placeholder:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          defaultMessage:
+                            type: string
+                          description:
+                            type: string
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      validation:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator: {}
+                            message:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                          required:
+                            - validator
+                            - message
+                        default: *a3
+                      label:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          defaultMessage:
+                            type: string
+                          description:
+                            type: string
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                      hideLabel:
+                        type: boolean
+                        default: false
+                      type:
+                        type: string
+                        const: DATE_RANGE
+                      configuration:
+                        type: object
+                        properties:
+                          notice:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                    required:
+                      - id
+                      - label
+                      - type
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      defaultValue:
                         type: string
                         minLength: 1
                       parent:
@@ -13097,6 +13620,137 @@ components:
                                 id:
                                   type: string
                                 defaultValue:
+                                  anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: array
+                                      maxItems: 2
+                                      minItems: 2
+                                      prefixItems:
+                                        - type: string
+                                          format: date
+                                        - type: string
+                                          format: date
+                                parent:
+                                  type: object
+                                  properties:
+                                    _fieldId:
+                                      type: string
+                                conditionals:
+                                  type: array
+                                  items:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: SHOW
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: ENABLE
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: DISPLAY_ON_REVIEW
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                  default: *a2
+                                required:
+                                  type: boolean
+                                  default: false
+                                placeholder:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                validation:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      validator: {}
+                                      message:
+                                        type: object
+                                        properties:
+                                          id:
+                                            type: string
+                                          defaultMessage:
+                                            type: string
+                                          description:
+                                            type: string
+                                        required:
+                                          - id
+                                          - defaultMessage
+                                          - description
+                                    required:
+                                      - validator
+                                      - message
+                                  default: *a3
+                                label:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                hideLabel:
+                                  type: boolean
+                                  default: false
+                                type:
+                                  type: string
+                                  const: DATE_RANGE
+                                configuration:
+                                  type: object
+                                  properties:
+                                    notice:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                        defaultMessage:
+                                          type: string
+                                        description:
+                                          type: string
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
+                              required:
+                                - id
+                                - label
+                                - type
+                            - type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultValue:
                                   type: string
                                   minLength: 1
                                 parent:
@@ -15939,6 +16593,137 @@ components:
                                 type:
                                   type: string
                                   const: DATE
+                                configuration:
+                                  type: object
+                                  properties:
+                                    notice:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                        defaultMessage:
+                                          type: string
+                                        description:
+                                          type: string
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
+                              required:
+                                - id
+                                - label
+                                - type
+                            - type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultValue:
+                                  anyOf:
+                                    - type: string
+                                      format: date
+                                    - type: array
+                                      maxItems: 2
+                                      minItems: 2
+                                      prefixItems:
+                                        - type: string
+                                          format: date
+                                        - type: string
+                                          format: date
+                                parent:
+                                  type: object
+                                  properties:
+                                    _fieldId:
+                                      type: string
+                                conditionals:
+                                  type: array
+                                  items:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: SHOW
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: ENABLE
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: DISPLAY_ON_REVIEW
+                                          conditional: {}
+                                        required:
+                                          - type
+                                          - conditional
+                                  default: *a2
+                                required:
+                                  type: boolean
+                                  default: false
+                                placeholder:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                validation:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      validator: {}
+                                      message:
+                                        type: object
+                                        properties:
+                                          id:
+                                            type: string
+                                          defaultMessage:
+                                            type: string
+                                          description:
+                                            type: string
+                                        required:
+                                          - id
+                                          - defaultMessage
+                                          - description
+                                    required:
+                                      - validator
+                                      - message
+                                  default: *a3
+                                label:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                hideLabel:
+                                  type: boolean
+                                  default: false
+                                type:
+                                  type: string
+                                  const: DATE_RANGE
                                 configuration:
                                   type: object
                                   properties:
@@ -18962,6 +19747,137 @@ components:
                             id:
                               type: string
                             defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  prefixItems:
+                                    - type: string
+                                      format: date
+                                    - type: string
+                                      format: date
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      defaultMessage:
+                                        type: string
+                                      description:
+                                        type: string
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              const: DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                          required:
+                            - id
+                            - label
+                            - type
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
                               type: string
                               minLength: 1
                             parent:
@@ -21804,6 +22720,137 @@ components:
                             type:
                               type: string
                               const: DATE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                          required:
+                            - id
+                            - label
+                            - type
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  prefixItems:
+                                    - type: string
+                                      format: date
+                                    - type: string
+                                      format: date
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      defaultMessage:
+                                        type: string
+                                      description:
+                                        type: string
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              const: DATE_RANGE
                             configuration:
                               type: object
                               properties:
@@ -24775,6 +25822,137 @@ components:
                             id:
                               type: string
                             defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  prefixItems:
+                                    - type: string
+                                      format: date
+                                    - type: string
+                                      format: date
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      defaultMessage:
+                                        type: string
+                                      description:
+                                        type: string
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              const: DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                          required:
+                            - id
+                            - label
+                            - type
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
                               type: string
                               minLength: 1
                             parent:
@@ -27642,6 +28820,137 @@ components:
                             id:
                               type: string
                             defaultValue:
+                              anyOf:
+                                - type: string
+                                  format: date
+                                - type: array
+                                  maxItems: 2
+                                  minItems: 2
+                                  prefixItems:
+                                    - type: string
+                                      format: date
+                                    - type: string
+                                      format: date
+                            parent:
+                              type: object
+                              properties:
+                                _fieldId:
+                                  type: string
+                            conditionals:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: SHOW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: ENABLE
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                                  - type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                        const: DISPLAY_ON_REVIEW
+                                      conditional: {}
+                                    required:
+                                      - type
+                                      - conditional
+                              default: *a2
+                            required:
+                              type: boolean
+                              default: false
+                            placeholder:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            validation:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  validator: {}
+                                  message:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      defaultMessage:
+                                        type: string
+                                      description:
+                                        type: string
+                                    required:
+                                      - id
+                                      - defaultMessage
+                                      - description
+                                required:
+                                  - validator
+                                  - message
+                              default: *a3
+                            label:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                defaultMessage:
+                                  type: string
+                                description:
+                                  type: string
+                              required:
+                                - id
+                                - defaultMessage
+                                - description
+                            hideLabel:
+                              type: boolean
+                              default: false
+                            type:
+                              type: string
+                              const: DATE_RANGE
+                            configuration:
+                              type: object
+                              properties:
+                                notice:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                          required:
+                            - id
+                            - label
+                            - type
+                        - type: object
+                          properties:
+                            id:
+                              type: string
+                            defaultValue:
                               type: string
                               minLength: 1
                             parent:
@@ -30180,6 +31489,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -30318,6 +31638,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -30495,6 +31826,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -30633,6 +31975,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -30806,6 +32159,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -30944,6 +32308,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -31117,6 +32492,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -31255,6 +32641,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -31428,6 +32825,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -31566,6 +32974,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -31739,6 +33158,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -31877,6 +33307,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -32050,6 +33491,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -32188,6 +33640,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -32363,6 +33826,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -32501,6 +33975,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -32674,6 +34159,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -32812,6 +34308,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -32988,6 +34495,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -33126,6 +34644,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -33299,6 +34828,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -33437,6 +34977,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -33613,6 +35164,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -33751,6 +35313,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -33927,6 +35500,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -34065,6 +35649,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -34241,6 +35836,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -34379,6 +35985,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -34552,6 +36169,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -34690,6 +36318,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -34873,6 +36512,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -35013,6 +36663,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -35172,6 +36833,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -35311,6 +36983,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -35472,6 +37155,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -35611,6 +37305,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -35769,6 +37474,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -35908,6 +37624,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -36064,6 +37791,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -36203,6 +37941,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -36359,6 +38108,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -36498,6 +38258,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -36654,6 +38425,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -36793,6 +38575,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -36949,6 +38742,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -37088,6 +38892,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -37244,6 +39059,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -37383,6 +39209,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -37542,6 +39379,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -37681,6 +39529,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -37840,6 +39699,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -37979,6 +39849,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -38135,6 +40016,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -38274,6 +40166,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -38430,6 +40333,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -38569,6 +40483,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -38728,6 +40653,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -38867,6 +40803,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -39026,6 +40973,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
@@ -39165,6 +41123,17 @@ components:
               - type: string
               - type: string
                 format: date
+              - anyOf:
+                  - type: string
+                    format: date
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    prefixItems:
+                      - type: string
+                        format: date
+                      - type: string
+                        format: date
               - type: boolean
               - type: number
               - type: object
