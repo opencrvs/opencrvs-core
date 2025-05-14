@@ -183,6 +183,7 @@ test('Action data accepts partial changes', async () => {
         [EventStatus.DECLARED]: {
           acceptedAt: stateAfterVillageRemoval.updatedAt as string,
           createdAt: stateAfterVillageRemoval.updatedAt as string,
+          createdByRole: user.role,
           createdBy: user.id,
           createdAtLocation: user.primaryOfficeId
         }

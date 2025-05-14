@@ -189,6 +189,7 @@ export async function createIndex(
                   createdAt: { type: 'date' },
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
                   acceptedAt: { type: 'date' }
                 } satisfies Record<
                   keyof ActionCreationMetadata,
@@ -201,6 +202,7 @@ export async function createIndex(
                   createdAt: { type: 'date' },
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
                   acceptedAt: { type: 'date' },
                   registrationNumber: { type: 'keyword' }
                 } satisfies Record<
