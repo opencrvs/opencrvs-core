@@ -19,6 +19,16 @@ import { getClientIdFromToken } from '@metrics/utils/authUtils'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@metrics/constants'
 
+class HttpError extends Error {
+  statusCode: number
+  constructor(message: string, statusCode: number) {
+    super(message)
+    this.name = 'HttpError'
+    this.message = message
+    this.statusCode = statusCode
+  }
+}
+
 export async function newAuditHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -52,6 +62,10 @@ export async function newAuditHandler(
     )
     await writePoints(points)
   } catch (err) {
+    console.log('Error writing audit point', err)
+    if (err instanceof HttpError && err.statusCode === 401) {
+      return h.response().code(401)
+    }
     return internal(err)
   }
   return h.response().code(201)
@@ -71,10 +85,11 @@ export async function getUser(
   })
 
   if (!res.ok) {
-    throw new Error(
+    throw new HttpError(
       `Unable to retrieve user mobile number. Error: ${
         res.status
-      } status received. ${await res.text()}`
+      } status received. ${await res.text()}`,
+      res.status
     )
   }
 
