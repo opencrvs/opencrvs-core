@@ -14,7 +14,7 @@ describe('elasticsearch db helper', () => {
   it('should create a query that searches child and mother name fields and event location', async () => {
     const newQuery = await advancedQueryBuilder(
       {
-        event: 'birth',
+        event: [{ eventName: 'birth' }],
         compositionType: ['birth-declaration', 'death-declaration']
       },
       '',
@@ -22,18 +22,115 @@ describe('elasticsearch db helper', () => {
     )
     expect(newQuery).toEqual({
       bool: {
-        must: [
+        filter: [
           {
-            match: {
-              event: 'birth'
+            bool: {
+              should: [
+                {
+                  term: { 'event.keyword': 'birth' }
+                }
+              ]
             }
-          },
+          }
+        ],
+        must: [
           {
             terms: {
               'compositionType.keyword': [
                 'birth-declaration',
                 'death-declaration'
               ]
+            }
+          }
+        ]
+      }
+    })
+  })
+  it('should create a query that searches by name', async () => {
+    const newQuery = await advancedQueryBuilder(
+      {
+        trackingId: '',
+        nationalId: '',
+        registrationNumber: '',
+        contactNumber: '',
+        contactEmail: '',
+        name: 'John Doe'
+      },
+      '',
+      false
+    )
+    expect(newQuery).toEqual({
+      bool: {
+        filter: [],
+        must: [
+          {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    filter: { term: { event: 'birth' } },
+                    must: {
+                      multi_match: {
+                        query: 'John Doe',
+                        fields: [
+                          'name^3',
+                          'childFirstNames^2',
+                          'childFamilyName',
+                          'informantFirstNames',
+                          'informantFamilyName',
+                          'motherFirstNames',
+                          'motherFamilyName',
+                          'fatherFirstNames',
+                          'fatherFamilyName'
+                        ],
+                        fuzziness: 'AUTO'
+                      }
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    filter: { term: { event: 'death' } },
+                    must: {
+                      multi_match: {
+                        query: 'John Doe',
+                        fields: [
+                          'name^3',
+                          'deceasedFirstNames^2',
+                          'deceasedFamilyName',
+                          'informantFirstNames',
+                          'informantFamilyName',
+                          'spouseFirstNames',
+                          'spouseFamilyName'
+                        ],
+                        fuzziness: 'AUTO'
+                      }
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    filter: { term: { event: 'marriage' } },
+                    must: {
+                      multi_match: {
+                        query: 'John Doe',
+                        fields: [
+                          'brideFirstNames^6',
+                          'brideFamilyName^6',
+                          'groomFirstNames^6',
+                          'groomFamilyName^6',
+                          'witnessOneFirstNames',
+                          'witnessOneFamilyName',
+                          'witnessTwoFirstNames',
+                          'witnessTwoFamilyName'
+                        ],
+                        fuzziness: 'AUTO'
+                      }
+                    }
+                  }
+                }
+              ],
+              minimum_should_match: 1
             }
           }
         ]

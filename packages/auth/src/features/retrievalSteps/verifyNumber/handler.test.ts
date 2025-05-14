@@ -8,14 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createServer } from '@auth/server'
+import { AuthServer, createServer } from '@auth/server'
 import * as codeService from '@auth/features/verifyCode/service'
 import * as retrievalService from '@auth/features/retrievalSteps/verifyUser/service'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('verifyNumber handler receives a request', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()
@@ -25,7 +25,7 @@ describe('verifyNumber handler receives a request', () => {
     jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
     fetch.mockResponse(
       JSON.stringify({
-        userId: '1',
+        id: '1',
         username: 'fake_user_name',
         status: 'active',
         scope: ['demo'],
@@ -33,19 +33,25 @@ describe('verifyNumber handler receives a request', () => {
         securityQuestionKey: 'dummyKey'
       })
     )
-    const stepOneRes = await server.server.inject({
+    const stepOneRes: {
+      result?: { nonce: string; securityQuestionKey?: string }
+    } = await server.server.inject({
       method: 'POST',
       url: '/verifyUser',
       payload: { mobile: '+8801711111111', retrieveFlow: 'password' }
     })
 
+    const stepOneResNonce = stepOneRes.result?.nonce ?? undefined
+
+    expect(stepOneResNonce).toBe('12345')
+
     const res = await server.server.inject({
       method: 'POST',
       url: '/verifyNumber',
-      payload: { nonce: stepOneRes.result.nonce, code: '000000' }
+      payload: { nonce: stepOneResNonce, code: '000000' }
     })
     expect(res.statusCode).toBe(200)
-    expect(JSON.parse(res.payload).nonce).toBe(stepOneRes.result.nonce)
+    expect(JSON.parse(res.payload).nonce).toBe(stepOneResNonce)
     expect(JSON.parse(res.payload).securityQuestionKey).toBe('dummyKey')
   })
   it('throws error for an invalid nonce', async () => {

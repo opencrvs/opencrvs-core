@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/dashboards",
-  "version": "1.6.5",
+  "version": "1.7.2",
   "description": "OpenCRVS performance dashboards",
   "type": "module",
   "main": "index.js",

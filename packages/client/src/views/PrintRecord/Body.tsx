@@ -43,7 +43,6 @@ import {
 } from '@client/forms'
 import {
   getConditionalActionsForField,
-  getListOfLocations,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import {
@@ -76,10 +75,11 @@ import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { messages as reviewMessages } from '@client/i18n/messages/views/review'
 import { Checkbox, Stack } from '@opencrvs/components/lib'
 import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
-import { Event, History, RegStatus } from '@client/utils/gateway'
+import { EventType, History, RegStatus } from '@client/utils/gateway'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { getListOfLocations } from '@client/utils/validate'
 
 interface PrintRecordTableProps {
   declaration: IDeclaration
@@ -403,7 +403,7 @@ function renderValue(
       : intl.formatMessage(buttonMessages.no)
   }
 
-  if (typeof value === 'string' || typeof value === 'number') {
+  if (value && (typeof value === 'string' || typeof value === 'number')) {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
@@ -413,6 +413,13 @@ function renderValue(
 
   return value
 }
+
+type NestedItem =
+  | {
+      label: string
+      value: IFormFieldValue | JSX.Element | undefined
+    }
+  | undefined
 
 export function PrintRecordBody(props: PrintRecordTableProps) {
   const offlineCountryConfiguration = useSelector(getOfflineData)
@@ -605,7 +612,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
   ) {
     const { declaration: draft } = props
     const visitedTags: string[] = []
-    const nestedItems: any[] = []
+    const nestedItems: NestedItem[] = []
     // parent field
     nestedItems.push(getSinglePreviewField(section, group, field))
     ;(
@@ -821,7 +828,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     offlineCountryConfiguration
   ).filter((sec) => sec.items.length > 0)
   function renderSignatureBox() {
-    if (props.declaration.event === Event.Marriage) {
+    if (props.declaration.event === EventType.Marriage) {
       return (
         <StyledStack>
           <StyledStack direction="column">
@@ -943,7 +950,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
           .filter(({ id }) => id === 'informant')
           .map((section, idx) => {
             const items =
-              props.declaration.event === Event.Marriage
+              props.declaration.event === EventType.Marriage
                 ? [
                     ...section.items.map((item) => ({
                       data: [

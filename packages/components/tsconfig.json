@@ -4,11 +4,7 @@
     "outDir": "lib/",
     "module": "ESNext",
     "target": "es6",
-    "lib": [
-      "es6",
-      "dom",
-      "es2017"
-    ],
+    "lib": ["es6", "dom", "es2019"],
     "sourceMap": true,
     "allowJs": false,
     "declaration": true,
@@ -21,19 +17,10 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false,
     "skipLibCheck": true,
     "declarationMap": true
   },
-  "include": [
-    "src/**/*.tsx",
-    "src/**/*.ts",
-    ".storybook",
-    "typings"
-  ],
-  "exclude": [
-    "node_modules",
-    "lib"
-  ]
+  "include": ["src/**/*.tsx", "src/**/*.ts", ".storybook"],
+  "exclude": ["node_modules", "lib"]
 }

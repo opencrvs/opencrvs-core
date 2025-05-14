@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as mongoose from 'mongoose'
-import { MONGO_URL } from '@config/config/constants'
+import mongoose from 'mongoose'
+import { env } from '@config/environment'
 import { logger } from '@opencrvs/commons'
 
 const db = mongoose.connection
@@ -31,7 +31,7 @@ const wait = (time: number) =>
 
 const connect = async (): Promise<void> => {
   try {
-    await mongoose.connect(MONGO_URL)
+    await mongoose.connect(env.MONGO_URL)
   } catch (err) {
     logger.error(err)
     await wait(1000)

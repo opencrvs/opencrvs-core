@@ -39,6 +39,19 @@ const practitionerRoleHandler = rest.get(
   }
 )
 
+const practitionerRoleHistoryHandler = rest.get(
+  'http://localhost:3447/fhir/PractitionerRole/:practitionerId/_history',
+  (_, res, ctx) => {
+    return res(
+      ctx.json({
+        resourceType: 'Bundle',
+        type: 'history',
+        entry: []
+      })
+    )
+  }
+)
+
 const hierarchyHandler = rest.get(
   'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
   (_req, res, ctx) => {
@@ -47,13 +60,14 @@ const hierarchyHandler = rest.get(
         fixtures.savedAdministrativeLocation({
           id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
           name: 'Ibombo',
-          partOf: { reference: 'Location/0' }
+          partOf: { reference: 'Location/0' as `Location/${UUID}` }
         }),
         fixtures.savedAdministrativeLocation({
           id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
           name: 'Ibombo District Office',
           partOf: {
-            reference: 'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb'
+            reference:
+              'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb' as `Location/${UUID}`
           }
         })
       ])
@@ -154,6 +168,7 @@ const handlers = [
   userHandler,
   practitionerHandler,
   practitionerRoleHandler,
+  practitionerRoleHistoryHandler,
   hierarchyHandler,
   locationHandler,
   notificationFlagsHandler,

@@ -30,16 +30,15 @@ export const GROOM_TITLE = "Groom's details"
 
 export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
 
-export const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
-export const CERTIFICATE_DOCS_TITLE = 'Certificates'
+const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
+const CERTIFICATE_DOCS_TITLE = 'Certificates'
 
-export const BIRTH_ENCOUNTER_TITLE = 'Birth encounter'
-export const MARRIAGE_ENCOUNTER_TITLE = 'Marriage encounter'
-export const DEATH_ENCOUNTER_TITLE = 'Death encounter'
-export const BIRTH_CORRECTION_ENCOUNTER_TITLE = 'Birth correction encounters'
-export const DEATH_CORRECTION_ENCOUNTER_TITLE = 'Death correction encounters'
-export const MARRIAGE_CORRECTION_ENCOUNTER_TITLE =
-  'Marriage correction encounters'
+const BIRTH_ENCOUNTER_TITLE = 'Birth encounter'
+const MARRIAGE_ENCOUNTER_TITLE = 'Marriage encounter'
+const DEATH_ENCOUNTER_TITLE = 'Death encounter'
+const BIRTH_CORRECTION_ENCOUNTER_TITLE = 'Birth correction encounters'
+const DEATH_CORRECTION_ENCOUNTER_TITLE = 'Death correction encounters'
+const MARRIAGE_CORRECTION_ENCOUNTER_TITLE = 'Marriage correction encounters'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
@@ -54,8 +53,8 @@ export const GROOM_CODE = 'groom-details'
 
 export const ATTACHMENT_DOCS_CODE = 'supporting-documents'
 
-export const CORRECTION_CERTIFICATE_DOCS_CODE = 'correction-certificates'
-export const CERTIFICATE_DOCS_CODE = 'certificates'
+const CORRECTION_CERTIFICATE_DOCS_CODE = 'correction-certificates'
+const CERTIFICATE_DOCS_CODE = 'certificates'
 
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 export const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
@@ -172,7 +171,7 @@ type ReferenceType =
 
 export type CompositionSectionCode = ReferenceType['code']
 
-type ReferenceTypeByCode<U extends CompositionSectionCode> = Extract<
+export type ReferenceTypeByCode<U extends CompositionSectionCode> = Extract<
   ReferenceType,
   { code: U }
 >
@@ -198,9 +197,6 @@ export type Section<Code extends CompositionSectionCode> = {
     }
   >
 }
-
-export type SectionMappingByCode<U extends CompositionSectionCode> =
-  ReferenceTypeByCode<U>['code']
 
 export type CompositionSection = Section<ReferenceType['code']>
 

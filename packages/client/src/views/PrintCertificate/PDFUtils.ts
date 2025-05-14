@@ -14,22 +14,19 @@ import {
   createIntl,
   createIntlCache
 } from 'react-intl'
-import {
-  AdminStructure,
-  ILocation,
-  IOfflineData
-} from '@client/offline/reducer'
+import { AdminStructure, ILocation } from '@client/offline/reducer'
 import { IPDFTemplate } from '@client/pdfRenderer'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
-import { MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
-import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import { FontFamilyTypes } from '@client/utils/referenceApi'
+import {
+  CertificateConfiguration,
+  FontFamilyTypes
+} from '@client/utils/referenceApi'
 import htmlToPdfmake from 'html-to-pdfmake'
 import { Content } from 'pdfmake/interfaces'
 import {
@@ -50,7 +47,7 @@ function isMessageDescriptor(
   )
 }
 
-export function formatAllNonStringValues(
+function formatAllNonStringValues(
   templateData: Record<string, TemplateDataType>,
   intl: IntlShape
 ): Record<string, string> {
@@ -90,7 +87,7 @@ export function formatAllNonStringValues(
 
 const cache = createIntlCache()
 
-export function executeHandlebarsTemplate(
+export function compileSvg(
   templateString: string,
   data: Record<string, any> = {},
   state: IStoreState
@@ -234,48 +231,23 @@ src: url("${url}") format("truetype");
   const serializer = new XMLSerializer()
   return serializer.serializeToString(svg)
 }
-
-export async function compileSvg(
-  svgTemplate: string,
-  templateValues: Record<string, unknown>,
-  state: IStoreState
+export function svgToPdfTemplate(
+  svg: string,
+  certificateFonts: CertificateConfiguration
 ) {
-  const resolvedSignatures = await Promise.all(
-    MARRIAGE_SIGNATURE_KEYS.map((k) => ({
-      signatureKey: k,
-      url: templateValues[k]
-    }))
-      .filter(({ url }) => Boolean(url))
-      .map(({ signatureKey, url }) =>
-        fetchImageAsBase64(url as string).then((value) => ({
-          [signatureKey]: value
-        }))
-      )
-  ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
-  templateValues = {
-    ...templateValues,
-    ...resolvedSignatures
-  }
-  return executeHandlebarsTemplate(svgTemplate, templateValues, state)
-}
-
-export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
-  const initialDefaultFont = offlineResource.templates.fonts
-    ? Object.keys(offlineResource.templates.fonts)[0]
-    : null
   const pdfTemplate: IPDFTemplate = {
     ...certificateBaseTemplate,
     definition: {
       ...certificateBaseTemplate.definition,
       defaultStyle: {
         font:
-          initialDefaultFont ||
+          Object.keys(certificateFonts)[0] ||
           certificateBaseTemplate.definition.defaultStyle.font
       }
     },
     fonts: {
       ...certificateBaseTemplate.fonts,
-      ...offlineResource.templates.fonts
+      ...certificateFonts
     }
   }
 

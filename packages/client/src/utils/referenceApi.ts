@@ -10,6 +10,7 @@
  */
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
+import { Validator } from '@client/forms/validators'
 import { ILanguage } from '@client/i18n/reducer'
 import {
   AdminStructure,
@@ -18,8 +19,7 @@ import {
   ILocation
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { Event, System } from '@client/utils/gateway'
-import { Validator } from '@client/forms/validators'
+import { EventType, System } from '@client/utils/gateway'
 import { IntlShape } from 'react-intl'
 
 export interface ILocationDataResponse {
@@ -28,6 +28,17 @@ export interface ILocationDataResponse {
 export interface IFacilitiesDataResponse {
   [facilityId: string]: Facility
 }
+
+export const SearchCriteria = {
+  TRACKING_ID: 'TRACKING_ID',
+  REGISTRATION_NUMBER: 'REGISTRATION_NUMBER',
+  NATIONAL_ID: 'NATIONAL_ID',
+  NAME: 'NAME',
+  PHONE_NUMBER: 'PHONE_NUMBER',
+  EMAIL: 'EMAIL'
+} as const
+
+export type SearchCriteriaType = keyof typeof SearchCriteria
 
 export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
@@ -66,10 +77,29 @@ interface ILoginBackground {
   backgroundImage?: string
   imageFit?: string
 }
-export interface ICertificateTemplateData {
-  event: Event
-  svgCode: string
+export interface ICertificateConfigData {
+  id: string
+  event: EventType
+  label: {
+    id: string
+    defaultMessage: string
+    description: string
+  }
+  isDefault: boolean
+  fee: {
+    onTime: number
+    late: number
+    delayed: number
+  }
+  svgUrl: string
+  fonts?: Record<string, FontFamilyTypes>
 }
+
+export interface ICertificateData extends ICertificateConfigData {
+  hash?: string
+  svg: string
+}
+
 export interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -87,39 +117,24 @@ export interface IApplicationConfig {
   BIRTH: {
     REGISTRATION_TARGET: number
     LATE_REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      LATE: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: {
     REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   MARRIAGE: {
     REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   FEATURES: {
     DEATH_REGISTRATION: boolean
     MARRIAGE_REGISTRATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
-    INFORMANT_SIGNATURE: boolean
     PRINT_DECLARATION: boolean
     DATE_OF_BIRTH_UNKNOWN: boolean
-    INFORMANT_SIGNATURE_REQUIRED: boolean
   }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
@@ -128,10 +143,11 @@ export interface IApplicationConfig {
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
+  SEARCH_DEFAULT_CRITERIA?: SearchCriteriaType
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
-  certificates: ICertificateTemplateData[]
+  certificates: ICertificateConfigData[]
   systems: System[]
 }
 
@@ -237,33 +253,6 @@ async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
   } catch (error) {
     return {}
   }
-}
-async function loadCertificateConfiguration(): Promise<CertificateConfiguration> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/certificate-configuration`
-
-  const res = await fetch(url, {
-    method: 'GET'
-  })
-
-  // for backward compatibility, if the endpoint is unimplemented
-  if (res.status === 404) {
-    return {
-      fonts: {
-        notosans: {
-          normal: 'NotoSans-Light.ttf',
-          bold: 'NotoSans-Regular.ttf',
-          italics: 'NotoSans-Light.ttf',
-          bolditalics: 'NotoSans-Regular.ttf'
-        }
-      }
-    }
-  }
-
-  if (!res.ok) {
-    throw Error(res.statusText)
-  }
-
-  return res.json()
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -403,7 +392,6 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 export const referenceApi = {
   loadLocations,
   loadFacilities,
-  loadCertificateConfiguration,
   loadContent,
   loadConfig,
   loadForms,

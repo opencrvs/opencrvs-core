@@ -18,9 +18,8 @@ import {
   UserSection
 } from '@client/forms/index'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { NATIONAL_ID } from '@client/utils/constants'
 
-export function userSectionFormType(): ISerializedFormSection {
+function userSectionFormType(): ISerializedFormSection {
   return {
     id: UserSection.User,
     viewType: 'form',
@@ -29,6 +28,7 @@ export function userSectionFormType(): ISerializedFormSection {
     groups: [
       {
         id: 'registration-office',
+        preventContinueIfError: true,
         title: userFormMessages.assignedRegistrationOffice,
         conditionals: [
           {
@@ -79,38 +79,38 @@ export function userSectionFormType(): ISerializedFormSection {
         title: userFormMessages.userDetails,
         fields: [
           {
-            name: 'firstNamesEng',
+            name: 'familyName',
             type: TEXT,
-            label: userFormMessages.firstNameEn,
+            label: userFormMessages.lastName,
             required: true,
             initialValue: '',
             validator: [{ operation: 'englishOnlyNameFormat' }],
             mapping: {
               mutation: {
                 operation: 'fieldToNameTransformer',
-                parameters: ['en', 'firstNames']
+                parameters: ['en', 'familyName']
               },
               query: {
                 operation: 'nameToFieldTransformer',
-                parameters: ['en', 'firstNames']
+                parameters: ['en', 'familyName']
               }
             }
           },
           {
-            name: 'familyNameEng',
+            name: 'firstName',
             type: TEXT,
-            label: userFormMessages.lastNameEn,
+            label: userFormMessages.firstName,
             required: true,
             initialValue: '',
             validator: [{ operation: 'englishOnlyNameFormat' }],
             mapping: {
               mutation: {
                 operation: 'fieldToNameTransformer',
-                parameters: ['en', 'familyName']
+                parameters: ['en', 'firstNames']
               },
               query: {
                 operation: 'nameToFieldTransformer',
-                parameters: ['en', 'familyName']
+                parameters: ['en', 'firstNames']
               }
             }
           },
@@ -153,29 +153,6 @@ export function userSectionFormType(): ISerializedFormSection {
             validator: [{ operation: 'emailAddressFormat' }]
           },
           {
-            name: 'nid',
-            type: TEXT,
-            label: userFormMessages.NID,
-            required: false,
-            initialValue: '',
-            validator: [
-              {
-                operation: 'validIDNumber',
-                parameters: [NATIONAL_ID]
-              }
-            ],
-            mapping: {
-              mutation: {
-                operation: 'fieldToIdentifierWithTypeTransformer',
-                parameters: [NATIONAL_ID]
-              },
-              query: {
-                operation: 'identifierWithTypeToFieldTransformer',
-                parameters: [NATIONAL_ID]
-              }
-            }
-          },
-          {
             name: 'seperator',
             type: 'DIVIDER',
             label: {
@@ -199,17 +176,6 @@ export function userSectionFormType(): ISerializedFormSection {
             conditionals: []
           },
           {
-            name: 'systemRole',
-            type: TEXT,
-            label: userFormMessages.systemRole,
-            required: false,
-            hidden: true,
-            hideValueInPreview: true,
-            initialValue: '',
-            validator: [],
-            conditionals: []
-          },
-          {
             name: 'device',
             type: TEXT,
             label: userFormMessages.userDevice,
@@ -222,11 +188,12 @@ export function userSectionFormType(): ISerializedFormSection {
       {
         id: 'signature-attachment',
         title: userFormMessages.userSignatureAttachmentTitle,
+        preventContinueIfError: true,
         conditionals: [
           {
             action: 'hide',
             expression:
-              '!window.config.SIGNATURE_REQUIRED_FOR_ROLES.includes(values.systemRole)'
+              "!values.scopes?.includes('profile.electronic-signature')"
           }
         ],
         fields: [
@@ -246,7 +213,7 @@ export function userSectionFormType(): ISerializedFormSection {
             description: userFormMessages.userSignatureAttachmentDesc,
             allowedDocType: ['image/png'],
             initialValue: '',
-            required: false,
+            required: true,
             validator: []
           }
         ]
@@ -264,7 +231,7 @@ const getPreviewGroups = () => {
   })
 }
 
-export const userSectionPreviewType: ISerializedFormSection = {
+const userSectionPreviewType: ISerializedFormSection = {
   id: UserSection.Preview,
   viewType: 'preview',
   name: userFormMessages.userFormReviewTitle,

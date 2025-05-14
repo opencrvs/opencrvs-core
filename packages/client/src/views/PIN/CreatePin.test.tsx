@@ -37,10 +37,10 @@ describe('Create PIN view', () => {
   let c: ReactWrapper
 
   beforeEach(async () => {
-    const { store, history } = createStore()
-    const testComponent = await createTestComponent(
+    const { store } = createStore()
+    const { component: testComponent } = await createTestComponent(
       <CreatePin onComplete={() => null} />,
-      { store, history }
+      { store }
     )
 
     c = testComponent

@@ -1,5 +1,5 @@
-ARG  VERSION=dev
-FROM opencrvs/ocrvs-base:${VERSION}
+ARG  BRANCH=develop
+FROM opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 

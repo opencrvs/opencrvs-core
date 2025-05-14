@@ -10,6 +10,7 @@
  */
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
+import { createSelector } from '@reduxjs/toolkit'
 import { merge } from 'lodash'
 
 const getOfflineState = (store: IStoreState): IOfflineDataState => store.offline
@@ -45,6 +46,22 @@ export const getOfflineData = (store: IStoreState): IOfflineData => {
   }
   return data
 }
+
+export const getLocations = createSelector(getOfflineData, (data) => ({
+  ...data.locations,
+  ...data.facilities,
+  ...data.offices
+}))
+
+export const getAdminStructureLocations = createSelector(
+  getOfflineData,
+  (data) => data.locations
+)
+
+export const getFacilityLocations = createSelector(
+  getOfflineData,
+  (data) => data.facilities
+)
 
 export const selectCountryBackground = (store: IStoreState) => {
   const countryBackground = getKey(store, 'offlineData').config

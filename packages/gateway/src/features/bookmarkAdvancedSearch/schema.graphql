@@ -14,12 +14,13 @@ type BookmarkedSeachItem {
 }
 
 type AdvancedSeachParameters {
-  event: Event
+  event: EventType
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
+  timePeriodFrom: String
   contactNumber: String
   contactEmail: String
   nationalId: String
@@ -80,12 +81,13 @@ input BookmarkSearchInput {
 }
 
 input AdvancedSearchParametersInput {
-  event: Event
+  event: EventType
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
+  timePeriodFrom: String
   contactNumber: String
   contactEmail: String
   nationalId: String

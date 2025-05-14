@@ -12,16 +12,17 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { useDispatch } from 'react-redux'
 import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
-import { goBack, goToPerformanceHome } from '@client/navigation'
+import { generatePerformanceHomeUrl } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import styled from 'styled-components'
 import IframeResizer from 'iframe-resizer-react'
 import { messages } from '@client/i18n/messages/views/dashboard'
-import { useLocation } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { constantsMessages } from '@client/i18n/messages'
+import { useSelector } from 'react-redux'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -34,22 +35,22 @@ interface IdashboardView {
   icon?: JSX.Element
 }
 
-interface ILocationState {
-  isNavigatedInsideApp: boolean
-}
-
 export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
   const intl = useIntl()
-  const dispatch = useDispatch()
-  const location = useLocation<ILocationState>()
+  const userDetails = useSelector(getUserDetails)
+
+  const location = useLocation()
+  const navigate = useNavigate()
   const handleCrossBar = () => {
     const navigatedFromInsideApp = Boolean(
       location.state && location.state.isNavigatedInsideApp
     )
     if (navigatedFromInsideApp) {
-      dispatch(goBack())
+      navigate(-1)
     } else {
-      dispatch(goToPerformanceHome())
+      navigate(generatePerformanceHomeUrl({
+        locationId: userDetails?.primaryOffice.id
+      }))
     }
   }
 

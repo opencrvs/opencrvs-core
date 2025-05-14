@@ -10,7 +10,7 @@
  */
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
 import { IStoreState } from '@client/store'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 
 const getPartialState = (store: IStoreState): IReviewFormState =>
   store.reviewForm
@@ -30,6 +30,6 @@ export const getReviewForm = (store: IStoreState) => {
   return form
 }
 
-export const getEventReviewForm = (store: IStoreState, event: Event) => {
+export const getEventReviewForm = (store: IStoreState, event: EventType) => {
   return getReviewForm(store)[event]
 }

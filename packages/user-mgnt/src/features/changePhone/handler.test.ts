@@ -14,11 +14,12 @@ import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
 import * as mockingoose from 'mockingoose'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo'] },
+  { scope: [SCOPES.USER_UPDATE] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -37,13 +38,10 @@ const mockUser: Partial<IUser & { _id: string }> = {
     }
   ],
   username: 'j.doe1',
-  identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   status: 'active',
   primaryOfficeId: '321',
-  scope: ['register'],
   device: 'D444',
   passwordHash:
     'c6fdf98bdbb45fb987392b9c2e398cb1dc2915ccbfc7a7d48f9fa7d6b3f1844385517231e98662fbfee5806dcc7a2b0edd7b63cbcfb87efe7e51875ec3e41006',

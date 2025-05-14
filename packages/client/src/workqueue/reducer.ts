@@ -25,10 +25,7 @@ import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import type {
-  GQLEventSearchResultSet,
-  GQLEventSearchSet
-} from '@client/utils/gateway-deprecated-do-not-use'
+import type { GQLEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -41,19 +38,10 @@ import {
   getCurrentUserWorkqueueFailed,
   GET_WORKQUEUE_SUCCESS,
   UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
-  UPDATE_WORKQUEUE_PAGINATION
+  UPDATE_WORKQUEUE_PAGINATION,
+  IQueryData
 } from './actions'
-
-export interface IQueryData {
-  inProgressTab: GQLEventSearchResultSet
-  notificationTab: GQLEventSearchResultSet
-  reviewTab: GQLEventSearchResultSet
-  rejectTab: GQLEventSearchResultSet
-  approvalTab: GQLEventSearchResultSet
-  printTab: GQLEventSearchResultSet
-  issueTab: GQLEventSearchResultSet
-  externalValidationTab: GQLEventSearchResultSet
-}
+import { SCOPES } from '@opencrvs/commons/client'
 
 export const EVENT_STATUS = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -77,7 +65,7 @@ export interface WorkqueueState {
   pagination: Record<keyof IQueryData, number>
 }
 
-export const workqueueInitialState: WorkqueueState = {
+const workqueueInitialState: WorkqueueState = {
   workqueue: {
     loading: true,
     error: false,
@@ -86,6 +74,7 @@ export const workqueueInitialState: WorkqueueState = {
       notificationTab: { totalItems: 0, results: [] },
       reviewTab: { totalItems: 0, results: [] },
       rejectTab: { totalItems: 0, results: [] },
+      sentForReviewTab: { totalItems: 0, results: [] },
       approvalTab: { totalItems: 0, results: [] },
       printTab: { totalItems: 0, results: [] },
       issueTab: { totalItems: 0, results: [] },
@@ -98,6 +87,7 @@ export const workqueueInitialState: WorkqueueState = {
     notificationTab: 1,
     reviewTab: 1,
     rejectTab: 1,
+    sentForReviewTab: 1,
     approvalTab: 1,
     externalValidationTab: 1,
     printTab: 1,
@@ -106,13 +96,12 @@ export const workqueueInitialState: WorkqueueState = {
 }
 
 interface IWorkqueuePaginationParams {
-  userId?: string
   pageSize: number
-  isFieldAgent: boolean
   inProgressSkip: number
   healthSystemSkip: number
   reviewSkip: number
   rejectSkip: number
+  sentForReviewSkip: number
   approvalSkip: number
   externalValidationSkip: number
   printSkip: number
@@ -121,15 +110,13 @@ interface IWorkqueuePaginationParams {
 
 export function updateRegistrarWorkqueue(
   userId?: string,
-  pageSize = 10,
-  isFieldAgent = false
+  pageSize = 10
 ): UpdateRegistrarWorkqueueAction {
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
       userId,
-      pageSize,
-      isFieldAgent
+      pageSize
     }
   }
 }
@@ -142,7 +129,6 @@ async function getFilteredDeclarations(
   unassignedDeclarations: IDeclaration[]
 }> {
   const state = getState()
-  const scope = getScope(state)
   const savedDeclarations = state.declarationsState.declarations
 
   const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
@@ -150,18 +136,6 @@ async function getFilteredDeclarations(
       return queryData[1].results
     }
   ) as Array<GQLEventSearchSet | null>
-
-  // for field agent, no declarations should be unassigned
-  // for registration agent, sent for approval declarations should not be unassigned
-
-  // for other agents, check if the status of workqueue declaration
-  // has changed and if that declaration is saved in the store
-  // also declaration should not show as unassigned when it is being submitted
-  if (scope?.includes('declare'))
-    return {
-      currentlyDownloadedDeclarations: savedDeclarations,
-      unassignedDeclarations: []
-    }
 
   const unassignedDeclarations = workqueueDeclarations
     .filter(
@@ -346,7 +320,7 @@ async function getWorkqueueData(
 
   const scope = getScope(state)
   const reviewStatuses =
-    scope && scope.includes('register')
+    scope && scope.includes(SCOPES.RECORD_REGISTER)
       ? [
           EVENT_STATUS.DECLARED,
           EVENT_STATUS.VALIDATED,
@@ -355,33 +329,32 @@ async function getWorkqueueData(
       : [EVENT_STATUS.DECLARED]
 
   const {
-    userId,
     pageSize,
-    isFieldAgent,
     inProgressSkip,
     healthSystemSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
+    sentForReviewSkip,
     externalValidationSkip,
     printSkip,
     issueSkip
   } = workqueuePaginationParams
 
   const result = await syncRegistrarWorkqueue(
+    userDetails.practitionerId,
     registrationLocationId,
     reviewStatuses,
     pageSize,
-    isFieldAgent,
     inProgressSkip,
     healthSystemSkip,
     reviewSkip,
     rejectSkip,
+    sentForReviewSkip,
     approvalSkip,
     externalValidationSkip,
     printSkip,
-    issueSkip,
-    userId
+    issueSkip
   )
   let workqueue
   const { currentUserData } = await getUserData(
@@ -407,14 +380,7 @@ async function getWorkqueueData(
       initialSyncDone: false
     }
   }
-  if (isFieldAgent) {
-    return mergeWorkQueueData(
-      state,
-      ['reviewTab', 'rejectTab'],
-      currentUserData && currentUserData.declarations,
-      workqueue
-    )
-  }
+
   return mergeWorkQueueData(
     state,
     ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
@@ -466,6 +432,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
       const {
         printTab,
         reviewTab,
+        sentForReviewTab,
         approvalTab,
         inProgressTab,
         externalValidationTab,
@@ -482,6 +449,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         healthSystemSkip: Math.max(notificationTab - 1, 0) * pageSize,
         reviewSkip: Math.max(reviewTab - 1, 0) * pageSize,
         rejectSkip: Math.max(rejectTab - 1, 0) * pageSize,
+        sentForReviewSkip: Math.max(sentForReviewTab - 1, 0) * pageSize,
         approvalSkip: Math.max(approvalTab - 1, 0) * pageSize,
         externalValidationSkip:
           Math.max(externalValidationTab - 1, 0) * pageSize,

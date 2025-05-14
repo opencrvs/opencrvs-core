@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["./src/*"]
+    },
+    "target": "es6",
+    "module": "ESNext",
+    "outDir": "build/dist/esm",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "rootDir": "src",
+    "declaration": true,
+    "lib": ["esnext.asynciterable", "es2015", "es6", "es2019"],
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "types": ["jest", "fhir"],
+    "skipLibCheck": true,
+    "declarationMap": true
+  },
+  "include": ["src/**/*.ts", "typings"],
+  "exclude": ["node_modules", "build"]
+}

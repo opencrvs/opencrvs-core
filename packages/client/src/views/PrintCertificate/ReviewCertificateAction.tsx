@@ -20,15 +20,14 @@ import {
   Spinner
 } from '@opencrvs/components'
 import React from 'react'
-import { useDispatch } from 'react-redux'
-import { useLocation, useParams } from 'react-router'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { goToHomeTab, goBack } from '@client/navigation'
+import { generateGoToHomeTabUrl } from '@client/navigation'
 import { useModal } from '@client/hooks/useModal'
 
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
 import { usePrintableCertificate } from './usePrintableCertificate'
@@ -46,8 +45,8 @@ const ReviewCertificateFrame = ({
   children: React.ReactNode
 }) => {
   const intl = useIntl()
-  const dispatch = useDispatch()
-  const location = useLocation<{ isNavigatedInsideApp: boolean }>()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const back = () => {
     const historyState = location.state
@@ -56,9 +55,13 @@ const ReviewCertificateFrame = ({
     )
 
     if (navigatedFromInsideApp) {
-      dispatch(goBack())
+      navigate(-1)
     } else {
-      dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
+      navigate(
+        generateGoToHomeTabUrl({
+          tabId: WORKQUEUE_TABS.readyToPrint
+        })
+      )
     }
   }
 
@@ -77,7 +80,13 @@ const ReviewCertificateFrame = ({
           desktopRight={
             <Button
               type="icon"
-              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))}
+              onClick={() =>
+                navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.readyToPrint
+                  })
+                )
+              }
             >
               <Icon name="X" size="large" />
             </Button>
@@ -93,7 +102,13 @@ const ReviewCertificateFrame = ({
           mobileRight={
             <Button
               type="icon"
-              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))}
+              onClick={() =>
+                navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.readyToPrint
+                  })
+                )
+              }
             >
               <Icon name="X" size="large" />
             </Button>
@@ -110,19 +125,21 @@ const ReviewCertificateFrame = ({
 }
 
 export const ReviewCertificate = () => {
-  const { registrationId } = useParams<{ registrationId: string }>()
-
+  const { registrationId } = useParams<{
+    registrationId: string
+  }>()
   const {
-    svg,
+    svgCode,
     handleCertify,
     isPrintInAdvance,
-    canUserEditRecord,
+    canUserCorrectRecord,
     handleEdit
   } = usePrintableCertificate(registrationId)
+
   const intl = useIntl()
   const [modal, openModal] = useModal()
 
-  if (!svg) {
+  if (!svgCode) {
     return (
       <ReviewCertificateFrame>
         <Frame.LayoutCentered>
@@ -183,14 +200,15 @@ export const ReviewCertificate = () => {
           <Box>
             <CertificateContainer
               id="print"
-              dangerouslySetInnerHTML={{ __html: svg }}
+              dangerouslySetInnerHTML={{ __html: svgCode }}
             />
           </Box>
           <Content
             title={intl.formatMessage(certificateMessages.reviewTitle)}
+            showTitleOnMobile
             bottomActionDirection="row"
             bottomActionButtons={[
-              canUserEditRecord ? (
+              canUserCorrectRecord ? (
                 <Button
                   key="edit-record"
                   type="negative"

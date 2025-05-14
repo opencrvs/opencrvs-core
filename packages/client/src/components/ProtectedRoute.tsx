@@ -8,43 +8,30 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { Redirect, Route } from 'react-router'
-import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getAuthenticated } from '@client/profile/profileSelectors'
-import { hasAccessToRoute } from '@client/utils/authUtils'
-import { SystemRoleType } from '@client/utils/gateway'
+import React from 'react'
+import { Navigate, RouteProps } from 'react-router-dom'
 import { HOME } from '@client/navigation/routes'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import { Scope } from '@opencrvs/commons/client'
 
 interface IProps {
-  roles?: SystemRoleType[]
+  scopes?: Scope[]
 }
 
-class ProtectedRouteWrapper extends Route<
-  IProps & ReturnType<typeof mapStateToProps>
-> {
-  public render() {
-    const { authenticated, userDetailsFetched, userDetails, roles, ...rest } =
-      this.props
-    if (!authenticated && !userDetailsFetched) {
-      return <div />
-    }
-    if (roles && userDetails) {
-      if (!hasAccessToRoute(roles, userDetails)) {
-        return <Redirect to={HOME} />
-      }
-    }
-    return <Route {...rest} />
-  }
-}
+/**
+ * Higher order component that wraps a route and checks if the user has access to it.
+ * If the user does not have access, they are redirected to the home page.
+ */
+export const ProtectedRoute: React.FC<IProps & RouteProps> = ({
+  scopes = [],
+  children,
+  ...rest
+}) => {
+  const { hasAnyScope } = usePermissions()
 
-const mapStateToProps = (store: IStoreState, props: IProps) => {
-  return {
-    ...props,
-    authenticated: getAuthenticated(store),
-    userDetails: store.profile.userDetails,
-    userDetailsFetched: store.profile.userDetailsFetched
+  if (!hasAnyScope(scopes)) {
+    return <Navigate to={HOME} />
   }
+
+  return <>{children}</>
 }
-export const ProtectedRoute = connect(mapStateToProps)(ProtectedRouteWrapper)

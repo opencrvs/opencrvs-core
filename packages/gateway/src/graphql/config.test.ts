@@ -12,10 +12,12 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { getApolloConfig } from './config'
 import { cloneDeep } from 'lodash'
-import { ContextFunction } from 'apollo-server-core'
-import { ApolloServer } from 'apollo-server-hapi'
 
 import * as fetchAny from 'jest-fetch-mock'
+import { Context } from './context'
+import { Request } from '@hapi/hapi'
+import { ApolloServer } from '@apollo/server'
+import { Headers } from 'node-fetch'
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('Test apollo server config', () => {
@@ -58,7 +60,6 @@ describe('Test apollo server config', () => {
 
   it('return config object with valid context', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockUser), { status: 200 })
-    const config = getApolloConfig()
 
     const request = {
       headers: {
@@ -70,11 +71,10 @@ describe('Test apollo server config', () => {
       }
     }
 
-    const context = await (config.context as ContextFunction)({
-      request,
-      h: {}
-    })
-    expect(context).toStrictEqual({
+    const context = new Context(request as unknown as Request)
+    const { dataSources, ...config } = context
+
+    expect(config).toStrictEqual({
       presignDocumentUrls: true,
       request,
       headers: {
@@ -115,10 +115,13 @@ describe('Test apollo server config', () => {
         variables: { id: '123-123-123-123' }
       },
       {
-        request: request
+        contextValue: new Context(request as unknown as Request)
       }
     )
-    expect(response.errors![0].message).toBe('Authentication failed')
+    expect(
+      response.body.kind == 'single' &&
+        response.body.singleResult.errors![0].message
+    ).toBe('Authentication failed')
   })
   it('throws authentication error when the token holder is not an active user', async () => {
     const deactivatedUser = cloneDeep(mockUser)
@@ -149,10 +152,13 @@ describe('Test apollo server config', () => {
         variables: { id: '123-123-123-123' }
       },
       {
-        request: request
+        contextValue: new Context(request as unknown as Request)
       }
     )
-    expect(response.errors![0].message).toBe('Authentication failed')
+    expect(
+      response.body.kind == 'single' &&
+        response.body.singleResult.errors![0].message
+    ).toBe('Authentication failed')
   })
   it('throws authentication error when the token holder has different scope', async () => {
     const userWithDifferentScope = cloneDeep(mockUser)
@@ -186,9 +192,12 @@ describe('Test apollo server config', () => {
         variables: { id: '123-123-123-123' }
       },
       {
-        request: request
+        contextValue: new Context(request as unknown as Request)
       }
     )
-    expect(response.errors![0].message).toBe('Authentication failed')
+    expect(
+      response.body.kind == 'single' &&
+        response.body.singleResult.errors![0].message
+    ).toBe('User does not have enough scope')
   })
 })

@@ -123,33 +123,6 @@ export const fieldToIdentityTransformer =
     return transformedData
   }
 
-export const nidVerificationFieldToIdentityTransformer = (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  fieldToIdentityTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
-    transformedData,
-    draftData,
-    sectionId,
-    field
-  )
-  const sectionData = transformedData[sectionId]
-  const existingIdentity = sectionData.identifier.find(
-    (identifier: IdentityType) =>
-      identifier.type && identifier.type === 'MOSIP_PSUT_TOKEN_ID'
-  )
-  if (existingIdentity) {
-    const modifiedFields = draftData[sectionId][
-      'fieldsModifiedByNidUserInfo'
-    ] as string[] | undefined
-    existingIdentity['fieldsModifiedByIdentity'] =
-      modifiedFields?.join(',') ?? ''
-  }
-  return transformedData
-}
-
 interface IAddress {
   [key: string]: any
 }

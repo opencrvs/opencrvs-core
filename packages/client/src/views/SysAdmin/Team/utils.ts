@@ -8,12 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { userMessages } from '@client/i18n/messages'
-import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { SystemRoleType } from '@client/utils/gateway'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
-import { UserDetails } from '@client/utils/userUtils'
+import { MessageDescriptor } from 'react-intl'
 
 export enum UserStatus {
   ACTIVE,
@@ -84,36 +81,4 @@ export function checkExternalValidationStatus(status?: string | null): boolean {
     !window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE &&
     status === 'WAITING_VALIDATION'
   )
-}
-
-export function getUserSystemRole(
-  user: { systemRole: SystemRoleType },
-  intl: IntlShape
-): string | undefined {
-  switch (user.systemRole) {
-    case SystemRoleType.FieldAgent:
-      return intl.formatMessage(userMessages.FIELD_AGENT)
-    case SystemRoleType.RegistrationAgent:
-      return intl.formatMessage(userMessages.REGISTRATION_AGENT)
-    case SystemRoleType.NationalRegistrar:
-      return intl.formatMessage(userMessages.NATIONAL_REGISTRAR)
-    case SystemRoleType.LocalRegistrar:
-      return intl.formatMessage(userMessages.LOCAL_REGISTRAR)
-    case SystemRoleType.LocalSystemAdmin:
-      return intl.formatMessage(userMessages.LOCAL_SYSTEM_ADMIN)
-    case SystemRoleType.NationalSystemAdmin:
-      return intl.formatMessage(userMessages.NATIONAL_SYSTEM_ADMIN)
-    case SystemRoleType.PerformanceManagement:
-      return intl.formatMessage(userMessages.PERFORMANCE_MANAGEMENT)
-    default:
-      return undefined
-  }
-}
-
-export const getUserRoleIntlKey = (_roleId: string) => {
-  return `role.${_roleId}`
-}
-
-export const canDeactivateUser = (id: string, userDetails: UserDetails) => {
-  return id !== userDetails.id ? true : false
 }

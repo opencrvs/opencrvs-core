@@ -18,11 +18,6 @@
                 "operation": "registrationNumberTransformer"
               },
               { "fieldName": "qrCode", "operation": "QRCodeTransformer" },
-              { "fieldName": "mosipAid", "operation": "mosipAidTransformer" },
-              {
-                "fieldName": "mosipAIDLabel",
-                "operation": "mosipAidLabelTransformer"
-              },
               {
                 "fieldName": "certificateDate",
                 "operation": "certificateDateTransformer",
@@ -1104,51 +1099,6 @@
                       "operation": "identityToFieldTransformer",
                       "parameters": ["id", "NATIONAL_ID"]
                     }
-                  }
-                },
-                {
-                  "name": "informantNidVerification",
-                  "type": "NID_VERIFICATION_BUTTON",
-                  "label": {
-                    "defaultMessage": "National ID number (in English)",
-                    "description": "Option for form field: Type of ID",
-                    "id": "form.field.label.iDTypeNationalID"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validator": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "const nationalIdSystem =\n    offlineCountryConfig &&\n    offlineCountryConfig.systems.find(s => s.integratingSystemType === 'MOSIP');\n    !nationalIdSystem ||\n    !nationalIdSystem.settings.openIdProviderBaseUrl ||\n    !nationalIdSystem.settings.openIdProviderClientId ||\n    !nationalIdSystem.settings.openIdProviderClaims;\n  "
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "((values.informantType===\"MOTHER\") || (values.informantType===\"FATHER\") || (!values.informantType))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "nidVerificationFieldToIdentityTransformer"
-                    },
-                    "query": {
-                      "operation": "identityToNidVerificationFieldTransformer"
-                    }
-                  },
-                  "labelForVerified": {
-                    "defaultMessage": "Authenticated",
-                    "description": "label for unverified nid state",
-                    "id": "form.field.nidVerified"
-                  },
-                  "labelForUnverified": {
-                    "defaultMessage": "Authenticate",
-                    "description": "label for verified nid state",
-                    "id": "form.field.nidNotVerified"
-                  },
-                  "labelForOffline": {
-                    "defaultMessage": "National ID authentication is currently not available offline.",
-                    "description": "Label for indicating offline status for the user. NID verification is not currently available offline.",
-                    "id": "form.field.nidVerificationOngoing"
                   }
                 },
                 {
@@ -12203,7 +12153,7 @@
                 "label": {
                   "defaultMessage": "Last name",
                   "description": "English last name",
-                  "id": "form.field.label.lastNameEN"
+                  "id": "form.field.label.userSurname"
                 },
                 "required": true,
                 "initialValue": "",
@@ -12261,33 +12211,6 @@
                   "query": {
                     "operation": "localPhoneTransformer",
                     "parameters": ["user.mobile"]
-                  }
-                }
-              },
-              {
-                "name": "nid",
-                "type": "TEXT",
-                "label": {
-                  "defaultMessage": "NID",
-                  "description": "National ID",
-                  "id": "form.field.label.NID"
-                },
-                "required": false,
-                "initialValue": "",
-                "validate": [
-                  {
-                    "operation": "validIDNumber",
-                    "parameters": ["NATIONAL_ID"]
-                  }
-                ],
-                "mapping": {
-                  "mutation": {
-                    "operation": "fieldToIdentifierWithTypeTransformer",
-                    "parameters": ["NATIONAL_ID"]
-                  },
-                  "query": {
-                    "operation": "identifierWithTypeToFieldTransformer",
-                    "parameters": ["NATIONAL_ID"]
                   }
                 }
               },
@@ -12420,7 +12343,7 @@
             "conditionals": [
               {
                 "action": "hide",
-                "expression": "values.role!==\"LOCAL_REGISTRAR\" && values.role!==\"NATIONAL_REGISTRAR\""
+                "expression": "!values.scopes?.includes('profile.electronic-signature')"
               }
             ],
             "fields": [
@@ -12555,7 +12478,7 @@
                 "label": {
                   "defaultMessage": "Last name",
                   "description": "English last name",
-                  "id": "form.field.label.lastNameEN"
+                  "id": "form.field.label.userSurname"
                 },
                 "required": true,
                 "initialValue": "",
@@ -12613,33 +12536,6 @@
                   "query": {
                     "operation": "localPhoneTransformer",
                     "parameters": ["user.mobile"]
-                  }
-                }
-              },
-              {
-                "name": "nid",
-                "type": "TEXT",
-                "label": {
-                  "defaultMessage": "NID",
-                  "description": "National ID",
-                  "id": "form.field.label.NID"
-                },
-                "required": false,
-                "initialValue": "",
-                "validate": [
-                  {
-                    "operation": "validIDNumber",
-                    "parameters": ["NATIONAL_ID"]
-                  }
-                ],
-                "mapping": {
-                  "mutation": {
-                    "operation": "fieldToIdentifierWithTypeTransformer",
-                    "parameters": ["NATIONAL_ID"]
-                  },
-                  "query": {
-                    "operation": "identifierWithTypeToFieldTransformer",
-                    "parameters": ["NATIONAL_ID"]
                   }
                 }
               },

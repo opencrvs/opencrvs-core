@@ -31,7 +31,7 @@ export const Row: React.FC<{
   return (
     <React.Fragment>
       <Stack>{label}</Stack>
-      <Stack style={{ gap: '50%' }}>
+      <Stack justifyContent="space-between">
         <HideOnLargeScreen>
           <Text variant="reg16" element="span" color="redDark">
             {heading.left}
@@ -39,7 +39,7 @@ export const Row: React.FC<{
         </HideOnLargeScreen>
         {leftValue}
       </Stack>
-      <Stack style={{ gap: '50%' }}>
+      <Stack justifyContent="space-between">
         <HideOnLargeScreen>
           <Text variant="reg16" element="span" color="grey600">
             {heading.right}

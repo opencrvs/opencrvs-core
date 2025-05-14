@@ -12,7 +12,9 @@ import * as React from 'react'
 import {
   createTestComponent,
   getReviewFormFromStore,
-  createTestStore
+  createTestStore,
+  setScopes,
+  flushPromises
 } from '@client/tests/util'
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -22,11 +24,12 @@ import {
   setInitialDeclarations
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
-import { Event } from '@client/utils/gateway'
-import * as profileSelectors from '@client/profile/profileSelectors'
+import { REVIEW_EVENT_PARENT_FORM_PAGE_GROUP } from '@opencrvs/client/src/navigation/routes'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType } from '@client/utils/gateway'
 import { vi } from 'vitest'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
+import { formatUrl } from '@client/navigation'
 
 const viewRecordMock = {
   data: {
@@ -182,7 +185,6 @@ const viewRecordMock = {
         type: 'BIRTH',
         trackingId: 'BGVLQSH',
         registrationNumber: null,
-        mosipAid: null,
         __typename: 'Registration'
       },
       history: [
@@ -914,13 +916,13 @@ const actualDeclarationMock = {
       {
         id: 'countries.FAR',
         defaultMessage: 'Farajaland',
-        description: 'Fictional country for OpenCRSV demo'
+        description: 'Fictional country for OpenCRVS demo'
       }
     ],
     placeOfBirthCountry: {
       id: 'countries.FAR',
       defaultMessage: 'Farajaland',
-      description: 'Fictional country for OpenCRSV demo'
+      description: 'Fictional country for OpenCRVS demo'
     },
     placeOfBirthState: 'Central',
     placeOfBirthDistrict: 'Ibombo',
@@ -942,13 +944,13 @@ const actualDeclarationMock = {
       {
         id: 'countries.FAR',
         defaultMessage: 'Farajaland',
-        description: 'Fictional country for OpenCRSV demo'
+        description: 'Fictional country for OpenCRVS demo'
       }
     ],
     motherCountry: {
       id: 'countries.FAR',
       defaultMessage: 'Farajaland',
-      description: 'Fictional country for OpenCRSV demo'
+      description: 'Fictional country for OpenCRVS demo'
     },
     motherCity: '',
     motherAddressLine3: '',
@@ -1142,9 +1144,13 @@ describe('when user is in the register form review section', () => {
   const mockViewRecordFunction = vi.fn()
   mockViewRecordFunction.mockReturnValue(viewRecordMock)
   ViewRecordQueries.fetchDeclarationForViewing = mockViewRecordFunction
-  let component: ReactWrapper<{}, {}>
+
+  let testComponent: ReactWrapper<{}, {}>
+
   beforeEach(async () => {
-    const { store, history } = await createTestStore()
+    const { store } = await createTestStore()
+
+    await flushPromises()
     const declaration = createReviewDeclaration(
       uuid(),
       {
@@ -1158,7 +1164,7 @@ describe('when user is in the register form review section', () => {
           }
         ]
       },
-      Event.Birth
+      EventType.Birth
     )
     declaration.duplicates = [
       {
@@ -1168,40 +1174,38 @@ describe('when user is in the register form review section', () => {
     ]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = vi.fn()
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
-    const form = await getReviewFormFromStore(store, Event.Birth)
+    setScopes([SCOPES.RECORD_REGISTER], store)
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
+    const form = await getReviewFormFromStore(store, EventType.Birth)
+
+    const { component } = await createTestComponent(
       <RegisterForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         registerForm={form}
         declaration={declaration}
         duplicate={true}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'review',
-            groupId: 'review-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE_GROUP}
       />,
-      { store, history }
+      {
+        store,
+        path: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
+        initialEntries: [
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE_GROUP, {
+            declarationId: declaration.id,
+            event: EventType.Birth,
+            groupId: 'review-view-group',
+            pageId: 'review'
+          })
+        ]
+      }
     )
-    component = testComponent
+
+    testComponent = component
   })
 
   it('should show the duplicate tracking id in tab', async () => {
     expect(
-      component
+      testComponent
         .find('#tab_4090df15-f4e5-4f16-ae7e-bb518129d493')
         .hostNodes()
         .text()
@@ -1209,13 +1213,13 @@ describe('when user is in the register form review section', () => {
   })
 
   it('should show comparison when click on duplicate trackingId from tab', async () => {
-    component
+    testComponent
       .find('#tab_4090df15-f4e5-4f16-ae7e-bb518129d493')
       .hostNodes()
       .simulate('click')
-    component.update()
+    testComponent.update()
 
-    expect(component.find('#content-name').hostNodes().text()).toBe(
+    expect(testComponent.find('#content-name').hostNodes().text()).toBe(
       'Is Edgar Samo (BPJM787) a duplicate?'
     )
   })

@@ -50,12 +50,23 @@ export function setMarriageRegistrationSectionTransformer(
       })
     }
 
-    if (draftData[sectionId].certificates) {
-      transformCertificateData(
-        transformedData,
-        (draftData[sectionId].certificates as ICertificate[])[0],
-        sectionId
+    const certificates: ICertificate[] = draftData[sectionId]
+      .certificates as ICertificate[]
+    if (
+      Array.isArray(certificates) &&
+      certificates.length &&
+      !draftData[sectionId].correction
+    ) {
+      const updatedCertificates = transformCertificateData(
+        certificates.slice(-1)
       )
+      transformedData[sectionId].certificates =
+        updatedCertificates.length > 0 &&
+        Object.keys(updatedCertificates[0]).length > 0 &&
+        updatedCertificates[0].collector // making sure we are not sending empty object as certificate
+          ? updatedCertificates
+          : []
     }
   }
+  return transformedData
 }

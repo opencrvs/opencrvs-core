@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { buildFHIRBundle } from '.'
-import { EVENT_TYPE } from './constants'
+import { EVENT_TYPE } from '../constants'
 
 import * as _ from 'lodash'
 

@@ -31,7 +31,7 @@ type HumanName { # -> HumanName
 
 # Although the recommended way is use ALL_CAPS but keeping it lowercase
 # makes it a lot more easier to use in client
-enum Event {
+enum EventType {
   birth
   death
   marriage

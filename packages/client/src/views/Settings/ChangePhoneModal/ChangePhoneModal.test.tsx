@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import {
-  createTestComponent,
-  createRouterProps,
-  userDetails
-} from '@client/tests/util'
+import { createTestComponent, userDetails } from '@client/tests/util'
 import { createStore } from '@client/store'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
@@ -54,12 +50,12 @@ const graphqlMocks = [
 describe('Change phone modal tests', () => {
   let component: ReactWrapper
   const onSuccessMock = vi.fn()
-  const { history } = createRouterProps('/settings')
-  const { store } = createStore(history)
+
+  const { store } = createStore()
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ChangePhoneModal
         show={true}
         onSuccess={onSuccessMock}
@@ -67,7 +63,6 @@ describe('Change phone modal tests', () => {
       />,
       {
         store,
-        history,
         graphqlMocks
       }
     )

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
-import { RegStatus, Event } from '@client/utils/gateway'
+import { RegStatus, EventType } from '@client/utils/gateway'
 
 import {
   Description,
@@ -40,7 +40,7 @@ interface BaseProps {
   statusMapping?: IStatusMapping
   onClickStatusDetails: (status?: keyof IStatusMapping) => void
   isAccessibleOffice: boolean
-  selectedEvent: Event
+  selectedEvent: EventType
 }
 
 const ContentHolder = styled.div``

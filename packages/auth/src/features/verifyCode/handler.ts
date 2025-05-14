@@ -17,9 +17,9 @@ import {
 } from '@auth/features/verifyCode/service'
 import {
   getStoredUserInformation,
-  createToken,
-  postUserActionToMetrics
+  createToken
 } from '@auth/features/authenticate/service'
+import { postUserActionToMetrics } from '@auth/metrics'
 import { logger } from '@opencrvs/commons'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 interface IVerifyPayload {

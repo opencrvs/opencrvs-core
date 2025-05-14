@@ -8,11 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createServerWithEnvironment } from '@auth/tests/util'
-import { createServer } from '@auth/server'
+import {
+  createProductionEnvironmentServer,
+  createServerWithEnvironment
+} from '@auth/tests/util'
+import { AuthServer, createServer } from '@auth/server'
 
 describe('resend handler receives a request', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()
@@ -44,13 +47,13 @@ describe('resend handler receives a request', () => {
 
   describe('resend notification service says nonce is valid, generates a mobile verification code and sends it to notification gateway', () => {
     it('returns a nonce to the client', async () => {
-      server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+      server = await createProductionEnvironmentServer()
       // eslint-disable-next-line
       const codeService = require('../verifyCode/service')
       // eslint-disable-next-line
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({
-        userId: '1',
+        id: '1',
         scope: ['admin'],
         mobile: '+345345343'
       })

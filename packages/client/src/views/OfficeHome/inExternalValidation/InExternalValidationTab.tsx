@@ -24,8 +24,7 @@ import {
   constantsMessages,
   wqMessages
 } from '@client/i18n/messages'
-import { connect } from 'react-redux'
-import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   formattedDuration,
@@ -43,6 +42,8 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
 
 interface IBaseProps {
   theme: ITheme
@@ -56,14 +57,10 @@ interface IBaseProps {
   error?: boolean
 }
 
-interface IDispatchProps {
-  goToPage: typeof goToPage
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-}
-
-type IProps = IBaseProps & IntlShapeProps & IDispatchProps
+type IProps = IBaseProps & IntlShapeProps
 
 function InExternalValidationComponent(props: IProps) {
+  const navigate = useNavigate()
   const [sortedCol, setSortedCOl] = React.useState<COLUMNS>(COLUMNS.NAME)
   const [sortOrder, setSortOrder] = React.useState<SORT_ORDER>(
     SORT_ORDER.ASCENDING
@@ -116,7 +113,12 @@ function InExternalValidationComponent(props: IProps) {
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'externalValidationTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {reg.name}
@@ -125,7 +127,12 @@ function InExternalValidationComponent(props: IProps) {
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'externalValidationTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -152,7 +159,12 @@ function InExternalValidationComponent(props: IProps) {
           {
             label: 'rowClickHandler',
             handler: () =>
-              props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
+              navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'externalValidationTab',
+                  declarationId: reg.id
+                })
+              )
           }
         ]
       }
@@ -234,7 +246,6 @@ function InExternalValidationComponent(props: IProps) {
   )
 }
 
-export const InExternalValidationTab = connect(null, {
-  goToPage,
-  goToDeclarationRecordAudit
-})(injectIntl(withTheme(InExternalValidationComponent)))
+export const InExternalValidationTab = injectIntl(
+  withTheme(InExternalValidationComponent)
+)

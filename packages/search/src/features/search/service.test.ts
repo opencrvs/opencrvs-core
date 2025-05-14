@@ -28,7 +28,7 @@ describe('Search service', () => {
         trackingId: 'dummy',
         contactNumber: 'dummy',
         registrationNumber: 'dummy',
-        event: 'birth',
+        event: [{ eventName: 'birth' }],
         registrationStatuses: ['DECLARED'],
         compositionType: ['birth-declaration', 'death-declaration'],
         declarationLocationId: '00000000-0000-0000-0000-000000000001' as UUID
@@ -47,7 +47,7 @@ describe('Search service', () => {
 
     await advancedSearch(false, {
       parameters: {
-        event: 'birth'
+        event: [{ eventName: 'birth' }]
       }
     })
 
@@ -65,7 +65,7 @@ describe('Search service', () => {
         trackingId: 'dummy',
         contactNumber: 'dummy',
         registrationNumber: 'dummy',
-        event: 'birth',
+        event: [{ eventName: 'birth' }],
         registrationStatuses: ['DECLARED'],
         compositionType: ['birth-declaration', 'death-declaration']
       },
@@ -84,7 +84,7 @@ describe('elasticsearch params formatter', () => {
           trackingId: 'myTrackingId',
           contactNumber: '07989898989',
           registrationNumber: 'BHGUGKJH',
-          event: 'birth',
+          event: [{ eventName: 'birth' }],
           registrationStatuses: ['DECLARED'],
           compositionType: ['birth-declaration'],
           declarationLocationId: '00000000-0000-0000-0000-000000000002' as UUID,
@@ -93,6 +93,7 @@ describe('elasticsearch params formatter', () => {
         createdBy: 'EMPTY_STRING',
         from: 0,
         size: 10,
+        sortColumn: 'dateOfDeclaration',
         sort: SortOrder.ASC
       },
       false
@@ -102,68 +103,70 @@ describe('elasticsearch params formatter', () => {
       from: 0,
       index: 'ocrvs',
       size: 10,
-      body: {
-        query: {
-          bool: {
-            must: [
-              {
-                match: {
-                  event: 'birth'
-                }
-              },
-              {
-                query_string: {
-                  default_field: 'type',
-                  query: '(DECLARED)'
-                }
-              },
-              {
-                match: {
-                  declarationLocationId: {
-                    boost: 2,
-                    query: '00000000-0000-0000-0000-000000000002'
+      query: {
+        bool: {
+          filter: [
+            {
+              bool: {
+                should: [
+                  {
+                    term: { 'event.keyword': 'birth' }
                   }
-                }
-              },
-              {
-                match: {
-                  eventLocationId: '00000000-0000-0000-0000-000000000003'
-                }
-              },
-              {
-                match: {
-                  contactNumber: '07989898989'
-                }
-              },
-              {
-                match: {
-                  registrationNumber: 'BHGUGKJH'
-                }
-              },
-              {
-                match: {
-                  trackingId: 'myTrackingId'
-                }
-              },
-              {
-                term: {
-                  'createdBy.keyword': {
-                    value: 'EMPTY_STRING'
-                  }
-                }
-              },
-              {
-                terms: {
-                  'compositionType.keyword': ['birth-declaration']
+                ]
+              }
+            }
+          ],
+          must: [
+            {
+              query_string: {
+                default_field: 'type',
+                query: '(DECLARED)'
+              }
+            },
+            {
+              match: {
+                declarationLocationId: {
+                  boost: 2,
+                  query: '00000000-0000-0000-0000-000000000002'
                 }
               }
-            ]
-          }
-        },
-        sort: [
-          { dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }
-        ]
-      }
+            },
+            {
+              match: {
+                eventLocationId: '00000000-0000-0000-0000-000000000003'
+              }
+            },
+            {
+              match: {
+                contactNumber: '07989898989'
+              }
+            },
+            {
+              match: {
+                registrationNumber: 'BHGUGKJH'
+              }
+            },
+            {
+              match: {
+                trackingId: 'myTrackingId'
+              }
+            },
+            {
+              term: {
+                'createdBy.keyword': {
+                  value: 'EMPTY_STRING'
+                }
+              }
+            },
+            {
+              terms: {
+                'compositionType.keyword': ['birth-declaration']
+              }
+            }
+          ]
+        }
+      },
+      sort: [{ dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }]
     })
   })
 
@@ -185,45 +188,84 @@ describe('elasticsearch params formatter', () => {
       from: 0,
       index: 'ocrvs',
       size: 10,
-      body: {
-        query: {
-          bool: {
-            must: [
-              {
-                multi_match: {
-                  query: 'sadman anik',
-                  fields: [
-                    'childFirstNames',
-                    'childFamilyName',
-                    'motherFirstNames',
-                    'motherFamilyName',
-                    'fatherFirstNames',
-                    'fatherFamilyName',
-                    'informantFirstNames',
-                    'informantFamilyName',
-                    'deceasedFirstNames',
-                    'deceasedFamilyName',
-                    'spouseFirstNames',
-                    'spouseFamilyName',
-                    'brideFirstNames',
-                    'brideFamilyName',
-                    'groomFirstNames',
-                    'groomFamilyName',
-                    'witnessOneFirstNames',
-                    'witnessOneFamilyName',
-                    'witnessTwoFirstNames',
-                    'witnessTwoFamilyName'
-                  ],
-                  fuzziness: 'AUTO'
-                }
+      query: {
+        bool: {
+          filter: [],
+          must: [
+            {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      filter: { term: { event: 'birth' } },
+                      must: {
+                        multi_match: {
+                          query: 'sadman anik',
+                          fields: [
+                            'name^3',
+                            'childFirstNames^2',
+                            'childFamilyName',
+                            'informantFirstNames',
+                            'informantFamilyName',
+                            'motherFirstNames',
+                            'motherFamilyName',
+                            'fatherFirstNames',
+                            'fatherFamilyName'
+                          ],
+                          fuzziness: 'AUTO'
+                        }
+                      }
+                    }
+                  },
+                  {
+                    bool: {
+                      filter: { term: { event: 'death' } },
+                      must: {
+                        multi_match: {
+                          query: 'sadman anik',
+                          fields: [
+                            'name^3',
+                            'deceasedFirstNames^2',
+                            'deceasedFamilyName',
+                            'informantFirstNames',
+                            'informantFamilyName',
+                            'spouseFirstNames',
+                            'spouseFamilyName'
+                          ],
+                          fuzziness: 'AUTO'
+                        }
+                      }
+                    }
+                  },
+                  {
+                    bool: {
+                      filter: { term: { event: 'marriage' } },
+                      must: {
+                        multi_match: {
+                          query: 'sadman anik',
+                          fields: [
+                            'brideFirstNames^6',
+                            'brideFamilyName^6',
+                            'groomFirstNames^6',
+                            'groomFamilyName^6',
+                            'witnessOneFirstNames',
+                            'witnessOneFamilyName',
+                            'witnessTwoFirstNames',
+                            'witnessTwoFamilyName'
+                          ],
+                          fuzziness: 'AUTO'
+                        }
+                      }
+                    }
+                  }
+                ],
+                minimum_should_match: 1
               }
-            ]
-          }
-        },
-        sort: [
-          { dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }
-        ]
-      }
+            }
+          ]
+        }
+      },
+      sort: []
     })
   })
 })

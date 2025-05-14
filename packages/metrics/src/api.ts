@@ -43,7 +43,12 @@ export function fetchFHIR<T = any>(
 }
 
 export function fetchTaskHistory(taskId: string, authHeader: IAuthHeader) {
-  return fetchFHIR<fhir.Bundle>(`Task/${taskId}/_history`, authHeader)
+  // querying task history in descending order in case task history
+  // gets very big and we always need the latest history
+  return fetchFHIR<fhir.Bundle>(
+    `Task/${taskId}/_history?_sort=-meta.lastUpdated`,
+    authHeader
+  )
 }
 
 export const fetchLocation = async (
@@ -196,7 +201,6 @@ export async function countRegistrarsByLocation(
       ...authHeader
     },
     body: JSON.stringify({
-      systemRole: 'LOCAL_REGISTRAR',
       locationId
     })
   })

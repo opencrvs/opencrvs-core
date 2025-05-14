@@ -8,19 +8,33 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
-import User, { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
-import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
+import {
+  Extension,
+  findExtension,
+  OPENCRVS_SPECIFICATION_URL
+} from '@opencrvs/commons/types'
+import {
+  DOCUMENTS_URL,
+  FHIR_URL,
+  NOTIFICATION_SERVICE_URL
+} from '@user-mgnt/constants'
+import User, {
+  ISignature,
+  ISignatureAttachment,
+  IUser,
+  IUserName
+} from '@user-mgnt/model/user'
+import fetch from 'node-fetch'
 
 export const createFhirPractitioner = (
   user: IUser,
-  system: boolean
+  system: boolean,
+  signatureAttachment?: ISignatureAttachment
 ): fhir.Practitioner => {
   if (system) {
     return {
       resourceType: 'Practitioner',
-      identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
         { system: 'email', value: user.emailForNotification }
@@ -36,31 +50,42 @@ export const createFhirPractitioner = (
   } else {
     return {
       resourceType: 'Practitioner',
-      identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
         { system: 'email', value: user.emailForNotification }
       ],
       name: user.name,
-      extension: user.signature && [
+      extension: signatureAttachment && [
         {
           url: 'http://opencrvs.org/specs/extension/employee-signature',
-          valueSignature: {
-            type: [
-              {
-                system: 'urn:iso-astm:E1762-95:2013',
-                code: '1.2.840.10065.1.12.1.13',
-                display: 'Review Signature'
-              }
-            ],
-            when: new Date().toISOString(),
-            contentType: user.signature.type,
-            blob: user.signature.data
-          }
+          valueAttachment: signatureAttachment
         }
       ]
     }
   }
+}
+
+export const uploadSignatureToMinio = async (
+  token: string,
+  signature: ISignature
+) => {
+  const result = await fetch(`${DOCUMENTS_URL}/upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ fileData: signature.data })
+  })
+  const res = await result.json()
+  return res.refUrl
+}
+
+export const getSignatureExtension = (extensions: Extension[] | undefined) => {
+  return findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
+    extensions || []
+  )
 }
 
 export const createFhirPractitionerRole = async (
@@ -82,22 +107,11 @@ export const createFhirPractitionerRole = async (
               code: 'AUTOMATED'
             }
           ]
-        },
-        {
-          coding: [
-            {
-              system: `http://opencrvs.org/specs/types`,
-              code: 'SYSTEM'
-            }
-          ]
         }
       ],
       location: [{ reference: `Location/${user.primaryOfficeId}` }]
     }
   } else {
-    const role = await UserRole.findOne({
-      _id: user.role
-    })
     return {
       resourceType: 'PractitionerRole',
       practitioner: {
@@ -108,15 +122,7 @@ export const createFhirPractitionerRole = async (
           coding: [
             {
               system: `http://opencrvs.org/specs/roles`,
-              code: user.systemRole
-            }
-          ]
-        },
-        {
-          coding: [
-            {
-              system: `http://opencrvs.org/specs/types`,
-              code: JSON.stringify(role?.labels)
+              code: user.role
             }
           ]
         }

@@ -15,20 +15,20 @@ import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { vi } from 'vitest'
 
-const { store, history } = createStore()
+const { store } = createStore()
 const mockHandleEdit = vi.fn()
 const mockHandleClose = vi.fn()
 
 describe('when user is in the review page', () => {
   let editComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <EditConfirmation
         show={true}
         handleEdit={mockHandleEdit}
         handleClose={mockHandleClose}
       />,
-      { store, history }
+      { store }
     )
     editComponent = testComponent
   })

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "target": "es2016",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "rootDir": "./src",
+    "outDir": "dist",
+    "paths": {
+      "@opencrvs/commons/conditionals": [
+        "../commons/src/conditionals/conditionals.ts"
+      ],
+      "@opencrvs/commons/scopes": ["../commons/src/scopes.ts"],
+      "@opencrvs/commons/events": ["../commons/src/events/index.ts"]
+    }
+  },
+  "references": [{ "path": "../commons" }],
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/node_modules/**", "dist"]
+}

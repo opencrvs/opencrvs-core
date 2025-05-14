@@ -10,17 +10,7 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import {
-  PORT,
-  HOST,
-  CHECK_INVALID_TOKEN,
-  CERT_PUBLIC_KEY_PATH,
-  AUTH_URL,
-  DEFAULT_TIMEOUT,
-  HOSTNAME,
-  LOGIN_URL,
-  CLIENT_APP_URL
-} from '@config/config/constants'
+import { DEFAULT_TIMEOUT } from '@config/config/constants'
 import getRoutes from '@config/config/routes'
 import getPlugins from '@config/config/plugins'
 import * as database from '@config/config/database'
@@ -28,18 +18,19 @@ import * as mongoDirect from '@config/config/hearthClient'
 import { validateFunc, logger } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 import { badRequest } from '@hapi/boom'
+import { env } from './environment'
 
-export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
+export const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
-  let whitelist: string[] = [HOSTNAME]
-  if (HOSTNAME[0] !== '*') {
-    whitelist = [LOGIN_URL, CLIENT_APP_URL]
+  let whitelist: string[] = [env.DOMAIN]
+  if (env.DOMAIN[0] !== '*') {
+    whitelist = [env.LOGIN_URL, env.CLIENT_APP_URL]
   }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
-    host: HOST,
-    port: PORT,
+    host: env.HOST,
+    port: env.PORT,
     routes: {
       cors: { origin: whitelist },
       validate: {
@@ -69,7 +60,7 @@ export async function createServer() {
       audience: 'opencrvs:config-user'
     },
     validate: (payload: any, request: Hapi.Request) =>
-      validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
+      validateFunc(payload, request, env.CHECK_INVALID_TOKEN, env.AUTH_URL)
   })
 
   server.auth.default('jwt')
@@ -96,7 +87,7 @@ export async function createServer() {
     await server.start()
     await database.start()
     await mongoDirect.start()
-    server.log('info', `Config server started on ${HOST}:${PORT}`)
+    server.log('info', `Config server started on ${env.HOST}:${env.PORT}`)
   }
 
   return { server, start, stop }

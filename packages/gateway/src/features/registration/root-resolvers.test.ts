@@ -9,18 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers as appResolvers } from '@gateway/features/registration/root-resolvers'
+import { UserInputError } from '@gateway/utils/graphql-errors'
 import { mockTaskBundle } from '@gateway/utils/testUtils'
 import { DOWNLOADED_EXTENSION_URL } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
-import * as jwt from 'jsonwebtoken'
-
-import { UserInputError } from 'apollo-server-hapi'
+import { sign } from 'jsonwebtoken'
+import { SCOPES } from '@opencrvs/commons/authentication'
+import RecordsAPI from '@gateway/features/fhir/recordsAPI'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
-const registerCertifyToken = jwt.sign(
-  { scope: ['register', 'certify'] },
+const registerCertifyToken = sign(
+  {
+    scope: [SCOPES.RECORD_REGISTER, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]
+  },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -30,8 +33,8 @@ const registerCertifyToken = jwt.sign(
   }
 )
 
-const validateToken = jwt.sign(
-  { scope: ['validate'] },
+const validateToken = sign(
+  { scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL] },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -41,8 +44,14 @@ const validateToken = jwt.sign(
   }
 )
 
-const declareToken = jwt.sign(
-  { scope: ['declare'] },
+const declareToken = sign(
+  {
+    scope: [
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE
+    ]
+  },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -52,8 +61,8 @@ const declareToken = jwt.sign(
   }
 )
 
-const certifyToken = jwt.sign(
-  { scope: ['certify'] },
+const certifyToken = sign(
+  { scope: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -62,8 +71,8 @@ const certifyToken = jwt.sign(
   }
 )
 
-const sysAdminToken = jwt.sign(
-  { scope: ['sysadmin'] },
+const unassignToken = sign(
+  { scope: [SCOPES.RECORD_UNASSIGN_OTHERS] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -88,12 +97,8 @@ const authHeaderNotRegCert = {
   Authorization: `Bearer ${declareToken}`
 }
 
-const authHeaderSysAdmin = {
-  Authorization: `Bearer ${sysAdminToken}`
-}
-
-const authHeaderNotSysAdmin = {
-  Authorization: `Bearer ${declareToken}`
+const authHeaderUnassignOthers = {
+  Authorization: `Bearer ${unassignToken}`
 }
 
 const mockUserDetails = {
@@ -168,7 +173,8 @@ const mockContext = {
   headers: authHeaderRegCert,
   dataSources: {
     locationsAPI: { getLocation: () => mockLocation },
-    usersAPI: { getUserById: () => mockUserDetails }
+    usersAPI: { getUserById: () => mockUserDetails },
+    recordsAPI: new RecordsAPI()
   }
 }
 
@@ -177,148 +183,6 @@ beforeEach(() => {
 })
 
 describe('Registration root resolvers', () => {
-  describe('searchBirthRegistrations()', () => {
-    it('throws an error if the user does not have sysadmin scope', async () => {
-      return expect(
-        resolvers.Query!.searchBirthRegistrations(
-          {},
-          {
-            fromDate: new Date('05 October 2011 14:48 UTC'),
-            toDate: new Date('05 October 2012 14:48 UTC')
-          },
-          authHeaderNotSysAdmin
-        )
-      ).rejects.toThrowError('User does not have a sysadmin scope')
-    })
-
-    it('returns an array of records', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'birth-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'birth-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-
-      const compositions = await resolvers.Query!.searchBirthRegistrations(
-        {},
-        {
-          fromDate: new Date('05 October 2011 14:48 UTC'),
-          toDate: new Date('05 October 2012 14:48 UTC')
-        },
-        { headers: authHeaderSysAdmin }
-      )
-
-      expect(compositions[0].entry[0].resource.id).toBe(
-        '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-      )
-    })
-  })
-
-  describe('searchDeathRegistrations()', () => {
-    it('throws an error if the user does not have sysadmin scope', async () => {
-      return expect(
-        resolvers.Query!.searchDeathRegistrations(
-          {},
-          {
-            fromDate: new Date('05 October 2011 14:48 UTC'),
-            toDate: new Date('05 October 2012 14:48 UTC')
-          },
-          authHeaderNotSysAdmin
-        )
-      ).rejects.toThrowError('User does not have a sysadmin scope')
-    })
-
-    it('returns an array of records', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'death-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'death-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-
-      const compositions = await resolvers.Query!.searchDeathRegistrations(
-        {},
-        {
-          fromDate: new Date('05 October 2011 14:48 UTC'),
-          toDate: new Date('05 October 2012 14:48 UTC')
-        },
-        { headers: authHeaderSysAdmin }
-      )
-
-      expect(compositions[0].entry[0].resource.id).toBe(
-        '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-      )
-    })
-  })
-
   describe('fetchBirthRegistration()', () => {
     it('returns the record in the OpenCRVS format', async () => {
       const mockTaskOfComposition = JSON.stringify({
@@ -420,7 +284,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchDeathRegistration()', () => {
@@ -525,7 +389,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchMarriageRegistration()', () => {
@@ -630,7 +494,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchRegistration()', () => {
@@ -745,7 +609,7 @@ describe('Registration root resolvers', () => {
           { id, reason, comment },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -762,7 +626,7 @@ describe('Registration root resolvers', () => {
           { id },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -779,7 +643,7 @@ describe('Registration root resolvers', () => {
           { id },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1022,7 +886,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           { headers: authHeaderRegCert }
         )
-      ).rejects.toThrowError('User does not have a validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1339,7 +1203,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           { headers: authHeaderRegCert }
         )
-      ).rejects.toThrowError('User does not have a validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1417,6 +1281,8 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [JSON.stringify(mockUserDetails), { status: 200 }],
         [
           JSON.stringify({
@@ -1449,6 +1315,10 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have a certify scope", async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation!.markBirthAsCertified(
@@ -1456,7 +1326,22 @@ describe('Registration root resolvers', () => {
           { id, details },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a certify scope')
+      ).rejects.toThrowError('User does not have enough scope')
+    })
+
+    it('throws an error when the user is not assigned to record', async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121331' }), { status: 200 }]
+      )
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      await expect(
+        resolvers.Mutation!.markBirthAsCertified(
+          {},
+          { id, details },
+          { headers: authHeaderNotRegCert }
+        )
+      ).rejects.toThrowError('User is not assigned to the record')
     })
   })
   describe('markDeathAsCertified()', () => {
@@ -1483,6 +1368,8 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [JSON.stringify(mockUserDetails), { status: 200 }],
         [
           JSON.stringify({
@@ -1517,16 +1404,30 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have a certify scope", async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle), { status: 200 }],
-        [JSON.stringify(mockUserDetails), { status: 200 }]
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
       )
       await expect(
         resolvers.Mutation!.markDeathAsCertified(
           {},
           { details },
-          authHeaderNotRegCert
+          { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a certify scope')
+      ).rejects.toThrowError('User does not have enough scope')
+    })
+
+    it('throws an error when the user is not assigned to the record', async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121331' }), { status: 200 }]
+      )
+      await expect(
+        resolvers.Mutation!.markDeathAsCertified(
+          {},
+          { details },
+          { headers: authHeaderNotRegCert }
+        )
+      ).rejects.toThrowError('User is not assigned to the record')
     })
   })
   describe('markEventAsNotDuplicate()', () => {
@@ -1542,7 +1443,7 @@ describe('Registration root resolvers', () => {
           },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
 
     it('throws an error when the declaration is not assigned', async () => {
@@ -1636,7 +1537,7 @@ describe('Registration root resolvers', () => {
           { identifier: '2019333494BAQFYEG6' },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1879,18 +1780,61 @@ describe('Registration root resolvers', () => {
 })
 
 describe('markEventAsUnassigned()', () => {
-  it('throws error if user does not have register or validate scope', async () => {
+  it('throws error if the record is not assigned to anyone', async () => {
+    fetch.mockResponses([JSON.stringify({}), { status: 200 }])
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    await expect(
+      resolvers.Mutation!.markEventAsUnassigned(
+        {},
+        { id },
+        { headers: authHeaderNotRegCert }
+      )
+    ).rejects.toThrowError('User has been unassigned')
+  })
+  it('throws error if the record is not assigned to user & user does not have unassign-others scope', async () => {
     fetch.mockResponses(
-      [JSON.stringify(mockTaskBundle), { status: 200 }],
-      [JSON.stringify(mockUserDetails), { status: 200 }]
+      [JSON.stringify({ practitionerId: 'test-1234' }), { status: 200 }],
+      [JSON.stringify({ practitionerId: 'test-3456' }), { status: 200 }]
     )
     const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
     await expect(
       resolvers.Mutation!.markEventAsUnassigned(
         {},
         { id },
-        authHeaderNotRegCert
+        { headers: authHeaderNotRegCert }
       )
-    ).rejects.toThrowError('User does not have a register or validate scope')
+    ).rejects.toThrowError(
+      'User has been unassigned or does not have required scope'
+    )
+  })
+  it('lets user without unassign-others scope unassign a record if the record is assigned to themselves', async () => {
+    fetch.mockResponses(
+      [JSON.stringify({ practitionerId: 'test-1234' }), { status: 200 }],
+      [JSON.stringify({ practitionerId: 'test-1234' }), { status: 200 }],
+      [JSON.stringify(mockTaskBundle), { status: 200 }]
+    )
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    expect(
+      await resolvers.Mutation!.markEventAsUnassigned(
+        {},
+        { id },
+        { headers: authHeaderNotRegCert }
+      )
+    ).toEqual('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
+  })
+  it('lets user with unassign-others scope unassign a record even if assigned to someone else', async () => {
+    fetch.mockResponses(
+      [JSON.stringify({ practitionerId: 'test-1234' }), { status: 200 }],
+      [JSON.stringify({ practitionerId: 'test-4567' }), { status: 200 }],
+      [JSON.stringify(mockTaskBundle), { status: 200 }]
+    )
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    expect(
+      await resolvers.Mutation!.markEventAsUnassigned(
+        {},
+        { id },
+        { headers: authHeaderUnassignOthers }
+      )
+    ).toEqual('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
   })
 })

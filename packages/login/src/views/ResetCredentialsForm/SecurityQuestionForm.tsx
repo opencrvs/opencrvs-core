@@ -8,12 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  FORGOTTEN_ITEMS,
-  goToPhoneNumberVerificationForm,
-  goToSuccessPage,
-  goToUpdatePasswordForm
-} from '@login/login/actions'
+import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import {
   authApi,
   IVerifySecurityAnswerResponse,
@@ -21,10 +16,8 @@ import {
 } from '@login/utils/authApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { messages as sharedMessages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { Frame } from '@opencrvs/components/lib/Frame'
@@ -33,6 +26,8 @@ import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { useLocation, useNavigate } from 'react-router-dom'
+import * as routes from '@login/navigation/routes'
 
 const Actions = styled.div`
   & > div {
@@ -83,194 +78,157 @@ const messages = {
   }
 }
 
-interface BaseProps
-  extends RouteComponentProps<
-    {},
-    {},
-    {
-      forgottenItem: FORGOTTEN_ITEMS
-      nonce: string
-      securityQuestionKey: QUESTION_KEYS
-    }
-  > {
-  goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
-  goToUpdatePasswordForm: typeof goToUpdatePasswordForm
-  goToSuccessPage: typeof goToSuccessPage
-}
-interface State {
-  answer: string
-  touched: boolean
-  error: boolean
-  questionKey: QUESTION_KEYS
-}
+type Props = WrappedComponentProps
 
-type Props = BaseProps & WrappedComponentProps
+const SecurityQuestionComponent = ({ intl }: Props) => {
+  const [answer, setAnswer] = useState<string>('')
+  const [touched, setTouched] = useState<boolean>(false)
+  const [error, setError] = useState<boolean>(false)
 
-class SecurityQuestionComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      answer: '',
-      touched: false,
-      error: false,
-      questionKey: props.location.state.securityQuestionKey
-    }
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const [questionKey, setQuestionKey] = useState<QUESTION_KEYS>(
+    location.state.securityQuestionKey
+  )
+
+  const handleChange = (value: string) => {
+    setAnswer(value)
+    setTouched(true)
+    setError(value === '')
   }
 
-  handleChange = (value: string) => {
-    this.setState({
-      error: value === '',
-      answer: value,
-      touched: true
-    })
-  }
-
-  handleContinue = async (event: React.FormEvent) => {
+  const handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!this.state.answer) {
-      this.setState({
-        touched: true,
-        error: true
-      })
-      return
+    if (!answer) {
+      setTouched(true)
+      return setError(true)
     }
-    if (this.state.error) {
-      return
-    }
+
+    if (error) return
 
     let result: IVerifySecurityAnswerResponse
 
     try {
-      result = await authApi.verifySecurityAnswer(
-        this.props.location.state.nonce,
-        this.state.answer
-      )
+      result = await authApi.verifySecurityAnswer(location.state.nonce, answer)
 
       if (!result.matched) {
-        this.setState({ questionKey: result.securityQuestionKey })
-        return
+        return setQuestionKey(result.securityQuestionKey)
       }
-      if (
-        this.props.location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME
-      ) {
-        await authApi.sendUserName(this.props.location.state.nonce)
-        this.props.goToSuccessPage(this.props.location.state.forgottenItem)
-      } else {
-        this.props.goToUpdatePasswordForm(result.nonce)
+      if (location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME) {
+        await authApi.sendUserName(location.state.nonce)
+        return navigate(routes.SUCCESS, {
+          state: { forgottenItem: location.state.forgottenItem }
+        })
       }
+
+      navigate(routes.UPDATE_PASSWORD, { state: { nonce: result.nonce } })
     } catch (error) {
       // @todo error handling
-      this.setState({ error: true })
+      setError(true)
     }
   }
 
-  render() {
-    const { intl, goToPhoneNumberVerificationForm } = this.props
-    const { forgottenItem } = this.props.location.state
+  const { forgottenItem } = location.state
 
-    return (
-      <>
-        <Frame
-          header={
-            <AppBar
-              desktopLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
-              }
-              mobileLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
-              }
-              mobileTitle={intl.formatMessage(
-                sharedMessages.credentialsResetFormTitle,
-                {
-                  forgottenItem
+  return (
+    <>
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() =>
+                  navigate(routes.PHONE_NUMBER_VERIFICATION, {
+                    state: forgottenItem
+                  })
                 }
-              )}
-              desktopTitle={intl.formatMessage(
-                sharedMessages.credentialsResetFormTitle,
-                {
-                  forgottenItem
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() =>
+                  navigate(routes.PHONE_NUMBER_VERIFICATION, {
+                    state: forgottenItem
+                  })
                 }
-              )}
-            />
-          }
-          skipToContentText={intl.formatMessage(
-            constantsMessages.skipToMainContent
-          )}
-        >
-          <form id="security-question-form" onSubmit={this.handleContinue}>
-            <Content
-              size={ContentSize.SMALL}
-              title={intl.formatMessage(messages[this.state.questionKey])}
-              showTitleOnMobile
-              subtitle={intl.formatMessage(
-                sharedMessages.securityQuestionFormBodySubheader
-              )}
-              bottomActionButtons={[
-                <Button
-                  key="1"
-                  id="continue"
-                  onClick={this.handleContinue}
-                  type="primary"
-                  size="large"
-                >
-                  {intl.formatMessage(sharedMessages.continueButtonLabel)}
-                </Button>
-              ]}
-            >
-              <Actions id="security-answer">
-                <InputField
-                  id="security-answer"
-                  key="securityAnswerFieldContainer"
-                  label={this.props.intl.formatMessage(
-                    sharedMessages.answerFieldLabel
-                  )}
-                  touched={this.state.touched}
-                  error={
-                    this.state.error
-                      ? this.props.intl.formatMessage(sharedMessages.error)
-                      : ''
-                  }
-                  hideAsterisk={true}
-                >
-                  <TextInput
-                    id="security-answer-input"
-                    type="text"
-                    key="securityAnswerInputField"
-                    name="securityAnswerInput"
-                    isSmallSized={true}
-                    value={this.state.answer}
-                    onChange={(e) => this.handleChange(e.target.value)}
-                    touched={this.state.touched}
-                    error={this.state.error}
-                  />
-                </InputField>
-              </Actions>
-            </Content>
-          </form>
-        </Frame>
-      </>
-    )
-  }
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileTitle={intl.formatMessage(
+              sharedMessages.credentialsResetFormTitle,
+              {
+                forgottenItem
+              }
+            )}
+            desktopTitle={intl.formatMessage(
+              sharedMessages.credentialsResetFormTitle,
+              {
+                forgottenItem
+              }
+            )}
+          />
+        }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+      >
+        <form id="security-question-form" onSubmit={handleContinue}>
+          <Content
+            size={ContentSize.SMALL}
+            title={intl.formatMessage(messages[questionKey])}
+            showTitleOnMobile
+            subtitle={intl.formatMessage(
+              sharedMessages.securityQuestionFormBodySubheader
+            )}
+            bottomActionButtons={[
+              <Button
+                key="1"
+                id="continue"
+                onClick={handleContinue}
+                type="primary"
+                size="large"
+              >
+                {intl.formatMessage(sharedMessages.continueButtonLabel)}
+              </Button>
+            ]}
+          >
+            <Actions id="security-answer">
+              <InputField
+                id="security-answer"
+                key="securityAnswerFieldContainer"
+                label={intl.formatMessage(sharedMessages.answerFieldLabel)}
+                touched={touched}
+                error={error ? intl.formatMessage(sharedMessages.error) : ''}
+                hideAsterisk={true}
+              >
+                <TextInput
+                  id="security-answer-input"
+                  type="text"
+                  key="securityAnswerInputField"
+                  name="securityAnswerInput"
+                  isSmallSized={true}
+                  value={answer}
+                  onChange={(e) => handleChange(e.target.value)}
+                  touched={touched}
+                  error={error}
+                />
+              </InputField>
+            </Actions>
+          </Content>
+        </form>
+      </Frame>
+    </>
+  )
 }
 
-export const SecurityQuestion = withRouter(
-  connect(null, {
-    goToPhoneNumberVerificationForm,
-    goToUpdatePasswordForm,
-    goToSuccessPage
-  })(injectIntl(SecurityQuestionComponent))
-)
+export const SecurityQuestion = injectIntl(SecurityQuestionComponent)
