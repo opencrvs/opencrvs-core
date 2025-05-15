@@ -38,8 +38,10 @@ const userId = '677fb08730f3abfa33072769'
 describe('stringifyEventMetadata', () => {
   test('Resolves event metadata', () => {
     const { declaration, ...metadata } = eventQueryDataGenerator({
+      id: 'seabeast-clad-stad-elia-oleocellosis',
       assignedTo: userId,
       createdBy: userId,
+      trackingId: 'B77FF6',
       createdAt: new Date(2000, 1, 1).toISOString(),
       updatedAt: new Date(2000, 1, 2).toISOString(),
       updatedAtLocation: locations[0].id,

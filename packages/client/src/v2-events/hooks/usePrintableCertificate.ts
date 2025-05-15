@@ -122,7 +122,12 @@ export const usePrintableCertificate = ({
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
-      $metadata: updatedMetadata,
+      $metadata: {
+        ...updatedMetadata,
+        // Temporarily add `modifiedAt` to the last action's data to display
+        // the current certification date in the certificate preview on the review page.
+        modifiedAt: new Date().toISOString()
+      },
       $declaration: declarationWithResolvedImages,
       locations,
       users: base64ReplacedUsersWithSignature,
