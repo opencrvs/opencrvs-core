@@ -308,25 +308,30 @@ export function useEventCustomAction(mutationKey: string[]) {
   const eventConfigurations = useEventConfigurations()
   const mutation = useMutation(queryClient.getMutationDefaults(mutationKey))
 
-  return {
-    mutate: (params: customApi.OnDeclareParams) => {
-      const localEvent = findLocalEventData(params.eventId)
+  const getMutationPayload = (params: customApi.OnDeclareParams) => {
+    const localEvent = findLocalEventData(params.eventId)
 
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
+    const eventConfiguration = eventConfigurations.find(
+      (event) => event.id === localEvent?.type
+    )
 
-      if (!eventConfiguration) {
-        throw new Error('Event configuration not found')
-      }
-
-      return mutation.mutate({
-        ...params,
-        declaration: omitHiddenPaginatedFields(
-          eventConfiguration.declaration,
-          params.declaration
-        )
-      })
+    if (!eventConfiguration) {
+      throw new Error('Event configuration not found')
     }
+
+    return {
+      ...params,
+      declaration: omitHiddenPaginatedFields(
+        eventConfiguration.declaration,
+        params.declaration
+      )
+    }
+  }
+
+  return {
+    mutate: (params: customApi.OnDeclareParams) =>
+      mutation.mutate(getMutationPayload(params)),
+    mutateAsync: async (params: customApi.OnDeclareParams) =>
+      mutation.mutateAsync(getMutationPayload(params))
   }
 }

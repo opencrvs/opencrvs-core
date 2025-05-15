@@ -34,6 +34,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useNotAssignedErrorToast } from '../useNotAssignedErrorToast'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -47,6 +48,9 @@ export function Review() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const event = events.getEventState.useSuspenseQuery(eventId)
+
+  const { onPossibleNotAssignedError, NotAssignedErrorToast } =
+    useNotAssignedErrorToast(event.trackingId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -121,7 +125,11 @@ export function Review() {
     })
 
     if (confirmedDeclaration) {
-      reviewActionConfiguration.onConfirm(eventId)
+      try {
+        await reviewActionConfiguration.onConfirm(eventId)
+      } catch (e) {
+        onPossibleNotAssignedError(e)
+      }
 
       goToHome()
     }
@@ -157,6 +165,7 @@ export function Review() {
       </ReviewComponent.Body>
       {modal}
       {saveAndExitModal}
+      <NotAssignedErrorToast />
     </FormLayout>
   )
 }

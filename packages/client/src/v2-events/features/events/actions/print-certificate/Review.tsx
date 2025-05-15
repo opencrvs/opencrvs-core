@@ -261,11 +261,11 @@ export function Review() {
 
         await handleCertify(fullEvent)
         navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-      } catch (error) {
-        onPossibleNotAssignedError(error)
+      } catch (e) {
+        onPossibleNotAssignedError(e)
         // TODO: add notification alert
         // eslint-disable-next-line no-console
-        console.error(error)
+        console.error(e)
       }
     }
   }

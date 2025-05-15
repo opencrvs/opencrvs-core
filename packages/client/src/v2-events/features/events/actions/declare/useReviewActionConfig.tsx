@@ -50,8 +50,8 @@ export function useReviewActionConfig({
     return {
       buttonType: 'primary',
       incomplete,
-      onConfirm: (eventId: string) => {
-        events.actions.notify.mutate({
+      onConfirm: async (eventId: string) => {
+        await events.actions.notify.mutateAsync({
           eventId,
           declaration,
           annotation,
@@ -67,12 +67,13 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive' as const,
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.customActions.registerOnDeclare.mutate({
+      onConfirm: async (eventId: string) => {
+        await events.customActions.registerOnDeclare.mutateAsync({
           eventId,
           declaration,
           annotation
-        }),
+        })
+      },
       messages: incomplete
         ? reviewMessages.incomplete.register
         : reviewMessages.complete.register,
@@ -84,12 +85,13 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive',
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.customActions.validateOnDeclare.mutate({
+      onConfirm: async (eventId: string) => {
+        await events.customActions.validateOnDeclare.mutateAsync({
           eventId,
           declaration,
           annotation
-        }),
+        })
+      },
       messages: incomplete
         ? reviewMessages.incomplete.validate
         : reviewMessages.complete.validate,
@@ -101,13 +103,14 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive',
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.actions.declare.mutate({
+      onConfirm: async (eventId: string) => {
+        await events.actions.declare.mutateAsync({
           eventId,
           declaration,
           annotation,
           transactionId: uuid()
-        }),
+        })
+      },
       messages: incomplete
         ? reviewMessages.incomplete.declare
         : reviewMessages.complete.declare,

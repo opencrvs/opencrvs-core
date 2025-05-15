@@ -46,8 +46,8 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive' as const,
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.customActions.registerOnValidate.mutate({
+      onConfirm: async (eventId: string) =>
+        events.customActions.registerOnValidate.mutateAsync({
           eventId,
           declaration,
           annotation
@@ -63,8 +63,8 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive' as const,
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.actions.validate.mutate({
+      onConfirm: async (eventId: string) =>
+        events.actions.validate.mutateAsync({
           eventId,
           declaration,
           annotation,
