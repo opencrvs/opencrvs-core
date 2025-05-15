@@ -19,7 +19,9 @@ import {
   UrbanAddressValue,
   UrbanAddressUpdateValue,
   GenericAddressValue,
-  GenericAddressUpdateValue
+  GenericAddressUpdateValue,
+  NameFieldValue,
+  NameFieldUpdateValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -65,7 +67,9 @@ export const FieldValue = z.union([
   UrbanAddressValue,
   RuralAddressValue,
   DataFieldValue,
-  GenericAddressValue
+  GenericAddressValue,
+  NameFieldValue,
+  NameFieldUpdateValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
@@ -81,7 +85,8 @@ export const FieldUpdateValue = z.union([
   UrbanAddressUpdateValue,
   RuralAddressUpdateValue,
   DataFieldValue,
-  GenericAddressUpdateValue
+  GenericAddressUpdateValue,
+  NameFieldUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
@@ -96,6 +101,7 @@ export type FieldValueSchema =
   | typeof AddressFieldValue
   | typeof NumberFieldValue
   | typeof DataFieldValue
+  | typeof NameFieldValue
   | z.ZodString
   | z.ZodBoolean
 /**
@@ -111,5 +117,6 @@ export type FieldUpdateValueSchema =
   | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
   | typeof DataFieldValue
+  | typeof NameFieldValue
   | z.ZodString
   | z.ZodBoolean

@@ -88,6 +88,8 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
+    case FieldType.ID:
+    case FieldType.PHONE:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
@@ -123,6 +125,14 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           filename: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
+        }
+      }
+    case FieldType.NAME:
+      return {
+        type: 'object',
+        properties: {
+          firstname: { type: 'keyword' },
+          surname: { type: 'keyword' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:

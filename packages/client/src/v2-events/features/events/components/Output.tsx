@@ -30,7 +30,8 @@ import {
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
-  isTextFieldType
+  isTextFieldType,
+  isNameFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -49,6 +50,7 @@ import {
   Text
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -116,6 +118,10 @@ function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
       options: field.config.options,
       value: field.value
     })
+  }
+
+  if (isNameFieldType(field)) {
+    return Name.Output({ value: field.value })
   }
 
   if (isAdministrativeAreaFieldType(field)) {

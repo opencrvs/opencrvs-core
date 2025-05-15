@@ -62,6 +62,22 @@ export const UrbanAddressUpdateValue = AdminStructure.extend({
   zipCode: z.string().nullish()
 })
 
+export const NameFieldValue = z
+  .object({
+    firstname: z.string(),
+    surname: z.string()
+  })
+  .or(z.undefined())
+export const NameFieldUpdateValue = z
+  .object({
+    firstname: z.string(),
+    surname: z.string()
+  })
+  .nullish()
+
+export type NameFieldValue = z.infer<typeof NameFieldValue>
+export type NameFieldUpdateValue = z.infer<typeof NameFieldUpdateValue>
+
 export type UrbanAddressUpdateValue = z.infer<typeof UrbanAddressUpdateValue>
 
 export const RuralAddressUpdateValue = AdminStructure.extend({

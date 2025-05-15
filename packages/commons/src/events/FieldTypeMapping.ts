@@ -33,7 +33,8 @@ import {
   TextAreaField,
   TextField,
   NumberField,
-  DataField
+  DataField,
+  NameField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -53,7 +54,8 @@ import {
   AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  AddressType
+  AddressType,
+  NameFieldValue
 } from './CompositeFieldValue'
 
 /**
@@ -101,6 +103,8 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.SIGNATURE:
+    case FieldType.PHONE:
+    case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -120,6 +124,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       break
     case FieldType.DATA:
       schema = DataFieldValue
+      break
+    case FieldType.NAME:
+      schema = NameFieldValue
       break
   }
 
@@ -157,6 +164,9 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
     case FieldType.PARAGRAPH:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
+    case FieldType.NAME:
+    case FieldType.PHONE:
+    case FieldType.ID:
     case FieldType.OFFICE:
       return `${field.id}-${field.type}-${i}`
     case FieldType.NUMBER:
@@ -220,6 +230,9 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
     case FieldType.DATA:
+    case FieldType.NAME:
+    case FieldType.PHONE:
+    case FieldType.ID:
       return null
     case FieldType.ADDRESS:
       return {
@@ -285,6 +298,13 @@ export const isNumberFieldType = (field: {
   value: FieldValue
 }): field is { value: number; config: NumberField } => {
   return field.config.type === FieldType.NUMBER
+}
+
+export const isNameFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: NameFieldValue; config: NameField } => {
+  return field.config.type === FieldType.NAME
 }
 
 export const isTextAreaFieldType = (field: {
