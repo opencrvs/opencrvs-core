@@ -22,8 +22,6 @@ import type {
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
 import pdfMake from 'pdfmake/build/pdfmake'
-import format from 'date-fns/format'
-import isValid from 'date-fns/isValid'
 import { Location } from '@events/service/locations/locations'
 import { isEqual } from 'lodash'
 
@@ -99,7 +97,7 @@ function findUserById(userId: string, users: User[]) {
 
   return {
     name: getUsersFullName(user.name, 'en'),
-    signature: user.signatureFilename
+    signature: user.signatureFilename ?? ''
   }
 }
 
@@ -109,12 +107,13 @@ export const stringifyEventMetadata = ({
   locations,
   users
 }: {
-  metadata: NonNullable<EventMetadata>
+  metadata: NonNullable<EventMetadata & { modifiedAt: string }>
   intl: IntlShape
   locations: Location[]
   users: User[]
 }) => {
   return {
+    modifiedAt: DateField.stringify(intl, metadata.modifiedAt),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
     // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
     dateOfEvent: metadata.dateOfEvent
@@ -260,7 +259,7 @@ export function compileSvg({
   config
 }: {
   templateString: string
-  $metadata: EventMetadata
+  $metadata: EventMetadata & { modifiedAt: string }
   $declaration: EventState
   locations: Location[]
   users: User[]
@@ -321,7 +320,6 @@ export function compileSvg({
     if (isEqual($metadata, obj)) {
       return getMixedPath(resolvedMetadata, propertyPath)
     }
-
     return getMixedPath(resolvedDeclaration, propertyPath)
   }
 
