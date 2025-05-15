@@ -17,14 +17,15 @@ import {
   getComposition,
   getTaskFromSavedBundle,
   getTrackingId,
+  isComposition,
   Resource,
   StringExtensionType,
-  Task
+  Task,
+  SavedBundleEntry
 } from '@opencrvs/commons/types'
 import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-// import { sendBundleToHearth, toSavedBundle } from '@workflow/records/fhir'
 import { getSystem } from '@workflow/features/user/utils'
 import { internal } from '@hapi/boom'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
@@ -36,7 +37,11 @@ import {
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getValidRecordById } from '@workflow/records'
 import { SEARCH_URL } from '@workflow/constants'
-import { updateTaskWithDuplicateIds } from '@workflow/utils/duplicate-checker'
+import {
+  updateCompositionWithDuplicateIds,
+  updateTaskWithDuplicateIds
+} from '@workflow/utils/duplicate-checker'
+import { logger } from '@opencrvs/commons'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
@@ -145,6 +150,37 @@ export async function eventNotificationHandler(
   if (response.duplicateIds && response.duplicateIds.length > 0) {
     let task = getTaskFromSavedBundle(updatedBundle)
     task = updateTaskWithDuplicateIds(task, response.duplicateIds)
+
+    updatedBundle.entry = updatedBundle.entry.map(
+      (e): SavedBundleEntry<Resource> => {
+        if (isComposition(e.resource) && response.duplicateIds.length > 0) {
+          logger.info(
+            `Workflow/records/evenNotificationHandler: ${response.duplicateIds.length} duplicate composition(s) found`
+          )
+          return {
+            ...e,
+            resource: {
+              ...updateCompositionWithDuplicateIds(
+                e.resource,
+                response.duplicateIds
+              ),
+              id: e.resource.id
+            }
+          }
+        }
+        if (e.resource.resourceType !== 'Task') {
+          return e
+        }
+        return {
+          ...e,
+          resource: {
+            ...task,
+            id: e.resource.id
+          }
+        }
+      }
+    )
+
     await sendBundleToHearth({
       ...updatedBundle,
       entry: [{ resource: task }]
