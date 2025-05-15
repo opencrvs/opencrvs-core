@@ -14,9 +14,14 @@ import {
   Bundle,
   EVENT_TYPE,
   findCompositionIdFromTransactionResponse,
+  getComposition,
+  getTaskFromSavedBundle,
+  getTrackingId,
+  isComposition,
   Resource,
   StringExtensionType,
-  Task
+  Task,
+  SavedBundleEntry
 } from '@opencrvs/commons/types'
 import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 import { indexBundle } from '@workflow/records/search'
@@ -31,6 +36,12 @@ import {
 } from '@workflow/features/registration/utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getValidRecordById } from '@workflow/records'
+import { SEARCH_URL } from '@workflow/constants'
+import {
+  updateCompositionWithDuplicateIds,
+  updateTaskWithDuplicateIds
+} from '@workflow/utils/duplicate-checker'
+import { logger } from '@opencrvs/commons'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
@@ -114,11 +125,77 @@ export async function eventNotificationHandler(
   const responseBundle = await sendBundleToHearth(
     savedBundleWithRegLastUserAndBusinessStatus
   )
-  const compositionId = findCompositionIdFromTransactionResponse(responseBundle)
 
+  const compositionId = findCompositionIdFromTransactionResponse(responseBundle)
   const updatedBundle = await getValidRecordById(compositionId!, token, true)
 
+  const duplicateCheckResponse = await fetch(
+    new URL('check-duplicates', SEARCH_URL).href,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(updatedBundle)
+    }
+  )
+
+  if (!duplicateCheckResponse.ok) {
+    throw internal('Failed to check for duplicates from search microservice')
+  }
+
+  const response: any = await duplicateCheckResponse.json()
+
+  if (response.duplicateIds && response.duplicateIds.length > 0) {
+    let task = getTaskFromSavedBundle(updatedBundle)
+    task = updateTaskWithDuplicateIds(task, response.duplicateIds)
+
+    updatedBundle.entry = updatedBundle.entry.map(
+      (e): SavedBundleEntry<Resource> => {
+        if (isComposition(e.resource) && response.duplicateIds.length > 0) {
+          logger.info(
+            `Workflow/records/evenNotificationHandler: ${response.duplicateIds.length} duplicate composition(s) found`
+          )
+          return {
+            ...e,
+            resource: {
+              ...updateCompositionWithDuplicateIds(
+                e.resource,
+                response.duplicateIds
+              ),
+              id: e.resource.id
+            }
+          }
+        }
+        if (e.resource.resourceType !== 'Task') {
+          return e
+        }
+        return {
+          ...e,
+          resource: {
+            ...task,
+            id: e.resource.id
+          }
+        }
+      }
+    )
+
+    await sendBundleToHearth({
+      ...updatedBundle,
+      entry: [{ resource: task }]
+    })
+    await indexBundle(updatedBundle, token)
+
+    return {
+      compositionId: getComposition(updatedBundle).id,
+      trackingId: getTrackingId(updatedBundle),
+      isPotentiallyDuplicate: true
+    }
+  }
+
   await indexBundle(updatedBundle, token)
+
   await auditEvent('sent-notification', updatedBundle, token)
 
   return h.response(updatedBundle).code(200)
